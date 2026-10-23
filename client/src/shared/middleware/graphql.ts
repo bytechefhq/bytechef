@@ -1048,11 +1048,6 @@ export type KnowledgeBaseEmbeddingActiveQueryVariables = Exact<{
 
 export type KnowledgeBaseEmbeddingActiveQuery = { knowledgeBaseEmbeddingActive: boolean };
 
-export type KnowledgeBaseStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type KnowledgeBaseStorageUsageQuery = { knowledgeBaseStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
-
 export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1156,14 +1151,6 @@ export type AutomationWorkflowProjectConfigurationMoveImpactQueryVariables = Exa
 
 export type AutomationWorkflowProjectConfigurationMoveImpactQuery = { automationWorkflowProjectConfigurationMoveImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
-export type AutomationWorkflowProjectConfigurationUpgradeImpactQueryVariables = Exact<{
-  targetId: string | number;
-  connectedUserIds: Array<string | number> | string | number;
-}>;
-
-
-export type AutomationWorkflowProjectConfigurationUpgradeImpactQuery = { automationWorkflowProjectConfigurationUpgradeImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
-
 export type AutomationWorkflowProjectConfigurationVersionImpactQueryVariables = Exact<{
   id: string | number;
   projectVersion: number;
@@ -1195,7 +1182,6 @@ export type AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery 
 
 export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
   projectId: string | number;
-  environmentId?: string | number | null | undefined;
 }>;
 
 
@@ -1230,9 +1216,7 @@ export type AutomationWorkflowProjectVersionsQueryVariables = Exact<{
 
 export type AutomationWorkflowProjectVersionsQuery = { automationWorkflowProjectVersions: Array<{ version: number, status: string, publishedDate: string | null, description: string | null }> };
 
-export type AutomationWorkflowProjectsQueryVariables = Exact<{
-  environmentId?: string | number | null | undefined;
-}>;
+export type AutomationWorkflowProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AutomationWorkflowProjectsQuery = { automationWorkflowProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, permissionExpression: string | null, configurationCount: number, lastPublishedDate: string | null, workflowTemplates: Array<{ workflowUuid: string, workflowId: string, label: string | null, description: string | null, permissionExpression: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
@@ -1722,49 +1706,6 @@ export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables =
 
 
 export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { updateMcpIntegrationInstanceConfigurationWorkflow: { id: string, enabled: boolean, mcpIntegrationInstanceConfigurationId: any, integrationInstanceConfigurationWorkflowId: any, parameters: any } | null };
-
-export type UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables = Exact<{
-  targetId: string | number;
-  connectedUserIds: Array<string | number> | string | number;
-}>;
-
-
-export type UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation = { upgradeAutomationWorkflowProjectConfigurationConnectedUsers: { movedConnectedUserIds: Array<string>, needsAttentionConnectedUserIds: Array<string>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
-
-export type ExternalInvocationLogsQueryVariables = Exact<{
-  type: Types.PlatformType;
-  environmentId?: string | number | null | undefined;
-  surface?: string | null | undefined;
-  outcome?: string | null | undefined;
-  mcpServerId?: any;
-  a2aServerId?: any;
-  connectedUserId?: any;
-  integrationInstanceId?: any;
-  fromDate?: any;
-  toDate?: any;
-  page?: number | null | undefined;
-}>;
-
-
-export type ExternalInvocationLogsQuery = { externalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
-
-export type WorkspaceExternalInvocationLogsQueryVariables = Exact<{
-  type: Types.PlatformType;
-  workspaceId: string | number;
-  environmentId: string | number;
-  surface?: string | null | undefined;
-  outcome?: string | null | undefined;
-  mcpServerId?: any;
-  a2aServerId?: any;
-  connectedUserId?: any;
-  integrationInstanceId?: any;
-  fromDate?: any;
-  toDate?: any;
-  page?: number | null | undefined;
-}>;
-
-
-export type WorkspaceExternalInvocationLogsQuery = { workspaceExternalInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, a2aServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 export type AiDefaultModelQueryVariables = Exact<{
   environment: string | number;
@@ -2451,6 +2392,7 @@ export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision:
 
 export type InviteUserMutationVariables = Exact<{
   email: string;
+  password: string;
   role: string;
 }>;
 
@@ -2480,6 +2422,83 @@ export type UsersQueryVariables = Exact<{
 
 
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
+
+export type DeleteWebSearchProviderMutationVariables = Exact<{
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type DeleteWebSearchProviderMutation = { deleteWebSearchProvider: boolean | null };
+
+export type EnableWebSearchProviderMutationVariables = Exact<{
+  enabled: boolean;
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type EnableWebSearchProviderMutation = { enableWebSearchProvider: boolean | null };
+
+export type TestWebSearchProviderMutationVariables = Exact<{
+  apiKey?: string | null | undefined;
+  baseUrl?: string | null | undefined;
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type TestWebSearchProviderMutation = { testWebSearchProvider: { errorMessage: string | null, success: boolean } };
+
+export type UpdateWebSearchProviderMutationVariables = Exact<{
+  apiKey?: string | null | undefined;
+  baseUrl?: string | null | undefined;
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type UpdateWebSearchProviderMutation = { updateWebSearchProvider: boolean | null };
+
+export type WebSearchProvidersQueryVariables = Exact<{
+  environment: string | number;
+}>;
+
+
+export type WebSearchProvidersQuery = { webSearchProviders: Array<{ apiKeyFromProperties: boolean, baseUrl: string, defaultBaseUrl: string, description: string, enabled: boolean, icon: string | null, label: string, maskedApiKey: string | null, name: string }> };
+
+export type ToolInvocationLogsQueryVariables = Exact<{
+  type: Types.PlatformType;
+  environmentId?: string | number | null | undefined;
+  surface?: string | null | undefined;
+  outcome?: string | null | undefined;
+  mcpServerId?: any;
+  connectedUserId?: any;
+  integrationInstanceId?: any;
+  fromDate?: any;
+  toDate?: any;
+  page?: number | null | undefined;
+}>;
+
+
+export type ToolInvocationLogsQuery = { toolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+
+export type WorkspaceToolInvocationLogsQueryVariables = Exact<{
+  type: Types.PlatformType;
+  workspaceId: string | number;
+  environmentId: string | number;
+  surface?: string | null | undefined;
+  outcome?: string | null | undefined;
+  mcpServerId?: any;
+  connectedUserId?: any;
+  integrationInstanceId?: any;
+  fromDate?: any;
+  toDate?: any;
+  page?: number | null | undefined;
+}>;
+
+
+export type WorkspaceToolInvocationLogsQuery = { workspaceToolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, workflowName: string | null, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
 
 
 export class TypedDocumentString<TResult, TVariables>
@@ -6212,33 +6231,6 @@ export const useKnowledgeBaseEmbeddingActiveQuery = <
   }
     )};
 
-export const KnowledgeBaseStorageUsageDocument = new TypedDocumentString(`
-    query KnowledgeBaseStorageUsage {
-  knowledgeBaseStorageUsage {
-    limitBytes
-    percentage
-    unlimited
-    usedBytes
-  }
-}
-    `);
-
-export const useKnowledgeBaseStorageUsageQuery = <
-      TData = KnowledgeBaseStorageUsageQuery,
-      TError = unknown
-    >(
-      variables?: KnowledgeBaseStorageUsageQueryVariables,
-      options?: Omit<UseQueryOptions<KnowledgeBaseStorageUsageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseStorageUsageQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<KnowledgeBaseStorageUsageQuery, TError, TData>(
-      {
-    queryKey: variables === undefined ? ['KnowledgeBaseStorageUsage'] : ['KnowledgeBaseStorageUsage', variables],
-    queryFn: fetcher<KnowledgeBaseStorageUsageQuery, KnowledgeBaseStorageUsageQueryVariables>(KnowledgeBaseStorageUsageDocument, variables),
-    ...options
-  }
-    )};
-
 export const KnowledgeBaseTagsDocument = new TypedDocumentString(`
     query knowledgeBaseTags {
   knowledgeBaseTags {
@@ -6599,44 +6591,6 @@ export const useAutomationWorkflowProjectConfigurationMoveImpactQuery = <
   }
     )};
 
-export const AutomationWorkflowProjectConfigurationUpgradeImpactDocument = new TypedDocumentString(`
-    query automationWorkflowProjectConfigurationUpgradeImpact($targetId: ID!, $connectedUserIds: [ID!]!) {
-  automationWorkflowProjectConfigurationUpgradeImpact(
-    targetId: $targetId
-    connectedUserIds: $connectedUserIds
-  ) {
-    workflows {
-      workflowUuid
-      label
-      newRequiredInputs
-      newRequiredConnections
-      affectedConnectedUserCount
-    }
-    skipped {
-      connectedUserId
-      reason
-      workflowLabels
-    }
-  }
-}
-    `);
-
-export const useAutomationWorkflowProjectConfigurationUpgradeImpactQuery = <
-      TData = AutomationWorkflowProjectConfigurationUpgradeImpactQuery,
-      TError = unknown
-    >(
-      variables: AutomationWorkflowProjectConfigurationUpgradeImpactQueryVariables,
-      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, TError, TData>(
-      {
-    queryKey: ['automationWorkflowProjectConfigurationUpgradeImpact', variables],
-    queryFn: fetcher<AutomationWorkflowProjectConfigurationUpgradeImpactQuery, AutomationWorkflowProjectConfigurationUpgradeImpactQueryVariables>(AutomationWorkflowProjectConfigurationUpgradeImpactDocument, variables),
-    ...options
-  }
-    )};
-
 export const AutomationWorkflowProjectConfigurationVersionImpactDocument = new TypedDocumentString(`
     query automationWorkflowProjectConfigurationVersionImpact($id: ID!, $projectVersion: Int!) {
   automationWorkflowProjectConfigurationVersionImpact(
@@ -6755,11 +6709,8 @@ export const useAutomationWorkflowProjectConfigurationWorkflowProvidableValuesQu
     )};
 
 export const AutomationWorkflowProjectConfigurationsDocument = new TypedDocumentString(`
-    query automationWorkflowProjectConfigurations($projectId: ID!, $environmentId: ID) {
-  automationWorkflowProjectConfigurations(
-    projectId: $projectId
-    environmentId: $environmentId
-  ) {
+    query automationWorkflowProjectConfigurations($projectId: ID!) {
+  automationWorkflowProjectConfigurations(projectId: $projectId) {
     id
     projectId
     environmentId
@@ -6934,8 +6885,8 @@ export const useAutomationWorkflowProjectVersionsQuery = <
     )};
 
 export const AutomationWorkflowProjectsDocument = new TypedDocumentString(`
-    query automationWorkflowProjects($environmentId: ID) {
-  automationWorkflowProjects(environmentId: $environmentId) {
+    query automationWorkflowProjects {
+  automationWorkflowProjects {
     id
     name
     description
@@ -8695,161 +8646,6 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
       {
     mutationKey: ['updateMcpIntegrationInstanceConfigurationWorkflow'],
     mutationFn: (variables?: UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(UpdateMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const UpgradeAutomationWorkflowProjectConfigurationConnectedUsersDocument = new TypedDocumentString(`
-    mutation upgradeAutomationWorkflowProjectConfigurationConnectedUsers($targetId: ID!, $connectedUserIds: [ID!]!) {
-  upgradeAutomationWorkflowProjectConfigurationConnectedUsers(
-    targetId: $targetId
-    connectedUserIds: $connectedUserIds
-  ) {
-    movedConnectedUserIds
-    needsAttentionConnectedUserIds
-    skipped {
-      connectedUserId
-      reason
-      workflowLabels
-    }
-  }
-}
-    `);
-
-export const useUpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation, TError, UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables, TContext>) => {
-    
-    return useMutation<UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation, TError, UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables, TContext>(
-      {
-    mutationKey: ['upgradeAutomationWorkflowProjectConfigurationConnectedUsers'],
-    mutationFn: (variables?: UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables) => fetcher<UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation, UpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutationVariables>(UpgradeAutomationWorkflowProjectConfigurationConnectedUsersDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const ExternalInvocationLogsDocument = new TypedDocumentString(`
-    query ExternalInvocationLogs($type: PlatformType!, $environmentId: ID, $surface: String, $outcome: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
-  externalInvocationLogs(
-    type: $type
-    environmentId: $environmentId
-    surface: $surface
-    outcome: $outcome
-    mcpServerId: $mcpServerId
-    a2aServerId: $a2aServerId
-    connectedUserId: $connectedUserId
-    integrationInstanceId: $integrationInstanceId
-    fromDate: $fromDate
-    toDate: $toDate
-    page: $page
-  ) {
-    content {
-      id
-      surface
-      kind
-      toolName
-      componentName
-      componentVersion
-      operationName
-      connectionId
-      environment
-      externalUserId
-      connectedUserId
-      integrationInstanceId
-      mcpServerId
-      a2aServerId
-      jobId
-      workflowName
-      outcome
-      errorType
-      errorMessage
-      durationMs
-      createdDate
-    }
-    number
-    size
-    totalElements
-    totalPages
-  }
-}
-    `);
-
-export const useExternalInvocationLogsQuery = <
-      TData = ExternalInvocationLogsQuery,
-      TError = unknown
-    >(
-      variables: ExternalInvocationLogsQueryVariables,
-      options?: Omit<UseQueryOptions<ExternalInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ExternalInvocationLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<ExternalInvocationLogsQuery, TError, TData>(
-      {
-    queryKey: ['ExternalInvocationLogs', variables],
-    queryFn: fetcher<ExternalInvocationLogsQuery, ExternalInvocationLogsQueryVariables>(ExternalInvocationLogsDocument, variables),
-    ...options
-  }
-    )};
-
-export const WorkspaceExternalInvocationLogsDocument = new TypedDocumentString(`
-    query WorkspaceExternalInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $surface: String, $outcome: String, $mcpServerId: Long, $a2aServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
-  workspaceExternalInvocationLogs(
-    type: $type
-    workspaceId: $workspaceId
-    environmentId: $environmentId
-    surface: $surface
-    outcome: $outcome
-    mcpServerId: $mcpServerId
-    a2aServerId: $a2aServerId
-    connectedUserId: $connectedUserId
-    integrationInstanceId: $integrationInstanceId
-    fromDate: $fromDate
-    toDate: $toDate
-    page: $page
-  ) {
-    content {
-      id
-      surface
-      kind
-      toolName
-      componentName
-      componentVersion
-      operationName
-      connectionId
-      environment
-      externalUserId
-      connectedUserId
-      integrationInstanceId
-      mcpServerId
-      a2aServerId
-      jobId
-      workflowName
-      outcome
-      errorType
-      errorMessage
-      durationMs
-      createdDate
-    }
-    number
-    size
-    totalElements
-    totalPages
-  }
-}
-    `);
-
-export const useWorkspaceExternalInvocationLogsQuery = <
-      TData = WorkspaceExternalInvocationLogsQuery,
-      TError = unknown
-    >(
-      variables: WorkspaceExternalInvocationLogsQueryVariables,
-      options?: Omit<UseQueryOptions<WorkspaceExternalInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceExternalInvocationLogsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<WorkspaceExternalInvocationLogsQuery, TError, TData>(
-      {
-    queryKey: ['WorkspaceExternalInvocationLogs', variables],
-    queryFn: fetcher<WorkspaceExternalInvocationLogsQuery, WorkspaceExternalInvocationLogsQueryVariables>(WorkspaceExternalInvocationLogsDocument, variables),
     ...options
   }
     )};
@@ -11666,8 +11462,8 @@ export const useIdentityProvidersQuery = <
     )};
 
 export const InviteUserDocument = new TypedDocumentString(`
-    mutation inviteUser($email: String!, $role: String!) {
-  inviteUser(email: $email, role: $role)
+    mutation inviteUser($email: String!, $password: String!, $role: String!) {
+  inviteUser(email: $email, password: $password, role: $role)
 }
     `);
 
@@ -11783,6 +11579,252 @@ export const useUsersQuery = <
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
     queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteWebSearchProviderDocument = new TypedDocumentString(`
+    mutation deleteWebSearchProvider($environment: ID!, $name: String!) {
+  deleteWebSearchProvider(environment: $environment, name: $name)
+}
+    `);
+
+export const useDeleteWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWebSearchProviderMutation, TError, DeleteWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWebSearchProviderMutation, TError, DeleteWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWebSearchProvider'],
+    mutationFn: (variables?: DeleteWebSearchProviderMutationVariables) => fetcher<DeleteWebSearchProviderMutation, DeleteWebSearchProviderMutationVariables>(DeleteWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableWebSearchProviderDocument = new TypedDocumentString(`
+    mutation enableWebSearchProvider($enabled: Boolean!, $environment: ID!, $name: String!) {
+  enableWebSearchProvider(
+    enabled: $enabled
+    environment: $environment
+    name: $name
+  )
+}
+    `);
+
+export const useEnableWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableWebSearchProviderMutation, TError, EnableWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<EnableWebSearchProviderMutation, TError, EnableWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['enableWebSearchProvider'],
+    mutationFn: (variables?: EnableWebSearchProviderMutationVariables) => fetcher<EnableWebSearchProviderMutation, EnableWebSearchProviderMutationVariables>(EnableWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TestWebSearchProviderDocument = new TypedDocumentString(`
+    mutation testWebSearchProvider($apiKey: String, $baseUrl: String, $environment: ID!, $name: String!) {
+  testWebSearchProvider(
+    apiKey: $apiKey
+    baseUrl: $baseUrl
+    environment: $environment
+    name: $name
+  ) {
+    errorMessage
+    success
+  }
+}
+    `);
+
+export const useTestWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestWebSearchProviderMutation, TError, TestWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<TestWebSearchProviderMutation, TError, TestWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['testWebSearchProvider'],
+    mutationFn: (variables?: TestWebSearchProviderMutationVariables) => fetcher<TestWebSearchProviderMutation, TestWebSearchProviderMutationVariables>(TestWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWebSearchProviderDocument = new TypedDocumentString(`
+    mutation updateWebSearchProvider($apiKey: String, $baseUrl: String, $environment: ID!, $name: String!) {
+  updateWebSearchProvider(
+    apiKey: $apiKey
+    baseUrl: $baseUrl
+    environment: $environment
+    name: $name
+  )
+}
+    `);
+
+export const useUpdateWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWebSearchProviderMutation, TError, UpdateWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWebSearchProviderMutation, TError, UpdateWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWebSearchProvider'],
+    mutationFn: (variables?: UpdateWebSearchProviderMutationVariables) => fetcher<UpdateWebSearchProviderMutation, UpdateWebSearchProviderMutationVariables>(UpdateWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WebSearchProvidersDocument = new TypedDocumentString(`
+    query webSearchProviders($environment: ID!) {
+  webSearchProviders(environment: $environment) {
+    apiKeyFromProperties
+    baseUrl
+    defaultBaseUrl
+    description
+    enabled
+    icon
+    label
+    maskedApiKey
+    name
+  }
+}
+    `);
+
+export const useWebSearchProvidersQuery = <
+      TData = WebSearchProvidersQuery,
+      TError = unknown
+    >(
+      variables: WebSearchProvidersQueryVariables,
+      options?: Omit<UseQueryOptions<WebSearchProvidersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WebSearchProvidersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WebSearchProvidersQuery, TError, TData>(
+      {
+    queryKey: ['webSearchProviders', variables],
+    queryFn: fetcher<WebSearchProvidersQuery, WebSearchProvidersQueryVariables>(WebSearchProvidersDocument, variables),
+    ...options
+  }
+    )};
+
+export const ToolInvocationLogsDocument = new TypedDocumentString(`
+    query ToolInvocationLogs($type: PlatformType!, $environmentId: ID, $surface: String, $outcome: String, $mcpServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+  toolInvocationLogs(
+    type: $type
+    environmentId: $environmentId
+    surface: $surface
+    outcome: $outcome
+    mcpServerId: $mcpServerId
+    connectedUserId: $connectedUserId
+    integrationInstanceId: $integrationInstanceId
+    fromDate: $fromDate
+    toDate: $toDate
+    page: $page
+  ) {
+    content {
+      id
+      surface
+      kind
+      toolName
+      componentName
+      componentVersion
+      operationName
+      connectionId
+      environment
+      externalUserId
+      connectedUserId
+      integrationInstanceId
+      mcpServerId
+      jobId
+      workflowName
+      outcome
+      errorType
+      errorMessage
+      durationMs
+      createdDate
+    }
+    number
+    size
+    totalElements
+    totalPages
+  }
+}
+    `);
+
+export const useToolInvocationLogsQuery = <
+      TData = ToolInvocationLogsQuery,
+      TError = unknown
+    >(
+      variables: ToolInvocationLogsQueryVariables,
+      options?: Omit<UseQueryOptions<ToolInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolInvocationLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolInvocationLogsQuery, TError, TData>(
+      {
+    queryKey: ['ToolInvocationLogs', variables],
+    queryFn: fetcher<ToolInvocationLogsQuery, ToolInvocationLogsQueryVariables>(ToolInvocationLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceToolInvocationLogsDocument = new TypedDocumentString(`
+    query WorkspaceToolInvocationLogs($type: PlatformType!, $workspaceId: ID!, $environmentId: ID!, $surface: String, $outcome: String, $mcpServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+  workspaceToolInvocationLogs(
+    type: $type
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    surface: $surface
+    outcome: $outcome
+    mcpServerId: $mcpServerId
+    connectedUserId: $connectedUserId
+    integrationInstanceId: $integrationInstanceId
+    fromDate: $fromDate
+    toDate: $toDate
+    page: $page
+  ) {
+    content {
+      id
+      surface
+      kind
+      toolName
+      componentName
+      componentVersion
+      operationName
+      connectionId
+      environment
+      externalUserId
+      connectedUserId
+      integrationInstanceId
+      mcpServerId
+      jobId
+      workflowName
+      outcome
+      errorType
+      errorMessage
+      durationMs
+      createdDate
+    }
+    number
+    size
+    totalElements
+    totalPages
+  }
+}
+    `);
+
+export const useWorkspaceToolInvocationLogsQuery = <
+      TData = WorkspaceToolInvocationLogsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceToolInvocationLogsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceToolInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceToolInvocationLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceToolInvocationLogsQuery, TError, TData>(
+      {
+    queryKey: ['WorkspaceToolInvocationLogs', variables],
+    queryFn: fetcher<WorkspaceToolInvocationLogsQuery, WorkspaceToolInvocationLogsQueryVariables>(WorkspaceToolInvocationLogsDocument, variables),
     ...options
   }
     )};
