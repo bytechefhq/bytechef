@@ -77,14 +77,6 @@ vi.mock('@/shared/queries/automation/projects.queries', () => ({
     }),
 }));
 
-vi.mock('@/ee/shared/mutations/automation/projectGit.queries', () => ({
-    useGetWorkspaceProjectGitConfigurationsQuery: () => ({
-        data: [],
-        error: null,
-        isLoading: false,
-    }),
-}));
-
 const mockImportMutate = vi.fn();
 vi.mock('@/shared/mutations/automation/projects.mutations', async () => {
     const actual = await vi.importActual<typeof import('@/shared/mutations/automation/projects.mutations')>(
