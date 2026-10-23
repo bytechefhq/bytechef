@@ -3,6 +3,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import buildNodeStatesFromTaskExecutions from '@/pages/platform/workflow-editor/utils/buildNodeStatesFromTaskExecutions';
 import getTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getTestRunTriggerName';
+import toClusterElementNodeState from '@/pages/platform/workflow-editor/utils/toClusterElementNodeState';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {JobStatusEnum, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
@@ -85,14 +86,34 @@ function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecuti
     if (jobStatus === 'COMPLETED') {
         const currentNodeStates = useWorkflowEditorStore.getState().workflowTestNodeStates;
 
+        const {removeWorkflowTestNodeState} = useWorkflowEditorStore.getState();
+
         for (const [name, nodeState] of Object.entries(currentNodeStates)) {
-            if (nodeState.status === 'RUNNING') {
+            if (nodeState.status !== 'RUNNING') {
+                continue;
+            }
+
+            if (nodeState.clusterElement) {
+                removeWorkflowTestNodeState(name);
+            } else {
                 setWorkflowTestNodeState(name, {...nodeState, status: 'COMPLETED'});
             }
         }
     } else if (jobStatus === 'FAILED' || jobStatus === 'STOPPED') {
         clearRunningNodeStates();
     }
+}
+
+function handleClusterElementCall(data: unknown) {
+    const payload = parseTaskLifecyclePayload(data);
+
+    if (!payload?.name) {
+        return;
+    }
+
+    const {setWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
+
+    setWorkflowTestNodeState(payload.name, toClusterElementNodeState(payload, workflowTestNodeStates[payload.name]));
 }
 
 function parseTaskLifecyclePayload(data: unknown): TaskLifecyclePayloadI | undefined {
@@ -174,6 +195,9 @@ export function useWorkflowTestStream({
 
                 setLastAssistantMessageContent(`${formatAskUserQuestionMessage(questionEvent)}\n\n`);
             },
+            cluster_element_completed: (data) => handleClusterElementCall(data),
+            cluster_element_failed: (data) => handleClusterElementCall(data),
+            cluster_element_started: (data) => handleClusterElementCall(data),
             error: (data) => {
                 clearRunningNodeStates();
                 setWorkflowIsRunning(false);
