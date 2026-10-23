@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SUBAGENT_CONVERSATION_ID;
+import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.TOOL_SIMULATIONS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -27,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -47,6 +49,8 @@ import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionConversationHistoryReader;
@@ -62,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -105,6 +110,9 @@ import org.springframework.ai.tool.definition.ToolDefinition;
  */
 @ExtendWith(MockitoExtension.class)
 class AbstractAiAgentChatActionTest {
+
+    private static final long TOOL_CALL_JOB_ID = 6333L;
+    private static final long TOOL_CALL_TASK_EXECUTION_ID = 63331L;
 
     private static final String TOOL_LOOP_CONVERSATION_ID = "tool-loop-conversation";
 
@@ -1545,6 +1553,166 @@ class AbstractAiAgentChatActionTest {
 
             return log;
         }
+    }
+
+    @Test
+    void testToolCallbacksReportCallsByWorkflowNodeName() throws Exception {
+        List<ClusterElementCallEvent> events = new CopyOnWriteArrayList<>();
+
+        AutoCloseable handle = ClusterElementCallRecorder.getInstance()
+            .addListener(TOOL_CALL_JOB_ID, events::add);
+
+        try {
+
+            List<ToolCallback> toolCallbacks = buildToolCallbacks(Map.of(), "httpClient_1", "slack_1");
+
+            findToolCallback(toolCallbacks, "httpClient_1").call("{}");
+        } finally {
+            handle.close();
+
+            ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID);
+        }
+
+        assertThat(events).extracting(ClusterElementCallEvent::type)
+            .containsExactly(ClusterElementCallEvent.Type.STARTED, ClusterElementCallEvent.Type.COMPLETED);
+        assertThat(events).extracting(event -> event.call()
+            .workflowNodeName())
+            .containsOnly("httpClient_1");
+    }
+
+    @Test
+    void testSimulatedToolCallIsReported() throws Exception {
+        List<ClusterElementCallEvent> events = new CopyOnWriteArrayList<>();
+
+        AutoCloseable handle = ClusterElementCallRecorder.getInstance()
+            .addListener(TOOL_CALL_JOB_ID, events::add);
+
+        try {
+
+            List<ToolCallback> toolCallbacks = buildToolCallbacks(
+                Map.of(TOOL_SIMULATIONS, Map.of("httpClient_1", Map.of("instructions", "Return 42"))), "httpClient_1");
+
+            findToolCallback(toolCallbacks, "httpClient_1").call("{}");
+        } finally {
+            handle.close();
+
+            ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID);
+        }
+
+        assertThat(events).extracting(ClusterElementCallEvent::type)
+            .containsExactly(ClusterElementCallEvent.Type.STARTED, ClusterElementCallEvent.Type.COMPLETED);
+    }
+
+    @Test
+    void testChatMemoryToolCallbacksAreNotReported() throws Exception {
+        List<ClusterElementCallEvent> events = new CopyOnWriteArrayList<>();
+
+        BaseChatMemoryAdvisor chatMemoryAdvisor = mock(BaseChatMemoryAdvisor.class);
+
+        when(chatMemoryAdvisor.getOrder()).thenReturn(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER);
+
+        ChatMemoryFunction.Result chatMemoryResult = ChatMemoryFunction.Result.persistingToolMessages(
+            chatMemoryAdvisor, conversationId -> List.of(), List.of(echoToolCallback()));
+
+        AutoCloseable handle = ClusterElementCallRecorder.getInstance()
+            .addListener(TOOL_CALL_JOB_ID, events::add);
+
+        try {
+
+            List<ToolCallback> toolCallbacks = AbstractAiAgentChatAction.concatToolCallbacks(
+                List.of(), Optional.of(chatMemoryResult), null, createToolCallActionContext());
+
+            toolCallbacks.getFirst()
+                .call("{}");
+        } finally {
+            handle.close();
+        }
+
+        assertThat(events).isEmpty();
+    }
+
+    private List<ToolCallback> buildToolCallbacks(Map<String, Object> inputParameterValues, String... workflowNodeNames)
+        throws Exception {
+
+        Map<String, Object> clusterElements = new HashMap<>();
+
+        clusterElements.put("model", buildModelClusterElement());
+
+        stubModelLookup();
+
+        List<Map<String, Object>> toolElements = new ArrayList<>();
+
+        for (String workflowNodeName : workflowNodeNames) {
+            toolElements.add(buildToolClusterElement(workflowNodeName, "otherComponent/v1/otherTool"));
+        }
+
+        clusterElements.put("tools", toolElements);
+
+        when(clusterElementDefinitionService.<MultipleConnectionsToolFunction>getClusterElement(
+            eq("otherComponent"), eq(1), eq("otherTool")))
+                .thenReturn(mock(MultipleConnectionsToolFunction.class));
+        when(aiAgentToolFacade.getFunctionToolCallback(any(ClusterElement.class), anyMap(), any(), any()))
+            .thenAnswer(invocation -> namedToolCallback(
+                invocation.<ClusterElement>getArgument(0)
+                    .getWorkflowNodeName()));
+
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "model_1", new ComponentConnection("testComponent", 1, 1L, Map.of(), null));
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            ChatClient.ChatClientRequestSpec chatClientRequestSpec = action.getChatClientRequestSpec(
+                MockParametersFactory.create(inputParameterValues), connectionParameters,
+                MockParametersFactory.create(Map.of("clusterElements", clusterElements)), null,
+                createToolCallActionContext());
+
+            return ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getToolCallbacks();
+        }
+    }
+
+    private static ActionContextAware createToolCallActionContext() {
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        lenient().when(actionContext.getJobId())
+            .thenReturn(TOOL_CALL_JOB_ID);
+        lenient().when(actionContext.getTaskExecutionId())
+            .thenReturn(TOOL_CALL_TASK_EXECUTION_ID);
+
+        return actionContext;
+    }
+
+    private static ToolCallback findToolCallback(List<ToolCallback> toolCallbacks, String toolName) {
+        return toolCallbacks.stream()
+            .filter(toolCallback -> toolName.equals(toolCallback.getToolDefinition()
+                .name()))
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private static ToolCallback namedToolCallback(String toolName) {
+        return new ToolCallback() {
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return ToolDefinition.builder()
+                    .name(toolName)
+                    .description("Returns a fixed value")
+                    .inputSchema("{\"type\":\"object\"}")
+                    .build();
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return "called";
+            }
+        };
     }
 
     private static class TestAiAgentChatAction extends AbstractAiAgentChatAction {
