@@ -6,6 +6,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 const hoisted = vi.hoisted(() => ({
+    canOpenInProject: true,
     deleteProjectDeploymentMock: vi.fn(),
     grantedScopes: ['DEPLOYMENT_CREATE', 'DEPLOYMENT_DELETE', 'DEPLOYMENT_EDIT'] as string[],
     openProjectMock: vi.fn(),
@@ -13,6 +14,7 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
     default: () => ({
+        canOpenInProject: hoisted.canOpenInProject,
         openProject: hoisted.openProjectMock,
         openProjectWorkflow: vi.fn(),
     }),
@@ -102,6 +104,7 @@ const projectDeployment: ProjectDeployment = {
 describe('ProjectDeploymentListItem', () => {
     beforeEach(() => {
         hoisted.deleteProjectDeploymentMock.mockReset();
+        hoisted.canOpenInProject = true;
         hoisted.grantedScopes = ['DEPLOYMENT_CREATE', 'DEPLOYMENT_DELETE', 'DEPLOYMENT_EDIT'];
         hoisted.openProjectMock.mockReset();
     });
@@ -150,6 +153,15 @@ describe('ProjectDeploymentListItem', () => {
 
     it('hides the open project controls when the deployment has no project', () => {
         render(<ProjectDeploymentListItem projectDeployment={{...projectDeployment, projectId: undefined}} />);
+
+        expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
+        expect(screen.queryByText('Open Project')).not.toBeInTheDocument();
+    });
+
+    it('hides the open project controls from a member who may not view the project workflows', () => {
+        hoisted.canOpenInProject = false;
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
 
         expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
         expect(screen.queryByText('Open Project')).not.toBeInTheDocument();

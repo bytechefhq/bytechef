@@ -30,6 +30,7 @@ export type WorkspaceScopeType =
     | 'DEPLOYMENT_CREATE'
     | 'DEPLOYMENT_EDIT'
     | 'DEPLOYMENT_DELETE'
+    | 'DEPLOYMENT_VIEW'
     | 'API_PLATFORM_CREATE'
     | 'API_PLATFORM_EDIT'
     | 'API_PLATFORM_DELETE'
