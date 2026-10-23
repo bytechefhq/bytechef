@@ -1,0 +1,19 @@
+extend type Query {
+    webSearchProviders(environment: ID!): [WebSearchProvider!]!
+}
+
+extend type Mutation {
+    deleteWebSearchProvider(environment: ID!, name: String!): Boolean
+    enableWebSearchProvider(enabled: Boolean!, environment: ID!, name: String!): Boolean
+    updateWebSearchProvider(apiKey: String!, environment: ID!, name: String!): Boolean
+}
+
+type WebSearchProvider {
+    apiKeyFromProperties: Boolean!
+    description: String!
+    enabled: Boolean!
+    icon: String
+    label: String!
+    maskedApiKey: String
+    name: String!
+}
