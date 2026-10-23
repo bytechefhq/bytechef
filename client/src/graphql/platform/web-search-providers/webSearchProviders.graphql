@@ -1,0 +1,13 @@
+query webSearchProviders($environment: ID!) {
+    webSearchProviders(environment: $environment) {
+        apiKeyFromProperties
+        baseUrl
+        defaultBaseUrl
+        description
+        enabled
+        icon
+        label
+        maskedApiKey
+        name
+    }
+}

@@ -1,0 +1,3 @@
+mutation enableWebSearchProvider($enabled: Boolean!, $environment: ID!, $name: String!) {
+    enableWebSearchProvider(enabled: $enabled, environment: $environment, name: $name)
+}

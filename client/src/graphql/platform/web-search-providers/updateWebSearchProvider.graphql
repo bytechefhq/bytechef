@@ -1,0 +1,3 @@
+mutation updateWebSearchProvider($apiKey: String, $baseUrl: String, $environment: ID!, $name: String!) {
+    updateWebSearchProvider(apiKey: $apiKey, baseUrl: $baseUrl, environment: $environment, name: $name)
+}
