@@ -63,7 +63,7 @@ class BaseDataSourceTest {
 
         dataSource.getConnection();
 
-        assertEquals("SET search_path TO public", capturedSearchPathStatement());
+        assertEquals("SET search_path TO \"public\"", capturedSearchPathStatement());
     }
 
     @Test
@@ -78,7 +78,7 @@ class BaseDataSourceTest {
 
             dataSource.getConnection();
 
-            assertEquals("SET search_path TO bytechef_000004, public", capturedSearchPathStatement());
+            assertEquals("SET search_path TO \"bytechef_000004\", \"public\"", capturedSearchPathStatement());
         } finally {
             TenantContext.resetCurrentTenantId();
         }
@@ -97,7 +97,26 @@ class BaseDataSourceTest {
             dataSource.getConnection();
 
             assertEquals(
-                "SET search_path TO bytechef_vectorstore_000004, public", capturedSearchPathStatement());
+                "SET search_path TO \"bytechef_vectorstore_000004\", \"public\"", capturedSearchPathStatement());
+        } finally {
+            TenantContext.resetCurrentTenantId();
+        }
+    }
+
+    @Test
+    void testGetConnectionQuotesTheSchemaIdentifier() throws SQLException {
+        when(delegate.getConnection()).thenReturn(connection);
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+
+        TenantContext.setCurrentTenantId("000004");
+
+        try {
+            BaseDataSource dataSource = new TestDataSource(delegate, "vec\"tor");
+
+            dataSource.getConnection();
+
+            assertEquals(
+                "SET search_path TO \"bytechef_vec\"\"tor_000004\", \"public\"", capturedSearchPathStatement());
         } finally {
             TenantContext.resetCurrentTenantId();
         }

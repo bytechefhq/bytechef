@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.tenant.TenantContext;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.AfterEach;
@@ -79,6 +80,14 @@ class JobResumeIdTest {
                 "a:b:c:d".getBytes(StandardCharsets.UTF_8));
 
         assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(tooManyParts));
+    }
+
+    @Test
+    void testParseRejectsAnInvalidTenantId() {
+        String invalidTenantId = EncodingUtils.base64EncodeToString(
+            "x;y:42:c6a8b8d4-6f7e-4b0a-9a7b-1f0f2b3c4d5e");
+
+        assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(invalidTenantId));
     }
 
     @Test

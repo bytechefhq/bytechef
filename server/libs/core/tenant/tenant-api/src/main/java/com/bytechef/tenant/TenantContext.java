@@ -17,6 +17,7 @@
 package com.bytechef.tenant;
 
 import com.bytechef.tenant.constant.TenantConstants;
+import com.bytechef.tenant.util.TenantIdValidator;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import org.slf4j.Logger;
@@ -38,6 +39,8 @@ public class TenantContext {
     private static final Logger log = LoggerFactory.getLogger(TenantContext.class);
 
     public static <V> V callWithTenantId(String tenantId, Callable<V> callable) {
+        validateTenantId(tenantId);
+
         String curTenantId = getCurrentTenantId();
 
         try {
@@ -80,6 +83,8 @@ public class TenantContext {
     }
 
     public static void runWithTenantId(String tenantId, Runnable runnable) {
+        validateTenantId(tenantId);
+
         String curTenantId = getCurrentTenantId();
 
         try {
@@ -96,11 +101,17 @@ public class TenantContext {
     }
 
     public static void setCurrentTenantId(String tenantId) {
-        Assert.notNull(tenantId, "tenantId must not be null");
+        validateTenantId(tenantId);
 
         currentTenant.set(tenantId);
 
         MDC.put("tenantId", tenantId);
+    }
+
+    private static void validateTenantId(String tenantId) {
+        Assert.notNull(tenantId, "tenantId must not be null");
+
+        TenantIdValidator.validate(tenantId);
     }
 
     @FunctionalInterface

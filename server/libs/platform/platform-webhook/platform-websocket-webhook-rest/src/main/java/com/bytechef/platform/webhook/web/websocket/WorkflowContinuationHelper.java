@@ -63,24 +63,8 @@ public class WorkflowContinuationHelper {
         try {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(workflowExecutionIdString);
 
-            JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
-                workflowExecutionId.getType());
-
-            String workflowId = jobPrincipalAccessor.getWorkflowId(
-                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
-
-            Map<String, Object> inputs = new HashMap<>(
-                jobPrincipalAccessor.getInputMap(
-                    workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid()));
-
-            inputs.put(workflowExecutionId.getTriggerName(), afterCallData);
-
             long jobId = TenantContext.callWithTenantId(
-                workflowExecutionId.getTenantId(),
-                () -> principalJobFacade.createJob(
-                    new JobParametersDTO(workflowId, inputs),
-                    workflowExecutionId.getJobPrincipalId(),
-                    workflowExecutionId.getType()));
+                workflowExecutionId.getTenantId(), () -> createJob(workflowExecutionId, afterCallData));
 
             log.info(
                 "Created continuation job: jobId={}, workflowExecutionId={}", jobId, workflowExecutionIdString);
@@ -88,5 +72,23 @@ public class WorkflowContinuationHelper {
             log.error(
                 "Failed to create continuation job: workflowExecutionId={}", workflowExecutionIdString, exception);
         }
+    }
+
+    private long createJob(WorkflowExecutionId workflowExecutionId, Map<String, Object> afterCallData) {
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
+
+        String workflowId = jobPrincipalAccessor.getWorkflowId(
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+
+        Map<String, Object> inputs = new HashMap<>(
+            jobPrincipalAccessor.getInputMap(
+                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid()));
+
+        inputs.put(workflowExecutionId.getTriggerName(), afterCallData);
+
+        return principalJobFacade.createJob(
+            new JobParametersDTO(workflowId, inputs), workflowExecutionId.getJobPrincipalId(),
+            workflowExecutionId.getType());
     }
 }

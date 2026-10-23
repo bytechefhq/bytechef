@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.util.TenantIdValidator;
 import java.io.Serializable;
 import java.util.Objects;
 import org.springframework.util.Assert;
@@ -58,13 +59,35 @@ public class WorkflowExecutionId implements Serializable {
             TenantContext.getCurrentTenantId(), type, jobPrincipalId, workflowUuid, triggerName);
     }
 
+    /**
+     * @throws IllegalArgumentException if the id is not a valid encoded workflow execution id
+     */
     public static WorkflowExecutionId parse(String id) {
-        id = EncodingUtils.base64DecodeToString(id);
+        Assert.hasText(id, "'id' must not be blank");
 
-        String[] items = id.split(":");
+        String decoded = EncodingUtils.base64DecodeToString(id);
+
+        String[] items = decoded.split(":");
+
+        if (items.length != 5) {
+            throw new IllegalArgumentException("Invalid WorkflowExecutionId format");
+        }
+
+        String tenantId = TenantIdValidator.validate(items[0]);
+
+        PlatformType[] platformTypes = PlatformType.values();
+
+        int typeOrdinal = Integer.parseInt(items[1]);
+
+        if (typeOrdinal < 0 || typeOrdinal >= platformTypes.length) {
+            throw new IllegalArgumentException("Invalid WorkflowExecutionId type");
+        }
+
+        Assert.hasText(items[3], "'workflowUuid' must not be blank");
+        Assert.hasText(items[4], "'triggerName' must not be blank");
 
         return new WorkflowExecutionId(
-            items[0], PlatformType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
+            tenantId, platformTypes[typeOrdinal], Long.parseLong(items[2]), items[3], items[4]);
     }
 
     public long getJobPrincipalId() {
