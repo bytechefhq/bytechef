@@ -53,7 +53,7 @@ const ProjectDeploymentListItem = ({
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
 
-    const {openProject} = useOpenInProject();
+    const {canOpenInProject, openProject} = useOpenInProject();
 
     const {data: projectVersions} = useGetProjectVersionsQuery(
         projectDeployment.projectId!,
@@ -143,7 +143,7 @@ const ProjectDeploymentListItem = ({
     const newerVersionAvailable =
         projectDeployment.projectVersion != null && lastPublishedProjectVersion > projectDeployment.projectVersion;
 
-    const showOpenProject = !hideOpenInProject && projectDeployment.projectId != null;
+    const showOpenProject = canOpenInProject && !hideOpenInProject && projectDeployment.projectId != null;
 
     const handleOpenProjectClick = () => {
         if (projectDeployment.projectId != null) {
