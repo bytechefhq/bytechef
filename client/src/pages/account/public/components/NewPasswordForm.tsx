@@ -1,16 +1,16 @@
 import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel} from '@/components/ui/form';
+import PasswordRequirements, {
+    passwordContainsNumberMessage,
+    passwordContainsUppercaseMessage,
+    passwordLengthMessage,
+} from '@/pages/account/public/components/PasswordRequirements';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {CheckIcon, DotIcon, EyeIcon, EyeOffIcon, XIcon} from 'lucide-react';
+import {EyeIcon, EyeOffIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {twMerge} from 'tailwind-merge';
 import {z} from 'zod';
-
-const passwordLengthMessage = 'At least 8 characters';
-const passwordContainsNumberMessage = 'At least 1 number';
-const passwordContainsUppercaseMessage = 'At least 1 uppercase';
 
 const formSchema = z
     .object({
@@ -105,74 +105,10 @@ const NewPasswordForm = ({onSubmit, submitLabel}: NewPasswordFormProps) => {
                                 </div>
                             </FormControl>
 
-                            <ul className="space-y-1">
-                                {errors.newPassword?.message &&
-                                    getValues('newPassword') !== '' &&
-                                    Object.entries(JSON.parse(errors.newPassword.message)).map(([key, value]) => {
-                                        const {message, validationPass} = value as {
-                                            message: string;
-                                            validationPass: boolean;
-                                        };
-
-                                        return (
-                                            <li
-                                                className={twMerge(
-                                                    'flex items-center gap-1 text-sm text-destructive',
-                                                    validationPass && 'text-success'
-                                                )}
-                                                key={key}
-                                            >
-                                                {validationPass ? <CheckIcon size={15} /> : <XIcon size={15} />}
-
-                                                <p>{message}</p>
-                                            </li>
-                                        );
-                                    })}
-
-                                {getValues('newPassword') === '' && (
-                                    <>
-                                        <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                            <DotIcon size={15} />
-
-                                            <p>{passwordLengthMessage}</p>
-                                        </li>
-
-                                        <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                            <DotIcon size={15} />
-
-                                            <p>{passwordContainsNumberMessage}</p>
-                                        </li>
-
-                                        <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                            <DotIcon size={15} />
-
-                                            <p>{passwordContainsUppercaseMessage}</p>
-                                        </li>
-                                    </>
-                                )}
-
-                                {!errors.newPassword && getValues('newPassword') !== '' && (
-                                    <>
-                                        <li className="flex items-center gap-1 text-sm text-success">
-                                            <CheckIcon size={15} />
-
-                                            <p>{passwordLengthMessage}</p>
-                                        </li>
-
-                                        <li className="flex items-center gap-1 text-sm text-success">
-                                            <CheckIcon size={15} />
-
-                                            <p>{passwordContainsNumberMessage}</p>
-                                        </li>
-
-                                        <li className="flex items-center gap-1 text-sm text-success">
-                                            <CheckIcon size={15} />
-
-                                            <p>{passwordContainsUppercaseMessage}</p>
-                                        </li>
-                                    </>
-                                )}
-                            </ul>
+                            <PasswordRequirements
+                                errorMessage={errors.newPassword?.message}
+                                password={getValues('newPassword')}
+                            />
                         </FormItem>
                     )}
                 />
