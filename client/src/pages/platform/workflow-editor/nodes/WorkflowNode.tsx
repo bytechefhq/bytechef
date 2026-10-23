@@ -28,6 +28,7 @@ import {
 import useCanvasDropzone from '../hooks/useCanvasDropzone';
 import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useNodeClickHandler from '../hooks/useNodeClick';
+import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore, {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
@@ -68,7 +69,6 @@ function getDisabledReferenceWarning(referencedDisabledNames: Array<string>): st
 
     return `References disabled node ${referencedDisabledNames[0]} — it will not run, so this value will not resolve`;
 }
-
 
 interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'id'> {
     clusterElementTypesCount: number;
@@ -613,7 +613,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setCopiedWorkflowId,
         setRenamingNodeName,
         setRootClusterElementNodeData,
-        workflowTestNodeStates,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterRootComponentDefinitions: state.clusterRootComponentDefinitions,
@@ -626,11 +625,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             setCopiedWorkflowId: state.setCopiedWorkflowId,
             setRenamingNodeName: state.setRenamingNodeName,
             setRootClusterElementNodeData: state.setRootClusterElementNodeData,
-            workflowTestNodeStates: state.workflowTestNodeStates,
         }))
     );
 
     const disabledTaskNames = useDisabledTaskNames();
+    const workflowTestNodeStates = useWorkflowTestNodeStates();
 
     const {cancelWorkflowQueries, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 

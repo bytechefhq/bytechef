@@ -24,7 +24,7 @@ export function createEdgeForMultipleClusterElementNode(nodeId: string, targetNo
         sourceHandle: `${targetNode.data.clusterElementType}-handle`,
         style: EDGE_STYLES,
         target: targetNode.id,
-        type: 'default',
+        type: 'clusterElement',
     };
 }
 

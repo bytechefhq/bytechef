@@ -11,15 +11,21 @@ import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../utils/canvasDrag
 import WorkflowNode from './WorkflowNode';
 
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
-const {dataStoreState, directionStoreState, editorStoreState, popoverMenuMock, recordedContextMenuProps} = vi.hoisted(
-    () => ({
-        dataStoreState: {definition: '{}'},
-        directionStoreState: {layoutDirection: 'TB'},
-        editorStoreState: {renamingNodeName: undefined as string | undefined},
-        popoverMenuMock: vi.fn(),
-        recordedContextMenuProps: {value: undefined as Record<string, unknown> | undefined},
-    })
-);
+const {
+    dataStoreState,
+    directionStoreState,
+    editorStoreState,
+    popoverMenuMock,
+    recordedContextMenuProps,
+    testNodeStatesState,
+} = vi.hoisted(() => ({
+    dataStoreState: {definition: '{}'},
+    directionStoreState: {layoutDirection: 'TB'},
+    editorStoreState: {renamingNodeName: undefined as string | undefined},
+    popoverMenuMock: vi.fn(),
+    recordedContextMenuProps: {value: undefined as Record<string, unknown> | undefined},
+    testNodeStatesState: {value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}>},
+}));
 
 // Render the context menu as a passthrough so the node content (and its rename input) is asserted directly.
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu', () => ({
@@ -65,6 +71,10 @@ vi.mock('@/shared/queries/platform/clusterElementDefinitions.queries', () => ({
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
     useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) =>
         selector({currentEnvironmentId: 1}),
+}));
+
+vi.mock('../hooks/useWorkflowTestNodeStates', () => ({
+    default: () => testNodeStatesState.value,
 }));
 
 vi.mock('../hooks/useNodeClick', () => ({
@@ -156,6 +166,28 @@ describe('WorkflowNode', () => {
         editorStoreState.renamingNodeName = undefined;
 
         popoverMenuMock.mockClear();
+
+        testNodeStatesState.value = {};
+    });
+
+    it('shows the test status of a called cluster element', () => {
+        testNodeStatesState.value = {httpClient_1: {status: 'FAILED'}};
+
+        renderNode(
+            {
+                clusterElementName: 'get',
+                clusterElementType: 'tools',
+                componentName: 'httpClient',
+                label: 'get',
+                name: 'httpClient_1',
+                operationName: 'get',
+                version: 1,
+                workflowNodeName: 'httpClient_1',
+            } as unknown as NodeDataType,
+            'httpClient_1'
+        );
+
+        expect(screen.getByRole('button', {name: 'httpClient_1 node'})).toHaveClass('border-red-500');
     });
 
     it('points the trigger replace popover at the trigger it replaces', () => {
