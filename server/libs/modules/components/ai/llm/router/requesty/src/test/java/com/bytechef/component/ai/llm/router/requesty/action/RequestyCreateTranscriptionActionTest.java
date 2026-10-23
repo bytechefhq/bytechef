@@ -24,12 +24,11 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -37,23 +36,17 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClient.RequestBodySpec;
-import org.springframework.web.client.RestClient.RequestBodyUriSpec;
-import org.springframework.web.client.RestClient.ResponseSpec;
 
 /**
  * @author Thibault Jaigu
+ * @author Igor Beslic
  */
 class RequestyCreateTranscriptionActionTest {
 
     private final ArgumentCaptor<MediaType> mediaTypeArgumentCaptor = forClass(MediaType.class);
-    private final RestClient.Builder mockedBuilder = mock(RestClient.Builder.class);
+
     private final byte[] mockedByteArray = new byte[] {
         1, 0
     };
@@ -62,81 +55,53 @@ class RequestyCreateTranscriptionActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FILE, mockedFileEntry, TEMPERATURE, 0.5, MODEL, "model", LANGUAGE, "language",
             TOKEN, "token"));
-    private final RequestBodySpec mockedRequestBodySpec = mock(RequestBodySpec.class);
-    private final RequestBodyUriSpec mockedRequestBodyUriSpec = mock(RequestBodyUriSpec.class);
-    private final ResponseSpec mockedResponseSpec = mock(ResponseSpec.class);
-    private final RestClient mockedRestClient = mock(RestClient.class);
+    private final Context.Http.Response mockedResponseSpec = mock(Context.Http.Response.class);
     private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Context.ContextFunction<Context.Http, Context.Http.Executor>> httpFunctionArgumentCaptor =
+        forClass(Context.ContextFunction.class);
 
     @Test
     void testPerform() {
-        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = Mockito.mockStatic(ModelUtils.class)) {
-            mockRestClient(modelUtilsMockedStatic, Map.of("text", "transcription"));
+        when(mockedExecutor.execute()).thenReturn(mockedResponseSpec);
 
-            String result = RequestyCreateTranscriptionAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture())).thenReturn(mockedExecutor);
 
-            assertEquals("transcription", result);
-            assertEquals(
-                List.of("https://router.requesty.ai/v1", "Authorization", "Bearer token", "/audio/transcriptions"),
-                stringArgumentCaptor.getAllValues());
-            assertEquals(MediaType.MULTIPART_FORM_DATA, mediaTypeArgumentCaptor.getValue());
+        String result = RequestyCreateTranscriptionAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture())).thenReturn(mockedExecutor);
 
-            ByteArrayResource expectedAudio = new ByteArrayResource(mockedByteArray) {
-                @Override
-                public String getFilename() {
-                    return "speech.wav";
-                }
-            };
+        assertEquals("transcription", result);
+        assertEquals(
+            List.of("https://router.requesty.ai/v1", "Authorization", "Bearer token", "/audio/transcriptions"),
+            stringArgumentCaptor.getAllValues());
+        assertEquals(MediaType.MULTIPART_FORM_DATA, mediaTypeArgumentCaptor.getValue());
 
-            assertEquals(
-                Map.of(
-                    "file", List.of(expectedAudio), "model", List.of("model"), "language", List.of("language"),
-                    "temperature", List.of("0.5")),
-                objectArgumentCaptor.getValue());
-        }
+        ByteArrayResource expectedAudio = new ByteArrayResource(mockedByteArray) {
+            @Override
+            public String getFilename() {
+                return "speech.wav";
+            }
+        };
+
+        assertEquals(
+            Map.of(
+                "file", List.of(expectedAudio), "model", List.of("model"), "language", List.of("language"),
+                "temperature", List.of("0.5")),
+            objectArgumentCaptor.getValue());
+
     }
 
     @Test
     void testPerformWithEmptyResponse() {
-        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = Mockito.mockStatic(ModelUtils.class)) {
-            mockRestClient(modelUtilsMockedStatic, null);
+        when(mockedExecutor.execute()).thenReturn(mockedResponseSpec);
 
-            assertThrows(
-                IllegalStateException.class,
-                () -> RequestyCreateTranscriptionAction.perform(mockedParameters, mockedParameters, mockedContext));
-        }
-    }
+        when(mockedContext.http(httpFunctionArgumentCaptor.capture())).thenReturn(mockedExecutor);
 
-    private void mockRestClient(MockedStatic<ModelUtils> modelUtilsMockedStatic, Map<String, Object> responseBody) {
-        when(mockedContext.file(any()))
-            .thenReturn(mockedByteArray);
-
-        when(mockedFileEntry.getName())
-            .thenReturn("speech.wav");
-
-        modelUtilsMockedStatic.when(ModelUtils::getRestClientBuilder)
-            .thenReturn(mockedBuilder);
-
-        when(mockedBuilder.baseUrl(stringArgumentCaptor.capture()))
-            .thenReturn(mockedBuilder);
-        when(mockedBuilder.defaultHeader(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-            .thenReturn(mockedBuilder);
-        when(mockedBuilder.build())
-            .thenReturn(mockedRestClient);
-
-        when(mockedRestClient.post())
-            .thenReturn(mockedRequestBodyUriSpec);
-        when(mockedRequestBodyUriSpec.uri(stringArgumentCaptor.capture()))
-            .thenReturn(mockedRequestBodySpec);
-        when(mockedRequestBodySpec.contentType(mediaTypeArgumentCaptor.capture()))
-            .thenReturn(mockedRequestBodySpec);
-        when(mockedRequestBodySpec.body(objectArgumentCaptor.capture()))
-            .thenReturn(mockedRequestBodySpec);
-        when(mockedRequestBodySpec.retrieve())
-            .thenReturn(mockedResponseSpec);
-        when(mockedResponseSpec.body(any(ParameterizedTypeReference.class)))
-            .thenReturn(responseBody);
+        assertThrows(
+            IllegalStateException.class,
+            () -> RequestyCreateTranscriptionAction.perform(mockedParameters, mockedParameters, mockedContext));
     }
 }
