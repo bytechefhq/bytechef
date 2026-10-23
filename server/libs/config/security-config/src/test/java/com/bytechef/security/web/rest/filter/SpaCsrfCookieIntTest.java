@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
@@ -41,7 +42,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -161,6 +164,18 @@ public class SpaCsrfCookieIntTest {
             .andExpect(header().doesNotExist(CSRF_REJECTED_HEADER_NAME));
     }
 
+    @Test
+    @WithMockUser(authorities = AuthorityConstants.USER)
+    void testMethodSecurityDenialIsNotMarkedAsCsrfRejection() throws Exception {
+        mockMvc
+            .perform(
+                post("/api/public-admin-only")
+                    .cookie(new Cookie(XSRF_TOKEN_COOKIE_NAME, "cookie-token"))
+                    .header("X-XSRF-TOKEN", "cookie-token"))
+            .andExpect(status().isForbidden())
+            .andExpect(header().doesNotExist(CSRF_REJECTED_HEADER_NAME));
+    }
+
     @TestConfiguration
     static class SpaCsrfCookieIntTestConfiguration {
 
@@ -170,7 +185,7 @@ public class SpaCsrfCookieIntTest {
 
                 @Override
                 public List<String> getApiPermitAllRequestMatcherPaths() {
-                    return List.of("/api/public-forbidden", "/api/public-form");
+                    return List.of("/api/public-admin-only", "/api/public-forbidden", "/api/public-form");
                 }
             });
         }
@@ -189,7 +204,16 @@ public class SpaCsrfCookieIntTest {
         public static class TestController {
 
             @GetMapping("/index.html")
-            public void index() {
+            public ResponseEntity<Void> index() {
+                return ResponseEntity.ok()
+                    .build();
+            }
+
+            @PostMapping("/api/public-admin-only")
+            @PreAuthorize("hasAuthority('" + AuthorityConstants.ADMIN + "')")
+            public ResponseEntity<Void> publicAdminOnly() {
+                return ResponseEntity.ok()
+                    .build();
             }
 
             @PostMapping("/api/public-forbidden")
@@ -199,7 +223,9 @@ public class SpaCsrfCookieIntTest {
             }
 
             @PostMapping("/api/public-form")
-            public void publicForm() {
+            public ResponseEntity<Void> publicForm() {
+                return ResponseEntity.ok()
+                    .build();
             }
         }
     }
