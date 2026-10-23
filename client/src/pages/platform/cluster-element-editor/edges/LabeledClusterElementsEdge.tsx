@@ -5,6 +5,7 @@ import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
+import useCalledClusterElementEdgeStyle from './useCalledClusterElementEdgeStyle';
 
 export default function LabeledClusterElementsEdge({
     id,
@@ -54,6 +55,8 @@ export default function LabeledClusterElementsEdge({
 
     const nodeLabel = node?.data.clusterElementLabel;
 
+    const calledClusterElementEdgeStyle = useCalledClusterElementEdgeStyle(targetClusterElement, style);
+
     function getEdgeLabelPosition() {
         const defaultPosition = `translate(-50%, 0%) translate(${sourceX}px,${sourceY + CLUSTER_ELEMENT_EDGE_LABEL_GAP}px)`;
 
@@ -63,10 +66,10 @@ export default function LabeledClusterElementsEdge({
     return (
         <>
             <BaseEdge
-                className="fill-none stroke-stroke-neutral-tertiary stroke-2"
+                className={calledClusterElementEdgeStyle.className}
                 id={id}
                 path={edgePath}
-                style={style}
+                style={calledClusterElementEdgeStyle.style}
             />
 
             <EdgeLabelRenderer key={id}>
