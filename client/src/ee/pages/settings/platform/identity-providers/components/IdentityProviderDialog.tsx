@@ -18,6 +18,7 @@ import {DownloadIcon, XIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
 import IdentityProviderScimSection from './IdentityProviderScimSection';
+import IdentityProviderServiceProviderCertificateSection from './IdentityProviderServiceProviderCertificateSection';
 import useIdentityProviderDialog from './hooks/useIdentityProviderDialog';
 
 const IdentityProviderDialog = () => {
@@ -30,6 +31,7 @@ const IdentityProviderDialog = () => {
         editingProviderId,
         editingRegistrationId,
         editingScimEnabled,
+        editingServiceProviderCertificate,
         handleAddDomain,
         handleOpenChange,
         handleRemoveDomain,
@@ -281,6 +283,14 @@ const IdentityProviderDialog = () => {
                                                     Download the Service Provider metadata XML to configure your IdP.
                                                 </p>
                                             </fieldset>
+                                        )}
+
+                                        {isEditing && editingProviderId && (
+                                            <IdentityProviderServiceProviderCertificateSection
+                                                identityProviderId={editingProviderId}
+                                                key={editingProviderId}
+                                                serviceProviderCertificate={editingServiceProviderCertificate}
+                                            />
                                         )}
                                     </>
                                 )}

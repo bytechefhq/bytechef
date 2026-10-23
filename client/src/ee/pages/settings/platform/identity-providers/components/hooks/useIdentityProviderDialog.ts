@@ -17,6 +17,7 @@ interface UseIdentityProviderDialogI {
     editingProviderId: string | null;
     editingRegistrationId: string | null;
     editingScimEnabled: boolean;
+    editingServiceProviderCertificate: string | null;
     handleAddDomain: () => void;
     handleClose: () => void;
     handleOpenChange: (open: boolean) => void;
@@ -217,6 +218,7 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
         editingProviderId: identityProvider?.id || null,
         editingRegistrationId: identityProvider?.registrationId || null,
         editingScimEnabled: identityProvider?.scimEnabled || false,
+        editingServiceProviderCertificate: identityProvider?.serviceProviderCertificate || null,
         handleAddDomain,
         handleClose,
         handleOpenChange,
