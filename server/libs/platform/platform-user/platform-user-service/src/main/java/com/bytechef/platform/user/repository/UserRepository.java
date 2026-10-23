@@ -23,8 +23,11 @@ import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -35,6 +38,10 @@ public interface UserRepository extends ListCrudRepository<User, Long>, ListPagi
 
     String USERS_BY_LOGIN_CACHE = "UserRepository.usersByLogin";
     String USERS_BY_EMAIL_CACHE = "UserRepository.usersByEmail";
+
+    @Modifying
+    @Query("UPDATE \"user\" SET activation_key = NULL WHERE id = :id AND activation_key = :activationKey")
+    int clearActivationKey(@Param("id") long id, @Param("activationKey") String activationKey);
 
     long countAllByActivatedIsTrue();
 

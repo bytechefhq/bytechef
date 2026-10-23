@@ -17,21 +17,17 @@
 package com.bytechef.platform.user.facade;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
-import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.user.validator.PasswordValidator;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -52,18 +48,18 @@ class UserManagementFacadeImpl implements UserManagementFacade {
     private static final int DEFAULT_PAGE_SIZE = 20;
 
     private final AuthorityService authorityService;
-    private final MailService mailService;
     private final TenantService tenantService;
+    private final UserInvitationService userInvitationService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     UserManagementFacadeImpl(
-        AuthorityService authorityService, MailService mailService, TenantService tenantService,
+        AuthorityService authorityService, TenantService tenantService, UserInvitationService userInvitationService,
         UserService userService) {
 
         this.authorityService = authorityService;
-        this.mailService = mailService;
         this.tenantService = tenantService;
+        this.userInvitationService = userInvitationService;
         this.userService = userService;
     }
 
@@ -75,45 +71,18 @@ class UserManagementFacadeImpl implements UserManagementFacade {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public void inviteUser(String email, String password, String role) {
-        if (email.length() > UserConstants.LOGIN_MAX_LENGTH) {
-            throw new InvalidEmailException(email);
-        }
-
+    public void inviteUser(String email, String role) {
         if (tenantService.isMultiTenantEnabled() && tenantService.tenantIdsByUserEmailExist(email)) {
             throw new EmailAlreadyUsedException();
-        } else {
-            Optional<User> user = userService.fetchUserByEmail(email);
-
-            if (user.isPresent()) {
-                throw new EmailAlreadyUsedException();
-            }
         }
 
-        PasswordValidator.validate(password);
+        Optional<User> existingUser = userService.fetchUserByEmail(email);
 
-        // Resolve the requested role before creating any user record so an invalid role cannot leave an orphaned user
-        Authority authority = authorityService.getAuthorities()
-            .stream()
-            .filter(curAuthority -> Objects.equals(curAuthority.getName(), role))
-            .findFirst()
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role));
+        if (existingUser.isPresent()) {
+            throw new EmailAlreadyUsedException();
+        }
 
-        String login = email.toLowerCase(Locale.ENGLISH);
-
-        AdminUserDTO userDTO = new AdminUserDTO();
-
-        userDTO.setLogin(login);
-        userDTO.setEmail(email);
-        userDTO.setLangKey(UserConstants.DEFAULT_LANGUAGE);
-
-        User user = userService.registerUser(userDTO, password);
-
-        user.setAuthorities(Set.of(authority));
-
-        userService.save(user);
-
-        mailService.sendInvitationEmail(user, password);
+        userInvitationService.inviteUser(email, role);
     }
 
     @Override
