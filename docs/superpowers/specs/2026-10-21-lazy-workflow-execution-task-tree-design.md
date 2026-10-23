@@ -64,8 +64,9 @@ response is unchanged. With `lazy=true`:
   ("see executions") calls the lazy root endpoint with the **child job id**
   (`GET /workflow-executions/{childJobId}?lazy=true`), which returns that job's top-level tasks, its own
   `focusPath` and its own total count, so the subflow view keeps today's auto-focus and header count. A
-  child job has no principal of its own, so `getWorkflowExecution` resolves the project deployment through
-  the root job, following `parentTaskExecutionId` upwards. A subflow can call a workflow of another project;
+  child job copies its parent's principal only when the parent has one (`PrincipalJobFacadeImpl.createChildJob`),
+  so `getWorkflowExecution` resolves the project deployment through the root job, following
+  `parentTaskExecutionId` upwards. A subflow can call a workflow of another project;
   the root deployment is then left out, so a response never pairs one project with another project's
   deployment. A cyclic parent chain fails the request instead of looping. The recursive `toJobDTO` →
   `getJobTaskExecutions` path is not used in lazy mode.
@@ -96,7 +97,7 @@ response is unchanged. With `lazy=true`:
 `GET /workflow-executions/{id}/task-executions/{taskExecutionId}/children?pageNumber=&pageSize=`
 
 - `{id}` is the workflow execution (root job) id. `{taskExecutionId}` must belong to that job or to one of its
-  descendant subflow jobs; reuse `validateTaskExecutionBelongsToJob`.
+  descendant subflow jobs, checked by `validateTaskExecutionBelongsToJob`.
 - For a plain parent: a page of direct children, ordered `created_date, id` (today's order with a
   deterministic tiebreak), each with `childCount` and a shallow `childJob` where the task spawned a subflow,
   and no nested `children` or `iterations`.
@@ -114,7 +115,7 @@ response is unchanged. With `lazy=true`:
   the spec). An out-of-range `pageNumber` or `pageSize` returns 400.
 
 **3. Repository support and index.**
-`task_execution` is indexed only on `id` and `job_id`. Every children page and every `childCount` query
+Before this change `task_execution` was indexed only on `id` and `job_id`. Every children page and every `childCount` query
 filters by `parent_id`, so a new index `(parent_id, created_date, id)` is **required**, added by a Liquibase
 changelog in its own commit before the code that depends on it. On PostgreSQL it is built with
 `CREATE INDEX CONCURRENTLY` outside a transaction, so the upgrade does not block writes to `task_execution`;
@@ -123,7 +124,8 @@ not just an index of that name: an interrupted concurrent build leaves an invali
 changeset drops and builds again on the next start. The same applies to the `job(parent_task_execution_id)` index used
 to attach subflow child jobs. The iteration count of a loop is the number of children with
 `task_number = 0`, plus one when the first child does not start an iteration, so `childCount` for a whole page
-of parents is two `GROUP BY parent_id` queries plus one query for the first child of each loop. Attaching child
+of parents is two `GROUP BY parent_id` queries plus one query that checks the first child of every parent on
+the page. Attaching child
 jobs adds one more query per page. Loop pages are read by iteration-start offsets and
 `created_date` ranges, so a page loads only the rows of its own iterations. The queries load full task
 execution rows; there is no light projection. The in-memory repository mirrors the JDBC behaviour for tests.
@@ -161,14 +163,18 @@ clients under `client/src/shared/middleware/...`). The embedded spec is not chan
   Expanded children pages of a running task are refetched too (only those currently open), so new
   iterations appear, and once more when that task finishes, so its final state shows while the job keeps
   running. Finished executions do not poll.
-- Subflows: "see executions" pushes the child job as today; its tree loads lazily the same way.
+- Subflows: "see executions" pushes the child job as today; its tree loads lazily the same way. When a
+  subflow fails to load, the view offers a way back to the parent.
+- A query of children pages is cached per start page, so reopening on another focused page starts there
+  instead of reusing pages cached from an earlier start. Without a known index, the view loads at most the
+  page limit while looking for a focused child.
 
 ## Compatibility
 
 - Without the lazy parameter, `GET /workflow-executions/{id}` returns the same full tree as today, so
-  `WorkflowExecutionTools`, the deployment executions sheet header (`ProjectDeploymentWorkflowExecutionsSheet`
-  uses the root only for the project version) and `useWorkflowExecutionSheet` are not broken. Those that only
-  need top-level data can switch to lazy mode as part of this work if it is trivial (builder's call).
+  `WorkflowExecutionTools` is not broken; a subflow whose parent task execution is missing still fails the
+  request rather than being left out. `ProjectDeploymentWorkflowExecutionsSheet` (which uses the root only for
+  the project version) and `useWorkflowExecutionSheet` only need top-level data and request lazy mode.
 - The embedded facade and its client are untouched.
 - `GET /workflow-executions/{id}/task-executions/{taskExecutionId}` now returns a shallow `childJob` for a task
   that spawned a subflow, where it used to return none. The change is additive.
@@ -184,7 +190,7 @@ clients under `client/src/shared/middleware/...`). The embedded spec is not chan
   (embedded / test output) still render.
 - Manual: an execution with over 100,000 task executions opens quickly and can be drilled into.
 
-## Decisions made by me (not discussed)
+## Design decisions
 
 - Lazy mode is opt-in by query parameter rather than a new root endpoint.
 - Default page size 50.
@@ -198,8 +204,9 @@ clients under `client/src/shared/middleware/...`). The embedded spec is not chan
 
 - Names: the `lazy` parameter, `childCount`, `focusPath` with `{taskExecutionId, iterationIndex?, childIndex?}`
   elements, `taskExecutionCount` and the `TaskExecutionChildrenPage` response.
-- Iteration boundaries, child counts, retry detection and the failed-leaf search run in SQL; `focusPath`
-  indexes are counts in SQL as well.
+- Iteration boundaries, child counts, retried-attempt detection and the failed-leaf search run in SQL;
+  `focusPath` indexes are counts in SQL as well. Superseded top-level attempts are found in Java from the
+  top-level rows already loaded and passed to those queries.
 - The view jumps straight to the page holding a deep-linked iteration or child, then loads earlier or later
   pages.
 - Each index changelog is its own commit, before the code that depends on it; generated code is committed
