@@ -10,8 +10,6 @@ package com.bytechef.platform.user.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,19 +18,18 @@ import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
-import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.audit.UserAuditEvents;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,8 +60,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 class UserManagementFacadeAuditIntTest {
 
-    private static final String INVITE_PASSWORD = "Invite1-" + UUID.randomUUID();
-
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
@@ -73,6 +68,9 @@ class UserManagementFacadeAuditIntTest {
 
     @MockitoBean
     private AuthorityService authorityService;
+
+    @MockitoBean
+    private UserInvitationService userInvitationService;
 
     @MockitoBean
     private UserService userService;
@@ -94,12 +92,12 @@ class UserManagementFacadeAuditIntTest {
     }
 
     @Test
-    void testInviteUserRecordsTheEmailAndRoleButNeverThePassword() {
-        when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(1L, "ROLE_USER")));
+    void testInviteUserRecordsTheEmailAndRole() {
         when(userService.fetchUserByEmail("carol@localhost.com")).thenReturn(Optional.empty());
-        when(userService.registerUser(any(), anyString())).thenReturn(new User());
 
-        userManagementFacade.inviteUser("carol@localhost.com", INVITE_PASSWORD, "ROLE_USER");
+        userManagementFacade.inviteUser("carol@localhost.com", "ROLE_USER");
+
+        verify(userInvitationService).inviteUser("carol@localhost.com", "ROLE_USER");
 
         PersistentAuditEvent persistentAuditEvent = findSingle();
 
@@ -108,7 +106,6 @@ class UserManagementFacadeAuditIntTest {
             .containsEntry("result", "SUCCESS")
             .containsEntry("email", "carol@localhost.com")
             .containsEntry("role", "ROLE_USER")
-            .doesNotContainValue(INVITE_PASSWORD)
             .doesNotContainKey("dataError");
     }
 
@@ -193,9 +190,10 @@ class UserManagementFacadeAuditIntTest {
 
         @Bean
         UserManagementFacade userManagementFacade(
-            AuthorityService authorityService, TenantService tenantService, UserService userService) {
+            AuthorityService authorityService, TenantService tenantService,
+            UserInvitationService userInvitationService, UserService userService) {
 
-            return new UserManagementFacadeImpl(authorityService, mock(MailService.class), tenantService, userService);
+            return new UserManagementFacadeImpl(authorityService, tenantService, userInvitationService, userService);
         }
     }
 }

@@ -27,6 +27,8 @@ import org.springframework.data.domain.Pageable;
  */
 public interface UserService {
 
+    Optional<User> activateInvitation(String key, String newPassword);
+
     Optional<User> activateRegistration(String key);
 
     void changePassword(String currentClearTextPassword, String newPassword);

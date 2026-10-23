@@ -268,6 +268,7 @@ class MailServiceIntTest {
         user.setLangKey(UserConstants.DEFAULT_LANGUAGE);
         user.setLogin("john");
         user.setEmail("john.doe@example.com");
+        user.setActivationKey("invitation-key");
 
         mailService.sendCreationEmail(user);
 
@@ -283,11 +284,26 @@ class MailServiceIntTest {
 
         Object content = message.getContent();
 
-        assertThat(content.toString()).isNotEmpty();
+        assertThat(content.toString()).contains("/accept-invitation?key=invitation-key");
 
         DataHandler dataHandler = message.getDataHandler();
 
         assertThat(dataHandler.getContentType()).isEqualTo("text/html;charset=UTF-8");
+    }
+
+    @Test
+    void testCreationEmailThrowsWhenDeliveryFails() {
+        doThrow(MailSendException.class).when(javaMailSender)
+            .send(any(MimeMessage.class));
+
+        User user = new User();
+
+        user.setLangKey(UserConstants.DEFAULT_LANGUAGE);
+        user.setLogin("john");
+        user.setEmail("john.doe@example.com");
+
+        assertThatThrownBy(() -> mailService.sendCreationEmail(user))
+            .isInstanceOf(MailSendException.class);
     }
 
     @Test

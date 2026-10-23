@@ -19,10 +19,9 @@ package com.bytechef.platform.user.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.platform.mail.MailService;
@@ -32,7 +31,6 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
-import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.facade.UserManagementFacade.UserWithAuthorities;
 import com.bytechef.platform.user.facade.UserManagementFacade.UsersWithAuthorities;
 import com.bytechef.platform.user.repository.AuthorityRepository;
@@ -71,8 +69,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class UserManagementFacadeIntTest {
 
-    private static final String PASSWORD = "Password123";
-
     @Autowired
     private AuthorityRepository authorityRepository;
 
@@ -90,6 +86,8 @@ class UserManagementFacadeIntTest {
 
     @BeforeEach
     void beforeEach() {
+        when(mailService.isMailConfigured()).thenReturn(true);
+
         authenticateAs(AuthorityConstants.ADMIN);
     }
 
@@ -99,20 +97,19 @@ class UserManagementFacadeIntTest {
     }
 
     @Test
-    void testInviteUserSendsInvitationEmail() {
-        userManagementFacade.inviteUser("newuser@example.com", PASSWORD, AuthorityConstants.USER);
+    void testInviteUserRegistersAnInvitedUser() {
+        userManagementFacade.inviteUser("newuser@example.com", AuthorityConstants.USER);
 
         User user = userRepository.findByEmailIgnoreCase("newuser@example.com")
             .orElseThrow();
 
+        assertThat(user.isInvited()).isTrue();
         assertThat(getAuthorityNames(user.getLogin())).containsExactly(AuthorityConstants.USER);
-
-        verify(mailService).sendInvitationEmail(any(User.class), eq(PASSWORD));
     }
 
     @Test
     void testInviteUserUsesLowerCasedEmailAsLogin() {
-        userManagementFacade.inviteUser("Jane.Doe@Example.com", PASSWORD, AuthorityConstants.USER);
+        userManagementFacade.inviteUser("Jane.Doe@Example.com", AuthorityConstants.USER);
 
         User user = userRepository.findByEmailIgnoreCase("jane.doe@example.com")
             .orElseThrow();
@@ -125,53 +122,37 @@ class UserManagementFacadeIntTest {
     void testInviteUserWithEmailLongerThanTheLoginLimitDoesNotRegister() {
         String email = "firstname.middlename.lastname.department@subdomain.example.com";
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser(email, PASSWORD, AuthorityConstants.USER))
+        assertThatThrownBy(() -> userManagementFacade.inviteUser(email, AuthorityConstants.USER))
             .isInstanceOf(InvalidEmailException.class);
 
         assertThat(userRepository.findByEmailIgnoreCase(email)).isEmpty();
 
-        verify(mailService, never()).sendInvitationEmail(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithPasswordTooShortDoesNotRegister() {
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("test@example.com", "Pass1", AuthorityConstants.USER))
-            .isInstanceOf(InvalidPasswordException.class);
-
-        assertThat(userRepository.findByEmailIgnoreCase("test@example.com")).isEmpty();
-    }
-
-    @Test
-    void testInviteUserWithPasswordMissingUppercaseDoesNotRegister() {
-        assertThatThrownBy(
-            () -> userManagementFacade.inviteUser("test@example.com", "password123", AuthorityConstants.USER))
-                .isInstanceOf(InvalidPasswordException.class);
-
-        assertThat(userRepository.findByEmailIgnoreCase("test@example.com")).isEmpty();
-    }
-
-    @Test
-    void testInviteUserWithPasswordMissingDigitDoesNotRegister() {
-        assertThatThrownBy(
-            () -> userManagementFacade.inviteUser("test@example.com", "PasswordABC", AuthorityConstants.USER))
-                .isInstanceOf(InvalidPasswordException.class);
-
-        assertThat(userRepository.findByEmailIgnoreCase("test@example.com")).isEmpty();
+        verify(mailService, never()).sendCreationEmail(any());
     }
 
     @Test
     void testInviteUserWithExistingEmailThrows() {
         User existingUser = saveUser("existing", "existing@example.com");
 
-        assertThatThrownBy(
-            () -> userManagementFacade.inviteUser("existing@example.com", PASSWORD, AuthorityConstants.USER))
-                .isInstanceOf(EmailAlreadyUsedException.class);
+        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", AuthorityConstants.USER))
+            .isInstanceOf(EmailAlreadyUsedException.class);
 
         assertThat(userRepository.findByEmailIgnoreCase("existing@example.com"))
             .map(User::getId)
             .contains(existingUser.getId());
 
-        verify(mailService, never()).sendInvitationEmail(any(), anyString());
+        verify(mailService, never()).sendCreationEmail(any());
+    }
+
+    @Test
+    void testInviteUserWithEmailOfAnotherTenantThrows() {
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
+        when(tenantService.tenantIdsByUserEmailExist("taken@example.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> userManagementFacade.inviteUser("taken@example.com", AuthorityConstants.USER))
+            .isInstanceOf(EmailAlreadyUsedException.class);
+
+        assertThat(userRepository.findByEmailIgnoreCase("taken@example.com")).isEmpty();
     }
 
     @Test
@@ -197,14 +178,14 @@ class UserManagementFacadeIntTest {
         authenticateAs(AuthorityConstants.USER);
 
         assertThatThrownBy(
-            () -> userManagementFacade.inviteUser("invited@example.com", PASSWORD, AuthorityConstants.USER))
+            () -> userManagementFacade.inviteUser("invited@example.com", AuthorityConstants.USER))
                 .isInstanceOf(AuthorizationDeniedException.class);
 
         assertThat(userRepository.findByEmailIgnoreCase("invited@example.com")).isEmpty();
 
         authenticateAs(AuthorityConstants.ADMIN);
 
-        userManagementFacade.inviteUser("invited@example.com", PASSWORD, AuthorityConstants.USER);
+        userManagementFacade.inviteUser("invited@example.com", AuthorityConstants.USER);
 
         assertThat(userRepository.findByEmailIgnoreCase("invited@example.com")).isPresent();
     }
