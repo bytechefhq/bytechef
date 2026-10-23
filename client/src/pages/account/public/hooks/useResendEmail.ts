@@ -1,11 +1,11 @@
-import {getCookie} from '@/shared/util/cookie-utils';
+import {getXsrfToken} from '@/shared/util/cookie-utils';
 import {useCallback, useEffect, useState} from 'react';
 
 const fetchResendActivationEmail = async (email: string): Promise<Response> => {
     return await fetch('/api/send-activation-email', {
         body: email,
         headers: {
-            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+            'X-XSRF-TOKEN': await getXsrfToken(),
         },
         method: 'POST',
     }).then((response) => response);

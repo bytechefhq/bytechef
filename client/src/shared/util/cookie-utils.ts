@@ -13,3 +13,11 @@ export function getCookie(name: string) {
     }
     return decodeURIComponent(xsrfCookies[0].split('=')[1]);
 }
+
+export async function getXsrfToken(): Promise<string> {
+    if (!getCookie('XSRF-TOKEN')) {
+        await fetch('/api/authenticate');
+    }
+
+    return getCookie('XSRF-TOKEN') || '';
+}

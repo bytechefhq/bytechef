@@ -34,6 +34,7 @@ if (legacyEmbeddedWorkflowBuilderUrl) {
 }
 
 const publicRoutes = [
+    '/accept-invitation',
     '/activate',
     '/chat',
     '/form',
