@@ -16,6 +16,7 @@ import SettingsMenu from '@/pages/automation/project/components/project-header/c
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
 import {useProjectWorkflowViewOnlyNotice} from '@/pages/automation/project/hooks/useProjectWorkflowViewOnlyNotice';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
 import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
@@ -24,6 +25,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
 import {RefObject, useState, useSyncExternalStore} from 'react';
@@ -77,6 +79,9 @@ const ProjectHeader = ({
             workflow: state.workflow,
         }))
     );
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canViewDeployments = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_VIEW');
 
     const openSavedProjectDeployment = useOpenSavedProjectDeployment({
         onDevelopmentDeploymentSaved: (projectDeploymentId) =>
@@ -163,7 +168,9 @@ const ProjectHeader = ({
 
                     <DeployButton onDeploymentSaved={openSavedProjectDeployment} project={project} />
 
-                    <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
+                    {canViewDeployments && (
+                        <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
+                    )}
                 </ButtonGroup>
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
@@ -176,7 +183,7 @@ const ProjectHeader = ({
                 />
             </div>
 
-            {projectDeploymentsSheetState && (
+            {canViewDeployments && projectDeploymentsSheetState && (
                 <ProjectDeploymentsSheet
                     expandedProjectDeploymentId={projectDeploymentsSheetState.expandedProjectDeploymentId}
                     onSheetOpenChange={(open) => !open && setProjectDeploymentsSheetState(undefined)}
