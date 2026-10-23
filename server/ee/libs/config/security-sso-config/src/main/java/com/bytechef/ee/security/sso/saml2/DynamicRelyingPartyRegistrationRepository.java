@@ -94,7 +94,7 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
         }
 
         try {
-            Saml2X509Credential signingCredential = getSigningCredential(registrationId, locatedIdentityProvider);
+            Saml2X509Credential signingCredential = getSigningCredential(locatedIdentityProvider);
 
             RelyingPartyRegistration.Builder relyingPartyRegistrationBuilder = RelyingPartyRegistrations
                 .fromMetadataLocation(identityProvider.getMetadataUri())
@@ -132,20 +132,16 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
         }
     }
 
-    private Saml2X509Credential getSigningCredential(
-        String registrationId, LocatedIdentityProvider locatedIdentityProvider) {
-
+    private Saml2X509Credential getSigningCredential(LocatedIdentityProvider locatedIdentityProvider) {
         String tenantId = locatedIdentityProvider.tenantId();
         IdentityProvider identityProvider = locatedIdentityProvider.identityProvider();
 
         if (identityProvider.getServiceProviderSigningCertificate() == null) {
-            ServiceProviderSigningCredentials.PemCredential pemCredential = ServiceProviderSigningCredentials.generate(
-                "ByteChef " + registrationId);
             long identityProviderId = identityProvider.getId();
 
             identityProvider = IdentityProviderLocator.callWithTenantId(
                 tenantId, () -> identityProviderService.createServiceProviderSigningCredentialIfAbsent(
-                    identityProviderId, pemCredential.certificate(), pemCredential.privateKey()));
+                    identityProviderId));
         }
 
         IdentityProvider signingIdentityProvider = identityProvider;

@@ -30,5 +30,7 @@ public interface IdentityProviderFacade {
 
     List<IdentityProvider> getIdentityProviders();
 
+    IdentityProvider regenerateServiceProviderSigningCredential(Long id);
+
     IdentityProvider update(IdentityProvider identityProvider);
 }

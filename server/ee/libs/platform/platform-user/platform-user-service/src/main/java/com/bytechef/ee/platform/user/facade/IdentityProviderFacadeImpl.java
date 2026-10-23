@@ -79,6 +79,15 @@ class IdentityProviderFacadeImpl implements IdentityProviderFacade {
     }
 
     @Override
+    @Audited(event = IdentityProviderAuditEvents.IDENTITY_PROVIDER_SIGNING_CREDENTIAL_REGENERATED, data = {
+        @AuditData(key = "identityProviderId", value = "#id")
+    })
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public IdentityProvider regenerateServiceProviderSigningCredential(Long id) {
+        return identityProviderService.regenerateServiceProviderSigningCredential(id);
+    }
+
+    @Override
     @Audited(event = IdentityProviderAuditEvents.IDENTITY_PROVIDER_UPDATED, data = {
         @AuditData(key = "identityProviderId", value = "#identityProvider.id"),
         @AuditData(key = "name", value = "#identityProvider.name"),

@@ -8,10 +8,7 @@
 package com.bytechef.ee.security.sso.saml2;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,9 +18,12 @@ import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.ee.security.sso.IdentityProviderLocator;
 import com.bytechef.ee.security.sso.IdentityProviderLocator.LocatedIdentityProvider;
-import com.bytechef.ee.security.sso.saml2.ServiceProviderSigningCredentials.PemCredential;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.tenant.TenantContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.saml2.core.Saml2X509Credential;
@@ -38,6 +38,8 @@ import org.springframework.security.saml2.provider.service.registration.RelyingP
 class DynamicRelyingPartyRegistrationRepositoryTest {
 
     private static final String REGISTRATION_ID = "saml-7";
+    private static final String SP_SIGNING_CERTIFICATE = resource("sp-signing-certificate.pem");
+    private static final String SP_SIGNING_KEY = resource("sp-signing-key.pem");
 
     private final IdentityProviderLocator identityProviderLocator = mock(IdentityProviderLocator.class);
     private final IdentityProviderService identityProviderService = mock(IdentityProviderService.class);
@@ -46,26 +48,12 @@ class DynamicRelyingPartyRegistrationRepositoryTest {
 
     @Test
     void testCreatesASigningCredentialForAnIdentityProviderThatHasNone() {
-        IdentityProvider identityProvider = samlIdentityProvider();
+        locate(samlIdentityProvider());
 
-        locate(identityProvider);
+        IdentityProvider storedIdentityProvider = withStoredSigningCredential(samlIdentityProvider());
 
-        when(identityProviderService.createServiceProviderSigningCredentialIfAbsent(eq(7L), anyString(), anyString()))
-            .thenAnswer(invocation -> {
-                IdentityProvider storedIdentityProvider = samlIdentityProvider();
-
-                storedIdentityProvider.setServiceProviderSigningCertificate(invocation.getArgument(1));
-                storedIdentityProvider.setServiceProviderSigningKey("encrypted:" + invocation.getArgument(2));
-
-                return storedIdentityProvider;
-            });
-        when(identityProviderService.getDecryptedServiceProviderSigningKey(any()))
-            .thenAnswer(invocation -> {
-                IdentityProvider storedIdentityProvider = invocation.getArgument(0);
-
-                return storedIdentityProvider.getServiceProviderSigningKey()
-                    .substring("encrypted:".length());
-            });
+        when(identityProviderService.createServiceProviderSigningCredentialIfAbsent(7L))
+            .thenReturn(storedIdentityProvider);
 
         RelyingPartyRegistration relyingPartyRegistration =
             dynamicRelyingPartyRegistrationRepository.findByRegistrationId(REGISTRATION_ID);
@@ -74,56 +62,32 @@ class DynamicRelyingPartyRegistrationRepositoryTest {
         assertThat(relyingPartyRegistration.getAssertingPartyMetadata()
             .getWantAuthnRequestsSigned()).isTrue();
         assertThat(relyingPartyRegistration.getSigningX509Credentials()).singleElement()
-            .extracting(Saml2X509Credential::isSigningCredential)
-            .isEqualTo(true);
+            .satisfies(credential -> {
+                assertThat(credential.isSigningCredential()).isTrue();
+                assertThat(credential.getCertificate()
+                    .getSubjectX500Principal()
+                    .getName()).isEqualTo("CN=ByteChef SAML Service Provider");
+            });
     }
 
     @Test
     void testReusesTheStoredSigningCredential() {
-        PemCredential pemCredential = ServiceProviderSigningCredentials.generate("ByteChef " + REGISTRATION_ID);
-
-        IdentityProvider identityProvider = samlIdentityProvider();
-
-        identityProvider.setServiceProviderSigningCertificate(pemCredential.certificate());
-        identityProvider.setServiceProviderSigningKey("encrypted");
-
-        locate(identityProvider);
-
-        when(identityProviderService.getDecryptedServiceProviderSigningKey(identityProvider))
-            .thenReturn(pemCredential.privateKey());
-
-        RelyingPartyRegistration relyingPartyRegistration =
-            dynamicRelyingPartyRegistrationRepository.findByRegistrationId(REGISTRATION_ID);
+        RelyingPartyRegistration relyingPartyRegistration = find(withStoredSigningCredential(samlIdentityProvider()));
 
         assertThat(relyingPartyRegistration.getSigningX509Credentials()).singleElement()
             .extracting(Saml2X509Credential::getCertificate)
-            .isEqualTo(ServiceProviderSigningCredentials.toSigningCredential(
-                pemCredential.certificate(), pemCredential.privateKey())
+            .isEqualTo(ServiceProviderSigningCredentials.toSigningCredential(SP_SIGNING_CERTIFICATE, SP_SIGNING_KEY)
                 .getCertificate());
 
-        verify(identityProviderService, never()).createServiceProviderSigningCredentialIfAbsent(
-            anyLong(), anyString(), anyString());
+        verify(identityProviderService, never()).createServiceProviderSigningCredentialIfAbsent(anyLong());
     }
 
     @Test
     void testServiceProviderMetadataPublishesTheSigningCertificate() {
-        PemCredential pemCredential = ServiceProviderSigningCredentials.generate("ByteChef " + REGISTRATION_ID);
-
-        IdentityProvider identityProvider = samlIdentityProvider();
-
-        identityProvider.setServiceProviderSigningCertificate(pemCredential.certificate());
-        identityProvider.setServiceProviderSigningKey("encrypted");
-
-        locate(identityProvider);
-
-        when(identityProviderService.getDecryptedServiceProviderSigningKey(identityProvider))
-            .thenReturn(pemCredential.privateKey());
-
         String metadata = new OpenSaml5MetadataResolver().resolve(
-            dynamicRelyingPartyRegistrationRepository.findByRegistrationId(REGISTRATION_ID));
+            find(withStoredSigningCredential(samlIdentityProvider())));
 
-        String certificateBase64 = pemCredential.certificate()
-            .replace("-----BEGIN CERTIFICATE-----", "")
+        String certificateBase64 = SP_SIGNING_CERTIFICATE.replace("-----BEGIN CERTIFICATE-----", "")
             .replace("-----END CERTIFICATE-----", "")
             .replaceAll("\\s", "");
 
@@ -133,7 +97,7 @@ class DynamicRelyingPartyRegistrationRepositoryTest {
 
     @Test
     void testVerifiesAssertionsAgainstTheMetadataCertificateByDefault() {
-        RelyingPartyRegistration relyingPartyRegistration = findWithStoredSigningCredential(samlIdentityProvider());
+        RelyingPartyRegistration relyingPartyRegistration = find(withStoredSigningCredential(samlIdentityProvider()));
 
         assertThat(relyingPartyRegistration.getAssertingPartyMetadata()
             .getVerificationX509Credentials()).singleElement()
@@ -145,13 +109,11 @@ class DynamicRelyingPartyRegistrationRepositoryTest {
 
     @Test
     void testAPinnedSigningCertificateReplacesTheMetadataCertificates() {
-        PemCredential pinnedPemCredential = ServiceProviderSigningCredentials.generate("Pinned IdP");
+        IdentityProvider identityProvider = withStoredSigningCredential(samlIdentityProvider());
 
-        IdentityProvider identityProvider = samlIdentityProvider();
+        identityProvider.setSigningCertificate(resource("pinned-idp-certificate.pem"));
 
-        identityProvider.setSigningCertificate(pinnedPemCredential.certificate());
-
-        RelyingPartyRegistration relyingPartyRegistration = findWithStoredSigningCredential(identityProvider);
+        RelyingPartyRegistration relyingPartyRegistration = find(identityProvider);
 
         assertThat(relyingPartyRegistration.getAssertingPartyMetadata()
             .getVerificationX509Credentials()).singleElement()
@@ -163,16 +125,8 @@ class DynamicRelyingPartyRegistrationRepositoryTest {
                 });
     }
 
-    private RelyingPartyRegistration findWithStoredSigningCredential(IdentityProvider identityProvider) {
-        PemCredential pemCredential = ServiceProviderSigningCredentials.generate("ByteChef " + REGISTRATION_ID);
-
-        identityProvider.setServiceProviderSigningCertificate(pemCredential.certificate());
-        identityProvider.setServiceProviderSigningKey("encrypted");
-
+    private RelyingPartyRegistration find(IdentityProvider identityProvider) {
         locate(identityProvider);
-
-        when(identityProviderService.getDecryptedServiceProviderSigningKey(identityProvider))
-            .thenReturn(pemCredential.privateKey());
 
         return dynamicRelyingPartyRegistrationRepository.findByRegistrationId(REGISTRATION_ID);
     }
@@ -180,6 +134,26 @@ class DynamicRelyingPartyRegistrationRepositoryTest {
     private void locate(IdentityProvider identityProvider) {
         when(identityProviderLocator.findByRegistrationId(REGISTRATION_ID))
             .thenReturn(Optional.of(new LocatedIdentityProvider(TenantContext.DEFAULT_TENANT_ID, identityProvider)));
+    }
+
+    private IdentityProvider withStoredSigningCredential(IdentityProvider identityProvider) {
+        identityProvider.setServiceProviderSigningCertificate(SP_SIGNING_CERTIFICATE);
+        identityProvider.setServiceProviderSigningKey("encrypted");
+
+        when(identityProviderService.getDecryptedServiceProviderSigningKey(identityProvider))
+            .thenReturn(SP_SIGNING_KEY);
+
+        return identityProvider;
+    }
+
+    private static String resource(String name) {
+        try (InputStream inputStream = DynamicRelyingPartyRegistrationRepositoryTest.class.getResourceAsStream(
+            "/saml2/" + name)) {
+
+            return new String(inputStream.readAllBytes(), StandardCharsets.US_ASCII);
+        } catch (IOException ioException) {
+            throw new UncheckedIOException(ioException);
+        }
     }
 
     private static IdentityProvider samlIdentityProvider() {

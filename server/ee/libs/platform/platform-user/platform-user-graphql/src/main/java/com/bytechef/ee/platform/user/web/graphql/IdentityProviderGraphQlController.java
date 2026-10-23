@@ -78,6 +78,15 @@ public class IdentityProviderGraphQlController {
             .toList();
     }
 
+    @MutationMapping(name = "regenerateIdentityProviderServiceProviderCertificate")
+    public IdentityProviderDTO regenerateIdentityProviderServiceProviderCertificate(@Argument Long id) {
+        try {
+            return toDTO(identityProviderFacade.regenerateServiceProviderSigningCredential(id));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new GraphQlBadRequestException(illegalArgumentException.getMessage(), illegalArgumentException);
+        }
+    }
+
     @MutationMapping(name = "updateIdentityProvider")
     public IdentityProviderDTO updateIdentityProvider(@Argument Long id, @Argument IdentityProviderInput input) {
         IdentityProvider identityProvider = toIdentityProvider(input);
@@ -142,6 +151,7 @@ public class IdentityProviderGraphQlController {
                 .value(),
             identityProvider.getScimApiKey() != null,
             identityProvider.getScopes(),
+            identityProvider.getServiceProviderSigningCertificate(),
             identityProvider.getSigningCertificate(),
             identityProvider.getType());
     }
@@ -225,8 +235,8 @@ public class IdentityProviderGraphQlController {
         boolean autoProvision, String clientId, String createdBy, Long createdDate, String defaultAuthority,
         List<String> domains, boolean enabled, boolean enforced, Long id, String issuerUri, String lastModifiedBy,
         Long lastModifiedDate, String metadataUri, String mfaMethod, boolean mfaRequired, String name,
-        String nameIdFormat, String registrationId, boolean scimEnabled, String scopes, String signingCertificate,
-        String type) {
+        String nameIdFormat, String registrationId, boolean scimEnabled, String scopes,
+        String serviceProviderCertificate, String signingCertificate, String type) {
     }
 
     record IdentityProviderInput(
