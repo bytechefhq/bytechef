@@ -252,6 +252,19 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         Map<Long, IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationsById =
             getInstanceConfigurations(integrationInstances, filteredConfiguration, connectedUser, mcpWorkflows);
 
+        Map<Long, ConnectedUserIntegrationDTO.ConnectionConfig> connectionConfigsById = new HashMap<>();
+
+        for (IntegrationInstanceConfigurationDTO instanceConfiguration : integrationInstanceConfigurationsById
+            .values()) {
+
+            ConnectedUserIntegrationDTO.ConnectionConfig connectionConfig = getConnectionConfig(
+                integrationDTO, connectionDefinition, instanceConfiguration);
+
+            if (connectionConfig != null) {
+                connectionConfigsById.put(instanceConfiguration.id(), connectionConfig);
+            }
+        }
+
         Authorization authorization = getAuthorization(
             connectionDefinition, integrationInstanceConfigurationDTO, integrationDTO.componentName());
 
@@ -279,7 +292,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
             authorization, connections, filteredConfiguration, integrationInstances,
-            integrationInstanceWorkflows, integrationInstanceConfigurationsById, oAuth2AuthorizationParameters,
+            integrationInstanceWorkflows, integrationInstanceConfigurationsById, connectionConfigsById,
+            oAuth2AuthorizationParameters,
             oAuth2Service.getRedirectUri());
 
         return connectedUserIntegrationDTO.withMcp(
@@ -468,6 +482,36 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
     }
 
+    private ConnectedUserIntegrationDTO.@Nullable ConnectionConfig getConnectionConfig(
+        IntegrationDTO integrationDTO, ConnectionDefinition connectionDefinition,
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
+
+        Authorization authorization = getAuthorization(
+            connectionDefinition, integrationInstanceConfigurationDTO, integrationDTO.componentName());
+
+        if (authorization == null) {
+            return null;
+        }
+
+        ConnectedUserIntegrationDTO.OAuth2 oAuth2 = null;
+
+        if (StringUtils.startsWith(authorization.getType()
+            .name(), "OAUTH2")) {
+
+            OAuth2AuthorizationParameters oAuth2AuthorizationParameters = oAuth2ParametersFacade
+                .getOAuth2AuthorizationParameters(
+                    integrationDTO.componentName(), connectionDefinition.getVersion(),
+                    integrationInstanceConfigurationDTO.connectionParameters(),
+                    integrationInstanceConfigurationDTO.authorizationType());
+
+            oAuth2 = new ConnectedUserIntegrationDTO.OAuth2(
+                oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
+        }
+
+        return new ConnectedUserIntegrationDTO.ConnectionConfig(
+            authorization.getType(), oAuth2, authorization.getProperties());
+    }
+
     private Map<Long, IntegrationInstanceConfigurationDTO> getInstanceConfigurations(
         List<IntegrationInstance> integrationInstances, IntegrationInstanceConfigurationDTO selfServeConfiguration,
         ConnectedUser connectedUser, List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows) {
@@ -484,7 +528,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             }
 
             IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
-                integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationFacade.getConnectedUserIntegrationInstanceConfiguration(
                     integrationInstanceConfigurationId);
 
             integrationInstanceConfigurationsById.put(
@@ -669,7 +713,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                 return new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
                     integrationInstance.connection(), integrationInstance.integrationInstance(),
                     integrationInstance.workflows(), mcpInstanceTools, mcpInstanceWorkflows,
-                    integrationInstance.integrationInstanceConfiguration());
+                    integrationInstance.integrationInstanceConfiguration(), integrationInstance.connectionConfig());
             })
             .toList();
     }

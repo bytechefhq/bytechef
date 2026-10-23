@@ -22,9 +22,11 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyGroupModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectionConfigModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputTypeModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceModel;
@@ -45,6 +47,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -140,7 +143,7 @@ class ConnectedUserIntegrationMapperTest {
 
         IntegrationInstanceModel integrationInstanceModel = generatedMapper.map(
             new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
-                new Connection(), integrationInstance, List.of(), List.of(), List.of(), null));
+                new Connection(), integrationInstance, List.of(), List.of(), List.of(), null, null));
 
         assertEquals(5L, integrationInstanceModel.getId());
         assertEquals(77L, integrationInstanceModel.getConnectionId());
@@ -177,8 +180,13 @@ class ConnectedUserIntegrationMapperTest {
         IntegrationInstanceModel integrationInstanceModel = generatedMapper.map(
             new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
                 new Connection(), integrationInstance, List.of(), List.of(), List.of(),
-                integrationInstanceConfigurationDTO));
+                integrationInstanceConfigurationDTO,
+                new ConnectedUserIntegrationDTO.ConnectionConfig(AuthorizationType.API_KEY, List.of(), null)));
 
+        ConnectionConfigModel connectionConfigModel = Objects.requireNonNull(
+            integrationInstanceModel.getConnectionConfig());
+
+        assertEquals(AuthorizationTypeModel.API_KEY, connectionConfigModel.getAuthorizationType());
         assertEquals(3, integrationInstanceModel.getIntegrationVersion());
         assertEquals(77L, integrationInstanceModel.getIntegrationInstanceConfigurationId());
         assertEquals(1, integrationInstanceModel.getAvailableWorkflows()
@@ -204,7 +212,7 @@ class ConnectedUserIntegrationMapperTest {
 
         IntegrationInstanceModel integrationInstanceModel = generatedBasicMapper.map(
             new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
-                new Connection(), integrationInstance, List.of(), List.of(), List.of(), null));
+                new Connection(), integrationInstance, List.of(), List.of(), List.of(), null, null));
 
         assertEquals(6L, integrationInstanceModel.getId());
         assertEquals(78L, integrationInstanceModel.getConnectionId());
