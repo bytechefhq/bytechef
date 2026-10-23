@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.LongConsumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -81,6 +82,19 @@ public class JobFacadeImpl implements JobFacade {
     public long createJob(JobParametersDTO jobParametersDTO) {
         Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
+        return startJob(job);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NEVER)
+    public long createJob(JobParametersDTO jobParametersDTO, LongConsumer jobCreatedCallback) {
+        Job job = jobService.create(
+            jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()), jobCreatedCallback);
+
+        return startJob(job);
+    }
+
+    private long startJob(Job job) {
         long jobId = Validate.notNull(job.getId(), "id");
 
         log.debug("Job id={}, label='{}' created", jobId, job.getLabel());
