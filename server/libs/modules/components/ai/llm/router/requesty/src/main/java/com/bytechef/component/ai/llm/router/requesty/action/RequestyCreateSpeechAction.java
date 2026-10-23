@@ -31,14 +31,15 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpHeaders;
@@ -96,17 +97,14 @@ public class RequestyCreateSpeechAction {
         Double speed = inputParameters.getDouble(SPEED);
 
         if (speed != null) {
-            body.put(SPEED, speed.intValue());
+            body.put(SPEED, speed);
         }
 
-        Context.Http.Response response1 = context.http(http -> http.post(BASE_URL + "/audio/speech")
+        return context.http(http -> http.post(BASE_URL + "/audio/speech")
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + connectionParameters.getRequiredString(TOKEN))
             .body(Context.Http.Body.of(body, Context.Http.BodyContentType.JSON)))
-            .execute();
-
-        byte[] bodyBytes = response1.getBody(new TypeReference<byte[]>() {});
-
-        return context.file(
-            file -> file.storeContent("speech." + responseFormat, new ByteArrayInputStream(bodyBytes)));
+            .configuration(responseType(ResponseType.BINARY).filename("speech." + responseFormat))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 }
