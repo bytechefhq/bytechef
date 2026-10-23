@@ -214,6 +214,8 @@ public class TaskWorker {
                 }
             }
 
+            notifyTaskExecutionFinished(taskExecution);
+
             if (output == null) {
                 taskExecution.setOutput(null);
             } else {
@@ -299,7 +301,19 @@ public class TaskWorker {
         taskExecution.setEndDate(Instant.now());
         taskExecution.setStatus(Status.FAILED);
 
+        notifyTaskExecutionFinished(taskExecution);
+
         eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+    }
+
+    private void notifyTaskExecutionFinished(TaskExecution taskExecution) {
+        for (TaskExecutionPostOutputProcessor taskExecutionPostOutputProcessor : taskExecutionPostOutputProcessors) {
+            try {
+                taskExecutionPostOutputProcessor.onTaskExecutionFinished(taskExecution);
+            } catch (RuntimeException exception) {
+                log.error(exception.getMessage(), exception);
+            }
+        }
     }
 
     long calculateTimeout(TaskExecution taskExecution) {

@@ -54,6 +54,7 @@ import com.bytechef.exception.ExecutionException;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.SyncMessageBroker;
 import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.worker.task.ClusterElementCallsTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
@@ -531,6 +532,24 @@ class JobSyncExecutorTest {
         assertThat(sseStreamIndex).isNotNegative();
         assertThat(suspendIndex).isNotNegative();
         assertThat(sseStreamIndex).isLessThan(suspendIndex);
+    }
+
+    @Test
+    void testCreateTaskExecutionPostOutputProcessorsStoresClusterElementCallsAfterStreamingAndBeforeSuspend() {
+        Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges = Caffeine.newBuilder()
+            .build();
+
+        List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors =
+            JobSyncExecutor.createTaskExecutionPostOutputProcessors(sseStreamBridges);
+
+        int sseStreamIndex = indexOf(
+            taskExecutionPostOutputProcessors, SseStreamTaskExecutionPostOutputProcessor.class);
+        int clusterElementCallsIndex = indexOf(
+            taskExecutionPostOutputProcessors, ClusterElementCallsTaskExecutionPostOutputProcessor.class);
+        int suspendIndex = indexOf(taskExecutionPostOutputProcessors, SuspendTaskExecutionPostOutputProcessor.class);
+
+        assertThat(clusterElementCallsIndex).isGreaterThan(sseStreamIndex);
+        assertThat(clusterElementCallsIndex).isLessThan(suspendIndex);
     }
 
     @Test

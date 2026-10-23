@@ -37,6 +37,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
+import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
@@ -66,6 +67,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ObjectMapperSetupExtension.class)
 @SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class TaskWorkerTest {
+
+    private static final String FINISHED = "finished";
 
     private static final Evaluator EVALUATOR = SpelEvaluator.create();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
@@ -189,6 +192,63 @@ public class TaskWorkerTest {
 
         Assertions.assertEquals(taskStartedApplicationEvent.getCreateDate(), completedTaskExecution.getStartDate());
         Assertions.assertNotNull(completedTaskExecution.getEndDate());
+    }
+
+    @Test
+    public void testNotifiesPostOutputProcessorsBeforeTheErrorEventWhenTheTaskFails() {
+        List<MessageEvent<?>> events = new CopyOnWriteArrayList<>();
+
+        TaskWorker worker = new TaskWorker(
+            null, EVALUATOR, event -> events.add((MessageEvent<?>) event), NEW_SINGLE_THREAD_EXECUTOR::execute,
+            task -> taskExecution -> {
+                throw new IllegalArgumentException("bad input");
+            }, taskFileStorage, List.of(new FinishedMarkingTaskExecutionPostOutputProcessor()));
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
+
+        TaskExecution failedTaskExecution = events.stream()
+            .filter(TaskExecutionErrorEvent.class::isInstance)
+            .map(event -> ((TaskExecutionErrorEvent) event).getTaskExecution())
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertEquals(Boolean.TRUE, failedTaskExecution.getMetadata()
+            .get(FINISHED));
+    }
+
+    @Test
+    public void testNotifiesPostOutputProcessorsWhenTheTaskProducesNoOutput() {
+        List<MessageEvent<?>> events = new CopyOnWriteArrayList<>();
+
+        TaskWorker worker = new TaskWorker(
+            null, EVALUATOR, event -> events.add((MessageEvent<?>) event), NEW_SINGLE_THREAD_EXECUTOR::execute,
+            task -> taskExecution -> null, taskFileStorage,
+            List.of(new FinishedMarkingTaskExecutionPostOutputProcessor()));
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
+
+        TaskExecution completedTaskExecution = events.stream()
+            .filter(TaskExecutionCompleteEvent.class::isInstance)
+            .map(event -> ((TaskExecutionCompleteEvent) event).getTaskExecution())
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertEquals(Boolean.TRUE, completedTaskExecution.getMetadata()
+            .get(FINISHED));
     }
 
     @Test
@@ -605,5 +665,18 @@ public class TaskWorkerTest {
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
 
         fixedThreadPool.shutdownNow();
+    }
+
+    private static class FinishedMarkingTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
+
+        @Override
+        public Object process(TaskExecution taskExecution, Object output) {
+            return output;
+        }
+
+        @Override
+        public void onTaskExecutionFinished(TaskExecution taskExecution) {
+            taskExecution.putMetadata(FINISHED, true);
+        }
     }
 }
