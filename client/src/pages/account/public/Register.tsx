@@ -3,26 +3,26 @@ import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import PasswordRequirements, {
+    passwordContainsNumberMessage,
+    passwordContainsUppercaseMessage,
+    passwordLengthMessage,
+} from '@/pages/account/public/components/PasswordRequirements';
 import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {CheckIcon, DotIcon, EyeIcon, EyeOffIcon, XIcon} from 'lucide-react';
+import {EyeIcon, EyeOffIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
 import githubLogo from '../images/github-logo.svg';
 import googleLogo from '../images/google-logo.svg';
-
-const passwordLengthMessage = 'At least 8 characters';
-const passwordContainsNumberMessage = 'At least 1 number';
-const passwordContainsUppercaseMessage = 'At least 1 uppercase';
 
 const formSchema = z
     .object({
@@ -237,80 +237,10 @@ const Register = () => {
                                                     </div>
                                                 </FormControl>
 
-                                                <ul className="space-y-1">
-                                                    {errors.password?.message &&
-                                                        getValues('password') !== '' &&
-                                                        Object.entries(JSON.parse(errors.password.message)).map(
-                                                            ([key, value]) => {
-                                                                const {message, validationPass} = value as {
-                                                                    message: string;
-                                                                    validationPass: boolean;
-                                                                };
-
-                                                                return (
-                                                                    <li
-                                                                        className={twMerge(
-                                                                            'flex items-center gap-1 text-sm text-destructive',
-                                                                            validationPass && 'text-success'
-                                                                        )}
-                                                                        key={key}
-                                                                    >
-                                                                        {validationPass ? (
-                                                                            <CheckIcon size={15} />
-                                                                        ) : (
-                                                                            <XIcon size={15} />
-                                                                        )}
-
-                                                                        <p>{message}</p>
-                                                                    </li>
-                                                                );
-                                                            }
-                                                        )}
-
-                                                    {getValues('password') === '' && (
-                                                        <>
-                                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                                <DotIcon size={15} />
-
-                                                                <p>{passwordLengthMessage}</p>
-                                                            </li>
-
-                                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                                <DotIcon size={15} />
-
-                                                                <p>{passwordContainsNumberMessage}</p>
-                                                            </li>
-
-                                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
-                                                                <DotIcon size={15} />
-
-                                                                <p>{passwordContainsUppercaseMessage}</p>
-                                                            </li>
-                                                        </>
-                                                    )}
-
-                                                    {!errors.password && getValues('password') !== '' && (
-                                                        <>
-                                                            <li className="flex items-center gap-1 text-sm text-success">
-                                                                <CheckIcon size={15} />
-
-                                                                <p>{passwordLengthMessage}</p>
-                                                            </li>
-
-                                                            <li className="flex items-center gap-1 text-sm text-success">
-                                                                <CheckIcon size={15} />
-
-                                                                <p>{passwordContainsNumberMessage}</p>
-                                                            </li>
-
-                                                            <li className="flex items-center gap-1 text-sm text-success">
-                                                                <CheckIcon size={15} />
-
-                                                                <p>{passwordContainsUppercaseMessage}</p>
-                                                            </li>
-                                                        </>
-                                                    )}
-                                                </ul>
+                                                <PasswordRequirements
+                                                    errorMessage={errors.password?.message}
+                                                    password={getValues('password')}
+                                                />
                                             </FormItem>
                                         )}
                                     />

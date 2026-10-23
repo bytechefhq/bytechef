@@ -54,8 +54,8 @@ public class UserGraphQlController {
     }
 
     @MutationMapping(name = "inviteUser")
-    public Boolean inviteUser(@Argument String email, @Argument String password, @Argument String role) {
-        userManagementFacade.inviteUser(email, password, role);
+    public Boolean inviteUser(@Argument String email, @Argument String role) {
+        userManagementFacade.inviteUser(email, role);
 
         return true;
     }

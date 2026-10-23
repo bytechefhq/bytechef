@@ -16,164 +16,75 @@
 
 package com.bytechef.platform.user.facade;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.mail.MailService;
-import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
-import com.bytechef.platform.user.exception.InvalidEmailException;
-import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 /**
- * Unit test for the {@link UserManagementFacadeImpl} invite orchestration that previously lived in
- * {@code UserGraphQlController}: password validation and email-collision handling run before the user is registered.
- *
  * @author Ivica Cardic
  */
 class UserManagementFacadeImplTest {
 
-    private AuthorityService authorityService;
-    private MailService mailService;
     private TenantService tenantService;
+    private UserInvitationService userInvitationService;
     private UserService userService;
     private UserManagementFacadeImpl userManagementFacade;
 
     @BeforeEach
     void setUp() {
-        authorityService = Mockito.mock(AuthorityService.class);
-        mailService = Mockito.mock(MailService.class);
         tenantService = Mockito.mock(TenantService.class);
+        userInvitationService = Mockito.mock(UserInvitationService.class);
         userService = Mockito.mock(UserService.class);
 
         userManagementFacade = new UserManagementFacadeImpl(
-            authorityService, mailService, tenantService, userService);
+            Mockito.mock(AuthorityService.class), tenantService, userInvitationService, userService);
     }
 
     @Test
-    void testInviteUserSendsInvitationEmail() {
-        Authority authority = createAuthority("ROLE_USER");
-        User user = createUser("newuser", "newuser@example.com");
-
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+    void testInviteUserDelegatesToTheInvitationService() {
         when(userService.fetchUserByEmail("newuser@example.com")).thenReturn(Optional.empty());
-        when(userService.registerUser(any(), anyString())).thenReturn(user);
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
 
-        userManagementFacade.inviteUser("newuser@example.com", "Password123", "ROLE_USER");
+        userManagementFacade.inviteUser("newuser@example.com", "ROLE_USER");
 
-        verify(mailService).sendInvitationEmail(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserUsesLowerCasedEmailAsLogin() {
-        Authority authority = createAuthority("ROLE_USER");
-
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("Jane.Doe@Example.com")).thenReturn(Optional.empty());
-        when(userService.registerUser(any(), anyString()))
-            .thenReturn(createUser("jane.doe@example.com", "jane.doe@example.com"));
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
-
-        userManagementFacade.inviteUser("Jane.Doe@Example.com", "Password123", "ROLE_USER");
-
-        ArgumentCaptor<AdminUserDTO> adminUserDTOArgumentCaptor = ArgumentCaptor.forClass(AdminUserDTO.class);
-
-        verify(userService).registerUser(adminUserDTOArgumentCaptor.capture(), anyString());
-
-        AdminUserDTO adminUserDTO = adminUserDTOArgumentCaptor.getValue();
-
-        assertThat(adminUserDTO.getLogin()).isEqualTo("jane.doe@example.com");
-    }
-
-    @Test
-    void testInviteUserWithEmailLongerThanTheLoginLimitDoesNotRegister() {
-        String email = "firstname.middlename.lastname.department@subdomain.example.com";
-
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail(email)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userManagementFacade.inviteUser(email, "Password123", "ROLE_USER"))
-            .isInstanceOf(InvalidEmailException.class);
-
-        verify(userService, never()).registerUser(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithPasswordTooShortDoesNotRegister() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("test@example.com", "Pass1", "ROLE_USER"))
-            .isInstanceOf(InvalidPasswordException.class);
-
-        verify(userService, never()).registerUser(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithPasswordMissingUppercaseDoesNotRegister() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("test@example.com", "password123", "ROLE_USER"))
-            .isInstanceOf(InvalidPasswordException.class);
-
-        verify(userService, never()).registerUser(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithPasswordMissingDigitDoesNotRegister() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("test@example.com", "PasswordABC", "ROLE_USER"))
-            .isInstanceOf(InvalidPasswordException.class);
-
-        verify(userService, never()).registerUser(any(), anyString());
+        verify(userInvitationService).inviteUser("newuser@example.com", "ROLE_USER");
     }
 
     @Test
     void testInviteUserWithExistingEmailThrows() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("existing@example.com"))
-            .thenReturn(Optional.of(createUser("existing", "existing@example.com")));
-
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", "Password123", "ROLE_USER"))
-            .isInstanceOf(EmailAlreadyUsedException.class);
-
-        verify(userService, never()).registerUser(any(), anyString());
-    }
-
-    private Authority createAuthority(String name) {
-        Authority authority = new Authority();
-
-        authority.setName(name);
-
-        return authority;
-    }
-
-    private User createUser(String login, String email) {
         User user = new User();
 
-        user.setLogin(login);
-        user.setEmail(email);
+        user.setEmail("existing@example.com");
+        user.setLogin("existing@example.com");
 
-        return user;
+        when(userService.fetchUserByEmail("existing@example.com")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", "ROLE_USER"))
+            .isInstanceOf(EmailAlreadyUsedException.class);
+
+        verify(userInvitationService, never()).inviteUser(anyString(), anyString());
+    }
+
+    @Test
+    void testInviteUserWithEmailOfAnotherTenantThrows() {
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
+        when(tenantService.tenantIdsByUserEmailExist("taken@example.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> userManagementFacade.inviteUser("taken@example.com", "ROLE_USER"))
+            .isInstanceOf(EmailAlreadyUsedException.class);
+
+        verify(userInvitationService, never()).inviteUser(anyString(), anyString());
     }
 }

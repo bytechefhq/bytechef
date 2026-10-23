@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailPreparationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -51,7 +52,6 @@ public class MailService {
 
     private static final String USER = "user";
     private static final String BASE_URL = "baseUrl";
-    private static final String PASSWORD = "password";
 
     private final JavaMailSender javaMailSender;
     private final Mail mail;
@@ -73,6 +73,10 @@ public class MailService {
         }
     }
 
+    public boolean isMailConfigured() {
+        return StringUtils.isNotBlank(mail.getHost());
+    }
+
     @Async
     public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         this.sendEmailSync(to, subject, content, isMultipart, isHtml);
@@ -90,35 +94,18 @@ public class MailService {
         this.sendEmailFromTemplateSync(user, "mail/activationEmail", "email.activation.title");
     }
 
-    @Async
+    /**
+     * Mails an invited user the link on which they set their own password. Sent synchronously; a delivery failure is
+     * thrown as a {@link MailException}.
+     */
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
 
-        this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.activation.title");
-    }
-
-    @Async
-    public void sendInvitationEmail(User user, String password) {
-        log.debug("Sending invitation email to '{}'", user.getEmail());
-
         if (Objects.isNull(user.getEmail())) {
-            log.warn("Email misses for user '{}'", user.getLogin());
-
-            return;
+            throw new MailPreparationException("Email misses for user '" + user.getLogin() + "'");
         }
 
-        Locale locale = Locale.forLanguageTag(user.getLangKey());
-
-        Context context = new Context(locale);
-
-        context.setVariable(USER, user);
-        context.setVariable(BASE_URL, mail.getBaseUrl());
-        context.setVariable(PASSWORD, password);
-
-        String content = templateEngine.process("mail/invitationEmail", context);
-        String subject = messageSource.getMessage("email.invitation.title", null, locale);
-
-        this.sendEmailSync(user.getEmail(), subject, content, false, true);
+        deliverEmailFromTemplate(user, "mail/creationEmail", "email.invitation.title");
     }
 
     @Async
@@ -135,6 +122,14 @@ public class MailService {
             return;
         }
 
+        try {
+            deliverEmailFromTemplate(user, templateName, titleKey);
+        } catch (MailException mailException) {
+            log.error("Email could not be sent to user '{}'", user.getEmail(), mailException);
+        }
+    }
+
+    private void deliverEmailFromTemplate(User user, String templateName, String titleKey) {
         Locale locale = Locale.forLanguageTag(user.getLangKey());
 
         Context context = new Context(locale);
@@ -146,13 +141,21 @@ public class MailService {
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
 
-        this.sendEmailSync(user.getEmail(), subject, content, false, true);
+        deliverEmail(user.getEmail(), subject, content, false, true);
     }
 
     private void sendEmailSync(String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
+        try {
+            deliverEmail(recipient, subject, content, isMultipart, isHtml);
+        } catch (MailException mailException) {
+            log.error("Email could not be sent to user '{}'", recipient, mailException);
+        }
+    }
+
+    private void deliverEmail(String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
         log.debug(
-            "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
-            isMultipart, isHtml, recipient, subject, content);
+            "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}'",
+            isMultipart, isHtml, recipient, subject);
 
         // Prepare message using a Spring helper
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -166,12 +169,12 @@ public class MailService {
 
             message.setSubject(subject);
             message.setText(content, isHtml);
-
-            javaMailSender.send(mimeMessage);
-
-            log.debug("Sent email to User '{}'", recipient);
-        } catch (MailException | MessagingException e) {
-            log.error("Email could not be sent to user '{}'", recipient, e);
+        } catch (MessagingException messagingException) {
+            throw new MailPreparationException(messagingException);
         }
+
+        javaMailSender.send(mimeMessage);
+
+        log.debug("Sent email to User '{}'", recipient);
     }
 }

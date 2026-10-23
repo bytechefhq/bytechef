@@ -3,7 +3,7 @@ import Badge from '@/components/Badge/Badge';
 import {Card} from '@/components/ui/card';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {AlertTriangleIcon, CheckIcon, CopyIcon, RefreshCwIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh: () => void}) => {
@@ -11,22 +11,37 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
     const [refreshed, setRefreshed] = useState(false);
     const [showRefreshDialog, setShowRefreshDialog] = useState(false);
 
+    const timeoutsRef = useRef<{copied?: ReturnType<typeof setTimeout>; refreshed?: ReturnType<typeof setTimeout>}>({});
+
     const handleCopy = () => {
         navigator.clipboard.writeText(codeSnippet);
 
         setCopied(true);
 
-        setTimeout(() => setCopied(false), 2000);
+        clearTimeout(timeoutsRef.current.copied);
+
+        timeoutsRef.current.copied = setTimeout(() => setCopied(false), 2000);
     };
 
     const handleRefreshConfirm = () => {
         setShowRefreshDialog(false);
         setRefreshed(true);
 
-        setTimeout(() => setRefreshed(false), 300);
+        clearTimeout(timeoutsRef.current.refreshed);
+
+        timeoutsRef.current.refreshed = setTimeout(() => setRefreshed(false), 300);
 
         onRefresh();
     };
+
+    useEffect(() => {
+        const timeouts = timeoutsRef.current;
+
+        return () => {
+            clearTimeout(timeouts.copied);
+            clearTimeout(timeouts.refreshed);
+        };
+    }, []);
 
     return (
         <Card className="relative overflow-hidden border-border bg-card py-0">

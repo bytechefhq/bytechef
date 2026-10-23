@@ -1,5 +1,4 @@
 import {useInviteUserDialogStore} from '@/pages/settings/platform/users/stores/useInviteUserDialogStore';
-import {isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
 import {AUTHORITIES} from '@/shared/constants';
 import useCeEdition from '@/shared/edition/useCeEdition';
 import {useAuthoritiesQuery, useInviteUserMutation} from '@/shared/middleware/graphql';
@@ -13,28 +12,16 @@ interface UseInviteUserDialogI {
     handleInvite: () => void;
     handleOpen: () => void;
     handleOpenChange: (open: boolean) => void;
-    handleRegeneratePassword: () => void;
     handleRoleChange: (role: string) => void;
     inviteDisabled: boolean;
     inviteEmail: string;
-    invitePassword: string;
     inviteRole: string | null;
     open: boolean;
     roleSelectVisible: boolean;
 }
 
 export default function useInviteUserDialog(): UseInviteUserDialogI {
-    const {
-        inviteEmail,
-        invitePassword,
-        inviteRole,
-        open,
-        regeneratePassword,
-        reset,
-        setInviteEmail,
-        setInviteRole,
-        setOpen,
-    } = useInviteUserDialogStore();
+    const {inviteEmail, inviteRole, open, reset, setInviteEmail, setInviteRole, setOpen} = useInviteUserDialogStore();
 
     const ceEdition = useCeEdition();
 
@@ -51,7 +38,7 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
     const roleSelectVisible = !ceEdition;
-    const inviteDisabled = !inviteEmail || (roleSelectVisible && !inviteRole) || !isValidPassword(invitePassword);
+    const inviteDisabled = !inviteEmail || (roleSelectVisible && !inviteRole);
 
     useEffect(() => {
         if (roleSelectVisible && open && !inviteRole && authorities.length > 0) {
@@ -75,10 +62,6 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         setInviteRole(role);
     };
 
-    const handleRegeneratePassword = () => {
-        regeneratePassword();
-    };
-
     const handleOpenChange = (open: boolean) => {
         if (!open) {
             handleClose();
@@ -91,7 +74,6 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         if (inviteEmail && role) {
             inviteUserMutation.mutate({
                 email: inviteEmail,
-                password: invitePassword,
                 role,
             });
         }
@@ -104,11 +86,9 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         handleInvite,
         handleOpen,
         handleOpenChange,
-        handleRegeneratePassword,
         handleRoleChange,
         inviteDisabled,
         inviteEmail,
-        invitePassword,
         inviteRole,
         open,
         roleSelectVisible,

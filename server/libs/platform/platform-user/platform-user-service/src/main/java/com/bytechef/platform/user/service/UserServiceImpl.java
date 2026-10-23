@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +66,7 @@ public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private static final EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
+    private static final int NOT_ACTIVATED_USER_RETENTION_DAYS = 3;
 
     private final AuthorityRepository authorityRepository;
     private final CacheManager cacheManager;
@@ -92,10 +92,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> activateInvitation(String key, String newPassword) {
+        log.debug("Activating invited user for activation key {}", key);
+
+        return userRepository.findByActivationKey(key)
+            .filter(User::isInvited)
+            .filter(user -> {
+                Instant createdDate = user.getCreatedDate();
+
+                return createdDate != null && createdDate.isAfter(
+                    Instant.now()
+                        .minus(NOT_ACTIVATED_USER_RETENTION_DAYS, ChronoUnit.DAYS));
+            })
+            .map(user -> {
+                user.setActivated(true);
+                user.setActivationKey(null);
+                user.setInvited(false);
+                user.setPassword(passwordEncoder.encode(newPassword));
+
+                user = userRepository.save(user);
+
+                this.clearUserCaches(user);
+
+                return user;
+            });
+    }
+
+    @Override
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
 
         return userRepository.findByActivationKey(key)
+            .filter(user -> !user.isInvited())
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActivated(true);
@@ -407,10 +435,9 @@ public class UserServiceImpl implements UserService {
      * Persistent Token are used for providing automatic authentication, they should be automatically deleted after 30
      * days.
      * <p>
-     * This is scheduled to get fired everyday, at midnight.
+     * {@link UserCleanup} runs this every day, at midnight, in every tenant.
      */
     @Override
-    @Scheduled(cron = "0 0 0 * * ?")
     public void removeOldPersistentTokens() {
         LocalDate now = LocalDate.now();
 
@@ -643,18 +670,17 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Not activated users should be automatically deleted after 3 days.
+     * Not activated users of the current tenant should be automatically deleted after 3 days.
      * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
+     * {@link UserCleanup} runs this every day, at 01:00 (am), in every tenant.
      */
     @Override
-    @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
                 LocalDateTimeUtils.toLocalDateTime(
                     Instant.now()
-                        .minus(3, ChronoUnit.DAYS)))
+                        .minus(NOT_ACTIVATED_USER_RETENTION_DAYS, ChronoUnit.DAYS)))
             .forEach(user -> {
                 log.debug("Deleting not activated user {}", user.getLogin());
 
