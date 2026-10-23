@@ -3,6 +3,7 @@ dependencies {
 
     implementation("org.slf4j:slf4j-api")
     implementation(libs.commons.validator)
+    implementation(libs.org.bouncycastle.bcpkix.jdk18on)
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-saml2-service-provider")

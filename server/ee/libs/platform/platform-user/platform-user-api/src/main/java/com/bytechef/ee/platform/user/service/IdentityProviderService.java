@@ -20,6 +20,12 @@ public interface IdentityProviderService {
 
     IdentityProvider create(IdentityProvider identityProvider);
 
+    /**
+     * Stores the service provider signing credential unless the identity provider already has one, and returns the
+     * identity provider with whichever credential won. The private key is encrypted at rest.
+     */
+    IdentityProvider createServiceProviderSigningCredentialIfAbsent(long id, String certificate, String privateKey);
+
     void delete(long id);
 
     Optional<IdentityProvider> fetchByDomain(String emailDomain);
@@ -35,6 +41,8 @@ public interface IdentityProviderService {
     String generateScimApiKey(long id);
 
     String getDecryptedClientSecret(IdentityProvider identityProvider);
+
+    String getDecryptedServiceProviderSigningKey(IdentityProvider identityProvider);
 
     IdentityProvider update(IdentityProvider identityProvider);
 }

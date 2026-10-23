@@ -92,6 +92,12 @@ public class IdentityProvider {
     @Column
     private String scopes = "openid,profile,email";
 
+    @Column("service_provider_signing_certificate")
+    private String serviceProviderSigningCertificate;
+
+    @Column("service_provider_signing_key")
+    private String serviceProviderSigningKey;
+
     @Column("signing_certificate")
     private String signingCertificate;
 
@@ -179,6 +185,14 @@ public class IdentityProvider {
         return scopes;
     }
 
+    public String getServiceProviderSigningCertificate() {
+        return serviceProviderSigningCertificate;
+    }
+
+    public String getServiceProviderSigningKey() {
+        return serviceProviderSigningKey;
+    }
+
     public String getSigningCertificate() {
         return signingCertificate;
     }
@@ -258,6 +272,14 @@ public class IdentityProvider {
 
     public void setScopes(String scopes) {
         this.scopes = scopes;
+    }
+
+    public void setServiceProviderSigningCertificate(String serviceProviderSigningCertificate) {
+        this.serviceProviderSigningCertificate = serviceProviderSigningCertificate;
+    }
+
+    public void setServiceProviderSigningKey(String serviceProviderSigningKey) {
+        this.serviceProviderSigningKey = serviceProviderSigningKey;
     }
 
     public void setSigningCertificate(String signingCertificate) {
