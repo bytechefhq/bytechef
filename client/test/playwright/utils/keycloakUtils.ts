@@ -26,7 +26,7 @@ export interface KeycloakUserI {
  * a spec file.
  */
 async function keycloakAdminRequest(
-    method: 'DELETE' | 'POST',
+    method: 'DELETE' | 'POST' | 'PUT',
     path: string,
     data?: unknown
 ): Promise<{location: string | undefined}> {
@@ -108,17 +108,24 @@ function samlAttributeMapper(userAttribute: string, attributeName: string) {
 
 /**
  * Registers ByteChef as a SAML client of the realm. Keycloak keys SAML clients by the SP entity id, which embeds the
- * registration id the server assigns, so the client can only be created after the identity provider. Returns the
+ * registration id the server assigns, so the client can only be created after the identity provider. With a
+ * requestSigningCertificate (base64 body), Keycloak rejects authentication requests not signed with its key. Returns the
  * client's internal id.
  */
-export async function createKeycloakSamlClient(identityProvider: IdentityProviderI): Promise<string> {
+export async function createKeycloakSamlClient(
+    identityProvider: IdentityProviderI,
+    options: {requestSigningCertificate?: string} = {}
+): Promise<string> {
     const assertionConsumerServiceUrl = `${AUTHENTICATION_BASE_URL}/login/saml2/sso/${identityProvider.registrationId}`;
 
     const {location} = await keycloakAdminRequest('POST', '/clients', {
         attributes: {
             'saml.authnstatement': 'true',
-            'saml.client.signature': 'false',
+            'saml.client.signature': options.requestSigningCertificate ? 'true' : 'false',
             'saml.server.signature': 'true',
+            ...(options.requestSigningCertificate
+                ? {'saml.signing.certificate': options.requestSigningCertificate}
+                : {}),
             saml_assertion_consumer_url_post: assertionConsumerServiceUrl,
             saml_force_name_id_format: 'true',
             saml_name_id_format: 'email',
@@ -135,6 +142,15 @@ export async function createKeycloakSamlClient(identityProvider: IdentityProvide
     });
 
     return lastPathSegment(location);
+}
+
+export async function setKeycloakSamlClientRequestSigningCertificate(
+    clientId: string,
+    requestSigningCertificate: string
+): Promise<void> {
+    await keycloakAdminRequest('PUT', `/clients/${clientId}`, {
+        attributes: {'saml.signing.certificate': requestSigningCertificate},
+    });
 }
 
 export async function deleteKeycloakClient(clientId: string | undefined): Promise<void> {
