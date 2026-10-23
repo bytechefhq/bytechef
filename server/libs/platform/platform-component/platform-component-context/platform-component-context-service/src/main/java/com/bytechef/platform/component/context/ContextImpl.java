@@ -55,7 +55,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -679,8 +678,6 @@ class ContextImpl implements Context, LogEntryBufferAware {
         private final @Nullable String componentOperationName;
         private final @Nullable Long jobId;
         private final @Nullable LogFileStorageWriter logFileStorageWriter;
-        @SuppressWarnings("PMD.LogVariableNameWithPrivateStaticFinalModifiers")
-        private final org.slf4j.Logger log;
         private final long taskExecutionId;
         private final String tenantId;
         private final @Nullable Long triggerExecutionId;
@@ -695,9 +692,6 @@ class ContextImpl implements Context, LogEntryBufferAware {
             this.componentOperationName = componentOperationName;
             this.jobId = jobId;
             this.logFileStorageWriter = logFileStorageWriter;
-            this.log = LoggerFactory.getLogger(
-                "com.bytechef.component." + componentName +
-                    (componentOperationName == null ? "" : "." + componentOperationName));
             this.taskExecutionId = taskExecutionId;
             this.tenantId = TenantContext.getCurrentTenantId();
             this.triggerExecutionId = triggerExecutionId;
@@ -705,136 +699,76 @@ class ContextImpl implements Context, LogEntryBufferAware {
 
         @Override
         public void debug(String message) {
-            if (log.isDebugEnabled()) {
-                log.debug(message);
-            }
-
             storeLogEntry(LogEntry.Level.DEBUG, message, null);
         }
 
         @Override
         public void debug(String format, Object... args) {
-            if (log.isDebugEnabled()) {
-                log.debug(format, args);
-            }
-
             storeLogEntry(LogEntry.Level.DEBUG, formatMessage(format, args), null);
         }
 
         @Override
         public void debug(String message, Exception exception) {
-            if (log.isDebugEnabled()) {
-                log.debug(message, exception);
-            }
-
             storeLogEntry(LogEntry.Level.DEBUG, message, exception);
         }
 
         @Override
         public void error(String message) {
-            if (log.isErrorEnabled()) {
-                log.error(message);
-            }
-
             storeLogEntry(LogEntry.Level.ERROR, message, null);
         }
 
         @Override
         public void error(String format, Object... args) {
-            if (log.isErrorEnabled()) {
-                log.error(format, args);
-            }
-
             storeLogEntry(LogEntry.Level.ERROR, formatMessage(format, args), null);
         }
 
         @Override
         public void error(String message, Exception exception) {
-            if (log.isErrorEnabled()) {
-                log.error(message, exception);
-            }
-
             storeLogEntry(LogEntry.Level.ERROR, message, exception);
         }
 
         @Override
         public void info(String message) {
-            if (log.isInfoEnabled()) {
-                log.info(message);
-            }
-
             storeLogEntry(LogEntry.Level.INFO, message, null);
         }
 
         @Override
         public void info(String format, Object... args) {
-            if (log.isInfoEnabled()) {
-                log.info(format, args);
-            }
-
             storeLogEntry(LogEntry.Level.INFO, formatMessage(format, args), null);
         }
 
         @Override
         public void info(String message, Exception exception) {
-            if (log.isInfoEnabled()) {
-                log.info(message, exception);
-            }
-
             storeLogEntry(LogEntry.Level.INFO, message, exception);
         }
 
         @Override
         public void warn(String message) {
-            if (log.isWarnEnabled()) {
-                log.warn(message);
-            }
-
             storeLogEntry(LogEntry.Level.WARN, message, null);
         }
 
         @Override
         public void warn(String format, Object... args) {
-            if (log.isWarnEnabled()) {
-                log.warn(format, args);
-            }
-
             storeLogEntry(LogEntry.Level.WARN, formatMessage(format, args), null);
         }
 
         @Override
         public void warn(String message, Exception exception) {
-            if (log.isWarnEnabled()) {
-                log.warn(message, exception);
-            }
-
             storeLogEntry(LogEntry.Level.WARN, message, exception);
         }
 
         @Override
         public void trace(String message) {
-            if (log.isTraceEnabled()) {
-                log.trace(message);
-            }
-
             storeLogEntry(LogEntry.Level.TRACE, message, null);
         }
 
         @Override
         public void trace(String format, Object... args) {
-            if (log.isTraceEnabled()) {
-                log.trace(format, args);
-            }
-
             storeLogEntry(LogEntry.Level.TRACE, formatMessage(format, args), null);
         }
 
         @Override
         public void trace(String message, Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(message, exception);
-            }
-
             storeLogEntry(LogEntry.Level.TRACE, message, exception);
         }
 
