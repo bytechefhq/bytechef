@@ -51,6 +51,7 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.validator.WorkflowDeploymentConnectionResolver.WorkflowNodeConnection;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Arrays;
@@ -252,12 +253,15 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
     private final WorkflowTestConfigurationService workflowTestConfigurationService =
         mock(WorkflowTestConfigurationService.class);
 
+    private final WorkflowDeploymentConnectionResolver workflowDeploymentConnectionResolver =
+        mock(WorkflowDeploymentConnectionResolver.class);
+
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
         mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
         componentDefinitionService, connectionService, taskDispatcherDefinitionService,
         mock(TriggerDefinitionFacade.class),
         mock(TriggerDefinitionService.class), workflowNodeTestOutputService, workflowService,
-        workflowTestConfigurationService, List.of());
+        workflowTestConfigurationService, List.of(), List.of(workflowDeploymentConnectionResolver));
 
     @BeforeEach
     void beforeEach() {
@@ -387,6 +391,45 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
 
         assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void aNodeWithADeploymentConnectionIsNotReported() {
+        stubComponent("affinity", "Affinity", true);
+
+        when(workflowDeploymentConnectionResolver.getWorkflowNodeConnections("wf-1", "affinity_1", 3L))
+            .thenReturn(List.of(new WorkflowNodeConnection(7L, "affinity")));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void aClusterElementWithADeploymentConnectionIsNotReported() {
+        stubComponent("aiAgent", "AI Agent", false);
+        stubComponent("openAi", "OpenAI", true);
+        stubComponent("httpClient", "HTTP Client", false);
+
+        when(workflowDeploymentConnectionResolver.getWorkflowNodeConnections("wf-1", "aiAgent_1", 3L))
+            .thenReturn(List.of(new WorkflowNodeConnection(7L, "openAi_1")));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(AGENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void aDeploymentConnectionWithInvalidCredentialsIsAnError() {
+        stubComponent("affinity", "Affinity", true);
+        stubConnection(7L, "My Affinity", Connection.CredentialStatus.INVALID);
+
+        when(workflowDeploymentConnectionResolver.getWorkflowNodeConnections("wf-1", "affinity_1", 3L))
+            .thenReturn(List.of(new WorkflowNodeConnection(7L, "affinity")));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[affinity_1] Invalid connection: My Affinity"), result.errors());
     }
 
     @Test
