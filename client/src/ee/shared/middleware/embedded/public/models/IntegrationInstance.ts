@@ -34,6 +34,13 @@ import {
     McpIntegrationInstanceToolToJSON,
     McpIntegrationInstanceToolToJSONTyped,
 } from './McpIntegrationInstanceTool';
+import type { ConnectionConfig } from './ConnectionConfig';
+import {
+    ConnectionConfigFromJSON,
+    ConnectionConfigFromJSONTyped,
+    ConnectionConfigToJSON,
+    ConnectionConfigToJSONTyped,
+} from './ConnectionConfig';
 import type { IntegrationWorkflow } from './IntegrationWorkflow';
 import {
     IntegrationWorkflowFromJSON,
@@ -68,6 +75,10 @@ export interface IntegrationInstance {
      * The workflows of the integration instance configuration this instance belongs to.
      */
     readonly availableWorkflows?: Array<IntegrationWorkflow>;
+    /**
+     * 
+     */
+    connectionConfig?: ConnectionConfig;
     /**
      * The id of the integration instance configuration this instance belongs to.
      */
@@ -115,6 +126,7 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
         'enabled': json['enabled'],
         'availableWorkflows': json['availableWorkflows'] == null ? undefined : ((json['availableWorkflows'] as Array<any>).map(IntegrationWorkflowFromJSON)),
+        'connectionConfig': json['connectionConfig'] == null ? undefined : ConnectionConfigFromJSON(json['connectionConfig']),
         'integrationInstanceConfigurationId': json['integrationInstanceConfigurationId'] == null ? undefined : json['integrationInstanceConfigurationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
         'mcpTools': json['mcpTools'] == null ? undefined : ((json['mcpTools'] as Array<any>).map(McpIntegrationInstanceToolFromJSON)),
@@ -137,6 +149,7 @@ export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance,
         'id': value['id'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
         'enabled': value['enabled'],
+        'connectionConfig': ConnectionConfigToJSON(value['connectionConfig']),
         'workflows': value['workflows'] == null ? undefined : ((value['workflows'] as Array<any>).map(IntegrationInstanceWorkflowToJSON)),
     };
 }
