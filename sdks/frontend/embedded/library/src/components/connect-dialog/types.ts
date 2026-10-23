@@ -1,17 +1,19 @@
 import type {ExecuteActionFunction} from './useExecuteAction';
 
+export interface ConnectionConfigType {
+    authorizationType: string;
+    inputs?: PropertyType[];
+    oauth2?: {
+        authorizationUrl: string;
+        scopes: Record<string, string> | string[] | string;
+        redirectUri: string;
+        clientId: string;
+    };
+}
+
 export interface IntegrationType {
     description?: string;
-    connectionConfig?: {
-        authorizationType: string;
-        inputs?: PropertyType[];
-        oauth2?: {
-            authorizationUrl: string;
-            scopes: Record<string, string> | string[] | string;
-            redirectUri: string;
-            clientId: string;
-        };
-    };
+    connectionConfig?: ConnectionConfigType;
     integrationInstances?: IntegrationInstanceType[];
     icon?: string;
     id?: number;
@@ -39,6 +41,7 @@ export interface MergedWorkflowType {
 export interface IntegrationInstanceType {
     id: number;
     availableWorkflows?: IntegrationWorkflowType[];
+    connectionConfig?: ConnectionConfigType;
     connectionId?: number;
     enabled: boolean;
     credentialStatus: string;

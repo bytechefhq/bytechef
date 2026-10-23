@@ -271,6 +271,16 @@ export default function useConnectDialog({
 
     const reauthorizeTargetConnectionId = reauthorizeConnectionId ?? reauthorizingInstance?.connectionId;
 
+    const existingInstance: IntegrationInstanceType | undefined =
+        reauthorizingInstance ??
+        integration?.integrationInstances?.find((instance: IntegrationInstanceType) =>
+            reauthorizeConnectionId !== undefined
+                ? instance.connectionId === reauthorizeConnectionId
+                : instance.id === currentIntegrationInstanceId
+        );
+
+    const activeConnectionConfig = existingInstance?.connectionConfig ?? integration?.connectionConfig;
+
     /**
      * Saves the connection and resolves with what to run once the save is done (host callbacks, closing the dialog), so
      * a failing host callback is never reported as a failed save.
@@ -509,9 +519,9 @@ export default function useConnectDialog({
 
     const isOAuth2AuthorizationType = useMemo(
         () =>
-            integration?.connectionConfig?.authorizationType &&
-            OAUTH2_TYPES.includes(integration?.connectionConfig?.authorizationType),
-        [integration]
+            activeConnectionConfig?.authorizationType &&
+            OAUTH2_TYPES.includes(activeConnectionConfig?.authorizationType),
+        [activeConnectionConfig]
     );
 
     const isOAuth2 = !!isOAuth2AuthorizationType;
@@ -535,7 +545,7 @@ export default function useConnectDialog({
     );
 
     const oauth2Scope = useMemo(() => {
-        const scopes = integration?.connectionConfig?.oauth2?.scopes;
+        const scopes = activeConnectionConfig?.oauth2?.scopes;
 
         if (Array.isArray(scopes)) {
             return scopes.join(' ');
@@ -549,13 +559,13 @@ export default function useConnectDialog({
         }
 
         return typeof scopes === 'string' ? scopes : '';
-    }, [integration?.connectionConfig?.oauth2?.scopes]);
+    }, [activeConnectionConfig?.oauth2?.scopes]);
 
     const {getAuth} = useOAuth2({
-        ...integration?.connectionConfig?.oauth2,
-        authorizationUrl: integration?.connectionConfig?.oauth2?.authorizationUrl || '',
-        clientId: integration?.connectionConfig?.oauth2?.clientId || '',
-        redirectUri: integration?.connectionConfig?.oauth2?.redirectUri || '',
+        ...activeConnectionConfig?.oauth2,
+        authorizationUrl: activeConnectionConfig?.oauth2?.authorizationUrl || '',
+        clientId: activeConnectionConfig?.oauth2?.clientId || '',
+        redirectUri: activeConnectionConfig?.oauth2?.redirectUri || '',
         onCodeSuccess: handleOnCodeSuccess,
         onError: (error: string) => {
             console.error(error);
@@ -585,8 +595,8 @@ export default function useConnectDialog({
     }, []);
 
     const validationRules = useMemo(
-        () => createValidationRules(integration?.connectionConfig?.inputs || []),
-        [createValidationRules, integration?.connectionConfig?.inputs]
+        () => createValidationRules(activeConnectionConfig?.inputs || []),
+        [createValidationRules, activeConnectionConfig?.inputs]
     );
 
     const validateForm = useCallback((data: Record<string, string>, rules: Record<string, ValidationRuleType>) => {
@@ -1070,7 +1080,7 @@ export default function useConnectDialog({
                 mergedMcpWorkflows={mergedMcpWorkflows}
                 mergedWorkflows={mergedWorkflows}
                 mode={mode}
-                properties={integration?.connectionConfig?.inputs}
+                properties={activeConnectionConfig?.inputs}
                 registerFormSubmit={registerFormSubmit}
                 saveError={saveError}
                 title={
