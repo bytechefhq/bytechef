@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -436,10 +435,9 @@ public class UserServiceImpl implements UserService {
      * Persistent Token are used for providing automatic authentication, they should be automatically deleted after 30
      * days.
      * <p>
-     * This is scheduled to get fired everyday, at midnight.
+     * {@link UserCleanup} runs this every day, at midnight, in every tenant.
      */
     @Override
-    @Scheduled(cron = "0 0 0 * * ?")
     public void removeOldPersistentTokens() {
         LocalDate now = LocalDate.now();
 
@@ -672,12 +670,11 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Not activated users should be automatically deleted after 3 days.
+     * Not activated users of the current tenant should be automatically deleted after 3 days.
      * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
+     * {@link UserCleanup} runs this every day, at 01:00 (am), in every tenant.
      */
     @Override
-    @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
