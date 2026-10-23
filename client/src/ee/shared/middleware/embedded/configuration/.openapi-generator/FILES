@@ -47,7 +47,12 @@ docs/IntegrationInstanceWorkflow.md
 docs/IntegrationStatus.md
 docs/IntegrationTagApi.md
 docs/IntegrationVersion.md
+docs/OAuth2AuthorizationParameters.md
 docs/Page.md
+docs/ProvisionIntegrationInstanceRequest.md
+docs/ProvisionIntegrationInstanceWorkflow.md
+docs/ProvisionableIntegration.md
+docs/ProvisionableIntegrationInstanceConfiguration.md
 docs/PublishConnectedUserProjectWorkflowRequest.md
 docs/PublishIntegrationRequest.md
 docs/StartWebhookTriggerTest200Response.md
@@ -90,7 +95,12 @@ models/IntegrationInstanceConfigurationWorkflowConnection.ts
 models/IntegrationInstanceWorkflow.ts
 models/IntegrationStatus.ts
 models/IntegrationVersion.ts
+models/OAuth2AuthorizationParameters.ts
 models/Page.ts
+models/ProvisionIntegrationInstanceRequest.ts
+models/ProvisionIntegrationInstanceWorkflow.ts
+models/ProvisionableIntegration.ts
+models/ProvisionableIntegrationInstanceConfiguration.ts
 models/PublishConnectedUserProjectWorkflowRequest.ts
 models/PublishIntegrationRequest.ts
 models/StartWebhookTriggerTest200Response.ts
