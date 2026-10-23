@@ -6,6 +6,7 @@ import {
     DeleteConnectedUserRequest,
     EnableConnectedUserRequest,
     ImportConnectedUsersRequest,
+    UpdateConnectedUserOperationRequest,
 } from '@/ee/shared/middleware/embedded/connected-user';
 import {useMutation} from '@tanstack/react-query';
 
@@ -60,6 +61,20 @@ export const useImportConnectedUsersMutation = (mutationProps?: ImportConnectedU
     useMutation<ConnectedUserImportResult, Error, ImportConnectedUsersRequest>({
         mutationFn: (importConnectedUsersRequest: ImportConnectedUsersRequest) => {
             return new ConnectedUserApi().importConnectedUsers(importConnectedUsersRequest);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface UpdateConnectedUserMutationProps {
+    onError?: (error: Error, variables: UpdateConnectedUserOperationRequest) => void;
+    onSuccess?: (result: ConnectedUser, variables: UpdateConnectedUserOperationRequest) => void;
+}
+
+export const useUpdateConnectedUserMutation = (mutationProps?: UpdateConnectedUserMutationProps) =>
+    useMutation<ConnectedUser, Error, UpdateConnectedUserOperationRequest>({
+        mutationFn: (updateConnectedUserOperationRequest: UpdateConnectedUserOperationRequest) => {
+            return new ConnectedUserApi().updateConnectedUser(updateConnectedUserOperationRequest);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
