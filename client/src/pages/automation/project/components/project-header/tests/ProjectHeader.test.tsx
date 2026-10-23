@@ -118,6 +118,7 @@ const renderProjectHeader = (projectId = 5, projectWorkflowId = 11) =>
     );
 
 beforeEach(() => {
+    applicationInfoStore.setState({application: {edition: EditionType.CE}});
     hoisted.isMutating.mockReturnValue(0);
 
     onlineManager.setOnline(true);
@@ -315,6 +316,20 @@ describe('ProjectHeader', () => {
         renderHeader(true);
 
         expect(screen.getByRole('status', {name: 'View only'})).toBeInTheDocument();
+    });
+
+    it('hides the project deployments button without DEPLOYMENT_VIEW', () => {
+        renderHeader(false);
+
+        expect(screen.queryByText('Project Deployments')).not.toBeInTheDocument();
+    });
+
+    it('shows the project deployments button with DEPLOYMENT_VIEW', () => {
+        setWorkflowEditScopeState({scopes: ['DEPLOYMENT_VIEW', 'WORKFLOW_VIEW'], status: 'loaded'});
+
+        renderHeader(false);
+
+        expect(screen.getByText('Project Deployments')).toBeInTheDocument();
     });
 
     it('never shows the View only badge on Community', () => {
