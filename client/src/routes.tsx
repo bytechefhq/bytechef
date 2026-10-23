@@ -1,6 +1,7 @@
 import ImportApp from '@/ImportApp';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import AcceptInvitation from '@/pages/account/public/AcceptInvitation';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
 import OAuth2Redirect from '@/pages/account/public/OAuth2Redirect';
@@ -472,6 +473,14 @@ export const getRouter = (queryClient: QueryClient) =>
                 </AccessControl>
             ),
             path: '/activate',
+        },
+        {
+            element: (
+                <AccessControl requiresKey>
+                    <AcceptInvitation />
+                </AccessControl>
+            ),
+            path: '/accept-invitation',
         },
         {
             element: (
