@@ -11,6 +11,9 @@ Name | Type
 `connectionId` | number
 `credentialStatus` | [CredentialStatus](CredentialStatus.md)
 `enabled` | boolean
+`availableWorkflows` | [Array&lt;IntegrationWorkflow&gt;](IntegrationWorkflow.md)
+`integrationInstanceConfigurationId` | number
+`integrationVersion` | number
 `mcpTools` | [Array&lt;McpIntegrationInstanceTool&gt;](McpIntegrationInstanceTool.md)
 `mcpWorkflows` | [Array&lt;IntegrationInstanceWorkflow&gt;](IntegrationInstanceWorkflow.md)
 `workflows` | [Array&lt;IntegrationInstanceWorkflow&gt;](IntegrationInstanceWorkflow.md)
@@ -26,6 +29,9 @@ const example = {
   "connectionId": null,
   "credentialStatus": null,
   "enabled": null,
+  "availableWorkflows": null,
+  "integrationInstanceConfigurationId": null,
+  "integrationVersion": null,
   "mcpTools": null,
   "mcpWorkflows": null,
   "workflows": null,
