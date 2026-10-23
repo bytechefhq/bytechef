@@ -41,7 +41,7 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
     @Override
     public ConnectedUser createConnectedUser(
         String externalId, Environment environment, @Nullable String name, @Nullable String email,
-        Map<String, String> metadata) {
+        @Nullable Map<String, String> metadata) {
 
         throw new UnsupportedOperationException();
     }
@@ -101,7 +101,7 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override
     public ConnectedUser updateConnectedUser(
-        long id, @Nullable String name, @Nullable String email, Map<String, String> metadata, int version) {
+        long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version) {
 
         throw new UnsupportedOperationException();
     }

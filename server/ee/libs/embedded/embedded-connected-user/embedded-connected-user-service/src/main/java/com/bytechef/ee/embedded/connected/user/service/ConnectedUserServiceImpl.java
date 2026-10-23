@@ -66,14 +66,15 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     @Override
     public ConnectedUser createConnectedUser(
         String externalId, Environment environment, @Nullable String name, @Nullable String email,
-        Map<String, String> metadata) {
+        @Nullable Map<String, String> metadata) {
 
         validateExternalId(externalId);
 
         String normalizedName = normalizeName(name);
         String normalizedEmail = normalizeEmail(email);
+        Map<String, String> normalizedMetadata = metadata == null ? Map.of() : metadata;
 
-        validateMetadata(metadata);
+        validateMetadata(normalizedMetadata);
 
         if (fetchConnectedUser(externalId, environment).isPresent()) {
             throw new IllegalArgumentException(
@@ -86,7 +87,7 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
         connectedUser.setEnabled(true);
         connectedUser.setEnvironment(environment);
         connectedUser.setExternalId(externalId);
-        connectedUser.setMetadata(metadata);
+        connectedUser.setMetadata(normalizedMetadata);
         connectedUser.setName(normalizedName);
 
         return connectedUserRepository.save(connectedUser);
@@ -182,7 +183,7 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     public ConnectedUser updateConnectedUser(
-        long id, @Nullable String name, @Nullable String email, Map<String, String> metadata, int version) {
+        long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version) {
 
         ConnectedUser connectedUser = getConnectedUser(id);
 
@@ -192,11 +193,12 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
         String normalizedName = normalizeName(name);
         String normalizedEmail = normalizeEmail(email);
+        Map<String, String> normalizedMetadata = metadata == null ? Map.of() : metadata;
 
-        validateMetadata(metadata);
+        validateMetadata(normalizedMetadata);
 
         connectedUser.setEmail(normalizedEmail);
-        connectedUser.setMetadata(metadata);
+        connectedUser.setMetadata(normalizedMetadata);
         connectedUser.setName(normalizedName);
 
         return connectedUserRepository.save(connectedUser);

@@ -19,7 +19,12 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserDTO;
+import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserImportResultDTO;
+import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserImportResultDTO.RejectedRow;
+import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserCsvParser.ParsedConnectedUsers;
+import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserCsvParser.ParsedRow;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -28,16 +33,22 @@ import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -81,6 +92,80 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public ConnectedUserDTO createConnectedUser(
+        String externalId, Environment environment, @Nullable String name, @Nullable String email,
+        @Nullable Map<String, String> metadata) {
+
+        ConnectedUser connectedUser = connectedUserService.createConnectedUser(
+            externalId, environment, name, email, metadata);
+
+        return getConnectedUserDTO(connectedUser.getId());
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConnectedUserImportResultDTO importConnectedUsers(Environment environment, InputStream csvInputStream) {
+        ParsedConnectedUsers parsedConnectedUsers = ConnectedUserCsvParser.parse(csvInputStream);
+
+        int createdCount = 0;
+        List<String> skippedExternalIds = new ArrayList<>();
+        List<RejectedRow> rejectedRows = new ArrayList<>();
+        Set<String> seenExternalIds = new HashSet<>();
+
+        for (ParsedRow parsedRow : parsedConnectedUsers.rows()) {
+            if (parsedRow.rejectionReason() != null) {
+                rejectedRows.add(new RejectedRow(parsedRow.rowNumber(), parsedRow.rejectionReason()));
+
+                continue;
+            }
+
+            String externalId = parsedRow.externalId();
+
+            try {
+                ConnectedUserServiceImpl.validateExternalId(externalId);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                rejectedRows.add(new RejectedRow(parsedRow.rowNumber(), illegalArgumentException.getMessage()));
+
+                continue;
+            }
+
+            if (seenExternalIds.contains(externalId) ||
+                connectedUserService.fetchConnectedUser(externalId, environment)
+                    .isPresent()) {
+
+                skippedExternalIds.add(externalId);
+
+                continue;
+            }
+
+            try {
+                connectedUserService.createConnectedUser(
+                    externalId, environment, parsedRow.name(), parsedRow.email(), parsedRow.metadata());
+
+                seenExternalIds.add(externalId);
+
+                createdCount++;
+            } catch (IllegalArgumentException illegalArgumentException) {
+                rejectedRows.add(new RejectedRow(parsedRow.rowNumber(), illegalArgumentException.getMessage()));
+            }
+        }
+
+        return new ConnectedUserImportResultDTO(createdCount, skippedExternalIds, rejectedRows);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public ConnectedUserDTO updateConnectedUser(
+        long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version) {
+
+        ConnectedUser connectedUser = connectedUserService.updateConnectedUser(id, name, email, metadata, version);
+
+        return getConnectedUserDTO(connectedUser.getId());
     }
 
     @Override
