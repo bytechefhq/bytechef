@@ -410,6 +410,59 @@ paths:
               schema:
                 type: integer
                 format: int64
+  /connected-users/{connectedUserId}/integration-instances:
+    post:
+      description: "Provision an integration instance for the connected user on a chosen integration instance configuration."
+      summary: "Provision an integration instance for the connected user"
+      tags:
+        - "integration-instance"
+      operationId: "provisionIntegrationInstance"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProvisionIntegrationInstanceRequest"
+        required: true
+      responses:
+        "200":
+          description: "The integration instance id."
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+  /connected-users/{connectedUserId}/provisionable-integrations:
+    get:
+      description: "Get the integrations that can be provisioned to the connected user."
+      summary: "Get the integrations that can be provisioned to the connected user"
+      tags:
+        - "integration-instance"
+      operationId: "getProvisionableIntegrations"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The provisionable integrations."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ProvisionableIntegration"
   /connected-user-project-workflows/{workflowUuid}:
     get:
       description: "Get connected user project workflow."
@@ -1569,6 +1622,91 @@ components:
         permissionExpression:
           description: "The SpEL permission expression evaluated against the connected user to control\
             \ integration visibility."
+          type: "string"
+    OAuth2AuthorizationParameters:
+      description: "The parameters needed to start an OAuth2 authorization flow."
+      type: "object"
+      properties:
+        authorizationUrl:
+          description: "The authorization url."
+          type: "string"
+        clientId:
+          description: "The client id."
+          type: "string"
+        extraQueryParameters:
+          description: "The extra query parameters of the authorization url."
+          type: "object"
+          additionalProperties:
+            type: "string"
+        scopes:
+          description: "The scopes, each flagged as enabled or not."
+          type: "object"
+          additionalProperties:
+            type: "boolean"
+    ProvisionIntegrationInstanceRequest:
+      description: "The request to provision an integration instance."
+      type: "object"
+      required:
+        - "integrationInstanceConfigurationId"
+      properties:
+        integrationInstanceConfigurationId:
+          description: "The id of the integration instance configuration to provision onto."
+          type: "integer"
+          format: "int64"
+        connectionParameters:
+          description: "The connection parameters of the integration instance."
+          type: "object"
+          additionalProperties: true
+        workflows:
+          description: "The workflows to enable on the integration instance."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ProvisionIntegrationInstanceWorkflow"
+    ProvisionIntegrationInstanceWorkflow:
+      description: "A workflow to enable on a provisioned integration instance."
+      type: "object"
+      required:
+        - "workflowUuid"
+      properties:
+        workflowUuid:
+          description: "The uuid of the workflow."
+          type: "string"
+        inputs:
+          description: "The inputs of the workflow."
+          type: "object"
+          additionalProperties: true
+    ProvisionableIntegration:
+      description: "An integration that can be provisioned to a connected user."
+      type: "object"
+      properties:
+        integration:
+          $ref: "#/components/schemas/IntegrationBasic"
+        componentVersion:
+          description: "The version of the integration's component."
+          type: "integer"
+          format: "int32"
+        integrationInstanceConfigurations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ProvisionableIntegrationInstanceConfiguration"
+    ProvisionableIntegrationInstanceConfiguration:
+      description: "An integration instance configuration the integration can be provisioned onto."
+      type: "object"
+      properties:
+        integrationInstanceConfiguration:
+          $ref: "#/components/schemas/IntegrationInstanceConfiguration"
+        selfServe:
+          description: "Whether self-serve connections of the connected user use this configuration."
+          type: "boolean"
+        sharedConnectionParameterNames:
+          description: "The names of connection parameters the configuration already sets for every instance."
+          type: "array"
+          items:
+            type: "string"
+        oAuth2AuthorizationParameters:
+          $ref: "#/components/schemas/OAuth2AuthorizationParameters"
+        redirectUri:
+          description: "The OAuth2 redirect uri."
           type: "string"
     IntegrationInstance:
       description: "Contains configurations and connections required for the execution\
