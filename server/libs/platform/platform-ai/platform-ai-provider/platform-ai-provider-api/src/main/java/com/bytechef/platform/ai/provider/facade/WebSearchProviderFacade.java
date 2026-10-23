@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.ai.provider.facade;
 
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderConnection;
 import com.bytechef.platform.ai.provider.dto.WebSearchProviderDTO;
+import com.bytechef.platform.ai.provider.dto.WebSearchProviderTestResultDTO;
 import com.bytechef.platform.ai.websearch.WebSearchProvider;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -29,16 +31,27 @@ public interface WebSearchProviderFacade {
     void deleteWebSearchProvider(String name, int environment);
 
     /**
-     * Returns the API key of a web search provider that is enabled in the environment, or {@code null}. A saved
-     * provider must be switched on; without a saved provider the key from the application properties counts when the
-     * properties enable it.
+     * Returns the API key and base URL of a web search provider that is enabled in the environment, or {@code null}. A
+     * saved provider must be switched on; without a saved provider the key from the application properties counts when
+     * the properties enable it.
      */
     @Nullable
-    String fetchEnabledApiKey(WebSearchProvider webSearchProvider, int environment);
+    WebSearchProviderConnection fetchEnabledConnection(WebSearchProvider webSearchProvider, int environment);
 
     List<WebSearchProviderDTO> getWebSearchProviders(int environment);
 
     void enableWebSearchProvider(String name, boolean enabled, int environment);
 
-    void updateWebSearchProvider(String name, String apiKey, int environment);
+    /**
+     * Runs one search with the given key and base URL; a {@code null} or blank value falls back to the saved one, then
+     * to the application properties.
+     */
+    WebSearchProviderTestResultDTO testWebSearchProvider(
+        String name, @Nullable String apiKey, @Nullable String baseUrl, int environment);
+
+    /**
+     * Saves a provider's key and base URL. A {@code null} or blank key keeps the current one, and a {@code null} or
+     * blank base URL goes back to the one in the application properties.
+     */
+    void updateWebSearchProvider(String name, @Nullable String apiKey, @Nullable String baseUrl, int environment);
 }
