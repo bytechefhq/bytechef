@@ -239,7 +239,7 @@ class AiProviderFacadeAuditIntTest {
 
     @Test
     void testWebSearchProviderDeleteRecordsTheProviderAndEnvironment() {
-        webSearchProviderFacade.updateWebSearchProvider(BRAVE, SECRET_API_KEY, ENVIRONMENT);
+        webSearchProviderFacade.updateWebSearchProvider(BRAVE, SECRET_API_KEY, null, ENVIRONMENT);
 
         persistenceAuditEventRepository.deleteAll();
 
@@ -272,7 +272,7 @@ class AiProviderFacadeAuditIntTest {
 
     @Test
     void testWebSearchProviderKeyUpdateNeverRecordsTheApiKey() {
-        webSearchProviderFacade.updateWebSearchProvider(BRAVE, SECRET_API_KEY, ENVIRONMENT);
+        webSearchProviderFacade.updateWebSearchProvider(BRAVE, SECRET_API_KEY, null, ENVIRONMENT);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(
             WebSearchProviderAuditEvents.WEB_SEARCH_PROVIDER_UPDATED);
