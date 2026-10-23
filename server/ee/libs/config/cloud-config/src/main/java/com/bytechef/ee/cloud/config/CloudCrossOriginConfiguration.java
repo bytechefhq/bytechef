@@ -48,6 +48,7 @@ public class CloudCrossOriginConfiguration {
 
         source.registerCorsConfiguration("/actuator/**", configuration);
         source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/graphql", configuration);
 
         return new CorsFilter(source);
     }
