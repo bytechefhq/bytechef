@@ -50,6 +50,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -269,6 +270,42 @@ class WebhookBridgeAgentResumeTest {
             .toList();
 
         assertThat(deltas).containsExactly("First chunk", "Second chunk");
+    }
+
+    @Test
+    void testStreamingResumeDecodesJsonEncodedTextChunks() throws AGUIException {
+        httpServer.createContext("/resume", exchange -> {
+            byte[] response = "data:\"Great\"\n\ndata:\" choice, Lis\"\n\ndata:\"bon\"\n\ndata:42\n\n"
+                .getBytes(StandardCharsets.UTF_8);
+
+            exchange.getResponseHeaders()
+                .set("Content-Type", "text/event-stream");
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody()
+                .write(response);
+            exchange.close();
+        });
+
+        AiHubChat chat = newWorkflowChat();
+
+        when(chatService.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+
+        resumeRegistry.register(THREAD_ID, baseUrl + "/resume");
+
+        WebhookBridgeAgent agent = newAgent();
+
+        agent.runAgent(parametersOf(buildInput("Lisbon")), subscriber);
+
+        ArgumentCaptor<TextMessageContentEvent> contentCaptor = ArgumentCaptor.forClass(TextMessageContentEvent.class);
+
+        verify(subscriber, timeout(5000).times(4)).onTextMessageContentEvent(contentCaptor.capture());
+
+        String text = contentCaptor.getAllValues()
+            .stream()
+            .map(TextMessageContentEvent::getDelta)
+            .collect(Collectors.joining());
+
+        assertThat(text).isEqualTo("Great choice, Lisbon42");
     }
 
     @Test

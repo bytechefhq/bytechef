@@ -485,9 +485,9 @@ public class WebhookBridgeAgent extends LocalAgent {
     }
 
     /**
-     * Streams an SSE-shaped resume response through the bridge. Each {@code data:} payload that parses as JSON becomes
-     * a {@code Map} event, so it is routed like the same event on a fresh streaming run; any other payload becomes a
-     * text chunk. Blank and non-data lines are skipped.
+     * Streams an SSE-shaped resume response through the bridge. A {@code data:} payload that is a JSON object becomes a
+     * {@code Map} event, so it is routed like the same event on a fresh streaming run; a JSON string becomes the text
+     * it encodes, and any other payload is a text chunk as sent. Blank and non-data lines are skipped.
      */
     private void streamResumeBody(Stream<String> lines, AgUiStreamBridge bridge) {
         try (Stream<String> stream = lines) {
@@ -504,17 +504,25 @@ public class WebhookBridgeAgent extends LocalAgent {
                     return;
                 }
 
-                Object parsed;
-
-                try {
-                    parsed = jsonMapper.readValue(payload, Map.class);
-                } catch (RuntimeException jsonException) {
-                    parsed = payload;
-                }
-
-                bridge.onEvent(parsed);
+                bridge.onEvent(parseResumeData(payload));
             });
         }
+    }
+
+    private Object parseResumeData(String payload) {
+        try {
+            Object value = jsonMapper.readValue(payload, Object.class);
+
+            if (value instanceof Map<?, ?> || value instanceof String) {
+                return value;
+            }
+        } catch (RuntimeException exception) {
+            if (log.isTraceEnabled()) {
+                log.trace("Workflow resume chunk is not JSON; streaming it as text", exception);
+            }
+        }
+
+        return payload;
     }
 
     private @Nullable Object parseResponseBody(@Nullable String body) {
