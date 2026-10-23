@@ -1,0 +1,6 @@
+mutation regenerateIdentityProviderServiceProviderCertificate($id: ID!) {
+    regenerateIdentityProviderServiceProviderCertificate(id: $id) {
+        id
+        serviceProviderCertificate
+    }
+}

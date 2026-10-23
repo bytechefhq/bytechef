@@ -18,6 +18,7 @@ mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
         name
         nameIdFormat
         scopes
+        serviceProviderCertificate
         signingCertificate
         type
     }
