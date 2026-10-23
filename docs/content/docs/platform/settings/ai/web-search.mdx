@@ -1,0 +1,48 @@
+---
+title: Web Search
+description: Enable Brave Search and Firecrawl per environment so the Copilot can search and read the web.
+---
+
+**Web Search** is where an admin enables the web search providers that AI agents use to look things up on the internet. These are not LLM providers: they don't generate text, they give an agent tools to search the web and read pages. The Copilot's Ask agents use them, for example, to find how to create a connection that the documentation doesn't cover. The specialists that build and import workflows use them when a workflow needs a service ByteChef has no component for.
+
+> Managing web search providers is restricted to **admins**.
+
+Keys are stored **per environment**, so Development, Staging, and Production can each use their own keys.
+
+## Providers
+
+| Provider | Tools the agent gets |
+|---|---|
+| **Brave Search** | `braveWebSearch`: fast web search that returns ranked result snippets. |
+| **Firecrawl** | `webSearch`, `webpageScrape` and `websiteMap`: web search, reading a page as Markdown, and listing a site's URLs. |
+
+You can enable one, both, or neither. An agent is offered only the tools of the providers enabled in the environment it runs in. When none is enabled, agents have no web search tools at all.
+
+## Enable a provider
+
+1. Go to **Settings → AI → Web Search** in the Automation workspace.
+2. Select the **environment** you're configuring.
+3. Flip the provider's **enable toggle on**. If the provider has no API key yet, its row expands to the key form.
+4. Enter the provider's **API Key**. Click **Test** to run one search with it before you save; the page shows whether it worked or the provider's error.
+5. Click **Save**. Saving a key for the first time also enables the provider.
+
+To change a key, expand the row and click **Edit**; leave the key field empty to keep the current key. **Test** on a saved row runs a search with the saved key. To stop using a provider, toggle it off; the key stays saved. **Remove** deletes the saved key.
+
+### Base URL
+
+Each provider calls its public API by default. Set **Base URL** to point it somewhere else, such as a self-hosted Firecrawl or a proxy in front of either service. Leave it empty to go back to the default. Only http and https URLs are accepted, and a row shows the base URL only when it differs from the default.
+
+The API key is encrypted at rest, and the page only ever shows its last four characters.
+
+## Self-hosting: keys in the application properties
+
+A self-hosted deployment can also set the keys through configuration properties or environment variables:
+
+| Provider | Properties |
+|---|---|
+| Brave Search | `BYTECHEF_AI_BRAVE_ENABLED=true` and `BYTECHEF_AI_BRAVE_API_KEY` |
+| Firecrawl | `BYTECHEF_AI_FIRECRAWL_ENABLED=true` and `BYTECHEF_AI_FIRECRAWL_API_KEY` |
+
+A key from the properties counts only while its `ENABLED` property is `true`. On the Web Search page such a provider shows an **Application properties** badge. A key saved on the page takes precedence over the properties, and toggling the provider off on the page turns it off even when the properties enable it. A key from the properties can be replaced on the page but not removed there.
+
+The `BASE_URL` variables set the default base URL; a base URL saved on the page takes precedence. See [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-brave-configuration).
