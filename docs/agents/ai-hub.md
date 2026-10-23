@@ -45,6 +45,9 @@ lists (never a sweep of every `ToolCallback` bean). ASK is read only: `ReadProje
 `ReadProjectWorkflowTools`, deployment reads, read pickers, `openWorkflowTab`, `openWorkflowChatTab`. BUILD adds
 `ProjectTools`, `ProjectWorkflowLifecycleTools`, deployment writes, write pickers, the workflow chat tools
 `listChatWorkflows` and `createWorkflowChat`, and `buildWorkflow` / `importWorkflow`.
+Both modes also get, per turn, the Brave and Firecrawl tools of the web search providers enabled for the verified
+environment (`WebSearchToolCallbackProvider` through `additionalToolCallbacks`). They are read only, skip the
+approval gate and are not pinned, so an approval never resumes one.
 The controller needs workspace role VIEWER for ASK and EDITOR for BUILD. Embedded connected users
 (`ConnectedUserAuthentication`) are refused on the REST entry points and in `AiHubWorkspaceAccess` for GraphQL.
 
