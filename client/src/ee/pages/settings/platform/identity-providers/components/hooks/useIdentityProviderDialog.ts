@@ -6,7 +6,7 @@ import {
     useUpdateIdentityProviderMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 interface UseIdentityProviderDialogI {
     clientId: string;
@@ -141,13 +141,11 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
     };
 
     const handleOpenCreate = () => {
-        resetFormState();
         setIdentityProvider(null);
         setOpen(true);
     };
 
     const handleOpenEdit = (provider: IdentityProviderType) => {
-        populateForm(provider);
         setIdentityProvider(provider);
         setOpen(true);
     };
@@ -197,6 +195,18 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
             createMutation.mutate({input});
         }
     };
+
+    useEffect(() => {
+        if (!open) {
+            return;
+        }
+
+        if (identityProvider) {
+            populateForm(identityProvider);
+        } else {
+            resetFormState();
+        }
+    }, [identityProvider, open]);
 
     return {
         clientId,
