@@ -50,6 +50,16 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     }
 
     @Override
+    public IdentityProvider createServiceProviderSigningCredentialIfAbsent(
+        long id, String certificate, String privateKey) {
+
+        identityProviderRepository.updateServiceProviderSigningCredentialIfAbsent(
+            id, certificate, encryption.encrypt(privateKey));
+
+        return getIdentityProvider(id);
+    }
+
+    @Override
     public void delete(long id) {
         identityProviderRepository.deleteById(id);
     }
@@ -113,6 +123,9 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         identityProvider.setCreatedBy(existingIdentityProvider.getCreatedBy());
         identityProvider.setCreatedDate(existingIdentityProvider.getCreatedDate());
         identityProvider.setScimApiKey(existingIdentityProvider.getScimApiKey());
+        identityProvider.setServiceProviderSigningCertificate(
+            existingIdentityProvider.getServiceProviderSigningCertificate());
+        identityProvider.setServiceProviderSigningKey(existingIdentityProvider.getServiceProviderSigningKey());
 
         return identityProviderRepository.save(identityProvider);
     }
@@ -121,5 +134,11 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     @Transactional(readOnly = true)
     public String getDecryptedClientSecret(IdentityProvider identityProvider) {
         return encryption.decrypt(identityProvider.getClientSecret());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getDecryptedServiceProviderSigningKey(IdentityProvider identityProvider) {
+        return encryption.decrypt(identityProvider.getServiceProviderSigningKey());
     }
 }

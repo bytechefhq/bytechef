@@ -9,7 +9,9 @@ package com.bytechef.ee.security.sso.saml2;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.domain.IdentityProviderRegistrationId;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.ee.security.sso.IdentityProviderLocator;
+import com.bytechef.ee.security.sso.IdentityProviderLocator.LocatedIdentityProvider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.constant.UserConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -21,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
@@ -49,10 +52,14 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
     private final Map<String, CachedRelyingPartyRegistration> cachedRelyingPartyRegistrations =
         new ConcurrentHashMap<>();
     private final IdentityProviderLocator identityProviderLocator;
+    private final IdentityProviderService identityProviderService;
 
     @SuppressFBWarnings("EI")
-    public DynamicRelyingPartyRegistrationRepository(IdentityProviderLocator identityProviderLocator) {
+    public DynamicRelyingPartyRegistrationRepository(
+        IdentityProviderLocator identityProviderLocator, IdentityProviderService identityProviderService) {
+
         this.identityProviderLocator = identityProviderLocator;
+        this.identityProviderService = identityProviderService;
     }
 
     @Override
@@ -62,15 +69,20 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
         }
 
         return identityProviderLocator.findByRegistrationId(registrationId)
-            .map(IdentityProviderLocator.LocatedIdentityProvider::identityProvider)
-            .filter(identityProvider -> identityProvider.isEnabled() &&
-                UserConstants.AUTH_PROVIDER_SAML.equals(identityProvider.getType()))
-            .map(identityProvider -> getRelyingPartyRegistration(registrationId, identityProvider))
+            .filter(locatedIdentityProvider -> {
+                IdentityProvider identityProvider = locatedIdentityProvider.identityProvider();
+
+                return identityProvider.isEnabled() &&
+                    UserConstants.AUTH_PROVIDER_SAML.equals(identityProvider.getType());
+            })
+            .map(locatedIdentityProvider -> getRelyingPartyRegistration(registrationId, locatedIdentityProvider))
             .orElse(null);
     }
 
     private RelyingPartyRegistration getRelyingPartyRegistration(
-        String registrationId, IdentityProvider identityProvider) {
+        String registrationId, LocatedIdentityProvider locatedIdentityProvider) {
+
+        IdentityProvider identityProvider = locatedIdentityProvider.identityProvider();
 
         Instant version = identityProvider.getLastModifiedDate();
         CachedRelyingPartyRegistration cachedRelyingPartyRegistration =
@@ -81,11 +93,14 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
         }
 
         try {
+            Saml2X509Credential signingCredential = getSigningCredential(registrationId, locatedIdentityProvider);
+
             RelyingPartyRegistration relyingPartyRegistration = RelyingPartyRegistrations
                 .fromMetadataLocation(identityProvider.getMetadataUri())
                 .registrationId(registrationId)
                 .entityId("{baseUrl}/saml2/metadata/{registrationId}")
                 .assertionConsumerServiceLocation("{baseUrl}/login/saml2/sso/{registrationId}")
+                .signingX509Credentials(signingCredentials -> signingCredentials.add(signingCredential))
                 .build();
 
             cachedRelyingPartyRegistrations.put(
@@ -99,6 +114,31 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
 
             return null;
         }
+    }
+
+    private Saml2X509Credential getSigningCredential(
+        String registrationId, LocatedIdentityProvider locatedIdentityProvider) {
+
+        String tenantId = locatedIdentityProvider.tenantId();
+        IdentityProvider identityProvider = locatedIdentityProvider.identityProvider();
+
+        if (identityProvider.getServiceProviderSigningCertificate() == null) {
+            ServiceProviderSigningCredentials.PemCredential pemCredential = ServiceProviderSigningCredentials.generate(
+                "ByteChef " + registrationId);
+            long identityProviderId = identityProvider.getId();
+
+            identityProvider = IdentityProviderLocator.callWithTenantId(
+                tenantId, () -> identityProviderService.createServiceProviderSigningCredentialIfAbsent(
+                    identityProviderId, pemCredential.certificate(), pemCredential.privateKey()));
+        }
+
+        IdentityProvider signingIdentityProvider = identityProvider;
+
+        String privateKey = IdentityProviderLocator.callWithTenantId(
+            tenantId, () -> identityProviderService.getDecryptedServiceProviderSigningKey(signingIdentityProvider));
+
+        return ServiceProviderSigningCredentials.toSigningCredential(
+            signingIdentityProvider.getServiceProviderSigningCertificate(), privateKey);
     }
 
     private record CachedRelyingPartyRegistration(

@@ -52,6 +52,7 @@ jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.57.0"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.5.1"
+org-bouncycastle-bcpkix-jdk18on = "org.bouncycastle:bcpkix-jdk18on:1.85"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r"
 org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref = "graalvm" }
 org-graalvm-polyglot-js = { module = "org.graalvm.polyglot:js", version.ref = "graalvm" }
