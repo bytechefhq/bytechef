@@ -11,6 +11,8 @@ const stubFetch = () => {
 
 describe('useActivateStore', () => {
     beforeEach(() => {
+        document.cookie = 'XSRF-TOKEN=xsrf-token';
+
         useActivateStore.setState({activationFailure: false, activationSuccess: false, loading: false});
     });
 
