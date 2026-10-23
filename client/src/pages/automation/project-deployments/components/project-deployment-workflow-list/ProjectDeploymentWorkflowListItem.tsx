@@ -79,7 +79,7 @@ const ProjectDeploymentWorkflowListItem = ({
         (state) => state.setWorkflowExecutionSheetOpen
     );
 
-    const {openProjectWorkflow} = useOpenInProject();
+    const {canOpenInProject, openProjectWorkflow} = useOpenInProject();
 
     const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
@@ -120,7 +120,7 @@ const ProjectDeploymentWorkflowListItem = ({
         }
     };
 
-    const showOpenInProject = !hideOpenInProject && projectId != null;
+    const showOpenInProject = canOpenInProject && !hideOpenInProject && projectId != null;
 
     const handleOpenInProjectClick = () => {
         if (projectId != null) {

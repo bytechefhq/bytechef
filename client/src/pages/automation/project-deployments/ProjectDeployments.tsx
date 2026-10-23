@@ -66,9 +66,6 @@ const ProjectDeployments = () => {
     const [searchParams] = useSearchParams();
 
     const canCreateDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_CREATE');
-    const canEditWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT');
-
-    const canCreateProjectDeployment = canCreateDeployment && canEditWorkflow;
 
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
@@ -131,14 +128,7 @@ const ProjectDeployments = () => {
         triggerDefinitions: true,
     });
 
-    const {
-        data: tags,
-        error: tagsError,
-        isLoading: tagsIsLoading,
-    } = useGetProjectDeploymentTagsQuery({
-        environmentId: currentEnvironmentId,
-        id: currentWorkspaceId!,
-    });
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectDeploymentTagsQuery();
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
@@ -176,7 +166,7 @@ const ProjectDeployments = () => {
                                     <TooltipContent>Refresh</TooltipContent>
                                 </Tooltip>
 
-                                {canCreateProjectDeployment && (
+                                {canCreateDeployment && (
                                     <ProjectDeploymentDialog
                                         onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
                                         projectDeployment={
@@ -284,7 +274,7 @@ const ProjectDeployments = () => {
                     <EmptyFilterResult entityName="project deployments" entityTitle="Project Deployments" />
                 ) : (
                     <ProjectDeploymentsEmptyState
-                        canCreateDeployment={canCreateProjectDeployment}
+                        canCreateDeployment={canCreateDeployment}
                         onDeploymentCreated={setNewlyCreatedDeploymentId}
                     />
                 )}

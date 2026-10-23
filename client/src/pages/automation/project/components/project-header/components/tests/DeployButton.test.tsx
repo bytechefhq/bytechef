@@ -72,10 +72,7 @@ const publishedProject = {
     name: 'Test Project',
 } as Project;
 
-// Deploy opens a dialog that creates a project deployment, which needs BOTH scopes:
-// ProjectDeploymentFacadeImpl.createProjectDeployment is annotated WORKFLOW_EDIT and the
-// ProjectDeploymentServiceImpl.create it delegates to is annotated DEPLOYMENT_CREATE (as is .update).
-const DEPLOY_SCOPES: WorkspaceScopeType[] = ['DEPLOYMENT_CREATE', 'WORKFLOW_EDIT'];
+const DEPLOY_SCOPES: WorkspaceScopeType[] = ['DEPLOYMENT_CREATE'];
 
 function setEnterpriseMemberScopes(scopes: WorkspaceScopeType[]): void {
     applicationInfoStore.setState({application: {edition: EditionType.EE}});
@@ -88,19 +85,31 @@ function setEnterpriseMemberScopes(scopes: WorkspaceScopeType[]): void {
     });
 }
 
+const createDeployButtonTree = (
+    queryClient: QueryClient,
+    project: Project,
+    controlled: {onOpenChange?: (open: boolean) => void; open?: boolean} = {}
+) => (
+    <MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+                <DeployButton onOpenChange={controlled.onOpenChange} open={controlled.open} project={project} />
+            </TooltipProvider>
+        </QueryClientProvider>
+    </MemoryRouter>
+);
+
 const renderDeployButton = (
     project = publishedProject,
     controlled: {onOpenChange?: (open: boolean) => void; open?: boolean} = {}
 ) => {
-    render(
-        <MemoryRouter>
-            <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
-                <TooltipProvider>
-                    <DeployButton onOpenChange={controlled.onOpenChange} open={controlled.open} project={project} />
-                </TooltipProvider>
-            </QueryClientProvider>
-        </MemoryRouter>
-    );
+    const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+    const renderResult = render(createDeployButtonTree(queryClient, project, controlled));
+
+    return {
+        rerender: (nextProject: Project) => renderResult.rerender(createDeployButtonTree(queryClient, nextProject)),
+    };
 };
 
 describe('DeployButton', () => {
@@ -123,7 +132,7 @@ describe('DeployButton', () => {
         );
     });
 
-    it('enables Deploy for a published project when the member holds both deploy scopes', () => {
+    it('enables Deploy for a published project when the member holds DEPLOYMENT_CREATE', () => {
         renderDeployButton();
 
         expect(screen.getByRole('button', {name: 'Deploy'})).not.toBeDisabled();
@@ -146,11 +155,7 @@ describe('DeployButton', () => {
     it('offers the current project after switching to another project', async () => {
         const {rerender} = renderDeployButton(publishedProject);
 
-        rerender(
-            <TooltipProvider>
-                <DeployButton project={{...publishedProject, id: 8, name: 'Invoices'}} />
-            </TooltipProvider>
-        );
+        rerender({...publishedProject, id: 8, name: 'Invoices'});
 
         await userEvent.click(screen.getByRole('button', {name: 'Deploy'}));
 
@@ -169,33 +174,20 @@ describe('DeployButton', () => {
         expect(await screen.findByRole('tooltip')).toHaveTextContent('Publish the project before deploying it.');
     });
 
-    it('disables Deploy for an Enterprise member holding neither deploy scope', () => {
-        // The server refuses ProjectDeploymentServiceImpl.create without this scope, so an enabled button only buys
-        // the user a rejected request at the end of a dialog.
-        setEnterpriseMemberScopes(['WORKFLOW_VIEW']);
+    it('disables Deploy for an Enterprise member without DEPLOYMENT_CREATE', () => {
+        setEnterpriseMemberScopes(['WORKFLOW_VIEW', 'WORKFLOW_EDIT']);
 
         renderDeployButton();
 
         expect(screen.getByRole('button', {name: 'Deploy'})).toBeDisabled();
     });
 
-    it('disables Deploy for a member holding DEPLOYMENT_CREATE but not WORKFLOW_EDIT', () => {
-        // The combination a custom role makes reachable. ProjectDeploymentFacadeImpl.createProjectDeployment is the
-        // outermost gate and it asks for WORKFLOW_EDIT, so an enabled button here ends in a 403 on submit — after the
-        // user has filled in the whole deployment dialog.
+    it('enables Deploy for a member holding DEPLOYMENT_CREATE without WORKFLOW_EDIT', () => {
         setEnterpriseMemberScopes(['DEPLOYMENT_CREATE']);
 
         renderDeployButton();
 
-        expect(screen.getByRole('button', {name: 'Deploy'})).toBeDisabled();
-    });
-
-    it('disables Deploy for a member holding WORKFLOW_EDIT but not DEPLOYMENT_CREATE', () => {
-        setEnterpriseMemberScopes(['WORKFLOW_EDIT']);
-
-        renderDeployButton();
-
-        expect(screen.getByRole('button', {name: 'Deploy'})).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Deploy'})).not.toBeDisabled();
     });
 
     it('does not call an entitled member unauthorized while the scopes are still loading', () => {

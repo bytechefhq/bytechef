@@ -139,6 +139,36 @@ for (const role of ['VIEWER', 'EDITOR', 'ADMIN'] as BuiltInRoleType[]) {
             await expectPresence(page, /^(New|Create) Deployment$/, expectations.createDeployment, 'button');
         });
 
+        test('project header offers deploy only to roles that may deploy', async ({adminApi, rbacWorkspace}) => {
+            await publishRbacWorkspaceProject(adminApi, rbacWorkspace);
+
+            await page.goto(
+                `/automation/projects/${rbacWorkspace.projectId}/project-workflows/${rbacWorkspace.projectWorkflowId}`
+            );
+
+            const projectDeploymentsButton = page.getByRole('button', {exact: true, name: 'Project Deployments'});
+
+            await expect(projectDeploymentsButton).toBeVisible({timeout: 30000});
+
+            const deployButton = page.getByRole('button', {exact: true, name: 'Deploy'});
+
+            if (expectations.createDeployment) {
+                await expect(deployButton).toBeEnabled();
+            } else {
+                await expect(deployButton).toBeDisabled();
+            }
+
+            await projectDeploymentsButton.click();
+
+            const projectDeploymentsSheet = page.getByRole('dialog', {name: 'Project Deployments'});
+
+            await expect(projectDeploymentsSheet.getByText(/^No deployments in /)).toBeVisible();
+
+            await expect(projectDeploymentsSheet.getByRole('button', {exact: true, name: 'Deploy'})).toHaveCount(
+                expectations.createDeployment ? 1 : 0
+            );
+        });
+
         test('MCP servers page offers create only to roles that may create servers', async () => {
             await openPage(page, '/automation/mcp-servers', PAGE_BODY_TEXT.mcpServers);
 
