@@ -96,4 +96,88 @@ describe('buildNodeStatesFromTaskExecutions', () => {
     it('should return no states when there is nothing to read', () => {
         expect(buildNodeStatesFromTaskExecutions(undefined, false)).toEqual({});
     });
+
+    it('adds a state for each stored cluster element call', () => {
+        const nodeStates = buildNodeStatesFromTaskExecutions(
+            [
+                {
+                    ...taskExecution('aiAgent_1', 'COMPLETED', 0, 5),
+                    clusterElementCalls: [
+                        {
+                            endDate: new Date('2024-01-01T10:00:01.412Z'),
+                            name: 'httpClient_1',
+                            startDate: new Date('2024-01-01T10:00:01Z'),
+                            status: 'COMPLETED',
+                        },
+                        {
+                            endDate: new Date('2024-01-01T10:00:02.031Z'),
+                            error: 'boom',
+                            name: 'slack_1',
+                            startDate: new Date('2024-01-01T10:00:02Z'),
+                            status: 'FAILED',
+                        },
+                    ],
+                },
+            ],
+            false
+        );
+
+        expect(nodeStates.httpClient_1).toEqual({
+            clusterElement: true,
+            durationMillis: 412,
+            error: undefined,
+            status: 'COMPLETED',
+        });
+        expect(nodeStates.slack_1).toEqual({clusterElement: true, durationMillis: 31, error: 'boom', status: 'FAILED'});
+    });
+
+    it('keeps a cluster element failed when another iteration completed it', () => {
+        const agentIteration = (status: string) => ({
+            ...taskExecution('aiAgent_1', 'COMPLETED', 0, 5),
+            clusterElementCalls: [
+                {
+                    endDate: new Date('2024-01-01T10:00:02Z'),
+                    error: status === 'FAILED' ? 'boom' : undefined,
+                    name: 'httpClient_1',
+                    startDate: new Date('2024-01-01T10:00:01Z'),
+                    status,
+                },
+            ],
+        });
+
+        const nodeStates = buildNodeStatesFromTaskExecutions(
+            [
+                {
+                    ...taskExecution('loop_1', 'COMPLETED', 0, 10),
+                    iterations: [[agentIteration('FAILED')], [agentIteration('COMPLETED')]],
+                },
+            ],
+            false
+        );
+
+        expect(nodeStates.httpClient_1.status).toBe('FAILED');
+        expect(nodeStates.httpClient_1.error).toBe('boom');
+    });
+
+    it('leaves a cluster element still marked started in a finished job uncoloured', () => {
+        const nodeStates = buildNodeStatesFromTaskExecutions(
+            [
+                {
+                    ...taskExecution('aiAgent_1', 'COMPLETED', 0, 5),
+                    clusterElementCalls: [
+                        {name: 'subagent_1', startDate: new Date('2024-01-01T10:00:01Z'), status: 'STARTED'},
+                    ],
+                },
+            ],
+            false
+        );
+
+        expect(nodeStates.subagent_1).toBeUndefined();
+    });
+
+    it('ignores task executions without cluster element calls', () => {
+        expect(buildNodeStatesFromTaskExecutions([taskExecution('var_1', 'COMPLETED', 0, 2)], false)).toEqual({
+            var_1: {durationMillis: 2000, error: undefined, status: 'COMPLETED'},
+        });
+    });
 });
