@@ -2,6 +2,7 @@ import {
     DeleteIntegrationInstanceRequest,
     EnableIntegrationInstanceRequest,
     IntegrationInstanceApi,
+    ProvisionIntegrationInstanceOperationRequest,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -13,6 +14,11 @@ interface DeleteIntegrationInstanceMutationProps {
 interface EnableIntegrationInstanceMutationProps {
     onError?: (error: Error, variables: EnableIntegrationInstanceRequest) => void;
     onSuccess?: (result: void, variables: EnableIntegrationInstanceRequest) => void;
+}
+
+interface ProvisionIntegrationInstanceMutationProps {
+    onError?: (error: Error, variables: ProvisionIntegrationInstanceOperationRequest) => void;
+    onSuccess?: (result: number, variables: ProvisionIntegrationInstanceOperationRequest) => void;
 }
 
 export const useDeleteIntegrationInstanceMutation = (mutationProps?: DeleteIntegrationInstanceMutationProps) =>
@@ -28,6 +34,15 @@ export const useEnableIntegrationInstanceMutation = (mutationProps?: EnableInteg
     useMutation<void, Error, EnableIntegrationInstanceRequest>({
         mutationFn: (enableIntegrationInstanceRequest: EnableIntegrationInstanceRequest) => {
             return new IntegrationInstanceApi().enableIntegrationInstance(enableIntegrationInstanceRequest);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+export const useProvisionIntegrationInstanceMutation = (mutationProps?: ProvisionIntegrationInstanceMutationProps) =>
+    useMutation<number, Error, ProvisionIntegrationInstanceOperationRequest>({
+        mutationFn: (provisionIntegrationInstanceRequest: ProvisionIntegrationInstanceOperationRequest) => {
+            return new IntegrationInstanceApi().provisionIntegrationInstance(provisionIntegrationInstanceRequest);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
