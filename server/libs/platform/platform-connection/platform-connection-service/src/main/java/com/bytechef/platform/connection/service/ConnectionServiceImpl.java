@@ -225,6 +225,16 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    public Connection updateCreatedBy(long id, String newCreatedBy) {
+        Connection connection = connectionRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
+
+        connection.setCreatedBy(newCreatedBy);
+
+        return connectionRepository.save(connection);
+    }
+
+    @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
         Assert.notNull(parameters, "'parameters' must not be null");
 

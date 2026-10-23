@@ -113,6 +113,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public Connection updateCreatedBy(long id, String newCreatedBy) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }

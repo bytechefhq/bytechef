@@ -26,9 +26,13 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
@@ -36,6 +40,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Authorization;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -62,15 +67,23 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -84,12 +97,15 @@ import org.springframework.transaction.annotation.Transactional;
 @SkipAutomationAuthorization
 public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrationFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(ConnectedUserIntegrationFacadeImpl.class);
+
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+    private final IntegrationInstanceConfigurationDTOAssembler integrationInstanceConfigurationDTOAssembler;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
@@ -114,6 +130,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         ConnectionFacade connectionFacade, ConnectionService connectionService,
         EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
+        IntegrationInstanceConfigurationDTOAssembler integrationInstanceConfigurationDTOAssembler,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
@@ -132,6 +149,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
         this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
+        this.integrationInstanceConfigurationDTOAssembler = integrationInstanceConfigurationDTOAssembler;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
@@ -160,33 +178,18 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationIntegrationInstanceConfiguration(integrationId, environment, true);
 
-        Integration integration = integrationService.getIntegration(integrationId);
+        return createIntegrationInstance(connectedUser, integrationInstanceConfiguration, connectionParameters);
+    }
 
-        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-            integration.getComponentName(), integration.getComponentVersion());
+    private IntegrationInstance createIntegrationInstance(
+        ConnectedUser connectedUser, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        Map<String, Object> connectionParameters) {
 
-        ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
+        Integration integration = integrationService.getIntegration(
+            integrationInstanceConfiguration.getIntegrationId());
 
-        Map<String, Object> mergedParameters = new HashMap<>(
-            integrationInstanceConfiguration.getConnectionParameters());
-
-        mergedParameters.putAll(connectionParameters);
-
-        String connectionName = getConnectionName(
-            connectedUser.getId(), integration.getComponentName(), integrationInstanceConfiguration.getName(),
-            environment);
-
-        ConnectionDTO connectionDTO = ConnectionDTO.builder()
-            .authorizationType(integrationInstanceConfiguration.getAuthorizationType())
-            .componentName(integration.getComponentName())
-            .connectionVersion(connectionDefinition.getVersion())
-            .environmentId(environment.ordinal())
-            .name(connectionName)
-            .parameters(mergedParameters)
-            .tags(List.of())
-            .build();
-
-        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+        long connectionId = createConnection(
+            connectedUser, integration, integrationInstanceConfiguration, connectionParameters);
 
         return integrationInstanceService.create(
             connectedUser.getId(), connectionId, integrationInstanceConfiguration.getId());
@@ -324,6 +327,303 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .toList();
     }
 
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @PreAuthorize("isTenantAdmin()")
+    public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        Map<Long, List<IntegrationInstanceConfiguration>> integrationInstanceConfigurationsByIntegrationId =
+            integrationInstanceConfigurationService
+                .getIntegrationInstanceConfigurations(connectedUser.getEnvironment(), true)
+                .stream()
+                .collect(Collectors.groupingBy(
+                    IntegrationInstanceConfiguration::getIntegrationId, LinkedHashMap::new, Collectors.toList()));
+
+        List<ProvisionableIntegrationDTO> provisionableIntegrations = new ArrayList<>();
+
+        for (List<IntegrationInstanceConfiguration> integrationInstanceConfigurations : integrationInstanceConfigurationsByIntegrationId
+            .values()) {
+
+            Integration integration = integrationService.getIntegration(
+                integrationInstanceConfigurations.getFirst()
+                    .getIntegrationId());
+
+            if (!embeddedPermissionEvaluator.evaluate(integration.getPermissionExpression(), connectedUser)) {
+                continue;
+            }
+
+            toProvisionableIntegrationDTO(connectedUser, integration, integrationInstanceConfigurations)
+                .ifPresent(provisionableIntegrations::add);
+        }
+
+        return provisionableIntegrations;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @PreAuthorize("isTenantAdmin()")
+    public long provisionIntegrationInstance(
+        long connectedUserId, long integrationInstanceConfigurationId,
+        @Nullable Map<String, Object> connectionParameters,
+        @Nullable List<ProvisionIntegrationInstanceWorkflowDTO> workflows) {
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
+
+        if (integrationInstanceConfiguration.getEnvironment() != connectedUser.getEnvironment()) {
+            throw new ConfigurationException(
+                "Integration instance configuration id=%s does not exist in environment=%s".formatted(
+                    integrationInstanceConfigurationId, connectedUser.getEnvironment()),
+                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_NOT_FOUND);
+        }
+
+        if (!integrationInstanceConfiguration.isEnabled()) {
+            throw new ConfigurationException(
+                "Integration instance configuration id=%s is disabled".formatted(integrationInstanceConfigurationId),
+                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_DISABLED);
+        }
+
+        Integration integration = integrationService.getIntegration(
+            integrationInstanceConfiguration.getIntegrationId());
+
+        if (!embeddedPermissionEvaluator.evaluate(integration.getPermissionExpression(), connectedUser)) {
+            throw new EmbeddedIntegrationNotVisibleException(integration.getId());
+        }
+
+        Map<String, Map<String, Object>> inputsByWorkflowId = getProvisionedWorkflowInputs(
+            connectedUser, integration, integrationInstanceConfiguration, workflows == null ? List.of() : workflows);
+
+        long connectionId = createConnection(
+            connectedUser, integration, integrationInstanceConfiguration,
+            connectionParameters == null ? Map.of() : connectionParameters);
+
+        IntegrationInstance integrationInstance = null;
+        List<String> enableAttemptedWorkflowIds = new ArrayList<>();
+
+        try {
+            connectionService.updateCreatedBy(connectionId, connectedUser.getExternalId());
+
+            integrationInstance = integrationInstanceService.create(
+                connectedUser.getId(), connectionId, integrationInstanceConfiguration.getId());
+
+            long integrationInstanceId = integrationInstance.getId();
+
+            for (Map.Entry<String, Map<String, Object>> entry : inputsByWorkflowId.entrySet()) {
+                integrationInstanceFacade.updateIntegrationInstanceWorkflow(
+                    integrationInstanceId, entry.getKey(), entry.getValue());
+
+                enableAttemptedWorkflowIds.add(entry.getKey());
+
+                integrationInstanceFacade.enableIntegrationInstanceWorkflow(integrationInstanceId, entry.getKey(),
+                    true);
+            }
+
+            return integrationInstanceId;
+        } catch (RuntimeException exception) {
+            removeProvisionedIntegrationInstance(
+                integrationInstance, connectionId, enableAttemptedWorkflowIds, exception);
+
+            throw exception;
+        }
+    }
+
+    private long createConnection(
+        ConnectedUser connectedUser, Integration integration,
+        IntegrationInstanceConfiguration integrationInstanceConfiguration, Map<String, Object> connectionParameters) {
+
+        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+            integration.getComponentName(), integration.getComponentVersion());
+
+        ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
+
+        Map<String, Object> mergedParameters = new HashMap<>(
+            integrationInstanceConfiguration.getConnectionParameters());
+
+        mergedParameters.putAll(connectionParameters);
+
+        Environment environment = integrationInstanceConfiguration.getEnvironment();
+
+        String connectionName = getConnectionName(
+            connectedUser.getId(), integration.getComponentName(), integrationInstanceConfiguration.getName(),
+            environment);
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(integrationInstanceConfiguration.getAuthorizationType())
+            .componentName(integration.getComponentName())
+            .connectionVersion(connectionDefinition.getVersion())
+            .environmentId(environment.ordinal())
+            .name(connectionName)
+            .parameters(mergedParameters)
+            .tags(List.of())
+            .build();
+
+        return connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+    }
+
+    private Map<String, Map<String, Object>> getProvisionedWorkflowInputs(
+        ConnectedUser connectedUser, Integration integration,
+        IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        List<ProvisionIntegrationInstanceWorkflowDTO> workflows) {
+
+        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            integration.getId(), integrationInstanceConfiguration.getIntegrationVersion());
+
+        Set<String> enabledConfigurationWorkflowIds = integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfiguration.getId())
+            .stream()
+            .filter(IntegrationInstanceConfigurationWorkflow::isEnabled)
+            .map(IntegrationInstanceConfigurationWorkflow::getWorkflowId)
+            .collect(Collectors.toSet());
+
+        Set<String> mcpWorkflowUuids = getMcpWorkflows(integration.getId(), connectedUser)
+            .stream()
+            .map(ConnectedUserIntegrationDTO.McpWorkflowInfo::workflowUuid)
+            .collect(Collectors.toSet());
+
+        Map<String, Map<String, Object>> inputsByWorkflowId = new LinkedHashMap<>();
+
+        for (ProvisionIntegrationInstanceWorkflowDTO workflow : workflows) {
+            IntegrationWorkflow integrationWorkflow = integrationWorkflows.stream()
+                .filter(curIntegrationWorkflow -> Objects.equals(
+                    curIntegrationWorkflow.getUuidAsString(), workflow.workflowUuid()))
+                .filter(curIntegrationWorkflow -> !mcpWorkflowUuids.contains(curIntegrationWorkflow.getUuidAsString()))
+                .filter(curIntegrationWorkflow -> enabledConfigurationWorkflowIds.contains(
+                    curIntegrationWorkflow.getWorkflowId()))
+                .findFirst()
+                .orElseThrow(() -> new ConfigurationException(
+                    "Workflow uuid=%s is not an enabled workflow of integration instance configuration id=%s".formatted(
+                        workflow.workflowUuid(), integrationInstanceConfiguration.getId()),
+                    IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION));
+
+            if (!embeddedPermissionEvaluator.evaluate(integrationWorkflow.getPermissionExpression(), connectedUser)) {
+                throw new EmbeddedIntegrationNotVisibleException(integration.getId());
+            }
+
+            Map<String, Object> inputs = workflow.inputs();
+
+            inputsByWorkflowId.put(integrationWorkflow.getWorkflowId(), inputs == null ? Map.of() : inputs);
+        }
+
+        return inputsByWorkflowId;
+    }
+
+    private void removeProvisionedIntegrationInstance(
+        @Nullable IntegrationInstance integrationInstance, long connectionId, List<String> enableAttemptedWorkflowIds,
+        RuntimeException failure) {
+
+        if (integrationInstance != null) {
+            long integrationInstanceId = integrationInstance.getId();
+
+            for (String enableAttemptedWorkflowId : enableAttemptedWorkflowIds) {
+                try {
+                    integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+                        integrationInstanceId, enableAttemptedWorkflowId, false);
+                } catch (RuntimeException exception) {
+                    failure.addSuppressed(exception);
+                }
+            }
+
+            try {
+                integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
+
+                integrationInstanceService.delete(integrationInstanceId);
+            } catch (RuntimeException exception) {
+                failure.addSuppressed(exception);
+            }
+        }
+
+        try {
+            connectionFacade.delete(connectionId);
+        } catch (RuntimeException exception) {
+            failure.addSuppressed(exception);
+        }
+    }
+
+    private Optional<ProvisionableIntegrationDTO> toProvisionableIntegrationDTO(
+        ConnectedUser connectedUser, Integration integration,
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
+
+        List<IntegrationInstanceConfiguration> sortedIntegrationInstanceConfigurations =
+            integrationInstanceConfigurations.stream()
+                .sorted(IntegrationInstanceConfigurationServiceImpl.SELF_SERVE_ORDER)
+                .toList();
+
+        IntegrationInstanceConfiguration selfServeIntegrationInstanceConfiguration =
+            sortedIntegrationInstanceConfigurations.getLast();
+
+        List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows;
+        ConnectionDefinition connectionDefinition;
+
+        try {
+            mcpWorkflows = getMcpWorkflows(integration.getId(), connectedUser);
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                integration.getComponentName(), integration.getComponentVersion());
+
+            connectionDefinition = componentDefinition.getConnection();
+        } catch (RuntimeException exception) {
+            log.warn("Skipping provisionable integration id={}, it could not be assembled", integration.getId(),
+                exception);
+
+            return Optional.empty();
+        }
+
+        IntegrationDTO integrationDTO = null;
+        List<ProvisionableIntegrationDTO.ProvisionableIntegrationInstanceConfiguration> provisionableConfigurations =
+            new ArrayList<>();
+
+        for (IntegrationInstanceConfiguration integrationInstanceConfiguration : sortedIntegrationInstanceConfigurations) {
+            IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO;
+            ConnectedUserIntegrationDTO.OAuth2 oAuth2;
+
+            try {
+                integrationInstanceConfigurationDTO = filterWorkflows(
+                    integrationInstanceConfigurationDTOAssembler.toConnectedUserIntegrationInstanceConfigurationDTO(
+                        integrationInstanceConfiguration.getId()),
+                    connectedUser, mcpWorkflows);
+
+                oAuth2 = connectionDefinition == null
+                    ? null
+                    : getOAuth2(
+                        integration.getComponentName(), connectionDefinition, integrationInstanceConfigurationDTO);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Skipping provisionable integration instance configuration id={}, it could not be assembled",
+                    integrationInstanceConfiguration.getId(), exception);
+
+                continue;
+            }
+
+            integrationDTO = integrationInstanceConfigurationDTO.integration();
+
+            List<String> sharedConnectionParameterNames = integrationInstanceConfiguration.getConnectionParameters()
+                .keySet()
+                .stream()
+                .sorted()
+                .toList();
+
+            provisionableConfigurations.add(
+                new ProvisionableIntegrationDTO.ProvisionableIntegrationInstanceConfiguration(
+                    integrationInstanceConfigurationDTO,
+                    Objects.equals(
+                        integrationInstanceConfiguration.getId(), selfServeIntegrationInstanceConfiguration.getId()),
+                    sharedConnectionParameterNames,
+                    oAuth2 == null ? null : oAuth2.oAuth2AuthorizationParameters(),
+                    oAuth2 == null ? null : oAuth2.redirectUri()));
+        }
+
+        if (provisionableConfigurations.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+            new ProvisionableIntegrationDTO(
+                integrationDTO, integration.getComponentVersion(), provisionableConfigurations));
+    }
+
     private String getConnectionName(
         long connectedUserId, String componentName, String name, Environment environment) {
 
@@ -376,8 +676,14 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         Map<String, String> permissionExpressionsByUuid = new HashMap<>();
 
-        for (IntegrationWorkflow integrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
-            integrationInstanceConfigurationDTO.integrationId())) {
+        Integer integrationVersion = integrationInstanceConfigurationDTO.integrationVersion();
+
+        List<IntegrationWorkflow> integrationWorkflows = integrationVersion == null
+            ? integrationWorkflowService.getIntegrationWorkflows(integrationInstanceConfigurationDTO.integrationId())
+            : integrationWorkflowService.getIntegrationWorkflows(
+                integrationInstanceConfigurationDTO.integrationId(), integrationVersion);
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflows) {
 
             String uuid = integrationWorkflow.getUuidAsString();
 
@@ -504,23 +810,29 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                         integrationInstanceConfigurationDTO.authorizationType(),
                         integrationDTO.componentName())));
 
-        ConnectedUserIntegrationDTO.OAuth2 oAuth2 = null;
-
-        if (StringUtils.startsWith(authorization.getType()
-            .name(), "OAUTH2")) {
-
-            OAuth2AuthorizationParameters oAuth2AuthorizationParameters = oAuth2ParametersFacade
-                .getOAuth2AuthorizationParameters(
-                    integrationDTO.componentName(), connectionDefinition.getVersion(),
-                    integrationInstanceConfigurationDTO.connectionParameters(),
-                    integrationInstanceConfigurationDTO.authorizationType());
-
-            oAuth2 = new ConnectedUserIntegrationDTO.OAuth2(
-                oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
-        }
+        ConnectedUserIntegrationDTO.OAuth2 oAuth2 = getOAuth2(
+            integrationDTO.componentName(), connectionDefinition, integrationInstanceConfigurationDTO);
 
         return new ConnectedUserIntegrationDTO.ConnectionConfig(
             authorization.getType(), oAuth2, authorization.getProperties());
+    }
+
+    private ConnectedUserIntegrationDTO.@Nullable OAuth2 getOAuth2(
+        String componentName, ConnectionDefinition connectionDefinition,
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
+
+        AuthorizationType authorizationType = integrationInstanceConfigurationDTO.authorizationType();
+
+        if (authorizationType == null || !StringUtils.startsWith(authorizationType.name(), "OAUTH2")) {
+            return null;
+        }
+
+        OAuth2AuthorizationParameters oAuth2AuthorizationParameters = oAuth2ParametersFacade
+            .getOAuth2AuthorizationParameters(
+                componentName, connectionDefinition.getVersion(),
+                integrationInstanceConfigurationDTO.connectionParameters(), authorizationType);
+
+        return new ConnectedUserIntegrationDTO.OAuth2(oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
     }
 
     private Map<Long, IntegrationInstanceConfigurationDTO> getInstanceConfigurations(
@@ -539,7 +851,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             }
 
             IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
-                integrationInstanceConfigurationFacade.getConnectedUserIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationDTOAssembler.toConnectedUserIntegrationInstanceConfigurationDTO(
                     integrationInstanceConfigurationId);
 
             integrationInstanceConfigurationsById.put(

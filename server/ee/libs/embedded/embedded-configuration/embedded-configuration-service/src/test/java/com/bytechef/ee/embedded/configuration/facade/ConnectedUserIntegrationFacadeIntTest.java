@@ -9,12 +9,17 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -46,6 +51,11 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO.ProvisionableIntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -55,8 +65,10 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -116,7 +128,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ContextConfiguration;
@@ -158,6 +172,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class ConnectedUserIntegrationFacadeIntTest {
 
     private static final long CONNECTION_ID = 42L;
+    private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID = 501L;
+    private static final long MCP_SERVER_ID = 601L;
 
     private static final String TRIGGER_WORKFLOW_DEFINITION = """
         {"label":"%s","triggers":[{"name":"trigger_1","type":"slack/v1/newMessage","parameters":{}}],\
@@ -186,6 +202,15 @@ class ConnectedUserIntegrationFacadeIntTest {
 
     @Autowired
     private IntegrationWorkflowService integrationWorkflowService;
+
+    @Autowired
+    private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
+
+    @Autowired
+    private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+
+    @Autowired
+    private McpServerService mcpServerService;
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
@@ -358,11 +383,33 @@ class ConnectedUserIntegrationFacadeIntTest {
     static class ConnectedUserServiceConfiguration {
     }
 
+    private void exposeAsMcpWorkflow(
+        long integrationId, long integrationInstanceConfigurationId, IntegrationWorkflow mcpIntegrationWorkflow) {
+
+        IntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationId, mcpIntegrationWorkflow.getWorkflowId());
+
+        when(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurationsByIntegrationId(
+            integrationId))
+                .thenReturn(List.of(
+                    new McpIntegrationInstanceConfiguration(
+                        MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, integrationInstanceConfigurationId,
+                        MCP_SERVER_ID)));
+        when(mcpServerService.getMcpServer(MCP_SERVER_ID))
+            .thenReturn(new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
+        when(mcpIntegrationInstanceConfigurationWorkflowService
+            .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
+                MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID))
+                    .thenReturn(List.of(
+                        new McpIntegrationInstanceConfigurationWorkflow(
+                            MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID,
+                            mcpIntegrationInstanceConfigurationWorkflow.getId())));
+    }
+
     @Nested
     class PermissionFilter {
 
-        private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID = 501L;
-        private static final long MCP_SERVER_ID = 601L;
         private static final String PRO_PLAN_PERMISSION_EXPRESSION = "metadata['plan'] == 'pro'";
 
         private static final String WORKFLOW_DEFINITION = """
@@ -376,15 +423,6 @@ class ConnectedUserIntegrationFacadeIntTest {
 
         @Autowired
         private ConnectionService connectionService;
-
-        @Autowired
-        private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
-
-        @Autowired
-        private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
-
-        @Autowired
-        private McpServerService mcpServerService;
 
         @BeforeEach
         void beforeEach() {
@@ -795,30 +833,6 @@ class ConnectedUserIntegrationFacadeIntTest {
             return integration.getId();
         }
 
-        private void exposeAsMcpWorkflow(
-            long integrationId, long integrationInstanceConfigurationId, IntegrationWorkflow mcpIntegrationWorkflow) {
-
-            IntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
-                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                    integrationInstanceConfigurationId, mcpIntegrationWorkflow.getWorkflowId());
-
-            when(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurationsByIntegrationId(
-                integrationId))
-                    .thenReturn(List.of(
-                        new McpIntegrationInstanceConfiguration(
-                            MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, integrationInstanceConfigurationId,
-                            MCP_SERVER_ID)));
-            when(mcpServerService.getMcpServer(MCP_SERVER_ID))
-                .thenReturn(new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
-            when(mcpIntegrationInstanceConfigurationWorkflowService
-                .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
-                    MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID))
-                        .thenReturn(List.of(
-                            new McpIntegrationInstanceConfigurationWorkflow(
-                                MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID,
-                                mcpIntegrationInstanceConfigurationWorkflow.getId())));
-        }
-
         private ConnectedUserIntegrationDTO getConnectedUserIntegration(String externalUserId, long integrationId) {
             return connectedUserIntegrationFacade
                 .getConnectedUserIntegrations(externalUserId, true, Environment.PRODUCTION)
@@ -984,6 +998,761 @@ class ConnectedUserIntegrationFacadeIntTest {
             integrationInstanceService.delete(integrationInstance.getId());
 
             connectionNamesById.remove(integrationInstance.getConnectionId());
+        }
+    }
+
+    @Nested
+    class ProvisioningTests {
+
+        private static final String PRO_PLAN_PERMISSION_EXPRESSION = "metadata['plan'] == 'pro'";
+
+        @Autowired
+        private ComponentDefinitionService componentDefinitionService;
+
+        @Autowired
+        private ConnectionDefinitionService connectionDefinitionService;
+
+        @Autowired
+        private ConnectionFacade connectionFacade;
+
+        @Autowired
+        private ConnectionService connectionService;
+
+        @Autowired
+        private OAuth2ParametersFacade oAuth2ParametersFacade;
+
+        @Autowired
+        private OAuth2Service oAuth2Service;
+
+        private long connectedUserId;
+        private long provisioningIntegrationId;
+        private long version1ConfigurationId;
+        private String workflowIdA;
+        private String workflowIdB;
+        private String workflowUuidA;
+        private String workflowUuidB;
+
+        @BeforeEach
+        void beforeEach() {
+            when(componentDefinitionService.getComponentDefinition(anyString(), any()))
+                .thenReturn(
+                    new ComponentDefinition(
+                        ComponentDsl.component("slack")
+                            .connection(
+                                ComponentDsl.connection()
+                                    .authorizations(
+                                        ComponentDsl.authorization(AuthorizationType.API_KEY)
+                                            .properties(ComponentDsl.string("token"))))));
+            when(connectionDefinitionService.getConnectionDefinition(anyString(), any()))
+                .thenReturn(mock(ConnectionDefinition.class));
+            when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
+                .thenReturn(CONNECTION_ID);
+
+            connectedUserId = createConnectedUser(Map.of());
+            provisioningIntegrationId = createIntegrationRow(null);
+            version1ConfigurationId = createConfiguration(
+                provisioningIntegrationId, 1, Environment.PRODUCTION, true, Map.of("sharedKey", "shared"));
+
+            IntegrationWorkflow integrationWorkflowA = addConfigurationWorkflow(
+                provisioningIntegrationId, version1ConfigurationId, 1, "workflow-a", null);
+
+            workflowIdA = integrationWorkflowA.getWorkflowId();
+            workflowUuidA = integrationWorkflowA.getUuidAsString();
+
+            IntegrationWorkflow integrationWorkflowB = addConfigurationWorkflow(
+                provisioningIntegrationId, version1ConfigurationId, 1, "workflow-b", null);
+
+            workflowIdB = integrationWorkflowB.getWorkflowId();
+            workflowUuidB = integrationWorkflowB.getUuidAsString();
+        }
+
+        @Test
+        void testProvisioningCreatesConnectionInstanceAndEnabledWorkflowsWithInputs() {
+            long instanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of("token", "t"),
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of("channel", "#ops"))));
+
+            IntegrationInstance instance = integrationInstanceService.getIntegrationInstance(instanceId);
+
+            assertThat(instance.getIntegrationInstanceConfigurationId()).isEqualTo(version1ConfigurationId);
+            assertThat(instance.getConnectionId()).isEqualTo(CONNECTION_ID);
+            assertThat(instance.getConnectedUserId()).isEqualTo(connectedUserId);
+
+            IntegrationInstanceWorkflow workflowA = integrationInstanceWorkflowService
+                .fetchIntegrationInstanceWorkflow(instanceId, workflowIdA)
+                .orElseThrow();
+
+            Map<String, ?> workflowAInputs = workflowA.getInputs();
+
+            assertThat(workflowA.isEnabled()).isTrue();
+            assertThat(workflowAInputs.get("channel")).isEqualTo("#ops");
+            assertThat(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(instanceId, workflowIdB))
+                .isEmpty();
+
+            ArgumentCaptor<ConnectionDTO> connectionCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
+
+            verify(connectionFacade).create(connectionCaptor.capture(), eq(PlatformType.EMBEDDED));
+
+            ConnectionDTO connectionDTO = connectionCaptor.getValue();
+
+            Map<String, ?> connectionParameters = connectionDTO.parameters();
+
+            assertThat(connectionParameters.get("token")).isEqualTo("t");
+            assertThat(connectionParameters.get("sharedKey")).isEqualTo("shared");
+            assertThat(connectionDTO.authorizationType()).isEqualTo(AuthorizationType.API_KEY);
+
+            verify(triggerLifecycleFacade).executeTriggerEnable(
+                eq(workflowIdA), any(), any(), any(), eq(CONNECTION_ID), any(), anyLong());
+            verify(triggerLifecycleFacade, never()).executeTriggerEnable(
+                eq(workflowIdB), any(), any(), any(), any(), any(), anyLong());
+        }
+
+        @Test
+        void testProvisionedConnectionIsOwnedByTheConnectedUserLogin() {
+            connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of("token", "t"), List.of());
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+            verify(connectionService).updateCreatedBy(CONNECTION_ID, connectedUser.getExternalId());
+        }
+
+        @Test
+        void testProvisioningTreatsNullConnectionParametersAndWorkflowsAsEmpty() {
+            long instanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, null, null);
+
+            assertThat(integrationInstanceService.getIntegrationInstance(instanceId)
+                .getIntegrationInstanceConfigurationId()).isEqualTo(version1ConfigurationId);
+
+            ArgumentCaptor<ConnectionDTO> connectionCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
+
+            verify(connectionFacade).create(connectionCaptor.capture(), eq(PlatformType.EMBEDDED));
+
+            ConnectionDTO connectionDTO = connectionCaptor.getValue();
+
+            assertThat(connectionDTO.parameters()).containsOnlyKeys("sharedKey");
+        }
+
+        @Test
+        void testProvisioningRefusesAnMcpWorkflow() {
+            IntegrationWorkflow mcpIntegrationWorkflow = addConfigurationWorkflow(
+                provisioningIntegrationId, version1ConfigurationId, 1, "mcp", null);
+
+            exposeAsMcpWorkflow(provisioningIntegrationId, version1ConfigurationId, mcpIntegrationWorkflow);
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(
+                    new ProvisionIntegrationInstanceWorkflowDTO(mcpIntegrationWorkflow.getUuidAsString(), Map.of()))))
+                        .isInstanceOf(ConfigurationException.class)
+                        .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                        .isEqualTo(
+                            IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
+
+            verifyNoInteractions(connectionFacade);
+        }
+
+        @Test
+        void testProvisioningRefusesADisabledConfiguration() {
+            long disabledConfigurationId = createConfiguration(
+                provisioningIntegrationId, 2, Environment.PRODUCTION, false, Map.of());
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, disabledConfigurationId, Map.of(), List.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                    .isEqualTo(IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_DISABLED.getErrorKey());
+
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
+
+            verifyNoInteractions(connectionFacade);
+        }
+
+        @Test
+        void testProvisioningRefusesAConfigurationFromAnotherEnvironment() {
+            long stagingConfigurationId = createConfiguration(
+                provisioningIntegrationId, 1, Environment.STAGING, true, Map.of());
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, stagingConfigurationId, Map.of(), List.of()))
+                    .isInstanceOf(ConfigurationException.class)
+                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                    .isEqualTo(
+                        IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_NOT_FOUND.getErrorKey());
+
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
+
+            verifyNoInteractions(connectionFacade);
+        }
+
+        @Test
+        void testProvisioningRefusesAWorkflowNotInTheConfiguration() {
+            long version2ConfigurationId = createConfiguration(
+                provisioningIntegrationId, 2, Environment.PRODUCTION, true, Map.of());
+
+            IntegrationWorkflow version2OnlyWorkflow = addConfigurationWorkflow(
+                provisioningIntegrationId, version2ConfigurationId, 2, "v2-only", null);
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(
+                    new ProvisionIntegrationInstanceWorkflowDTO(version2OnlyWorkflow.getUuidAsString(), Map.of()))))
+                        .isInstanceOf(ConfigurationException.class)
+                        .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                        .isEqualTo(
+                            IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
+
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
+
+            verifyNoInteractions(connectionFacade);
+        }
+
+        @Test
+        void testProvisioningRefusesADisabledConfigurationWorkflow() {
+            IntegrationWorkflow disabledWorkflow = addConfigurationWorkflow(
+                provisioningIntegrationId, version1ConfigurationId, 1, "disabled", null, false);
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(disabledWorkflow.getUuidAsString(), Map.of()))))
+                    .isInstanceOf(ConfigurationException.class)
+                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                    .isEqualTo(IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
+
+            verifyNoInteractions(connectionFacade);
+        }
+
+        @Test
+        void testProvisioningRefusesAnIntegrationHiddenByThePermissionExpression() {
+            long hiddenIntegrationId = createIntegrationRow(PRO_PLAN_PERMISSION_EXPRESSION);
+            long hiddenConfigurationId = createConfiguration(
+                hiddenIntegrationId, 1, Environment.PRODUCTION, true, Map.of());
+
+            long freeConnectedUserId = createConnectedUser(Map.of("plan", "free"));
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                freeConnectedUserId, hiddenConfigurationId, Map.of(), List.of()))
+                    .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
+
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(freeConnectedUserId))
+                .isEmpty();
+
+            verifyNoInteractions(connectionFacade);
+        }
+
+        @Test
+        void testProvisioningRefusesAWorkflowHiddenByThePermissionExpression() {
+            IntegrationWorkflow gatedWorkflow = addConfigurationWorkflow(
+                provisioningIntegrationId, version1ConfigurationId, 1, "gated", PRO_PLAN_PERMISSION_EXPRESSION);
+
+            long freeConnectedUserId = createConnectedUser(Map.of("plan", "free"));
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                freeConnectedUserId, version1ConfigurationId, Map.of(),
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(gatedWorkflow.getUuidAsString(), Map.of()))))
+                    .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
+
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(freeConnectedUserId))
+                .isEmpty();
+
+            verifyNoInteractions(connectionFacade);
+        }
+
+        @Test
+        void testProvisioningAllowsASecondInstanceOnTheSameConfiguration() {
+            long firstInstanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(), List.of());
+            long secondInstanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(), List.of());
+
+            assertThat(secondInstanceId).isNotEqualTo(firstInstanceId);
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId))
+                .extracting(IntegrationInstance::getId, IntegrationInstance::getIntegrationInstanceConfigurationId)
+                .containsExactlyInAnyOrder(
+                    tuple(firstInstanceId, version1ConfigurationId), tuple(secondInstanceId, version1ConfigurationId));
+        }
+
+        @Test
+        void testProvisioningRollsBackInstanceConnectionAndTriggersWhenAWorkflowFailsToEnable() {
+            doThrow(new IllegalStateException("trigger registration failed"))
+                .when(triggerLifecycleFacade)
+                .executeTriggerEnable(eq(workflowIdB), any(), any(), any(), any(), any(), anyLong());
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()),
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of()))))
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessage("trigger registration failed");
+
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
+
+            verify(triggerLifecycleFacade).executeTriggerDisable(
+                eq(workflowIdA), any(), any(), any(), eq(CONNECTION_ID));
+            verify(connectionFacade).delete(CONNECTION_ID);
+        }
+
+        @Test
+        void testProvisioningDisablesTheWorkflowWhoseEnableFailedAfterItsTriggerWasRegistered() {
+            IllegalStateException enableFailure = new IllegalStateException("trigger state save failed");
+
+            doThrow(enableFailure)
+                .when(triggerLifecycleFacade)
+                .executeTriggerEnable(eq(workflowIdB), any(), any(), any(), any(), any(), anyLong());
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()),
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of()))))
+                        .isSameAs(enableFailure);
+
+            verify(triggerLifecycleFacade).executeTriggerDisable(
+                eq(workflowIdB), any(), any(), any(), eq(CONNECTION_ID));
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
+            verify(connectionFacade).delete(CONNECTION_ID);
+        }
+
+        @Test
+        void testProvisioningKeepsTheEnableFailureWhenDisablingTheInFlightWorkflowFails() {
+            IllegalStateException enableFailure = new IllegalStateException("trigger state save failed");
+            IllegalStateException disableFailure = new IllegalStateException("trigger disable failed");
+
+            doThrow(enableFailure)
+                .when(triggerLifecycleFacade)
+                .executeTriggerEnable(eq(workflowIdA), any(), any(), any(), any(), any(), anyLong());
+            doThrow(disableFailure)
+                .when(triggerLifecycleFacade)
+                .executeTriggerDisable(eq(workflowIdA), any(), any(), any(), any());
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()))))
+                    .isSameAs(enableFailure)
+                    .hasSuppressedException(disableFailure);
+
+            assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
+            verify(connectionFacade).delete(CONNECTION_ID);
+        }
+
+        @Test
+        void testProvisionableIntegrationsListsEnabledVisibleConfigurationsAndMarksTheSelfServeOne() {
+            long listedIntegrationId = createIntegrationRow(null, 3);
+
+            long listedVersion1ConfigurationId = createConfiguration(
+                listedIntegrationId, 1, Environment.PRODUCTION, true, Map.of("clientId", "x"));
+            long listedVersion2ConfigurationId = createConfiguration(
+                listedIntegrationId, 2, Environment.PRODUCTION, true, Map.of());
+
+            createConfiguration(listedIntegrationId, 3, Environment.PRODUCTION, false, Map.of());
+
+            String visibleWorkflowUuid = addConfigurationWorkflow(
+                listedIntegrationId, listedVersion1ConfigurationId, 1, "visible", null)
+                    .getUuidAsString();
+
+            addConfigurationWorkflow(
+                listedIntegrationId, listedVersion1ConfigurationId, 1, "gated", PRO_PLAN_PERMISSION_EXPRESSION);
+            addConfigurationWorkflow(listedIntegrationId, listedVersion1ConfigurationId, 1, "disabled", null, false);
+            addConfigurationWorkflow(listedIntegrationId, listedVersion2ConfigurationId, 2, "v2", null);
+
+            long hiddenIntegrationId = createIntegrationRow(PRO_PLAN_PERMISSION_EXPRESSION);
+
+            createConfiguration(hiddenIntegrationId, 1, Environment.PRODUCTION, true, Map.of());
+
+            long stagingIntegrationId = createIntegrationRow(null);
+
+            createConfiguration(stagingIntegrationId, 1, Environment.STAGING, true, Map.of());
+
+            long freeConnectedUserId = createConnectedUser(Map.of("plan", "free"));
+
+            List<ProvisionableIntegrationDTO> integrations =
+                connectedUserIntegrationFacade.getProvisionableIntegrations(freeConnectedUserId);
+
+            assertThat(integrations)
+                .extracting(integration -> integration.integration()
+                    .id())
+                .contains(listedIntegrationId)
+                .doesNotContain(hiddenIntegrationId, stagingIntegrationId);
+
+            ProvisionableIntegrationDTO listedIntegration = integrations.stream()
+                .filter(integration -> Objects.equals(
+                    integration.integration()
+                        .id(),
+                    listedIntegrationId))
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(listedIntegration.componentVersion()).isEqualTo(3);
+
+            List<ProvisionableIntegrationInstanceConfiguration> configurations =
+                listedIntegration.integrationInstanceConfigurations();
+
+            assertThat(configurations)
+                .extracting(
+                    configuration -> configuration.integrationInstanceConfiguration()
+                        .integrationVersion(),
+                    ProvisionableIntegrationInstanceConfiguration::selfServe)
+                .containsExactly(tuple(1, false), tuple(2, true));
+
+            ProvisionableIntegrationInstanceConfiguration version1Configuration = configurations.getFirst();
+
+            assertThat(version1Configuration.sharedConnectionParameterNames()).containsExactly("clientId");
+            assertThat(version1Configuration.integrationInstanceConfiguration()
+                .integrationInstanceConfigurationWorkflows())
+                    .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                    .containsExactly(visibleWorkflowUuid);
+            assertThat(version1Configuration.oAuth2AuthorizationParameters()).isNull();
+        }
+
+        @Test
+        void testProvisionableIntegrationsUseThePermissionExpressionOfTheConfigurationsOwnVersion() {
+            long versionedIntegrationId = createIntegrationRow(null);
+
+            long versionedVersion1ConfigurationId = createConfiguration(
+                versionedIntegrationId, 1, Environment.PRODUCTION, true, Map.of());
+            long versionedVersion2ConfigurationId = createConfiguration(
+                versionedIntegrationId, 2, Environment.PRODUCTION, true, Map.of());
+
+            IntegrationWorkflow version1Workflow = addConfigurationWorkflow(
+                versionedIntegrationId, versionedVersion1ConfigurationId, 1, "versioned", null);
+
+            IntegrationWorkflow version2Workflow = addConfigurationWorkflow(
+                versionedIntegrationId, versionedVersion2ConfigurationId, 2, "versioned",
+                PRO_PLAN_PERMISSION_EXPRESSION);
+
+            version2Workflow.setUuid(version1Workflow.getUuidAsString());
+
+            integrationWorkflowService.update(version2Workflow);
+
+            long freeConnectedUserId = createConnectedUser(Map.of("plan", "free"));
+
+            ProvisionableIntegrationDTO versionedIntegration = connectedUserIntegrationFacade
+                .getProvisionableIntegrations(freeConnectedUserId)
+                .stream()
+                .filter(integration -> Objects.equals(
+                    integration.integration()
+                        .id(),
+                    versionedIntegrationId))
+                .findFirst()
+                .orElseThrow();
+
+            List<ProvisionableIntegrationInstanceConfiguration> configurations =
+                versionedIntegration.integrationInstanceConfigurations();
+
+            assertThat(configurations.getFirst()
+                .integrationInstanceConfiguration()
+                .integrationInstanceConfigurationWorkflows())
+                    .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                    .containsExactly(version1Workflow.getUuidAsString());
+            assertThat(configurations.getLast()
+                .integrationInstanceConfiguration()
+                .integrationInstanceConfigurationWorkflows())
+                    .isEmpty();
+        }
+
+        @Test
+        void testProvisionableIntegrationsCarryOAuth2ParametersAndRedirectUriOfAnOAuth2Configuration() {
+            long oAuth2IntegrationId = createIntegrationRow(null);
+
+            createConfiguration(
+                oAuth2IntegrationId, 1, Environment.PRODUCTION, true, Map.of("clientId", "client"),
+                AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+            OAuth2AuthorizationParameters oAuth2AuthorizationParameters = new OAuth2AuthorizationParameters(
+                "https://slack.com/oauth", "client", Map.of(), Map.of());
+
+            when(oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+                eq("slack"), anyInt(), any(), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)))
+                    .thenReturn(oAuth2AuthorizationParameters);
+            when(oAuth2Service.getRedirectUri()).thenReturn("https://bytechef/callback");
+
+            ProvisionableIntegrationDTO oAuth2Integration = connectedUserIntegrationFacade
+                .getProvisionableIntegrations(connectedUserId)
+                .stream()
+                .filter(integration -> Objects.equals(
+                    integration.integration()
+                        .id(),
+                    oAuth2IntegrationId))
+                .findFirst()
+                .orElseThrow();
+
+            List<ProvisionableIntegrationInstanceConfiguration> configurations =
+                oAuth2Integration.integrationInstanceConfigurations();
+
+            ProvisionableIntegrationInstanceConfiguration configuration = configurations.getFirst();
+
+            assertThat(configuration.oAuth2AuthorizationParameters()).isEqualTo(oAuth2AuthorizationParameters);
+            assertThat(configuration.redirectUri()).isEqualTo("https://bytechef/callback");
+            assertThat(configuration.sharedConnectionParameterNames()).containsExactly("clientId");
+        }
+
+        @Test
+        void testProvisionableIntegrationsSkipAnIntegrationWhoseComponentDefinitionFailsToLoad() {
+            long brokenIntegrationId = createIntegrationRow(null, 5);
+
+            createConfiguration(brokenIntegrationId, 1, Environment.PRODUCTION, true, Map.of());
+
+            when(componentDefinitionService.getComponentDefinition("slack", 5))
+                .thenThrow(new IllegalStateException("component definition slack/v5 not found"));
+
+            assertThat(connectedUserIntegrationFacade.getProvisionableIntegrations(connectedUserId))
+                .extracting(integration -> integration.integration()
+                    .id())
+                .contains(provisioningIntegrationId)
+                .doesNotContain(brokenIntegrationId);
+        }
+
+        @Test
+        void testProvisionableIntegrationsSkipAConfigurationThatFailsToAssembleAndKeepTheSelfServeFlag() {
+            long partlyBrokenIntegrationId = createIntegrationRow(null);
+
+            long version1ConfigurationId = createConfiguration(
+                partlyBrokenIntegrationId, 1, Environment.PRODUCTION, true, Map.of());
+
+            createConfiguration(
+                partlyBrokenIntegrationId, 2, Environment.PRODUCTION, true, Map.of("clientId", "client"),
+                AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+            when(oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+                eq("slack"), anyInt(), any(), eq(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)))
+                    .thenThrow(new IllegalStateException("OAuth2 parameters unavailable"));
+
+            ProvisionableIntegrationDTO partlyBrokenIntegration = connectedUserIntegrationFacade
+                .getProvisionableIntegrations(connectedUserId)
+                .stream()
+                .filter(integration -> Objects.equals(
+                    integration.integration()
+                        .id(),
+                    partlyBrokenIntegrationId))
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(partlyBrokenIntegration.integrationInstanceConfigurations())
+                .extracting(
+                    configuration -> configuration.integrationInstanceConfiguration()
+                        .id(),
+                    ProvisionableIntegrationInstanceConfiguration::selfServe)
+                .containsExactly(tuple(version1ConfigurationId, false));
+        }
+
+        @Test
+        void testProvisionableIntegrationsSkipAConfigurationWhoseWorkflowFailsToLoadInATransactionalService() {
+            long partlyBrokenIntegrationId = createIntegrationRow(null);
+
+            long version1ConfigurationId = createConfiguration(
+                partlyBrokenIntegrationId, 1, Environment.PRODUCTION, true, Map.of());
+            long version2ConfigurationId = createConfiguration(
+                partlyBrokenIntegrationId, 2, Environment.PRODUCTION, true, Map.of());
+
+            String missingWorkflowId = "missing-" + UUID.randomUUID();
+
+            integrationWorkflowService.addWorkflow(partlyBrokenIntegrationId, 2, missingWorkflowId);
+
+            IntegrationInstanceConfigurationWorkflow brokenConfigurationWorkflow =
+                new IntegrationInstanceConfigurationWorkflow();
+
+            brokenConfigurationWorkflow.setEnabled(true);
+            brokenConfigurationWorkflow.setIntegrationInstanceConfigurationId(version2ConfigurationId);
+            brokenConfigurationWorkflow.setWorkflowId(missingWorkflowId);
+
+            integrationInstanceConfigurationWorkflowService.create(brokenConfigurationWorkflow);
+
+            ProvisionableIntegrationDTO partlyBrokenIntegration = connectedUserIntegrationFacade
+                .getProvisionableIntegrations(connectedUserId)
+                .stream()
+                .filter(integration -> Objects.equals(
+                    integration.integration()
+                        .id(),
+                    partlyBrokenIntegrationId))
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(partlyBrokenIntegration.integrationInstanceConfigurations())
+                .extracting(
+                    configuration -> configuration.integrationInstanceConfiguration()
+                        .id())
+                .containsExactly(version1ConfigurationId);
+        }
+
+        @Nested
+        @ContextConfiguration(classes = ProvisioningMethodSecurity.MethodSecurityConfiguration.class)
+        @MockitoBean(types = PermissionService.class)
+        class ProvisioningMethodSecurity {
+
+            @Autowired
+            private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
+
+            @Autowired
+            private PermissionService permissionService;
+
+            @AfterEach
+            void afterEach() {
+                SecurityContextHolder.clearContext();
+            }
+
+            @Test
+            void testTenantAdminProvisionsThroughTheGuardedChain() {
+                SecurityContextHolder.getContext()
+                    .setAuthentication(
+                        new UsernamePasswordAuthenticationToken(
+                            "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+                when(permissionService.isTenantAdmin()).thenReturn(true);
+
+                assertThat(integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId))
+                    .extracting(integration -> integration.integration()
+                        .id())
+                    .contains(provisioningIntegrationId);
+
+                long instanceId = integrationInstanceAdminFacade.provisionIntegrationInstance(
+                    connectedUserId, version1ConfigurationId, Map.of("token", "t"),
+                    List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of("channel", "#ops"))));
+
+                IntegrationInstanceWorkflow workflowA = integrationInstanceWorkflowService
+                    .fetchIntegrationInstanceWorkflow(instanceId, workflowIdA)
+                    .orElseThrow();
+
+                assertThat(workflowA.isEnabled()).isTrue();
+                assertThat(integrationInstanceService.getIntegrationInstance(instanceId)
+                    .getConnectedUserId()).isEqualTo(connectedUserId);
+            }
+
+            @Test
+            void testConnectedUserIsDeniedOnTheAdminAndSharedFacades() {
+                ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+                SecurityContextHolder.getContext()
+                    .setAuthentication(
+                        new EmbeddedApiKeyAuthenticationToken(
+                            Environment.PRODUCTION.ordinal(), connectedUserId,
+                            new User(connectedUser.getExternalId(), "", List.of()), false));
+
+                assertThatThrownBy(() -> integrationInstanceAdminFacade.provisionIntegrationInstance(
+                    connectedUserId, version1ConfigurationId, Map.of(), List.of()))
+                        .isInstanceOf(AccessDeniedException.class);
+                assertThatThrownBy(() -> integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId))
+                    .isInstanceOf(AccessDeniedException.class);
+                assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+                    connectedUserId, version1ConfigurationId, Map.of(), List.of()))
+                        .isInstanceOf(AccessDeniedException.class);
+                assertThatThrownBy(() -> connectedUserIntegrationFacade.getProvisionableIntegrations(connectedUserId))
+                    .isInstanceOf(AccessDeniedException.class);
+
+                assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
+
+                verifyNoInteractions(connectionFacade);
+            }
+
+            @Configuration
+            @EnableMethodSecurity
+            static class MethodSecurityConfiguration {
+
+                @Bean
+                static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+                    @Lazy PermissionService permissionService) {
+
+                    return new AutomationMethodSecurityExpressionHandler(permissionService);
+                }
+            }
+        }
+
+        private IntegrationWorkflow addConfigurationWorkflow(
+            long integrationId, long integrationInstanceConfigurationId, int integrationVersion, String label,
+            String permissionExpression) {
+
+            return addConfigurationWorkflow(
+                integrationId, integrationInstanceConfigurationId, integrationVersion, label, permissionExpression,
+                true);
+        }
+
+        private IntegrationWorkflow addConfigurationWorkflow(
+            long integrationId, long integrationInstanceConfigurationId, int integrationVersion, String label,
+            String permissionExpression, boolean enabled) {
+
+            Workflow workflow = workflowService.create(
+                TRIGGER_WORKFLOW_DEFINITION.formatted(label), Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+            IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
+                integrationId, integrationVersion, workflow.getId());
+
+            if (permissionExpression != null) {
+                integrationWorkflow = integrationWorkflowService.updatePermissionExpression(
+                    integrationWorkflow.getId(), permissionExpression);
+            }
+
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                new IntegrationInstanceConfigurationWorkflow();
+
+            integrationInstanceConfigurationWorkflow.setEnabled(enabled);
+            integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+                integrationInstanceConfigurationId);
+            integrationInstanceConfigurationWorkflow.setWorkflowId(workflow.getId());
+
+            integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+            return integrationWorkflow;
+        }
+
+        private long createConfiguration(
+            long integrationId, int integrationVersion, Environment environment, boolean enabled,
+            Map<String, Object> connectionParameters) {
+
+            return createConfiguration(
+                integrationId, integrationVersion, environment, enabled, connectionParameters,
+                AuthorizationType.API_KEY);
+        }
+
+        private long createConfiguration(
+            long integrationId, int integrationVersion, Environment environment, boolean enabled,
+            Map<String, Object> connectionParameters, AuthorizationType authorizationType) {
+
+            IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+            integrationInstanceConfiguration.setAuthorizationType(authorizationType);
+            integrationInstanceConfiguration.setConnectionParameters(connectionParameters);
+            integrationInstanceConfiguration.setEnvironment(environment);
+            integrationInstanceConfiguration.setIntegrationId(integrationId);
+            integrationInstanceConfiguration.setIntegrationVersion(integrationVersion);
+            integrationInstanceConfiguration.setName("Slack");
+
+            integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
+                integrationInstanceConfiguration);
+
+            integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), enabled);
+
+            return integrationInstanceConfiguration.getId();
+        }
+
+        private long createConnectedUser(Map<String, Object> metadata) {
+            String externalUserId = "provisioning-user-" + UUID.randomUUID();
+
+            ConnectedUser connectedUser = connectedUserService.createConnectedUser(
+                externalUserId, Environment.PRODUCTION);
+
+            if (!metadata.isEmpty()) {
+                connectedUserService.updateConnectedUser(externalUserId, Environment.PRODUCTION, metadata);
+            }
+
+            return connectedUser.getId();
+        }
+
+        private long createIntegrationRow(String permissionExpression) {
+            return createIntegrationRow(permissionExpression, 1);
+        }
+
+        private long createIntegrationRow(String permissionExpression, int componentVersion) {
+            Integration integration = new Integration();
+
+            integration.setComponentName("slack");
+            integration.setComponentVersion(componentVersion);
+            integration.setName("Slack " + UUID.randomUUID());
+            integration.setPermissionExpression(permissionExpression);
+
+            integration = integrationService.create(integration);
+
+            return integration.getId();
         }
     }
 }

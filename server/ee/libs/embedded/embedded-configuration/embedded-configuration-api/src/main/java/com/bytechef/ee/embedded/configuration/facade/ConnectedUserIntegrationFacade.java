@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
@@ -30,4 +32,17 @@ public interface ConnectedUserIntegrationFacade {
 
     List<ConnectedUserIntegrationDTO> getConnectedUserIntegrations(
         String externalUserId, boolean enabled, Environment environment);
+
+    List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId);
+
+    /**
+     * Creates the connected user's connection and integration instance on the given configuration and enables the given
+     * workflows with their inputs. If a workflow fails to enable, the workflows already enabled are disabled and the
+     * instance and connection are deleted before the error is rethrown.
+     *
+     * @return the id of the new integration instance
+     */
+    long provisionIntegrationInstance(
+        long connectedUserId, long integrationInstanceConfigurationId, Map<String, Object> connectionParameters,
+        List<ProvisionIntegrationInstanceWorkflowDTO> workflows);
 }
