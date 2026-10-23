@@ -18,11 +18,19 @@ import {
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
 import {ReactNode, useEffect, useRef, useState} from 'react';
+import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useAiAgentTestingChatStore, useTestingModeStore} from '../../../stores';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => message;
+
+// Stored messages have no id, so assistant-ui gives each one an id that ends with its index in the store
+const getMessageIndex = (messageId: string | null) => {
+    const indexMatch = messageId?.match(/(\d+)$/);
+
+    return indexMatch ? Number(indexMatch[1]) : -1;
+};
 
 const attachmentAdapter = new CompositeAttachmentAdapter([
     new SimpleImageAttachmentAdapter(),
@@ -175,14 +183,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         }
     }, [connectionState, sseError, setLastAssistantMessageError]);
 
-    const onNew = async (message: AppendMessage) => {
-        if (message.content[0]?.type !== 'text') {
-            throw new Error('Only text messages are supported');
-        }
-
-        const input = message.content[0].text;
-
-        setMessage({content: input, role: 'user'});
+    const startTestRun = (input: string, attachments: NonNullable<ThreadMessageLike['attachments']>) => {
         setIsRunning(true);
 
         try {
@@ -191,7 +192,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
             const request: SSERequestType = {
                 init: {
                     body: JSON.stringify({
-                        attachments: message.attachments ?? [],
+                        attachments,
                         conversationId,
                         environmentId: currentEnvironmentId,
                         message: input,
@@ -216,6 +217,19 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         }
     };
 
+    const onNew = async (message: AppendMessage) => {
+        if (message.content[0]?.type !== 'text') {
+            throw new Error('Only text messages are supported');
+        }
+
+        const input = message.content[0].text;
+        const attachments = message.attachments ?? [];
+
+        setMessage({attachments: [...attachments], content: input, role: 'user'});
+
+        startTestRun(input, attachments);
+    };
+
     const onEdit = async (message: AppendMessage) => {
         const parentIndex = message.parentId != null ? Number.parseInt(message.parentId, 10) : -1;
         const editedIndex = Number.isNaN(parentIndex) ? messages.length : parentIndex + 1;
@@ -223,6 +237,21 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         truncateMessagesFrom(editedIndex);
 
         await onNew(message);
+    };
+
+    const onReload = async (parentId: string | null) => {
+        const parentIndex = getMessageIndex(parentId);
+        const parentMessage = messages[parentIndex];
+
+        if (parentMessage?.role !== 'user' || typeof parentMessage.content !== 'string') {
+            toast.error('Could not resolve the message to refresh');
+
+            return;
+        }
+
+        truncateMessagesFrom(parentIndex + 1);
+
+        startTestRun(parentMessage.content, parentMessage.attachments ?? []);
     };
 
     const runtime = useExternalStoreRuntime({
@@ -234,6 +263,7 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         messages,
         onEdit,
         onNew,
+        onReload,
     });
 
     return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
