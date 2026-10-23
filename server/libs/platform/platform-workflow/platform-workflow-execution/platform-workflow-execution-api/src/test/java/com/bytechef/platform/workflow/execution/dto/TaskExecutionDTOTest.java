@@ -16,12 +16,15 @@
 
 package com.bytechef.platform.workflow.execution.dto;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.platform.workflow.execution.constant.TaskExecutionMetadataConstants;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -139,5 +142,64 @@ class TaskExecutionDTOTest {
             .getFirst()
             .workflowTask()
             .getName());
+    }
+
+    @Test
+    void testClusterElementCallsFromMetadata() {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(10L)
+            .workflowTask(new WorkflowTask(Map.of("name", "aiAgent_1", "type", "aiAgent/v1/chat")))
+            .build();
+        taskExecution.putMetadata(
+            TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALLS,
+            List.of(
+                Map.of(
+                    "workflowNodeName", "httpClient_1", "status", "COMPLETED", "startDate", "2026-10-23T10:00:00Z",
+                    "endDate", "2026-10-23T10:00:00.412Z"),
+                Map.of(
+                    "workflowNodeName", "slack_1", "status", "FAILED", "startDate", "2026-10-23T10:00:01Z",
+                    "endDate", "2026-10-23T10:00:01.031Z", "error", "boom")));
+
+        TaskExecutionDTO taskExecutionDTO =
+            new TaskExecutionDTO(taskExecution, "AI Agent", "icon", Map.of(), null, null);
+
+        assertThat(taskExecutionDTO.clusterElementCalls()).containsExactly(
+            new ClusterElementCallDTO(
+                "httpClient_1", "COMPLETED", Instant.parse("2026-10-23T10:00:00Z"),
+                Instant.parse("2026-10-23T10:00:00.412Z"), null),
+            new ClusterElementCallDTO(
+                "slack_1", "FAILED", Instant.parse("2026-10-23T10:00:01Z"),
+                Instant.parse("2026-10-23T10:00:01.031Z"), "boom"));
+    }
+
+    @Test
+    void testNoClusterElementCallsIsEmptyList() {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(10L)
+            .workflowTask(new WorkflowTask(Map.of("name", "aiAgent_1", "type", "aiAgent/v1/chat")))
+            .build();
+
+        TaskExecutionDTO taskExecutionDTO = new TaskExecutionDTO(taskExecution, "Task", "icon", Map.of(), null, null);
+
+        assertThat(taskExecutionDTO.clusterElementCalls()).isEmpty();
+    }
+
+    @Test
+    void testBuildHierarchyKeepsClusterElementCalls() {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(10L)
+            .workflowTask(new WorkflowTask(Map.of("name", "aiAgent_1", "type", "aiAgent/v1/chat")))
+            .build();
+        taskExecution.putMetadata(
+            TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALLS,
+            List.of(
+                Map.of("workflowNodeName", "httpClient_1", "status", "STARTED", "startDate", "2026-10-23T10:00:00Z")));
+
+        List<TaskExecutionDTO> hierarchy = TaskExecutionDTO.buildHierarchy(
+            List.of(new TaskExecutionDTO(taskExecution, "AI Agent", "icon", Map.of(), null, null)));
+
+        assertThat(hierarchy.getFirst()
+            .clusterElementCalls()).extracting(ClusterElementCallDTO::name)
+                .containsExactly("httpClient_1");
     }
 }
