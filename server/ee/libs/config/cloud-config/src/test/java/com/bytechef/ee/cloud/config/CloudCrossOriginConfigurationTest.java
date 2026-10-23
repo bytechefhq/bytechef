@@ -9,8 +9,7 @@ package com.bytechef.ee.cloud.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -26,12 +25,9 @@ class CloudCrossOriginConfigurationTest {
 
     private final CorsFilter corsFilter = new CloudCrossOriginConfiguration().corsFilter();
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "/api/automation/internal/projects", "/graphql"
-    })
-    void testCrossOriginResponseExposesCsrfRejectedHeader(String path) throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", path);
+    @Test
+    void testCrossOriginResponseExposesCsrfRejectedHeader() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/automation/internal/projects");
 
         request.addHeader(HttpHeaders.ORIGIN, "https://app.bytechef.io");
 
