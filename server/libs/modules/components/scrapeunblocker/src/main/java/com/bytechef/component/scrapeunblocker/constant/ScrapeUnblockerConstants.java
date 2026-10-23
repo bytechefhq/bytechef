@@ -21,6 +21,8 @@ package com.bytechef.component.scrapeunblocker.constant;
  */
 public class ScrapeUnblockerConstants {
 
+    public static final String MAIN_CONTENT_ONLY = "main_content_only";
+    public static final String MARKDOWN = "markdown";
     public static final String PARSED_DATA = "parsed_data";
     public static final String PROXY_COUNTRY = "proxy_country";
     public static final String TIME_SLEEP = "time_sleep";

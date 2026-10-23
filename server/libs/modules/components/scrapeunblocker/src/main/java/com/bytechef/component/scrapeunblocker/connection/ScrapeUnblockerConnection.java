@@ -45,7 +45,7 @@ public class ScrapeUnblockerConnection {
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
                     Map.of("X-ScrapeUnblocker-Key", List.of(connectionParameters.getString(API_TOKEN))))))
         .version(1)
-        .help("", "https://developers.scrapeunblocker.com");
+        .help("", "https://docs.scrapeunblocker.com");
 
     private ScrapeUnblockerConnection() {
     }
