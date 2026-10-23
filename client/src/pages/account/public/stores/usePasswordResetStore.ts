@@ -1,4 +1,4 @@
-import {getCookie} from '@/shared/util/cookie-utils';
+import {getXsrfToken} from '@/shared/util/cookie-utils';
 
 /* eslint-disable sort-keys */
 
@@ -24,7 +24,7 @@ const fetchResetPasswordInit = async (email: string): Promise<Response> => {
         body: email,
         headers: {
             'Content-Type': 'text/plain',
-            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+            'X-XSRF-TOKEN': await getXsrfToken(),
         },
         method: 'POST',
     }).then((response) => response);
@@ -35,7 +35,7 @@ const fetchResetPasswordFinish = async (data: string): Promise<Response> => {
         body: data,
         headers: {
             'Content-Type': 'application/json',
-            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+            'X-XSRF-TOKEN': await getXsrfToken(),
         },
         method: 'POST',
     }).then((response) => response);
