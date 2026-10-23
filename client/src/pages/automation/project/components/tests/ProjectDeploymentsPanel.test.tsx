@@ -7,12 +7,17 @@ import {fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    canCreateDeployment: true,
     error: null as Error | null,
     isLoading: false,
     navigate: vi.fn(),
     projectDeployments: [] as ProjectDeployment[] | undefined,
     refetch: vi.fn(),
     savedEnvironmentId: 0,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoisted.canCreateDeployment,
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
@@ -144,6 +149,7 @@ const renderProjectDeploymentsPanel = (
 
 describe('ProjectDeploymentsPanel', () => {
     beforeEach(() => {
+        hoisted.canCreateDeployment = true;
         hoisted.error = null;
         hoisted.isLoading = false;
         hoisted.navigate.mockReset();
@@ -281,6 +287,15 @@ describe('ProjectDeploymentsPanel', () => {
         fireEvent.click(screen.getByText('Save deployment'));
 
         expect(onProjectDeploymentSaved).toHaveBeenCalledWith(3);
+    });
+
+    it('hides Deploy from the empty state without DEPLOYMENT_CREATE', () => {
+        hoisted.canCreateDeployment = false;
+        hoisted.projectDeployments = [];
+
+        renderProjectDeploymentsPanel();
+
+        expect(screen.queryByText('Save deployment')).not.toBeInTheDocument();
     });
 
     it('asks to publish an unpublished project', () => {
