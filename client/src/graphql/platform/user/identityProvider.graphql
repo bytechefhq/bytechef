@@ -20,6 +20,7 @@ query identityProvider($id: ID!) {
         registrationId
         scimEnabled
         scopes
+        serviceProviderCertificate
         signingCertificate
         type
     }
