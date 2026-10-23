@@ -31,6 +31,8 @@ import com.bytechef.security.web.filter.CsrfCookieIssuingFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
 import com.bytechef.security.web.filter.TwoFactorVerificationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.observation.ObservationRegistry;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -58,6 +61,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.access.CompositeAccessDeniedHandler;
+import org.springframework.security.web.access.ObservationMarkingAccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -66,6 +73,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
@@ -88,6 +96,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @EnableMethodSecurity(securedEnabled = true)
 @Profile("!liquibase")
 public class SecurityConfiguration {
+
+    private static final String CSRF_REJECTED_HEADER = "X-CSRF-Rejected";
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
@@ -188,9 +198,16 @@ public class SecurityConfiguration {
     public SecurityFilterChain apiFilterChain(
         HttpSecurity http, PathPatternRequestMatcher.Builder mvc,
         List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors, Environment environment,
+        ObjectProvider<ObservationRegistry> observationRegistryProvider,
         List<SecurityConfigurerContributor> securityConfigurerContributors,
         List<SpaWebFilterContributor> spaWebFilterContributors)
         throws Exception {
+
+        AccessDeniedHandler csrfAccessDeniedHandler = new CompositeAccessDeniedHandler(
+            (request, response, accessDeniedException) -> response.setHeader(CSRF_REJECTED_HEADER, "true"),
+            new ObservationMarkingAccessDeniedHandler(
+                observationRegistryProvider.getIfAvailable(() -> ObservationRegistry.NOOP)),
+            new AccessDeniedHandlerImpl());
 
         if (!oAuth2LoginCustomizers.isEmpty() || !saml2LoginCustomizers.isEmpty()) {
             List<String> matchers = new ArrayList<>(List.of("/api/**", "/graphql"));
@@ -219,7 +236,16 @@ public class SecurityConfiguration {
                     .ignoringRequestMatchers(request -> Objects.equals(request.getMethod(), "OPTIONS"))
                     // For internal calls from the swagger UI in the dev profile
                     .ignoringRequestMatchers(request -> environment.acceptsProfiles(Profiles.of("dev")) &&
-                        Strings.CS.contains(request.getHeader("Referer"), "/swagger-ui/"));
+                        Strings.CS.contains(request.getHeader("Referer"), "/swagger-ui/"))
+                    .withObjectPostProcessor(new ObjectPostProcessor<CsrfFilter>() {
+
+                        @Override
+                        public <O extends CsrfFilter> O postProcess(O csrfFilter) {
+                            csrfFilter.setAccessDeniedHandler(csrfAccessDeniedHandler);
+
+                            return csrfFilter;
+                        }
+                    });
             });
 
         http.addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
@@ -360,6 +386,10 @@ public class SecurityConfiguration {
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authz -> {
+                authz
+                    .dispatcherTypeMatchers(DispatcherType.ERROR)
+                    .permitAll();
+
                 for (AuthorizeHttpRequestContributor authorizeHttpRequestContributor : authorizeHttpRequestContributors) {
                     for (String path : authorizeHttpRequestContributor.getPermitAllRequestMatcherPaths()) {
                         authz

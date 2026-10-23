@@ -21,9 +21,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
@@ -38,7 +40,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -62,6 +68,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
     })
 public class SpaCsrfCookieIntTest {
 
+    private static final String CSRF_REJECTED_HEADER_NAME = "X-CSRF-Rejected";
     private static final String XSRF_TOKEN_COOKIE_NAME = "XSRF-TOKEN";
 
     @MockitoBean
@@ -120,7 +127,53 @@ public class SpaCsrfCookieIntTest {
     @Test
     void testFormSubmitWithoutXsrfTokenIsRejected() throws Exception {
         mockMvc.perform(post("/api/public-form"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isForbidden())
+            .andExpect(header().string(CSRF_REJECTED_HEADER_NAME, "true"));
+    }
+
+    @Test
+    void testFormSubmitWithMismatchedXsrfTokenIsMarkedAsCsrfRejection() throws Exception {
+        mockMvc
+            .perform(
+                post("/api/public-form")
+                    .cookie(new Cookie(XSRF_TOKEN_COOKIE_NAME, "cookie-token"))
+                    .header("X-XSRF-TOKEN", "other-token"))
+            .andExpect(status().isForbidden())
+            .andExpect(header().string(CSRF_REJECTED_HEADER_NAME, "true"));
+    }
+
+    @Test
+    void testAcceptedFormSubmitIsNotMarkedAsCsrfRejection() throws Exception {
+        mockMvc
+            .perform(
+                post("/api/public-form")
+                    .cookie(new Cookie(XSRF_TOKEN_COOKIE_NAME, "cookie-token"))
+                    .header("X-XSRF-TOKEN", "cookie-token"))
+            .andExpect(status().isOk())
+            .andExpect(header().doesNotExist(CSRF_REJECTED_HEADER_NAME));
+    }
+
+    @Test
+    void testControllerForbiddenResponseIsNotMarkedAsCsrfRejection() throws Exception {
+        mockMvc
+            .perform(
+                post("/api/public-forbidden")
+                    .cookie(new Cookie(XSRF_TOKEN_COOKIE_NAME, "cookie-token"))
+                    .header("X-XSRF-TOKEN", "cookie-token"))
+            .andExpect(status().isForbidden())
+            .andExpect(header().doesNotExist(CSRF_REJECTED_HEADER_NAME));
+    }
+
+    @Test
+    @WithMockUser(authorities = AuthorityConstants.USER)
+    void testMethodSecurityDenialIsNotMarkedAsCsrfRejection() throws Exception {
+        mockMvc
+            .perform(
+                post("/api/public-admin-only")
+                    .cookie(new Cookie(XSRF_TOKEN_COOKIE_NAME, "cookie-token"))
+                    .header("X-XSRF-TOKEN", "cookie-token"))
+            .andExpect(status().isForbidden())
+            .andExpect(header().doesNotExist(CSRF_REJECTED_HEADER_NAME));
     }
 
     @TestConfiguration
@@ -132,7 +185,7 @@ public class SpaCsrfCookieIntTest {
 
                 @Override
                 public List<String> getApiPermitAllRequestMatcherPaths() {
-                    return List.of("/api/public-form");
+                    return List.of("/api/public-admin-only", "/api/public-forbidden", "/api/public-form");
                 }
             });
         }
@@ -152,6 +205,17 @@ public class SpaCsrfCookieIntTest {
 
             @GetMapping("/index.html")
             public void index() {
+            }
+
+            @PostMapping("/api/public-admin-only")
+            @PreAuthorize("hasAuthority('" + AuthorityConstants.ADMIN + "')")
+            public void publicAdminOnly() {
+            }
+
+            @PostMapping("/api/public-forbidden")
+            public ResponseEntity<Void> publicForbidden() {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .build();
             }
 
             @PostMapping("/api/public-form")
