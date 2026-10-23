@@ -212,8 +212,8 @@ All fixtures are independent and can be combined in any order via `mergeTests`.
 
 ## Authentication specs
 
-`tests/authentication` covers social login (Google, GitHub), SSO (OIDC and SAML), two-factor authentication and SCIM
-provisioning end to end. They need identity provider mocks and a server configured to use them, so they are skipped
+`tests/authentication` covers social login (Google, GitHub), SSO (OIDC and SAML, against mocks and against Keycloak),
+two-factor authentication and SCIM provisioning end to end. They need identity provider mocks and a server configured to use them, so they are skipped
 unless `BYTECHEF_E2E_AUTHENTICATION_MOCKS=1` is set.
 
 1. Start the mocks. `SAML_SP_BASE_URLS` is the browser origin of the client (the Playwright base URL); the SAML IdP
@@ -229,6 +229,10 @@ unless `BYTECHEF_E2E_AUTHENTICATION_MOCKS=1` is set.
     | `oidc` (mock-oauth2-server) | 18090 | Google (issuer `/google`) and every OIDC SSO provider the specs create |
     | `github`                    | 18091 | GitHub's OAuth2 endpoints                                              |
     | `saml` (SimpleSAMLphp)      | 18080 | A SAML IdP with `user1`/`user1pass` (`user1@example.com`)              |
+    | `keycloak`                  | 18180 | A real OIDC and SAML IdP, realm `bytechef-e2e` (admin `admin`/`admin`) |
+
+    `keycloak.spec.ts` creates its users and SAML clients through the Keycloak admin API and deletes them afterwards, so
+    the realm file (`keycloak-realm.json`) only holds the OIDC client.
 
 2. Start the server (Enterprise Edition) with these settings, on a database of its own:
 

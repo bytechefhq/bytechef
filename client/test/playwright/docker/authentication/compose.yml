@@ -34,3 +34,16 @@ services:
             - '18080:8080'
         volumes:
             - ./saml20-sp-remote.php:/var/www/simplesamlphp/metadata/saml20-sp-remote.php:ro
+
+    # A real IdP for OIDC and SAML SSO: realm bytechef-e2e with the OIDC client bytechef-e2e. The specs create users and
+    # SAML clients through its admin API (admin/admin), since SAML client ids embed the server-assigned registration id.
+    keycloak:
+        image: quay.io/keycloak/keycloak:26.4.0
+        command: ['start-dev', '--import-realm']
+        environment:
+            KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+            KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        ports:
+            - '18180:8080'
+        volumes:
+            - ./keycloak-realm.json:/opt/keycloak/data/import/bytechef-e2e-realm.json:ro

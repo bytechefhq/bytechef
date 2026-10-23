@@ -69,12 +69,19 @@ const IDENTITY_PROVIDER_FIELDS = 'domains id name registrationId';
 
 export async function createOidcIdentityProvider(
     apiContext: APIRequestContext,
-    options: {autoProvision?: boolean; enforced?: boolean} = {}
+    options: {
+        autoProvision?: boolean;
+        clientId?: string;
+        clientSecret?: string;
+        enforced?: boolean;
+        issuerUri?: string;
+        namePrefix?: string;
+    } = {}
 ): Promise<IdentityProviderI> {
     const suffix = uniqueSuffix();
     const domain = `sso-${suffix}.e2e.example.com`;
     const issuerPath = `sso-${suffix}`;
-    const name = `E2E OIDC ${suffix}`;
+    const name = `${options.namePrefix || 'E2E OIDC'} ${suffix}`;
 
     const data = await graphql<{createIdentityProvider: {id: string; registrationId: string}}>(
         apiContext,
@@ -84,13 +91,13 @@ export async function createOidcIdentityProvider(
         {
             input: {
                 autoProvision: options.autoProvision ?? true,
-                clientId: 'e2e-sso',
-                clientSecret: 'e2e-sso-secret',
+                clientId: options.clientId || 'e2e-sso',
+                clientSecret: options.clientSecret || 'e2e-sso-secret',
                 defaultAuthority: 'ROLE_USER',
                 domains: [domain],
                 enabled: true,
                 enforced: options.enforced ?? false,
-                issuerUri: `${OIDC_MOCK_URL}/${issuerPath}`,
+                issuerUri: options.issuerUri || `${OIDC_MOCK_URL}/${issuerPath}`,
                 name,
                 type: 'OIDC',
             },
@@ -100,8 +107,12 @@ export async function createOidcIdentityProvider(
     return {domain, issuerPath, name, ...data.createIdentityProvider};
 }
 
-export async function createSamlIdentityProvider(apiContext: APIRequestContext): Promise<IdentityProviderI> {
-    const name = `E2E SAML ${uniqueSuffix()}`;
+export async function createSamlIdentityProvider(
+    apiContext: APIRequestContext,
+    options: {domain?: string; metadataUri?: string; namePrefix?: string} = {}
+): Promise<IdentityProviderI> {
+    const domain = options.domain || 'example.com';
+    const name = `${options.namePrefix || 'E2E SAML'} ${uniqueSuffix()}`;
 
     const data = await graphql<{createIdentityProvider: {id: string; registrationId: string}}>(
         apiContext,
@@ -112,16 +123,16 @@ export async function createSamlIdentityProvider(apiContext: APIRequestContext):
             input: {
                 autoProvision: true,
                 defaultAuthority: 'ROLE_USER',
-                domains: ['example.com'],
+                domains: [domain],
                 enabled: true,
-                metadataUri: SAML_IDP_METADATA_URL,
+                metadataUri: options.metadataUri || SAML_IDP_METADATA_URL,
                 name,
                 type: 'SAML',
             },
         }
     );
 
-    return {domain: 'example.com', issuerPath: '', name, ...data.createIdentityProvider};
+    return {domain, issuerPath: '', name, ...data.createIdentityProvider};
 }
 
 export async function setIdentityProviderEnforced(
@@ -321,6 +332,16 @@ export async function signInAtSamlIdp(page: Page): Promise<void> {
     await page.getByRole('button', {name: 'Login'}).click();
 }
 
+export async function continueWithSso(page: Page, email: string, identityProvider: IdentityProviderI): Promise<void> {
+    await page.goto('/login');
+
+    await page.getByLabel('Email', {exact: true}).fill(email);
+
+    await page.getByLabel('Password', {exact: true}).click();
+
+    await page.getByRole('button', {name: `Continue with ${identityProvider.name}`}).click();
+}
+
 export async function startSocialSignIn(page: Page, provider: 'Github' | 'Google'): Promise<void> {
     await page.goto('/login');
 
@@ -337,7 +358,9 @@ export async function expectSignInRefused(page: Page, message: string | RegExp):
     await expect(page.getByText(message)).toBeVisible();
 }
 
-export async function currentAccount(page: Page): Promise<{authorities: string[]; email: string; login: string}> {
+export async function currentAccount(
+    page: Page
+): Promise<{authorities: string[]; email: string; firstName?: string; lastName?: string; login: string}> {
     const response = await page.request.get('/api/account');
 
     expect(response.ok(), `GET /api/account answered ${response.status()}`).toBeTruthy();
