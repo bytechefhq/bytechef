@@ -16,7 +16,9 @@ import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
@@ -28,6 +30,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
@@ -78,6 +81,8 @@ public class PermissionServiceImpl implements PermissionService {
     private final WorkspaceUserRepository workspaceUserRepository;
     private final Map<String, List<ResourceEnvironmentResolver>> resourceEnvironmentResolvers;
     private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
+    private final Map<String, ResourceVisibilityProvider> resourceVisibilityProviders;
+    private final ResourceVisibilityResolver resourceVisibilityResolver;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
@@ -87,6 +92,8 @@ public class PermissionServiceImpl implements PermissionService {
         ProjectRepository projectRepository, WorkspaceScopeCacheService workspaceScopeCacheService,
         WorkspaceUserRepository workspaceUserRepository,
         List<ResourceOwnershipResolver> resourceOwnershipResolvers,
+        List<ResourceVisibilityProvider> resourceVisibilityProviders,
+        ResourceVisibilityResolver resourceVisibilityResolver,
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
         ObjectProvider<ConnectedUserAccessDecider> connectedUserAccessDeciderProvider,
         EmbeddedScopeCacheService embeddedScopeCacheService, EmbeddedUserRepository embeddedUserRepository,
@@ -105,6 +112,9 @@ public class PermissionServiceImpl implements PermissionService {
         this.workspaceUserRepository = workspaceUserRepository;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
             .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
+        this.resourceVisibilityProviders = resourceVisibilityProviders.stream()
+            .collect(Collectors.toMap(ResourceVisibilityProvider::resourceType, Function.identity()));
+        this.resourceVisibilityResolver = resourceVisibilityResolver;
 
         this.resourceEnvironmentResolvers = resourceEnvironmentResolvers.stream()
             .collect(Collectors.groupingBy(ResourceEnvironmentResolver::resourceType));
@@ -263,6 +273,10 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
+        if (!isResourceVisible(projectId, PROJECT)) {
+            return false;
+        }
+
         Long workspaceId = projectRepository.findById(projectId)
             .map(Project::getWorkspaceId)
             .orElse(null);
@@ -292,6 +306,10 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         if (isEmbeddedProject(projectId)) {
+            return false;
+        }
+
+        if (!isResourceVisible(projectId, PROJECT)) {
             return false;
         }
 
@@ -333,10 +351,17 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
+        // Visibility is a precondition of the scope check, not a filter running beside it. Holding
+        // CONNECTION_EDIT in a workspace does not entitle a member to a colleague's PRIVATE connection, even
+        // though the workspace-scope check below would otherwise pass for every row in that workspace.
+        if (!resourceOwner.embedded() && !isResourceVisible(id, resourceType)) {
+            return false;
+        }
+
         OptionalLong workspaceId = resourceOwner.workspaceId();
 
         if (!resourceOwner.embedded() && workspaceId.isEmpty()) {
-            return false;
+            return scope.endsWith("_VIEW") && isOrganizationVisible(id, resourceType);
         }
 
         Optional<Environment> environment;
@@ -407,6 +432,12 @@ public class PermissionServiceImpl implements PermissionService {
             return hasEmbeddedScope(scope, environment);
         }
 
+        // Visibility is a precondition here for the same reason as in hasResourceScope: naming an environment must not
+        // reach a resource the caller cannot see.
+        if (!isResourceVisible(id, resourceType)) {
+            return false;
+        }
+
         OptionalLong workspaceId = resourceOwner.workspaceId();
 
         if (workspaceId.isEmpty()) {
@@ -414,6 +445,43 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         return hasWorkspaceScope(workspaceId.getAsLong(), scope, environment);
+    }
+
+    /**
+     * Whether the current principal may see the resource at all, delegating to the same resolver the list path uses so
+     * the two cannot drift. A resource type with no registered provider has not opted into visibility and is
+     * unrestricted by it; a registered type whose resource does not exist fails closed.
+     */
+    private boolean isOrganizationVisible(Serializable id, String resourceType) {
+        ResourceVisibilityProvider resourceVisibilityProvider = resourceVisibilityProviders.get(resourceType);
+
+        if (resourceVisibilityProvider == null || !(id instanceof Number number)) {
+            return false;
+        }
+
+        return resourceVisibilityProvider.fetchVisibility(number.longValue())
+            .map(visibilityRecord -> visibilityRecord.visibility() == ResourceVisibility.ORGANIZATION)
+            .orElse(false);
+    }
+
+    private boolean isResourceVisible(Serializable id, String resourceType) {
+        ResourceVisibilityProvider resourceVisibilityProvider = resourceVisibilityProviders.get(resourceType);
+
+        if (resourceVisibilityProvider == null) {
+            return true;
+        }
+
+        return resourceVisibilityProvider.fetchVisibility(id)
+            .map(visibilityRecord -> {
+                // workspaceId is unused by both resolver implementations — they resolve against the current
+                // principal, not the argument — so 0 is safe. The parameter exists for a future SQL-predicate
+                // implementation.
+                Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
+                    resourceVisibilityProvider.visibilityResourceType(), 0L, List.of(visibilityRecord));
+
+                return !visibleIds.isEmpty();
+            })
+            .orElse(false);
     }
 
     @Override
@@ -430,9 +498,26 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        OptionalLong ownerUserId = resolveOwner(resourceType, id).ownerUserId();
+        ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
-        return ownerUserId.isPresent() && isCurrentUser(ownerUserId.getAsLong());
+        OptionalLong ownerUserId = resourceOwner.ownerUserId();
+
+        if (ownerUserId.isEmpty() || !isCurrentUser(ownerUserId.getAsLong())) {
+            return false;
+        }
+
+        OptionalLong workspaceId = resourceOwner.workspaceId();
+
+        return workspaceId.isEmpty() ||
+            workspaceUserRepository.existsByUserIdAndWorkspaceId(ownerUserId.getAsLong(), workspaceId.getAsLong());
+    }
+
+    private boolean hasProjectWorkflowScope(String workflowId, String scope, Environment environment) {
+        return projectRepository.findByWorkflowId(workflowId)
+            .filter(project -> isResourceVisible(project.getId(), PROJECT))
+            .map(Project::getWorkspaceId)
+            .map(workspaceId -> hasWorkspaceScope(workspaceId, scope, environment))
+            .orElse(false);
     }
 
     private boolean isEmbeddedProject(long projectId) {
@@ -533,15 +618,10 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope);
+        return projectRepository.findByWorkflowId(workflowId)
+            .map(Project::getId)
+            .map(projectId -> hasResourceScope(projectId, PROJECT, scope))
+            .orElse(false);
     }
 
     @Override
@@ -569,15 +649,7 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope, environment);
+        return hasProjectWorkflowScope(workflowId, scope, environment);
     }
 
     @Override
@@ -605,15 +677,7 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
-            .map(Project::getWorkspaceId)
-            .orElse(null);
-
-        if (workspaceId == null) {
-            return false;
-        }
-
-        return hasWorkspaceScope(workspaceId, scope, environment);
+        return hasProjectWorkflowScope(workflowId, scope, environment);
     }
 
     @Override
@@ -702,9 +766,23 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        OptionalLong connectionWorkspaceId = resolveOwner(CONNECTION, connectionId).workspaceId();
+        ResourceOwner connectionOwner = resolveOwner(CONNECTION, connectionId);
 
-        if (connectionWorkspaceId.isEmpty() || connectionWorkspaceId.getAsLong() != workspaceId) {
+        if (connectionOwner.embedded()) {
+            return false;
+        }
+
+        if (!isResourceVisible(connectionId, CONNECTION)) {
+            return false;
+        }
+
+        OptionalLong connectionWorkspaceId = connectionOwner.workspaceId();
+
+        if (connectionWorkspaceId.isEmpty()) {
+            if (!isOrganizationVisible(connectionId, CONNECTION)) {
+                return false;
+            }
+        } else if (connectionWorkspaceId.getAsLong() != workspaceId) {
             return false;
         }
 
@@ -723,6 +801,27 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         return checkWorkspaceScope(workspaceId, CONNECTION_VIEW, environment);
+    }
+
+    @Override
+    public boolean hasResourceScopeIfProjectWorkflow(
+        String workflowId, Serializable id, String resourceType, String scope) {
+
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        if (projectRepository.findByWorkflowId(workflowId)
+            .isEmpty()) {
+
+            return true;
+        }
+
+        return hasResourceScope(id, resourceType, scope);
     }
 
     @Override

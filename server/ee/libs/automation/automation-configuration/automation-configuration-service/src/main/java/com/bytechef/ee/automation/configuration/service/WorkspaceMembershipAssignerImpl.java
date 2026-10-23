@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
+import com.bytechef.automation.configuration.event.WorkspaceUserRemovedEvent;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PermissionService.UserWorkspacePair;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
@@ -19,12 +20,15 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.service.WorkspaceMembershipAssigner;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,20 +42,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceMembershipAssignerImpl implements WorkspaceMembershipAssigner {
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final EmbeddedUserService embeddedUserService;
     private final PermissionService permissionService;
+    private final UserService userService;
     private final WorkspaceService workspaceService;
     private final WorkspaceUserRepository workspaceUserRepository;
     private final WorkspaceUserService workspaceUserService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceMembershipAssignerImpl(
-        EmbeddedUserService embeddedUserService, PermissionService permissionService,
-        WorkspaceService workspaceService, WorkspaceUserRepository workspaceUserRepository,
-        WorkspaceUserService workspaceUserService) {
+        ApplicationEventPublisher applicationEventPublisher, EmbeddedUserService embeddedUserService,
+        PermissionService permissionService, UserService userService, WorkspaceService workspaceService,
+        WorkspaceUserRepository workspaceUserRepository, WorkspaceUserService workspaceUserService) {
 
+        this.applicationEventPublisher = applicationEventPublisher;
         this.embeddedUserService = embeddedUserService;
         this.permissionService = permissionService;
+        this.userService = userService;
         this.workspaceService = workspaceService;
         this.workspaceUserRepository = workspaceUserRepository;
         this.workspaceUserService = workspaceUserService;
@@ -101,6 +109,16 @@ public class WorkspaceMembershipAssignerImpl implements WorkspaceMembershipAssig
         permissionService.evictWorkspaceScopeCaches(cacheEvictionTargets);
 
         embeddedUserService.deleteEmbeddedMemberships(userId);
+
+        if (workspaceIds.isEmpty()) {
+            return;
+        }
+
+        User user = userService.getUser(userId);
+
+        for (Long workspaceId : workspaceIds) {
+            applicationEventPublisher.publishEvent(new WorkspaceUserRemovedEvent(workspaceId, userId, user.getLogin()));
+        }
     }
 
     private static WorkspaceRole parseRole(String roleName) {

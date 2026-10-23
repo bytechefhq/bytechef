@@ -592,6 +592,12 @@ class WorkspaceUserServiceIntTest {
             when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
                 .thenReturn(List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR)));
 
+            User removedUser = new User();
+
+            removedUser.setLogin("bob");
+
+            when(userService.getUser(USER_ID)).thenReturn(removedUser);
+
             workspaceUserFacade.removeWorkspaceUser(USER_ID, WORKSPACE_ID);
 
             PersistentAuditEvent persistentAuditEvent = captureSavedEvent();

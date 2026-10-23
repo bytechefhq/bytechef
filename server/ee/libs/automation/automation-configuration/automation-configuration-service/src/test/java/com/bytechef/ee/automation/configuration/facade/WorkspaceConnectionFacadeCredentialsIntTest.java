@@ -18,12 +18,16 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.security.ConnectionEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ConnectionOwnershipResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -54,19 +58,23 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -97,6 +105,7 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
 
     private static final String DEVELOPMENT_EDITOR_PRODUCTION_VIEWER = "development-editor-production-viewer";
     private static final String EDITOR = "editor";
+    private static final String OTHER_TENANT_ADMIN = "other-tenant-admin";
     private static final String TENANT_ADMIN = "tenant-admin";
     private static final String VIEWER = "viewer";
     private static final Map<String, Long> USER_IDS_BY_LOGIN = Map.of(
@@ -290,6 +299,45 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
         }
     }
 
+    @Test
+    void testEveryTenantAdminGetsTheCredentialsOfAnOrganizationConnection() {
+        long organizationConnectionId = seedConnection(
+            DEVELOPMENT, OTHER_TENANT_ADMIN, ResourceVisibility.ORGANIZATION);
+
+        authenticate(TENANT_ADMIN, AuthorityConstants.ADMIN);
+
+        assertWithCredentials(
+            workspaceConnectionFacade.getConnection(organizationConnectionId), organizationConnectionId);
+    }
+
+    @Test
+    void testWorkspaceMemberGetsNoCredentialsOfAnOrganizationConnection() {
+        long organizationConnectionId = seedConnection(
+            DEVELOPMENT, OTHER_TENANT_ADMIN, ResourceVisibility.ORGANIZATION);
+
+        authenticate(EDITOR, "ROLE_USER");
+
+        assertWithoutCredentials(
+            workspaceConnectionFacade.getConnection(organizationConnectionId), organizationConnectionId);
+    }
+
+    @Test
+    void testReassignedOwnerGetsTheCredentialsAndThePreviousOwnerDoesNot() {
+        long reassignedConnectionId = seedConnection(DEVELOPMENT, DEVELOPMENT_EDITOR_PRODUCTION_VIEWER);
+
+        reassignOwner(reassignedConnectionId, DEVELOPMENT, EDITOR);
+
+        authenticate(EDITOR, "ROLE_USER");
+
+        assertWithCredentials(
+            workspaceConnectionFacade.getConnection(reassignedConnectionId), reassignedConnectionId);
+
+        authenticate(DEVELOPMENT_EDITOR_PRODUCTION_VIEWER, "ROLE_USER");
+
+        assertWithoutCredentials(
+            workspaceConnectionFacade.getConnection(reassignedConnectionId), reassignedConnectionId);
+    }
+
     private static void assertWithCredentials(ConnectionDTO connectionDTO, long connectionId) {
         assertThat(connectionDTO.id()).isEqualTo(connectionId);
         assertThat(connectionDTO.authorizationParameters()
@@ -315,6 +363,12 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
     }
 
     private static ConnectionDTO connectionDTO(long connectionId, int environmentId, String createdBy) {
+        return connectionDTO(connectionId, environmentId, createdBy, ResourceVisibility.WORKSPACE);
+    }
+
+    private static ConnectionDTO connectionDTO(
+        long connectionId, int environmentId, String createdBy, ResourceVisibility visibility) {
+
         return ConnectionDTO.builder()
             .authorizationParameters(Map.of("access_token", "secret-token"))
             .componentName("slack")
@@ -325,6 +379,7 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
             .name("connection-" + connectionId)
             .parameters(Map.of("password", "secret-password"))
             .tags(List.of())
+            .visibility(visibility)
             .build();
     }
 
@@ -341,19 +396,35 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
         return insertedWorkspaceId;
     }
 
+    private void reassignOwner(long connectionId, int environmentId, String newOwnerLogin) {
+        Connection connection = connectionService.fetchConnection(connectionId)
+            .orElseThrow();
+
+        connection.reassignOwner(newOwnerLogin);
+
+        when(connectionFacade.getConnection(connectionId))
+            .thenReturn(connectionDTO(connectionId, environmentId, connection.getCreatedBy()));
+    }
+
     private long seedConnection(int environmentId, String createdBy) {
+        return seedConnection(environmentId, createdBy, ResourceVisibility.WORKSPACE);
+    }
+
+    private long seedConnection(int environmentId, String createdBy, ResourceVisibility visibility) {
         long connectionId = Math.abs(UUID.randomUUID()
             .getMostSignificantBits() % 1_000_000_000L);
 
         Connection connection = new Connection();
 
+        connection.setCreatedBy(createdBy);
         connection.setEnvironmentId(environmentId);
         connection.setId(connectionId);
         connection.setType(PlatformType.AUTOMATION);
+        connection.setVisibility(visibility);
 
         when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
         when(connectionFacade.getConnection(connectionId))
-            .thenReturn(connectionDTO(connectionId, environmentId, createdBy));
+            .thenReturn(connectionDTO(connectionId, environmentId, createdBy, visibility));
 
         workspaceConnectionRepository.save(new WorkspaceConnection(connectionId, workspaceId));
 
@@ -408,14 +479,23 @@ class WorkspaceConnectionFacadeCredentialsIntTest {
         }
 
         @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
+
+        @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
             ConnectionFacade connectionFacade, ConnectionService connectionService,
-            PermissionService permissionService, WorkspaceConnectionService workspaceConnectionService) {
+            PermissionService permissionService, ResourceVisibilityResolver resourceVisibilityResolver,
+            UserService userService, WorkspaceConnectionService workspaceConnectionService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, permissionService,
-                mock(ProjectDeploymentWorkflowService.class), mock(WorkflowTestConfigurationService.class),
-                workspaceConnectionService);
+                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, resourceVisibilityResolver,
+                new StaticListableBeanFactory().getBeanProvider(MeterRegistry.class), permissionService,
+                mock(ProjectDeploymentWorkflowService.class), mock(ProjectService.class), userService,
+                mock(WorkflowTestConfigurationService.class), workspaceConnectionService, mock(WorkspaceFacade.class));
         }
 
         @Bean

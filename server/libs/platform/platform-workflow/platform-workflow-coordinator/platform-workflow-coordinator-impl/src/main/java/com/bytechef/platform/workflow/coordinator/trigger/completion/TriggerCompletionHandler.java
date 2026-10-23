@@ -74,6 +74,14 @@ public class TriggerCompletionHandler {
 
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
+        Map<String, Object> inputMap = (Map<String, Object>) getInputMap(workflowExecutionId);
+        String workflowId = getWorkflowId(workflowExecutionId);
+        Map<String, ?> metadataMap = getMetadataMap(workflowExecutionId);
+
+        jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType())
+            .validateConnectionsForJob(
+                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+
         triggerExecution.setStatus(Status.COMPLETED);
 
         if (triggerExecution.getId() == null) {
@@ -85,10 +93,6 @@ public class TriggerCompletionHandler {
         if (triggerExecution.getState() != null) {
             triggerStateService.save(workflowExecutionId, triggerExecution.getState());
         }
-
-        Map<String, Object> inputMap = (Map<String, Object>) getInputMap(workflowExecutionId);
-        String workflowId = getWorkflowId(workflowExecutionId);
-        Map<String, ?> metadataMap = getMetadataMap(workflowExecutionId);
 
         Object output = triggerExecution.getOutput() == null
             ? null

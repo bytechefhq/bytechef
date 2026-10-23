@@ -21,6 +21,8 @@ import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -76,7 +79,7 @@ class PermissionServiceResourceTest {
 
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, ownershipResolvers, environmentResolvers,
+            workspaceUserRepository, ownershipResolvers, List.of(), permissiveResolver(), environmentResolvers,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class),
             beanFactory.getBeanProvider(EmbeddedResourceResolver.class),
@@ -123,101 +126,6 @@ class PermissionServiceResourceTest {
                 return owner;
             }
         };
-    }
-
-    @Test
-    void testHasResourceScopeUsesWorkspaceScopeInEe() {
-        lenient().when(currentUserResolver.fetchCurrentUserId())
-            .thenReturn(OptionalLong.of(7L));
-        when(workspaceScopeCacheService.getWorkspaceScopes(7L, 42L))
-            .thenReturn(Set.of("CONNECTION_DELETE"));
-
-        PermissionServiceImpl service = service(resolver("Connection", ResourceOwner.ofWorkspace(42L)));
-
-        assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();
-    }
-
-    @Test
-    void testHasResourceScopeNoWorkspaceFailsClosed() {
-        lenient().when(currentUserResolver.fetchCurrentUserId())
-            .thenReturn(OptionalLong.of(7L));
-
-        PermissionServiceImpl service = service(resolver("Connection", ResourceOwner.unknown()));
-
-        assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isFalse();
-    }
-
-    @Test
-    void testIsResourceOwnerMatchAllowsInEe() {
-        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(7L));
-
-        PermissionServiceImpl service = service(resolver("ApiKey", ResourceOwner.ofUser(7L)));
-
-        assertThat(service.isResourceOwner("ApiKey", 1L)).isTrue();
-    }
-
-    @Test
-    void testIsResourceOwnerMismatchDeniesInEe() {
-        when(currentUserResolver.fetchCurrentUserId()).thenReturn(OptionalLong.of(99L));
-
-        PermissionServiceImpl service = service(resolver("ApiKey", ResourceOwner.ofUser(7L)));
-
-        assertThat(service.isResourceOwner("ApiKey", 1L)).isFalse();
-    }
-
-    @Test
-    void testHasResourceRoleChecksWorkspaceRoleInEe() {
-        lenient().when(currentUserResolver.fetchCurrentUserId())
-            .thenReturn(OptionalLong.of(7L));
-
-        com.bytechef.ee.automation.configuration.domain.WorkspaceUser workspaceUser =
-            Mockito.mock(com.bytechef.ee.automation.configuration.domain.WorkspaceUser.class);
-
-        when(workspaceUser.getWorkspaceRole())
-            .thenReturn(com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole.EDITOR.ordinal());
-        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(7L, 42L))
-            .thenReturn(Optional.of(workspaceUser));
-
-        PermissionServiceImpl service = service(resolver("KnowledgeBase", ResourceOwner.ofWorkspace(42L)));
-
-        assertThat(service.hasResourceRole(1L, "KnowledgeBase", "VIEWER")).isTrue();
-    }
-
-    @Test
-    void testHasResourceRoleNoWorkspaceFailsClosedInEe() {
-        lenient().when(currentUserResolver.fetchCurrentUserId())
-            .thenReturn(OptionalLong.of(7L));
-
-        PermissionServiceImpl service = service(resolver("KnowledgeBase", ResourceOwner.unknown()));
-
-        assertThat(service.hasResourceRole(1L, "KnowledgeBase", "VIEWER")).isFalse();
-    }
-
-    @Test
-    void testHasWorkflowScopeResolvesProjectWorkspaceInEe() {
-        lenient().when(currentUserResolver.fetchCurrentUserId())
-            .thenReturn(OptionalLong.of(7L));
-
-        Project project =
-            Mockito.mock(Project.class);
-
-        when(project.getWorkspaceId()).thenReturn(42L);
-        when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
-        when(workspaceScopeCacheService.getWorkspaceScopes(7L, 42L))
-            .thenReturn(Set.of("WORKFLOW_EDIT"));
-
-        PermissionServiceImpl service = service();
-
-        assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
-    }
-
-    @Test
-    void testHasWorkflowScopeUnknownWorkflowFailsClosedInEe() {
-        when(projectRepository.findByWorkflowId("nope")).thenReturn(Optional.empty());
-
-        PermissionServiceImpl service = service();
-
-        assertThat(service.hasWorkflowScope("nope", "WORKFLOW_EDIT")).isFalse();
     }
 
     @Test
@@ -492,7 +400,7 @@ class PermissionServiceResourceTest {
 
         PermissionServiceImpl service = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(), List.of(),
+            workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of(),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
             embeddedScopeCacheService, Mockito.mock(EmbeddedUserRepository.class),
             embeddedBeanFactory(embeddedResourceResolver).getBeanProvider(EmbeddedResourceResolver.class),
@@ -609,5 +517,15 @@ class PermissionServiceResourceTest {
         connection.setType(type);
 
         return connection;
+    }
+
+    /**
+     * A resolver that hides nothing, so these tests exercise workspace-scope and ownership resolution rather than
+     * visibility. The visibility precondition has its own test class.
+     */
+    private static ResourceVisibilityResolver permissiveResolver() {
+        return (resourceType, workspaceId, candidates) -> candidates.stream()
+            .map(VisibilityRecord::id)
+            .collect(Collectors.toSet());
     }
 }

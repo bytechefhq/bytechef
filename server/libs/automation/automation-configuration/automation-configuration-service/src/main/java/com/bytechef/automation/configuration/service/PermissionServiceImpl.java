@@ -16,9 +16,12 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -31,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -51,16 +55,26 @@ import org.springframework.stereotype.Service;
 @ConditionalOnCEVersion
 public class PermissionServiceImpl implements PermissionService {
 
+    private final ProjectRepository projectRepository;
     private final UserService userService;
     private final Map<String, List<ResourceOwnershipResolver>> resourceOwnershipResolvers;
+    private final Map<String, ResourceVisibilityProvider> resourceVisibilityProviders;
+    private final ResourceVisibilityResolver resourceVisibilityResolver;
 
     @SuppressFBWarnings("EI")
     public PermissionServiceImpl(
-        UserService userService, List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
+        ProjectRepository projectRepository, UserService userService,
+        List<ResourceOwnershipResolver> resourceOwnershipResolvers,
+        List<ResourceVisibilityProvider> resourceVisibilityProviders,
+        ResourceVisibilityResolver resourceVisibilityResolver) {
 
+        this.projectRepository = projectRepository;
         this.userService = userService;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
             .collect(Collectors.groupingBy(ResourceOwnershipResolver::resourceType));
+        this.resourceVisibilityProviders = resourceVisibilityProviders.stream()
+            .collect(Collectors.toMap(ResourceVisibilityProvider::resourceType, Function.identity()));
+        this.resourceVisibilityResolver = resourceVisibilityResolver;
     }
 
     @Override
@@ -104,15 +118,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
-        return SecurityUtils.isAuthenticated();
+        return hasResourceScope(projectId, "Project", scope);
     }
 
-    /**
-     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
-     */
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasResourceScope(projectId, "Project", scope);
     }
 
     @Override
@@ -131,6 +142,27 @@ public class PermissionServiceImpl implements PermissionService {
 
         ResourceOwner resourceOwner = resolveOwner(resourceType, id);
 
+        // Visibility is a precondition of every scope check, not a filter running beside it. Without this a member
+        // would pass here for a resource the list correctly hides — the by-id half of the same authorization
+        // question answering differently from the list half.
+        if (!resourceOwner.embedded() && !isResourceVisible(id, resourceType)) {
+            return false;
+        }
+
+        if (!resourceOwner.embedded() && resourceVisibilityProviders.containsKey(resourceType)) {
+            // Visibility already decided this, and it is the stricter answer: CE creates every connection
+            // WORKSPACE-visible, so also requiring the caller to be the owner would deny a colleague the list has
+            // already shown them. All that remains is that the resource actually exists somewhere.
+            return resourceOwner.workspaceId()
+                .isPresent() ||
+                resourceOwner.ownerUserId()
+                    .isPresent();
+        }
+
+        // Resource families that have not opted into visibility keep CE owner-isolation unchanged, provided they have
+        // a registered ResourceOwnershipResolver. API keys reach this branch through ApiKeyOwnershipResolver;
+        // ApiKeyFacadeImpl enforces the same owner-or-tenant-admin rule in plain Java for deployments carrying no
+        // PermissionService bean at all.
         OptionalLong ownerUserId = resourceOwner.ownerUserId();
 
         if (ownerUserId.isPresent()) {
@@ -154,6 +186,31 @@ public class PermissionServiceImpl implements PermissionService {
         return hasResourceScope(id, resourceType, scope);
     }
 
+    /**
+     * Whether the current principal may see the resource at all, delegating to the same resolver the list path uses so
+     * the two cannot drift. A resource type with no registered provider has not opted into visibility and is
+     * unrestricted by it; a registered type whose resource does not exist fails closed.
+     */
+    private boolean isResourceVisible(Serializable id, String resourceType) {
+        ResourceVisibilityProvider resourceVisibilityProvider = resourceVisibilityProviders.get(resourceType);
+
+        if (resourceVisibilityProvider == null) {
+            return true;
+        }
+
+        return resourceVisibilityProvider.fetchVisibility(id)
+            .map(visibilityRecord -> {
+                // workspaceId is unused by both resolver implementations — they resolve against the current
+                // principal, not the argument — so 0 is safe. The parameter exists for a future SQL-predicate
+                // implementation.
+                Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
+                    resourceVisibilityProvider.visibilityResourceType(), 0L, List.of(visibilityRecord));
+
+                return !visibleIds.isEmpty();
+            })
+            .orElse(false);
+    }
+
     @Override
     public boolean isAuthorizationSkipped() {
         return AutomationAuthorizationContext.isSkipChecks();
@@ -171,17 +228,24 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope) {
-        return SecurityUtils.isAuthenticated();
+        if (!SecurityUtils.isAuthenticated()) {
+            return false;
+        }
+
+        return projectRepository.findByWorkflowId(workflowId)
+            .map(Project::getId)
+            .map(projectId -> hasResourceScope(projectId, "Project", scope))
+            .orElse(true);
     }
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasWorkflowScope(workflowId, scope);
     }
 
     @Override
     public boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment) {
-        return SecurityUtils.isAuthenticated();
+        return hasWorkflowScope(workflowId, scope);
     }
 
     @Override
@@ -192,6 +256,13 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment) {
         return hasResourceScope(connectionId, "Connection", "CONNECTION_VIEW");
+    }
+
+    @Override
+    public boolean hasResourceScopeIfProjectWorkflow(
+        String workflowId, Serializable id, String resourceType, String scope) {
+
+        return SecurityUtils.isAuthenticated();
     }
 
     @Override

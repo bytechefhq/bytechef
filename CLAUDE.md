@@ -353,6 +353,81 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Empty blocks are forbidden — a comment alone doesn't satisfy the `EmptyBlock` rule; add an executable statement
 - `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
+### Resource Visibility & Sharing
+
+Connections carry a `visibility` column typed `ResourceVisibility` (`PRIVATE < WORKSPACE <
+ORGANIZATION`, in `platform-api`). Every resource is created **WORKSPACE-visible** — shared with its
+workspace unless its owner withholds it. The model is resource-agnostic; connections and projects are
+wired to it. Connection visibility is workspace-level (there is no project-level connection visibility).
+Projects support `PRIVATE` and `WORKSPACE` only (`ProjectVisibilityPolicy`); project workflows,
+deployments and jobs have no visibility of their own and return their owning project's record from their
+`ResourceVisibilityProvider` (`visibilityResourceType() == "Project"`), so grants resolve against the
+project. There is no `Workflow` token: `hasWorkflowScope` resolves the workflow's project and checks
+`hasResourceScope(projectId, "Project", scope)`. Project sharing lives on the EE `ProjectSharingFacade`; grants are deleted with the project by
+`ProjectBeforeDeleteEventListener`. List surfaces filter through `ProjectVisibilityFilter`.
+
+- **CE**: `ConnectionFacadeImpl.create()` force-writes `WORKSPACE`. No picker, no grants — CE has no
+  authorization boundary between workspace members, so everything is workspace-public.
+- **EE**: the picker offers Shared with workspace / Private / Specific people. No `ROLE_ADMIN` gate on
+  `WORKSPACE` — it is the default, so gating it would fail every ordinary create. `ORGANIZATION` is
+  **not** offered here: it is reached through `createOrganizationConnection`, and
+  `setConnectionVisibility` rejects it. Organization connections are listed in every workspace, and any
+  member passes `*_VIEW` scopes on them by id; everything else goes through the admin-only
+  `OrganizationConnectionFacade`.
+- **Embedded**: force-written `PRIVATE`, unchanged. An embedded connection belongs to a connected user,
+  not a workspace member, so workspace reach would be wrong in a way that crosses customers.
+
+**What sharing exposes.** `WORKSPACE` grants *use plus existence*, not *read plus write*: both REST
+controllers obfuscate `authorizationParameters` and null `parameters`. A member can run a workflow against
+a colleague's account; they cannot extract or repoint the credential. Renaming and replacing the credentials of a
+connection (`updateConnectionCredentials`) need `CONNECTION_EDIT`, deleting needs `CONNECTION_DELETE`, and
+both also need ownership: `hasPermission(#connectionId, 'Connection', <scope>) && (isResourceOwner(#connectionId,
+'Connection') || isTenantAdmin())`. Attaching a connection to a project
+workflow's test configuration or to a deployment requires `CONNECTION_VIEW` on it, so a PRIVATE
+connection cannot be bound by id.
+
+**"Specific people"** is not a fourth stored value — it is `PRIVATE` plus rows in `resource_grant`
+(EE, `platform-resource-grant`). A grant conveys visibility only; what the recipient may then do is
+decided by the usual `PermissionScope`/`WorkspaceRole` machinery. Grants survive promotion so demoting
+restores the previous audience, and are deleted with the connection because `resource_id` is
+polymorphic and has no foreign key. Removing a member publishes `WorkspaceUserRemovedEvent`: their grants
+on that workspace's connections are revoked in the same transaction, and after commit the connections
+they own move to `PENDING_REASSIGNMENT` for a tenant admin to reassign. A creator who has left the
+workspace no longer counts as the owner.
+
+**Visibility is a precondition of `hasResourceScope`**, in both editions — not a filter running beside
+it. Without that, a member holding a workspace scope would pass the by-id check for a resource the
+list correctly hides. In CE this replaces owner-isolation *only* for resource types that registered a
+`ResourceVisibilityProvider`; a type with a `ResourceOwnershipResolver` but no visibility provider
+keeps it. API keys are such a type: `ApiKeyOwnershipResolver` claims the `"ApiKey"` token and fills the
+owner, and no visibility provider exists for it, so CE `hasResourceScope` answers
+`isCurrentUser(owner)`. `ApiKeyFacadeImpl` enforces the same owner-or-tenant-admin rule in plain Java,
+and `ResourceTokenResolverCoverageTest.OWNER_ISOLATED_BY_DESIGN` pins the exemption.
+The `VisibilityPrecondition` nest of the EE `PermissionServiceTest` is the regression guard for the visibility
+precondition.
+
+**Auditing**: connection and project sharing events are `@Audited` on the EE facades with
+`ConnectionAuditMapper` / `ProjectAuditMapper`; `WORKFLOW_PAUSED` is `@Audited` on
+`ConnectionService.validateConnectionsActive(jobPrincipalId, workflowId, connectionIds)` with the CE
+`WorkflowPausedAuditMapper`, which records only when a connection is not `ACTIVE`.
+
+**GraphQL mutations** (owner-or-admin, annotated on the facade so they protect every caller):
+- `setConnectionVisibility(workspaceId, connectionId, visibility)` — rejects `ORGANIZATION` (set
+  through `createOrganizationConnection`) and refuses to narrow to `PRIVATE` while any deployment
+  references the connection.
+- `grantConnectionAccess` / `revokeConnectionAccess(workspaceId, connectionId, userId)` — grantee must
+  be a member of the owning workspace; a non-member and a non-existent user fail the same membership
+  check, so user ids cannot be enumerated. Grant is idempotent via `ON CONFLICT DO NOTHING` on
+  PostgreSQL, not a caught `DuplicateKeyException` — PostgreSQL aborts the transaction on a constraint
+  violation, so catching it still fails at commit. Other dialects (H2) use `INSERT ... WHERE NOT EXISTS`.
+- `connectionGrants(workspaceId, connectionId)` — owner-or-admin; a plain viewer must not learn who
+  else a connection was handed to.
+
+**Metrics**: `bytechef_connection_create` (Counter), tagged `visibility=PRIVATE|WORKSPACE` (organization
+connections are created through their own facade and not counted), wired via
+`ObjectProvider<MeterRegistry>` so lightweight app variants without actuator start cleanly.
+
+
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)

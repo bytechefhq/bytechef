@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
 import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -93,6 +94,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
+    private static final String CONNECTION_RESOURCE_TYPE = "Connection";
+
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
@@ -105,6 +108,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
+    private final ProjectVisibilityFilter projectVisibilityFilter;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
     private final TriggerDefinitionService triggerDefinitionService;
@@ -115,13 +119,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectDeploymentFacadeImpl(
-        ConnectionService connectionService, Evaluator evaluator, EnvironmentService environmentService,
-        PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService, JobFacade jobFacade,
-        JobService jobService, ProjectDeploymentService projectDeploymentService,
+    public ProjectDeploymentFacadeImpl(ConnectionService connectionService, Evaluator evaluator,
+        EnvironmentService environmentService, PrincipalJobFacade principalJobFacade,
+        PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService, TagService tagService,
-        TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
+        ProjectVisibilityFilter projectVisibilityFilter, ProjectWorkflowService projectWorkflowService,
+        TagService tagService, TriggerDefinitionService triggerDefinitionService,
+        TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, PermissionService permissionService,
         WorkflowService workflowService,
@@ -139,6 +144,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
+        this.projectVisibilityFilter = projectVisibilityFilter;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -154,11 +160,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     // checked is the one held in the environment being deployed into.
     @PreAuthorize("hasPermission(#projectDeploymentDTO, 'DEPLOYMENT_CREATE')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = CollectionUtils.map(
+            projectDeploymentDTO.projectDeploymentWorkflows(),
+            ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow);
+
+        validateConnectionsAccessible(projectDeploymentWorkflows, Set.of());
+
         return createProjectDeployment(
-            projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            projectDeploymentDTO.tags());
+            projectDeploymentDTO.toProjectDeployment(), projectDeploymentWorkflows, projectDeploymentDTO.tags());
     }
 
     @Override
@@ -221,6 +230,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 id, workflowId);
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
+
+        List<Long> connectionIds = projectDeploymentWorkflow.getConnections()
+            .stream()
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .toList();
+
+        connectionService.validateConnectionsActive(id, workflowId, connectionIds);
 
         return principalJobFacade.createJob(
             new JobParametersDTO(
@@ -338,7 +354,18 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     public List<ProjectDeployment> getProjectDeployments(
         long workspaceId, Environment environment, @Nullable Long projectId, @Nullable Long tagId) {
 
-        return projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId);
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
+            false, environment, projectId, tagId, workspaceId);
+
+        if (projectDeployments.isEmpty()) {
+            return projectDeployments;
+        }
+
+        Set<Long> visibleProjectIds = projectVisibilityFilter.visibleProjectIds(getProjects(projectDeployments));
+
+        return projectDeployments.stream()
+            .filter(projectDeployment -> visibleProjectIds.contains(projectDeployment.getProjectId()))
+            .toList();
     }
 
     @Override
@@ -459,12 +486,17 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @Override
     @PreAuthorize("hasPermission(#projectDeploymentDTO.id, 'ProjectDeployment', 'DEPLOYMENT_CREATE')")
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = CollectionUtils.map(
+            projectDeploymentDTO.projectDeploymentWorkflows(),
+            ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow);
+
+        validateConnectionsAccessible(
+            projectDeploymentWorkflows,
+            getConnectionIds(
+                projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentDTO.id())));
+
         updateProjectDeployment(
-            projectDeploymentDTO.toProjectDeployment(),
-            CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            projectDeploymentDTO.tags());
+            projectDeploymentDTO.toProjectDeployment(), projectDeploymentWorkflows, projectDeploymentDTO.tags());
     }
 
     @Override
@@ -566,6 +598,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         checkProjectDeploymentWorkflowConnectionUsage(
             projectDeploymentWorkflow.getConnections(), storedProjectDeploymentWorkflow.getWorkflowId(),
             projectDeployment.getEnvironment());
+
+        validateConnectionsAccessible(
+            List.of(projectDeploymentWorkflow), getConnectionIds(List.of(storedProjectDeploymentWorkflow)));
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
         projectDeploymentWorkflowService.update(projectDeploymentWorkflow);
@@ -617,6 +652,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.getWorkflowId(),
                 projectDeployment.getEnvironment());
             validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+            validateDeploymentConnectionEnvironments(
+                projectDeploymentWorkflow.getConnections(), projectDeployment.getEnvironment());
 
             if (oldProjectDeploymentWorkflow == null) {
                 projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
@@ -891,17 +928,18 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             return projectDeployments;
         }
 
-        Set<Long> systemProjectIds = getProjects(projectDeployments).stream()
+        List<Project> projects = getProjects(projectDeployments);
+
+        Set<Long> systemProjectIds = projects.stream()
             .filter(SystemProjects::isSystemProject)
             .map(Project::getId)
             .collect(Collectors.toSet());
 
-        if (systemProjectIds.isEmpty()) {
-            return projectDeployments;
-        }
+        Set<Long> visibleProjectIds = projectVisibilityFilter.visibleProjectIds(projects);
 
         return projectDeployments.stream()
             .filter(projectDeployment -> !systemProjectIds.contains(projectDeployment.getProjectId()))
+            .filter(projectDeployment -> visibleProjectIds.contains(projectDeployment.getProjectId()))
             .toList();
     }
 
@@ -911,6 +949,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 .stream()
                 .map(ProjectDeployment::getProjectId)
                 .filter(Objects::nonNull)
+                .distinct()
                 .toList());
     }
 
@@ -1021,6 +1060,48 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             if (!permissionService.canUseConnectionInWorkflow(connectionId, workflowId, environment)) {
                 throw new AccessDeniedException(
                     "Connection id=%s cannot be used by workflow id=%s".formatted(connectionId, workflowId));
+            }
+        }
+    }
+
+    private static Set<Long> getConnectionIds(List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+        return projectDeploymentWorkflows.stream()
+            .flatMap(projectDeploymentWorkflow -> projectDeploymentWorkflow.getConnections()
+                .stream())
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    }
+
+    private void validateConnectionsAccessible(
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows, Set<Long> attachedConnectionIds) {
+
+        for (Long connectionId : getConnectionIds(projectDeploymentWorkflows)) {
+            if (attachedConnectionIds.contains(connectionId)) {
+                continue;
+            }
+
+            if (!permissionService.hasResourceScope(connectionId, CONNECTION_RESOURCE_TYPE, "CONNECTION_VIEW")) {
+                throw new AccessDeniedException("Connection id=%s is not accessible".formatted(connectionId));
+            }
+        }
+    }
+
+    private void validateDeploymentConnectionEnvironments(
+        List<ProjectDeploymentWorkflowConnection> workflowConnections, Environment targetEnvironment) {
+
+        for (ProjectDeploymentWorkflowConnection workflowConnection : workflowConnections) {
+            if (workflowConnection.getConnectionId() == null) {
+                continue;
+            }
+
+            Connection connection = connectionService.getConnection(workflowConnection.getConnectionId());
+
+            if (connection.getEnvironmentId() != targetEnvironment.ordinal()) {
+                throw new ConfigurationException(
+                    "Connection '%s' environment does not match deployment environment %s".formatted(
+                        connection.getName(), targetEnvironment.name()),
+                    ConnectionErrorType.INVALID_CONNECTION);
             }
         }
     }

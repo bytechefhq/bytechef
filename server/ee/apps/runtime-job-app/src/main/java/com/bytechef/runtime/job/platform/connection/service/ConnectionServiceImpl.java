@@ -12,6 +12,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
 import java.util.List;
 import java.util.Map;
@@ -54,11 +55,18 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Optional<Connection> fetchConnection(long id) {
+        // Connection parameters are injected into the job's context before it runs, so inside a runtime job every
+        // addressed connection exists by construction.
         return Optional.of(getConnection(id));
     }
 
     @Override
     public List<Connection> getConnections(PlatformType type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getConnectionsByVisibility(ResourceVisibility visibility, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
@@ -99,12 +107,32 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    public Connection reassignOwner(long id, String newOwnerLogin) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection updateVisibility(long id, ResourceVisibility visibility) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 }

@@ -19,11 +19,14 @@ package com.bytechef.automation.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
 /**
+ * Authorization (ADMIN) is enforced on {@link WorkspaceConnectionFacade}, not here.
+ *
  * @author Ivica Cardic
  */
 @Controller
@@ -42,5 +45,17 @@ public class ConnectionGraphQlController {
         workspaceConnectionFacade.disconnectConnection(connectionId);
 
         return true;
+    }
+
+    @MutationMapping(name = "updateConnectionCredentials")
+    public Boolean updateConnectionCredentials(@Argument UpdateConnectionCredentialsInput input) {
+        workspaceConnectionFacade.updateConnectionCredentials(
+            input.connectionId(), input.parameters(), input.version());
+
+        return true;
+    }
+
+    @SuppressFBWarnings("EI")
+    public record UpdateConnectionCredentialsInput(long connectionId, Map<String, Object> parameters, int version) {
     }
 }

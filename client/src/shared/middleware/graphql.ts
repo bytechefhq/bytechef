@@ -459,6 +459,14 @@ export type AddWorkspaceUserMutationVariables = Exact<{
 
 export type AddWorkspaceUserMutation = { addWorkspaceUser: { id: string | null, workspaceId: string, userId: string, workspaceRole: Types.WorkspaceRole | null, customRoleId: string | null, user: { email: string, firstName: string | null, lastName: string | null } | null } };
 
+export type AffectedWorkflowsQueryVariables = Exact<{
+  workspaceId: string | number;
+  userLogin: string;
+}>;
+
+
+export type AffectedWorkflowsQuery = { affectedWorkflows: Array<{ workflowId: string, workflowName: string, connectionIds: Array<string> }> };
+
 export type AssignWorkspaceUserCustomRoleMutationVariables = Exact<{
   workspaceId: string | number;
   userId: string | number;
@@ -472,6 +480,14 @@ export type BuiltInRolesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type BuiltInRolesQuery = { builtInRoles: Array<{ name: string, scopes: Array<string> }> };
+
+export type ConnectionGrantsQueryVariables = Exact<{
+  workspaceId: string | number;
+  connectionId: string | number;
+}>;
+
+
+export type ConnectionGrantsQuery = { connectionGrants: Array<any> };
 
 export type CreateA2aProjectMutationVariables = Exact<{
   input: Types.CreateA2aProjectInput;
@@ -500,6 +516,13 @@ export type CreateMcpProjectMutationVariables = Exact<{
 
 
 export type CreateMcpProjectMutation = { createMcpProject: { id: string, mcpServerId: string, projectDeploymentId: string, projectVersion: number | null } | null };
+
+export type CreateOrganizationConnectionMutationVariables = Exact<{
+  input: Types.CreateOrganizationConnectionInput;
+}>;
+
+
+export type CreateOrganizationConnectionMutation = { createOrganizationConnection: string };
 
 export type CreateWorkspaceApiKeyMutationVariables = Exact<{
   workspaceId: string | number;
@@ -559,6 +582,13 @@ export type DeleteMcpProjectWorkflowMutationVariables = Exact<{
 
 export type DeleteMcpProjectWorkflowMutation = { deleteMcpProjectWorkflow: boolean | null };
 
+export type DeleteOrganizationConnectionMutationVariables = Exact<{
+  connectionId: string | number;
+}>;
+
+
+export type DeleteOrganizationConnectionMutation = { deleteOrganizationConnection: boolean };
+
 export type DeleteSharedProjectMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -609,6 +639,24 @@ export type ExportSharedWorkflowMutationVariables = Exact<{
 
 
 export type ExportSharedWorkflowMutation = { exportSharedWorkflow: boolean };
+
+export type GrantConnectionAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectionId: string | number;
+  userId: string | number;
+}>;
+
+
+export type GrantConnectionAccessMutation = { grantConnectionAccess: boolean };
+
+export type GrantProjectAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+  userId: string | number;
+}>;
+
+
+export type GrantProjectAccessMutation = { grantProjectAccess: boolean };
 
 export type ImportProjectTemplateMutationVariables = Exact<{
   id: string;
@@ -680,6 +728,13 @@ export type MyWorkspaceScopesQueryVariables = Exact<{
 
 export type MyWorkspaceScopesQuery = { myWorkspaceScopes: Array<string> };
 
+export type OrganizationConnectionsQueryVariables = Exact<{
+  environmentId?: string | number | null | undefined;
+}>;
+
+
+export type OrganizationConnectionsQuery = { organizationConnections: Array<{ id: string, name: string, componentName: string, environmentId: number, visibility: Types.ResourceVisibility, createdBy: string | null, createdDate: string | null, lastModifiedDate: string | null }> };
+
 export type PermissionScopeGroupsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -708,6 +763,14 @@ export type ProjectByIdQueryVariables = Exact<{
 
 export type ProjectByIdQuery = { project: { id: string, name: string } | null };
 
+export type ProjectGrantsQueryVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+}>;
+
+
+export type ProjectGrantsQuery = { projectGrants: Array<any> };
+
 export type ProjectTemplateQueryVariables = Exact<{
   id: string;
   sharedProject: boolean;
@@ -715,6 +778,15 @@ export type ProjectTemplateQueryVariables = Exact<{
 
 
 export type ProjectTemplateQuery = { projectTemplate: { description: string | null, projectVersion: number | null, publicUrl: string | null, components: Array<{ key: string | null, value: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { componentName: string, version: number } | null } | null> }>, project: { name: string } | null, workflows: Array<{ id: string, label: string }> } | null };
+
+export type ReassignAllConnectionsMutationVariables = Exact<{
+  workspaceId: string | number;
+  userLogin: string;
+  newOwnerLogin: string;
+}>;
+
+
+export type ReassignAllConnectionsMutation = { reassignAllConnections: boolean };
 
 export type RemoveWorkspaceUserMutationVariables = Exact<{
   workspaceId: string | number;
@@ -732,6 +804,42 @@ export type RemoveWorkspaceUserEnvironmentRoleMutationVariables = Exact<{
 
 
 export type RemoveWorkspaceUserEnvironmentRoleMutation = { removeWorkspaceUserEnvironmentRole: boolean };
+
+export type RevokeConnectionAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectionId: string | number;
+  userId: string | number;
+}>;
+
+
+export type RevokeConnectionAccessMutation = { revokeConnectionAccess: boolean };
+
+export type RevokeProjectAccessMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+  userId: string | number;
+}>;
+
+
+export type RevokeProjectAccessMutation = { revokeProjectAccess: boolean };
+
+export type SetConnectionVisibilityMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectionId: string | number;
+  visibility: Types.ResourceVisibility;
+}>;
+
+
+export type SetConnectionVisibilityMutation = { setConnectionVisibility: boolean };
+
+export type SetProjectVisibilityMutationVariables = Exact<{
+  workspaceId: string | number;
+  projectId: string | number;
+  visibility: Types.ResourceVisibility;
+}>;
+
+
+export type SetProjectVisibilityMutation = { setProjectVisibility: boolean };
 
 export type SetWorkspaceUserEnvironmentRoleMutationVariables = Exact<{
   workspaceId: string | number;
@@ -765,6 +873,14 @@ export type ToolEligibleProjectVersionWorkflowsQueryVariables = Exact<{
 
 
 export type ToolEligibleProjectVersionWorkflowsQuery = { toolEligibleProjectVersionWorkflows: Array<{ id: string, workflow: { id: string, label: string } }> };
+
+export type UnresolvedConnectionsQueryVariables = Exact<{
+  workspaceId: string | number;
+  userLogin: string;
+}>;
+
+
+export type UnresolvedConnectionsQuery = { unresolvedConnections: Array<{ connectionId: string, connectionName: string, visibility: Types.ResourceVisibility, environmentId: number, dependentWorkflowCount: number }> };
 
 export type UpdateA2aProjectMutationVariables = Exact<{
   id: string | number;
@@ -806,6 +922,13 @@ export type UpdateA2aServerTagsMutationVariables = Exact<{
 
 export type UpdateA2aServerTagsMutation = { updateA2aServerTags: Array<{ id: string } | null> | null };
 
+export type UpdateConnectionCredentialsMutationVariables = Exact<{
+  input: Types.UpdateConnectionCredentialsInput;
+}>;
+
+
+export type UpdateConnectionCredentialsMutation = { updateConnectionCredentials: boolean };
+
 export type UpdateCustomRoleMutationVariables = Exact<{
   id: string | number;
   input: Types.UpdateCustomRoleInput;
@@ -845,6 +968,16 @@ export type UpdateMcpServerTagsMutationVariables = Exact<{
 
 
 export type UpdateMcpServerTagsMutation = { updateMcpServerTags: Array<{ id: string } | null> | null };
+
+export type UpdateOrganizationConnectionMutationVariables = Exact<{
+  connectionId: string | number;
+  name: string;
+  tagIds?: Array<string | number> | string | number | null | undefined;
+  version: number;
+}>;
+
+
+export type UpdateOrganizationConnectionMutation = { updateOrganizationConnection: boolean };
 
 export type UpdateWorkspaceApiKeyMutationVariables = Exact<{
   apiKeyId: string | number;
@@ -4059,6 +4192,32 @@ export const useAddWorkspaceUserMutation = <
   }
     )};
 
+export const AffectedWorkflowsDocument = new TypedDocumentString(`
+    query affectedWorkflows($workspaceId: ID!, $userLogin: String!) {
+  affectedWorkflows(workspaceId: $workspaceId, userLogin: $userLogin) {
+    workflowId
+    workflowName
+    connectionIds
+  }
+}
+    `);
+
+export const useAffectedWorkflowsQuery = <
+      TData = AffectedWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: AffectedWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<AffectedWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AffectedWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AffectedWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['affectedWorkflows', variables],
+    queryFn: fetcher<AffectedWorkflowsQuery, AffectedWorkflowsQueryVariables>(AffectedWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
 export const AssignWorkspaceUserCustomRoleDocument = new TypedDocumentString(`
     mutation AssignWorkspaceUserCustomRole($workspaceId: ID!, $userId: ID!, $customRoleId: ID!) {
   assignWorkspaceUserCustomRole(
@@ -4108,6 +4267,28 @@ export const useBuiltInRolesQuery = <
       {
     queryKey: variables === undefined ? ['BuiltInRoles'] : ['BuiltInRoles', variables],
     queryFn: fetcher<BuiltInRolesQuery, BuiltInRolesQueryVariables>(BuiltInRolesDocument, variables),
+    ...options
+  }
+    )};
+
+export const ConnectionGrantsDocument = new TypedDocumentString(`
+    query ConnectionGrants($workspaceId: ID!, $connectionId: ID!) {
+  connectionGrants(workspaceId: $workspaceId, connectionId: $connectionId)
+}
+    `);
+
+export const useConnectionGrantsQuery = <
+      TData = ConnectionGrantsQuery,
+      TError = unknown
+    >(
+      variables: ConnectionGrantsQueryVariables,
+      options?: Omit<UseQueryOptions<ConnectionGrantsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectionGrantsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ConnectionGrantsQuery, TError, TData>(
+      {
+    queryKey: ['ConnectionGrants', variables],
+    queryFn: fetcher<ConnectionGrantsQuery, ConnectionGrantsQueryVariables>(ConnectionGrantsDocument, variables),
     ...options
   }
     )};
@@ -4198,6 +4379,25 @@ export const useCreateMcpProjectMutation = <
       {
     mutationKey: ['createMcpProject'],
     mutationFn: (variables?: CreateMcpProjectMutationVariables) => fetcher<CreateMcpProjectMutation, CreateMcpProjectMutationVariables>(CreateMcpProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateOrganizationConnectionDocument = new TypedDocumentString(`
+    mutation createOrganizationConnection($input: CreateOrganizationConnectionInput!) {
+  createOrganizationConnection(input: $input)
+}
+    `);
+
+export const useCreateOrganizationConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateOrganizationConnectionMutation, TError, CreateOrganizationConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<CreateOrganizationConnectionMutation, TError, CreateOrganizationConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['createOrganizationConnection'],
+    mutationFn: (variables?: CreateOrganizationConnectionMutationVariables) => fetcher<CreateOrganizationConnectionMutation, CreateOrganizationConnectionMutationVariables>(CreateOrganizationConnectionDocument, variables)(),
     ...options
   }
     )};
@@ -4372,6 +4572,25 @@ export const useDeleteMcpProjectWorkflowMutation = <
   }
     )};
 
+export const DeleteOrganizationConnectionDocument = new TypedDocumentString(`
+    mutation deleteOrganizationConnection($connectionId: ID!) {
+  deleteOrganizationConnection(connectionId: $connectionId)
+}
+    `);
+
+export const useDeleteOrganizationConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteOrganizationConnectionMutation, TError, DeleteOrganizationConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteOrganizationConnectionMutation, TError, DeleteOrganizationConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteOrganizationConnection'],
+    mutationFn: (variables?: DeleteOrganizationConnectionMutationVariables) => fetcher<DeleteOrganizationConnectionMutation, DeleteOrganizationConnectionMutationVariables>(DeleteOrganizationConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteSharedProjectDocument = new TypedDocumentString(`
     mutation deleteSharedProject($id: ID!) {
   deleteSharedProject(id: $id)
@@ -4501,6 +4720,52 @@ export const useExportSharedWorkflowMutation = <
       {
     mutationKey: ['exportSharedWorkflow'],
     mutationFn: (variables?: ExportSharedWorkflowMutationVariables) => fetcher<ExportSharedWorkflowMutation, ExportSharedWorkflowMutationVariables>(ExportSharedWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GrantConnectionAccessDocument = new TypedDocumentString(`
+    mutation GrantConnectionAccess($workspaceId: ID!, $connectionId: ID!, $userId: ID!) {
+  grantConnectionAccess(
+    workspaceId: $workspaceId
+    connectionId: $connectionId
+    userId: $userId
+  )
+}
+    `);
+
+export const useGrantConnectionAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GrantConnectionAccessMutation, TError, GrantConnectionAccessMutationVariables, TContext>) => {
+    
+    return useMutation<GrantConnectionAccessMutation, TError, GrantConnectionAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['GrantConnectionAccess'],
+    mutationFn: (variables?: GrantConnectionAccessMutationVariables) => fetcher<GrantConnectionAccessMutation, GrantConnectionAccessMutationVariables>(GrantConnectionAccessDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GrantProjectAccessDocument = new TypedDocumentString(`
+    mutation GrantProjectAccess($workspaceId: ID!, $projectId: ID!, $userId: ID!) {
+  grantProjectAccess(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    userId: $userId
+  )
+}
+    `);
+
+export const useGrantProjectAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GrantProjectAccessMutation, TError, GrantProjectAccessMutationVariables, TContext>) => {
+    
+    return useMutation<GrantProjectAccessMutation, TError, GrantProjectAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['GrantProjectAccess'],
+    mutationFn: (variables?: GrantProjectAccessMutationVariables) => fetcher<GrantProjectAccessMutation, GrantProjectAccessMutationVariables>(GrantProjectAccessDocument, variables)(),
     ...options
   }
     )};
@@ -4775,6 +5040,37 @@ export const useMyWorkspaceScopesQuery = <
   }
     )};
 
+export const OrganizationConnectionsDocument = new TypedDocumentString(`
+    query organizationConnections($environmentId: ID) {
+  organizationConnections(environmentId: $environmentId) {
+    id
+    name
+    componentName
+    environmentId
+    visibility
+    createdBy
+    createdDate
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useOrganizationConnectionsQuery = <
+      TData = OrganizationConnectionsQuery,
+      TError = unknown
+    >(
+      variables?: OrganizationConnectionsQueryVariables,
+      options?: Omit<UseQueryOptions<OrganizationConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<OrganizationConnectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<OrganizationConnectionsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['organizationConnections'] : ['organizationConnections', variables],
+    queryFn: fetcher<OrganizationConnectionsQuery, OrganizationConnectionsQueryVariables>(OrganizationConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
 export const PermissionScopeGroupsDocument = new TypedDocumentString(`
     query PermissionScopeGroups {
   permissionScopeGroups {
@@ -4916,6 +5212,28 @@ export const useProjectByIdQuery = <
   }
     )};
 
+export const ProjectGrantsDocument = new TypedDocumentString(`
+    query ProjectGrants($workspaceId: ID!, $projectId: ID!) {
+  projectGrants(workspaceId: $workspaceId, projectId: $projectId)
+}
+    `);
+
+export const useProjectGrantsQuery = <
+      TData = ProjectGrantsQuery,
+      TError = unknown
+    >(
+      variables: ProjectGrantsQueryVariables,
+      options?: Omit<UseQueryOptions<ProjectGrantsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectGrantsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProjectGrantsQuery, TError, TData>(
+      {
+    queryKey: ['ProjectGrants', variables],
+    queryFn: fetcher<ProjectGrantsQuery, ProjectGrantsQueryVariables>(ProjectGrantsDocument, variables),
+    ...options
+  }
+    )};
+
 export const ProjectTemplateDocument = new TypedDocumentString(`
     query projectTemplate($id: String!, $sharedProject: Boolean!) {
   projectTemplate(id: $id, sharedProject: $sharedProject) {
@@ -4962,6 +5280,29 @@ export const useProjectTemplateQuery = <
   }
     )};
 
+export const ReassignAllConnectionsDocument = new TypedDocumentString(`
+    mutation reassignAllConnections($workspaceId: ID!, $userLogin: String!, $newOwnerLogin: String!) {
+  reassignAllConnections(
+    workspaceId: $workspaceId
+    userLogin: $userLogin
+    newOwnerLogin: $newOwnerLogin
+  )
+}
+    `);
+
+export const useReassignAllConnectionsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ReassignAllConnectionsMutation, TError, ReassignAllConnectionsMutationVariables, TContext>) => {
+    
+    return useMutation<ReassignAllConnectionsMutation, TError, ReassignAllConnectionsMutationVariables, TContext>(
+      {
+    mutationKey: ['reassignAllConnections'],
+    mutationFn: (variables?: ReassignAllConnectionsMutationVariables) => fetcher<ReassignAllConnectionsMutation, ReassignAllConnectionsMutationVariables>(ReassignAllConnectionsDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const RemoveWorkspaceUserDocument = new TypedDocumentString(`
     mutation RemoveWorkspaceUser($workspaceId: ID!, $userId: ID!) {
   removeWorkspaceUser(workspaceId: $workspaceId, userId: $userId)
@@ -5000,6 +5341,98 @@ export const useRemoveWorkspaceUserEnvironmentRoleMutation = <
       {
     mutationKey: ['RemoveWorkspaceUserEnvironmentRole'],
     mutationFn: (variables?: RemoveWorkspaceUserEnvironmentRoleMutationVariables) => fetcher<RemoveWorkspaceUserEnvironmentRoleMutation, RemoveWorkspaceUserEnvironmentRoleMutationVariables>(RemoveWorkspaceUserEnvironmentRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RevokeConnectionAccessDocument = new TypedDocumentString(`
+    mutation RevokeConnectionAccess($workspaceId: ID!, $connectionId: ID!, $userId: ID!) {
+  revokeConnectionAccess(
+    workspaceId: $workspaceId
+    connectionId: $connectionId
+    userId: $userId
+  )
+}
+    `);
+
+export const useRevokeConnectionAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RevokeConnectionAccessMutation, TError, RevokeConnectionAccessMutationVariables, TContext>) => {
+    
+    return useMutation<RevokeConnectionAccessMutation, TError, RevokeConnectionAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['RevokeConnectionAccess'],
+    mutationFn: (variables?: RevokeConnectionAccessMutationVariables) => fetcher<RevokeConnectionAccessMutation, RevokeConnectionAccessMutationVariables>(RevokeConnectionAccessDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RevokeProjectAccessDocument = new TypedDocumentString(`
+    mutation RevokeProjectAccess($workspaceId: ID!, $projectId: ID!, $userId: ID!) {
+  revokeProjectAccess(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    userId: $userId
+  )
+}
+    `);
+
+export const useRevokeProjectAccessMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RevokeProjectAccessMutation, TError, RevokeProjectAccessMutationVariables, TContext>) => {
+    
+    return useMutation<RevokeProjectAccessMutation, TError, RevokeProjectAccessMutationVariables, TContext>(
+      {
+    mutationKey: ['RevokeProjectAccess'],
+    mutationFn: (variables?: RevokeProjectAccessMutationVariables) => fetcher<RevokeProjectAccessMutation, RevokeProjectAccessMutationVariables>(RevokeProjectAccessDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetConnectionVisibilityDocument = new TypedDocumentString(`
+    mutation SetConnectionVisibility($workspaceId: ID!, $connectionId: ID!, $visibility: ResourceVisibility!) {
+  setConnectionVisibility(
+    workspaceId: $workspaceId
+    connectionId: $connectionId
+    visibility: $visibility
+  )
+}
+    `);
+
+export const useSetConnectionVisibilityMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetConnectionVisibilityMutation, TError, SetConnectionVisibilityMutationVariables, TContext>) => {
+    
+    return useMutation<SetConnectionVisibilityMutation, TError, SetConnectionVisibilityMutationVariables, TContext>(
+      {
+    mutationKey: ['SetConnectionVisibility'],
+    mutationFn: (variables?: SetConnectionVisibilityMutationVariables) => fetcher<SetConnectionVisibilityMutation, SetConnectionVisibilityMutationVariables>(SetConnectionVisibilityDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetProjectVisibilityDocument = new TypedDocumentString(`
+    mutation SetProjectVisibility($workspaceId: ID!, $projectId: ID!, $visibility: ResourceVisibility!) {
+  setProjectVisibility(
+    workspaceId: $workspaceId
+    projectId: $projectId
+    visibility: $visibility
+  )
+}
+    `);
+
+export const useSetProjectVisibilityMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetProjectVisibilityMutation, TError, SetProjectVisibilityMutationVariables, TContext>) => {
+    
+    return useMutation<SetProjectVisibilityMutation, TError, SetProjectVisibilityMutationVariables, TContext>(
+      {
+    mutationKey: ['SetProjectVisibility'],
+    mutationFn: (variables?: SetProjectVisibilityMutationVariables) => fetcher<SetProjectVisibilityMutation, SetProjectVisibilityMutationVariables>(SetProjectVisibilityDocument, variables)(),
     ...options
   }
     )};
@@ -5120,6 +5553,34 @@ export const useToolEligibleProjectVersionWorkflowsQuery = <
   }
     )};
 
+export const UnresolvedConnectionsDocument = new TypedDocumentString(`
+    query unresolvedConnections($workspaceId: ID!, $userLogin: String!) {
+  unresolvedConnections(workspaceId: $workspaceId, userLogin: $userLogin) {
+    connectionId
+    connectionName
+    visibility
+    environmentId
+    dependentWorkflowCount
+  }
+}
+    `);
+
+export const useUnresolvedConnectionsQuery = <
+      TData = UnresolvedConnectionsQuery,
+      TError = unknown
+    >(
+      variables: UnresolvedConnectionsQueryVariables,
+      options?: Omit<UseQueryOptions<UnresolvedConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<UnresolvedConnectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<UnresolvedConnectionsQuery, TError, TData>(
+      {
+    queryKey: ['unresolvedConnections', variables],
+    queryFn: fetcher<UnresolvedConnectionsQuery, UnresolvedConnectionsQueryVariables>(UnresolvedConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
 export const UpdateA2aProjectDocument = new TypedDocumentString(`
     mutation updateA2aProject($id: ID!, $input: UpdateA2aProjectInput!) {
   updateA2aProject(id: $id, input: $input) {
@@ -5222,6 +5683,25 @@ export const useUpdateA2aServerTagsMutation = <
       {
     mutationKey: ['updateA2aServerTags'],
     mutationFn: (variables?: UpdateA2aServerTagsMutationVariables) => fetcher<UpdateA2aServerTagsMutation, UpdateA2aServerTagsMutationVariables>(UpdateA2aServerTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateConnectionCredentialsDocument = new TypedDocumentString(`
+    mutation UpdateConnectionCredentials($input: UpdateConnectionCredentialsInput!) {
+  updateConnectionCredentials(input: $input)
+}
+    `);
+
+export const useUpdateConnectionCredentialsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateConnectionCredentialsMutation, TError, UpdateConnectionCredentialsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateConnectionCredentialsMutation, TError, UpdateConnectionCredentialsMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateConnectionCredentials'],
+    mutationFn: (variables?: UpdateConnectionCredentialsMutationVariables) => fetcher<UpdateConnectionCredentialsMutation, UpdateConnectionCredentialsMutationVariables>(UpdateConnectionCredentialsDocument, variables)(),
     ...options
   }
     )};
@@ -5339,6 +5819,30 @@ export const useUpdateMcpServerTagsMutation = <
       {
     mutationKey: ['updateMcpServerTags'],
     mutationFn: (variables?: UpdateMcpServerTagsMutationVariables) => fetcher<UpdateMcpServerTagsMutation, UpdateMcpServerTagsMutationVariables>(UpdateMcpServerTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateOrganizationConnectionDocument = new TypedDocumentString(`
+    mutation updateOrganizationConnection($connectionId: ID!, $name: String!, $tagIds: [ID!], $version: Int!) {
+  updateOrganizationConnection(
+    connectionId: $connectionId
+    name: $name
+    tagIds: $tagIds
+    version: $version
+  )
+}
+    `);
+
+export const useUpdateOrganizationConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateOrganizationConnectionMutation, TError, UpdateOrganizationConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateOrganizationConnectionMutation, TError, UpdateOrganizationConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['updateOrganizationConnection'],
+    mutationFn: (variables?: UpdateOrganizationConnectionMutationVariables) => fetcher<UpdateOrganizationConnectionMutation, UpdateOrganizationConnectionMutationVariables>(UpdateOrganizationConnectionDocument, variables)(),
     ...options
   }
     )};

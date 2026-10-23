@@ -21,6 +21,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -107,9 +108,13 @@ public final class Connection {
     @Version
     private int version;
 
+    @Column
+    private int visibility;
+
     public Connection() {
         this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
-        this.status = ConnectionStatus.ACTIVE.ordinal();
+        this.status = ConnectionStatus.ACTIVE.getCode();
+        this.visibility = ResourceVisibility.WORKSPACE.ordinal();
     }
 
     public static Builder builder() {
@@ -223,15 +228,12 @@ public final class Connection {
     }
 
     public ConnectionStatus getStatus() {
-        ConnectionStatus[] values = ConnectionStatus.values();
-
-        if (status < 0 || status >= values.length) {
+        try {
+            return ConnectionStatus.fromCode(status);
+        } catch (IllegalArgumentException exception) {
             throw new IllegalStateException(
-                "Connection id=%s has invalid status ordinal %d (valid range: 0-%d)".formatted(
-                    id, status, values.length - 1));
+                "Connection id=%s has invalid status code %d".formatted(id, status), exception);
         }
-
-        return values[status];
     }
 
     public List<Long> getTagIds() {
@@ -248,6 +250,18 @@ public final class Connection {
         return version;
     }
 
+    public ResourceVisibility getVisibility() {
+        ResourceVisibility[] values = ResourceVisibility.values();
+
+        if (visibility < 0 || visibility >= values.length) {
+            throw new IllegalStateException(
+                "Connection id=%s has invalid visibility ordinal %d (valid range: 0-%d)".formatted(
+                    id, visibility, values.length - 1));
+        }
+
+        return values[visibility];
+    }
+
     public void putAllParameters(Map<String, ?> parameters) {
         this.parameters.putAll(parameters);
     }
@@ -260,8 +274,25 @@ public final class Connection {
         this.componentName = componentName;
     }
 
+    /**
+     * Overrides the auditing-populated creator login. Reassignment goes through {@link #reassignOwner(String)}.
+     */
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public void reassignOwner(String newOwnerLogin) {
+        Objects.requireNonNull(newOwnerLogin, "newOwnerLogin");
+
+        if (getStatus() == ConnectionStatus.REVOKED) {
+            throw new IllegalStateException("Cannot reassign a revoked connection");
+        }
+
+        this.createdBy = newOwnerLogin;
+
+        if (getStatus() == ConnectionStatus.PENDING_REASSIGNMENT) {
+            setStatus(ConnectionStatus.ACTIVE);
+        }
     }
 
     public void setConnectionVersion(int connectionVersion) {
@@ -284,7 +315,7 @@ public final class Connection {
                 "Cannot transition connection status from %s to %s".formatted(currentStatus, status));
         }
 
-        this.status = status.ordinal();
+        this.status = status.getCode();
     }
 
     public void setEnvironmentId(int environmentId) {
@@ -341,6 +372,16 @@ public final class Connection {
         this.version = version;
     }
 
+    /**
+     * Assign visibility. A plain field assignment: which rungs a connection may be set to is declared by
+     * {@code ResourceVisibilityPolicy} and enforced at the facade.
+     */
+    public void setVisibility(ResourceVisibility visibility) {
+        Objects.requireNonNull(visibility, "visibility");
+
+        this.visibility = visibility.ordinal();
+    }
+
     @Override
     public String toString() {
         return "Connection{" +
@@ -354,6 +395,7 @@ public final class Connection {
             ", connectionTags=" + connectionTags +
             ", status=" + status +
             ", type=" + type +
+            ", visibility=" + visibility +
             ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
@@ -375,6 +417,7 @@ public final class Connection {
         private List<Long> tagIds;
         private PlatformType type;
         private int version;
+        private ResourceVisibility visibility;
 
         private Builder() {
         }
@@ -439,6 +482,12 @@ public final class Connection {
             return this;
         }
 
+        public Builder visibility(ResourceVisibility visibility) {
+            this.visibility = visibility;
+
+            return this;
+        }
+
         public Connection build() {
             Connection connection = new Connection();
 
@@ -454,6 +503,10 @@ public final class Connection {
 
             if (status != null) {
                 connection.setStatus(status);
+            }
+
+            if (visibility != null) {
+                connection.setVisibility(visibility);
             }
 
             return connection;

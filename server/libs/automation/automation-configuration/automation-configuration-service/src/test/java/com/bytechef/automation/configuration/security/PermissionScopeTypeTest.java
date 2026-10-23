@@ -85,6 +85,7 @@ class PermissionScopeTypeTest {
         "hasEmbeddedScopeInEnvironmentId",
         "hasEmbeddedScopeInEveryEnvironment",
         "hasPermission",
+        "hasResourceScopeIfProjectWorkflow",
         "hasResourceScopeInEnvironment",
         "hasResourceScopeInEnvironmentId",
         "hasWorkspaceScopeInEnvironment",
@@ -130,6 +131,7 @@ class PermissionScopeTypeTest {
      * here would look uncatalogued.</li>
      * <li>{@code hasResourceScopeInEnvironment(id, 'Type', 'SCOPE', environment)} — third of four, and the same for its
      * {@code InEnvironmentId} sibling, which needs its own pattern for the reason given above.</li>
+     * <li>{@code hasResourceScopeIfProjectWorkflow(workflowId, id, 'Type', 'SCOPE')} — fourth of four.</li>
      * <li>{@code hasWorkflowScope(workflowId, 'SCOPE')} — second of two.</li>
      * <li>{@code hasWorkflowScopeInEnvironment(workflowId, 'SCOPE', environment)} — second of three.</li>
      * <li>{@code hasWorkflowScopeIfProjectWorkflowInEnvironment(workflowId, 'SCOPE', environment)} and its
@@ -159,7 +161,10 @@ class PermissionScopeTypeTest {
                 + "\\s*,"),
         Pattern.compile(
             "hasResourceScopeInEnvironmentId\\(\\s*[^,()]+?,\\s*'[A-Za-z][A-Za-z0-9]*'\\s*,\\s*" + SCOPE_GROUP
-                + "\\s*,"));
+                + "\\s*,"),
+        Pattern.compile(
+            "hasResourceScopeIfProjectWorkflow\\(\\s*[^,()]+?,\\s*[^,()]+?,\\s*'[A-Za-z][A-Za-z0-9]*'\\s*,\\s*"
+                + SCOPE_GROUP + "\\s*\\)"));
 
     private static final Pattern GATE_FUNCTION_CALL = Pattern.compile("(@?[A-Za-z_][A-Za-z0-9_.]*)\\(");
 

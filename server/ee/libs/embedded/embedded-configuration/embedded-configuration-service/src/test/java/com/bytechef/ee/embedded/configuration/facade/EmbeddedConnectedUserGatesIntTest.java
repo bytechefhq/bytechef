@@ -33,6 +33,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.security.ConnectionEnvironmentResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -41,6 +42,8 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowCreator;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -130,16 +133,19 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -718,12 +724,12 @@ class EmbeddedConnectedUserGatesIntTest {
             authenticate(login, TENANT_ADMIN.equals(login));
 
             assertThatThrownBy(() -> workspaceConnectionFacade.delete(EMBEDDED_PRODUCTION_CONNECTION_ID))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(
                 () -> workspaceConnectionFacade.update(EMBEDDED_PRODUCTION_CONNECTION_ID, "name", List.of(), 0))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(() -> workspaceConnectionFacade.updateTags(EMBEDDED_PRODUCTION_CONNECTION_ID, List.of()))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOfAny(AccessDeniedException.class, NoSuchElementException.class);
             assertThatThrownBy(() -> workspaceConnectionFacade.getConnection(EMBEDDED_PRODUCTION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
         }
@@ -1036,15 +1042,24 @@ class EmbeddedConnectedUserGatesIntTest {
     static class RealPermissionConfiguration {
 
         @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
+
+        @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
             ConnectionFacade connectionFacade, ConnectionService connectionService,
             PermissionService permissionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+            ResourceVisibilityResolver resourceVisibilityResolver, UserService userService,
             WorkflowTestConfigurationService workflowTestConfigurationService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, permissionService,
-                projectDeploymentWorkflowService, workflowTestConfigurationService,
-                mock(WorkspaceConnectionService.class));
+                connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService, resourceVisibilityResolver,
+                new StaticListableBeanFactory().getBeanProvider(MeterRegistry.class), permissionService,
+                projectDeploymentWorkflowService, mock(ProjectService.class), userService,
+                workflowTestConfigurationService, mock(WorkspaceConnectionService.class), mock(WorkspaceFacade.class));
         }
 
         @Bean
