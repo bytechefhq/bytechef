@@ -123,6 +123,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     const handleProjectWorkflowValueChange = useCallback(
         (projectWorkflowId: number) => {
             setWorkflowTestExecution(undefined);
+            useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
             setCurrentNode(undefined);
 
             const newSearchParams = new URLSearchParams(searchParams.toString());
