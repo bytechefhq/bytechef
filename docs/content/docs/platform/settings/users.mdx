@@ -29,21 +29,18 @@ When there are more users than fit on one page, pagination controls appear in th
 
 ## Invite a user
 
-1. Click **Invite User**. The dialog explains: "Enter the user email. A strong password is pre-generated according to the security rules. This password will be included in the invitation email."
+1. Click **Invite User**. The dialog explains: "The invitee receives an email with a link on which they set their own password. The link expires after 3 days."
 2. Enter the **Email** address.
-3. A **Password** is generated for you and shown read-only. **Regenerate** produces a different one. The rule beneath the field states it: "Password must be at least 8 characters and include at least 1 uppercase letter and 1 number."
-4. Choose a **Role**. The options come from the organization's configured authorities; the first one is preselected. This step is Enterprise Edition only - Community Edition shows no **Role** field and invites every account as an administrator.
-5. Click **Invite**.
+3. Choose a **Role**. The options come from the organization's configured authorities; the first one is preselected. This step is Enterprise Edition only - Community Edition shows no **Role** field and invites every account as an administrator.
+4. Click **Invite**.
 
-The **Invite** button stays disabled until an email address is set *and* the generated password satisfies the password rules; in Enterprise Edition a role must be chosen too. An invalid role is rejected before any account row is created, so a bad request cannot leave an orphaned user behind.
+The **Invite** button stays disabled until an email address is set; in Enterprise Edition a role must be chosen too. An invalid role is rejected before any account row is created, so a bad request cannot leave an orphaned user behind. Inviting needs a configured mail server: without one the invitation is refused, because the invitee could never receive their link.
 
 ![The Invite User dialog](users/invite-user.png)
 
-<Callout type="warn" title="The temporary password travels by email">
-    The generated password is both shown to the administrator and sent to the invitee in the invitation email, alongside an activation link. Treat it as a one-time credential: tell the new user to change it in [Profile → Change password](/platform/your-account/profile) once they are in.
-</Callout>
+Nobody chooses a password for the invitee and no password travels by email. The invitation email carries a link to `/accept-invitation?key=…`, where the invitee sets their own password; doing so activates the account in the same step. Until then the account is **not activated**, so it shows **Pending** in the table and cannot sign in.
 
-The invitation email carries a link to `/activate?key=…`. Until the invitee follows it the account is **not activated**, so it shows **Pending** in the table; following the link flips it to **Active**. Inviting an email address that already has an account is rejected.
+The link is valid for 3 days and works once. After that it no longer works: delete the pending user and invite them again to send a new one. A nightly cleanup at 01:00 also removes accounts whose invitation expired, in every tenant. Inviting an email address that already has an account is rejected.
 
 An invited account occupies a seat against the deployment's member quota from the moment the invitation is sent, not from the moment it is claimed.
 
