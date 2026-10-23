@@ -4,6 +4,7 @@
   "description": "AI providers, skills, and memories",
   "pages": [
     "ai-providers",
+    "web-search",
     "skills",
     "memories"
   ]
