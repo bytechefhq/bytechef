@@ -21,7 +21,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.service.CopilotWorkflowGenerator;
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -164,6 +167,10 @@ class ConnectedUserProjectFacadeIntTest {
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String NEW_WORKFLOW_DEFINITION = """
+        {"label":"New Workflow","description":"","inputs":[],"triggers":[],"tasks":[]}
+        """;
+
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
@@ -191,6 +198,9 @@ class ConnectedUserProjectFacadeIntTest {
     @Autowired
     private ConnectedUserService connectedUserService;
 
+    @MockitoBean
+    private CopilotWorkflowGenerator copilotWorkflowGenerator;
+
     @Autowired
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
@@ -211,6 +221,9 @@ class ConnectedUserProjectFacadeIntTest {
 
     @Autowired
     private PrincipalJobService principalJobService;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @Autowired
     private ProjectDeploymentService projectDeploymentService;
@@ -351,6 +364,31 @@ class ConnectedUserProjectFacadeIntTest {
             .singleElement()
             .satisfies(connectedUserProjectWorkflowDTO -> assertThat(connectedUserProjectWorkflowDTO.attentionReason())
                 .isNull());
+    }
+
+    @Test
+    void testGenerateNamesAWorkflowStillCalledNewWorkflowFromThePrompt() {
+        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, NEW_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am",
+            Environment.PRODUCTION, true);
+
+        assertThat(getLastWorkflowLabel(workflowUuid))
+            .isEqualTo("Post a standup reminder to #general every weekday at 9am");
+    }
+
+    @Test
+    void testGenerateKeepsTheNameOfARenamedWorkflow() {
+        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, NEW_WORKFLOW_DEFINITION.replace("New Workflow", "Standup"), Environment.PRODUCTION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am",
+            Environment.PRODUCTION, true);
+
+        assertThat(getLastWorkflowLabel(workflowUuid)).isEqualTo("Standup");
     }
 
     @Test
@@ -857,6 +895,12 @@ class ConnectedUserProjectFacadeIntTest {
             integrationInstanceConfiguration);
 
         integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), enabled);
+    }
+
+    private String getLastWorkflowLabel(String workflowUuid) {
+        Workflow workflow = workflowService.getWorkflow(projectWorkflowService.getLastWorkflowId(workflowUuid));
+
+        return workflow.getLabel();
     }
 
     private String createPublishedCopy(String copyExternalUserId, String definition) {
