@@ -37,6 +37,7 @@ Name | Type
 `iterations` | Array&lt;Array&lt;TaskExecution&gt;&gt;
 `childJob` | [Job](Job.md)
 `childCount` | number
+`clusterElementCalls` | [Array&lt;ClusterElementCall&gt;](ClusterElementCall.md)
 
 ## Example
 
@@ -75,6 +76,7 @@ const example = {
   "iterations": null,
   "childJob": null,
   "childCount": null,
+  "clusterElementCalls": null,
 } satisfies TaskExecution
 
 console.log(example)

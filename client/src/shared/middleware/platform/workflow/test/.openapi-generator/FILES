@@ -1,5 +1,6 @@
 apis/WorkflowTestApi.ts
 apis/index.ts
+docs/ClusterElementCall.md
 docs/ComponentConnection.md
 docs/ExecutionError.md
 docs/Job.md
@@ -12,6 +13,7 @@ docs/WorkflowTestApi.md
 docs/WorkflowTestExecution.md
 docs/WorkflowTrigger.md
 index.ts
+models/ClusterElementCall.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
 models/Job.ts
