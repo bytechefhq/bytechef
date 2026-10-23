@@ -32,6 +32,7 @@ import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -99,7 +100,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
     private final @Nullable Mode mode;
     private final List<ToolCallback> pinnedToolCallbacks;
+    private final @Nullable SecurityContextRehydrator securityContextRehydrator;
     private final List<ToolCallback> toolCallbacks;
+    private final @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider;
 
     protected AiHubSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
@@ -107,7 +110,9 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
         this.mode = builder.mode;
         this.pinnedToolCallbacks = List.copyOf(builder.pendingToolCallbacks);
+        this.securityContextRehydrator = builder.securityContextRehydrator;
         this.toolCallbacks = List.copyOf(builder.wrappedToolCallbacks);
+        this.webSearchToolCallbackProvider = builder.webSearchToolCallbackProvider;
     }
 
     public static Builder builder() {
@@ -129,6 +134,25 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
      */
     public List<ToolCallback> toolCallbacks() {
         return toolCallbacks;
+    }
+
+    /**
+     * Adds the web search tools of the providers enabled in the turn's environment. They are read-only, so they pass
+     * the empty-result and context wrappers but not the approval gate, and they are not pinned: an approval never
+     * resumes one of them.
+     */
+    @Override
+    protected List<ToolCallback> additionalToolCallbacks(RunAgentInput input) {
+        Integer environmentOrdinal = environmentOrdinal(input);
+
+        if (webSearchToolCallbackProvider == null || environmentOrdinal == null) {
+            return super.additionalToolCallbacks(input);
+        }
+
+        return webSearchToolCallbackProvider.getToolCallbacks(environmentOrdinal)
+            .stream()
+            .map(toolCallback -> AiHubToolCallbackWrappers.wrap(toolCallback, securityContextRehydrator))
+            .toList();
     }
 
     @Override
@@ -469,12 +493,26 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
         private @Nullable AiHubApprovalGate approvalGate;
         private @Nullable Mode mode;
+        private @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider;
         private final List<ToolCallback> pendingToolCallbacks = new ArrayList<>();
         private final List<ToolCallback> wrappedToolCallbacks = new ArrayList<>();
 
         @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder securityContextRehydrator(@Nullable SecurityContextRehydrator securityContextRehydrator) {
             this.securityContextRehydrator = securityContextRehydrator;
+
+            return this;
+        }
+
+        /**
+         * Offers each turn the web search tools of the providers enabled in its environment. A {@code null} provider
+         * offers none.
+         */
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder webSearchToolCallbackProvider(
+            @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider) {
+
+            this.webSearchToolCallbackProvider = webSearchToolCallbackProvider;
 
             return this;
         }
