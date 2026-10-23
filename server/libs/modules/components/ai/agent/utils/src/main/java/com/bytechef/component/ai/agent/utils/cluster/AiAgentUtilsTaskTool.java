@@ -20,10 +20,12 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.component.definition.ai.agent.SubagentFunction.SUBAGENT;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 
+import com.bytechef.component.ai.agent.utils.cluster.subagent.ClusterElementCallObservingSubagentExecutor;
 import com.bytechef.component.ai.agent.utils.cluster.subagent.ClusterElementSubagentExecutor;
 import com.bytechef.component.ai.agent.utils.cluster.subagent.ClusterElementSubagentResolver;
 import com.bytechef.component.ai.agent.utils.cluster.subagent.TenantAwareTaskRepository;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.llm.tool.ClusterElementCallObservingToolCallback;
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -31,7 +33,9 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -45,6 +49,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.jspecify.annotations.Nullable;
+import org.springaicommunity.agent.common.task.subagent.SubagentExecutor;
 import org.springaicommunity.agent.common.task.subagent.SubagentType;
 import org.springaicommunity.agent.tools.task.TaskOutputTool;
 import org.springaicommunity.agent.tools.task.TaskTool;
@@ -105,7 +110,7 @@ public class AiAgentUtilsTaskTool {
         TenantAwareTaskRepository taskRepository = new TenantAwareTaskRepository(executorService);
 
         ToolCallback taskToolCallback = TaskTool.builder()
-            .subagentTypes(new SubagentType(subagentResolver, subagentExecutor))
+            .subagentTypes(new SubagentType(subagentResolver, observe(subagentExecutor, context)))
             .subagentReferences(subagentResolver.getReferences())
             .taskRepository(taskRepository)
             .build();
@@ -117,7 +122,7 @@ public class AiAgentUtilsTaskTool {
         return ToolCallbackProvider.from(taskToolCallback, taskOutputToolCallback);
     }
 
-    private List<ToolCallback> buildSubagentToolCallbacks(
+    List<ToolCallback> buildSubagentToolCallbacks(
         ClusterElement subagentClusterElement, Map<String, ComponentConnection> componentConnections,
         Context context) {
 
@@ -127,11 +132,29 @@ public class AiAgentUtilsTaskTool {
 
         for (ClusterElement toolClusterElement : subagentClusterElementMap.getClusterElements(TOOLS)) {
             toolCallbacks.addAll(
-                clusterElementToolCallbacks.build(
-                    toolClusterElement, componentConnections, (ActionContext) context));
+                ClusterElementCallObservingToolCallback.wrap(
+                    clusterElementToolCallbacks.build(
+                        toolClusterElement, componentConnections, (ActionContext) context),
+                    toolClusterElement.getWorkflowNodeName(), context));
         }
 
         return toolCallbacks;
+    }
+
+    private static SubagentExecutor observe(SubagentExecutor subagentExecutor, Context context) {
+        if (!(context instanceof ActionContextAware actionContextAware)) {
+            return subagentExecutor;
+        }
+
+        Long jobId = actionContextAware.getJobId();
+        Long taskExecutionId = actionContextAware.getTaskExecutionId();
+
+        if (jobId == null || taskExecutionId == null) {
+            return subagentExecutor;
+        }
+
+        return new ClusterElementCallObservingSubagentExecutor(
+            subagentExecutor, jobId, taskExecutionId, ClusterElementCallRecorder.getInstance());
     }
 
     @Nullable
