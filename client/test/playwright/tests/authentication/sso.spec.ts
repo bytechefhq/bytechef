@@ -1,4 +1,4 @@
-import {APIRequestContext, Page, expect, test} from '@playwright/test';
+import {APIRequestContext, expect, test} from '@playwright/test';
 
 import {
     AUTHENTICATION_BASE_URL,
@@ -7,6 +7,7 @@ import {
     INVITED_USER_PASSWORD,
     type IdentityProviderI,
     SAML_IDP_USER,
+    continueWithSso,
     createOidcIdentityProvider,
     createSamlIdentityProvider,
     currentAccount,
@@ -24,16 +25,6 @@ import {
 import {TEST_USER} from '../../utils/constants';
 import {login} from '../../utils/login';
 import {createAdminApiContext} from '../../utils/rbacUtils';
-
-async function continueWithSso(page: Page, email: string, identityProvider: IdentityProviderI): Promise<void> {
-    await page.goto('/login');
-
-    await page.getByLabel('Email', {exact: true}).fill(email);
-
-    await page.getByLabel('Password', {exact: true}).click();
-
-    await page.getByRole('button', {name: `Continue with ${identityProvider.name}`}).click();
-}
 
 test.describe('Single sign-on (#1040)', () => {
     test.skip(!AUTHENTICATION_MOCKS_ENABLED, AUTHENTICATION_MOCKS_MISSING_REASON);
