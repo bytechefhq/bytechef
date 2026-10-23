@@ -1,0 +1,11 @@
+@reference '../../../../../styles/index.css';
+
+.web-search-provider {
+    h3 {
+        @apply w-full;
+    }
+
+    svg.duration-200 {
+        @apply invisible;
+    }
+}

@@ -190,6 +190,7 @@ export default [
                         '^radix-',
                         // Component-specific classes
                         '^ai-provider$',
+                        '^web-search-provider$',
                         '^connect-',
                         '^dropdown-menu-item',
                         '^is-(active|checked|selected|unchecked)$',
