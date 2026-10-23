@@ -21,6 +21,8 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.authentication.TenantUserDetails;
+import com.bytechef.security.web.authentication.TenantUserDetailsService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,7 +37,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
@@ -43,7 +44,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  *
  * @author Ivica Cardic
  */
-public class MultiTenantUserDetailsService implements UserDetailsService, ApplicationContextAware {
+public class MultiTenantUserDetailsService implements TenantUserDetailsService, ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(MultiTenantUserDetailsService.class);
 
@@ -71,12 +72,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
                 throw new UsernameNotFoundException("User with email " + login + " was not found in the database");
             }
 
-            return TenantContext.callWithTenantId(
-                tenantIds.getFirst(),
-                () -> getUserService().fetchUserByEmail(login)
-                    .map(user -> createSpringSecurityUser(login, user))
-                    .orElseThrow(() -> new UsernameNotFoundException(
-                        "User with email " + login + " was not found in the database")));
+            return loadUserByUsername(login, tenantIds.getFirst());
         }
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
@@ -87,16 +83,33 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
             throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database");
         }
 
+        return loadUserByUsername(lowercaseLogin, tenantIds.getFirst());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String login, String tenantId) {
+        EmailValidator emailValidator = EmailValidator.getInstance();
+
+        if (emailValidator.isValid(login)) {
+            return TenantContext.callWithTenantId(
+                tenantId,
+                () -> getUserService().fetchUserByEmail(login)
+                    .map(user -> createSpringSecurityUser(login, user, tenantId))
+                    .orElseThrow(() -> new UsernameNotFoundException(
+                        "User with email " + login + " was not found in the database")));
+        }
+
+        String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
+
         return TenantContext.callWithTenantId(
-            tenantIds.getFirst(),
+            tenantId,
             () -> getUserService().fetchUserByLogin(lowercaseLogin)
-                .map(user -> createSpringSecurityUser(lowercaseLogin, user))
+                .map(user -> createSpringSecurityUser(lowercaseLogin, user, tenantId))
                 .orElseThrow(
                     () -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database")));
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(
-        String lowercaseLogin, User user) {
+    private TenantUserDetails createSpringSecurityUser(String lowercaseLogin, User user, String tenantId) {
 
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
@@ -110,8 +123,7 @@ public class MultiTenantUserDetailsService implements UserDetailsService, Applic
             .map(SimpleGrantedAuthority::new)
             .toList();
 
-        return new org.springframework.security.core.userdetails.User(
-            user.getLogin(), user.getPassword(), grantedAuthorities);
+        return new TenantUserDetails(user.getLogin(), user.getPassword(), grantedAuthorities, tenantId);
     }
 
     @Override
