@@ -40,11 +40,11 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     const workflowExecutionKind = useWorkflowExecutionSheetStore((state) => state.workflowExecutionKind);
 
+    const queryClient = useQueryClient();
+
     const subflowOpen = subflowStack.length > 0;
     const activeJobId = subflowStack.at(-1)?.jobId ?? workflowExecutionId;
     const activeWorkflowExecutionKind = subflowOpen ? 'JOB' : workflowExecutionKind;
-
-    const queryClient = useQueryClient();
 
     const {
         data: workflowExecution,
