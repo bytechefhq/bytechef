@@ -238,6 +238,35 @@ components:
           type: "string"
         required:
           type: "boolean"
+    ClusterElementCall:
+      description: "The outcome of the calls a task made to one of its cluster elements."
+      type: "object"
+      required:
+        - "name"
+        - "startDate"
+        - "status"
+      properties:
+        endDate:
+          description: "The time the last call ended."
+          type: "string"
+          format: "date-time"
+        error:
+          description: "The error message of the first failed call."
+          type: "string"
+        name:
+          description: "The workflow node name of the cluster element."
+          type: "string"
+        startDate:
+          description: "The time the first call started."
+          type: "string"
+          format: "date-time"
+        status:
+          description: "FAILED if any call failed, otherwise the state of the latest call."
+          type: "string"
+          enum:
+            - "STARTED"
+            - "COMPLETED"
+            - "FAILED"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"
@@ -604,6 +633,12 @@ components:
           description: "The number of entries the task execution expands to: its direct children, its iterations for a loop, or its two branches for an on-error task, and 0 when it has no children. Set only on the task executions of a lazily loaded workflow execution and of a children page."
           type: "integer"
           format: "int32"
+          readOnly: true
+        clusterElementCalls:
+          description: "The calls the task made to the cluster elements it chooses to call, such as an AI agent's tools."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ClusterElementCall"
           readOnly: true
     TaskExecutionChildrenPage:
       description: "A page of the children of a task execution. At most one of children and iterations is non-empty; both are empty on an empty page."
