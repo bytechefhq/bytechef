@@ -83,6 +83,7 @@ class AuditDataContractTest {
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String OUTPUT_PREVIEW = "computes a task output without saving it";
+    private static final String CONNECTIVITY_CHECK = "connectivity check that saves nothing";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
@@ -164,6 +165,7 @@ class AuditDataContractTest {
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("ProjectWorkflowFacadeImpl.saveWorkflowTestConnection", WORKFLOW_INPUTS),
         Map.entry("TaskDispatcherDefinitionFacadeImpl.executeOutput", OUTPUT_PREVIEW),
+        Map.entry("WebSearchProviderFacadeImpl.testWebSearchProvider", CONNECTIVITY_CHECK),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceDataTableFacadeImpl.addColumn", DELEGATES),
