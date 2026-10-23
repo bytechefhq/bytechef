@@ -1,7 +1,11 @@
 import {
+    ConnectedUser,
     ConnectedUserApi,
+    ConnectedUserImportResult,
+    CreateConnectedUserOperationRequest,
     DeleteConnectedUserRequest,
     EnableConnectedUserRequest,
+    ImportConnectedUsersRequest,
 } from '@/ee/shared/middleware/embedded/connected-user';
 import {useMutation} from '@tanstack/react-query';
 
@@ -28,6 +32,34 @@ export const useEnableConnectedUserMutation = (mutationProps?: EnableConnectedUs
     useMutation<void, Error, EnableConnectedUserRequest>({
         mutationFn: (enableConnectedUserRequest: EnableConnectedUserRequest) => {
             return new ConnectedUserApi().enableConnectedUser(enableConnectedUserRequest);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface CreateConnectedUserMutationProps {
+    onError?: (error: Error, variables: CreateConnectedUserOperationRequest) => void;
+    onSuccess?: (result: ConnectedUser, variables: CreateConnectedUserOperationRequest) => void;
+}
+
+export const useCreateConnectedUserMutation = (mutationProps?: CreateConnectedUserMutationProps) =>
+    useMutation<ConnectedUser, Error, CreateConnectedUserOperationRequest>({
+        mutationFn: (createConnectedUserOperationRequest: CreateConnectedUserOperationRequest) => {
+            return new ConnectedUserApi().createConnectedUser(createConnectedUserOperationRequest);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface ImportConnectedUsersMutationProps {
+    onError?: (error: Error, variables: ImportConnectedUsersRequest) => void;
+    onSuccess?: (result: ConnectedUserImportResult, variables: ImportConnectedUsersRequest) => void;
+}
+
+export const useImportConnectedUsersMutation = (mutationProps?: ImportConnectedUsersMutationProps) =>
+    useMutation<ConnectedUserImportResult, Error, ImportConnectedUsersRequest>({
+        mutationFn: (importConnectedUsersRequest: ImportConnectedUsersRequest) => {
+            return new ConnectedUserApi().importConnectedUsers(importConnectedUsersRequest);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
