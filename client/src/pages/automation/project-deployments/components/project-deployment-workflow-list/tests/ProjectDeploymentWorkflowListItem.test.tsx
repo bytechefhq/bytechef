@@ -14,13 +14,18 @@ vi.mock('@/shared/mutations/automation/projectDeploymentWorkflows.mutations', ()
     useEnableProjectDeploymentWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
-const {openProjectWorkflowMock, rowPropsMock} = vi.hoisted(() => ({
+const {openInProjectState, openProjectWorkflowMock, rowPropsMock} = vi.hoisted(() => ({
+    openInProjectState: {canOpenInProject: true},
     openProjectWorkflowMock: vi.fn(),
     rowPropsMock: vi.fn(),
 }));
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
-    default: () => ({openProject: vi.fn(), openProjectWorkflow: openProjectWorkflowMock}),
+    default: () => ({
+        canOpenInProject: openInProjectState.canOpenInProject,
+        openProject: vi.fn(),
+        openProjectWorkflow: openProjectWorkflowMock,
+    }),
 }));
 
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
@@ -38,6 +43,10 @@ vi.mock(
 
 vi.mock('@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog', () => ({
     default: () => null,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) => scope === 'DEPLOYMENT_EDIT',
 }));
 
 const workflow = {
@@ -83,6 +92,7 @@ const renderListItem = (projectName?: string, projectId?: number, overrides: Ren
 
 describe('ProjectDeploymentWorkflowListItem', () => {
     beforeEach(() => {
+        openInProjectState.canOpenInProject = true;
         openProjectWorkflowMock.mockReset();
 
         useProjectDeploymentWorkflowSheetStore.setState({
@@ -201,6 +211,14 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         const {container} = renderListItem('Subflow', undefined, {showRunSlot: false, showTriggerUrlSlot: false});
 
         expect(container.querySelectorAll('div.size-9.shrink-0')).toHaveLength(0);
+    });
+
+    it('hides the open in project icon from a member who may not view the project workflows', () => {
+        openInProjectState.canOpenInProject = false;
+
+        renderListItem('Subflow', 7);
+
+        expect(screen.queryByRole('button', {name: 'Open in project'})).not.toBeInTheDocument();
     });
 
     it('does not open the executions sheet when the enable switch is toggled', async () => {
