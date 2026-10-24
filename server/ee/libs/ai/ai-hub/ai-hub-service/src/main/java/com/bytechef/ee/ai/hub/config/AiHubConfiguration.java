@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.hub.config;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.config.InteractivePickerToolCallbacks;
+import com.bytechef.ai.copilot.tool.PersistedWorkflowChecker;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
@@ -24,6 +25,7 @@ import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
@@ -42,6 +44,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
@@ -110,6 +113,8 @@ public class AiHubConfiguration {
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, WorkflowExecutionTools workflowExecutionTools,
         ObjectProvider<ComponentTools> componentToolsProvider,
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
+        ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
@@ -123,6 +128,7 @@ public class AiHubConfiguration {
             List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools, workflowExecutionTools)));
 
         toolCallbacks.addAll(componentDefinitionToolCallbacks(componentToolsProvider));
+        toolCallbacks.addAll(checkWorkflowToolCallbacks(persistedWorkflowCheckerProvider, projectServiceProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
@@ -140,6 +146,8 @@ public class AiHubConfiguration {
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ProjectTools projectTools,
         ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools, WorkflowExecutionTools workflowExecutionTools,
         ObjectProvider<ComponentTools> componentToolsProvider,
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
+        ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
@@ -155,6 +163,7 @@ public class AiHubConfiguration {
             List.of(ToolCallbacks.from(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools)));
 
         toolCallbacks.addAll(componentDefinitionToolCallbacks(componentToolsProvider));
+        toolCallbacks.addAll(checkWorkflowToolCallbacks(persistedWorkflowCheckerProvider, projectServiceProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
@@ -248,6 +257,20 @@ public class AiHubConfiguration {
             .filter(toolCallback -> COMPONENT_DEFINITION_TOOL_NAMES.contains(toolCallback.getToolDefinition()
                 .name()))
             .toList();
+    }
+
+    static List<ToolCallback> checkWorkflowToolCallbacks(
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
+        ObjectProvider<ProjectService> projectServiceProvider) {
+
+        PersistedWorkflowChecker persistedWorkflowChecker = persistedWorkflowCheckerProvider.getIfAvailable();
+        ProjectService projectService = projectServiceProvider.getIfAvailable();
+
+        if (persistedWorkflowChecker == null || projectService == null) {
+            return List.of();
+        }
+
+        return List.of(ToolCallbacks.from(new CheckWorkflowTools(persistedWorkflowChecker, projectService)));
     }
 
     static List<ToolCallback> deploymentFlatCrudToolCallbacks(
