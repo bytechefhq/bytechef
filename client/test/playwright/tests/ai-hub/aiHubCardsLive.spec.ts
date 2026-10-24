@@ -115,8 +115,8 @@ test.describe('@live AI Hub cards', () => {
             await liveTurn(
                 aiHubPage,
                 `Create a new project "${projectName}" with a workflow: when a webhook receives a new signup ` +
-                    '(name, email, plan), post a message about it to Slack. I have not decided which Slack channel ' +
-                    'yet, so ask me which channel to use before you finish the workflow.'
+                    '(name, email, plan), post a message about it to Slack. I have not decided between the #signups ' +
+                    'and #growth channels yet, so ask me which of the two to use before you finish the workflow.'
             );
 
             const answers = await answerCards(page, aiHubPage);
