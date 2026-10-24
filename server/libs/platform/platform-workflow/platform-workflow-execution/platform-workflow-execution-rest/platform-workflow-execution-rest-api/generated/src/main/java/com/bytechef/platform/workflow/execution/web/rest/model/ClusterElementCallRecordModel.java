@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementCallRecord", description = "One call a task made to one of its cluster elements, such as an AI agent's tool or sub-agent.")
 @JsonTypeName("ClusterElementCallRecord")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-30T10:50:22.378559+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-30T11:10:54.162712+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ClusterElementCallRecordModel {
 
   private @Nullable String componentName;
@@ -56,7 +56,13 @@ public class ClusterElementCallRecordModel {
     
     COMPLETED("COMPLETED"),
     
-    FAILED("FAILED");
+    FAILED("FAILED"),
+    
+    BLOCKED("BLOCKED"),
+    
+    REDACTED("REDACTED"),
+    
+    WITHHELD("WITHHELD");
 
     private final String value;
 
@@ -214,11 +220,11 @@ public class ClusterElementCallRecordModel {
   }
 
   /**
-   * The output of the call, capped in length.
+   * The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason).
    * @return output
    */
   
-  @Schema(name = "output", description = "The output of the call, capped in length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "output", description = "The call's output, or for a BLOCKED, REDACTED or WITHHELD outcome a JSON object with value-free details (side, matchCount, confidenceScore, maskCount, reason).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("output")
   public @Nullable String getOutput() {
     return output;
