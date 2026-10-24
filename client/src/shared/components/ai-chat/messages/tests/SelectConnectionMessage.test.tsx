@@ -1,3 +1,4 @@
+import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {render, screen} from '@testing-library/react';
 import {type ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -59,6 +60,31 @@ describe('SelectConnectionMessage', () => {
 
         expect(screen.getByText('Slack prod')).toBeInTheDocument();
         expect(screen.queryByText('OpenAI (provider)')).not.toBeInTheDocument();
+    });
+
+    it('shows a loading state, not an empty one, while the connections load', () => {
+        vi.mocked(useGetWorkspaceConnectionsQuery).mockReturnValueOnce({data: undefined} as ReturnType<
+            typeof useGetWorkspaceConnectionsQuery
+        >);
+
+        render(
+            <SelectConnectionMessage data={data} name="select-connection" status={{type: 'complete'}} type="data" />
+        );
+
+        expect(screen.getByText('Loading Slack connections...')).toBeInTheDocument();
+        expect(screen.queryByText(/No existing Slack connection/)).not.toBeInTheDocument();
+    });
+
+    it('says there is no connection once the list loads empty', () => {
+        vi.mocked(useGetWorkspaceConnectionsQuery).mockReturnValueOnce({data: []} as unknown as ReturnType<
+            typeof useGetWorkspaceConnectionsQuery
+        >);
+
+        render(
+            <SelectConnectionMessage data={data} name="select-connection" status={{type: 'complete'}} type="data" />
+        );
+
+        expect(screen.getByText(/No existing Slack connection/)).toBeInTheDocument();
     });
 
     it('renders the picked state for a restored pick', () => {
