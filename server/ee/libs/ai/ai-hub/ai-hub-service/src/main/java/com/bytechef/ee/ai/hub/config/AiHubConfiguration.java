@@ -38,6 +38,7 @@ import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubGatedToolFilterAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
@@ -78,6 +79,25 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
+ * Declares the AI Hub's two AG-UI {@link com.agui.server.LocalAgent}s, {@code ai_hub_ask} and {@code ai_hub_build}, and
+ * the session memory both read and write. Each is an {@link AiHubRoutingAgent} that sends workflow chat turns to the
+ * {@link WebhookBridgeAgent} and every other turn to its mode's {@link AiHubSpringAIAgent}.
+ *
+ * <p>
+ * Tool lists are built explicitly (spec D3), never by sweeping every {@link ToolCallback} bean. ASK holds the read
+ * views of the project, workflow and deployment tools, the read pickers, {@code openWorkflowTab} and
+ * {@code openWorkflowChatTab}. BUILD holds the full project tools, the workflow lifecycle tools (no tool that writes
+ * workflow content), the deployment write tools, every picker, {@code openWorkflowTab}, the workflow chat tools
+ * ({@code openWorkflowChatTab}, {@code listChatWorkflows}, {@code createWorkflowChat}), and the {@code buildWorkflow} /
+ * {@code importWorkflow} delegates, which are the only way it authors workflow content. The delegates' sub-agents never
+ * see a tool the approval gate gates, by default or by a workspace rule ({@link AiHubGatedToolFilterAdvisor}).
+ * </p>
+ *
+ * <p>
+ * Gated on {@code bytechef.ai.hub.enabled} AND {@code bytechef.ai.copilot.enabled}: the delegates come from the
+ * Copilot's sub-agents, so a hub without the Copilot cannot author workflows.
+ * </p>
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -154,8 +174,9 @@ public class AiHubConfiguration {
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
-        SecurityContextRehydrator securityContextRehydrator,
-        AiHubApprovalGate approvalGate, ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
+        SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
+        AiHubToolApprovalPolicy toolApprovalPolicy,
+        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
@@ -175,7 +196,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
-                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient),
+                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
                 (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
                     new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
 
