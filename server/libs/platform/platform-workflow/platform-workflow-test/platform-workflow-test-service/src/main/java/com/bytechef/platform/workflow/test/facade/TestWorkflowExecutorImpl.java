@@ -41,6 +41,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -561,7 +562,25 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             payload.put("error", clusterElementCall.error());
         }
 
+        ClusterElementCallRecord clusterElementCallRecord = clusterElementCallEvent.record();
+
+        payload.put("callId", clusterElementCallRecord.id());
+        payload.put("callStatus", clusterElementCallRecord.status()
+            .name());
+
+        putIfNotNull(payload, "parentCallId", clusterElementCallRecord.parentId());
+        putIfNotNull(payload, "componentName", clusterElementCallRecord.componentName());
+        putIfNotNull(payload, "toolName", clusterElementCallRecord.toolName());
+        putIfNotNull(payload, "input", clusterElementCallRecord.input());
+        putIfNotNull(payload, "output", clusterElementCallRecord.output());
+
         return payload;
+    }
+
+    private static void putIfNotNull(Map<String, Object> payload, String key, Object value) {
+        if (value != null) {
+            payload.put(key, value);
+        }
     }
 
     private static String getClusterElementEventName(ClusterElementCallEvent.Type type) {
