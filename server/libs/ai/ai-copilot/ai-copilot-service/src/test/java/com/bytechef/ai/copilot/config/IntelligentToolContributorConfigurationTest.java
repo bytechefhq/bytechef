@@ -45,6 +45,7 @@ import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ScriptTools;
 import com.bytechef.automation.configuration.tool.WorkflowIntelligentToolContributorConfiguration;
 import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
+import com.bytechef.automation.data.table.tool.DataTableTools;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionAgentType;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionIntelligentToolContributorConfiguration;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
@@ -635,7 +636,7 @@ final class IntelligentToolContributorConfigurationTest {
                 actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
                 propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
             actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-            propertyOptionsResolver, scopedConnectionGuard);
+            propertyOptionsResolver, scopedConnectionGuard, emptyDataTableToolsProvider());
     }
 
     private static List<IntelligentToolDefinition> contributedDefinitions(
@@ -701,6 +702,11 @@ final class IntelligentToolContributorConfigurationTest {
 
     @SuppressWarnings("unchecked")
     private static ObjectProvider<SubAgentAskRelay> emptySubAgentAskRelayProvider() {
+        return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<DataTableTools> emptyDataTableToolsProvider() {
         return mock(ObjectProvider.class);
     }
 

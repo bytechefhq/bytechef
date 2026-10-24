@@ -42,6 +42,7 @@ import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ReadProjectTools;
 import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ScriptTools;
+import com.bytechef.automation.data.table.tool.DataTableTools;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
 import com.bytechef.platform.ai.skill.tool.ReadSkillsTools;
 import com.bytechef.platform.ai.skill.tool.SkillAgentType;
@@ -72,6 +73,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -188,6 +190,7 @@ public class CopilotConfiguration {
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final PropertyOptionsResolver propertyOptionsResolver;
     private final ScopedConnectionGuard scopedConnectionGuard;
+    private final @Nullable DataTableTools dataTableTools;
 
     @SuppressFBWarnings({
         "EI", "CT_CONSTRUCTOR_THROW"
@@ -208,8 +211,9 @@ public class CopilotConfiguration {
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ActionDefinitionService actionDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver,
-        ScopedConnectionGuard scopedConnectionGuard) {
+        ScopedConnectionGuard scopedConnectionGuard, ObjectProvider<DataTableTools> dataTableToolsProvider) {
 
+        this.dataTableTools = dataTableToolsProvider.getIfAvailable();
         this.interactivePickerToolCallbacks = interactivePickerToolCallbacks;
         this.scopedConnectionGuard = scopedConnectionGuard;
         this.actionDefinitionService = actionDefinitionService;
@@ -428,6 +432,10 @@ public class CopilotConfiguration {
             List.of(
                 projectWorkflowTools, componentTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools));
+
+        if (dataTableTools != null) {
+            tools.add(dataTableTools);
+        }
 
         tools.addAll(interactivePickerToolCallbacks.write());
 
@@ -731,8 +739,8 @@ public class CopilotConfiguration {
         return ChatClient.builder(chatModel)
             .defaultSystem(buildWorkflowSubAgentSystemPrompt(askToolAvailable))
             .defaultTools(
-                projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
-                workflowInstructionTools)
+                withDataTableTools(
+                    projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools))
             .defaultToolCallbacks(toolCallbacks)
             .build();
     }
@@ -783,9 +791,20 @@ public class CopilotConfiguration {
         return ChatClient.builder(chatModel)
             .defaultSystem(converterSubAgentSystemPrompt())
             .defaultTools(
-                projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools)
+                withDataTableTools(
+                    projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools))
             .defaultToolCallbacks(webSearchToolCallbacks)
             .build();
+    }
+
+    private Object[] withDataTableTools(Object... tools) {
+        List<Object> allTools = new ArrayList<>(List.of(tools));
+
+        if (dataTableTools != null) {
+            allTools.add(dataTableTools);
+        }
+
+        return allTools.toArray();
     }
 
     String converterSubAgentSystemPrompt() {
