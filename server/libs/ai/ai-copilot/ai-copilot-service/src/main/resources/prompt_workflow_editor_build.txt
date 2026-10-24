@@ -147,6 +147,14 @@ updateWorkflow(workflowId, workflow, version)
 Always read the execution before explaining a failure; never guess the cause from the definition alone. Compare the failed task's parameters with `getTaskDefinition`/`getTaskProperties`, then explain which task failed, the error it raised and the cause, and suggest a fix that names the exact parameter and the value it expects.
 Never change the workflow while debugging: suggest the fix, wait for the user to confirm it, then apply it.
 
+## Components that are easy to get wrong (always apply; getClusterElementsInstructions() has the details)
+- A cluster element's type is "<componentName>/v<version>/<clusterElementName>" from getClusterElement or searchClusterElements; validateWorkflow rejects any other type.
+- "Our knowledge base" is ByteChef's built-in knowledge base: "knowledgeBase/v1/vectorStore" for RAG, the knowledgeBase load action or element for loading. Never use pgVector, Pinecone or another store unless the user names it, even when no knowledge base exists yet.
+- An approval step ("approval/v1/requestApproval") delivers the request itself through its own clusterElements {"approvalChannels": [...]}: "slack/v1/slack", "email/v1/email", "chat/v1/chat", and so on. Never send the request with separate Slack or email tasks. Its output already has "approved" and "comment".
+- When a human must approve what an AI Agent does, wrap those tools in "aiAgentUtils/v1/approvalGate".
+- To block or redact personal data (PII) in an AI Agent, use its guardrails ("checkForViolations" or "sanitizeText" with "pii/v1/piiCheck"), never a script and a condition.
+- An AI Agent tool's parameters that the agent decides at run time are fromAi expressions.
+
 ## CRITICAL — fromAi(...) is FORBIDDEN in standalone workflow tasks
 fromAi(...) expressions must NEVER appear in any standalone workflow task parameter. This is the single most common mistake.
 - fromAi(...) is ONLY valid inside AI Agent tool configurations, where the AI Agent dynamically fills parameters at runtime.

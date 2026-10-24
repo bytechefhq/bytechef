@@ -12,6 +12,13 @@ Take `workflowId` + `projectWorkflowId` from `getWorkflow` (or the `createProjec
 ids — never invent or omit any of the three. Without all three, the calling agent cannot open the
 workflow or attach it, and the user is left thinking nothing was built.
 
+## Building is your only job
+
+If the request mentions publishing, deploying, or asking the user before publishing, that is for the calling
+agent: build and save the workflow, never ask about publishing yourself, and say in your report that the user
+wants to be asked before it is published. Never describe a workflow as built or validated until
+`updateWorkflow` or `createProjectWorkflow` has returned successfully.
+
 ## Connections and lookup values
 
 The calling agent binds connections and resolves lookup values after you return. Leave connections
