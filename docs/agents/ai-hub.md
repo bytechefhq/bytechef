@@ -89,9 +89,10 @@ Every tool callback is wrapped in one place, `AiHubSpringAIAgent.Builder.build()
 registration does not nest the gate.
 
 Rules (`AiHubToolApprovalPolicy.Decision.isGated`):
-- Gated by default: `AiHubToolApprovalDefaults.DEFAULT_TOOL_NAMES` (`deleteProject`, `deleteWorkflow`,
-  `deleteProjectDeployment`, `rollbackProjectDeployment`, `promoteWorkflow`) and the prefixes `delete`, `drop`,
-  `rollback`, `promote` followed by an uppercase letter.
+- Gated by default: `AiHubToolApprovalDefaults.DEFAULT_TOOL_NAMES`, the destructive tools (`deleteProject`,
+  `deleteWorkflow`, `deleteProjectDeployment`, `rollbackProjectDeployment`, `promoteWorkflow`) and the go-live tools
+  (`publishProject`, `createProjectDeployment`, `updateProjectDeployment`, `toggleProjectDeployment`), plus the
+  prefixes `delete`, `drop`, `rollback`, `promote` followed by an uppercase letter.
 - A workspace rule (`AiHubToolApprovalRule`, mode `REQUIRE` or `EXEMPT`) adds to or lifts that. `EXEMPT` always wins.
 - If the rule lookup fails, only the built-in defaults gate.
 - The `buildWorkflow` / `importWorkflow` sub-agents never see a tool gated by default: the hub decorates their chat
