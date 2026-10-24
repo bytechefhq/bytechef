@@ -1,4 +1,4 @@
-import {type Page, type Request, type Route, expect} from '@playwright/test';
+import {type Locator, type Page, type Request, type Route, expect} from '@playwright/test';
 
 import {AI_HUB_ATTACH_URL, type AgUiTurnType, toSseBody} from './agUiStreamStub';
 import {
@@ -935,4 +935,80 @@ export async function listConnections(
     await expectOk(response, `listing ${componentName} connections`);
 
     return (await response.json()) as Array<{id: number; name: string}>;
+}
+
+const CARD_CHROME_BUTTON_NAMES = new Set(['Copy', 'Dismiss', 'More', 'Other…', 'Refresh', 'Retry']);
+
+const MAX_CARD_ROUNDS = 5;
+
+const CONNECTIONS_LOADING_TEXT = /^Loading .+ connections\.\.\.$/;
+
+export interface InteractiveCardAnswerI {
+    answer: string;
+    cardText: string;
+}
+
+/**
+ * Answers the interactive cards a turn ends with, one round at a time, until the last assistant message offers nothing
+ * more to answer: a question card's option buttons, or a picker card's combobox (its first option). Returns each card's
+ * text with the answer given.
+ */
+export async function answerInteractiveCards(
+    page: Page,
+    {
+        chooseOption = (cardText, optionNames) => optionNames[0],
+        readLastMessage,
+        waitForTurnEnd,
+    }: {
+        chooseOption?: (cardText: string, optionNames: string[]) => string;
+        readLastMessage: () => Locator;
+        waitForTurnEnd: () => Promise<void>;
+    }
+): Promise<InteractiveCardAnswerI[]> {
+    const answers: InteractiveCardAnswerI[] = [];
+
+    for (let round = 0; round < MAX_CARD_ROUNDS; round++) {
+        const lastMessage = readLastMessage();
+
+        await expect(lastMessage.getByText(CONNECTIONS_LOADING_TEXT)).toHaveCount(0);
+
+        const cardText = await lastMessage.innerText();
+        const picker = lastMessage.getByRole('combobox');
+
+        if ((await picker.count()) > 0 && (await picker.first().isEnabled())) {
+            await picker.first().click();
+
+            const firstOption = page.getByRole('option').first();
+            const optionName = (await firstOption.innerText()).trim();
+
+            await firstOption.click();
+
+            answers.push({answer: optionName, cardText});
+
+            await waitForTurnEnd();
+
+            continue;
+        }
+
+        const optionNames = (await lastMessage.getByRole('button').allInnerTexts())
+            .map((optionName) => optionName.trim())
+            .filter(
+                (optionName) =>
+                    optionName && !CARD_CHROME_BUTTON_NAMES.has(optionName) && !optionName.startsWith('Connect ')
+            );
+
+        if (optionNames.length === 0) {
+            break;
+        }
+
+        const answer = chooseOption(cardText, optionNames);
+
+        answers.push({answer, cardText});
+
+        await lastMessage.getByRole('button', {exact: true, name: answer}).click();
+
+        await waitForTurnEnd();
+    }
+
+    return answers;
 }

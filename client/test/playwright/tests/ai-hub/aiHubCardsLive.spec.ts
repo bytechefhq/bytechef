@@ -4,6 +4,7 @@ import {loginTest} from '../../fixtures';
 import {AiHubPage} from '../../pages/aiHubPage';
 import {
     type AiHubChatRefI,
+    answerInteractiveCards,
     calledToolNames,
     createAnthropicConnectionThroughApi,
     createDataTableThroughApi,
@@ -24,10 +25,6 @@ import getRandomString from '../../utils/getRandomString';
 const test = mergeTests(loginTest());
 
 const LIVE_TURN_TIMEOUT = 840000;
-
-const CARD_CHROME_BUTTON_NAMES = new Set(['Copy', 'Dismiss', 'Other…', 'Refresh', 'Retry']);
-
-const MAX_QUESTION_ROUNDS = 4;
 
 interface LiveHubI {
     aiHubPage: AiHubPage;
@@ -84,43 +81,11 @@ async function readLastToolResults(page: Page, chat: Omit<AiHubChatRefI, 'thread
         .map((toolEvent) => toolEvent.response ?? '');
 }
 
-/**
- * Answers the question cards the turn ends with, one round at a time, until the last assistant message offers no more
- * options. Returns the answers given, keyed by the question card's text.
- */
-async function answerQuestionCards(
-    aiHubPage: AiHubPage,
-    chooseOption: (cardText: string, optionNames: string[]) => string
-): Promise<Map<string, string>> {
-    const answers = new Map<string, string>();
-
-    for (let round = 0; round < MAX_QUESTION_ROUNDS; round++) {
-        const lastMessage = aiHubPage.assistantMessages.last();
-        const optionNames = (await lastMessage.getByRole('button').allInnerTexts())
-            .map((optionName) => optionName.trim())
-            .filter(
-                (optionName) =>
-                    optionName && !CARD_CHROME_BUTTON_NAMES.has(optionName) && !optionName.startsWith('Connect ')
-            );
-
-        if (optionNames.length === 0) {
-            break;
-        }
-
-        const cardText = await lastMessage.innerText();
-        const optionName = chooseOption(cardText, optionNames);
-
-        answers.set(cardText, optionName);
-
-        await lastMessage.getByRole('button', {exact: true, name: optionName}).click();
-
-        await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
-
-        await expect(aiHubPage.runErrors).toHaveCount(0);
-    }
-
-    return answers;
-}
+const answerCards = (page: Page, aiHubPage: AiHubPage) =>
+    answerInteractiveCards(page, {
+        readLastMessage: () => aiHubPage.assistantMessages.last(),
+        waitForTurnEnd: () => aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT),
+    });
 
 async function deleteProjectByName(page: Page, workspaceId: number, projectName: string) {
     const project = await findProjectByName(page, workspaceId, projectName);
@@ -149,15 +114,8 @@ test.describe('@live AI Hub cards', () => {
                     'yet, so ask me which channel to use before you finish the workflow.'
             );
 
-            let pickedChannel: string | undefined;
-
-            await answerQuestionCards(aiHubPage, (cardText, optionNames) => {
-                if (/channel/i.test(cardText)) {
-                    pickedChannel = optionNames[0];
-                }
-
-                return optionNames[0];
-            });
+            const answers = await answerCards(page, aiHubPage);
+            const pickedChannel = answers.find((cardAnswer) => /channel\?/i.test(cardAnswer.cardText))?.answer;
 
             expect(pickedChannel, 'the builder asked for the channel').toBeDefined();
 
@@ -191,7 +149,7 @@ test.describe('@live AI Hub cards', () => {
                     'Mistral model (mistral-large-latest). Then help me connect Mistral.'
             );
 
-            await answerQuestionCards(aiHubPage, (cardText, optionNames) => optionNames[0]);
+            await answerCards(page, aiHubPage);
 
             await test.step('Create the connection from the Connect card', async () => {
                 await aiHubPage.assistantMessages.last().getByRole('button', {name: 'Connect Mistral'}).click();
@@ -318,7 +276,7 @@ test.describe('@live AI Hub cards', () => {
                     'uses.'
             );
 
-            await answerQuestionCards(aiHubPage, (cardText, optionNames) => optionNames[0]);
+            await answerCards(page, aiHubPage);
 
             const connectionPicker = page.getByRole('combobox').filter({hasText: /Choose Anthropic connection/});
 
