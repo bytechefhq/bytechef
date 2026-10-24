@@ -49,6 +49,7 @@ import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
@@ -198,7 +199,8 @@ public class AiHubConfiguration {
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
                 (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient),
-                (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback, workspaceFacade)));
+                (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
+                    new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
 
         requireBuildWorkflow(toolCallbacks);
 
