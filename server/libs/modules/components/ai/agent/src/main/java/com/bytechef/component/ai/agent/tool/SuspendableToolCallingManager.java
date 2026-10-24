@@ -19,6 +19,8 @@ package com.bytechef.component.ai.agent.tool;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,11 +111,15 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
 
         String suspendedToolCallId = findSuspendedToolCallId(conversation, suspendedToolResult);
 
+        ClusterElementCallRef suspendedCallRef = findSuspendedCall();
+
         continueParameters.put(
             AgentToolSuspension.CONTINUE_PARAMETER_KEY,
             new AgentToolSuspension(
                 ConversationState.from(conversation), suspendedToolCallId,
-                Objects.requireNonNull(suspendedToolResult, "suspendedToolResult")));
+                Objects.requireNonNull(suspendedToolResult, "suspendedToolResult"),
+                suspendedCallRef == null ? null : suspendedCallRef.id(),
+                suspendedCallRef == null ? null : suspendedCallRef.workflowNodeName()));
 
         actionContext.suspend(new ActionContext.Suspend(continueParameters, suspend.expiresAt()));
 
@@ -121,6 +127,18 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
             .conversationHistory(withEmptiedLastToolResponse(conversation))
             .returnDirect(true)
             .build();
+    }
+
+    private @Nullable ClusterElementCallRef findSuspendedCall() {
+        Long taskExecutionId = actionContext.getTaskExecutionId();
+
+        if (taskExecutionId == null || actionContext.getJobId() == null) {
+            return null;
+        }
+
+        return ClusterElementCallRecorder.getInstance()
+            .findSuspendedCall(taskExecutionId)
+            .orElse(null);
     }
 
     private ToolExecutionResult executeToolCallsUntilSuspended(Prompt prompt, ChatResponse chatResponse) {

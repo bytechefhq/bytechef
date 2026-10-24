@@ -57,6 +57,8 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.component.definition.ai.agent.ConversationHistoryReader;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
@@ -357,9 +359,32 @@ public abstract class AbstractAiAgentChatAction {
 
         String toolResult = resumeData.isEmpty() ? NO_HUMAN_RESPONSE_TOOL_RESULT : JsonUtils.write(resumeData);
 
+        completeSuspendedCall(agentToolSuspension, toolResult, context);
+
         return getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context,
             agentToolSuspension.resumeConversation(toolResult), true);
+    }
+
+    private static void completeSuspendedCall(
+        AgentToolSuspension agentToolSuspension, String toolResult, ActionContext context) {
+
+        String callId = agentToolSuspension.suspendedClusterElementCallId();
+        String workflowNodeName = agentToolSuspension.suspendedClusterElementWorkflowNodeName();
+
+        if (callId == null || workflowNodeName == null || !(context instanceof ActionContextAware actionContext)) {
+            return;
+        }
+
+        Long jobId = actionContext.getJobId();
+        Long taskExecutionId = actionContext.getTaskExecutionId();
+
+        if (jobId == null || taskExecutionId == null) {
+            return;
+        }
+
+        ClusterElementCallRecorder.getInstance()
+            .callCompleted(jobId, taskExecutionId, new ClusterElementCallRef(callId, workflowNodeName), toolResult);
     }
 
     private static ChatClient.ChatClientRequestSpec createPrompt(
