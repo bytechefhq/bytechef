@@ -346,7 +346,7 @@ class AbstractAiAgentChatActionTest {
             clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
                 eq("sanitizeText"), eq(1), eq("sanitizeText")))
                     .thenReturn(guardrailsFunction);
-        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any()))
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(advisor);
 
         ComponentConnection componentConnection = new ComponentConnection(
@@ -400,7 +400,7 @@ class AbstractAiAgentChatActionTest {
             clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
                 eq("checkForViolations"), eq(1), eq("checkForViolations")))
                     .thenReturn(guardrailsFunction);
-        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any()))
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenThrow(new RuntimeException("simulated guardrail init failure"));
 
         ComponentConnection componentConnection = new ComponentConnection(

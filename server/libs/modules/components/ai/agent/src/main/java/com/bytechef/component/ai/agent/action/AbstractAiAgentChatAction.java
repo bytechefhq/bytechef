@@ -612,7 +612,7 @@ public abstract class AbstractAiAgentChatAction {
                 ParametersFactory.create(clusterElement.getParameters()),
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections, context,
-                conversationHistory);
+                conversationHistory, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName());
         } catch (Exception e) {
             throw clusterElementInitializationException(clusterElement, "guardrails", e, context);
         }

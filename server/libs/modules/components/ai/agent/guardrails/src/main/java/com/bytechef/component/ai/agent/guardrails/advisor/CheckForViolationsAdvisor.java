@@ -28,6 +28,11 @@ import com.bytechef.component.ai.agent.guardrails.util.MaskEntityMapUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallTarget;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
@@ -35,6 +40,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolR
 import com.bytechef.platform.component.definition.ai.agent.guardrails.MaskResult;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightMasking;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
+import com.bytechef.platform.configuration.domain.ClusterElement;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,6 +63,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import reactor.core.publisher.Flux;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Spring-AI advisor that runs every configured guardrail check over the user prompt (gated by {@code validateInput})
@@ -76,16 +83,26 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     private static final List<String> CORRELATION_KEYS = List.of(
         "conversationId", "traceId", "spanId", "requestId", "correlationId");
     private static final String NAME = "CheckForViolationsAdvisor";
+    private static final String SIDE_INPUT = "INPUT";
+    private static final String SIDE_OUTPUT = "OUTPUT";
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .build();
 
     private static final Set<String> INTERNAL_INFO_KEYS = Set.of("maskEntities");
 
     private final String blockedMessage;
+    private final ClusterElementCallTarget callTarget;
     private final List<CheckEntry> checkEntries;
     private final Context context;
     private final List<Message> conversationHistoryMessages;
+    private final String frameComponentName;
+    private final String frameWorkflowNodeName;
 
-    private CheckForViolationsAdvisor(Builder builder) {
+    private CheckForViolationsAdvisor(Builder builder, ClusterElementCallTarget callTarget) {
         this.blockedMessage = builder.blockedMessage;
+        this.callTarget = callTarget;
+        this.frameComponentName = builder.frameComponentName;
+        this.frameWorkflowNodeName = builder.frameWorkflowNodeName;
         this.checkEntries = List.copyOf(builder.checkEntries);
         this.context = Objects.requireNonNull(builder.context, "context");
         this.conversationHistoryMessages =
@@ -115,7 +132,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         CheckOutcome inputOutcome = safeRunChecks(request);
 
         if (!inputOutcome.violations.isEmpty()) {
-            return blockedResponse(request, inputOutcome);
+            return blockedResponse(request, inputOutcome, SIDE_INPUT);
         }
 
         ChatClientResponse response = chain.nextCall(request);
@@ -130,7 +147,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         }
 
         if (!outputOutcome.violations.isEmpty()) {
-            return blockedResponse(request, outputOutcome);
+            return blockedResponse(request, outputOutcome, SIDE_OUTPUT);
         }
 
         return response;
@@ -141,7 +158,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         CheckOutcome inputOutcome = safeRunChecks(request);
 
         if (!inputOutcome.violations.isEmpty()) {
-            return Flux.just(blockedResponse(request, inputOutcome));
+            return Flux.just(blockedResponse(request, inputOutcome, SIDE_INPUT));
         }
 
         return chain.nextStream(request)
@@ -157,7 +174,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                 }
 
                 if (!outputOutcome.violations.isEmpty()) {
-                    return Flux.just(blockedResponse(request, outputOutcome));
+                    return Flux.just(blockedResponse(request, outputOutcome, SIDE_OUTPUT));
                 }
 
                 return Flux.just(response);
@@ -173,16 +190,14 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         } catch (Throwable throwable) {
             LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
 
-            return CheckOutcome.violations(List.of(Violation.ofExecutionFailure(NAME, throwable)));
+            return CheckOutcome.advisorFailure(throwable);
         }
     }
 
     private ChatClientResponse failClosedResponse(ChatClientRequest request, Throwable throwable) {
         LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
 
-        CheckOutcome failure = CheckOutcome.violations(List.of(Violation.ofExecutionFailure(NAME, throwable)));
-
-        return blockedResponse(request, failure);
+        return blockedResponse(request, CheckOutcome.advisorFailure(throwable), SIDE_OUTPUT);
     }
 
     List<Violation> runChecksForTesting(ChatClientRequest request) {
@@ -192,6 +207,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     private CheckOutcome runChecks(ChatClientRequest request) {
         String textForLlm = extractUserText(request);
         List<Violation> aggregated = new ArrayList<>();
+        List<CheckViolations> byCheck = new ArrayList<>();
         MaskEntityMapUtils maskEntities = new MaskEntityMapUtils(context);
 
         // Stage 1: PREFLIGHT (rule-based) — runs against the progressively-mutated user text (including human answers)
@@ -201,10 +217,12 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                 continue;
             }
 
+            List<Violation> entryViolations = new ArrayList<>();
+
             try {
                 List<Violation> results = entry.function.applyAll(textForLlm, entry.context);
 
-                aggregated.addAll(Objects.requireNonNull(results));
+                entryViolations.addAll(Objects.requireNonNull(results));
 
                 if (entry.function instanceof PreflightMasking masking) {
                     MaskResult maskResult = masking.mask(textForLlm, entry.context);
@@ -221,44 +239,49 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             } catch (Throwable throwable) {
                 LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
 
-                aggregated.add(Violation.ofExecutionFailure(entry.guardrailName, throwable));
+                entryViolations.add(Violation.ofExecutionFailure(entry.guardrailName, throwable));
             }
+
+            collect(entry, entryViolations, aggregated, byCheck);
         }
 
         if (!maskEntities.isEmpty()) {
             textForLlm = maskEntities.applyTo(textForLlm);
         }
 
-        runStage(GuardrailStage.LLM, VALIDATE_INPUT, textForLlm, aggregated);
+        runStage(GuardrailStage.LLM, VALIDATE_INPUT, textForLlm, aggregated, byCheck);
 
         logViolations(request, aggregated);
 
-        return CheckOutcome.violations(aggregated);
+        return new CheckOutcome(aggregated, byCheck);
     }
 
     private CheckOutcome runOutputChecks(ChatClientRequest request, ChatClientResponse response, boolean runLlmChecks) {
         ChatResponse chatResponse = response.chatResponse();
 
         if (chatResponse == null || chatResponse.getResults() == null) {
-            return CheckOutcome.violations(
-                List.of(Violation.ofExecutionFailure(NAME, new IllegalStateException("ChatResponse is null"))));
+            return CheckOutcome.advisorFailure(new IllegalStateException("ChatResponse is null"));
         }
 
         String responseText = extractAssistantText(response);
         List<Violation> aggregated = new ArrayList<>();
+        List<CheckViolations> byCheck = new ArrayList<>();
 
-        runStage(GuardrailStage.PREFLIGHT, VALIDATE_OUTPUT, responseText, aggregated);
+        runStage(GuardrailStage.PREFLIGHT, VALIDATE_OUTPUT, responseText, aggregated, byCheck);
 
         if (runLlmChecks) {
-            runStage(GuardrailStage.LLM, VALIDATE_OUTPUT, responseText, aggregated);
+            runStage(GuardrailStage.LLM, VALIDATE_OUTPUT, responseText, aggregated, byCheck);
         }
 
         logViolations(request, aggregated);
 
-        return CheckOutcome.violations(aggregated);
+        return new CheckOutcome(aggregated, byCheck);
     }
 
-    private void runStage(GuardrailStage stage, String validateKey, String text, List<Violation> aggregated) {
+    private void runStage(
+        GuardrailStage stage, String validateKey, String text, List<Violation> aggregated,
+        List<CheckViolations> byCheck) {
+
         for (CheckEntry entry : checkEntries) {
             if (entry.function.stage() != stage || !shouldRun(entry, validateKey)) {
                 continue;
@@ -269,18 +292,35 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                     ? entry.context
                     : entry.context.withConversationHistoryMessages(conversationHistoryMessages);
 
+            List<Violation> entryViolations = new ArrayList<>();
+
             try {
                 List<Violation> results = entry.function.applyAll(text, effectiveContext);
 
-                aggregated.addAll(Objects.requireNonNull(results));
+                entryViolations.addAll(Objects.requireNonNull(results));
             } catch (OutOfMemoryError error) {
                 throw error;
             } catch (Throwable throwable) {
                 LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
 
-                aggregated.add(Violation.ofExecutionFailure(entry.guardrailName, throwable));
+                entryViolations.add(Violation.ofExecutionFailure(entry.guardrailName, throwable));
             }
+
+            collect(entry, entryViolations, aggregated, byCheck);
         }
+    }
+
+    private static void collect(
+        CheckEntry entry, List<Violation> entryViolations, List<Violation> aggregated,
+        List<CheckViolations> byCheck) {
+
+        if (entryViolations.isEmpty()) {
+            return;
+        }
+
+        aggregated.addAll(entryViolations);
+
+        byCheck.add(new CheckViolations(entry, List.copyOf(entryViolations)));
     }
 
     private static boolean shouldRun(CheckEntry entry, String validateKey) {
@@ -381,7 +421,9 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             .containsKey(VIOLATIONS_METADATA_KEY);
     }
 
-    private ChatClientResponse blockedResponse(ChatClientRequest request, CheckOutcome outcome) {
+    private ChatClientResponse blockedResponse(ChatClientRequest request, CheckOutcome outcome, String side) {
+        recordOutcomes(outcome, side);
+
         ChatResponse chatResponse = ChatResponse.builder()
             .generations(List.of(new Generation(new AssistantMessage(blockedMessage))))
             .metadata(
@@ -395,6 +437,113 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             .chatResponse(chatResponse)
             .context(request.context())
             .build();
+    }
+
+    private void recordOutcomes(CheckOutcome outcome, String side) {
+        if (callTarget == null || frameWorkflowNodeName == null) {
+            return;
+        }
+
+        Map<String, Object> frameDetails = new LinkedHashMap<>();
+
+        frameDetails.put("side", side);
+
+        if (outcome.byCheck()
+            .isEmpty()) {
+
+            frameDetails.put("reason", "checks could not run");
+        } else {
+            frameDetails.put("matchCount", sumMatchCount(outcome.violations()));
+        }
+
+        ClusterElementCallRef parentRef = ClusterElementCallScope.current();
+        ClusterElementCallRecorder recorder = callTarget.recorder();
+
+        ClusterElementCallRef frameRef = recorder.recordOutcome(
+            callTarget.jobId(), callTarget.taskExecutionId(), frameWorkflowNodeName, frameComponentName,
+            parentRef == null ? null : parentRef.id(), ClusterElementCallRecord.Status.BLOCKED,
+            JSON_MAPPER.writeValueAsString(frameDetails), null);
+
+        for (CheckViolations checkViolations : outcome.byCheck()) {
+            CheckEntry entry = checkViolations.entry();
+
+            if (entry.workflowNodeName() == null) {
+                continue;
+            }
+
+            recordCheckOutcome(recorder, frameRef, entry, checkViolations.violations(), side);
+        }
+    }
+
+    private void recordCheckOutcome(
+        ClusterElementCallRecorder recorder, ClusterElementCallRef frameRef, CheckEntry entry,
+        List<Violation> violations, String side) {
+
+        Map<String, Object> details = new LinkedHashMap<>();
+
+        details.put("side", side);
+
+        boolean executionFailed = false;
+
+        for (Violation violation : violations) {
+            if (!(violation instanceof Violation.ExecutionFailureViolation failure)) {
+                continue;
+            }
+
+            executionFailed = true;
+
+            Throwable exception = failure.exception();
+
+            if (recorder.claimFailure(callTarget.taskExecutionId(), exception)) {
+                String message = exception.getMessage();
+
+                recorder.recordOutcome(
+                    callTarget.jobId(), callTarget.taskExecutionId(), entry.workflowNodeName(),
+                    entry.componentName(), frameRef.id(), ClusterElementCallRecord.Status.FAILED, null,
+                    resolveFailureKind(exception) + ": " + (message == null ? exception.getClass()
+                        .getSimpleName() : message));
+
+                return;
+            }
+        }
+
+        if (executionFailed) {
+            details.put("reason", "could not run");
+        } else {
+            details.put("matchCount", sumMatchCount(violations));
+
+            Double confidenceScore = null;
+
+            for (Violation violation : violations) {
+                if (violation instanceof Violation.ClassifiedViolation classified &&
+                    (confidenceScore == null || classified.confidenceScore() > confidenceScore)) {
+
+                    confidenceScore = classified.confidenceScore();
+                }
+            }
+
+            if (confidenceScore != null) {
+                details.put("confidenceScore", confidenceScore);
+            }
+        }
+
+        recorder.recordOutcome(
+            callTarget.jobId(), callTarget.taskExecutionId(), entry.workflowNodeName(), entry.componentName(),
+            frameRef.id(), ClusterElementCallRecord.Status.BLOCKED, JSON_MAPPER.writeValueAsString(details), null);
+    }
+
+    private static int sumMatchCount(List<Violation> violations) {
+        int matchCount = 0;
+
+        for (Violation violation : violations) {
+            if (violation instanceof Violation.PatternViolation pattern) {
+                List<String> matchedSubstrings = pattern.matchedSubstrings();
+
+                matchCount += matchedSubstrings.size();
+            }
+        }
+
+        return matchCount;
     }
 
     private static Map<String, Serializable> scrubInternalKeys(Map<String, Serializable> info) {
@@ -496,13 +645,29 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     public static final class Builder {
 
         private String blockedMessage = "";
+        private ClusterElementCallTarget callTarget;
         private final List<PendingCheck> pendingChecks = new ArrayList<>();
         private final List<CheckEntry> checkEntries = new ArrayList<>();
         private Context context;
         private List<Message> conversationHistoryMessages;
+        private String frameComponentName;
+        private String frameWorkflowNodeName;
 
         public Builder blockedMessage(String value) {
             this.blockedMessage = value;
+
+            return this;
+        }
+
+        public Builder callTarget(ClusterElementCallTarget value) {
+            this.callTarget = value;
+
+            return this;
+        }
+
+        public Builder clusterElement(String workflowNodeName, String componentName) {
+            this.frameWorkflowNodeName = workflowNodeName;
+            this.frameComponentName = componentName;
 
             return this;
         }
@@ -544,8 +709,21 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             ChatClient chatClient) {
 
             pendingChecks.add(new PendingCheck(
-                guardrailName, function, inputParameters, connectionParameters, parentParameters,
+                guardrailName, null, null, function, inputParameters, connectionParameters, parentParameters,
                 extensions, componentConnections, chatClient));
+
+            return this;
+        }
+
+        public Builder add(
+            ClusterElement element, GuardrailCheckFunction function, Parameters inputParameters,
+            Parameters connectionParameters, Parameters parentParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections, ChatClient chatClient) {
+
+            pendingChecks.add(new PendingCheck(
+                element.getClusterElementName(), element.getWorkflowNodeName(), element.getComponentName(), function,
+                inputParameters, connectionParameters, parentParameters, extensions, componentConnections,
+                chatClient));
 
             return this;
         }
@@ -564,27 +742,39 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                     .context(context)
                     .build();
 
-                checkEntries.add(new CheckEntry(pending.guardrailName, pending.function, guardrailContext));
+                checkEntries.add(new CheckEntry(
+                    pending.guardrailName, pending.workflowNodeName, pending.componentName, pending.function,
+                    guardrailContext));
             }
 
-            return new CheckForViolationsAdvisor(this);
+            ClusterElementCallTarget resolvedCallTarget = callTarget == null
+                ? ClusterElementCallTarget.of(context)
+                    .orElse(null)
+                : callTarget;
+
+            return new CheckForViolationsAdvisor(this, resolvedCallTarget);
         }
     }
 
     private record PendingCheck(
-        String guardrailName, GuardrailCheckFunction function, Parameters inputParameters,
+        String guardrailName, String workflowNodeName, String componentName, GuardrailCheckFunction function,
+        Parameters inputParameters,
         Parameters connectionParameters, Parameters parentParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections, ChatClient chatClient) {
     }
 
     private record CheckEntry(
-        String guardrailName, GuardrailCheckFunction function, GuardrailContext context) {
+        String guardrailName, String workflowNodeName, String componentName, GuardrailCheckFunction function,
+        GuardrailContext context) {
     }
 
-    private record CheckOutcome(List<Violation> violations) {
+    private record CheckViolations(CheckEntry entry, List<Violation> violations) {
+    }
 
-        private static CheckOutcome violations(List<Violation> violations) {
-            return new CheckOutcome(violations);
+    private record CheckOutcome(List<Violation> violations, List<CheckViolations> byCheck) {
+
+        private static CheckOutcome advisorFailure(Throwable throwable) {
+            return new CheckOutcome(List.of(Violation.ofExecutionFailure(NAME, throwable)), List.of());
         }
     }
 }
