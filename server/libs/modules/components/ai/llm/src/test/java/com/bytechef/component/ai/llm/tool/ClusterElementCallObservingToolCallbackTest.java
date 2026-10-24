@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent.Type;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
@@ -121,6 +122,34 @@ class ClusterElementCallObservingToolCallbackTest {
         assertThat(events.getLast()
             .record()
             .error()).isEqualTo("boom");
+
+        ClusterElementCallRecord callRecord = recorder.drain(10)
+            .records()
+            .getFirst();
+
+        assertThat(callRecord.status()).isEqualTo(Status.FAILED);
+        assertThat(callRecord.error()).isEqualTo("boom");
+        assertThat(callRecord.input()).isEqualTo("{}");
+        assertThat(callRecord.toolName()).isEqualTo("get");
+    }
+
+    @Test
+    void testSuspensionFailureIsRecordedAsFailed() {
+        ToolSuspensionException exception = new ToolSuspensionException(
+            "The approval request could not be sent: boom", new RuntimeException("boom"));
+
+        when(delegate.call("{}")).thenThrow(exception);
+
+        assertThatThrownBy(() -> createToolCallback(null).call("{}")).isSameAs(exception);
+
+        List<ClusterElementCallRecord> records = recorder.drain(10)
+            .records();
+
+        assertThat(records).hasSize(1);
+        assertThat(records.getFirst()
+            .status()).isEqualTo(Status.FAILED);
+        assertThat(records.getFirst()
+            .error()).isEqualTo("The approval request could not be sent: boom");
     }
 
     @Test
