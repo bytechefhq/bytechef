@@ -57,8 +57,10 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallTarget;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingAdvisor;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingChatModel;
@@ -156,15 +158,23 @@ public abstract class AbstractAiAgentChatAction {
         Map<String, Object> concatenatedInputParameters = MapUtils.concat(
             new HashMap<>(inputParameters.toMap()), new HashMap<>(modelClusterElement.getParameters()));
 
-        ChatModel chatModel = (ChatModel) modelFunction.apply(
-            ParametersFactory.create(concatenatedInputParameters),
-            ParametersFactory.create(modelConnection.getParameters()), true);
+        ChatModel providerChatModel;
+
+        try {
+            providerChatModel = (ChatModel) modelFunction.apply(
+                ParametersFactory.create(concatenatedInputParameters),
+                ParametersFactory.create(modelConnection.getParameters()), true);
+        } catch (Exception e) {
+            throw clusterElementInitializationException(modelClusterElement, "model", e, context);
+        }
+
+        ChatModel chatModel = providerChatModel;
 
         Optional<ClusterElementCallTarget> clusterElementCallTarget = ClusterElementCallTarget.of(context);
 
         if (clusterElementCallTarget.isPresent()) {
             chatModel = new ClusterElementFailureAttributingChatModel(
-                chatModel, modelClusterElement.getWorkflowNodeName(), modelClusterElement.getComponentName(),
+                providerChatModel, modelClusterElement.getWorkflowNodeName(), modelClusterElement.getComponentName(),
                 clusterElementCallTarget.get());
         }
 
@@ -196,7 +206,7 @@ public abstract class AbstractAiAgentChatAction {
                     concatToolCallbacks(
                         getToolCallbacks(
                             clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                            toolExecutionListener, toolSimulations, chatModel, conversationId, context),
+                            toolExecutionListener, toolSimulations, providerChatModel, conversationId, context),
                         chatMemoryResult, toolExecutionListener, context)
                             .toArray());
 
@@ -228,7 +238,7 @@ public abstract class AbstractAiAgentChatAction {
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections, context);
         } catch (Exception e) {
-            throw clusterElementInitializationException(clusterElement, "chat memory", e, context);
+            throw clusterElementInitializationException(clusterElement, "chat memory advisor", e, context);
         }
     }
 
@@ -238,14 +248,34 @@ public abstract class AbstractAiAgentChatAction {
         Class<? extends Throwable> causeClass = cause.getClass();
 
         String message = String.format(
-            "Failed to initialize %s advisor for cluster element '%s' (component=%s v%d): %s",
+            "Failed to initialize %s for cluster element '%s' (component=%s v%d): %s",
             kind, clusterElement.getClusterElementName(), clusterElement.getComponentName(),
             clusterElement.getComponentVersion(),
             cause.getMessage() == null ? causeClass.getSimpleName() : cause.getMessage());
 
         context.log(log -> log.error(message, cause));
 
+        ClusterElementCallTarget.of(context)
+            .ifPresent(target -> recordInitializationFailure(target, clusterElement, cause, message));
+
         return new IllegalStateException(message, cause);
+    }
+
+    private static void recordInitializationFailure(
+        ClusterElementCallTarget target, ClusterElement clusterElement, Throwable cause, String message) {
+
+        ClusterElementCallRecorder recorder = target.recorder();
+
+        if (!recorder.claimFailure(target.taskExecutionId(), cause)) {
+            return;
+        }
+
+        ClusterElementCallRef parent = ClusterElementCallScope.current();
+
+        recorder.recordOutcome(
+            target.jobId(), target.taskExecutionId(), clusterElement.getWorkflowNodeName(),
+            clusterElement.getComponentName(), parent == null ? null : parent.id(),
+            ClusterElementCallRecord.Status.FAILED, null, message);
     }
 
     static ToolCallback createObservableToolCallback(
@@ -614,7 +644,7 @@ public abstract class AbstractAiAgentChatAction {
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections, context,
                 conversationHistory, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName());
         } catch (Exception e) {
-            throw clusterElementInitializationException(clusterElement, "guardrails", e, context);
+            throw clusterElementInitializationException(clusterElement, "guardrails advisor", e, context);
         }
     }
 
@@ -632,7 +662,7 @@ public abstract class AbstractAiAgentChatAction {
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
-            throw clusterElementInitializationException(clusterElement, "RAG", e, context);
+            throw clusterElementInitializationException(clusterElement, "RAG advisor", e, context);
         }
     }
 
