@@ -22,18 +22,24 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = "com.bytechef.platform.data.table")
+@EnableAsync
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
@@ -41,8 +47,32 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 public class DataTableIntTestConfiguration {
 
     @Bean
+    MeterRegistry meterRegistry() {
+        return new SimpleMeterRegistry();
+    }
+
+    @Bean
     TagService tagService() {
         return mock(TagService.class);
+    }
+
+    @Bean
+    AsyncTaskExecutor taskExecutor() {
+        return new SimpleAsyncTaskExecutor("task-");
+    }
+
+    @Bean
+    AsyncTaskExecutor webhookDeliveryExecutor() {
+        return new SimpleAsyncTaskExecutor("webhook-delivery-");
+    }
+
+    @Bean
+    AsyncTaskExecutor workerExecutor() {
+        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("worker-");
+
+        simpleAsyncTaskExecutor.setConcurrencyLimit(1);
+
+        return simpleAsyncTaskExecutor;
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

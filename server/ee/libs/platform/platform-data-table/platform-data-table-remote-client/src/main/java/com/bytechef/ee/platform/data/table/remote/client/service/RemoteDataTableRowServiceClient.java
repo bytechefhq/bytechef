@@ -9,9 +9,12 @@ package com.bytechef.ee.platform.data.table.remote.client.service;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +31,20 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
     }
 
     @Override
+    public List<DataTableRow> findRows(
+        String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
+        int offset, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -38,7 +54,26 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
     }
 
     @Override
+    public List<DataTableRow> updateRows(
+        String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean deleteRow(String baseName, long id, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> deleteAllRows(String baseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> deleteRows(
+        String baseName, DataTableRowConditions conditions, long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 

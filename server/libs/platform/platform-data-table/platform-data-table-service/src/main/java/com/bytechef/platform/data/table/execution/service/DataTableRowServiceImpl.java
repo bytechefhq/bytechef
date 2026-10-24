@@ -22,6 +22,9 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookTyp
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -31,6 +34,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -38,24 +42,49 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
+import java.time.temporal.TemporalQuery;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
@@ -65,6 +94,28 @@ import org.springframework.util.Assert;
 public class DataTableRowServiceImpl implements DataTableRowService {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
+
+    static final int MAX_ARRAY_PARAMETER_LENGTH = 50_000;
+
+    private static final long MIN_EPOCH_MILLISECONDS = 100_000_000_000L;
+
+    private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone(ZoneOffset.UTC);
+
+    private static final Pattern EPOCH_PATTERN = Pattern.compile("-?\\d+");
+
+    private static final DateTimeFormatter[] STRICT_DATE_FORMATTERS = {
+        DateTimeFormatter.ISO_LOCAL_DATE,
+        DateTimeFormatter.ofPattern("uuuu-M-d")
+            .withResolverStyle(ResolverStyle.STRICT)
+    };
+
+    private static final DateTimeFormatter[] STRICT_DATE_TIME_FORMATTERS = {
+        DateTimeFormatter.ISO_DATE_TIME,
+        DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+            .withResolverStyle(ResolverStyle.STRICT),
+        DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
+            .withResolverStyle(ResolverStyle.STRICT)
+    };
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final JdbcTemplate jdbcTemplate;
@@ -92,7 +143,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         DataTableRow deletedDataTableRow;
 
@@ -106,15 +157,81 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return false;
         }
 
-        Map<String, Object> payload = new HashMap<>();
-
-        payload.put("id", deletedDataTableRow.id());
-        payload.put("values", deletedDataTableRow.values());
-
-        applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, payload, environmentId));
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, List.of(deletedDataTableRow), environmentId);
 
         return true;
+    }
+
+    @Override
+    @Transactional
+    public List<DataTableRow> deleteAllRows(String baseName, long environmentId) {
+        return deleteMatchingRows(baseName, DataTableRowConditions.matchAll(), environmentId);
+    }
+
+    @Override
+    @Transactional
+    public List<DataTableRow> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId) {
+        Objects.requireNonNull(conditions, "conditions");
+
+        conditions.requireAtLeastOneCondition();
+
+        return deleteMatchingRows(baseName, conditions, environmentId);
+    }
+
+    /**
+     * Deletes every row of a data table matching the given OR groups of AND conditions.
+     *
+     * <p>
+     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter columns must match an
+     * existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
+     * {@link #validateBaseName(String)}. Filter values use parameterized queries.
+     */
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<DataTableRow> deleteMatchingRows(
+        String baseName, DataTableRowConditions conditions, long environmentId) {
+
+        validateBaseName(baseName);
+
+        String physicalName = buildPhysicalName(environmentId, baseName);
+
+        checkHasId(baseName, physicalName);
+
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+
+        List<String> columnNames = getNonIdColumnNames(columnSpecs);
+
+        WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
+
+        String tableName = escapeIdentifier(physicalName);
+
+        List<DataTableRow> deletedDataTableRows;
+
+        if (isReturningSupported()) {
+            String sql = "DELETE FROM " + tableName + whereClause.sql() + " RETURNING " +
+                buildSelectColumns(columnNames);
+
+            deletedDataTableRows = jdbcTemplate.query(
+                sql, preparedStatement -> setFilterParameters(preparedStatement, 1, whereClause.filterParameters()),
+                (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+        } else {
+            deletedDataTableRows = selectRowsForUpdate(tableName, columnNames, whereClause);
+
+            List<Long> ids = deletedDataTableRows.stream()
+                .map(DataTableRow::id)
+                .toList();
+
+            if (!ids.isEmpty()) {
+                jdbcTemplate.update(
+                    "DELETE FROM " + tableName + " WHERE " + buildAnyCondition("\"id\"", ids.size()),
+                    (PreparedStatementSetter) preparedStatement -> setIds(preparedStatement, 1, ids));
+            }
+        }
+
+        List<DataTableRow> sortedDataTableRows = sortById(deletedDataTableRows);
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, sortedDataTableRows, environmentId);
+
+        return sortedDataTableRows;
     }
 
     /**
@@ -127,12 +244,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    public DataTableRow getRow(String baseName, long id, long environmentId) {
+    public @Nullable DataTableRow getRow(String baseName, long id, long environmentId) {
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<String> columnNames = listColumns(physicalName).stream()
             .map(ColumnSpec::name)
@@ -146,7 +263,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String sql = "SELECT " + selectColumns + " FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
 
         List<DataTableRow> rows = jdbcTemplate.query(
-            sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+            sql, preparedStatement -> preparedStatement.setLong(1, id),
+            (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
         return rows.isEmpty() ? null : rows.getFirst();
     }
@@ -157,7 +275,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
         List<String> columnNames = columnSpecs.stream()
@@ -183,7 +301,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
                 Object value = values.get(columnName);
 
-                curValues.add(value == null ? "" : String.valueOf(value));
+                curValues.add(toCsvValue(value));
             }
 
             csvWriter.writeRow(curValues);
@@ -201,12 +319,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     @Override
+    @Transactional
     public void importCsv(String baseName, String csv, long environmentId) {
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
         if (csv == null) {
             return;
@@ -219,6 +338,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .toList();
 
         CsvReader.CsvReaderBuilder csvReaderBuilder = CsvReader.builder();
+
+        List<DataTableRow> insertedDataTableRows = new ArrayList<>();
 
         try (CsvReader csvReader = csvReaderBuilder.build(new StringReader(csv))) {
             List<String> headers = null;
@@ -251,6 +372,18 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                         mappedColumnNames.add(columnName);
                     }
 
+                    if (mappedColumnNames.stream()
+                        .allMatch(Objects::isNull)) {
+
+                        List<String> tableColumnNames = columnNames.stream()
+                            .filter(columnName -> !columnName.equalsIgnoreCase("id"))
+                            .toList();
+
+                        throw new IllegalArgumentException(
+                            "CSV header %s matches no column of table '%s'; its columns are %s; no row was imported"
+                                .formatted(headers, baseName, tableColumnNames));
+                    }
+
                     continue;
                 }
 
@@ -274,11 +407,26 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     values.put(curColumnName, (field == null || field.isEmpty()) ? null : field);
                 }
 
-                insertRow(baseName, values, environmentId);
+                try {
+                    insertedDataTableRows.add(
+                        insertRowWithoutEvent(
+                            baseName, physicalName, columnSpecs, values, environmentId, new HashSet<>()));
+                } catch (IllegalArgumentException exception) {
+                    throw new IllegalArgumentException(
+                        "CSV line %d: %s; no row was imported".formatted(
+                            csvRow.getOriginalLineNumber(), exception.getMessage()),
+                        exception);
+                } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+                    throw withRowPosition(
+                        "CSV line " + csvRow.getOriginalLineNumber(), "no row was imported",
+                        dataIntegrityViolationException);
+                }
             }
         } catch (IOException exception) {
             throw new RuntimeException("Failed to import CSV", exception);
         }
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
     }
 
     /**
@@ -296,47 +444,100 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
-        List<String> allColumnNames = listColumns(physicalName).stream()
-            .map(ColumnSpec::name)
-            .toList();
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
-        List<String> insertableColumnNames = values.keySet()
-            .stream()
-            .filter(columnName -> allColumnNames.stream()
-                .anyMatch(column -> column.equalsIgnoreCase(columnName)))
-            .filter(k -> !"id".equalsIgnoreCase(k))
-            .map(columnName -> allColumnNames.stream()
-                .filter(c -> c.equalsIgnoreCase(columnName))
-                .findFirst()
-                .orElse(columnName))
-            .toList();
+        DataTableRow dataTableRow = insertRowWithoutEvent(
+            baseName, physicalName, listColumns(physicalName), values, environmentId, ignoredColumnNames);
 
-        String columnsClause = insertableColumnNames.stream()
-            .map(this::escapeIdentifier)
-            .collect(Collectors.joining(", "));
-        String placeholders = insertableColumnNames.stream()
-            .map(k -> "?")
-            .collect(Collectors.joining(", "));
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
 
-        String valuesClause = insertableColumnNames.isEmpty()
-            ? " DEFAULT VALUES" : (" (" + columnsClause + ") VALUES (" + placeholders + ")");
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, List.of(dataTableRow), environmentId);
 
-        Map<String, ColumnType> typeMap = columnTypeMap(physicalName);
+        return dataTableRow;
+    }
 
-        PreparedStatementSetter preparedStatementSetter = ps -> {
-            int i = 1;
+    @Override
+    @Transactional
+    public List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId) {
+        validateBaseName(baseName);
 
-            for (String columnName : insertableColumnNames) {
-                ColumnType columnType = typeMap.getOrDefault(columnName.toLowerCase(Locale.ROOT), ColumnType.STRING);
-                Object rawValue = getValueCaseInsensitive(values, columnName);
+        String physicalName = buildPhysicalName(environmentId, baseName);
 
-                Object coercedValue = coerceValue(columnType, rawValue);
+        checkHasId(baseName, physicalName);
 
-                setParam(ps, i++, columnType, coercedValue);
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<DataTableRow> insertedDataTableRows = new ArrayList<>();
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
+
+        for (int index = 0; index < rowValues.size(); index++) {
+            try {
+                insertedDataTableRows.add(
+                    insertRowWithoutEvent(
+                        baseName, physicalName, columnSpecs, rowValues.get(index), environmentId, ignoredColumnNames));
+            } catch (IllegalArgumentException exception) {
+                throw new IllegalArgumentException(
+                    "Record %d: %s; no record was inserted".formatted(index + 1, exception.getMessage()), exception);
+            } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+                throw withRowPosition("Record " + (index + 1), "no record was inserted",
+                    dataIntegrityViolationException);
             }
-        };
+        }
+
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
+
+        return insertedDataTableRows;
+    }
+
+    private static DataIntegrityViolationException withRowPosition(
+        String rowPosition, String outcome, DataIntegrityViolationException dataIntegrityViolationException) {
+
+        Throwable mostSpecificCause = dataIntegrityViolationException.getMostSpecificCause();
+
+        String message = mostSpecificCause.getMessage();
+
+        if (message == null || message.isBlank()) {
+            Class<? extends Throwable> mostSpecificCauseClass = mostSpecificCause.getClass();
+
+            message = mostSpecificCauseClass.getSimpleName();
+        }
+
+        String firstLine = message.lines()
+            .findFirst()
+            .orElse(message)
+            .strip();
+
+        return new DataIntegrityViolationException(
+            "%s: %s; %s".formatted(rowPosition, firstLine, outcome), dataIntegrityViolationException);
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRow insertRowWithoutEvent(
+        String baseName, String physicalName, List<ColumnSpec> columnSpecs, Map<String, Object> values,
+        long environmentId, Set<String> ignoredColumnNames) {
+
+        List<String> allColumnNames = getColumnNames(columnSpecs);
+
+        List<ColumnValue> columnValues = getColumnValues(
+            columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
+
+        String columnsClause = columnValues.stream()
+            .map(columnValue -> {
+                ColumnSpec columnSpec = columnValue.columnSpec();
+
+                return escapeIdentifier(columnSpec.name());
+            })
+            .collect(Collectors.joining(", "));
+
+        String valuesClause = columnValues.isEmpty()
+            ? " DEFAULT VALUES"
+            : (" (" + columnsClause + ") VALUES (" + buildPlaceholders(columnValues.size()) + ")");
+
+        PreparedStatementSetter preparedStatementSetter =
+            preparedStatement -> setColumnValues(preparedStatement, 1, columnValues);
 
         DataTableRow result;
 
@@ -351,43 +552,65 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             throw new IllegalStateException("Failed to insert row");
         }
 
-        // Dispatch event for webhooks
-        Map<String, Object> payload = new HashMap<>();
-
-        payload.put("id", result.id());
-        payload.put("values", result.values());
-
-        applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, payload, environmentId));
-
         return result;
     }
 
     @Override
-    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
+        return findRows(baseName, DataTableRowConditions.matchAll(), null, limit, offset, environmentId);
+    }
+
+    /**
+     * Finds rows of a data table matching the given OR groups of AND conditions.
+     *
+     * <p>
+     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter and sort columns must
+     * match an existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
+     * {@link #validateBaseName(String)}. Filter values use parameterized queries.
+     */
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public List<DataTableRow> findRows(
+        String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
+        int offset, long environmentId) {
+
+        Objects.requireNonNull(conditions, "conditions");
+
+        if (limit < 0 || offset < 0) {
+            throw new IllegalArgumentException(
+                "limit and offset must not be negative, got limit=%d and offset=%d".formatted(limit, offset));
+        }
+
         validateBaseName(baseName);
 
-        String buildPhysicalName = buildPhysicalName(environmentId, baseName);
+        String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(buildPhysicalName);
+        checkHasId(baseName, physicalName);
 
-        List<String> columnNames = listColumns(buildPhysicalName).stream()
-            .map(ColumnSpec::name)
-            .filter(n -> !"id".equalsIgnoreCase(n))
-            .toList();
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
-        String selectColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
-            .map(this::escapeIdentifier)
-            .collect(Collectors.joining(", ")));
+        List<String> columnNames = getNonIdColumnNames(columnSpecs);
 
-        String sql =
-            "SELECT " + selectColumns + " FROM " + escapeIdentifier(buildPhysicalName) +
-                " ORDER BY \"id\" LIMIT ? OFFSET ?";
+        WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
 
-        return jdbcTemplate.query(sql, ps -> {
-            ps.setInt(1, Math.max(0, limit));
-            ps.setInt(2, Math.max(0, offset));
+        String orderByClause = " ORDER BY \"id\"";
+
+        if (sort != null) {
+            ColumnSpec sortColumnSpec = getColumnSpec(columnSpecs, sort.column());
+            DataTableRowSort.Direction direction = sort.direction();
+
+            orderByClause = " ORDER BY " + escapeIdentifier(sortColumnSpec.name()) + " " + direction.name() +
+                " NULLS LAST, \"id\"";
+        }
+
+        String sql = "SELECT " + buildSelectColumns(columnNames) + " FROM " + escapeIdentifier(physicalName) +
+            whereClause.sql() + orderByClause + " LIMIT ? OFFSET ?";
+
+        return jdbcTemplate.query(sql, preparedStatement -> {
+            int index = setFilterParameters(preparedStatement, 1, whereClause.filterParameters());
+
+            preparedStatement.setInt(index++, limit);
+            preparedStatement.setInt(index, offset);
         }, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
     }
 
@@ -398,57 +621,35 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        checkHasId(physicalName);
+        checkHasId(baseName, physicalName);
 
-        List<String> allColumnNames = listColumns(physicalName).stream()
-            .map(ColumnSpec::name)
-            .toList();
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
-        List<String> updatableColumnNames = values.keySet()
-            .stream()
-            .filter(columnName -> allColumnNames.stream()
-                .anyMatch(column -> column.equalsIgnoreCase(columnName)))
-            .filter(k -> !"id".equalsIgnoreCase(k))
-            .map(columnName -> allColumnNames.stream()
-                .filter(c -> c.equalsIgnoreCase(columnName))
-                .findFirst()
-                .orElse(columnName))
-            .toList();
+        List<String> allColumnNames = getColumnNames(columnSpecs);
 
-        if (updatableColumnNames.isEmpty()) {
-            // nothing to update, return current row
-            List<DataTableRow> dataTableRows = listRows(baseName, 1, 0, environmentId).stream()
-                .filter(dataTableRow -> dataTableRow.id() == id)
-                .toList();
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
-            if (!dataTableRows.isEmpty()) {
-                return dataTableRows.getFirst();
+        List<ColumnValue> columnValues = getColumnValues(
+            columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
+
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+
+        if (columnValues.isEmpty()) {
+            DataTableRow dataTableRow = getRow(baseName, id, environmentId);
+
+            if (dataTableRow == null) {
+                throw new IllegalArgumentException("Row not found: id=" + id);
             }
 
-            throw new IllegalArgumentException("Row not found: id=" + id);
+            return dataTableRow;
         }
 
-        String setClause = updatableColumnNames.stream()
-            .map(c -> escapeIdentifier(c) + " = ?")
-            .collect(Collectors.joining(", "));
+        String setClause = buildSetClause(columnValues);
 
-        Map<String, ColumnType> columnTypeMap = columnTypeMap(physicalName);
+        PreparedStatementSetter preparedStatementSetter = preparedStatement -> {
+            int index = setColumnValues(preparedStatement, 1, columnValues);
 
-        PreparedStatementSetter preparedStatementSetter = ps -> {
-            int i = 1;
-
-            for (String columnName : updatableColumnNames) {
-                ColumnType columnType = columnTypeMap.getOrDefault(
-                    columnName.toLowerCase(Locale.ROOT), ColumnType.STRING);
-
-                Object rawValue = getValueCaseInsensitive(values, columnName);
-
-                Object coercedValue = coerceValue(columnType, rawValue);
-
-                setParam(ps, i++, columnType, coercedValue);
-            }
-
-            ps.setLong(i, id);
+            preparedStatement.setLong(index, id);
         };
 
         DataTableRow updatedDataTableRow;
@@ -465,15 +666,347 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             throw new IllegalArgumentException("Row not found: id=" + id);
         }
 
-        Map<String, Object> payload = new HashMap<>();
-
-        payload.put("id", updatedDataTableRow.id());
-        payload.put("values", updatedDataTableRow.values());
-
-        applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, payload, environmentId));
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, List.of(updatedDataTableRow), environmentId);
 
         return updatedDataTableRow;
+    }
+
+    /**
+     * Updates every row of a data table matching the given OR groups of AND conditions in one transaction.
+     *
+     * <p>
+     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter and updated columns must
+     * match an existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
+     * {@link #validateBaseName(String)}. Filter and row values use parameterized queries.
+     */
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    @Transactional
+    public List<DataTableRow> updateRows(
+        String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
+
+        Objects.requireNonNull(conditions, "conditions");
+
+        conditions.requireAtLeastOneCondition();
+
+        validateBaseName(baseName);
+
+        String physicalName = buildPhysicalName(environmentId, baseName);
+
+        checkHasId(baseName, physicalName);
+
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+
+        List<String> columnNames = getNonIdColumnNames(columnSpecs);
+
+        WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
+
+        List<ColumnValue> columnValues = getColumnValues(columnSpecs, values, ValuePolicy.BULK_UPDATE, Set.of());
+
+        if (columnValues.isEmpty()) {
+            throw new IllegalArgumentException("Updating rows requires a value for at least one column");
+        }
+
+        String tableName = escapeIdentifier(physicalName);
+        String setClause = buildSetClause(columnValues);
+
+        List<DataTableRow> updatedDataTableRows;
+
+        if (isReturningSupported()) {
+            String sql = "UPDATE " + tableName + " SET " + setClause + whereClause.sql() + " RETURNING " +
+                buildSelectColumns(columnNames);
+
+            updatedDataTableRows = jdbcTemplate.query(sql, preparedStatement -> {
+                int index = setColumnValues(preparedStatement, 1, columnValues);
+
+                setFilterParameters(preparedStatement, index, whereClause.filterParameters());
+            }, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+        } else {
+            List<Long> ids = selectRowsForUpdate(tableName, columnNames, whereClause).stream()
+                .map(DataTableRow::id)
+                .toList();
+
+            if (ids.isEmpty()) {
+                return List.of();
+            }
+
+            String idsClause = " WHERE " + buildAnyCondition("\"id\"", ids.size());
+
+            jdbcTemplate.update("UPDATE " + tableName + " SET " + setClause + idsClause,
+                (PreparedStatementSetter) preparedStatement -> {
+                    int index = setColumnValues(preparedStatement, 1, columnValues);
+
+                    setIds(preparedStatement, index, ids);
+                });
+
+            updatedDataTableRows = jdbcTemplate.query(
+                "SELECT " + buildSelectColumns(columnNames) + " FROM " + tableName + idsClause,
+                preparedStatement -> setIds(preparedStatement, 1, ids),
+                (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+        }
+
+        List<DataTableRow> sortedDataTableRows = sortById(updatedDataTableRows);
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, sortedDataTableRows, environmentId);
+
+        return sortedDataTableRows;
+    }
+
+    private static String toCsvValue(@Nullable Object value) {
+        if (value == null) {
+            return "";
+        }
+
+        if (value instanceof Timestamp timestamp) {
+            LocalDateTime localDateTime = LocalDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
+
+            return localDateTime.toString();
+        }
+
+        return String.valueOf(value);
+    }
+
+    private String buildPlaceholders(int count) {
+        return String.join(", ", Collections.nCopies(count, "?"));
+    }
+
+    private String buildSelectColumns(List<String> columnNames) {
+        return "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
+            .map(this::escapeIdentifier)
+            .collect(Collectors.joining(", ")));
+    }
+
+    private String buildSetClause(List<ColumnValue> columnValues) {
+        return columnValues.stream()
+            .map(columnValue -> {
+                ColumnSpec columnSpec = columnValue.columnSpec();
+
+                return escapeIdentifier(columnSpec.name()) + " = ?";
+            })
+            .collect(Collectors.joining(", "));
+    }
+
+    private WhereClause buildWhereClause(List<ColumnSpec> columnSpecs, DataTableRowConditions conditions) {
+        List<FilterParameter> filterParameters = new ArrayList<>();
+        List<String> orConditions = new ArrayList<>();
+
+        for (List<DataTableRowFilter> andFilters : conditions.groups()) {
+            List<String> andConditions = new ArrayList<>();
+
+            for (DataTableRowFilter filter : andFilters) {
+                andConditions.add(
+                    buildCondition(getColumnSpec(columnSpecs, filter.column()), filter, filterParameters));
+            }
+
+            orConditions.add("(" + String.join(" AND ", andConditions) + ")");
+        }
+
+        String sql = orConditions.isEmpty() ? "" : " WHERE " + String.join(" OR ", orConditions);
+
+        return new WhereClause(sql, filterParameters);
+    }
+
+    private List<ColumnValue> getColumnValues(
+        List<ColumnSpec> columnSpecs, Map<String, Object> values, ValuePolicy valuePolicy,
+        Set<String> ignoredColumnNames) {
+
+        List<ColumnValue> columnValues = new ArrayList<>();
+        List<String> unknownColumnNames = new ArrayList<>();
+        Set<String> givenColumnNames = new HashSet<>();
+
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            String columnName = entry.getKey();
+            Object value = entry.getValue();
+
+            if ("id".equalsIgnoreCase(columnName)) {
+                if (valuePolicy == ValuePolicy.BULK_UPDATE) {
+                    throw new IllegalArgumentException(
+                        "The id column cannot be updated; add a condition on id to select the rows to change");
+                }
+
+                continue;
+            }
+
+            if (valuePolicy == ValuePolicy.BULK_UPDATE
+                && (value == null || (value instanceof String string && string.isBlank()))) {
+                throw new IllegalArgumentException(
+                    ("Value for column '%s' is empty; updating rows by conditions does not clear columns, use " +
+                        "Update Record to clear a column of a single record").formatted(columnName));
+            }
+
+            findColumnSpec(columnSpecs, columnName).ifPresentOrElse(
+                columnSpec -> {
+                    if (!givenColumnNames.add(columnSpec.name())) {
+                        throw new IllegalArgumentException(
+                            "Column '%s' is given more than once".formatted(columnSpec.name()));
+                    }
+
+                    columnValues.add(new ColumnValue(columnSpec, coerceValueStrictly(columnSpec, value, true)));
+                },
+                () -> unknownColumnNames.add(columnName));
+        }
+
+        if (!unknownColumnNames.isEmpty()) {
+            if (valuePolicy == ValuePolicy.BULK_UPDATE || columnValues.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Unknown column(s): %s; available columns: %s".formatted(
+                        String.join(", ", unknownColumnNames), String.join(", ", getNonIdColumnNames(columnSpecs))));
+            }
+
+            ignoredColumnNames.addAll(unknownColumnNames);
+        }
+
+        return columnValues;
+    }
+
+    private static void logIgnoredColumnNames(String baseName, long environmentId, Set<String> ignoredColumnNames) {
+        if (!ignoredColumnNames.isEmpty()) {
+            log.warn(
+                "Ignored values for unknown column(s) {} of data table '{}' in environment {}",
+                String.join(", ", ignoredColumnNames), baseName, environmentId);
+        }
+    }
+
+    private static List<String> getColumnNames(List<ColumnSpec> columnSpecs) {
+        return columnSpecs.stream()
+            .map(ColumnSpec::name)
+            .toList();
+    }
+
+    private static List<String> getNonIdColumnNames(List<ColumnSpec> columnSpecs) {
+        return columnSpecs.stream()
+            .map(ColumnSpec::name)
+            .filter(name -> !"id".equalsIgnoreCase(name))
+            .toList();
+    }
+
+    private void publishWebhookEvent(
+        String baseName, DataTableWebhookType dataTableWebhookType, List<DataTableRow> dataTableRows,
+        long environmentId) {
+
+        if (dataTableRows.isEmpty()) {
+            return;
+        }
+
+        applicationEventPublisher.publishEvent(
+            new DataTableWebhookEvent(baseName, dataTableWebhookType, dataTableRows, environmentId));
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<DataTableRow> selectRowsForUpdate(
+        String tableName, List<String> columnNames, WhereClause whereClause) {
+
+        String sql = "SELECT " + buildSelectColumns(columnNames) + " FROM " + tableName + whereClause.sql() +
+            " ORDER BY \"id\" FOR UPDATE";
+
+        return jdbcTemplate.query(
+            sql, preparedStatement -> setFilterParameters(preparedStatement, 1, whereClause.filterParameters()),
+            (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+    }
+
+    private int setColumnValues(PreparedStatement preparedStatement, int index, List<ColumnValue> columnValues)
+        throws SQLException {
+
+        int parameterIndex = index;
+
+        for (ColumnValue columnValue : columnValues) {
+            ColumnSpec columnSpec = columnValue.columnSpec();
+
+            setParam(preparedStatement, parameterIndex++, columnSpec.type(), columnValue.value());
+        }
+
+        return parameterIndex;
+    }
+
+    private int
+        setFilterParameters(PreparedStatement preparedStatement, int index, List<FilterParameter> filterParameters)
+            throws SQLException {
+
+        int parameterIndex = index;
+
+        for (FilterParameter filterParameter : filterParameters) {
+            if (filterParameter.value() instanceof Object[] values) {
+                setArrayParam(preparedStatement, parameterIndex++, filterParameter.columnType(), values);
+            } else {
+                setParam(preparedStatement, parameterIndex++, filterParameter.columnType(), filterParameter.value());
+            }
+        }
+
+        return parameterIndex;
+    }
+
+    private static void setArrayParam(PreparedStatement preparedStatement, int index, ColumnType type, Object[] values)
+        throws SQLException {
+
+        Object[] elements = new Object[values.length];
+
+        for (int elementIndex = 0; elementIndex < values.length; elementIndex++) {
+            elements[elementIndex] = toArrayElement(type, values[elementIndex]);
+        }
+
+        Connection connection = preparedStatement.getConnection();
+
+        Array array = connection.createArrayOf(getArrayElementTypeName(type), elements);
+
+        preparedStatement.setArray(index, array);
+    }
+
+    private static void setIds(PreparedStatement preparedStatement, int index, List<Long> ids) throws SQLException {
+        int parameterIndex = index;
+
+        for (List<Long> chunk : partition(ids)) {
+            setArrayParam(preparedStatement, parameterIndex++, ColumnType.INTEGER, chunk.toArray());
+        }
+    }
+
+    private static String buildAnyCondition(String column, int valueCount) {
+        int chunkCount = Math.max(1, (valueCount + MAX_ARRAY_PARAMETER_LENGTH - 1) / MAX_ARRAY_PARAMETER_LENGTH);
+
+        String condition = String.join(" OR ", Collections.nCopies(chunkCount, column + " = ANY(?)"));
+
+        return chunkCount == 1 ? condition : "(" + condition + ")";
+    }
+
+    private static <T> List<List<T>> partition(List<T> values) {
+        List<List<T>> chunks = new ArrayList<>();
+
+        for (int start = 0; start < values.size(); start += MAX_ARRAY_PARAMETER_LENGTH) {
+            chunks.add(values.subList(start, Math.min(start + MAX_ARRAY_PARAMETER_LENGTH, values.size())));
+        }
+
+        return chunks;
+    }
+
+    private static String getArrayElementTypeName(ColumnType type) {
+        return switch (type) {
+            case STRING -> "varchar";
+            case NUMBER -> "numeric";
+            case INTEGER -> "bigint";
+            case DATE -> "date";
+            case DATE_TIME -> "timestamp";
+            case BOOLEAN -> "boolean";
+        };
+    }
+
+    private static Object toArrayElement(ColumnType type, Object value) {
+        return switch (type) {
+            case STRING -> String.valueOf(value);
+            case NUMBER -> toBigDecimal((Number) value);
+            case INTEGER -> ((Number) value).longValue();
+            case DATE -> value instanceof java.sql.Date date ? date : new java.sql.Date(((Date) value).getTime());
+            case DATE_TIME -> switch (value) {
+                case LocalDateTime localDateTime -> localDateTime.toString();
+                case Timestamp timestamp -> timestamp;
+                default -> new Timestamp(((Date) value).getTime());
+            };
+            case BOOLEAN -> value;
+        };
+    }
+
+    private static List<DataTableRow> sortById(List<DataTableRow> dataTableRows) {
+        return dataTableRows.stream()
+            .sorted(Comparator.comparingLong(DataTableRow::id))
+            .toList();
     }
 
     private void validateBaseName(String baseName) {
@@ -491,16 +1024,370 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return "dt_" + environmentId + "_" + normalizedName;
     }
 
-    private void checkHasId(String physical) {
+    private String buildCondition(
+        ColumnSpec columnSpec, DataTableRowFilter filter, List<FilterParameter> filterParameters) {
+
+        String column = escapeIdentifier(columnSpec.name());
+        ColumnType columnType = columnSpec.type();
+        DataTableRowFilter.Operation operation = filter.operation();
+
+        if (operation.textOnly() && columnType != ColumnType.STRING) {
+            throw new IllegalArgumentException(
+                "Filter operation %s is only supported on text columns, but column '%s' is %s".formatted(
+                    operation, columnSpec.name(), columnType));
+        }
+
+        return switch (operation) {
+            case EQUALS -> addComparison(column, "=", columnSpec, filter, filterParameters);
+            case EQUALS_IGNORE_CASE -> {
+                filterParameters.add(
+                    new FilterParameter(ColumnType.STRING, coerceFilterValue(columnSpec, filter.singleValue())));
+
+                yield "LOWER(" + column + ") = LOWER(?)";
+            }
+            case NOT_EQUALS -> addComparison(column, "IS DISTINCT FROM", columnSpec, filter, filterParameters);
+            case GREATER -> addComparison(column, ">", columnSpec, filter, filterParameters);
+            case GREATER_EQUALS -> addComparison(column, ">=", columnSpec, filter, filterParameters);
+            case LESS -> addComparison(column, "<", columnSpec, filter, filterParameters);
+            case LESS_EQUALS -> addComparison(column, "<=", columnSpec, filter, filterParameters);
+            case CONTAINS -> addLike(column, "%", "%", false, columnSpec, filter, filterParameters);
+            case NOT_CONTAINS -> addLike(column, "%", "%", true, columnSpec, filter, filterParameters);
+            case STARTS_WITH -> addLike(column, "", "%", false, columnSpec, filter, filterParameters);
+            case ENDS_WITH -> addLike(column, "%", "", false, columnSpec, filter, filterParameters);
+            case IN -> {
+                List<Object> values = filter.values();
+
+                List<Object> coercedValues = values.stream()
+                    .map(value -> coerceFilterValue(columnSpec, value))
+                    .toList();
+
+                for (List<Object> chunk : partition(coercedValues)) {
+                    filterParameters.add(new FilterParameter(columnType, chunk.toArray()));
+                }
+
+                yield buildAnyCondition(column, coercedValues.size());
+            }
+            case BETWEEN -> {
+                List<Object> values = filter.values();
+
+                Object lowerValue = coerceFilterValue(columnSpec, values.getFirst());
+                Object upperValue = coerceFilterValue(columnSpec, values.getLast());
+
+                if (columnType != ColumnType.STRING && isGreater(lowerValue, upperValue)) {
+                    throw new IllegalArgumentException(
+                        "Filter on column '%s' with operation BETWEEN has Value %s after To Value %s".formatted(
+                            columnSpec.name(), values.getFirst(), values.getLast()));
+                }
+
+                filterParameters.add(new FilterParameter(columnType, lowerValue));
+                filterParameters.add(new FilterParameter(columnType, upperValue));
+
+                yield column + " BETWEEN ? AND ?";
+            }
+            case EMPTY -> columnType == ColumnType.STRING
+                ? "(" + column + " IS NULL OR " + column + " = '')" : column + " IS NULL";
+            case NOT_EMPTY -> columnType == ColumnType.STRING
+                ? "(" + column + " IS NOT NULL AND " + column + " <> '')" : column + " IS NOT NULL";
+        };
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private static boolean isGreater(Object value, Object otherValue) {
+        Class<?> valueClass = value.getClass();
+
+        return value instanceof Comparable comparable && valueClass.equals(otherValue.getClass())
+            && comparable.compareTo(otherValue) > 0;
+    }
+
+    private String addComparison(
+        String column, String comparisonOperator, ColumnSpec columnSpec, DataTableRowFilter filter,
+        List<FilterParameter> filterParameters) {
+
+        filterParameters.add(
+            new FilterParameter(columnSpec.type(), coerceFilterValue(columnSpec, filter.singleValue())));
+
+        return column + " " + comparisonOperator + " ?";
+    }
+
+    private String addLike(
+        String column, String prefix, String suffix, boolean negated, ColumnSpec columnSpec,
+        DataTableRowFilter filter, List<FilterParameter> filterParameters) {
+
+        Object rawValue = filter.singleValue();
+
+        String value = rawValue instanceof String string ? string : (String) coerceFilterValue(columnSpec, rawValue);
+
+        filterParameters.add(new FilterParameter(ColumnType.STRING, prefix + escapeLikePattern(value) + suffix));
+
+        if (negated) {
+            return "(" + column + " IS NULL OR " + column + " NOT LIKE ? ESCAPE '\\')";
+        }
+
+        return column + " LIKE ? ESCAPE '\\'";
+    }
+
+    private Object coerceFilterValue(ColumnSpec columnSpec, @Nullable Object rawValue) {
+        return Objects.requireNonNull(
+            coerceValueStrictly(columnSpec, rawValue, false), "filter values are checked by DataTableRowFilter");
+    }
+
+    private @Nullable Object coerceValueStrictly(
+        ColumnSpec columnSpec, @Nullable Object rawValue, boolean epochMillisecondsAllowed) {
+
+        if (rawValue == null) {
+            return null;
+        }
+
+        ColumnType columnType = columnSpec.type();
+
+        if (rawValue instanceof String string && string.isBlank()) {
+            return columnType == ColumnType.STRING ? "" : null;
+        }
+
+        if (rawValue instanceof Collection<?> || rawValue instanceof Map<?, ?> || isArray(rawValue)) {
+            throw new IllegalArgumentException(
+                "Value for column '%s' must be a single value, not a list or an object".formatted(columnSpec.name()));
+        }
+
+        boolean dateColumn = columnType == ColumnType.DATE || columnType == ColumnType.DATE_TIME;
+
+        if (dateColumn && isEpochLike(rawValue)) {
+            Object dateValue = epochMillisecondsAllowed ? fromEpochMilliseconds(columnType, rawValue) : null;
+
+            if (dateValue != null) {
+                return dateValue;
+            }
+
+            throw new IllegalArgumentException(
+                "Value '%s' is not a valid %s for column '%s'; use an ISO format such as %s".formatted(
+                    rawValue, columnType == ColumnType.DATE ? "date" : "date_time", columnSpec.name(),
+                    columnType == ColumnType.DATE ? "2026-01-31" : "2026-01-31T08:00:00"));
+        }
+
+        Object coercedValue = switch (columnType) {
+            case BOOLEAN -> toBoolean(rawValue);
+            case INTEGER -> toLong(rawValue);
+            case NUMBER -> toNumber(rawValue);
+            case DATE -> toDate(rawValue);
+            case DATE_TIME -> toTimestamp(rawValue);
+            default -> coerceValue(columnType, rawValue);
+        };
+
+        if (coercedValue == null) {
+            throw new IllegalArgumentException(
+                "Value '%s' is not a valid %s for column '%s'".formatted(
+                    rawValue, columnType.name()
+                        .toLowerCase(Locale.ROOT),
+                    columnSpec.name()));
+        }
+
+        return coercedValue;
+    }
+
+    private static boolean isArray(Object value) {
+        Class<?> valueClass = value.getClass();
+
+        return valueClass.isArray();
+    }
+
+    private @Nullable Object toNumber(Object rawValue) {
+        try {
+            return coerceValue(ColumnType.NUMBER, rawValue);
+        } catch (NumberFormatException numberFormatException) {
+            return null;
+        }
+    }
+
+    private static @Nullable Object fromEpochMilliseconds(ColumnType columnType, Object rawValue) {
+        if (rawValue instanceof Boolean) {
+            return null;
+        }
+
+        Long epochMilliseconds = toLong(rawValue);
+
+        if (epochMilliseconds == null || Math.abs(epochMilliseconds) < MIN_EPOCH_MILLISECONDS) {
+            return null;
+        }
+
+        LocalDateTime dateTime;
+
+        try {
+            dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMilliseconds), ZoneOffset.UTC);
+        } catch (DateTimeException dateTimeException) {
+            return null;
+        }
+
+        return columnType == ColumnType.DATE ? java.sql.Date.valueOf(dateTime.toLocalDate()) : dateTime;
+    }
+
+    private static Instant toInstant(Date date) {
+        if (date instanceof Timestamp timestamp) {
+            return timestamp.toInstant();
+        }
+
+        return Instant.ofEpochMilli(date.getTime());
+    }
+
+    private @Nullable Object toDate(Object rawValue) {
+        if (rawValue instanceof java.sql.Date sqlDate) {
+            return sqlDate;
+        }
+
+        if (rawValue instanceof Date date) {
+            return java.sql.Date.valueOf(LocalDate.ofInstant(toInstant(date), ZoneOffset.UTC));
+        }
+
+        String value = String.valueOf(rawValue)
+            .trim();
+
+        for (DateTimeFormatter dateTimeFormatter : STRICT_DATE_FORMATTERS) {
+            LocalDate localDate = parseOrNull(value, dateTimeFormatter, LocalDate::from);
+
+            if (localDate != null) {
+                return java.sql.Date.valueOf(localDate);
+            }
+        }
+
+        TemporalAccessor dateTime = parseDateTimeStrictly(value);
+
+        if (dateTime == null) {
+            return null;
+        }
+
+        if (dateTime.query(TemporalQueries.zone()) != null) {
+            return java.sql.Date.valueOf(LocalDate.ofInstant(Instant.from(dateTime), ZoneOffset.UTC));
+        }
+
+        return java.sql.Date.valueOf(LocalDate.from(dateTime));
+    }
+
+    private @Nullable Object toTimestamp(Object rawValue) {
+        if (rawValue instanceof Date date) {
+            return LocalDateTime.ofInstant(toInstant(date), ZoneOffset.UTC);
+        }
+
+        TemporalAccessor dateTime = parseDateTimeStrictly(
+            String.valueOf(rawValue)
+                .trim());
+
+        if (dateTime == null) {
+            return null;
+        }
+
+        if (dateTime.query(TemporalQueries.zone()) != null) {
+            return LocalDateTime.ofInstant(Instant.from(dateTime), ZoneOffset.UTC);
+        }
+
+        return LocalDateTime.from(dateTime);
+    }
+
+    private static @Nullable TemporalAccessor parseDateTimeStrictly(String value) {
+        for (DateTimeFormatter dateTimeFormatter : STRICT_DATE_TIME_FORMATTERS) {
+            TemporalAccessor dateTime = parseOrNull(value, dateTimeFormatter, temporalAccessor -> temporalAccessor);
+
+            if (dateTime != null) {
+                return dateTime;
+            }
+        }
+
+        return null;
+    }
+
+    private static <T> @Nullable T parseOrNull(String value, DateTimeFormatter formatter, TemporalQuery<T> query) {
+        try {
+            return formatter.parse(value, query);
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
+    }
+
+    private static boolean isEpochLike(Object rawValue) {
+        if (rawValue instanceof Number || rawValue instanceof Boolean) {
+            return true;
+        }
+
+        if (rawValue instanceof CharSequence charSequence) {
+            String value = String.valueOf(charSequence);
+
+            return EPOCH_PATTERN.matcher(value.trim())
+                .matches();
+        }
+
+        return false;
+    }
+
+    private static @Nullable Boolean toBoolean(Object rawValue) {
+        if (rawValue instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+
+        String value = String.valueOf(rawValue)
+            .trim()
+            .toLowerCase(Locale.ROOT);
+
+        return switch (value) {
+            case "true", "t", "yes", "y", "1" -> Boolean.TRUE;
+            case "false", "f", "no", "n", "0" -> Boolean.FALSE;
+            default -> null;
+        };
+    }
+
+    private static @Nullable Long toLong(Object rawValue) {
+        try {
+            BigDecimal decimal = (rawValue instanceof Number number)
+                ? toBigDecimal(number) : new BigDecimal(String.valueOf(rawValue)
+                    .trim());
+
+            return decimal.longValueExact();
+        } catch (ArithmeticException | NumberFormatException exception) {
+            return null;
+        }
+    }
+
+    private static String escapeLikePattern(String value) {
+        return value.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+    }
+
+    private static Optional<ColumnSpec> findColumnSpec(List<ColumnSpec> columnSpecs, String columnName) {
+        return columnSpecs.stream()
+            .filter(columnSpec -> {
+                String name = columnSpec.name();
+
+                return name.equalsIgnoreCase(columnName);
+            })
+            .findFirst();
+    }
+
+    private static ColumnSpec getColumnSpec(List<ColumnSpec> columnSpecs, String columnName) {
+        return findColumnSpec(columnSpecs, columnName)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Unknown column: %s; available columns: %s".formatted(
+                    columnName, String.join(", ", getColumnNames(columnSpecs)))));
+    }
+
+    private void checkHasId(String baseName, String physicalName) {
         String sql =
             "SELECT 1 FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = ? AND " +
                 "column_name = 'id'";
 
-        List<Integer> exists = jdbcTemplate.query(sql, ps -> ps.setString(1, physical), (rs, rowNum) -> 1);
+        List<Integer> exists = jdbcTemplate.query(
+            sql, preparedStatement -> preparedStatement.setString(1, physicalName), (resultSet, rowNum) -> 1);
 
-        if (exists.isEmpty()) {
-            throw new IllegalStateException("Table does not have primary key column 'id': " + physical);
+        if (!exists.isEmpty()) {
+            return;
         }
+
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+
+        if (columnSpecs.isEmpty()) {
+            throw new IllegalArgumentException("Table '%s' not found".formatted(baseName));
+        }
+
+        throw new IllegalStateException("Table does not have primary key column 'id': " + physicalName);
     }
 
     private Object coerceValue(ColumnType type, Object rawValue) {
@@ -546,16 +1433,6 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         };
     }
 
-    private Map<String, ColumnType> columnTypeMap(String physicalName) {
-        Map<String, ColumnType> columnTypeMap = new HashMap<>();
-
-        for (ColumnSpec columnSpec : listColumns(physicalName)) {
-            columnTypeMap.put(StringUtils.lowerCase(columnSpec.name()), columnSpec.type());
-        }
-
-        return columnTypeMap;
-    }
-
     private String escapeIdentifier(String identifier) {
         Assert.hasText(identifier, "identifier must not be empty");
 
@@ -566,29 +1443,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return '"' + normalizedName + '"';
     }
 
-    private Object getValueCaseInsensitive(Map<String, Object> values, String columnName) {
-        if (values.containsKey(columnName)) {
-            return values.get(columnName);
-        }
-
-        String lowerCaseColumnName = columnName.toLowerCase(Locale.ROOT);
-
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            String key = entry.getKey();
-
-            if (lowerCaseColumnName.equals(key.toLowerCase(Locale.ROOT))) {
-                return entry.getValue();
-            }
-        }
-
-        return null;
-    }
-
     private static DataTableRow toDataTableRow(ResultSet resultSet, List<String> columnNames) throws SQLException {
         Map<String, Object> values = new HashMap<>();
 
         for (String columnName : columnNames) {
-            values.put(columnName, resultSet.getObject(columnName));
+            Object value = resultSet.getObject(columnName);
+
+            if (value instanceof Timestamp) {
+                value = resultSet.getTimestamp(columnName, Calendar.getInstance(UTC_TIME_ZONE));
+            }
+
+            values.put(columnName, value);
         }
 
         return new DataTableRow(resultSet.getLong("id"), values);
@@ -598,12 +1463,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String sql = "SELECT column_name, data_type FROM information_schema.columns " +
             "WHERE table_schema = current_schema() AND table_name = ? ORDER BY ordinal_position";
 
-        return jdbcTemplate.query(sql, ps -> ps.setString(1, physicalName), (rs, rowNum) -> {
-            String name = rs.getString("column_name");
-            String dataType = rs.getString("data_type");
+        return jdbcTemplate.query(sql, preparedStatement -> preparedStatement.setString(1, physicalName),
+            (resultSet, rowNum) -> {
+                String name = resultSet.getString("column_name");
+                String dataType = resultSet.getString("data_type");
 
-            return new ColumnSpec(name, mapType(dataType));
-        });
+                return new ColumnSpec(name, mapType(dataType));
+            });
     }
 
     private ColumnType mapType(String pgType) {
@@ -635,7 +1501,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
     }
 
-    private void setParam(PreparedStatement ps, int index, ColumnType type, Object value) throws SQLException {
+    private void setParam(PreparedStatement preparedStatement, int index, ColumnType type, Object value)
+        throws SQLException {
         if (value == null) {
             int sqlType = switch (type) {
                 case STRING -> Types.VARCHAR;
@@ -646,46 +1513,50 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 case BOOLEAN -> Types.BOOLEAN;
             };
 
-            ps.setNull(index, sqlType);
+            preparedStatement.setNull(index, sqlType);
 
             return;
         }
 
         switch (type) {
-            case STRING -> ps.setString(index, String.valueOf(value));
+            case STRING -> preparedStatement.setString(index, String.valueOf(value));
             case NUMBER ->
-                ps.setBigDecimal(index, (value instanceof BigDecimal bd) ? bd : toBigDecimal((Number) value));
+                preparedStatement.setBigDecimal(index,
+                    (value instanceof BigDecimal bigDecimal) ? bigDecimal : toBigDecimal((Number) value));
             case INTEGER -> {
                 switch (value) {
-                    case Integer integer -> ps.setInt(index, integer);
-                    case Long aLong -> ps.setLong(index, aLong);
-                    case Number number -> ps.setLong(index, number.longValue());
-                    default -> ps.setObject(index, value, Types.BIGINT);
+                    case Integer integer -> preparedStatement.setInt(index, integer);
+                    case Long longValue -> preparedStatement.setLong(index, longValue);
+                    case Number number -> preparedStatement.setLong(index, number.longValue());
+                    default -> preparedStatement.setObject(index, value, Types.BIGINT);
                 }
             }
             case DATE -> {
-                if (value instanceof java.sql.Date d)
-                    ps.setDate(index, d);
-                else if (value instanceof Date d)
-                    ps.setDate(index, new java.sql.Date(d.getTime()));
-                else
-                    ps.setDate(index, DateUtils.parseSqlDate(String.valueOf(value)));
+                if (value instanceof java.sql.Date sqlDate) {
+                    preparedStatement.setDate(index, sqlDate);
+                } else if (value instanceof Date date) {
+                    preparedStatement.setDate(index, new java.sql.Date(date.getTime()));
+                } else {
+                    preparedStatement.setDate(index, DateUtils.parseSqlDate(String.valueOf(value)));
+                }
             }
             case DATE_TIME -> {
-                if (value instanceof Timestamp t)
-                    ps.setTimestamp(index, t);
-                else if (value instanceof Date d)
-                    ps.setTimestamp(index, new Timestamp(d.getTime()));
-                else
-                    ps.setTimestamp(
-                        index,
-                        DateUtils.parseSqlTimestamp(String.valueOf(value)));
+                if (value instanceof LocalDateTime localDateTime) {
+                    preparedStatement.setObject(index, localDateTime);
+                } else if (value instanceof Timestamp timestamp) {
+                    preparedStatement.setTimestamp(index, timestamp);
+                } else if (value instanceof Date date) {
+                    preparedStatement.setTimestamp(index, new Timestamp(date.getTime()));
+                } else {
+                    preparedStatement.setTimestamp(index, DateUtils.parseSqlTimestamp(String.valueOf(value)));
+                }
             }
             case BOOLEAN -> {
-                if (value instanceof Boolean b)
-                    ps.setBoolean(index, b);
-                else
-                    ps.setBoolean(index, Boolean.parseBoolean(String.valueOf(value)));
+                if (value instanceof Boolean booleanValue) {
+                    preparedStatement.setBoolean(index, booleanValue);
+                } else {
+                    preparedStatement.setBoolean(index, Boolean.parseBoolean(String.valueOf(value)));
+                }
             }
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         }
@@ -733,7 +1604,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             returningColumns;
 
         List<DataTableRow> deletedDataTableRows = jdbcTemplate.query(
-            sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+            sql, preparedStatement -> preparedStatement.setLong(1, id),
+            (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
         return deletedDataTableRows.isEmpty() ? null : deletedDataTableRows.getFirst();
     }
@@ -750,7 +1622,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
 
-        int deletedRowCount = jdbcTemplate.update(sql, (PreparedStatementSetter) ps -> ps.setLong(1, id));
+        int deletedRowCount =
+            jdbcTemplate.update(sql, (PreparedStatementSetter) preparedStatement -> preparedStatement.setLong(1, id));
 
         return deletedRowCount == 0 ? null : dataTableRow;
     }
@@ -862,5 +1735,20 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             sql, preparedStatementSetter, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
         return updatedDataTableRows.isEmpty() ? null : updatedDataTableRows.getFirst();
+    }
+
+    private record ColumnValue(ColumnSpec columnSpec, @Nullable Object value) {
+    }
+
+    private record FilterParameter(ColumnType columnType, Object value) {
+    }
+
+    private enum ValuePolicy {
+
+        SINGLE_ROW,
+        BULK_UPDATE
+    }
+
+    private record WhereClause(String sql, List<FilterParameter> filterParameters) {
     }
 }
