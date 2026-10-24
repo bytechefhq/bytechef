@@ -30,8 +30,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -603,10 +605,26 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     private void stubComponent(String name, String title, boolean connectionRequired) {
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+        List<ClusterElementDefinition> clusterElementDefinitions = switch (name) {
+            case "aiAgent" -> List.of(clusterElementDefinition("chat", "tools"));
+            case "httpClient" -> List.of(clusterElementDefinition("get", "tools"));
+            case "openAi" -> List.of(clusterElementDefinition("model", "model"));
+            default -> List.of();
+        };
 
+        when(componentDefinition.getClusterElements()).thenReturn(clusterElementDefinitions);
         when(componentDefinition.getTitle()).thenReturn(title);
         when(componentDefinition.isConnectionRequired()).thenReturn(connectionRequired);
         when(componentDefinitionService.getComponentDefinition(name, 1)).thenReturn(componentDefinition);
+    }
+
+    private static ClusterElementDefinition clusterElementDefinition(String name, String slotKey) {
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getName()).thenReturn(name);
+        when(clusterElementDefinition.getType()).thenReturn(new ClusterElementType(slotKey, slotKey, slotKey, false));
+
+        return clusterElementDefinition;
     }
 
     private static ActionDefinition actionDefinition(ComponentDsl.ModifiableStringProperty... properties) {
