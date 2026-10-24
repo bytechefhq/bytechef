@@ -20,6 +20,7 @@ import com.agui.core.event.ToolCallStartEvent;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -98,6 +99,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
     private final Object dispatchLock = new Object();
     private Long pendingJobId;
     private final StringBuilder assistantTextBuilder = new StringBuilder();
+    private volatile @Nullable Map<?, ?> askedQuestion;
 
     /**
      * @param threadId       the chat's thread id, also the {@link WebhookResumeRegistry} key
@@ -139,6 +141,16 @@ public class AgUiStreamBridge implements SseStreamBridge {
         }
 
         return assistantTextBuilder.toString();
+    }
+
+    /**
+     * Returns the last {@code ask_user_question} event relayed through this bridge, or null when the workflow asked
+     * nothing. Used to persist the question with the turn.
+     */
+    public @Nullable Map<?, ?> getAskedQuestion() {
+        Map<?, ?> currentAskedQuestion = askedQuestion;
+
+        return currentAskedQuestion == null ? null : Collections.unmodifiableMap(currentAskedQuestion);
     }
 
     @Override
@@ -282,6 +294,8 @@ public class AgUiStreamBridge implements SseStreamBridge {
     }
 
     private void onAskUserQuestion(Map<?, ?> map) {
+        askedQuestion = map;
+
         if (map.get("resumeUrl") instanceof String resumeUrl && !resumeUrl.isBlank()) {
             resumeRegistry.register(threadId, resumeUrl);
         } else {

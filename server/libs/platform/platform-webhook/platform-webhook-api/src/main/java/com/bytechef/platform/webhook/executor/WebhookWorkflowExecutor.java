@@ -22,6 +22,7 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -73,6 +74,28 @@ public interface WebhookWorkflowExecutor {
      */
     @Nullable
     Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+
+    /**
+     * Executes a webhook workflow synchronously like {@link #executeSync(WorkflowExecutionId, WebhookRequest)},
+     * reporting the id of each job it starts to {@code jobIdListener} before waiting on it, so the caller can stop the
+     * run with {@link #stopSyncJob(long)} while this call blocks.
+     *
+     * @param workflowExecutionId the unique identifier of the workflow execution
+     * @param webhookRequest      the webhook request relevant to the execution
+     * @param jobIdListener       receives the id of each job the execution starts
+     * @return the result of the synchronous execution, or {@code null} if no result is returned
+     */
+    @Nullable
+    Object executeSync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, LongConsumer jobIdListener);
+
+    /**
+     * Stops a job that {@link #executeSync(WorkflowExecutionId, WebhookRequest, LongConsumer)} started. A synchronous
+     * job runs on its own coordinator, so it is stopped here rather than through the platform's job facade.
+     *
+     * @param jobId the id reported to the {@code jobIdListener}
+     */
+    void stopSyncJob(long jobId);
 
     /**
      * Executes a workflow with streaming output. Events are pushed to {@code sseStreamBridge} as the workflow runs;

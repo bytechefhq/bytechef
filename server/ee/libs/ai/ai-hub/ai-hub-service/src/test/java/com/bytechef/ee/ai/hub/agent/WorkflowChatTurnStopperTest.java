@@ -42,7 +42,7 @@ class WorkflowChatTurnStopperTest {
         TenantContext.resetCurrentTenantId();
 
         jobFacade = mock(JobFacade.class);
-        stopper = new WorkflowChatTurnStopper(CHAT_ID, TURN_TENANT_ID, jobFacade);
+        stopper = new WorkflowChatTurnStopper(CHAT_ID, TURN_TENANT_ID, jobFacade::stopJob);
     }
 
     @AfterEach
