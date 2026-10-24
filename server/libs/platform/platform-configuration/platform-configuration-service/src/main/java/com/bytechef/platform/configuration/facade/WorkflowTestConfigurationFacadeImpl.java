@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.exception.ConfigurationException;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -130,13 +132,46 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        validateConnection(workflowNodeName, workflowConnectionKey, connectionId, workflow);
+        ComponentConnection clusterElementComponentConnection = fetchClusterElementComponentConnection(
+            workflow, workflowNodeName);
 
-        boolean workflowNodeTrigger = WorkflowTrigger.fetch(workflow, workflowNodeName)
+        String rootWorkflowNodeName = clusterElementComponentConnection == null
+            ? workflowNodeName : clusterElementComponentConnection.workflowNodeName();
+        String rootWorkflowConnectionKey = clusterElementComponentConnection == null
+            ? workflowConnectionKey : clusterElementComponentConnection.key();
+
+        validateConnection(rootWorkflowNodeName, rootWorkflowConnectionKey, connectionId, workflow);
+
+        boolean workflowNodeTrigger = WorkflowTrigger.fetch(workflow, rootWorkflowNodeName)
             .isPresent();
 
         workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, connectionId, workflowNodeTrigger, environmentId);
+            workflowId, rootWorkflowNodeName, rootWorkflowConnectionKey, connectionId, workflowNodeTrigger,
+            environmentId);
+    }
+
+    private @Nullable ComponentConnection fetchClusterElementComponentConnection(
+        Workflow workflow, String workflowNodeName) {
+
+        if (WorkflowTrigger.fetch(workflow, workflowNodeName)
+            .isPresent()) {
+
+            return null;
+        }
+
+        List<WorkflowTask> workflowTasks = workflow.getTasks(true);
+
+        if (CollectionUtils.anyMatch(workflowTasks, workflowTask -> workflowNodeName.equals(workflowTask.getName()))) {
+            return null;
+        }
+
+        return workflowTasks.stream()
+            .flatMap(workflowTask -> componentConnectionFacade.getComponentConnections(workflowTask)
+                .stream())
+            .filter(componentConnection -> workflowNodeName.equals(componentConnection.key()) &&
+                !workflowNodeName.equals(componentConnection.workflowNodeName()))
+            .findFirst()
+            .orElse(null);
     }
 
     @Override
