@@ -72,15 +72,26 @@ class PlatformApiKeyAuthenticationProviderTest {
             .hasMessage("Admin API key required");
     }
 
+    @Test
+    void testAuthenticateRejectsAnApiKeyWithoutOwner() {
+        assertThatThrownBy(() -> newProvider(null, null).authenticate(newToken()))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("API key has no owner");
+    }
+
     private static PlatformApiKeyAuthenticationToken newToken() {
         return new PlatformApiKeyAuthenticationToken((int) ENVIRONMENT_ID, SECRET_KEY, "public");
     }
 
     private static PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType) {
+        return newProvider(platformType, 1L);
+    }
+
+    private static PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType, Long userId) {
         ApiKey apiKey = mock(ApiKey.class);
 
         when(apiKey.getType()).thenReturn(platformType);
-        when(apiKey.getUserId()).thenReturn(1L);
+        when(apiKey.getUserId()).thenReturn(userId);
 
         ApiKeyService apiKeyService = mock(ApiKeyService.class);
 
