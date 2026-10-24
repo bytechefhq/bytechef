@@ -120,6 +120,7 @@ const LoadWorkflowVersionDialog = ({onClose, projectId, workflowUuid}: LoadWorkf
                                                 <span className="text-sm font-semibold">{`V${version}`}</span>
 
                                                 <Badge
+                                                    className="border-transparent"
                                                     icon={<SendIcon />}
                                                     label="Published"
                                                     styleType="success-outline"

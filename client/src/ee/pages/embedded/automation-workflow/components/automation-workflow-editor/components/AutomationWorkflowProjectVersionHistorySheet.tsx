@@ -55,6 +55,7 @@ const AutomationWorkflowProjectVersionHistorySheet = ({
                                             )}
 
                                             <Badge
+                                                className="border-transparent"
                                                 label={projectVersion.status}
                                                 styleType={
                                                     projectVersion.status === 'PUBLISHED'

@@ -192,7 +192,11 @@ const AutomationWorkflowProjectListItem = ({
                             )}
 
                             {project.published ? (
-                                <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
+                                <Badge
+                                    className="flex space-x-1 border-transparent"
+                                    styleType="success-outline"
+                                    weight="semibold"
+                                >
                                     <span>V{project.lastPublishedVersion}</span>
 
                                     <span>PUBLISHED</span>

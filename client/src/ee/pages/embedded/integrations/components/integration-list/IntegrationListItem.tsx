@@ -283,7 +283,11 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                             <div className="flex flex-col items-end gap-y-2">
                                 <div className="flex min-h-8 items-center">
                                     {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
-                                        <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
+                                        <Badge
+                                            className="flex space-x-1 border-transparent"
+                                            styleType="success-outline"
+                                            weight="semibold"
+                                        >
                                             <span>V{integration.lastIntegrationVersion - 1}</span>
 
                                             <span>PUBLISHED</span>

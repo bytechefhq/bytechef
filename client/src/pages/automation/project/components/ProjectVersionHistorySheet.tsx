@@ -139,6 +139,7 @@ const ProjectVersionHistorySheet = ({
                                         <div className="flex items-center gap-x-2">
                                             {published ? (
                                                 <Badge
+                                                    className="border-transparent"
                                                     icon={<SendIcon />}
                                                     label="Published"
                                                     styleType="success-outline"
