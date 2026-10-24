@@ -46,6 +46,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -81,6 +82,7 @@ public final class AiHubAgentFixtures {
     public final AiHubChatService chatService = mock(AiHubChatService.class);
     public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
     public final ChatModel chatModel = mock(ChatModel.class);
+    public final ComponentTools componentTools = mock(ComponentTools.class);
     public final AiHubToolApprovalPolicy policy = mock(AiHubToolApprovalPolicy.class);
     public final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
     public final ProjectFacade projectFacade = mock(ProjectFacade.class);
@@ -183,6 +185,7 @@ public final class AiHubAgentFixtures {
 
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools, workflowExecutionTools,
+            componentToolsProvider(),
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
             chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
@@ -195,6 +198,7 @@ public final class AiHubAgentFixtures {
 
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools, workflowExecutionTools,
+            componentToolsProvider(),
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
             artifactRecorder,
@@ -228,6 +232,15 @@ public final class AiHubAgentFixtures {
             return null;
         }).when(provider)
             .ifAvailable(any());
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectProvider<ComponentTools> componentToolsProvider() {
+        ObjectProvider<ComponentTools> provider = mock(ObjectProvider.class);
+
+        when(provider.getIfAvailable()).thenReturn(componentTools);
 
         return provider;
     }

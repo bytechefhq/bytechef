@@ -41,10 +41,10 @@ class AiHubConfigurationToolSetTest {
             .contains(
                 "listProjects", "getWorkflow", "listProjectDeployments", "listConnectionsForComponent",
                 "askUserQuestion", "openWorkflowTab", "openWorkflowChatTab", "listWorkflowExecutions",
-                "getWorkflowExecution")
+                "getWorkflowExecution", "getAction", "getTrigger", "getClusterElement")
             .doesNotContain(
                 "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-                "updateWorkflow", "listChatWorkflows", "createWorkflowChat");
+                "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
     }
 
     @Test

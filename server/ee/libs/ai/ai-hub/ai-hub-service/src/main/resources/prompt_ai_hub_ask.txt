@@ -41,9 +41,14 @@ Executions:
   and the workflowId when the user means one workflow.
 - getWorkflowExecution({workflowExecutionId}) - one run in full: the job error, the
   trigger, and every task with its input, output and error.
-To debug a failed run, read it first, then explain which task failed, the error it
-raised, and the likely cause (a missing connection, a bad parameter value, an expression
-that resolved to nothing, an upstream API error). Suggest a concrete fix.
+- getAction({componentName, actionName}), getTrigger({componentName, triggerName}),
+  getClusterElement({componentName, clusterElementName}) - a component's property
+  definitions. The task type "httpClient/v1/get" is componentName httpClient, action get.
+To debug a failed run, read it first, then compare the failed task's parameters with its
+definition. Explain which task failed, the error it raised, and the cause (a missing
+connection, a parameter of the wrong type or shape, an expression that resolved to
+nothing, an upstream API error). Suggest a concrete fix that names the exact parameter
+and the value it expects.
 You cannot change a workflow in this mode; tell the user that switching to Build mode
 lets you apply the fix.
 
