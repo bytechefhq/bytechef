@@ -118,15 +118,15 @@ arriving soon was not helping a reader.
 | [`/developer-guide/architecture`](/developer-guide/architecture) | **AI & Agents** | **all commented out** |
 | [`/platform/automation/ai/skills`](/platform/automation/ai/skills) | Create With AI; The Skills Copilot; Skills as Tools for Other Agents; Test with Evals | rendered |
 | [`/platform/automation/build/connections`](/platform/automation/build/connections) | Get Started; Managing Connections | rendered |
-| [`/platform/automation/build/workflows/ai/agent`](/platform/automation/build/workflows/ai/agent) | Chat Memory Slot; Chat memory vs Auto Memory; Guardrails Slot; The Agent Utils toolset; Test with Evals; **Realtime Chat** | **1 of 6 commented out** |
+| [`/platform/automation/build/workflows/ai/agent`](/platform/automation/build/workflows/ai/agent) | Chat Memory Slot; Chat memory vs Auto Memory; Guardrails Slot; Seeing which tools ran; The Agent Utils toolset; Test with Evals; **Realtime Chat** | **1 of 7 commented out** |
 | [`/platform/automation/build/workflows/ai/agent/agent-utils`](/platform/automation/build/workflows/ai/agent/agent-utils) | Ask User Question; Agent Client; Auto Memory | rendered |
 | [`/platform/automation/build/workflows/flow-controls`](/platform/automation/build/workflows/flow-controls) | (page intro); Outputs; Graph | rendered |
 | [`/platform/automation/build/workflows/human-in-the-loop`](/platform/automation/build/workflows/human-in-the-loop) | Coming soon: expanded approvals | rendered |
 | [`/platform/automation/build/workflows/projects`](/platform/automation/build/workflows/projects) | New Code Workflow; Share Projects and Workflows as Templates | rendered |
-| [`/platform/automation/build/workflows/workflows`](/platform/automation/build/workflows/workflows) | Multiple triggers; Stream data in bulk; Add Sticky Notes; Canvas Controls; Test with Chat (**voice half commented out**) | **1 of 5 partly commented out** |
+| [`/platform/automation/build/workflows/workflows`](/platform/automation/build/workflows/workflows) | Multiple triggers; Stream data in bulk; Add Sticky Notes; Canvas Controls; Run, Test, and the Output panel; Test with Chat (**voice half commented out**) | **1 of 6 partly commented out** |
 | [`/platform/automation/data/data-tables`](/platform/automation/data/data-tables) | Storage limits | rendered |
 | [`/platform/automation/data/knowledge-base/add-documents`](/platform/automation/data/knowledge-base/add-documents) | Storage limits | rendered |
-| [`/platform/automation/monitor/workflow-executions`](/platform/automation/monitor/workflow-executions) | Retention; Reading executions programmatically | rendered |
+| [`/platform/automation/monitor/workflow-executions`](/platform/automation/monitor/workflow-executions) | What the detail view shows; Retention; Reading executions programmatically | rendered |
 | [`/platform/embedded/build/app-events`](/platform/embedded/build/app-events) | Firing an App Event from your application | rendered |
 | [`/platform/embedded/build/integrations`](/platform/embedded/build/integrations) | AI Copilot | rendered |
 | [`/platform/embedded/build/workflows`](/platform/embedded/build/workflows) | AI Copilot | rendered |
