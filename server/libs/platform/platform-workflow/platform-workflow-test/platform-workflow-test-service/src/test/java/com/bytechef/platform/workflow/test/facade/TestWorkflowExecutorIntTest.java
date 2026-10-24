@@ -533,6 +533,87 @@ class TestWorkflowExecutorIntTest {
     }
 
     @Test
+    void executeAsyncForwardsEachCallsOwnDatesAndError() throws Exception {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "agent", "type": "testComponent/v1/block", "parameters": {"gate": "agent"}}
+                    ]
+                }
+                """);
+
+        RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
+
+        CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
+            () -> testWorkflowExecutor.executeAsync(
+                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                (key, future) -> future.join(), key -> {}));
+
+        TaskGate taskGate = taskGates.get("agent");
+
+        assertThat(taskGate.awaitEntered(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+        assertThat(sseStreamBridge.awaitEvent(isEvent("task_started"), TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+
+        long jobId = getStartedJobId(sseStreamBridge);
+
+        List<Map<String, Object>> taskStartedPayloads = getTaskEventPayloads(sseStreamBridge, "task_started");
+
+        Map<String, Object> taskStartedPayload = taskStartedPayloads.getFirst();
+
+        long taskExecutionId = Long.parseLong((String) taskStartedPayload.get("taskExecutionId"));
+
+        ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
+
+        try {
+            ClusterElementCallRef firstClusterElementCallRef = clusterElementCallRecorder.callStarted(
+                jobId, taskExecutionId, "agent_1", "tool", "search", null, "{\"q\":\"first\"}");
+
+            clusterElementCallRecorder.callFailed(jobId, taskExecutionId, firstClusterElementCallRef, "first failed");
+
+            TimeUnit.MILLISECONDS.sleep(20);
+
+            ClusterElementCallRef secondClusterElementCallRef = clusterElementCallRecorder.callStarted(
+                jobId, taskExecutionId, "agent_1", "tool", "search", null, "{\"q\":\"second\"}");
+
+            clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, secondClusterElementCallRef, "done");
+
+            assertThat(
+                sseStreamBridge.awaitEventCount(isClusterElementEvent(), 4, TIMEOUT_SECONDS, TimeUnit.SECONDS))
+                    .isTrue();
+
+            taskGate.release();
+
+            executeAsyncFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } finally {
+            clusterElementCallRecorder.drain(taskExecutionId);
+        }
+
+        List<Map<String, Object>> clusterElementPayloads = getClusterElementEventPayloads(sseStreamBridge);
+
+        assertThat(clusterElementPayloads).hasSize(4);
+
+        Map<String, Object> firstStartedPayload = clusterElementPayloads.get(0);
+        Map<String, Object> firstFailedPayload = clusterElementPayloads.get(1);
+        Map<String, Object> secondStartedPayload = clusterElementPayloads.get(2);
+        Map<String, Object> secondCompletedPayload = clusterElementPayloads.get(3);
+
+        assertThat(firstFailedPayload).containsEntry("callError", "first failed")
+            .containsKey("callEndDate")
+            .doesNotContainKey("input");
+        assertThat(secondStartedPayload.get("callStartDate"))
+            .isNotEqualTo(firstStartedPayload.get("callStartDate"));
+        assertThat(secondStartedPayload).doesNotContainKey("callEndDate")
+            .doesNotContainKey("callError")
+            .containsEntry("input", "{\"q\":\"second\"}");
+        assertThat(secondCompletedPayload).containsEntry("callStartDate", secondStartedPayload.get("callStartDate"))
+            .containsKey("callEndDate")
+            .containsEntry("output", "done")
+            .doesNotContainKey("callError")
+            .doesNotContainKey("input");
+    }
+
+    @Test
     void executeAsyncSendsStartAndResultEvents() {
         String workflowId = createWorkflow(getEchoWorkflowDefinition());
 
@@ -805,6 +886,20 @@ class TestWorkflowExecutorIntTest {
         return Long.parseLong((String) payload.get("jobId"));
     }
 
+    private static List<Map<String, Object>> getClusterElementEventPayloads(RecordingSseStreamBridge sseStreamBridge) {
+        List<Map<String, Object>> payloads = new ArrayList<>();
+
+        for (Object payload : sseStreamBridge.getPayloads()) {
+            if (isClusterElementEvent().test(payload)) {
+                Map<?, ?> event = (Map<?, ?>) payload;
+
+                payloads.add(toObjectMap((Map<?, ?>) event.get("payload")));
+            }
+        }
+
+        return payloads;
+    }
+
     private static List<Map<String, Object>> getTaskEventPayloads(
         RecordingSseStreamBridge sseStreamBridge, String eventName) {
 
@@ -825,6 +920,11 @@ class TestWorkflowExecutorIntTest {
         }
 
         return objectMap;
+    }
+
+    private static Predicate<Object> isClusterElementEvent() {
+        return payload -> payload instanceof Map<?, ?> map && map.get("event") instanceof String eventName &&
+            eventName.startsWith("cluster_element_");
     }
 
     private static Predicate<Object> isEvent(String eventName) {
