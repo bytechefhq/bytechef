@@ -1,6 +1,7 @@
 import {WorkflowTestNodeStateI} from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useSSE} from '@/shared/hooks/useSSE';
+import {ClusterElementCallRecord} from '@/shared/middleware/platform/workflow/test';
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
@@ -11,9 +12,20 @@ const mockResetWorkflowTestNodeStates = vi.fn();
 const mockSetWorkflowIsRunning = vi.fn();
 const mockSetWorkflowTestExecution = vi.fn();
 const mockSetWorkflowTestNodeState = vi.fn();
+const mockUpsertWorkflowTestClusterElementCallRecord = vi.fn(
+    (taskExecutionId: string, record: ClusterElementCallRecord) => {
+        const records = mockWorkflowTestClusterElementCallRecords[taskExecutionId] ?? [];
+
+        mockWorkflowTestClusterElementCallRecords[taskExecutionId] = [
+            ...records.filter((existing) => existing.id !== record.id),
+            record,
+        ];
+    }
+);
 
 let mockWorkflowIsRunning = false;
 let mockWorkflowTestExecution: {job?: {status?: string}} | undefined;
+let mockWorkflowTestClusterElementCallRecords: Record<string, ClusterElementCallRecord[]> = {};
 let mockWorkflowTestNodeStates: Record<string, WorkflowTestNodeStateI> = {};
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
@@ -24,7 +36,9 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => 
         setWorkflowIsRunning: mockSetWorkflowIsRunning,
         setWorkflowTestExecution: mockSetWorkflowTestExecution,
         setWorkflowTestNodeState: mockSetWorkflowTestNodeState,
+        upsertWorkflowTestClusterElementCallRecord: mockUpsertWorkflowTestClusterElementCallRecord,
         workflowIsRunning: mockWorkflowIsRunning,
+        workflowTestClusterElementCallRecords: mockWorkflowTestClusterElementCallRecords,
         workflowTestExecution: mockWorkflowTestExecution,
         workflowTestNodeStates: mockWorkflowTestNodeStates,
     });
@@ -70,6 +84,7 @@ describe('useWorkflowTestStream', () => {
     afterEach(() => {
         mockWorkflowIsRunning = false;
         mockWorkflowTestExecution = undefined;
+        mockWorkflowTestClusterElementCallRecords = {};
         mockWorkflowTestNodeStates = {};
 
         vi.clearAllMocks();
@@ -553,6 +568,52 @@ describe('useWorkflowTestStream', () => {
             clusterElement: true,
             durationMillis: 412,
             status: 'COMPLETED',
+        });
+    });
+
+    it('records a live call from its events', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.cluster_element_started({
+                callId: 'a',
+                callStatus: 'STARTED',
+                componentName: 'httpClient',
+                name: 'httpClient_1',
+                startDate: '2026-10-23T10:00:00Z',
+                status: 'STARTED',
+                taskExecutionId: '10',
+                toolName: 'get',
+            });
+        });
+
+        act(() => {
+            eventHandlers.cluster_element_completed({
+                callId: 'a',
+                callStatus: 'COMPLETED',
+                componentName: 'httpClient',
+                endDate: '2026-10-23T10:00:00.412Z',
+                input: '{"url":"x"}',
+                name: 'httpClient_1',
+                output: '{"ok":true}',
+                startDate: '2026-10-23T10:00:00Z',
+                status: 'COMPLETED',
+                taskExecutionId: '10',
+                toolName: 'get',
+            });
+        });
+
+        expect(mockWorkflowTestClusterElementCallRecords['10']).toHaveLength(1);
+        expect(mockWorkflowTestClusterElementCallRecords['10'][0]).toMatchObject({
+            componentName: 'httpClient',
+            id: 'a',
+            input: '{"url":"x"}',
+            output: '{"ok":true}',
+            status: 'COMPLETED',
+            toolName: 'get',
+            workflowNodeName: 'httpClient_1',
         });
     });
 
