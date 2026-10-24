@@ -119,14 +119,14 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                                 <div className="flex min-h-8 flex-wrap items-center justify-end gap-2">
                                     {connection.credentialStatus === 'VALID' ? (
                                         <Badge
-                                            className="uppercase"
+                                            className="border-transparent uppercase"
                                             label={connection.active ? 'Active' : 'Not Active'}
                                             styleType={connection.active ? 'success-outline' : 'secondary-outline'}
                                             weight="semibold"
                                         />
                                     ) : (
                                         <Badge
-                                            className="uppercase"
+                                            className="border-transparent uppercase"
                                             label={connection.credentialStatus ?? 'INVALID'}
                                             styleType="destructive-outline"
                                             weight="semibold"

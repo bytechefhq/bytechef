@@ -113,7 +113,7 @@ export const getStatusBadge = (status: number) => {
     switch (status) {
         case STATUS_READY:
             return (
-                <Badge styleType="success-outline" weight="semibold">
+                <Badge className="border-transparent" styleType="success-outline" weight="semibold">
                     {statusLabel}
                 </Badge>
             );
@@ -128,7 +128,7 @@ export const getStatusBadge = (status: number) => {
             );
         case STATUS_ERROR:
             return (
-                <Badge styleType="destructive-outline" weight="semibold">
+                <Badge className="border-transparent" styleType="destructive-outline" weight="semibold">
                     {statusLabel}
                 </Badge>
             );

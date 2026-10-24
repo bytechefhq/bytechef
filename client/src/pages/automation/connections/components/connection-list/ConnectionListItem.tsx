@@ -157,14 +157,14 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                             <div className="flex min-w-52 flex-col items-end gap-y-4">
                                 {connection.credentialStatus === 'VALID' ? (
                                     <Badge
-                                        className="uppercase"
+                                        className="border-transparent uppercase"
                                         label={connection.active ? 'Active' : 'Not Active'}
                                         styleType={connection.active ? 'success-outline' : 'secondary-outline'}
                                         weight="semibold"
                                     />
                                 ) : (
                                     <Badge
-                                        className="uppercase"
+                                        className="border-transparent uppercase"
                                         label={connection.credentialStatus ?? 'INVALID'}
                                         styleType="destructive-outline"
                                         weight="semibold"

@@ -56,6 +56,7 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                                                 )}
 
                                                 <Badge
+                                                    className="border-transparent"
                                                     label={integrationVersion.status ?? ''}
                                                     styleType={
                                                         integrationVersion.status === IntegrationStatus.Published
