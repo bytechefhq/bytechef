@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,6 +30,8 @@ public interface TaskExecutionService {
 
     boolean completeIfNotCancelled(long id);
 
+    long countJobTaskExecutions(long jobId, List<Long> supersededTaskExecutionIds);
+
     TaskExecution create(TaskExecution taskExecution);
 
     void delete(long id);
@@ -37,11 +40,41 @@ public interface TaskExecutionService {
 
     Optional<TaskExecution> fetchLastJobTaskExecution(long jobId);
 
+    Optional<TaskExecution> fetchLastStartedJobTaskExecution(long jobId);
+
+    Optional<TaskExecution> fetchTaskExecution(long id);
+
+    Map<Long, Long> getChildCounts(List<Long> parentIds);
+
+    int getChildIndex(TaskExecution taskExecution);
+
+    int getIterationIndex(TaskExecution taskExecution);
+
+    Map<Long, Long> getIterationCounts(List<Long> parentIds);
+
+    List<TaskExecution> getLatestAttemptFailedLeafJobTaskExecutions(
+        long jobId, List<Long> supersededTaskExecutionIds, int pageNumber, int pageSize);
+
+    List<TaskExecution> getParentIterationStartTaskExecutions(long parentId, long offset, int limit);
+
+    List<Long> getParentTaskExecutionIds(long parentId);
+
+    List<TaskExecution> getParentTaskExecutions(long parentId, int pageNumber, int pageSize);
+
+    List<TaskExecution> getParentTaskExecutionsBetween(
+        long parentId, TaskExecution fromTaskExecution, TaskExecution toTaskExecution);
+
+    List<TaskExecution> getParentTaskExecutionsFrom(long parentId, TaskExecution fromTaskExecution);
+
     TaskExecution getTaskExecution(long id);
+
+    List<TaskExecution> getTaskExecutions(List<Long> ids);
 
     TaskExecution getTaskExecutionForUpdate(long id);
 
     List<TaskExecution> getJobTaskExecutions(long jobId);
+
+    List<TaskExecution> getJobTopLevelTaskExecutions(long jobId);
 
     List<TaskExecution> getParentTaskExecutions(long parentId);
 

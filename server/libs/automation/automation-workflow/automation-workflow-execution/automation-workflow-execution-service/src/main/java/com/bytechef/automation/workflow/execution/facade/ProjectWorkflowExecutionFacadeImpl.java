@@ -53,7 +53,9 @@ import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
@@ -66,6 +68,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +76,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -100,6 +104,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     private final EnvironmentService environmentService;
     private final WorkflowExecutionRowService workflowExecutionRowService;
     private final JobService jobService;
+    private final LazyTaskExecutionTreeBuilder lazyTaskExecutionTreeBuilder;
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
     private final ProjectDeploymentService projectDeploymentService;
@@ -144,33 +149,55 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.workflowService = workflowService;
+
+        this.lazyTaskExecutionTreeBuilder = new LazyTaskExecutionTreeBuilder(
+            taskExecutionService, jobService, this::createListTaskExecutionDTOConverter);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowExecutionDTO getWorkflowExecution(long id) {
+    public WorkflowExecutionDTO getWorkflowExecution(long id, boolean lazy) {
         Job job = jobService.getJob(id);
 
         Map<String, ?> outputs = job.getOutputs() == null
             ? null
             : taskFileStorage.readJobOutputs(job.getOutputs());
 
-        JobDTO jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, false));
+        JobDTO jobDTO;
+        List<FocusPathElementDTO> focusPath = null;
+        Long taskExecutionCount = null;
+
+        if (lazy) {
+            List<TaskExecution> topLevelTaskExecutions = lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutionRows(id);
+
+            jobDTO = new JobDTO(job, outputs, lazyTaskExecutionTreeBuilder.decorate(topLevelTaskExecutions));
+            focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(id, topLevelTaskExecutions);
+            taskExecutionCount = lazyTaskExecutionTreeBuilder.countTaskExecutions(id, topLevelTaskExecutions);
+        } else {
+            jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, false));
+        }
+
+        long rootJobId = getRootJobId(job);
+        Project project = projectService.getWorkflowProject(jobDTO.workflowId());
 
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
-            Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
+            rootJobId, PlatformType.AUTOMATION);
+
+        ProjectDeployment projectDeployment = projectDeploymentIdOptional
+            .map(projectDeploymentService::getProjectDeployment)
+            .filter(rootProjectDeployment -> rootJobId == id ||
+                Objects.equals(rootProjectDeployment.getProjectId(), project.getId()))
+            .orElse(null);
 
         return new WorkflowExecutionDTO(
-            jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
-            projectDeploymentIdOptional
-                .map(projectDeploymentService::getProjectDeployment)
-                .orElse(null),
-            getProjectVersion(jobDTO.workflowId()), jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
+            jobDTO.id(), project, projectDeployment, getProjectVersion(jobDTO.workflowId()), jobDTO,
+            workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
-                projectDeploymentIdOptional.orElse(null),
+                projectDeployment == null ? null : projectDeploymentIdOptional.orElse(null),
                 triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
                     .orElse(null),
-                job));
+                job),
+            focusPath, taskExecutionCount);
     }
 
     @Override
@@ -192,17 +219,70 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Override
     @Transactional(readOnly = true)
     public TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId) {
-        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+        TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
-        return toTaskExecutionDTO(taskExecution, null, true);
+        JobDTO childJob = lazyTaskExecutionTreeBuilder.getChildJob(taskExecutionId);
+
+        return toTaskExecutionDTO(taskExecution, childJob, true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
+        long id, long taskExecutionId, int pageNumber, int pageSize) {
+
+        TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
+
+        validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
+
+        return lazyTaskExecutionTreeBuilder.getChildrenPage(taskExecution, pageNumber, pageSize);
+    }
+
+    private long getRootJobId(Job job) {
+        Job currentJob = job;
+        Long parentTaskExecutionId = currentJob.getParentTaskExecutionId();
+        Set<Long> visitedJobIds = new HashSet<>();
+
+        while (parentTaskExecutionId != null) {
+            if (!visitedJobIds.add(Validate.notNull(currentJob.getId(), "id"))) {
+                throw new IllegalStateException("Cyclic subflow job chain at job id=" + currentJob.getId());
+            }
+
+            Optional<Job> parentJobOptional = taskExecutionService.fetchTaskExecution(parentTaskExecutionId)
+                .map(TaskExecution::getJobId)
+                .flatMap(jobService::fetchJob);
+
+            if (parentJobOptional.isEmpty()) {
+                log.warn(
+                    "Parent job of job id={} not found through parent task execution id={}", currentJob.getId(),
+                    parentTaskExecutionId);
+
+                break;
+            }
+
+            currentJob = parentJobOptional.get();
+            parentTaskExecutionId = currentJob.getParentTaskExecutionId();
+        }
+
+        return Validate.notNull(currentJob.getId(), "id");
+    }
+
+    private TaskExecution getRequestedTaskExecution(long taskExecutionId) {
+        return taskExecutionService.fetchTaskExecution(taskExecutionId)
+            .orElseThrow(() -> new NoSuchElementException("Task execution " + taskExecutionId + " not found"));
     }
 
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
         long currentJobId = Objects.requireNonNull(taskExecution.getJobId());
+        Set<Long> visitedJobIds = new HashSet<>();
 
         while (currentJobId != id) {
+            if (!visitedJobIds.add(currentJobId)) {
+                throw new IllegalStateException("Cyclic subflow job chain at job id=" + currentJobId);
+            }
+
             Job job = jobService.getJob(currentJobId);
 
             Long parentTaskExecutionId = job.getParentTaskExecutionId();
@@ -712,13 +792,34 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             return List.of();
         }
 
-        return jobService.getJobs(childJobIds)
+        List<Job> childJobs = jobService.getJobs(childJobIds)
             .stream()
             .filter(childJob -> childJob.getParentTaskExecutionId() != null)
-            .map(childJob -> toTaskExecutionDTO(
-                taskExecutionService.getTaskExecution(childJob.getParentTaskExecutionId()), toSubflowJobDTO(childJob),
-                false))
             .toList();
+
+        Map<Long, TaskExecution> parentTaskExecutionMap = taskExecutionService
+            .getTaskExecutions(
+                CollectionUtils.map(childJobs, childJob -> Objects.requireNonNull(childJob.getParentTaskExecutionId())))
+            .stream()
+            .collect(Collectors.toMap(TaskExecution::getId, Function.identity(), (first, second) -> first));
+
+        return childJobs.stream()
+            .map(childJob -> toTaskExecutionDTO(
+                getParentTaskExecution(childJob, parentTaskExecutionMap), toSubflowJobDTO(childJob), false))
+            .toList();
+    }
+
+    private static TaskExecution getParentTaskExecution(
+        Job childJob, Map<Long, TaskExecution> parentTaskExecutionMap) {
+
+        TaskExecution parentTaskExecution = parentTaskExecutionMap.get(childJob.getParentTaskExecutionId());
+
+        if (parentTaskExecution == null) {
+            throw new IllegalStateException(
+                String.format("TaskExecution with id '%s' not found", childJob.getParentTaskExecutionId()));
+        }
+
+        return parentTaskExecution;
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(
@@ -770,6 +871,12 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private JobDTO toSubflowJobDTO(Job job) {
         return new JobDTO(job, null, getSubflowJobTaskExecutions(Objects.requireNonNull(job.getId())));
+    }
+
+    private BiFunction<TaskExecution, JobDTO, TaskExecutionDTO> createListTaskExecutionDTOConverter() {
+        Map<String, DefinitionResult> definitionResultCache = new HashMap<>();
+
+        return (taskExecution, childJob) -> toTaskExecutionDTO(taskExecution, childJob, false, definitionResultCache);
     }
 
     TaskExecutionDTO toTaskExecutionDTO(TaskExecution taskExecution, JobDTO childJob, boolean includeTaskData) {

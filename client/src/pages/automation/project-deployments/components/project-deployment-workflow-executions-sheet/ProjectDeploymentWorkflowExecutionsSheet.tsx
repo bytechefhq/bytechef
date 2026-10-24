@@ -72,7 +72,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
     const {openProject, openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
 
     const {data: workflowExecution} = useGetProjectWorkflowExecutionQuery(
-        {id: workflowExecutionId},
+        {id: workflowExecutionId, lazy: true},
         enabled && activeTab === 'executions' && workflowExecutionSheetOpen,
         undefined,
         workflowExecutionKind

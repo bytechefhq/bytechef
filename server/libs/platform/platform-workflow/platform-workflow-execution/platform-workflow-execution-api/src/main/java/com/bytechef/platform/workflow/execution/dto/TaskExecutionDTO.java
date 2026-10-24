@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -44,7 +45,7 @@ public record TaskExecutionDTO(
     int progress, int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis,
     Instant startDate, TaskExecution.Status status, int taskNumber, String title, String type,
     WorkflowTask workflowTask, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations,
-    JobDTO childJob) {
+    JobDTO childJob, @Nullable Integer childCount) {
 
     public TaskExecutionDTO(
         TaskExecution taskExecution, String title, String icon, Map<String, ?> input, Object output, JobDTO childJob) {
@@ -58,12 +59,12 @@ public record TaskExecutionDTO(
             taskExecution.getRetryAttempts(), taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(),
             taskExecution.getRetryDelayMillis(), taskExecution.getStartDate(), taskExecution.getStatus(),
             taskExecution.getTaskNumber(), title, taskExecution.getType(), taskExecution.getWorkflowTask(),
-            List.of(), List.of(), childJob);
+            List.of(), List.of(), childJob, null);
     }
 
     private TaskExecutionDTO(
         TaskExecutionDTO taskExecutionDTO, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations,
-        JobDTO childJob) {
+        JobDTO childJob, @Nullable Integer childCount) {
 
         this(
             taskExecutionDTO.createdBy(), taskExecutionDTO.createdDate(), taskExecutionDTO.endDate(),
@@ -74,7 +75,19 @@ public record TaskExecutionDTO(
             taskExecutionDTO.retryAttempts(), taskExecutionDTO.retryDelay(), taskExecutionDTO.retryDelayFactor(),
             taskExecutionDTO.retryDelayMillis(), taskExecutionDTO.startDate(), taskExecutionDTO.status(),
             taskExecutionDTO.taskNumber(), taskExecutionDTO.title(), taskExecutionDTO.type(),
-            taskExecutionDTO.workflowTask(), children, iterations, childJob);
+            taskExecutionDTO.workflowTask(), children, iterations, childJob, childCount);
+    }
+
+    public TaskExecutionDTO withChildCount(@Nullable Integer childCount) {
+        return new TaskExecutionDTO(this, children, iterations, childJob, childCount);
+    }
+
+    public static boolean isLoopType(@Nullable String type) {
+        return isTaskDispatcherType(type, "loop");
+    }
+
+    public static boolean isOnErrorType(@Nullable String type) {
+        return isTaskDispatcherType(type, "on-error");
     }
 
     public static List<TaskExecutionDTO> buildHierarchy(List<TaskExecutionDTO> taskExecutionDTOS) {
@@ -101,7 +114,7 @@ public record TaskExecutionDTO(
         List<TaskExecutionDTO> taskExecutions = tasksMap.getOrDefault(taskExecutionDTO.id(), List.of());
         String type = taskExecutionDTO.type();
 
-        if (type != null && Strings.CS.contains(type.toLowerCase(), "loop")) {
+        if (isLoopType(type)) {
             List<List<TaskExecutionDTO>> iterationTaskExecutions = new ArrayList<>();
             List<TaskExecutionDTO> currentIterationTaskExecutions = new ArrayList<>();
             Integer previousTaskNumber = null;
@@ -125,10 +138,11 @@ public record TaskExecutionDTO(
             }
 
             return new TaskExecutionDTO(
-                taskExecutionDTO, List.of(), iterationTaskExecutions, taskExecutionDTO.childJob());
+                taskExecutionDTO, List.of(), iterationTaskExecutions, taskExecutionDTO.childJob(),
+                taskExecutionDTO.childCount());
         }
 
-        if (type != null && Strings.CS.contains(type.toLowerCase(), "on-error")) {
+        if (isOnErrorType(type)) {
             WorkflowTask workflowTask = taskExecutionDTO.workflowTask();
 
             Set<String> onErrorBranchTaskNames = getBranchTaskNames(workflowTask, "on-error-branch");
@@ -160,17 +174,19 @@ public record TaskExecutionDTO(
                 branchItems.add(errorBranchTaskExecutions);
             }
 
-            return new TaskExecutionDTO(taskExecutionDTO, List.of(), branchItems, taskExecutionDTO.childJob());
+            return new TaskExecutionDTO(
+                taskExecutionDTO, List.of(), branchItems, taskExecutionDTO.childJob(), taskExecutionDTO.childCount());
         }
 
         List<TaskExecutionDTO> children = taskExecutions.stream()
             .map(child -> buildTaskExecutionTree(child, tasksMap))
             .toList();
 
-        return new TaskExecutionDTO(taskExecutionDTO, children, List.of(), taskExecutionDTO.childJob());
+        return new TaskExecutionDTO(
+            taskExecutionDTO, children, List.of(), taskExecutionDTO.childJob(), taskExecutionDTO.childCount());
     }
 
-    private static Set<String> getBranchTaskNames(WorkflowTask workflowTask, String branchKey) {
+    public static Set<String> getBranchTaskNames(@Nullable WorkflowTask workflowTask, String branchKey) {
         if (workflowTask == null) {
             return Set.of();
         }
@@ -182,5 +198,9 @@ public record TaskExecutionDTO(
             .stream()
             .map(WorkflowTask::getName)
             .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    private static boolean isTaskDispatcherType(@Nullable String type, String name) {
+        return type != null && name.equalsIgnoreCase(StringUtils.substringBefore(type, "/"));
     }
 }

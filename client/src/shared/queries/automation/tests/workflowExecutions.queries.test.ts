@@ -4,24 +4,31 @@ import {type ReactNode, createElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {
+    TASK_EXECUTION_CHILDREN_PAGE_SIZE,
     WorkflowExecutionKeys,
     getWorkflowExecutionsRefetchInterval,
     useGetProjectWorkflowExecutionQuery,
+    useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
     useGetWorkspaceProjectWorkflowExecutionsQuery,
 } from '../workflowExecutions.queries';
 
-const {getTriggerExecutionWorkflowExecutionMock, getWorkflowExecutionMock, getWorkflowExecutionsPageMock} = vi.hoisted(
-    () => ({
-        getTriggerExecutionWorkflowExecutionMock: vi.fn(),
-        getWorkflowExecutionMock: vi.fn(),
-        getWorkflowExecutionsPageMock: vi.fn(),
-    })
-);
+const {
+    getTriggerExecutionWorkflowExecutionMock,
+    getWorkflowExecutionMock,
+    getWorkflowExecutionTaskExecutionChildrenMock,
+    getWorkflowExecutionsPageMock,
+} = vi.hoisted(() => ({
+    getTriggerExecutionWorkflowExecutionMock: vi.fn(),
+    getWorkflowExecutionMock: vi.fn(),
+    getWorkflowExecutionTaskExecutionChildrenMock: vi.fn(),
+    getWorkflowExecutionsPageMock: vi.fn(),
+}));
 
 vi.mock('@/shared/middleware/automation/workflow/execution', () => ({
     WorkflowExecutionApi: class {
         getTriggerExecutionWorkflowExecution = getTriggerExecutionWorkflowExecutionMock;
         getWorkflowExecution = getWorkflowExecutionMock;
+        getWorkflowExecutionTaskExecutionChildren = getWorkflowExecutionTaskExecutionChildrenMock;
         getWorkflowExecutionsPage = getWorkflowExecutionsPageMock;
     },
 }));
@@ -207,5 +214,148 @@ describe('workflowExecutions.queries', () => {
 
             expect(getWorkflowExecutionsPageMock).toHaveBeenCalledTimes(1);
         });
+    });
+});
+
+describe('lazy workflow execution keys and children query', () => {
+    beforeEach(() => {
+        getWorkflowExecutionTaskExecutionChildrenMock.mockReset();
+    });
+
+    it('keeps the non-lazy key and distinguishes the lazy key', () => {
+        expect(WorkflowExecutionKeys.workflowExecution(5, 'JOB', false)).toEqual(
+            WorkflowExecutionKeys.workflowExecution(5)
+        );
+        expect(WorkflowExecutionKeys.workflowExecution(5, 'JOB', true)).not.toEqual(
+            WorkflowExecutionKeys.workflowExecution(5)
+        );
+    });
+
+    it('builds the children key per execution and task execution', () => {
+        expect(WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9)).not.toEqual(
+            WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 10)
+        );
+    });
+
+    it('nests every children key of a job under the key that invalidates them', () => {
+        const childrenOfJobKey = WorkflowExecutionKeys.workflowExecutionTaskExecutionChildrenOfJob(5);
+
+        expect(
+            WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9).slice(0, childrenOfJobKey.length)
+        ).toEqual(childrenOfJobKey);
+        expect(
+            WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9, 30).slice(0, childrenOfJobKey.length)
+        ).toEqual(childrenOfJobKey);
+    });
+
+    it('builds a separate children key per start page', () => {
+        expect(WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9, 0)).not.toEqual(
+            WorkflowExecutionKeys.workflowExecutionTaskExecutionChildren(5, 9, 30)
+        );
+    });
+
+    it('pages children with the page size and computes the next page', async () => {
+        getWorkflowExecutionTaskExecutionChildrenMock.mockResolvedValue({number: 0, totalPages: 3});
+
+        const {result} = renderHook(
+            () => useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true),
+            {wrapper}
+        );
+
+        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+        expect(TASK_EXECUTION_CHILDREN_PAGE_SIZE).toBe(50);
+        expect(getWorkflowExecutionTaskExecutionChildrenMock).toHaveBeenCalledWith({
+            id: 5,
+            pageNumber: 0,
+            pageSize: 50,
+            taskExecutionId: 9,
+        });
+        expect(result.current.hasNextPage).toBe(true);
+    });
+
+    it('has no next page on the last page', async () => {
+        getWorkflowExecutionTaskExecutionChildrenMock.mockResolvedValue({number: 2, totalPages: 3});
+
+        const {result} = renderHook(
+            () => useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true),
+            {wrapper}
+        );
+
+        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+        expect(result.current.hasNextPage).toBe(false);
+    });
+
+    it('starts on the requested page and pages back to the first one', async () => {
+        getWorkflowExecutionTaskExecutionChildrenMock.mockImplementation(({pageNumber}: {pageNumber: number}) =>
+            Promise.resolve({number: pageNumber, totalPages: 5})
+        );
+
+        const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+        const {result} = renderHook(
+            () =>
+                useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true, false, 3),
+            {
+                wrapper: ({children}: {children: ReactNode}) =>
+                    createElement(QueryClientProvider, {client: queryClient}, children),
+            }
+        );
+
+        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+        expect(getWorkflowExecutionTaskExecutionChildrenMock).toHaveBeenCalledWith(
+            expect.objectContaining({pageNumber: 3})
+        );
+        expect(result.current.hasPreviousPage).toBe(true);
+        expect(result.current.hasNextPage).toBe(true);
+
+        const previousPageResult = await result.current.fetchPreviousPage();
+
+        expect(previousPageResult.data?.pages.map((page) => page.number)).toEqual([2, 3]);
+    });
+
+    it('starts on the requested page although the children were cached from another start page', async () => {
+        getWorkflowExecutionTaskExecutionChildrenMock.mockImplementation(({pageNumber}: {pageNumber: number}) =>
+            Promise.resolve({number: pageNumber, totalPages: 40})
+        );
+
+        const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+        const queryClientWrapper = ({children}: {children: ReactNode}) =>
+            createElement(QueryClientProvider, {client: queryClient}, children);
+
+        const {result: firstStartResult, unmount} = renderHook(
+            () => useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true),
+            {wrapper: queryClientWrapper}
+        );
+
+        await waitFor(() => expect(firstStartResult.current.isSuccess).toBe(true));
+
+        unmount();
+
+        const {result: focusedStartResult} = renderHook(
+            () =>
+                useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true, false, 30),
+            {wrapper: queryClientWrapper}
+        );
+
+        await waitFor(() => expect(focusedStartResult.current.isSuccess).toBe(true));
+
+        expect(focusedStartResult.current.data?.pages.map((page) => page.number)).toEqual([30]);
+    });
+
+    it('has no previous page on the first page', async () => {
+        getWorkflowExecutionTaskExecutionChildrenMock.mockResolvedValue({number: 0, totalPages: 3});
+
+        const {result} = renderHook(
+            () => useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery({id: 5, taskExecutionId: 9}, true),
+            {wrapper}
+        );
+
+        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+        expect(result.current.hasPreviousPage).toBe(false);
     });
 });

@@ -8,10 +8,15 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
 
+    testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc"))
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

@@ -20,12 +20,17 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
+import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionChildrenPageModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,10 +62,11 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
+    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id, Boolean lazy) {
         return ResponseEntity.ok(
             conversionService.convert(
-                projectWorkflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
+                projectWorkflowExecutionFacade.getWorkflowExecution(id, Boolean.TRUE.equals(lazy)),
+                WorkflowExecutionModel.class));
     }
 
     @Override
@@ -69,6 +75,17 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
             conversionService.convert(
                 projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(id, taskExecutionId),
                 TaskExecutionModel.class));
+    }
+
+    @Override
+    public ResponseEntity<TaskExecutionChildrenPageModel> getWorkflowExecutionTaskExecutionChildren(
+        Long id, Long taskExecutionId, Integer pageNumber, Integer pageSize) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecutionChildren(
+                    id, taskExecutionId, pageNumber, pageSize),
+                TaskExecutionChildrenPageModel.class));
     }
 
     @Override
@@ -84,5 +101,14 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
                     jobStartDate == null ? null : jobStartDate.toInstant(),
                     jobEndDate == null ? null : jobEndDate.toInstant(), projectId, projectDeploymentId,
                     connectedUserId, workflowId, projectVersion, workspaceId, pageNumber));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolationException(
+        ConstraintViolationException constraintViolationException) {
+
+        return ResponseEntity
+            .of(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, constraintViolationException.getMessage()))
+            .build();
     }
 }
