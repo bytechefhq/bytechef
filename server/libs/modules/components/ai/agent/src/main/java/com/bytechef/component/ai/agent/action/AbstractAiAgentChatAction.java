@@ -654,7 +654,8 @@ public abstract class AbstractAiAgentChatAction {
 
             toolCallbacks.addAll(
                 ClusterElementCallObservingToolCallback.wrap(
-                    clusterElementCallbacks, clusterElement.getWorkflowNodeName(), context));
+                    clusterElementCallbacks, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName(),
+                    context));
         }
 
         if (toolExecutionListener == null) {
