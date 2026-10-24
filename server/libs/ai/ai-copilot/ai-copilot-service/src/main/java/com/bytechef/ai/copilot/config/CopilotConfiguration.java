@@ -40,6 +40,7 @@ import com.bytechef.ai.copilot.tool.SampleOutputTools;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
+import com.bytechef.ai.copilot.tool.advisor.TokenUsageLoggerAdvisor;
 import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
@@ -484,6 +485,7 @@ public class CopilotConfiguration {
             .state(state)
             .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .advisor(questionAnswerAdvisor)
+            .advisor(new TokenUsageLoggerAdvisor(CopilotAgentType.WORKFLOW_EDITOR_ASK.key()))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .permissionService(permissionService)
@@ -524,6 +526,7 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
             .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .advisor(new TokenUsageLoggerAdvisor(CopilotAgentType.WORKFLOW_EDITOR_BUILD.key()))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .permissionService(permissionService)
@@ -885,6 +888,7 @@ public class CopilotConfiguration {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(buildWorkflowSubAgentSystemPrompt(askToolAvailable))
+            .defaultAdvisors(new TokenUsageLoggerAdvisor(CopilotAgentType.BUILD_WORKFLOW.key()))
             .defaultTools(
                 withDataTableTools(
                     projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools))
