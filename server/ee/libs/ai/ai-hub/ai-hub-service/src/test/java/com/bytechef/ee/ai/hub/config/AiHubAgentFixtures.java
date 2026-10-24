@@ -51,8 +51,10 @@ import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -128,7 +130,8 @@ public final class AiHubAgentFixtures {
             mock(ConnectionDefinitionService.class), mock(WorkspaceConnectionFacade.class),
             mock(ComponentDefinitionService.class), mock(ActionDefinitionService.class),
             mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
-            mock(TriggerDefinitionFacade.class), new PropertyOptionsResolver(securityContextRehydrator),
+            mock(TriggerDefinitionFacade.class), mock(ClusterElementDefinitionService.class),
+            mock(ClusterElementDefinitionFacade.class), new PropertyOptionsResolver(securityContextRehydrator),
             mock(ObjectProvider.class), mock(ScopedConnectionGuard.class));
 
         when(intelligentToolCatalog.getByNames(anySet(), eq(IntelligentToolVariant.BUILD), any(), any()))
