@@ -9,11 +9,15 @@ package com.bytechef.ee.embedded.ai.tool;
 
 import com.bytechef.ee.embedded.ai.tool.model.CreatedIntegrationWorkflowInfo;
 import com.bytechef.ee.embedded.ai.tool.model.IntegrationWorkflowInfo;
+import com.bytechef.ee.embedded.ai.tool.model.IntegrationWorkflowSaveInfo;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
@@ -52,10 +57,15 @@ public class IntegrationWorkflowTools {
         """;
 
     private final IntegrationWorkflowFacade integrationWorkflowFacade;
+    private final ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider;
 
     @SuppressFBWarnings("EI")
-    public IntegrationWorkflowTools(IntegrationWorkflowFacade integrationWorkflowFacade) {
+    public IntegrationWorkflowTools(
+        IntegrationWorkflowFacade integrationWorkflowFacade,
+        ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider) {
+
         this.integrationWorkflowFacade = integrationWorkflowFacade;
+        this.workflowValidatorFacadeProvider = workflowValidatorFacadeProvider;
     }
 
     @Tool(
@@ -148,7 +158,7 @@ public class IntegrationWorkflowTools {
     }
 
     @Tool(
-        description = "Create a new workflow in a ByteChef integration. Returns the created workflow information including workflow_id (the workflowId used by the other workflow tools), integration_workflow_id, integration_id and integration_version.")
+        description = "Create a new workflow in a ByteChef integration. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the complete definition. Returns the created workflow information including workflow_id (the workflowId used by the other workflow tools), integration_workflow_id, integration_id and integration_version.")
     public CreatedIntegrationWorkflowInfo createIntegrationWorkflow(
         @ToolParam(description = "The ID of the integration to add the workflow to") long integrationId,
         @ToolParam(
@@ -156,6 +166,8 @@ public class IntegrationWorkflowTools {
                 DEFAULT_DEFINITION) String definition) {
 
         try {
+            validateBeforeSave(definition, null, IntegrationWorkflowErrorType.CREATE_WORKFLOW);
+
             long integrationWorkflowId = integrationWorkflowFacade.addWorkflow(integrationId, definition);
 
             IntegrationWorkflowDTO integrationWorkflowDTO =
@@ -205,8 +217,8 @@ public class IntegrationWorkflowTools {
     }
 
     @Tool(
-        description = "Update the workflow definition. Pass the version returned by the getWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. Returns the updated workflow id, name, definition and new version.")
-    public IntegrationWorkflowInfo updateWorkflow(
+        description = "Update the workflow definition. Pass the version returned by the getWorkflow or updateWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the same version. Returns the updated workflow id, name, new version and any validation warnings; the saved definition is the one you sent.")
+    public IntegrationWorkflowSaveInfo updateWorkflow(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(
             description = "The new definition of the workflow. Needs to be in JSON format similar to " +
@@ -223,6 +235,9 @@ public class IntegrationWorkflowTools {
                 throw staleWorkflowVersionException(workflowId, version, null);
             }
 
+            List<String> warnings = validateBeforeSave(
+                definition, workflowId, IntegrationWorkflowErrorType.UPDATE_WORKFLOW);
+
             IntegrationWorkflowDTO updatedIntegrationWorkflowDTO;
 
             try {
@@ -238,12 +253,42 @@ public class IntegrationWorkflowTools {
                     updatedIntegrationWorkflowDTO.getLabel());
             }
 
-            return toIntegrationWorkflowInfo(updatedIntegrationWorkflowDTO);
+            return new IntegrationWorkflowSaveInfo(
+                updatedIntegrationWorkflowDTO.getId(), updatedIntegrationWorkflowDTO.getIntegrationWorkflowId(),
+                updatedIntegrationWorkflowDTO.getLabel(), updatedIntegrationWorkflowDTO.getVersion(), warnings);
         } catch (RuntimeException exception) {
             throw EmbeddedToolFailures.toExecutionException(
                 log, "updateWorkflow(" + workflowId + ", " + version + ")", "Failed to update workflow", exception,
                 IntegrationWorkflowErrorType.UPDATE_WORKFLOW);
         }
+    }
+
+    private List<String> validateBeforeSave(
+        String definition, @Nullable String workflowId, IntegrationWorkflowErrorType integrationWorkflowErrorType) {
+
+        WorkflowValidatorFacade workflowValidatorFacade = workflowValidatorFacadeProvider.getIfAvailable();
+
+        if (workflowValidatorFacade == null) {
+            return List.of();
+        }
+
+        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                definition, workflowId,
+                environment == null ? Environment.DEVELOPMENT.ordinal() : environment.ordinal());
+
+        List<String> errors = workflowValidationResult.savingErrors();
+
+        if (!errors.isEmpty()) {
+            throw new ExecutionException(
+                "Nothing was saved: the workflow definition has " + errors.size() + " validation error(s). Fix " +
+                    "every one of them and save the complete definition again.\n- " + String.join("\n- ", errors),
+                integrationWorkflowErrorType);
+        }
+
+        return workflowValidationResult.warnings();
     }
 
     private static ExecutionException staleWorkflowVersionException(
