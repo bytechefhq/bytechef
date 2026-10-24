@@ -1,0 +1,26 @@
+{
+    "label": "Invoice Search",
+    "description": "Finds invoice emails every morning",
+    "inputs": [],
+    "triggers": [
+        {
+            "label": "Every Morning",
+            "name": "trigger_1",
+            "type": "schedule/v1/everyDay",
+            "parameters": {
+                "hour": 8,
+                "minute": 0
+            }
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Find Invoices",
+            "name": "searchEmail_1",
+            "type": "googleMail/v1/searchEmail",
+            "parameters": {
+                "query": "subject:invoice"
+            }
+        }
+    ]
+}
