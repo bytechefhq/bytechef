@@ -3,7 +3,22 @@ import {type APIResponse, type Page} from '@playwright/test';
 import {TEST_USER} from './constants';
 import {login} from './login';
 
-export const SERVER_URL = process.env.BYTECHEF_SERVER_URL || 'http://localhost:9555';
+function resolveServerUrl(): string {
+    if (process.env.BYTECHEF_SERVER_URL) {
+        return process.env.BYTECHEF_SERVER_URL;
+    }
+
+    if (process.env.PLAYWRIGHT_BASE_URL) {
+        throw new Error(
+            'PLAYWRIGHT_BASE_URL points the specs at another client, so set BYTECHEF_SERVER_URL to the server that ' +
+                'client proxies to; without it, server calls would go to whichever server runs on localhost:9555.'
+        );
+    }
+
+    return 'http://localhost:9555';
+}
+
+export const SERVER_URL = resolveServerUrl();
 
 export const AUTOMATION_API_PATH = '/api/automation/internal';
 

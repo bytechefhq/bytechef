@@ -247,3 +247,19 @@ clients, so the clients the run registers stay behind (their grants are revoked)
 ```bash
 npx playwright test test/playwright/tests/mcp --workers=1
 ```
+
+## Approval Specs
+
+The specs in `tests/approvals` call some server paths directly, not through the client: webhooks, the channel
+interactivity callbacks and the approval short-token endpoint. They read the server from `BYTECHEF_SERVER_URL`.
+
+| Variable                | Default                 | Purpose                                                                      |
+| ----------------------- | ----------------------- | ---------------------------------------------------------------------------- |
+| `BYTECHEF_SERVER_URL`   | `http://localhost:9555` | The server the client proxies to; required when `PLAYWRIGHT_BASE_URL` is set |
+| `MAILPIT_URL`           | `http://localhost:8025` | Mailpit, which receives the approval mails                                   |
+| `OPENAI_API_KEY`        | -                       | Runs the AI agent cases, which call gpt-4o-mini                              |
+| `PLAYWRIGHT_SLOW`       | -                       | `1` runs the sweep and one-hour expiry cases                                 |
+| `BYTECHEF_MULTI_TENANT` | -                       | `true` runs the cross-tenant cases against a multi-tenant server             |
+
+When `PLAYWRIGHT_BASE_URL` is set and `BYTECHEF_SERVER_URL` is not, the approval utilities stop with an error instead
+of falling back to `localhost:9555`, so a run against one client never sends its server calls to another server.
