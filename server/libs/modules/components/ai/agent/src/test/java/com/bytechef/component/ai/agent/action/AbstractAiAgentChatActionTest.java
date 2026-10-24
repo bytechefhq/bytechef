@@ -50,6 +50,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
@@ -1562,6 +1563,8 @@ class AbstractAiAgentChatActionTest {
         AutoCloseable handle = ClusterElementCallRecorder.getInstance()
             .addListener(TOOL_CALL_JOB_ID, events::add);
 
+        List<ClusterElementCallRecord> records;
+
         try {
 
             List<ToolCallback> toolCallbacks = buildToolCallbacks(Map.of(), "httpClient_1", "slack_1");
@@ -1570,9 +1573,13 @@ class AbstractAiAgentChatActionTest {
         } finally {
             handle.close();
 
-            ClusterElementCallRecorder.getInstance()
-                .drain(TOOL_CALL_TASK_EXECUTION_ID);
+            records = ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID)
+                .records();
         }
+
+        assertThat(records).extracting(ClusterElementCallRecord::componentName)
+            .containsExactly("httpClient");
 
         assertThat(events).extracting(ClusterElementCallEvent::type)
             .containsExactly(ClusterElementCallEvent.Type.STARTED, ClusterElementCallEvent.Type.COMPLETED);
@@ -1645,13 +1652,13 @@ class AbstractAiAgentChatActionTest {
         List<Map<String, Object>> toolElements = new ArrayList<>();
 
         for (String workflowNodeName : workflowNodeNames) {
-            toolElements.add(buildToolClusterElement(workflowNodeName, "otherComponent/v1/otherTool"));
+            toolElements.add(buildToolClusterElement(workflowNodeName, "httpClient/v1/get"));
         }
 
         clusterElements.put("tools", toolElements);
 
         when(clusterElementDefinitionService.<MultipleConnectionsToolFunction>getClusterElement(
-            eq("otherComponent"), eq(1), eq("otherTool")))
+            eq("httpClient"), eq(1), eq("get")))
                 .thenReturn(mock(MultipleConnectionsToolFunction.class));
         when(aiAgentToolFacade.getFunctionToolCallback(any(ClusterElement.class), anyMap(), any(), any()))
             .thenAnswer(invocation -> namedToolCallback(
