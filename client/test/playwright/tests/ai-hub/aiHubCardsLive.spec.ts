@@ -7,6 +7,7 @@ import {
     answerInteractiveCards,
     calledToolNames,
     createAnthropicConnectionThroughApi,
+    createBearerTokenConnectionThroughApi,
     createDataTableThroughApi,
     deleteConnectionThroughApi,
     deleteProjectThroughApi,
@@ -260,6 +261,13 @@ test.describe('@live AI Hub cards', () => {
         const {aiHubPage, environmentId, workspaceId} = await openLiveHub(page);
         const projectName = shortName('hub_knowledge_pick');
         const knowledgeBases: Array<{id: string; name: string}> = [];
+        const openAiConnectionId = await createBearerTokenConnectionThroughApi(page, {
+            componentName: 'openAi',
+            environmentId,
+            name: shortName('openai_card'),
+            token: `sk-playwright-${getRandomString()}`,
+            workspaceId,
+        });
 
         try {
             for (const knowledgeBaseName of [shortName('handbook'), shortName('policies')]) {
@@ -316,6 +324,8 @@ test.describe('@live AI Hub cards', () => {
                     id: knowledgeBase.id,
                 });
             }
+
+            await deleteConnectionThroughApi(page, openAiConnectionId);
         }
     });
 
