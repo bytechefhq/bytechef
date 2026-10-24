@@ -62,6 +62,7 @@ public class GoogleMailConstants {
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_TOKEN = "pageToken";
     public static final String PAYLOAD = "payload";
+    public static final String QUERY = "query";
     public static final String RAW = "raw";
     public static final String REPLY_TO = "replyTo";
     public static final String RESULT_SIZE_ESTIMATE = "resultSizeEstimate";
