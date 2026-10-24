@@ -168,6 +168,10 @@ final class AiAgentResumeTestSupport {
     }
 
     static Parameters createExtensions(boolean withChatMemory, boolean withGuardrail) {
+        return createExtensions(withChatMemory, withGuardrail, false);
+    }
+
+    static Parameters createExtensions(boolean withChatMemory, boolean withGuardrail, boolean withRag) {
         Map<String, Object> modelElementMap = new HashMap<>();
 
         modelElementMap.put("name", "model_1");
@@ -205,6 +209,16 @@ final class AiAgentResumeTestSupport {
             clusterElements.put("guardrails", List.of(guardrailElementMap));
         }
 
+        if (withRag) {
+            Map<String, Object> ragElementMap = new HashMap<>();
+
+            ragElementMap.put("name", "rag_1");
+            ragElementMap.put("type", "testComponent/v1/testRag");
+            ragElementMap.put("parameters", Map.of());
+
+            clusterElements.put("rag", ragElementMap);
+        }
+
         return MockParametersFactory.create(Map.of("clusterElements", clusterElements));
     }
 
@@ -214,6 +228,7 @@ final class AiAgentResumeTestSupport {
         connectionParameters.put("model_1", new ComponentConnection("testComponent", 1, 1L, Map.of(), null));
         connectionParameters.put("tool_1", new ComponentConnection("testComponent", 1, 2L, Map.of(), null));
         connectionParameters.put("chatMemory_1", new ComponentConnection("testComponent", 1, 3L, Map.of(), null));
+        connectionParameters.put("rag_1", new ComponentConnection("testComponent", 1, 4L, Map.of(), null));
 
         return connectionParameters;
     }

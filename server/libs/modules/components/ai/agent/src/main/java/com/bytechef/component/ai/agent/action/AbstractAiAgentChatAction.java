@@ -61,6 +61,9 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallTarget;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingAdvisor;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingChatModel;
 import com.bytechef.platform.component.definition.ai.agent.ConversationHistoryReader;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
@@ -158,6 +161,14 @@ public abstract class AbstractAiAgentChatAction {
         ChatModel chatModel = (ChatModel) modelFunction.apply(
             ParametersFactory.create(concatenatedInputParameters),
             ParametersFactory.create(modelConnection.getParameters()), true);
+
+        Optional<ClusterElementCallTarget> clusterElementCallTarget = ClusterElementCallTarget.of(context);
+
+        if (clusterElementCallTarget.isPresent()) {
+            chatModel = new ClusterElementFailureAttributingChatModel(
+                chatModel, modelClusterElement.getWorkflowNodeName(), modelClusterElement.getComponentName(),
+                clusterElementCallTarget.get());
+        }
 
         String conversationId = clusterElementMap.fetchClusterElement(CHAT_MEMORY)
             .map(clusterElement -> resolveConversationId(inputParameters, clusterElement))
@@ -518,10 +529,15 @@ public abstract class AbstractAiAgentChatAction {
 
         // memory
 
+        Optional<ClusterElementCallTarget> clusterElementCallTarget = ClusterElementCallTarget.of(context);
+
+        Optional<ClusterElement> chatMemoryClusterElement = clusterElementMap.fetchClusterElement(CHAT_MEMORY);
+
         chatMemoryResult
-            .map(result -> result.supportsToolMessagePersistence() ? result.advisor()
+            .map(result -> result.supportsToolMessagePersistence() ? (Advisor) result.advisor()
                 : resumedTurn ? getResumedTurnChatMemoryAdvisor(result)
                     : new BlankReplySkippingChatMemoryAdvisor(result.advisor()))
+            .map(advisor -> attributeFailures(advisor, chatMemoryClusterElement, clusterElementCallTarget))
             .ifPresent(advisors::add);
 
         // tool call
@@ -547,13 +563,30 @@ public abstract class AbstractAiAgentChatAction {
 
         advisors.add(toolCallingAdvisor);
 
-        clusterElementMap.fetchClusterElement(RAG)
+        Optional<ClusterElement> ragClusterElement = clusterElementMap.fetchClusterElement(RAG);
+
+        ragClusterElement
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
+            .map(advisor -> attributeFailures(advisor, ragClusterElement, clusterElementCallTarget))
             .ifPresent(advisors::add);
 
         advisors.add(new ContextLoggerAdvisor(context));
 
         return advisors;
+    }
+
+    private static Advisor attributeFailures(
+        Advisor advisor, Optional<ClusterElement> clusterElement,
+        Optional<ClusterElementCallTarget> clusterElementCallTarget) {
+
+        if (clusterElement.isEmpty() || clusterElementCallTarget.isEmpty()) {
+            return advisor;
+        }
+
+        ClusterElement element = clusterElement.get();
+
+        return new ClusterElementFailureAttributingAdvisor(
+            advisor, element.getWorkflowNodeName(), element.getComponentName(), clusterElementCallTarget.get());
     }
 
     private static Advisor getResumedTurnChatMemoryAdvisor(ChatMemoryFunction.Result chatMemoryResult) {

@@ -581,6 +581,14 @@ class ClusterElementCallRecorderTest {
     }
 
     @Test
+    void testClaimFailureAlsoClaimsTheCauses() {
+        RuntimeException cause = new RuntimeException("root");
+
+        assertTrue(recorder.claimFailure(2L, new IllegalStateException("wrap", cause)));
+        assertFalse(recorder.claimFailure(2L, cause));
+    }
+
+    @Test
     void testDrainClearsClaims() {
         RuntimeException failure = new RuntimeException("x");
 

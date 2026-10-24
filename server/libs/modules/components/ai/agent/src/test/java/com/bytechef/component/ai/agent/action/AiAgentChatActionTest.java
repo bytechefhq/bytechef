@@ -40,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
@@ -52,7 +53,11 @@ import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunc
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallDrain;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
+import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -62,11 +67,15 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -79,6 +88,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import reactor.core.scheduler.Scheduler;
 
 /**
  * @author Ivica Cardic
@@ -90,6 +100,152 @@ class AiAgentChatActionTest {
     private static final String FIRST_TOOL_CALL_ID = "call_1";
     private static final String SECOND_TOOL_CALL_ID = "call_2";
     private static final String THIRD_TOOL_CALL_ID = "call_3";
+    private static final long JOB_ID = 6559L;
+    private static final long TASK_EXECUTION_ID = 65_590L;
+
+    @BeforeEach
+    void drainRecorderBefore() {
+        ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+    }
+
+    @AfterEach
+    void drainRecorderAfter() {
+        ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+    }
+
+    @Test
+    void testModelFailureUnderAGuardrailFailsTheAgent() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = createGuardedChatActionDefinition(
+            prompts, callNumber -> {
+                throw new RuntimeException("invalid api key");
+            }, null, false);
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(chatActionDefinition);
+
+        assertThatThrownBy(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false, true),
+            createRecordingActionContext(new AtomicReference<>()))).hasMessageContaining("invalid api key");
+
+        assertThat(prompts).hasSize(1);
+    }
+
+    @Test
+    void testModelFailureIsRecordedOnlyOnTheModelElement() throws Exception {
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(new InMemoryChatMemoryRepository())
+            .build();
+
+        ChatMemoryFunction.Result chatMemoryResult = ChatMemoryFunction.Result.of(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .build(),
+            chatMemory);
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = createGuardedChatActionDefinition(
+            new ArrayList<>(), callNumber -> {
+                throw new RuntimeException("invalid api key");
+            }, chatMemoryResult, true);
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(chatActionDefinition);
+
+        assertThatThrownBy(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true, true, true),
+            createRecordingActionContext(new AtomicReference<>()))).hasMessageContaining("invalid api key");
+
+        ClusterElementCallDrain drain = ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+
+        List<ClusterElementCallRecord> failedRecords = drain.records()
+            .stream()
+            .filter(callRecord -> callRecord.status() == ClusterElementCallRecord.Status.FAILED)
+            .toList();
+
+        assertThat(failedRecords).hasSize(1);
+        assertThat(failedRecords.getFirst()
+            .workflowNodeName()).isEqualTo("model_1");
+        assertThat(drain.records()).extracting(ClusterElementCallRecord::workflowNodeName)
+            .doesNotContain("chatMemory_1", "rag_1");
+    }
+
+    @Test
+    void testToolSuspensionPassesThroughAnAttachedGuardrail() throws Exception {
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(new InMemoryChatMemoryRepository())
+            .build();
+
+        ChatMemoryFunction.Result chatMemoryResult = ChatMemoryFunction.Result.of(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .build(),
+            chatMemory);
+
+        List<Prompt> suspendPrompts = new ArrayList<>();
+
+        AiAgentChatAction.ChatActionDefinitionWrapper suspendDefinition = createGuardedChatActionDefinition(
+            suspendPrompts, callNumber -> suspendingToolCallResponse(FIRST_TOOL_CALL_ID), chatMemoryResult, true);
+
+        AtomicReference<ActionContext.Suspend> suspendReference = new AtomicReference<>();
+
+        Object performResult = getPerformFunction(suspendDefinition).apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true, true, true),
+            createRecordingActionContext(suspendReference));
+
+        assertThat(performResult).isNull();
+        assertThat(suspendReference.get()).isNotNull();
+        assertThat(suspendPrompts).hasSize(1);
+
+        List<Prompt> failingPrompts = new ArrayList<>();
+
+        AiAgentChatAction.ChatActionDefinitionWrapper failingDefinition = createGuardedChatActionDefinition(
+            failingPrompts, callNumber -> toolCallResponse(FAILING_TOOL_NAME, FIRST_TOOL_CALL_ID), chatMemoryResult,
+            true);
+
+        MultipleConnectionsPerformFunction failingPerformFunction = getPerformFunction(failingDefinition);
+
+        assertThatThrownBy(() -> failingPerformFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true, true, true),
+            createRecordingActionContext(new AtomicReference<>()))).isInstanceOf(ToolSuspensionException.class);
+
+        assertThat(failingPrompts).hasSize(1);
+
+        ClusterElementCallDrain drain = ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+
+        assertThat(drain.records()).filteredOn(
+            callRecord -> callRecord.status() == ClusterElementCallRecord.Status.FAILED)
+            .extracting(ClusterElementCallRecord::workflowNodeName)
+            .doesNotContain("model_1", "chatMemory_1", "rag_1");
+    }
+
+    @Test
+    void testMemoryReadFailureIsRecordedOnTheMemoryElement() throws Exception {
+        ChatMemoryFunction.Result chatMemoryResult = ChatMemoryFunction.Result.of(new FailingMemoryAdvisor(), null);
+
+        List<Prompt> prompts = new ArrayList<>();
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = createGuardedChatActionDefinition(
+            prompts, callNumber -> finalAnswer(), chatMemoryResult, false);
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(chatActionDefinition);
+
+        assertThatThrownBy(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true, true),
+            createRecordingActionContext(new AtomicReference<>()))).hasMessageContaining("memory store unavailable");
+
+        ClusterElementCallDrain drain = ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+
+        assertThat(drain.records()).hasSize(1);
+        assertThat(drain.records()
+            .getFirst()
+            .workflowNodeName()).isEqualTo("chatMemory_1");
+        assertThat(drain.records()
+            .getFirst()
+            .status()).isEqualTo(ClusterElementCallRecord.Status.FAILED);
+        assertThat(prompts).isEmpty();
+    }
 
     @Test
     void testPerformSuspendsAndResumeContinuesFromPersistedState() throws Exception {
@@ -572,6 +728,44 @@ class AiAgentChatActionTest {
             createToolCallingManager());
     }
 
+    private static ActionContextAware createRecordingActionContext(
+        AtomicReference<ActionContext.Suspend> suspendReference) {
+
+        ActionContextAware actionContext = createActionContext(suspendReference);
+
+        when(actionContext.getJobId()).thenReturn(JOB_ID);
+        when(actionContext.getTaskExecutionId()).thenReturn(TASK_EXECUTION_ID);
+
+        return actionContext;
+    }
+
+    private static AiAgentChatAction.ChatActionDefinitionWrapper createGuardedChatActionDefinition(
+        List<Prompt> prompts, Function<Integer, ChatResponse> responseFunction,
+        ChatMemoryFunction.@Nullable Result chatMemoryResult, boolean withRag) throws Exception {
+
+        ClusterElementDefinitionService clusterElementDefinitionService = createClusterElementDefinitionService(
+            createChatModel(prompts, responseFunction), chatMemoryResult);
+
+        GuardrailsFunction guardrailsFunction = (
+            inputParameters, connectionParameters, extensions, componentConnections, context,
+            conversationHistory) -> new PassThroughAdvisor("guardrail", HIGHEST_PRECEDENCE);
+
+        when(clusterElementDefinitionService.<GuardrailsFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testGuardrail"))).thenReturn(guardrailsFunction);
+
+        if (withRag) {
+            RagFunction ragFunction = (
+                inputParameters, connectionParameters, extensions,
+                componentConnections) -> new PassThroughAdvisor("rag", 0);
+
+            when(clusterElementDefinitionService.<RagFunction>getClusterElement(
+                eq("testComponent"), eq(1), eq("testRag"))).thenReturn(ragFunction);
+        }
+
+        return AiAgentChatAction.of(
+            mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager());
+    }
+
     private static MultipleConnectionsPerformFunction getPerformFunction(
         AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition) {
 
@@ -628,6 +822,60 @@ class AiAgentChatActionTest {
 
     private static ChatResponse suspendingToolCallResponse(String toolCallId) {
         return toolCallResponse(SUSPENDING_TOOL_NAME, toolCallId);
+    }
+
+    private static final class PassThroughAdvisor implements CallAdvisor {
+
+        private final String name;
+        private final int order;
+
+        private PassThroughAdvisor(String name, int order) {
+            this.name = name;
+            this.order = order;
+        }
+
+        @Override
+        public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
+            return callAdvisorChain.nextCall(chatClientRequest);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public int getOrder() {
+            return order;
+        }
+    }
+
+    private static final class FailingMemoryAdvisor implements BaseAdvisor {
+
+        @Override
+        public ChatClientRequest before(ChatClientRequest chatClientRequest, AdvisorChain advisorChain) {
+            throw new IllegalStateException("memory store unavailable");
+        }
+
+        @Override
+        public ChatClientResponse after(ChatClientResponse chatClientResponse, AdvisorChain advisorChain) {
+            return chatClientResponse;
+        }
+
+        @Override
+        public Scheduler getScheduler() {
+            return DEFAULT_SCHEDULER;
+        }
+
+        @Override
+        public String getName() {
+            return "failingMemory";
+        }
+
+        @Override
+        public int getOrder() {
+            return 0;
+        }
     }
 
     private static final class HumanAnswerBlockingAdvisor implements CallAdvisor {
