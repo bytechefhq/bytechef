@@ -2915,6 +2915,19 @@ describe('getElkLayoutElements with cluster roots', () => {
         expect(positionOf(result.nodes, 'task2').y - rootBottom).toBe(CHAIN_GAP);
     });
 
+    it('centers a configured root on the chain axis of a horizontal layout', async () => {
+        const nodes: Node[] = [taskNode('task1'), clusterRootNode('aiAgent_1', true), taskNode('task2')];
+
+        const edges: Edge[] = [edge('task1', 'aiAgent_1'), edge('aiAgent_1', 'task2')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1000, direction: 'LR', edges, nodes});
+
+        const taskHandleY = positionOf(result.nodes, 'task1').y + 36;
+
+        expect(positionOf(result.nodes, 'aiAgent_1').y + 59).toBe(taskHandleY);
+        expect(positionOf(result.nodes, 'task2').y + 36).toBe(taskHandleY);
+    });
+
     it('keeps the chain handle column straight through a configured read-only root', async () => {
         const nodes: Node[] = [
             {...taskNode('task1'), type: 'readonly'},
