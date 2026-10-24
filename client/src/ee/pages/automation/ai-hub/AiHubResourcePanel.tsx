@@ -7,7 +7,7 @@ import ResourcePickerMenu, {
 } from '@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {PanelRightCloseIcon, PlusIcon, XIcon} from 'lucide-react';
+import {PanelRightIcon, PlusIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -109,7 +109,7 @@ const AiHubResourcePanel = () => {
                             <TooltipTrigger asChild>
                                 <Button
                                     aria-label="Close resource panel"
-                                    icon={<PanelRightCloseIcon />}
+                                    icon={<PanelRightIcon />}
                                     onClick={() => setRightPanelOpen(false)}
                                     size="icon"
                                     variant="ghost"
