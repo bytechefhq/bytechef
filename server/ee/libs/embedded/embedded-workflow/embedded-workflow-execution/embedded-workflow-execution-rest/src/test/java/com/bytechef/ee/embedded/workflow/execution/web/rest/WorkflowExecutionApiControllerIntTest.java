@@ -218,7 +218,7 @@ class WorkflowExecutionApiControllerIntTest {
         return new TaskExecutionDTO(
             null, null, null, null, 0, null, id, null, 5L, null, null, 0, null, 9L, 0, 0, 0, null, 0, 0, null,
             TaskExecution.Status.COMPLETED, 0, "Title", "myComponent/v1/myAction", null, List.of(), List.of(),
-            childJob, childCount, List.of());
+            childJob, childCount, List.of(), List.of());
     }
 
     @Configuration
