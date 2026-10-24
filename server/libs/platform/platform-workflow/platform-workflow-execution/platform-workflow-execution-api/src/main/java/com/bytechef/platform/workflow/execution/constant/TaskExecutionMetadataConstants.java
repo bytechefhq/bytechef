@@ -23,6 +23,8 @@ public final class TaskExecutionMetadataConstants {
 
     public static final String CLUSTER_ELEMENT_CALLS = "clusterElementCalls";
 
+    public static final String CLUSTER_ELEMENT_CALL_RECORDS = "clusterElementCallRecords";
+
     private TaskExecutionMetadataConstants() {
     }
 }

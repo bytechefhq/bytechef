@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
@@ -41,6 +42,7 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall.Status;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.scheduler.TriggerScheduler;
@@ -52,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -132,6 +135,51 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
     }
 
     @Test
+    void testWritesRecordsToMetadata() {
+        TaskExecution taskExecution = createTaskExecution("recordTwoCompletedCalls/v1");
+
+        List<ClusterElementCallRef> refs = new CopyOnWriteArrayList<>();
+
+        testTaskHandlerRegistry.register("recordTwoCompletedCalls/v1", clonedTaskExecution -> {
+            long jobId = Objects.requireNonNull(clonedTaskExecution.getJobId());
+            long taskExecutionId = Objects.requireNonNull(clonedTaskExecution.getId());
+
+            ClusterElementCallRef firstRef = start(jobId, taskExecutionId, "httpClient_1");
+
+            recorder.callCompleted(jobId, taskExecutionId, firstRef, "first");
+
+            ClusterElementCallRef secondRef = start(jobId, taskExecutionId, "slack_1");
+
+            recorder.callCompleted(jobId, taskExecutionId, secondRef, "second");
+
+            refs.add(firstRef);
+            refs.add(secondRef);
+
+            return "output";
+        });
+
+        TaskExecution completedTaskExecution = execute(taskExecution);
+
+        List<ClusterElementCallRecord> records = getRecords(completedTaskExecution);
+
+        assertEquals(2, records.size());
+
+        ClusterElementCallRecord firstRecord = records.get(0);
+        ClusterElementCallRef firstRef = refs.get(0);
+        ClusterElementCallRecord secondRecord = records.get(1);
+        ClusterElementCallRef secondRef = refs.get(1);
+
+        assertEquals(firstRef.id(), firstRecord.id());
+        assertEquals("first", firstRecord.output());
+        assertEquals(secondRef.id(), secondRecord.id());
+        assertEquals("second", secondRecord.output());
+
+        Map<String, ?> metadata = completedTaskExecution.getMetadata();
+
+        assertTrue(metadata.containsKey(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALLS));
+    }
+
+    @Test
     void testMergesWithExistingMetadata() {
         TaskExecution taskExecution = createTaskExecution("recordCompletedCall/v1");
 
@@ -158,6 +206,40 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
         assertEquals(Status.FAILED, call.status());
         assertEquals(startDate, call.startDate());
         assertEquals("boom", call.error());
+    }
+
+    @Test
+    void testMergesRecordsWithStoredOnes() {
+        TaskExecution taskExecution = createTaskExecution("completeStoredSuspendedCall/v1");
+
+        Instant startDate = Instant.parse("2026-10-23T10:00:00Z");
+
+        ClusterElementCallRecord storedRecord = new ClusterElementCallRecord(
+            "a", null, "httpClient_1", "httpClient", "get", ClusterElementCallRecord.Status.SUSPENDED, startDate, null,
+            "stored input", null, null);
+
+        taskExecution.putMetadata(
+            TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS, List.of(storedRecord.toMap()));
+
+        testTaskHandlerRegistry.register("completeStoredSuspendedCall/v1", clonedTaskExecution -> {
+            recorder.callCompleted(
+                Objects.requireNonNull(clonedTaskExecution.getJobId()),
+                Objects.requireNonNull(clonedTaskExecution.getId()),
+                new ClusterElementCallRef("a", "httpClient_1"), "answer");
+
+            return "output";
+        });
+
+        List<ClusterElementCallRecord> records = getRecords(execute(taskExecution));
+
+        assertEquals(1, records.size());
+
+        ClusterElementCallRecord record = records.get(0);
+
+        assertEquals("a", record.id());
+        assertEquals(ClusterElementCallRecord.Status.COMPLETED, record.status());
+        assertEquals("stored input", record.input());
+        assertEquals("answer", record.output());
     }
 
     @Test
@@ -221,6 +303,7 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
         Map<String, ?> metadata = completedTaskExecution.getMetadata();
 
         assertFalse(metadata.containsKey(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALLS));
+        assertFalse(metadata.containsKey(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS));
     }
 
     private ClusterElementCallRef start(long jobId, long taskExecutionId, String workflowNodeName) {
@@ -261,6 +344,20 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
         return calls.stream()
             .map(ClusterElementCall::fromMap)
             .collect(Collectors.toMap(ClusterElementCall::workflowNodeName, call -> call));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<ClusterElementCallRecord> getRecords(TaskExecution taskExecution) {
+        Map<String, ?> metadata = taskExecution.getMetadata();
+
+        List<Map<String, ?>> records = (List<Map<String, ?>>) metadata.get(
+            TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS);
+
+        assertNotNull(records, "The cluster element call records must be stored in the task execution metadata");
+
+        return records.stream()
+            .map(ClusterElementCallRecord::fromMap)
+            .toList();
     }
 
     @TestConfiguration
