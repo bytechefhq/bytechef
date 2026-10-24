@@ -1018,3 +1018,31 @@ export async function answerInteractiveCards(
 
     return answers;
 }
+
+export async function createBearerTokenConnectionThroughApi(
+    page: Page,
+    {
+        componentName,
+        environmentId,
+        name,
+        token,
+        workspaceId,
+    }: {componentName: string; environmentId: number; name: string; token: string; workspaceId: number}
+): Promise<number> {
+    const response = await page.request.post(CONNECTIONS_API_PATH, {
+        data: {
+            authorizationType: 'BEARER_TOKEN',
+            componentName,
+            connectionVersion: 1,
+            environmentId,
+            name,
+            parameters: {token},
+            workspaceId,
+        },
+        headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
+    });
+
+    await expectOk(response, `creating connection ${name}`);
+
+    return Number(await response.text());
+}
