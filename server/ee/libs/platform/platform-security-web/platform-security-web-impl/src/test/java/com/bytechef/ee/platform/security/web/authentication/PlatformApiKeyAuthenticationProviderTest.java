@@ -29,13 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
- * /api/platform/v1 is admin-key-only. An admin key is the one carrying no {@link PlatformType} --
- * {@code getAdminApiKeys(environmentId)} is {@code getApiKeys(environmentId, null)} -- so a non-null type means an
- * automation or embedded key was presented. Everything behind that path is ROLE_ADMIN-guarded and tenant-wide in
- * effect, so an environment-scoped key promised a containment the endpoints do not provide.
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 class PlatformApiKeyAuthenticationProviderTest {
@@ -78,15 +72,26 @@ class PlatformApiKeyAuthenticationProviderTest {
             .hasMessage("Admin API key required");
     }
 
+    @Test
+    void testAuthenticateRejectsAnApiKeyWithoutOwner() {
+        assertThatThrownBy(() -> newProvider(null, null).authenticate(newToken()))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("API key has no owner");
+    }
+
     private static PlatformApiKeyAuthenticationToken newToken() {
         return new PlatformApiKeyAuthenticationToken((int) ENVIRONMENT_ID, SECRET_KEY, "public");
     }
 
     private static PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType) {
+        return newProvider(platformType, 1L);
+    }
+
+    private static PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType, Long userId) {
         ApiKey apiKey = mock(ApiKey.class);
 
         when(apiKey.getType()).thenReturn(platformType);
-        when(apiKey.getUserId()).thenReturn(1L);
+        when(apiKey.getUserId()).thenReturn(userId);
 
         ApiKeyService apiKeyService = mock(ApiKeyService.class);
 
