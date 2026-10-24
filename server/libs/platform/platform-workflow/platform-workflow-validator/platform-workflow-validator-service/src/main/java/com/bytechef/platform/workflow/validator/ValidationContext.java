@@ -266,6 +266,10 @@ class ValidationContext {
         return requiredClusterElementTypes == null ? clusterElementTypes : requiredClusterElementTypes;
     }
 
+    public @Nullable Set<String> getClusterElementSlotKeys(String clusterElementType) {
+        return clusterTypesProvider == null ? null : clusterTypesProvider.getClusterElementSlotKeys(clusterElementType);
+    }
+
     public WorkflowValidator.ResourceReferenceProvider getResourceReferenceProvider() {
         return resourceReferenceProvider;
     }
