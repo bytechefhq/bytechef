@@ -30,7 +30,7 @@ import {
     ArchiveIcon,
     ArchiveRestoreIcon,
     MoreVerticalIcon,
-    PanelRightOpenIcon,
+    PanelRightIcon,
     PencilIcon,
     Trash2Icon,
     WrenchIcon,
@@ -123,7 +123,7 @@ const AiHubPanel = () => {
                             <TooltipTrigger asChild>
                                 <Button
                                     aria-label="Open resource panel"
-                                    icon={<PanelRightOpenIcon />}
+                                    icon={<PanelRightIcon />}
                                     onClick={() => setRightPanelOpen(true)}
                                     size="icon"
                                     variant="ghost"
