@@ -1,0 +1,125 @@
+name: Live AI Tests
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-ai-tests
+  cancel-in-progress: false
+
+jobs:
+  live-ai-tests:
+    if: ${{ github.repository == 'bytechefhq/bytechef' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      BYTECHEF_AI_PROVIDER_ANTHROPIC_APIKEY: ${{ secrets.LIVE_TESTS_ANTHROPIC_API_KEY }}
+      BYTECHEF_SERVER_URL: http://127.0.0.1:9555
+      NODE_OPTIONS: "--max_old_space_size=4096"
+      PLAYWRIGHT_ANTHROPIC_API_KEY: ${{ secrets.LIVE_TESTS_ANTHROPIC_API_KEY }}
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:5173
+      PLAYWRIGHT_LIVE: 1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require the Anthropic key
+        run: |
+          if [ -z "$BYTECHEF_AI_PROVIDER_ANTHROPIC_APIKEY" ]; then
+            echo "Set the LIVE_TESTS_ANTHROPIC_API_KEY repository secret to run the live AI tests."
+            exit 1
+          fi
+      - name: Set up GraalVM for JDK 25
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'graalvm-community'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Start the development infrastructure
+        env:
+          PASSWORD_FROM_LOCAL_DOT_ENV_FILE: postgres
+        run: docker compose -f server/docker-compose.dev.infra.yml up -d --wait
+      - name: Install the client and Playwright
+        working-directory: client
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Start the server
+        run: |
+          nohup ./gradlew -p server/apps/server-app bootRun \
+            --args="--server.port=9555 --bytechef.ai.copilot.enabled=true --bytechef.ai.hub.enabled=true --bytechef.ai.mcp.server.enabled=true --bytechef.ai.knowledge-base.enabled=true" \
+            > server.log 2>&1 &
+          for attempt in $(seq 1 180); do
+            if curl -sf http://127.0.0.1:9555/actuator/health > /dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "The server did not become healthy"
+          tail -200 server.log
+          exit 1
+      - name: Start the client
+        working-directory: client
+        run: |
+          nohup npm run dev -- --port 5173 --strictPort --host 127.0.0.1 > ../client.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:5173 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "The client did not start"
+          exit 1
+      - name: Run the stubbed AI specs
+        working-directory: client
+        run: |
+          npx playwright test \
+            test/playwright/tests/ai-hub/aiHubBuild.spec.ts \
+            test/playwright/tests/ai-hub/aiHubRegressions.spec.ts \
+            test/playwright/tests/copilot/copilotPickers.spec.ts \
+            test/playwright/tests/workflow/clusterElementLayout.spec.ts \
+            --project=chromium --workers=3 --reporter=list
+      - name: Run the live AI specs
+        working-directory: client
+        run: |
+          npx playwright test \
+            test/playwright/tests/ai-hub/aiHubBuilderSamplesLive.spec.ts \
+            test/playwright/tests/ai-hub/aiHubBuilderEditsLive.spec.ts \
+            test/playwright/tests/ai-hub/aiHubCardsLive.spec.ts \
+            test/playwright/tests/ai-hub/aiHubDebugLive.spec.ts \
+            test/playwright/tests/ai-hub/aiHubLive.spec.ts \
+            test/playwright/tests/copilot/copilotCardsLive.spec.ts \
+            test/playwright/tests/copilot/copilotLive.spec.ts \
+            --grep-invert "configuration" \
+            --project=chromium --workers=3 --reporter=list,html
+      - name: Upload the Playwright report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-ai-tests-report
+          path: client/playwright-report
+          retention-days: 14
+      - name: Upload the server log
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-ai-tests-server-log
+          path: |
+            server.log
+            client.log
+          retention-days: 14
