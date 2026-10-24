@@ -1,0 +1,41 @@
+{
+    "label": "Contacts Export",
+    "description": "Copies contacts from a CSV file to a JSON file",
+    "inputs": [],
+    "triggers": [
+        {
+            "label": "Manual",
+            "name": "trigger_1",
+            "type": "manual/v1/manual",
+            "parameters": {}
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Stream Contacts",
+            "name": "stream_1",
+            "type": "dataStream/v1/stream",
+            "parameters": {},
+            "clusterElements": {
+                "source": {
+                    "label": "Read CSV",
+                    "name": "reader_1",
+                    "type": "csvFile/v1/reader",
+                    "parameters": {
+                        "headerRow": true,
+                        "delimiter": ","
+                    }
+                },
+                "destination": {
+                    "label": "Write JSON",
+                    "name": "writer_1",
+                    "type": "jsonFile/v1/writer",
+                    "parameters": {
+                        "fileType": "JSON",
+                        "filename": "contacts.json"
+                    }
+                }
+            }
+        }
+    ]
+}

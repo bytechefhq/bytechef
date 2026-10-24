@@ -1,0 +1,46 @@
+{
+    "label": "Support Agent",
+    "description": "Answers support questions in chat",
+    "inputs": [],
+    "triggers": [
+        {
+            "label": "Chat",
+            "name": "trigger_1",
+            "type": "chat/v1/newChatRequest",
+            "parameters": {
+                "mode": 1
+            }
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Support Agent",
+            "name": "aiAgent_1",
+            "type": "aiAgent/v1/chat",
+            "parameters": {
+                "format": "SIMPLE",
+                "systemPrompt": "You are a helpful support agent.",
+                "userPrompt": "${trigger_1.message}"
+            },
+            "clusterElements": {
+                "chatMemory": {
+                    "label": "Memory",
+                    "name": "chatMemory_1",
+                    "type": "chatMemory/v2/chatMemory",
+                    "parameters": {
+                        "conversationId": "${trigger_1.conversationId}"
+                    }
+                },
+                "model": {
+                    "label": "Claude",
+                    "name": "anthropic_1",
+                    "type": "anthropic/v1/model",
+                    "parameters": {
+                        "model": "claude-sonnet-4-5",
+                        "maxTokens": 1024
+                    }
+                }
+            }
+        }
+    ]
+}
