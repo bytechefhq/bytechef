@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall.Status;
@@ -486,6 +487,108 @@ class ClusterElementCallRecorderTest {
                 .records()
                 .getFirst()
                 .input());
+    }
+
+    @Test
+    void testRecordOutcomeStoresOneFinishedRecordAndNotifies() {
+        List<ClusterElementCallEvent> events = new CopyOnWriteArrayList<>();
+
+        recorder.addListener(1, events::add);
+
+        String details = "{\"side\":\"INPUT\"}";
+
+        recorder.recordOutcome(
+            1L, 2L, "guardrails_1", "checkForViolations", null, ClusterElementCallRecord.Status.BLOCKED, details,
+            null);
+
+        ClusterElementCallDrain drain = recorder.drain(2L);
+
+        assertEquals(1, drain.records()
+            .size());
+
+        ClusterElementCallRecord callRecord = drain.records()
+            .getFirst();
+
+        assertEquals(ClusterElementCallRecord.Status.BLOCKED, callRecord.status());
+        assertNotNull(callRecord.startDate());
+        assertEquals(callRecord.startDate(), callRecord.endDate());
+        assertEquals(details, callRecord.output());
+        assertNull(callRecord.error());
+        assertNull(callRecord.input());
+        assertEquals(1, events.size());
+        assertEquals(Type.BLOCKED, events.getFirst()
+            .type());
+        assertEquals(ClusterElementCallRecord.Status.BLOCKED, events.getFirst()
+            .record()
+            .status());
+        assertEquals(Status.BLOCKED, drain.calls()
+            .get("guardrails_1")
+            .status());
+    }
+
+    @Test
+    void testRecordOutcomeRejectsNonOutcomeStatus() {
+        for (ClusterElementCallRecord.Status status : List.of(
+            ClusterElementCallRecord.Status.STARTED, ClusterElementCallRecord.Status.COMPLETED,
+            ClusterElementCallRecord.Status.SUSPENDED)) {
+
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> recorder.recordOutcome(1L, 2L, "guardrails_1", null, null, status, null, null));
+        }
+    }
+
+    @Test
+    void testOutcomeFailedKeepsAggregateFailedAcrossLaterCompletedCall() {
+        recorder.recordOutcome(1L, 2L, "model_1", "openAi", null, ClusterElementCallRecord.Status.FAILED, null, "bad");
+
+        ClusterElementCallRef ref = recorder.callStarted(1L, 2L, "model_1", "openAi", null, null, null);
+
+        recorder.callCompleted(1L, 2L, ref, null);
+
+        ClusterElementCall call = recorder.drain(2L)
+            .calls()
+            .get("model_1");
+
+        assertEquals(Status.FAILED, call.status());
+        assertEquals("bad", call.error());
+    }
+
+    @Test
+    void testBlockedAggregateIsNotClearedByALaterCompletedCall() {
+        recorder.recordOutcome(
+            1L, 2L, "guardrails_1", "checkForViolations", null, ClusterElementCallRecord.Status.BLOCKED, null, null);
+
+        ClusterElementCallRef ref = recorder.callStarted(
+            1L, 2L, "guardrails_1", "checkForViolations", null, null, null);
+
+        recorder.callCompleted(1L, 2L, ref, null);
+
+        assertEquals(Status.BLOCKED, recorder.drain(2L)
+            .calls()
+            .get("guardrails_1")
+            .status());
+    }
+
+    @Test
+    void testClaimFailureClaimsOnceAndSeesThroughCauses() {
+        RuntimeException cause = new RuntimeException("x");
+
+        assertTrue(recorder.claimFailure(2L, cause));
+        assertFalse(recorder.claimFailure(2L, cause));
+        assertFalse(recorder.claimFailure(2L, new IllegalStateException("wrap", cause)));
+        assertTrue(recorder.claimFailure(2L, new RuntimeException("other")));
+    }
+
+    @Test
+    void testDrainClearsClaims() {
+        RuntimeException failure = new RuntimeException("x");
+
+        assertTrue(recorder.claimFailure(2L, failure));
+
+        recorder.drain(2L);
+
+        assertTrue(recorder.claimFailure(2L, failure));
     }
 
     private static ClusterElementCallRef start(ClusterElementCallRecorder recorder, String input) {
