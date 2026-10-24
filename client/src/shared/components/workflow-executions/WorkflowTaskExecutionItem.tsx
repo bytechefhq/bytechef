@@ -1,13 +1,11 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {
-    ClusterElementCallTaskExecutionI,
-    isClusterElementCallTaskExecution,
-} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
+import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, TaskExecution} from '@/shared/middleware/platform/workflow/execution';
+import {CircleDashedIcon} from 'lucide-react';
 
 interface WorkflowTaskExecutionItemProps {
     attemptLabel?: string;
@@ -20,9 +18,13 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: Wor
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
     const callNote = isClusterElementCallTaskExecution(taskExecution)
-        ? (taskExecution as ClusterElementCallTaskExecutionI).clusterElementCallNote
+        ? taskExecution.clusterElementCallNote
         : undefined;
-    const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobStatus));
+    const statusIcon = callNote ? (
+        <CircleDashedIcon className="size-4 text-muted-foreground" />
+    ) : (
+        getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobStatus))
+    );
 
     return (
         <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">
