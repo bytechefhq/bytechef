@@ -85,6 +85,15 @@ describe('AiHubResourcePanel', () => {
         expect(aiHubTabsStore.getState().rightPanelOpen).toBe(false);
     });
 
+    it('shows the plain right-panel icon on its close control', () => {
+        renderPanel();
+
+        const closeButton = screen.getByRole('button', {name: 'Close resource panel'});
+
+        expect(closeButton.querySelector('svg.lucide-panel-right')).not.toBeNull();
+        expect(closeButton.querySelector('svg.lucide-panel-right-close')).toBeNull();
+    });
+
     it('scrolls the active tab into view so it is never left clipped', () => {
         const scrolledElements: Element[] = [];
 
