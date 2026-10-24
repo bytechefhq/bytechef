@@ -55,8 +55,10 @@ import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
 import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -639,6 +641,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             new InteractivePickerToolCallbacks(
                 connectionDefinitionService, workspaceConnectionFacade, componentDefinitionService,
                 actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                mock(ClusterElementDefinitionService.class), mock(ClusterElementDefinitionFacade.class),
                 propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
             actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
             propertyOptionsResolver, scopedConnectionGuard, emptyDataTableToolsProvider());

@@ -77,8 +77,9 @@ class CopilotConfigurationTest {
 
     private static final List<String> KNOWN_PICKER_AND_ASK_TOOL_NAMES = List.of(
         "askUserQuestion", "createConnection", "listConnectionsForComponent", "lookupActionPropertyOptions",
-        "lookupComponentPropertyOptions", "lookupTriggerPropertyOptions", "saveWorkflowTestConnection",
-        "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption");
+        "lookupClusterElementPropertyOptions", "lookupComponentPropertyOptions", "lookupTriggerPropertyOptions",
+        "saveWorkflowTestConnection", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
+        "selectTriggerPropertyOption");
 
     private static final String LOOKUP_PROPERTY_OPTIONS_TOOL_NAME = new LookupComponentPropertyOptionsToolCallback(
         mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
