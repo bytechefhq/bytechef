@@ -9,6 +9,7 @@
     "get-started/quick-start",
     "--- Build ---",
     "build/ai-copilot",
+    "build/ai-examples",
     "build/connections",
     "build/workflows",
     "--- Deploy ---",
