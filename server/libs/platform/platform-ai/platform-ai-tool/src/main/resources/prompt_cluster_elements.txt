@@ -8,6 +8,9 @@ Rules:
 - Put each element under the key of its own cluster element type (model, chatMemory, tools, rag, guardrails, source, processor, destination, ...). Use an array for a type that allows multiple elements and an object otherwise; getAction on the root tells you which.
 - Use the root's native cluster element types for what the request asks for, for example guardrails for blocking personal data instead of a script and a condition around the agent.
 - validateWorkflow reports a cluster element whose type does not exist or that sits under the wrong key. Fix those before you finish.
+- An AI Agent tool's parameters that the agent decides at run time (the numbers to add, the message to post, the record to look up) must be fromAi expressions, for example "firstNumber": "=fromAi('firstNumber', 'NUMBER', {'description': 'The first number to add'})". A fixed value makes the tool always use that value. Use fixed values only for settings the user gave you, such as a Slack channel.
+- Work the agent does belongs in its tools; later workflow tasks cannot read a tool's result. When a human must approve what the agent does (for example every Slack post), wrap those tools in an approval gate: put an "aiAgentUtils/v1/approvalGate" element in the agent's tools with parameters {"name": "<what is approved>"} and its own clusterElements {"tools": [the gated tools], "approvalChannels": [the channels]}. For approval in the chat use "chat/v1/chat" as the channel. Never put "approval/v1/requestApproval" or another gate inside a gate.
+- For a RAG question over "our knowledge base", use the built-in "knowledgeBase/v1/vectorStore" as the vector store unless the user names another store.
 Example of tasks with cluster elements:
 "tasks": [
   {
