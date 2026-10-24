@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.tool.ProjectTools;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.configuration.tool.ReadProjectTools;
 import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
@@ -104,7 +105,7 @@ public class AiHubConfiguration {
     @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubAskSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, WorkflowExecutionTools workflowExecutionTools,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
@@ -115,7 +116,7 @@ public class AiHubConfiguration {
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
-            List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools)));
+            List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools, workflowExecutionTools)));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
@@ -131,7 +132,7 @@ public class AiHubConfiguration {
     @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubBuildSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ProjectTools projectTools,
-        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
+        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools, WorkflowExecutionTools workflowExecutionTools,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
@@ -144,7 +145,7 @@ public class AiHubConfiguration {
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
-            List.of(ToolCallbacks.from(projectTools, projectWorkflowLifecycleTools)));
+            List.of(ToolCallbacks.from(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools)));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
