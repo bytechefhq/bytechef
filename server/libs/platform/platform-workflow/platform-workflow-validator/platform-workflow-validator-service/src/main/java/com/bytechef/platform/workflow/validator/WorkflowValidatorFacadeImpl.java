@@ -105,6 +105,11 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             public List<String> getRequiredClusterElementTypes(String taskType) {
                 return getClusterElementTypeKeys(taskType, true);
             }
+
+            @Override
+            public Set<String> getClusterElementSlotKeys(String clusterElementType) {
+                return findClusterElementSlotKeys(clusterElementType);
+            }
         };
 
     @SuppressFBWarnings("EI2")
@@ -738,6 +743,38 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         }
 
         return null;
+    }
+
+    private Set<String> findClusterElementSlotKeys(String clusterElementType) {
+        WorkflowNodeType workflowNodeType;
+
+        try {
+            workflowNodeType = WorkflowNodeType.ofType(clusterElementType);
+        } catch (IllegalArgumentException exception) {
+            return Set.of();
+        }
+
+        String clusterElementName = workflowNodeType.operation();
+
+        if (clusterElementName == null) {
+            return Set.of();
+        }
+
+        ComponentDefinition componentDefinition;
+
+        try {
+            componentDefinition = componentDefinitionService.getComponentDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+        } catch (IllegalArgumentException exception) {
+            return Set.of();
+        }
+
+        return componentDefinition.getClusterElements()
+            .stream()
+            .filter(clusterElementDefinition -> clusterElementName.equals(clusterElementDefinition.getName()))
+            .map(clusterElementDefinition -> clusterElementDefinition.getType()
+                .key())
+            .collect(Collectors.toSet());
     }
 
     static List<String> toClusterElementTypeKeys(
