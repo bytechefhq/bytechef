@@ -17,6 +17,8 @@
 package com.bytechef.component.ai.agent.utils.cluster.subagent;
 
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
@@ -55,26 +57,27 @@ public class ClusterElementCallObservingSubagentExecutor implements SubagentExec
 
         ClusterElement clusterElement = clusterElementSubagentDefinition.getClusterElement();
 
-        String workflowNodeName = clusterElement.getWorkflowNodeName();
-
-        recorder.callStarted(jobId, taskExecutionId, workflowNodeName);
+        ClusterElementCallRef parent = ClusterElementCallScope.current();
+        ClusterElementCallRef ref = recorder.callStarted(
+            jobId, taskExecutionId, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName(),
+            clusterElementSubagentDefinition.getName(), parent == null ? null : parent.id(), taskCall.prompt());
 
         String result;
 
         try {
-            result = delegate.execute(taskCall, subagentDefinition);
+            result = ClusterElementCallScope.callWith(ref, () -> delegate.execute(taskCall, subagentDefinition));
         } catch (RuntimeException exception) {
             String message = exception.getMessage();
 
             recorder.callFailed(
-                jobId, taskExecutionId, workflowNodeName,
+                jobId, taskExecutionId, ref,
                 message == null ? exception.getClass()
                     .getSimpleName() : message);
 
             throw exception;
         }
 
-        recorder.callCompleted(jobId, taskExecutionId, workflowNodeName);
+        recorder.callCompleted(jobId, taskExecutionId, ref, result);
 
         return result;
     }

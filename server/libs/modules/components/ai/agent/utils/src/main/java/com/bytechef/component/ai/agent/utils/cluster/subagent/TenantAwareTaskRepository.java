@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.agent.utils.cluster.subagent;
 
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.tenant.TenantContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -55,7 +57,12 @@ public class TenantAwareTaskRepository implements TaskRepository {
     public BackgroundTask putTask(String taskId, Supplier<String> supplier) {
         String tenantId = TenantContext.getCurrentTenantId();
 
-        return defaultTaskRepository.putTask(taskId, () -> TenantContext.callWithTenantId(tenantId, supplier::get));
+        ClusterElementCallRef callRef = ClusterElementCallScope.current();
+
+        return defaultTaskRepository.putTask(
+            taskId,
+            () -> TenantContext.callWithTenantId(
+                tenantId, () -> ClusterElementCallScope.callWith(callRef, supplier::get)));
     }
 
     @Override
