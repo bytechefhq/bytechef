@@ -360,8 +360,20 @@ execution detail:
   run resumes.
 - **A background sub-agent's call** that was still running when the agent finished reads "Still running
   when the agent finished".
-- **Only tools and Task Tool sub-agents get rows.** The model, memory, RAG and guardrail elements do
-  not.
+- **Only tools and Task Tool sub-agents get rows on a normal run.** The model, memory, RAG and
+  guardrail elements get a row only when they fail, block or redact, as described below.
+
+The model, chat memory, RAG and guardrail elements stay grey on a normal run. The element that raised
+an error (model, chat memory or RAG) turns red, its row shows the error, and the agent fails; an error
+from below a guardrail now fails the agent too, instead of producing the guardrail's blocked message or
+"response withheld" text. A Check for Violations check that blocked the input or the output turns
+amber, as does its Check for Violations frame, and the agent stays green with a **Blocked** badge; a
+check that could not run because its model failed reads "could not run", and a check that crashed turns
+red. A Sanitize Text sanitizer that changed the text turns blue with the number of masked values, and
+the agent is unchanged; a sanitizer that crashed turns red, its Sanitize Text frame turns amber, the
+reply is withheld, and the agent shows a **Withheld** badge. These rows have a **Details** tab instead
+of Input and Output, and never show the matched or redacted text, only which check or sanitizer, which
+side (input or output) and how many.
 
 ### Supplying tool parameters with fromAi
 
