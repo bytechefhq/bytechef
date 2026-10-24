@@ -182,11 +182,14 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
         return chain.nextStream(sanitizedRequest)
             .map(response -> safeRewriteResponse(request, response, outputTally, parentRef))
             .takeUntil(SanitizeTextAdvisor::isWithheldResponse)
-            .doOnComplete(() -> {
-                if (!outputTally.withheld) {
-                    recordRedactions(outputTally, SIDE_OUTPUT, parentRef);
-                }
-            });
+            .doOnComplete(() -> recordStreamRedactions(outputTally, parentRef))
+            .doOnError(throwable -> recordStreamRedactions(outputTally, parentRef));
+    }
+
+    private void recordStreamRedactions(SanitizeTally outputTally, ClusterElementCallRef parentRef) {
+        if (!outputTally.withheld) {
+            recordRedactions(outputTally, SIDE_OUTPUT, parentRef);
+        }
     }
 
     private ChatClientResponse safeRewriteResponse(
@@ -389,7 +392,11 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
 
                             maskEntities.merge(entities);
 
-                            tally.redacted(entry, entities.size());
+                            int maskCount = MaskEntityMapUtils.countMatches(intermediate, entities);
+
+                            if (maskCount > 0) {
+                                tally.redacted(entry, maskCount);
+                            }
                         }
                         case MaskResult.Masked maskedResult -> {
                             String maskedText = maskedResult.text();
