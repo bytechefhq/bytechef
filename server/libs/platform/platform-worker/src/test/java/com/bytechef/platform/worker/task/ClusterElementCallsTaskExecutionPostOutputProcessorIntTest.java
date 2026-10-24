@@ -243,6 +243,37 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
     }
 
     @Test
+    void testStoresOutcomeRecordsWithTheTaskExecution() {
+        TaskExecution taskExecution = createTaskExecution("recordBlockedOutcome/v1");
+
+        String details = "{\"side\":\"INPUT\",\"matchCount\":2}";
+
+        testTaskHandlerRegistry.register("recordBlockedOutcome/v1", clonedTaskExecution -> {
+            recorder.recordOutcome(
+                Objects.requireNonNull(clonedTaskExecution.getJobId()),
+                Objects.requireNonNull(clonedTaskExecution.getId()), "guardrails_1", "guardrails", null,
+                ClusterElementCallRecord.Status.BLOCKED, details, null);
+
+            return "output";
+        });
+
+        TaskExecution completedTaskExecution = execute(taskExecution);
+
+        List<ClusterElementCallRecord> records = getRecords(completedTaskExecution);
+
+        assertEquals(1, records.size());
+
+        ClusterElementCallRecord record = records.get(0);
+
+        assertEquals(ClusterElementCallRecord.Status.BLOCKED, record.status());
+        assertEquals(details, record.output());
+
+        ClusterElementCall call = getCalls(completedTaskExecution).get("guardrails_1");
+
+        assertEquals(Status.BLOCKED, call.status());
+    }
+
+    @Test
     void testLeavesOutputUnchanged() {
         TaskExecution taskExecution = createTaskExecution("recordStartedCallWithMapOutput/v1");
 
