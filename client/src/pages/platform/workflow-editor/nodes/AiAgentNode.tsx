@@ -32,6 +32,7 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import getClusterElementIconStatuses from '../utils/getClusterElementIconStatuses';
+import getClusterRootOutcome from '../utils/getClusterRootOutcome';
 import {getNodeLabel} from '../utils/getNodeLabel';
 import {getTask} from '../utils/getTask';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
@@ -41,6 +42,7 @@ import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {toggleNodeDisabled} from '../utils/toggleNodeDisabled';
 import ClusterFrameShell from './ClusterFrameShell';
+import ClusterRootOutcomeBadge from './ClusterRootOutcomeBadge';
 import DisabledNodeBadge from './DisabledNodeBadge';
 import styles from './NodeTypes.module.css';
 import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
@@ -123,6 +125,14 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             data.clusterElements && !Array.isArray(data.clusterElements)
                 ? getClusterElementIconStatuses(data.clusterElements, workflowTestNodeStates)
                 : {},
+        [data.clusterElements, workflowTestNodeStates]
+    );
+
+    const clusterRootOutcome = useMemo(
+        () =>
+            data.clusterElements && !Array.isArray(data.clusterElements)
+                ? getClusterRootOutcome(data.clusterElements, workflowTestNodeStates)
+                : undefined,
         [data.clusterElements, workflowTestNodeStates]
     );
 
@@ -447,6 +457,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     onClick={handleNodeClick}
                                 >
                                     {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
+
+                                    {clusterRootOutcome && <ClusterRootOutcomeBadge outcome={clusterRootOutcome} />}
 
                                     <span className="self-center text-content-neutral-primary [&_svg]:size-9">
                                         {data.icon ? (
