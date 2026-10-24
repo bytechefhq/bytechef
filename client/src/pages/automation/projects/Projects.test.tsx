@@ -8,6 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const mockProjectsState = vi.hoisted(() => ({
     captureEmptyStateAction: vi.fn(),
     captureProjectImported: vi.fn(),
+    dataSyncs: [] as {id: string; projectId: string; triggerType: string}[],
     navigate: vi.fn(),
     projects: [] as unknown[],
 }));
@@ -97,7 +98,17 @@ vi.mock('@/shared/mutations/automation/projects.mutations', async () => {
 vi.mock('@/pages/automation/project/loadProject', () => ({default: vi.fn()}));
 
 vi.mock('@/pages/automation/projects/components/project-list/ProjectList', () => ({
-    default: () => <div data-testid="project-list" />,
+    default: ({defaultActiveTab, projects}: {defaultActiveTab?: string; projects: {id: number; name: string}[]}) => (
+        <div data-default-active-tab={defaultActiveTab} data-testid="project-list">
+            {projects.map((project) => (
+                <span key={project.id}>{project.name}</span>
+            ))}
+        </div>
+    ),
+}));
+
+vi.mock('@/pages/automation/data-syncs/hooks/useDataSyncs', () => ({
+    default: () => ({dataSyncs: mockProjectsState.dataSyncs, dataSyncsIsLoading: false}),
 }));
 
 vi.mock('sonner', () => ({toast: vi.fn()}));
@@ -119,6 +130,7 @@ beforeEach(() => {
     mockProjectsState.captureEmptyStateAction.mockClear();
     mockProjectsState.captureProjectImported.mockClear();
     mockProjectsState.navigate.mockClear();
+    mockProjectsState.dataSyncs = [];
     mockProjectsState.projects = [];
 });
 
@@ -308,5 +320,51 @@ describe('Projects menus', () => {
 
             clickSpy.mockRestore();
         });
+    });
+});
+
+describe('Projects data syncs filter', () => {
+    const setUpProjectsWithDataSyncs = () => {
+        mockProjectsState.projects = [
+            {id: 1, name: 'Scheduled Project'},
+            {id: 2, name: 'Manual Project'},
+            {id: 3, name: 'Workflow Project'},
+        ];
+
+        mockProjectsState.dataSyncs = [
+            {id: 'ds1', projectId: '1', triggerType: 'SCHEDULE'},
+            {id: 'ds2', projectId: '2', triggerType: 'MANUAL'},
+        ];
+    };
+
+    it('keeps only projects with a data sync for All Data Syncs, opening rows on Data Syncs', () => {
+        setUpProjectsWithDataSyncs();
+
+        renderProjects(['/?dataSyncs=all']);
+
+        const projectList = screen.getByTestId('project-list');
+
+        expect(within(projectList).getByText('Scheduled Project')).toBeInTheDocument();
+        expect(within(projectList).getByText('Manual Project')).toBeInTheDocument();
+        expect(within(projectList).queryByText('Workflow Project')).not.toBeInTheDocument();
+        expect(projectList).toHaveAttribute('data-default-active-tab', 'dataSyncs');
+    });
+
+    it('keeps only projects with a scheduled data sync for Scheduled', () => {
+        setUpProjectsWithDataSyncs();
+
+        renderProjects(['/?dataSyncs=scheduled']);
+
+        const projectList = screen.getByTestId('project-list');
+
+        expect(within(projectList).getByText('Scheduled Project')).toBeInTheDocument();
+        expect(within(projectList).queryByText('Manual Project')).not.toBeInTheDocument();
+        expect(within(projectList).queryByText('Workflow Project')).not.toBeInTheDocument();
+    });
+
+    it('carries the active data syncs filter over to the category links', () => {
+        renderProjects(['/?dataSyncs=scheduled']);
+
+        expect(screen.getByRole('link', {name: 'All Categories'})).toHaveAttribute('href', '/?dataSyncs=scheduled');
     });
 });

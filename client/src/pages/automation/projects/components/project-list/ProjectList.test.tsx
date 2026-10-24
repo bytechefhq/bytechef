@@ -55,8 +55,17 @@ vi.mock('@/pages/automation/projects/components/project-agent-list/ProjectAgentL
     default: ({project}: any) => <div data-testid="project-agent-list">Agents for {project.id}</div>,
 }));
 
+vi.mock('@/pages/automation/projects/components/project-data-sync-list/ProjectDataSyncList', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    default: ({project}: any) => <div data-testid="project-data-sync-list">Data Syncs for {project.id}</div>,
+}));
+
 vi.mock('@/pages/automation/projects/components/project-agent-list/ProjectAgentCreationActions', () => ({
     default: () => <button aria-label="Create Agent">+ Agent</button>,
+}));
+
+vi.mock('@/pages/automation/projects/components/project-data-sync-list/ProjectDataSyncCreationActions', () => ({
+    default: () => <button aria-label="Create Data Sync">+ Data Sync</button>,
 }));
 
 vi.mock('@/pages/automation/agents/hooks/useAgents', () => ({
@@ -69,12 +78,18 @@ vi.mock('@/pages/automation/agents/hooks/useAgents', () => ({
     }),
 }));
 
+vi.mock('@/pages/automation/data-syncs/hooks/useDataSyncs', () => ({
+    default: () => ({
+        dataSyncs: [{id: 'ds1', projectId: '1', title: 'CRM Sync'}],
+    }),
+}));
+
 const projects = [
     {id: 1, name: 'Project One', projectWorkflowIds: [10, 20, 30]},
     {id: 2, name: 'Project Two', projectWorkflowIds: []},
 ] as Project[];
 
-const renderProjectList = (newlyCreatedProjectId?: number, defaultActiveTab?: 'agents' | 'workflows') =>
+const renderProjectList = (newlyCreatedProjectId?: number, defaultActiveTab?: 'agents' | 'dataSyncs' | 'workflows') =>
     render(
         <MemoryRouter>
             <ProjectList
@@ -93,6 +108,26 @@ describe('ProjectList', () => {
 
         expect(await screen.findByText('Workflows (3)')).toBeInTheDocument();
         expect(screen.getByText('Agents (2)')).toBeInTheDocument();
+        expect(screen.getByText('Data Syncs (1)')).toBeInTheDocument();
+    });
+
+    it('renders the data sync tab content and its tab-row create button for the expanded project', async () => {
+        renderProjectList(1);
+
+        (await screen.findByTestId('tabs-trigger-dataSyncs')).click();
+
+        await waitFor(() => expect(screen.getByTestId('project-data-sync-list')).toHaveTextContent('Data Syncs for 1'));
+
+        expect(await screen.findByRole('button', {name: 'Create Data Sync'})).toBeInTheDocument();
+    });
+
+    it('leaves the Data Syncs tab row without a create button while it is empty', async () => {
+        renderProjectList(2);
+
+        (await screen.findByTestId('tabs-trigger-dataSyncs')).click();
+
+        expect(await screen.findByText('Data Syncs (0)')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Data Sync'})).not.toBeInTheDocument();
     });
 
     it('always shows both tabs even when the project has nothing in them', async () => {
