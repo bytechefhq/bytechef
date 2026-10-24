@@ -16,7 +16,7 @@ import {
 } from '../../utils/aiHubUtils';
 import {enableCopilotInApplicationInfo, hideReactQueryDevtools} from '../../utils/copilotUtils';
 import getRandomString from '../../utils/getRandomString';
-import {McpClient, toolResultText} from '../../utils/mcpClient';
+import {McpClient, buildWorkflowAnsweringQuestions, toolResultText} from '../../utils/mcpClient';
 import editDataStream from './fixtures/edit-data-stream.json';
 import editInvoiceSchedule from './fixtures/edit-invoice-schedule.json';
 import editOrderSync from './fixtures/edit-order-sync.json';
@@ -300,7 +300,7 @@ test.describe('@live Builder edits of existing workflows', () => {
 
                 await mcpClient.initialize();
 
-                const buildResult = await mcpClient.callTool('buildWorkflow', {
+                const buildResult = await buildWorkflowAnsweringQuestions(mcpClient, {
                     request: `Update the existing workflow with workflowId ${seededWorkflow.workflowId}. ${editCase.instruction}`,
                     workspaceId,
                 });
