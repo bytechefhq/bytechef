@@ -130,7 +130,7 @@ class ValidationErrorUtils {
     public static String undefinedClusterElementSlot(
         String elementKey, String taskType, Collection<String> clusterElementKeys) {
 
-        return "Cluster element slot '" + elementKey + "' does not exist on " + taskType + "; its slots are " +
+        return "Cluster element '" + elementKey + "' is not a slot of " + taskType + "; its slots are " +
             String.join(", ", new TreeSet<>(clusterElementKeys));
     }
 }
