@@ -22,6 +22,7 @@ import com.bytechef.ai.agent.tool.AgentTypeRegistry;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.copilot.agent.CopilotRunErrorCode;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.advisor.TokenUsageLoggerAdvisor;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.NumberUtils;
@@ -489,6 +490,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private static final String TOOL_OBJECTS_UNSUPPORTED_MESSAGE =
             "AI Hub tools must be ToolCallbacks so they pass the approval gate; use toolCallbacks(...)";
 
+        private String agentId = "ai_hub";
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
         private @Nullable AiHubApprovalGate approvalGate;
@@ -579,6 +581,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         public Builder agentId(String agentId) {
             super.agentId(agentId);
 
+            this.agentId = agentId;
+
             return this;
         }
 
@@ -639,6 +643,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         public AiHubSpringAIAgent build() throws AGUIException {
             super.advisor(new NonEmptyMessagesAdvisor());
             super.advisor(new SimpleLoggerAdvisor(Integer.MAX_VALUE));
+            super.advisor(new TokenUsageLoggerAdvisor(agentId));
 
             wrappedToolCallbacks.clear();
 
