@@ -31,6 +31,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.component.domain.StringProperty;
@@ -460,6 +461,75 @@ class TestWorkflowExecutorIntTest {
             .containsEntry("taskExecutionId", String.valueOf(taskExecutionId))
             .containsKey("startDate")
             .containsKey("endDate");
+    }
+
+    @Test
+    void executeAsyncForwardsEachCallRecordWithCappedValues() throws Exception {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "agent", "type": "testComponent/v1/block", "parameters": {"gate": "agent"}}
+                    ]
+                }
+                """);
+
+        RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
+
+        CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
+            () -> testWorkflowExecutor.executeAsync(
+                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                (key, future) -> future.join(), key -> {}));
+
+        TaskGate taskGate = taskGates.get("agent");
+
+        assertThat(taskGate.awaitEntered(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+        assertThat(sseStreamBridge.awaitEvent(isEvent("task_started"), TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+
+        long jobId = getStartedJobId(sseStreamBridge);
+
+        List<Map<String, Object>> taskStartedPayloads = getTaskEventPayloads(sseStreamBridge, "task_started");
+
+        Map<String, Object> taskStartedPayload = taskStartedPayloads.getFirst();
+
+        long taskExecutionId = Long.parseLong((String) taskStartedPayload.get("taskExecutionId"));
+
+        ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
+
+        try {
+            ClusterElementCallRef clusterElementCallRef = clusterElementCallRecorder.callStarted(
+                jobId, taskExecutionId, "agent_1", "tool", "search", "parent-1", "{\"q\":\"x\"}");
+
+            clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, clusterElementCallRef, "y".repeat(70_000));
+
+            assertThat(
+                sseStreamBridge.awaitEvent(isEvent("cluster_element_completed"), TIMEOUT_SECONDS, TimeUnit.SECONDS))
+                    .isTrue();
+
+            taskGate.release();
+
+            executeAsyncFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } finally {
+            clusterElementCallRecorder.drain(taskExecutionId);
+        }
+
+        List<Map<String, Object>> startedPayloads = getTaskEventPayloads(sseStreamBridge, "cluster_element_started");
+        List<Map<String, Object>> completedPayloads = getTaskEventPayloads(
+            sseStreamBridge, "cluster_element_completed");
+
+        Map<String, Object> startedPayload = startedPayloads.getFirst();
+        Map<String, Object> completedPayload = completedPayloads.getFirst();
+
+        assertThat(startedPayload).containsEntry("parentCallId", "parent-1")
+            .containsEntry("componentName", "tool")
+            .containsEntry("toolName", "search")
+            .containsEntry("callStatus", "STARTED")
+            .containsEntry("input", "{\"q\":\"x\"}")
+            .doesNotContainKey("output");
+        assertThat(completedPayload).containsEntry("callStatus", "COMPLETED")
+            .containsEntry("callId", startedPayload.get("callId"));
+        assertThat((String) completedPayload.get("output")).hasSize(
+            ClusterElementCallRecord.MAX_VALUE_LENGTH + "\n... [truncated, 70000 characters]".length());
     }
 
     @Test
