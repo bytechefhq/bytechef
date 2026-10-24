@@ -28,17 +28,25 @@ import com.bytechef.component.ai.agent.guardrails.util.MaskEntityMapUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallTarget;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.MaskResult;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightMasking;
+import com.bytechef.platform.configuration.domain.ClusterElement;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
@@ -56,6 +64,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.content.Media;
 import reactor.core.publisher.Flux;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Spring-AI advisor that runs sanitizers over the user message (input) and the assistant message (output). PREFLIGHT
@@ -73,13 +82,23 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
 
     private static final String NAME = "SanitizeTextAdvisor";
     private static final String SANITIZER_FAILURE_PLACEHOLDER = "[sanitizer failed — response withheld]";
+    private static final String SIDE_INPUT = "INPUT";
+    private static final String SIDE_OUTPUT = "OUTPUT";
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .build();
 
-    private final List<SanitizerEntry> sanitizers;
+    private final ClusterElementCallTarget callTarget;
     private final Context context;
+    private final String frameComponentName;
+    private final String frameWorkflowNodeName;
+    private final List<SanitizerEntry> sanitizers;
 
-    private SanitizeTextAdvisor(Builder builder) {
-        this.sanitizers = List.copyOf(builder.sanitizers);
+    private SanitizeTextAdvisor(Builder builder, ClusterElementCallTarget callTarget) {
+        this.callTarget = callTarget;
         this.context = Objects.requireNonNull(builder.context, "context");
+        this.frameComponentName = builder.frameComponentName;
+        this.frameWorkflowNodeName = builder.frameWorkflowNodeName;
+        this.sanitizers = List.copyOf(builder.sanitizers);
     }
 
     public static Builder builder() {
@@ -98,57 +117,92 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
 
     @Override
     public ChatClientResponse adviseCall(ChatClientRequest request, CallAdvisorChain chain) {
+        ClusterElementCallRef parentRef = ClusterElementCallScope.current();
+        SanitizeTally inputTally = new SanitizeTally();
         ChatClientRequest sanitizedRequest;
 
         try {
-            sanitizedRequest = sanitizeRequest(request);
+            sanitizedRequest = sanitizeRequest(request, inputTally);
         } catch (OutOfMemoryError error) {
             throw error;
         } catch (Throwable throwable) {
             LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
 
+            recordWithheld(inputTally, SIDE_INPUT, parentRef);
+
             return withheldResponse(request);
         }
+
+        recordRedactions(inputTally, SIDE_INPUT, parentRef);
 
         ChatClientResponse response = chain.nextCall(sanitizedRequest);
 
+        SanitizeTally outputTally = new SanitizeTally();
+        ChatClientResponse rewrittenResponse;
+
         try {
-            return rewriteResponse(response);
+            rewrittenResponse = rewriteResponse(response, outputTally);
         } catch (OutOfMemoryError error) {
             throw error;
         } catch (Throwable throwable) {
             LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
 
+            recordWithheld(outputTally, SIDE_OUTPUT, parentRef);
+
             return withheldResponse(request);
         }
+
+        recordRedactions(outputTally, SIDE_OUTPUT, parentRef);
+
+        return rewrittenResponse;
     }
 
     @Override
     public Flux<ChatClientResponse> adviseStream(ChatClientRequest request, StreamAdvisorChain chain) {
+        ClusterElementCallRef parentRef = ClusterElementCallScope.current();
+        SanitizeTally inputTally = new SanitizeTally();
         ChatClientRequest sanitizedRequest;
 
         try {
-            sanitizedRequest = sanitizeRequest(request);
+            sanitizedRequest = sanitizeRequest(request, inputTally);
         } catch (OutOfMemoryError error) {
             throw error;
         } catch (Throwable throwable) {
             LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
+
+            recordWithheld(inputTally, SIDE_INPUT, parentRef);
 
             return Flux.just(withheldResponse(request));
         }
 
+        recordRedactions(inputTally, SIDE_INPUT, parentRef);
+
+        SanitizeTally outputTally = new SanitizeTally();
+
         return chain.nextStream(sanitizedRequest)
-            .map(response -> safeRewriteResponse(request, response))
-            .takeUntil(SanitizeTextAdvisor::isWithheldResponse);
+            .map(response -> safeRewriteResponse(request, response, outputTally, parentRef))
+            .takeUntil(SanitizeTextAdvisor::isWithheldResponse)
+            .doOnComplete(() -> {
+                if (!outputTally.withheld) {
+                    recordRedactions(outputTally, SIDE_OUTPUT, parentRef);
+                }
+            });
     }
 
-    private ChatClientResponse safeRewriteResponse(ChatClientRequest request, ChatClientResponse response) {
+    private ChatClientResponse safeRewriteResponse(
+        ChatClientRequest request, ChatClientResponse response, SanitizeTally outputTally,
+        ClusterElementCallRef parentRef) {
+
         try {
-            return rewriteResponse(response);
+            return rewriteResponse(response, outputTally);
         } catch (OutOfMemoryError error) {
             throw error;
         } catch (Throwable throwable) {
             LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
+
+            outputTally.withheld = true;
+
+            recordWithheld(outputTally, SIDE_OUTPUT, parentRef);
 
             return withheldResponse(request);
         }
@@ -162,7 +216,84 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
     }
 
     String sanitizeForTesting(String text) {
-        return sanitize(text, false);
+        return sanitize(text, false, new SanitizeTally());
+    }
+
+    private boolean canRecord() {
+        return callTarget != null && frameWorkflowNodeName != null;
+    }
+
+    private void recordRedactions(SanitizeTally tally, String side, ClusterElementCallRef parentRef) {
+        if (!canRecord() || tally.redactions.isEmpty()) {
+            return;
+        }
+
+        Integer frameMaskCount = null;
+
+        for (Redaction redaction : tally.redactions.values()) {
+            if (redaction.maskCount != null) {
+                frameMaskCount = (frameMaskCount == null ? 0 : frameMaskCount) + redaction.maskCount;
+            }
+        }
+
+        ClusterElementCallRecorder recorder = callTarget.recorder();
+
+        ClusterElementCallRef frameRef = recorder.recordOutcome(
+            callTarget.jobId(), callTarget.taskExecutionId(), frameWorkflowNodeName, frameComponentName,
+            parentRef == null ? null : parentRef.id(), ClusterElementCallRecord.Status.REDACTED,
+            redactionDetails(side, frameMaskCount), null);
+
+        for (SanitizerEntry entry : sanitizers) {
+            Redaction redaction = tally.redactions.get(entry);
+
+            if (redaction == null || entry.workflowNodeName() == null) {
+                continue;
+            }
+
+            recorder.recordOutcome(
+                callTarget.jobId(), callTarget.taskExecutionId(), entry.workflowNodeName(), entry.componentName(),
+                frameRef.id(), ClusterElementCallRecord.Status.REDACTED,
+                redactionDetails(side, redaction.maskCount), null);
+        }
+    }
+
+    private void recordWithheld(SanitizeTally tally, String side, ClusterElementCallRef parentRef) {
+        if (!canRecord()) {
+            return;
+        }
+
+        ClusterElementCallRecorder recorder = callTarget.recorder();
+
+        ClusterElementCallRef frameRef = recorder.recordOutcome(
+            callTarget.jobId(), callTarget.taskExecutionId(), frameWorkflowNodeName, frameComponentName,
+            parentRef == null ? null : parentRef.id(), ClusterElementCallRecord.Status.WITHHELD,
+            redactionDetails(side, null), null);
+
+        for (SanitizerEntry entry : sanitizers) {
+            Throwable failure = tally.failures.get(entry);
+
+            if (failure == null || entry.workflowNodeName() == null) {
+                continue;
+            }
+
+            Class<? extends Throwable> failureClass = failure.getClass();
+
+            recorder.recordOutcome(
+                callTarget.jobId(), callTarget.taskExecutionId(), entry.workflowNodeName(), entry.componentName(),
+                frameRef.id(), ClusterElementCallRecord.Status.FAILED, null, failureClass.getSimpleName());
+        }
+    }
+
+    private static String redactionDetails(String side, Integer maskCount) {
+        Map<String, Object> details = new LinkedHashMap<>();
+
+        details.put("side", side);
+
+        if (maskCount != null) {
+            details.put("maskCount", maskCount);
+        }
+
+        return JSON_MAPPER.writeValueAsString(details);
     }
 
     private static ChatClientResponse withheldResponse(ChatClientRequest request) {
@@ -177,7 +308,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
             .build();
     }
 
-    private ChatClientResponse rewriteResponse(ChatClientResponse response) {
+    private ChatClientResponse rewriteResponse(ChatClientResponse response, SanitizeTally tally) {
         if (sanitizers.isEmpty()) {
             return response;
         }
@@ -216,7 +347,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                 continue;
             }
 
-            String sanitized = sanitize(originalText, false);
+            String sanitized = sanitize(originalText, false, tally);
 
             AssistantMessage rewrittenAssistantMessage = AssistantMessage.builder()
                 .content(sanitized)
@@ -238,7 +369,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
             .build();
     }
 
-    private String sanitize(String text, boolean isInput) {
+    private String sanitize(String text, boolean isInput, SanitizeTally tally) {
         Map<String, Throwable> closedFailures = new LinkedHashMap<>();
         String intermediate = text;
         MaskEntityMapUtils maskEntities = new MaskEntityMapUtils(context);
@@ -253,8 +384,22 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                     MaskResult maskResult = masking.mask(intermediate, entry.context);
 
                     switch (maskResult) {
-                        case MaskResult.Entities entitiesResult -> maskEntities.merge(entitiesResult.entities());
-                        case MaskResult.Masked maskedResult -> intermediate = maskedResult.text();
+                        case MaskResult.Entities entitiesResult -> {
+                            Map<String, List<String>> entities = entitiesResult.entities();
+
+                            maskEntities.merge(entities);
+
+                            tally.redacted(entry, entities.size());
+                        }
+                        case MaskResult.Masked maskedResult -> {
+                            String maskedText = maskedResult.text();
+
+                            if (!maskedText.equals(intermediate)) {
+                                tally.redacted(entry, null);
+                            }
+
+                            intermediate = maskedText;
+                        }
                         case MaskResult.Unchanged ignored -> {
                         }
                     }
@@ -262,9 +407,16 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                     String preflightResult = entry.function.apply(intermediate, entry.context);
 
                     if (preflightResult == null) {
-                        closedFailures.put(entry.sanitizerName,
-                            new IllegalStateException("Sanitizer returned null"));
+                        IllegalStateException nullResult = new IllegalStateException("Sanitizer returned null");
+
+                        closedFailures.put(entry.sanitizerName, nullResult);
+
+                        tally.failed(entry, nullResult);
                     } else {
+                        if (!preflightResult.equals(intermediate)) {
+                            tally.redacted(entry, null);
+                        }
+
                         intermediate = preflightResult;
                     }
                 }
@@ -274,6 +426,8 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                 LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
 
                 closedFailures.put(entry.sanitizerName, throwable);
+
+                tally.failed(entry, throwable);
             }
         }
 
@@ -286,7 +440,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                 continue;
             }
 
-            intermediate = collectingApply(entry, intermediate, closedFailures);
+            intermediate = collectingApply(entry, intermediate, closedFailures, tally);
         }
 
         if (!closedFailures.isEmpty()) {
@@ -296,7 +450,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
         return intermediate;
     }
 
-    private ChatClientRequest sanitizeRequest(ChatClientRequest request) {
+    private ChatClientRequest sanitizeRequest(ChatClientRequest request, SanitizeTally tally) {
         boolean anyInputSanitizer = sanitizers.stream()
             .anyMatch(entry -> entry.context.inputParameters()
                 .getBoolean(VALIDATE_INPUT, DEFAULT_VALIDATE_INPUT));
@@ -320,7 +474,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                     continue;
                 }
 
-                String sanitizedHumanResponseText = sanitize(humanResponseText, true);
+                String sanitizedHumanResponseText = sanitize(humanResponseText, true, tally);
 
                 if (sanitizedHumanResponseText.equals(humanResponseText)) {
                     sanitizedMessages.add(message);
@@ -348,7 +502,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                 continue;
             }
 
-            String sanitizedText = sanitize(text, true);
+            String sanitizedText = sanitize(text, true, tally);
 
             if (!sanitizedText.equals(text)) {
                 sanitizedMessages.add(rewriteUserMessage(message, sanitizedText));
@@ -402,16 +556,23 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
     }
 
     private static String collectingApply(
-        SanitizerEntry entry, String text, Map<String, Throwable> closedFailures) {
+        SanitizerEntry entry, String text, Map<String, Throwable> closedFailures, SanitizeTally tally) {
 
         try {
             String result = entry.function.apply(text, entry.context);
 
             if (result == null) {
-                closedFailures.put(entry.sanitizerName,
-                    new IllegalStateException("Sanitizer returned null"));
+                IllegalStateException nullResult = new IllegalStateException("Sanitizer returned null");
+
+                closedFailures.put(entry.sanitizerName, nullResult);
+
+                tally.failed(entry, nullResult);
 
                 return text;
+            }
+
+            if (!result.equals(text)) {
+                tally.redacted(entry, null);
             }
 
             return result;
@@ -422,15 +583,33 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
 
             closedFailures.put(entry.sanitizerName, throwable);
 
+            tally.failed(entry, throwable);
+
             return text;
         }
     }
 
     public static final class Builder {
 
+        private ClusterElementCallTarget callTarget;
+        private Context context;
+        private String frameComponentName;
+        private String frameWorkflowNodeName;
         private final List<PendingSanitizer> pendingSanitizers = new ArrayList<>();
         private final List<SanitizerEntry> sanitizers = new ArrayList<>();
-        private Context context;
+
+        public Builder callTarget(ClusterElementCallTarget value) {
+            this.callTarget = value;
+
+            return this;
+        }
+
+        public Builder clusterElement(String workflowNodeName, String componentName) {
+            this.frameWorkflowNodeName = workflowNodeName;
+            this.frameComponentName = componentName;
+
+            return this;
+        }
 
         public Builder context(Context value) {
             this.context = value;
@@ -481,8 +660,21 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
             Map<String, ComponentConnection> componentConnections, ChatClient chatClient) {
 
             pendingSanitizers.add(new PendingSanitizer(
-                sanitizerName, function, inputParameters, connectionParameters, parentParameters, extensions,
-                componentConnections, chatClient));
+                sanitizerName, null, null, function, inputParameters, connectionParameters, parentParameters,
+                extensions, componentConnections, chatClient));
+
+            return this;
+        }
+
+        public Builder add(
+            ClusterElement element, GuardrailSanitizerFunction function, Parameters inputParameters,
+            Parameters connectionParameters, Parameters parentParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections, ChatClient chatClient) {
+
+            pendingSanitizers.add(new PendingSanitizer(
+                element.getClusterElementName(), element.getWorkflowNodeName(), element.getComponentName(), function,
+                inputParameters, connectionParameters, parentParameters, extensions, componentConnections,
+                chatClient));
 
             return this;
         }
@@ -501,20 +693,53 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
                     .context(context)
                     .build();
 
-                sanitizers.add(new SanitizerEntry(pending.sanitizerName, pending.function, guardrailContext));
+                sanitizers.add(new SanitizerEntry(
+                    pending.sanitizerName, pending.workflowNodeName, pending.componentName, pending.function,
+                    guardrailContext));
             }
 
-            return new SanitizeTextAdvisor(this);
+            ClusterElementCallTarget resolvedCallTarget = callTarget == null
+                ? ClusterElementCallTarget.of(context)
+                    .orElse(null)
+                : callTarget;
+
+            return new SanitizeTextAdvisor(this, resolvedCallTarget);
         }
     }
 
     private record PendingSanitizer(
-        String sanitizerName, GuardrailSanitizerFunction function, Parameters inputParameters,
-        Parameters connectionParameters, Parameters parentParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, ChatClient chatClient) {
+        String sanitizerName, @Nullable String workflowNodeName, @Nullable String componentName,
+        GuardrailSanitizerFunction function, Parameters inputParameters, Parameters connectionParameters,
+        Parameters parentParameters, Parameters extensions, Map<String, ComponentConnection> componentConnections,
+        ChatClient chatClient) {
     }
 
     private record SanitizerEntry(
-        String sanitizerName, GuardrailSanitizerFunction function, GuardrailContext context) {
+        String sanitizerName, @Nullable String workflowNodeName, @Nullable String componentName,
+        GuardrailSanitizerFunction function, GuardrailContext context) {
+    }
+
+    private static final class Redaction {
+
+        private Integer maskCount;
+    }
+
+    private static final class SanitizeTally {
+
+        private final Map<SanitizerEntry, Throwable> failures = new IdentityHashMap<>();
+        private final Map<SanitizerEntry, Redaction> redactions = new IdentityHashMap<>();
+        private boolean withheld;
+
+        private void failed(SanitizerEntry entry, Throwable throwable) {
+            failures.putIfAbsent(entry, throwable);
+        }
+
+        private void redacted(SanitizerEntry entry, Integer maskCount) {
+            Redaction redaction = redactions.computeIfAbsent(entry, key -> new Redaction());
+
+            if (maskCount != null) {
+                redaction.maskCount = (redaction.maskCount == null ? 0 : redaction.maskCount) + maskCount;
+            }
+        }
     }
 }
