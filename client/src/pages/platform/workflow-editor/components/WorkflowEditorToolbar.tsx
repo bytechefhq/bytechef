@@ -34,6 +34,7 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getWorkflowTaskCount from '../utils/getWorkflowTaskCount';
 import isElkLayoutSupported from '../utils/isElkLayoutSupported';
 import {saveLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
+import WorkflowTestStatusLegend from './WorkflowTestStatusLegend';
 
 interface WorkflowEditorToolbarPropsI {
     enableUndoRedo?: boolean;
@@ -397,6 +398,8 @@ const WorkflowEditorToolbar = ({
                             </Tooltip>
                         </ButtonGroup>
                     )}
+
+                    <WorkflowTestStatusLegend />
                 </div>
             </Panel>
         </>
