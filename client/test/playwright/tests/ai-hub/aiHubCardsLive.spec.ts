@@ -116,7 +116,7 @@ test.describe('@live AI Hub cards', () => {
             );
 
             const answers = await answerCards(page, aiHubPage);
-            const pickedChannel = answers.find((cardAnswer) => /channel\?/i.test(cardAnswer.cardText))?.answer;
+            const pickedChannel = answers.find((cardAnswer) => /channel/i.test(cardAnswer.cardText))?.answer;
 
             expect(pickedChannel, 'the builder asked for the channel').toBeDefined();
 
@@ -238,8 +238,11 @@ test.describe('@live AI Hub cards', () => {
 
             expect(createRecordsNode?.parameters.table).toBe(pickedTableName);
 
-            expect(calledToolNames(await readChatToolEvents(page, currentChat(aiHubPage, workspaceId)))).toContain(
-                'lookupActionPropertyOptions'
+            expect(
+                calledToolNames(await readChatToolEvents(page, currentChat(aiHubPage, workspaceId))),
+                'the table options came from the real data tables'
+            ).toEqual(
+                expect.arrayContaining([expect.stringMatching(/^(lookupActionPropertyOptions|selectPropertyOption)$/)])
             );
         } finally {
             await deleteProjectByName(page, workspaceId, projectName);

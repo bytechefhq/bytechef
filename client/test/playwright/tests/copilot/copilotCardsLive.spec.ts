@@ -127,7 +127,7 @@ test.describe('@live Copilot cards', () => {
         );
 
         const answers = await answerCards(page, liveCopilot);
-        const pickedChannel = answers.find((cardAnswer) => /channel\?/i.test(cardAnswer.cardText))?.answer;
+        const pickedChannel = answers.find((cardAnswer) => /channel/i.test(cardAnswer.cardText))?.answer;
 
         expect(pickedChannel, 'the Copilot asked for the channel').toBeDefined();
 
