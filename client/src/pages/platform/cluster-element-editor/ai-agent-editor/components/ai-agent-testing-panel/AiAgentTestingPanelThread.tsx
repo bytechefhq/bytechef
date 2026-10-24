@@ -140,8 +140,6 @@ const ThreadWelcome: FC = () => {
                     </m.div>
                 </div>
             </div>
-
-            <ThreadSuggestions />
         </div>
     );
 };
@@ -351,6 +349,10 @@ const Composer: FC = () => {
 
                 <ComposerAction hasAttachments={hasAttachments} />
             </ComposerPrimitive.Root>
+
+            <ThreadPrimitive.If empty>
+                <ThreadSuggestions />
+            </ThreadPrimitive.If>
         </div>
     );
 };
