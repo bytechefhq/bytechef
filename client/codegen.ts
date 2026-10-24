@@ -90,6 +90,7 @@ const config: CodegenConfig = {
         '../server/ee/libs/platform/platform-ai/platform-ai-agent/platform-ai-agent-eval/platform-ai-agent-eval-graphql/src/main/resources/graphql/**/*.graphqls',
         '../server/libs/platform/platform-ai/platform-ai-auto-memory/platform-ai-auto-memory-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-ai/platform-ai-skill/platform-ai-skill-graphql/src/main/resources/graphql/**/*.graphqls',
+        '../server/libs/automation/automation-data-sync/automation-data-sync-graphql/src/main/resources/graphql/*.graphqls',
     ],
 };
 

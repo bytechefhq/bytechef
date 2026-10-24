@@ -1,0 +1,78 @@
+extend type Query {
+    dataSync(id: ID!): DataSync
+    dataSyncs(workspaceId: ID!): [DataSync!]!
+    dataSyncDeployments(workspaceId: ID!): [DataSyncDeployment!]!
+    dataSyncVersions(id: ID!): [DataSyncVersion!]!
+}
+
+extend type Mutation {
+    createDataSync(input: CreateDataSyncInput!): DataSync!
+    updateDataSync(input: UpdateDataSyncInput!): DataSync!
+    updateDataSyncTrigger(input: UpdateDataSyncTriggerInput!): Boolean!
+    setDataSyncElement(input: SetDataSyncElementInput!): DataSyncElement!
+    updateDataSyncElement(input: UpdateDataSyncElementInput!): Boolean!
+    deleteDataSync(id: ID!): Boolean!
+    runDataSyncDeployment(id: ID!, projectDeploymentId: ID!): ID!
+}
+
+enum DataSyncTriggerType { MANUAL, SCHEDULE }
+enum DataSyncElementKind { SOURCE, DESTINATION, PROCESSOR }
+
+type DataSync {
+    id: ID!
+    name: String!
+    title: String!
+    description: String
+    workspaceId: ID
+    projectId: ID!
+    projectWorkflowUuid: String!
+    uuid: String!
+    triggerType: DataSyncTriggerType!
+    triggerParameters: Map
+    elements: [DataSyncElement!]!
+    unpublishedChanges: Boolean!
+    lastPublishedVersion: Int!
+    publishedDate: String
+    lastModifiedDate: String
+    draftWorkflowId: String!
+}
+
+type DataSyncElement {
+    id: ID!
+    kind: DataSyncElementKind!
+    componentName: String!
+    componentVersion: Int!
+    operationName: String!
+    parameters: Map
+    connectionId: ID
+}
+
+type DataSyncVersion { version: Int!, description: String, publishedDate: String, status: String! }
+
+type DataSyncDeployment {
+    id: ID!
+    name: String!
+    dataSyncId: ID!
+    dataSyncTitle: String!
+    projectId: ID!
+    environmentId: Int!
+    enabled: Boolean!
+    projectVersion: Int!
+    triggerType: DataSyncTriggerType!
+    workflowId: String!
+    lastExecutionDate: String
+}
+
+input CreateDataSyncInput { title: String!, description: String, workspaceId: ID!, projectId: ID }
+input UpdateDataSyncInput { id: ID!, title: String, description: String }
+input UpdateDataSyncTriggerInput { id: ID!, triggerType: DataSyncTriggerType!, triggerParameters: Map }
+input SetDataSyncElementInput {
+    dataSyncId: ID!
+    kind: DataSyncElementKind!
+    componentName: String!
+    componentVersion: Int!
+    operationName: String!
+    parameters: Map
+    connectionId: ID
+}
+input UpdateDataSyncElementInput { id: ID!, parameters: Map, connectionId: ID }
