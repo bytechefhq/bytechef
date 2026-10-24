@@ -123,6 +123,13 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public boolean clusterElementDefinesConnection(
+        String componentName, int componentVersion, String clusterElementName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public <T> T getClusterElement(String componentName, int componentVersion, String clusterElementName) {
         throw new UnsupportedOperationException();
     }
@@ -154,6 +161,11 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public List<ClusterElementDefinition> getClusterElementDefinitions(String componentName, int componentVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ClusterElementDefinition> getClusterElementDefinitions(
         String componentName, int componentVersion, ClusterElementType clusterElementType) {
 
@@ -168,8 +180,22 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public List<String> getPropertyLookupDependsOn(
+        String componentName, int componentVersion, String clusterElementName, String propertyName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ClusterElementDefinition> getRootClusterElementDefinitions(
         String rootComponentName, int rootComponentVersion, String clusterElementTypeName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean propertyHasOptionsDataSource(
+        String componentName, int componentVersion, String clusterElementName, String propertyName) {
 
         throw new UnsupportedOperationException();
     }
