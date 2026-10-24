@@ -4,7 +4,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useUserGuidingLauncher} from '@/hooks/useUserGuiding';
 import useClusterElementsViewModeStore from '@/pages/platform/workflow-editor/stores/useClusterElementsViewModeStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {NodeDataType} from '@/shared/types';
 import {Panel, useReactFlow} from '@xyflow/react';
 import {
     ArrowRightIcon,
@@ -32,6 +31,7 @@ import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import getWorkflowTaskCount from '../utils/getWorkflowTaskCount';
 import isElkLayoutSupported from '../utils/isElkLayoutSupported';
 import {saveLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 
@@ -77,9 +77,7 @@ const WorkflowEditorToolbar = ({
     const {updateWorkflowMutation} = useWorkflowEditor();
     const userGuidingLauncher = useUserGuidingLauncher();
 
-    const taskCount = nodes.filter(
-        (node) => (node.type === 'workflow' || node.type === 'readonly') && !(node.data as NodeDataType).taskDispatcher
-    ).length;
+    const taskCount = getWorkflowTaskCount(nodes);
 
     const layoutDirectionLabel = layoutDirection === 'TB' ? 'Switch to horizontal layout' : 'Switch to vertical layout';
 
