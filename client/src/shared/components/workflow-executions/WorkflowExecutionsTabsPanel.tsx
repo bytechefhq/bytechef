@@ -7,6 +7,10 @@ import WorkflowExecutionContent from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import WorkflowExecutionLogsContent from '@/shared/components/workflow-executions/WorkflowExecutionLogsContent';
 import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
+import {
+    ClusterElementCallTaskExecutionI,
+    isClusterElementCallTaskExecution,
+} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {AlertCircleIcon, ExpandIcon, ScrollTextIcon, SquarePenIcon} from 'lucide-react';
@@ -71,6 +75,11 @@ const WorkflowExecutionsTabsPanel = ({
             }),
         [job, selectedItem, activeTab, triggerExecution]
     );
+
+    const callExecution =
+        selectedItem && isClusterElementCallTaskExecution(selectedItem as TaskExecution)
+            ? (selectedItem as ClusterElementCallTaskExecutionI)
+            : undefined;
 
     const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
 
@@ -274,10 +283,15 @@ const WorkflowExecutionsTabsPanel = ({
                     <TabsContent className="h-full p-3" value="logs">
                         {(job?.id || triggerExecution?.id) && (
                             <WorkflowExecutionLogsContent
+                                clusterElementCallId={callExecution?.clusterElementCallId}
                                 isEditorEnvironment={isEditorEnvironment}
                                 jobId={job?.id}
                                 taskExecutionId={
-                                    selectedItem && 'workflowTask' in selectedItem ? selectedItem.id : undefined
+                                    callExecution
+                                        ? callExecution.parentTaskExecutionId
+                                        : selectedItem && 'workflowTask' in selectedItem
+                                          ? selectedItem.id
+                                          : undefined
                                 }
                                 toolbarContainer={logsToolbarContainer}
                                 triggerExecutionId={isTriggerExecution ? triggerExecution?.id : undefined}
