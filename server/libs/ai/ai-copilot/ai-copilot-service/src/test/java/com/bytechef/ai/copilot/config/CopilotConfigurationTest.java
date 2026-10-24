@@ -31,6 +31,7 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.automation.ai.tool.DataTableTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -94,7 +95,7 @@ class CopilotConfigurationTest {
         mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
         mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
         mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class), mock(TriggerDefinitionFacade.class),
-        mock(PropertyOptionsResolver.class), mock(ScopedConnectionGuard.class));
+        mock(PropertyOptionsResolver.class), mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider());
 
     @Test
     void testMcpServerBuildAgentIsRegisteredUnderTheMcpServerSourceId() throws AGUIException {
@@ -318,7 +319,7 @@ class CopilotConfigurationTest {
             mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
             mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
             mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
-            mock(ScopedConnectionGuard.class));
+            mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider());
     }
 
     private static String readResource(String name) {
@@ -358,6 +359,11 @@ class CopilotConfigurationTest {
 
     @SuppressWarnings("unchecked")
     private static <T> ObjectProvider<T> emptyProvider() {
+        return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<DataTableTools> emptyDataTableToolsProvider() {
         return mock(ObjectProvider.class);
     }
 }
