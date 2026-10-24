@@ -18,6 +18,7 @@ package com.bytechef.component.ai.agent.guardrails.advisor;
 
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VALIDATE_INPUT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -251,7 +252,7 @@ class SanitizeTextAdvisorTest {
     }
 
     @Test
-    void testStreamUpstreamErrorWithholdsResponse() {
+    void testStreamUpstreamErrorPropagates() {
         GuardrailSanitizerFunction noop = (text, context) -> text;
 
         SanitizeTextAdvisor advisor = SanitizeTextAdvisor.builder()
@@ -261,26 +262,14 @@ class SanitizeTextAdvisorTest {
 
         StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
         ChatClientRequest request = requestWithUser("user message");
+        RuntimeException upstreamError = new RuntimeException("upstream exploded");
 
-        when(streamChain.nextStream(request))
-            .thenReturn(Flux.error(new RuntimeException("upstream exploded")));
+        when(streamChain.nextStream(request)).thenReturn(Flux.error(upstreamError));
 
-        List<ChatClientResponse> responses = Objects.requireNonNull(
-            advisor.adviseStream(request, streamChain)
-                .collectList()
-                .block(),
-            "responses");
+        Flux<ChatClientResponse> stream = advisor.adviseStream(request, streamChain);
 
-        assertThat(responses).hasSize(1);
-
-        ChatResponse withheldChatResponse = Objects.requireNonNull(
-            responses.get(0)
-                .chatResponse(),
-            "chatResponse");
-        Generation result = Objects.requireNonNull(withheldChatResponse.getResult(), "result");
-
-        assertThat(result.getOutput()
-            .getText()).contains("sanitizer failed");
+        assertThatThrownBy(() -> stream.collectList()
+            .block()).isSameAs(upstreamError);
     }
 
     @Test

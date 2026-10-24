@@ -17,12 +17,14 @@
 package com.bytechef.component.ai.agent.guardrails.advisor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
@@ -102,7 +104,7 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
     }
 
     @Test
-    void partialLeakUpstreamStreamErrorAfterShippedChunkReplacesRemainderWithWithheldPlaceholder() {
+    void partialLeakUpstreamStreamErrorAfterShippedChunkPropagates() {
         GuardrailSanitizerFunction passThrough = (text, context) -> text;
 
         SanitizeTextAdvisor advisor = SanitizeTextAdvisor.builder()
@@ -112,49 +114,34 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
 
         StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
         ChatClientRequest request = requestWithUser("hello");
+        RuntimeException upstreamError = new RuntimeException("upstream stream reset");
 
         when(streamChain.nextStream(any(ChatClientRequest.class))).thenReturn(
             Flux.concat(
                 Flux.just(assistantResponse("ok chunk")),
-                Flux.error(new RuntimeException("upstream stream reset"))));
+                Flux.error(upstreamError)));
 
-        List<ChatClientResponse> responses = Objects.requireNonNull(
-            advisor.adviseStream(request, streamChain)
-                .collectList()
-                .block(),
-            "responses");
+        List<ChatClientResponse> shipped = new ArrayList<>();
+        Flux<ChatClientResponse> stream = advisor.adviseStream(request, streamChain)
+            .doOnNext(shipped::add);
 
-        // Distinct branch from the sanitizer-throws case above: symmetric ERROR-level telemetry is expected, but the
-        // cause is upstream rather than local. Both branches emit the withheld placeholder as the last chunk.
-        assertThat(responses).hasSize(2);
+        assertThatThrownBy(() -> stream.collectList()
+            .block()).isSameAs(upstreamError);
 
-        ChatResponse firstChatResponse = Objects.requireNonNull(
-            responses.get(0)
+        assertThat(shipped).hasSize(1);
+
+        ChatResponse shippedChatResponse = Objects.requireNonNull(
+            shipped.get(0)
                 .chatResponse(),
             "chatResponse");
-        Generation firstResult = Objects.requireNonNull(firstChatResponse.getResult(), "result");
+        Generation shippedResult = Objects.requireNonNull(shippedChatResponse.getResult(), "result");
 
-        assertThat(firstResult.getOutput()
+        assertThat(shippedResult.getOutput()
             .getText()).isEqualTo("ok chunk");
-
-        ChatResponse secondChatResponse = Objects.requireNonNull(
-            responses.get(1)
-                .chatResponse(),
-            "chatResponse");
-        Generation secondResult = Objects.requireNonNull(secondChatResponse.getResult(), "result");
-
-        assertThat(secondResult.getOutput()
-            .getText())
-                .contains("sanitizer failed")
-                .doesNotContain("upstream stream reset");
     }
 
     @Test
-    void adviseCallUpstreamThrowProducesWithheldPlaceholder() {
-        // Companion to the stream path: adviseCall must also fail closed when chain.nextCall throws — symmetric with
-        // adviseStream's onErrorResume branch. Without this test, a refactor that removes the outer try/catch in
-        // adviseCall would let the upstream exception propagate unchecked (carrying any partial content with it)
-        // and every streaming test would still pass. Explicit pin.
+    void adviseCallUpstreamThrowPropagates() {
         GuardrailSanitizerFunction passThrough = (text, context) -> text;
 
         SanitizeTextAdvisor advisor = SanitizeTextAdvisor.builder()
@@ -164,18 +151,11 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
 
         CallAdvisorChain chain = mock(CallAdvisorChain.class);
         ChatClientRequest request = requestWithUser("hello");
+        RuntimeException upstreamError = new RuntimeException("upstream 503");
 
-        when(chain.nextCall(any(ChatClientRequest.class))).thenThrow(new RuntimeException("upstream 503"));
+        when(chain.nextCall(any(ChatClientRequest.class))).thenThrow(upstreamError);
 
-        ChatClientResponse response = advisor.adviseCall(request, chain);
-
-        ChatResponse withheldChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
-        Generation result = Objects.requireNonNull(withheldChatResponse.getResult(), "result");
-
-        assertThat(result.getOutput()
-            .getText())
-                .contains("sanitizer failed")
-                .doesNotContain("upstream 503");
+        assertThatThrownBy(() -> advisor.adviseCall(request, chain)).isSameAs(upstreamError);
     }
 
     private static ChatClientRequest requestWithUser(String text) {
