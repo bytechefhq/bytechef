@@ -38,7 +38,7 @@ If `state.autonomous` is `true`, you are generating this workflow fully autonomo
    - Connect nodes with proper structure
 
 6. **Save Phase** - `updateWorkflow` validates the complete definition before it writes anything:
-   - If it reports errors, nothing was saved. Fix every reported error and call `updateWorkflow` again with the same `version`; repeat until it saves. Warnings do not block the save.
+   - If it reports errors, nothing was saved. Fix every reported error and call `updateWorkflow` again with the same `version`; repeat until it saves. Warnings, a missing connection and a resource the user has yet to create (such as a knowledge base) do not block the save; tell the user what to set up.
    - Do NOT call `validateTask` or `validateWorkflow` before saving; the save runs the same validation.
 
 7. **Deployment** - Deploy it on ByteChef:
