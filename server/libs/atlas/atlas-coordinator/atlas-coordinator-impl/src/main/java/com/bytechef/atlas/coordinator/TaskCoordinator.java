@@ -187,8 +187,10 @@ public class TaskCoordinator {
             return;
         }
 
-        eventPublisher.publishEvent(
-            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+        if (job.getStatus() == Job.Status.STARTED) {
+            eventPublisher.publishEvent(
+                new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+        }
     }
 
     /**

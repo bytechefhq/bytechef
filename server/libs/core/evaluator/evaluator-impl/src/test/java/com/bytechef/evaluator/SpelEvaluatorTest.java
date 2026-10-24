@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,26 +50,26 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  * @author Arik Cohen
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-public class SpelEvaluatorTest {
+class SpelEvaluatorTest {
 
     private static final Evaluator EVALUATOR = SpelEvaluator.create();
 
     @Test
-    public void test1() {
+    void test1() {
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "hello"), Collections.emptyMap());
 
         assertEquals(map, Map.of("type", "hello"));
     }
 
     @Test
-    public void test2() {
+    void test2() {
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "hello", "world"), Collections.emptyMap());
 
         assertEquals(map, Map.of("type", "type", "hello", "world"));
     }
 
     @Test
-    public void test3() {
+    void test3() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "hello", "${name}"), Collections.singletonMap("name", "arik"));
 
@@ -76,7 +77,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test4() {
+    void test4() {
         Map<String, Object> context = new HashMap<>();
 
         context.put("firstName", "Arik");
@@ -89,7 +90,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test5() {
+    void test5() {
         Map<String, Object> context = new HashMap<>();
 
         context.put("number", "5");
@@ -99,7 +100,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testLenientModeReturnsOriginalValueForInvalidFormula() {
+    void testLenientModeReturnsOriginalValueForInvalidFormula() {
         Map<String, Object> context = new HashMap<>();
 
         context.put("number", "5");
@@ -111,7 +112,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test6() {
+    void test6() {
         Map<String, Object> context = new HashMap<>();
         context.put("firstName", "Arik");
         context.put("lastName", "Cohen");
@@ -123,7 +124,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test7() {
+    void test7() {
         Map<String, Object> context = new HashMap<>();
 
         context.put("firstName", "Arik");
@@ -134,7 +135,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test8() {
+    void test8() {
         Map<String, Object> context = new HashMap<>();
 
         context.put("n1", 5);
@@ -146,7 +147,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test9() {
+    void test9() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "message", "${name}"), Collections.emptyMap());
 
@@ -154,7 +155,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test10() {
+    void test10() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "message", "yo ${name}"), Collections.emptyMap());
 
@@ -162,7 +163,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test11() {
+    void test11() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "thing", "${number}"), Collections.singletonMap("number", 1));
 
@@ -170,7 +171,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test12() {
+    void test12() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "thing", "=number*3"), Collections.singletonMap("number", 1));
 
@@ -178,7 +179,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test13() {
+    void test13() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "thing", "=number*3"), Collections.emptyMap(), true);
 
@@ -186,7 +187,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test14() {
+    void test14() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "list", "=range(1,3)"), Collections.emptyMap());
 
@@ -194,7 +195,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test15() {
+    void test15() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "sub", Collections.singletonMap("list", "=range(1,3)")), Collections.emptyMap());
 
@@ -204,7 +205,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test16() {
+    void test16() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "message", "${item1}-${item2}"), Map.of("item1", "hello", "item2", "world"));
 
@@ -212,7 +213,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test17() {
+    void test17() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someBoolean", "=boolean('1')"), Collections.emptyMap());
 
@@ -220,7 +221,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test18() {
+    void test18() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someByte", "=byte('127')"), Collections.emptyMap());
 
@@ -228,7 +229,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test19() {
+    void test19() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someChar", "=char('c')"), Collections.emptyMap());
 
@@ -236,7 +237,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test20() {
+    void test20() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someShort", "=short('32767')"), Collections.emptyMap());
 
@@ -244,7 +245,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test21() {
+    void test21() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someInt", "=int('1')"), Collections.emptyMap());
 
@@ -252,7 +253,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test22() {
+    void test22() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someLong", "=long('1')"), Collections.emptyMap());
 
@@ -260,7 +261,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test23() {
+    void test23() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someFloat", "=float('1.337')"), Collections.emptyMap());
 
@@ -268,7 +269,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test24() {
+    void test24() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "someDouble", "=double('1.337')"), Collections.emptyMap());
 
@@ -276,7 +277,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test25() {
+    void test25() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "joined", "=join(',',range(1,3))"), Collections.emptyMap());
 
@@ -284,7 +285,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test26() {
+    void test26() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "joined", "=join(',',range(1,1))"), Collections.emptyMap());
 
@@ -292,7 +293,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test27() {
+    void test27() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "joined", "=join(' and ',{'a','b','c'})"), Collections.emptyMap());
 
@@ -300,7 +301,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test28() {
+    void test28() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "concatenated", "=concat({'a','b','c'}, {'d','e','f'})"), Collections.emptyMap());
 
@@ -308,7 +309,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test29() {
+    void test29() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "concatenated", "=concat({'a','b','c'}, range(1,3))"), Collections.emptyMap());
 
@@ -316,7 +317,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test30() {
+    void test30() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "flattened", "=flatten({{'a','b','c'},{'d','e','f'}})"), Collections.emptyMap());
 
@@ -324,29 +325,15 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test31() {
+    void test31() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "flattened", "=flatten({{'a','b','c'},range(1,3)})"), Collections.emptyMap());
 
         assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), MapUtils.get(map, "flattened"));
     }
 
-//    @Test
-//    public void test32() {
-//        Map<String, Object> map = EVALUATOR.evaluate(
-//            Map.of("type", "type", "tempDir", "=tempDir()"), Collections.emptyMap());
-//
-//        String tmpDir = System.getProperty("java.io.tmpdir");
-//
-//        if (tmpDir.endsWith(File.separator)) {
-//            tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
-//        }
-//
-//        assertEquals(tmpDir, MapUtils.get(map, "tempDir"));
-//    }
-
     @Test
-    public void test33() {
+    void test33() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "uuid", "=uuid()"), Collections.emptyMap());
 
@@ -354,7 +341,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test34() {
+    void test34() {
         Map<String, Object> context = new HashMap<>();
 
         context.put("firstName", "Arik");
@@ -366,7 +353,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test35() {
+    void test35() {
         Map<String, Object> context = new HashMap<>();
 
         context.put("num", 5.0);
@@ -378,7 +365,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test38() {
+    void test38() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "sorted", "=sort({3,1,2})"), Collections.emptyMap());
 
@@ -386,7 +373,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test39() {
+    void test39() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "sorted", "=sort({'C','A','B'})"), Collections.emptyMap());
 
@@ -394,7 +381,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test40() {
+    void test40() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "date", "=format(now(),'yyyyMMdd')"), Collections.emptyMap());
 
@@ -404,7 +391,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test41() {
+    void test41() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
         Map<String, Object> map = EVALUATOR.evaluate(
@@ -428,7 +415,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test42() {
+    void test42() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
         assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
@@ -442,7 +429,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testLenientModeReturnsOriginalValueForMethodCallFormula() {
+    void testLenientModeReturnsOriginalValueForMethodCallFormula() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
         Map<String, Object> map1 = EVALUATOR.evaluate(
@@ -457,14 +444,14 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test43() {
+    void test43() {
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("size", "=size(${list})"), Map.of("list", List.of(1, 2)));
 
         assertEquals(2, MapUtils.getInteger(map, "size"));
     }
 
     @Test
-    public void test44() {
+    void test44() {
         Map<String, Object> testMap = new HashMap<>();
 
         testMap.put("list", null);
@@ -475,7 +462,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test45() {
+    void test45() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
             Map.of("str1", "test", "str2", "Test"));
@@ -484,7 +471,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test46() {
+    void test46() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("equalsIgnoreCase", "=equalsIgnoreCase(${str1}, ${str2})"),
             Map.of("str1", "test", "str2", "abc"));
@@ -493,7 +480,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test47() {
+    void test47() {
         Map<String, Object> testMap = new HashMap<>();
 
         testMap.put("str1", null);
@@ -506,7 +493,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void test48() {
+    void test48() {
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(
@@ -517,7 +504,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testConcatJoinsAllStringArguments() {
+    void testConcatJoinsAllStringArguments() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(
                 "fullName", "=concat(${firstName}, ' ', ${lastName})",
@@ -529,7 +516,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testConcatJoinsAllListArguments() {
+    void testConcatJoinsAllListArguments() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("concatenated", "=concat(${list1}, ${list2}, ${list3})"),
             Map.of("list1", List.of("a", "b"), "list2", List.of(), "list3", List.of(1, 2)));
@@ -538,7 +525,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testConcatReturnsSingleArgumentUnchanged() {
+    void testConcatReturnsSingleArgumentUnchanged() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("string", "=concat('abc')", "list", "=concat({'a','b'})"), Collections.emptyMap());
 
@@ -547,7 +534,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testConcatConvertsNonStringValuesToText() {
+    void testConcatConvertsNonStringValuesToText() {
         Map<String, Object> variables = new HashMap<>();
 
         variables.put("id", 42);
@@ -566,7 +553,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testConcatRejectsMaps() {
+    void testConcatRejectsMaps() {
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(
@@ -578,7 +565,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testConcatRejectsMixedStringsAndLists() {
+    void testConcatRejectsMixedStringsAndLists() {
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(
@@ -590,7 +577,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testConcatRejectsNoArguments() {
+    void testConcatRejectsNoArguments() {
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("concatenated", "=concat()"), Collections.emptyMap()));
@@ -601,13 +588,13 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testIncompleteFormulaThrowsInStrictMode() {
+    void testIncompleteFormulaThrowsInStrictMode() {
         assertThrowsExactly(ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(
             Map.of("type", "type", "value", "=222+"), Collections.emptyMap()));
     }
 
     @Test
-    public void testIncompleteFormulaReturnsOriginalValueInLenientMode() {
+    void testIncompleteFormulaReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "value", "=222+"), Collections.emptyMap(), true);
 
@@ -615,7 +602,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testIncompleteFormulaWithAccessorReturnsOriginalValueInLenientMode() {
+    void testIncompleteFormulaWithAccessorReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "value", "=n1+"), Map.of("n1", 5), true);
 
@@ -626,7 +613,7 @@ public class SpelEvaluatorTest {
     @ValueSource(strings = {
         "=split()", "=split('a,b')", "=substring()", "=join(',')", "=split(1, ',')"
     })
-    public void testFunctionWithInvalidArgumentsReturnsOriginalValueInLenientMode(String formula) {
+    void testFunctionWithInvalidArgumentsReturnsOriginalValueInLenientMode(String formula) {
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("value", formula), Collections.emptyMap(), true);
 
         assertEquals(formula, MapUtils.get(map, "value"));
@@ -636,14 +623,14 @@ public class SpelEvaluatorTest {
     @ValueSource(strings = {
         "=split()", "=split('a,b')", "=substring()", "=join(',')", "=split(1, ',')"
     })
-    public void testFunctionWithInvalidArgumentsThrowsInStrictMode(String formula) {
+    void testFunctionWithInvalidArgumentsThrowsInStrictMode(String formula) {
         assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", formula), Collections.emptyMap()));
     }
 
     @Test
-    public void testFormulaWithTrailingOperatorReturnsOriginalValueInLenientMode() {
+    void testFormulaWithTrailingOperatorReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("type", "type", "value", "=10*3-"), Collections.emptyMap(), true);
 
@@ -798,7 +785,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testEvaluationFailureThrowsInStrictMode() {
+    void testEvaluationFailureThrowsInStrictMode() {
         String formula = "=${startDate} > parseDate('2026-08-24T22:00:00Z', \"yyyy-MM-dd'T'HH:mm:ssX\")";
 
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
@@ -811,7 +798,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testEvaluationFailureReturnsOriginalValueInLenientMode() {
+    void testEvaluationFailureReturnsOriginalValueInLenientMode() {
         String formula = "=${startDate} > parseDate('2026-08-24T22:00:00Z', \"yyyy-MM-dd'T'HH:mm:ssX\")";
 
         Map<String, Object> map = EVALUATOR.evaluate(
@@ -821,7 +808,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateAcceptsAnAlreadyTemporalArgument() {
+    void testParseDateAcceptsAnAlreadyTemporalArgument() {
         Map<String, Object> context = Map.of("dbDate", java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z"));
 
         Map<String, Object> map = EVALUATOR.evaluate(
@@ -831,7 +818,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateStillAcceptsAString() {
+    void testParseDateStillAcceptsAString() {
         Map<String, Object> context = Map.of("dbDate", "2026-08-26T00:00:00.000Z");
 
         Map<String, Object> map = EVALUATOR.evaluate(
@@ -841,7 +828,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateTimeAcceptsAnAlreadyTemporalArgument() {
+    void testParseDateTimeAcceptsAnAlreadyTemporalArgument() {
         Map<String, Object> context = Map.of("dbDate", java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z"));
 
         Map<String, Object> map = EVALUATOR.evaluate(Map.of("value", "=parseDateTime(${dbDate})"), context);
@@ -850,7 +837,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateRejectsALocalTimeArgument() {
+    void testParseDateRejectsALocalTimeArgument() {
         Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
 
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
@@ -864,7 +851,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateTimeRejectsALocalTimeArgument() {
+    void testParseDateTimeRejectsALocalTimeArgument() {
         Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
 
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
@@ -876,7 +863,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateRejectsANonTemporalNonStringArgument() {
+    void testParseDateRejectsANonTemporalNonStringArgument() {
         Map<String, Object> context = Map.of("dbValue", 123);
 
         assertThrowsExactly(
@@ -885,7 +872,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testAccessorEvaluationFailureReturnsOriginalExpression() {
+    void testAccessorEvaluationFailureReturnsOriginalExpression() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("value", "${items[5]}"), Map.of("items", List.of(1, 2, 3)));
 
@@ -893,14 +880,14 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testFormulaEvaluationFailureStillThrowsForTheSameFailure() {
+    void testFormulaEvaluationFailureStillThrowsForTheSameFailure() {
         assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=${items[5]} > 1"), Map.of("items", List.of(1, 2, 3))));
     }
 
     @Test
-    public void testParseDateRejectionReturnsOriginalValueInLenientMode() {
+    void testParseDateRejectionReturnsOriginalValueInLenientMode() {
         Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
 
         Map<String, Object> map = EVALUATOR.evaluate(
@@ -910,7 +897,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateUnparseableTextReturnsOriginalValueInLenientMode() {
+    void testParseDateUnparseableTextReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("value", "=parseDate('not-a-date')"), Collections.emptyMap(), true);
 
@@ -918,7 +905,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateUnparseableTextThrowsInStrictMode() {
+    void testParseDateUnparseableTextThrowsInStrictMode() {
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDate('not-a-date')"), Collections.emptyMap()));
@@ -928,7 +915,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateReturnTypeFollowsTheArgumentPrecision() {
+    void testParseDateReturnTypeFollowsTheArgumentPrecision() {
         assertInstanceOf(
             LocalDate.class,
             MapUtils.get(EVALUATOR.evaluate(Map.of("value", "=parseDate(${a})"), Map.of("a", "2026-08-26")), "value"));
@@ -953,7 +940,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateWithNoArgumentsReturnsOriginalValueInLenientMode() {
+    void testParseDateWithNoArgumentsReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("value", "=parseDate()"), Collections.emptyMap(), true);
 
@@ -961,7 +948,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateTimeWithNoArgumentsReturnsOriginalValueInLenientMode() {
+    void testParseDateTimeWithNoArgumentsReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("value", "=parseDateTime()"), Collections.emptyMap(), true);
 
@@ -969,7 +956,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateWithNoArgumentsThrowsInStrictMode() {
+    void testParseDateWithNoArgumentsThrowsInStrictMode() {
         ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDate()"), Collections.emptyMap()));
@@ -979,7 +966,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateWithTooManyArgumentsThrowsInStrictMode() {
+    void testParseDateWithTooManyArgumentsThrowsInStrictMode() {
         assertThrowsExactly(
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(
@@ -987,7 +974,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testParseDateWithNonStringFormatReturnsOriginalValueInLenientMode() {
+    void testParseDateWithNonStringFormatReturnsOriginalValueInLenientMode() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("value", "=parseDate('2026-08-26', 5)"), Collections.emptyMap(), true);
 
@@ -995,7 +982,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testProjectionResolvesAKeyMissingFromTheFirstItemToNull() {
+    void testProjectionResolvesAKeyMissingFromTheFirstItemToNull() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("emails", "=${users}.![email]"),
             Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
@@ -1004,7 +991,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testProjectionResolvesAKeyMissingFromEveryItemToNull() {
+    void testProjectionResolvesAKeyMissingFromEveryItemToNull() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("emails", "=${users}.![email]"), Map.of("users", List.of(Map.of("id", 1), Map.of("id", 2))));
 
@@ -1012,7 +999,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testSelectionSkipsItemsMissingTheKey() {
+    void testSelectionSkipsItemsMissingTheKey() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("emails", "=${users}.?[email != null].![email]"),
             Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
@@ -1021,7 +1008,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testProjectionOverAnUnresolvedReferenceStaysUnresolved() {
+    void testProjectionOverAnUnresolvedReferenceStaysUnresolved() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("emails", "=${users}.![email]"), Collections.emptyMap());
 
@@ -1029,7 +1016,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testMissingNestedKeyOutsideAProjectionStaysUnresolved() {
+    void testMissingNestedKeyOutsideAProjectionStaysUnresolved() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("formula", "=${task.email}", "text", "${task.email}"), Map.of("task", Map.of("id", 1)));
 
@@ -1038,7 +1025,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testMissingNestedKeyOutsideAProjectionStaysUnresolvedWhenTheFormulaAlsoProjects() {
+    void testMissingNestedKeyOutsideAProjectionStaysUnresolvedWhenTheFormulaAlsoProjects() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("value", "={task: ${task.email}, emails: ${users}.![email]}"),
             Map.of("task", Map.of("id", 1), "users", List.of(Map.of("id", 2))));
@@ -1047,7 +1034,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testProjectionOfANestedPathResolvesMissingKeysToNull() {
+    void testProjectionOfANestedPathResolvesMissingKeysToNull() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("cities", "=${users}.![address.city]"),
             Map.of(
@@ -1058,7 +1045,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testSelectionOnANestedPathSkipsItemsMissingIt() {
+    void testSelectionOnANestedPathSkipsItemsMissingIt() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("ids", "=${users}.?[address.city == 'Zagreb'].![id]"),
             Map.of(
@@ -1071,7 +1058,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testProjectionAppliesOperatorsToAMissingKey() {
+    void testProjectionAppliesOperatorsToAMissingKey() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("emails", "=${users}.![email ?: 'none']"),
             Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
@@ -1080,7 +1067,7 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testProjectionKeepsInlineMapKeys() {
+    void testProjectionKeepsInlineMapKeys() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("contacts", "=${users}.![{mail: email}]"),
             Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
@@ -1090,12 +1077,64 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    public void testProjectionThroughThisResolvesAMissingKeyToNull() {
+    void testProjectionThroughThisResolvesAMissingKeyToNull() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of("emails", "=${users}.![#this.email]"),
             Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
 
         assertEquals(Arrays.asList(null, "a@x.io"), map.get("emails"));
+    }
+
+    @Test
+    void testNameSeededWithNullResolvesToNull() {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put("disabledTask", null);
+
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("value", "${disabledTask}"), context);
+
+        assertTrue(map.containsKey("value"));
+        assertNull(MapUtils.get(map, "value"));
+    }
+
+    @Test
+    void testPropertyAccessOnNameSeededWithNullResolvesToNull() {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put("disabledTask", null);
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "formula", "=disabledTask.field", "index", "${disabledTask[0].field}",
+                "nested", "${disabledTask.field.nested}", "value", "${disabledTask.field}"),
+            context);
+
+        assertTrue(map.containsKey("value"));
+        assertNull(MapUtils.get(map, "value"));
+        assertNull(MapUtils.get(map, "nested"));
+        assertNull(MapUtils.get(map, "index"));
+        assertNull(MapUtils.get(map, "formula"));
+    }
+
+    @Test
+    void testPropertyAccessOnNullNestedValueStillReturnsOriginalExpression() {
+        Map<String, Object> context = new HashMap<>();
+        Map<String, Object> task = new HashMap<>();
+
+        task.put("field", null);
+
+        context.put("task", task);
+
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("value", "${task.field.nested}"), context);
+
+        assertEquals("${task.field.nested}", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    void testPropertyAccessOnMissingNameStillReturnsOriginalExpression() {
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("value", "${unknownTask.field}"), Collections.emptyMap());
+
+        assertEquals("${unknownTask.field}", MapUtils.get(map, "value"));
     }
 
     @Test
