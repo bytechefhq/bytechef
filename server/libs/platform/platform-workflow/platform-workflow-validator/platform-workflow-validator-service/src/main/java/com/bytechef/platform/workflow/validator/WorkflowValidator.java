@@ -1064,6 +1064,18 @@ public class WorkflowValidator {
         if (parametersJsonNode != null && parametersJsonNode.isObject()) {
             collectNestedTaskNames(parametersJsonNode, nodeNames);
         }
+
+        JsonNode clusterElementsJsonNode = taskJsonNode.get("clusterElements");
+
+        if (clusterElementsJsonNode != null && clusterElementsJsonNode.isObject()) {
+            for (JsonNode clusterElementJsonNode : clusterElementsJsonNode) {
+                if (clusterElementJsonNode.isArray()) {
+                    collectTaskNames(clusterElementJsonNode, nodeNames);
+                } else {
+                    collectTaskName(clusterElementJsonNode, nodeNames);
+                }
+            }
+        }
     }
 
     /**
