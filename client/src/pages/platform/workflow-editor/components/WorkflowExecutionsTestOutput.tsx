@@ -13,9 +13,11 @@ import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
+import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {RefreshCwIcon, RefreshCwOffIcon, WorkflowIcon, XIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutions from './properties/hooks/useWorkflowExecutions';
 
@@ -98,7 +100,7 @@ const WorkflowExecutionsTestOutput = ({
                                     className="flex flex-col overflow-hidden"
                                     defaultSize={resizablePanelSize}
                                 >
-                                    <div className="flex h-9 items-center gap-1 px-3 py-2">
+                                    <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'gap-1')}>
                                         <RefreshCwIcon className="size-3 shrink-0 animate-spin text-content-neutral-secondary" />
 
                                         <span className="text-xs leading-4 font-medium text-content-neutral-secondary">
@@ -116,19 +118,18 @@ const WorkflowExecutionsTestOutput = ({
                                 <ResizableHandle className="bg-surface-neutral-secondary" />
 
                                 <ResizablePanel className="flex min-h-0 flex-col">
-                                    <div
-                                        className="flex flex-col gap-4 p-4"
-                                        data-testid="workflow-test-output-pending-details"
-                                    >
-                                        <div className="flex items-center justify-between">
+                                    <div className="flex flex-col" data-testid="workflow-test-output-pending-details">
+                                        <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'justify-between')}>
                                             <Skeleton className="h-5 w-48" />
 
                                             <Skeleton className="h-4 w-32" />
                                         </div>
 
-                                        <Skeleton className="h-9 w-56" />
+                                        <div className="px-3">
+                                            <Skeleton className="h-9 w-56" />
+                                        </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-2 p-3">
                                             <Skeleton className="h-4 w-3/4" />
 
                                             <Skeleton className="h-4 w-1/2" />
@@ -156,7 +157,7 @@ const WorkflowExecutionsTestOutput = ({
                                         defaultSize={resizablePanelSize}
                                     >
                                         {subflowStack.length === 0 && rootJob && (
-                                            <div className="flex h-9 items-center gap-1 px-3 py-2">
+                                            <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'gap-1')}>
                                                 <WorkflowIcon className="size-3 shrink-0 text-content-neutral-primary" />
 
                                                 <TruncatedLabel

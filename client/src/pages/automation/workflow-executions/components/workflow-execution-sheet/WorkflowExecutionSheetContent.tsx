@@ -16,10 +16,12 @@ import WorkflowTriggerExecutionItem from '@/shared/components/workflow-execution
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
+import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {WorkflowIcon} from 'lucide-react';
 import {ReactNode, useCallback, useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import {type FocusedExecutionI} from './hooks/useWorkflowExecutionDetail';
 
@@ -128,7 +130,7 @@ const WorkflowExecutionSheetContent = ({
                         minSize={15}
                     >
                         {subflowStack.length === 0 && rootJob && (
-                            <div className="flex h-9 items-center gap-1 px-3 py-2">
+                            <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'gap-1')}>
                                 <WorkflowIcon className="size-3 shrink-0 text-content-neutral-primary" />
 
                                 <TruncatedLabel
