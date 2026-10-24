@@ -18,16 +18,29 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type LucideIcon, PanelLeftIcon} from 'lucide-react';
-import {useEffect} from 'react';
+import {Fragment, useCallback, useEffect, useMemo, useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 
+import AppSidebarCollapsedGroup from './AppSidebarCollapsedGroup';
+import AppSidebarCollapsibleGroup from './AppSidebarCollapsibleGroup';
 import {AppSidebarFooter} from './AppSidebarFooter';
 import {AppSidebarWorkspaceSelect} from './AppSidebarWorkspaceSelect';
 
+export interface AppSidebarNavGroupI {
+    icon: LucideIcon;
+    name: string;
+}
+
 export interface AppSidebarNavItemI {
+    group?: AppSidebarNavGroupI;
     href: string;
     icon: LucideIcon;
     name: string;
+}
+
+interface AppSidebarNavSectionI {
+    group?: AppSidebarNavGroupI;
+    items: AppSidebarNavItemI[];
 }
 
 interface AppSidebarProps {
@@ -35,6 +48,9 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({navigation}: AppSidebarProps) {
+    const [manuallyOpenedGroup, setManuallyOpenedGroup] = useState<{name: string | null; pathname: string}>();
+    const [openFlyoutName, setOpenFlyoutName] = useState<string | null>(null);
+
     const {pathname} = useLocation();
 
     const navigate = useNavigate();
@@ -60,6 +76,43 @@ export function AppSidebar({navigation}: AppSidebarProps) {
             navigate('/embedded/configurations');
         }
     };
+
+    const sections = useMemo(() => {
+        const foldedSections: AppSidebarNavSectionI[] = [];
+
+        for (const item of navigation) {
+            const lastSection = foldedSections[foldedSections.length - 1];
+
+            if (lastSection && lastSection.group?.name === item.group?.name) {
+                lastSection.items.push(item);
+            } else {
+                foldedSections.push({group: item.group, items: [item]});
+            }
+        }
+
+        return foldedSections;
+    }, [navigation]);
+
+    const activeGroupName =
+        sections.find((section) => section.group && section.items.some((item) => isActive(item.href)))?.group?.name ??
+        null;
+
+    const openGroupName = manuallyOpenedGroup?.pathname === pathname ? manuallyOpenedGroup.name : activeGroupName;
+
+    const handleCollapsibleOpenChange = useCallback(
+        (name: string, open: boolean) => setManuallyOpenedGroup({name: open ? name : null, pathname}),
+        [pathname]
+    );
+
+    const handleFlyoutOpenChange = useCallback((name: string, open: boolean) => {
+        setOpenFlyoutName((currentName) => {
+            if (open) {
+                return name;
+            }
+
+            return currentName === name ? null : currentName;
+        });
+    }, []);
 
     useEffect(() => {
         const {documentElement} = document;
@@ -108,22 +161,51 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                     <SidebarGroupContent>
                         <nav aria-label="Main navigation">
                             <SidebarMenu>
-                                {navigation.map((item) => (
-                                    <SidebarMenuItem key={item.name}>
-                                        <SidebarMenuButton
-                                            asChild
-                                            className="h-10 gap-3 text-sm group-data-[collapsible=icon]:!size-10 data-[active=true]:font-medium data-[active=true]:text-sidebar-active-foreground [&>svg]:size-6"
-                                            isActive={isActive(item.href)}
-                                            tooltip={item.name}
-                                        >
-                                            <Link to={item.href}>
-                                                <item.icon aria-hidden="true" />
+                                {sections.map((section, sectionIndex) => {
+                                    const group = collapsed && section.items.length < 2 ? undefined : section.group;
 
-                                                <span>{item.name}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
+                                    return (
+                                        <Fragment key={`${section.group?.name || 'main'}-${sectionIndex}`}>
+                                            {group && collapsed && (
+                                                <AppSidebarCollapsedGroup
+                                                    group={group}
+                                                    isActive={isActive}
+                                                    items={section.items}
+                                                    onOpenChange={handleFlyoutOpenChange}
+                                                    open={openFlyoutName === group.name}
+                                                />
+                                            )}
+
+                                            {group && !collapsed && (
+                                                <AppSidebarCollapsibleGroup
+                                                    group={group}
+                                                    isActive={isActive}
+                                                    items={section.items}
+                                                    onOpenChange={handleCollapsibleOpenChange}
+                                                    open={openGroupName === group.name}
+                                                />
+                                            )}
+
+                                            {!group &&
+                                                section.items.map((item) => (
+                                                    <SidebarMenuItem key={item.name}>
+                                                        <SidebarMenuButton
+                                                            asChild
+                                                            className="h-10 gap-3 text-sm group-data-[collapsible=icon]:!size-10 data-[active=true]:font-medium data-[active=true]:text-sidebar-active-foreground [&>svg]:size-6"
+                                                            isActive={isActive(item.href)}
+                                                            tooltip={item.name}
+                                                        >
+                                                            <Link to={item.href}>
+                                                                <item.icon aria-hidden="true" />
+
+                                                                <span>{item.name}</span>
+                                                            </Link>
+                                                        </SidebarMenuButton>
+                                                    </SidebarMenuItem>
+                                                ))}
+                                        </Fragment>
+                                    );
+                                })}
                             </SidebarMenu>
                         </nav>
                     </SidebarGroupContent>
