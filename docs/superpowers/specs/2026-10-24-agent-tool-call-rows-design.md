@@ -12,8 +12,10 @@ When an AI Agent runs, its task row is a black box: the test output and the Work
 - **Per-call logs.** Each call row has a Logs tab showing only the entries written while that call ran.
 - **Size cap.** A call's input and output are stored capped at 64 KB each; a truncated value ends with a visible marker.
 - **Branch.** Own issue and PR, stacked on 6333.
-- **Sub-agents nest.** A Task Tool sub-agent's tool calls are rows under that sub-agent's call row, not siblings of it:
-  agent > sub-agent call > the tools it called. Each call records its parent call.
+- **Sub-agents nest.** A Task Tool is itself a TOOLS element, so its `Task` call is a row under the agent; the
+  sub-agent run nests under that row, and the sub-agent's own tool calls nest under the run:
+  agent > `Task` call > sub-agent run > the tools it called. A background run is collected by `TaskOutput` calls,
+  which are rows under the agent too. Each call records its parent call.
 - **Background calls freeze.** A background sub-agent can keep calling tools after its agent's task has finished and
   been saved. Its rows show the state at the moment the agent's task finished; a call still running then is marked as
   still running when the agent finished. Nothing is written to the task execution after it has been saved.
@@ -57,7 +59,7 @@ When an AI Agent runs, its task row is a black box: the test output and the Work
 
 ### Client
 
-- **Task list.** `WorkflowExecutionsAccordionItem` renders an agent task's calls as nested rows, the way it nests loop iterations and subflow children, with a sub-agent's calls nested under the sub-agent's row: tool icon, element name, the tool name when it differs, a call number when the element was called more than once (`fetch_ok #2`), status icon and duration. A call still running when its agent finished says so instead of showing a spinner. Collapsed rows follow the same expand control as other nested rows.
+- **Task list.** `WorkflowExecutionsAccordionItem` renders an agent task's calls as nested rows, the way it nests loop iterations and subflow children, with the `Task` call's row holding the sub-agent run and the sub-agent's calls nested under that run: tool icon, element name, the tool name when it differs, a call number when the element was called more than once (`fetch_ok #2`), status icon and duration. A call still running when its agent finished says so instead of showing a spinner. Collapsed rows follow the same expand control as other nested rows.
 - **Details.** Selecting a call row shows the same details pane as a task: header with the element's name and date, then Input, Output (or Error) and Logs tabs. Input and Output render with the existing JSON/text viewer; Logs uses `WorkflowExecutionLogsContent` filtered to the call.
 - **Live.** During a test run, a started call appears as a running row under the agent and fills in when the call returns.
 - **Canvas.** Unchanged, except that selecting a call row could later highlight its element; out of scope here.
@@ -70,3 +72,12 @@ When an AI Agent runs, its task row is a black box: the test output and the Work
 - How the resume path finds the suspended call to complete (for example, its id saved with the suspension's continue parameters).
 - Marker wording for truncated values.
 - Row styling details, within the existing task list look.
+
+## Known limits
+
+- Each call's input and output are capped at 65,536 characters, but the number of calls per task execution is not
+  limited.
+- All call records are stored inline in the task execution's metadata, travel with the task execution between worker
+  and coordinator, and are returned with every job view. An agent that makes many calls with large results makes the
+  stored execution and the executions sheet heavy.
+- Options for later: cap the stored records per task execution, or load each call's input and output lazily per call.

@@ -349,7 +349,10 @@ execution detail:
   the entries from that call. A tool backed by an external provider, such as an MCP Client tool, has no logs of its own, so its **Logs** tab is empty. The agent's own **Logs** tab is unchanged.
 - **Rows appear live.** During a test run a row shows up as soon as the call starts, and fills in when
   it returns.
-- **A Task Tool sub-agent is a row too**, with the tools it called nested under it.
+- **A Task Tool sub-agent nests three levels deep.** The agent's `Task` call is a row (its **Input** is
+  the prompt, its **Output** the result), the sub-agent run is nested under it, and the tools the
+  sub-agent called are nested under that run. A background run's result is collected by separate Task
+  output calls, which are rows under the agent.
 - **Long values are cut off.** An input or output over 65,536 characters is truncated, and ends with a
   marker giving the original length.
 - **A call waiting on a human** reads "Waiting for a response", and completes with the answer when the
