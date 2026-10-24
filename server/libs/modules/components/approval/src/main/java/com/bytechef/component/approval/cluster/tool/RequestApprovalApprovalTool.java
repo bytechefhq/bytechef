@@ -19,7 +19,7 @@ package com.bytechef.component.approval.cluster.tool;
 import static com.bytechef.component.approval.constant.ApprovalConstants.APPROVAL;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
-import com.bytechef.component.approval.action.ApprovalRequestApprovalAction;
+import com.bytechef.component.approval.action.RequestApprovalApprovalAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ComponentDsl;
@@ -37,34 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Adapts the {@link ApprovalRequestApprovalAction} into a {@link MultipleConnectionsToolFunction} so the AI agent can
- * invoke it as a tool. It is built by hand because {@code ComponentDsl#tool(...)} supports only single-connection
- * performs, while this action's {@link MultipleConnectionsPerformFunction} needs every connection and must be able to
- * suspend the agent.
- *
- * <p>
- * Each invocation gets its {@link ActionContext} from {@link ClusterElementContextAware#toActionContext}. That context
- * keeps the tool's own component and action (connections reach the action through {@code componentConnections}), but
- * forwards {@code suspend(...)} and the resume URL to the agent's action context, so the action's suspend suspends the
- * agent's task, where {@code SuspendableToolCallingManager} picks it up.
- *
- * <p>
- * The action's perform always suspends (or throws) and returns {@code null}, so the tool returns the suspended tool
- * result (see {@link ToolSuspension}) instead; on resume the approver's answer replaces it as this tool call's
- * response. When the request cannot be sent, the tool throws {@link ToolSuspensionException}, which fails the agent
- * rather than letting the model continue without the approval.
- *
- * <p>
- * A workflow editor test run's in-memory job cannot be resumed through the resume URL, so there the tool neither sends
- * the request nor suspends, and tells the model that nothing was approved.
- *
- * <p>
- * The suspend carries the tool's own input parameters, because the approval form would otherwise be built from the
- * suspended task's parameters, which are the agent's.
- *
  * @author Ivica Cardic
  */
-public class ApprovalRequestApprovalTool {
+public class RequestApprovalApprovalTool {
 
     static final String EDITOR_ENVIRONMENT_RESULT =
         "Approval requests cannot be sent in a workflow editor test run, so nothing was approved. Do not perform the " +
@@ -74,7 +49,7 @@ public class ApprovalRequestApprovalTool {
     public static ModifiableClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
             .orElseThrow();
@@ -115,6 +90,6 @@ public class ApprovalRequestApprovalTool {
             });
     }
 
-    private ApprovalRequestApprovalTool() {
+    private RequestApprovalApprovalTool() {
     }
 }

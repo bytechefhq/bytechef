@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class ApprovalRequestApprovalToolTest {
+class RequestApprovalApprovalToolTest {
 
     private static final ApprovalLinks APPROVAL_LINKS = new ApprovalLinks(
         "https://example.com", "abc", "https://example.com/job/resume/abc", "https://example.com/resume/abc");
@@ -129,7 +129,7 @@ class ApprovalRequestApprovalToolTest {
         Object result = getToolFunction().apply(
             inputParameters, connectionParameters, extensions, Map.of(), clusterElementContextAware);
 
-        assertEquals(ApprovalRequestApprovalTool.EDITOR_ENVIRONMENT_RESULT, result);
+        assertEquals(RequestApprovalApprovalTool.EDITOR_ENVIRONMENT_RESULT, result);
         verify(clusterElementContextAware, never()).toActionContext("approval", 1, "requestApproval", null);
         verify(actionContextAware, never()).suspend(any(Suspend.class));
     }
@@ -180,7 +180,7 @@ class ApprovalRequestApprovalToolTest {
     @Test
     void testToolFunctionAndDefinitionMetadataIsStable() {
         ModifiableClusterElementDefinition<MultipleConnectionsToolFunction> definition =
-            ApprovalRequestApprovalTool.of(clusterElementDefinitionService);
+            RequestApprovalApprovalTool.of(clusterElementDefinitionService);
 
         assertEquals("requestApproval", definition.getName());
         assertEquals(
@@ -194,7 +194,7 @@ class ApprovalRequestApprovalToolTest {
 
     private MultipleConnectionsToolFunction getToolFunction() {
         ModifiableClusterElementDefinition<MultipleConnectionsToolFunction> definition =
-            ApprovalRequestApprovalTool.of(clusterElementDefinitionService);
+            RequestApprovalApprovalTool.of(clusterElementDefinitionService);
 
         return definition.getElement();
     }

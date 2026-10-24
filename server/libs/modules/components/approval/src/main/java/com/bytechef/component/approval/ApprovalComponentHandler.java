@@ -20,8 +20,8 @@ import static com.bytechef.component.approval.constant.ApprovalConstants.APPROVA
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.approval.action.ApprovalRequestApprovalAction;
-import com.bytechef.component.approval.cluster.tool.ApprovalRequestApprovalTool;
+import com.bytechef.component.approval.action.RequestApprovalApprovalAction;
+import com.bytechef.component.approval.cluster.tool.RequestApprovalApprovalTool;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
@@ -44,8 +44,8 @@ public class ApprovalComponentHandler implements ComponentHandler {
                 .description("Approval component for manual intervention in workflows.")
                 .icon("path:assets/approval.svg")
                 .categories(ComponentCategory.HELPERS)
-                .actions(ApprovalRequestApprovalAction.of(clusterElementDefinitionService))
-                .clusterElements(ApprovalRequestApprovalTool.of(clusterElementDefinitionService)));
+                .actions(RequestApprovalApprovalAction.of(clusterElementDefinitionService))
+                .clusterElements(RequestApprovalApprovalTool.of(clusterElementDefinitionService)));
     }
 
     @Override
