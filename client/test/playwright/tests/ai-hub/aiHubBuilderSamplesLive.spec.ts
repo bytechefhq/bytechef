@@ -369,21 +369,18 @@ test.describe('@live Builder samples', () => {
 
                 projectId = mcpProject.id;
 
-                const mcpWorkflow = readStructuredResult<{workflow_id: string}>(
-                    await mcpClient.callTool('createProjectWorkflow', {
-                        name: shortName('mcp_sample_workflow'),
-                        projectId: mcpProject.id,
-                    })
-                );
-
                 const buildResult = await mcpClient.callTool('buildWorkflow', {
-                    request: `Update the existing workflow with workflowId ${mcpWorkflow.workflow_id}. ${sample.instruction}`,
+                    request: `Create a new workflow in project ${mcpProject.id}. ${sample.instruction}`,
                     workspaceId: workspaces[0].id,
                 });
 
                 expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
 
-                await expectSampleBuilt(sample, await readWorkflowNodes(page, mcpWorkflow.workflow_id));
+                const [workflowId] = await listProjectWorkflowIds(page, mcpProject.id);
+
+                expect(workflowId, 'buildWorkflow created the workflow in the project').toBeDefined();
+
+                await expectSampleBuilt(sample, await readWorkflowNodes(page, workflowId));
             } finally {
                 if (projectId !== undefined) {
                     await deleteProjectThroughApi(page, projectId);
