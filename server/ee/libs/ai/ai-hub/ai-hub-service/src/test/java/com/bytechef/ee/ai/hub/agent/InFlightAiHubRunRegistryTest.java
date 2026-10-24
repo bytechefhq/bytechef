@@ -14,6 +14,7 @@ import com.agui.core.event.RunStartedEvent;
 import com.agui.core.event.TextMessageContentEvent;
 import com.agui.core.type.EventType;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry.InFlightRun;
+import com.bytechef.tenant.TenantContext;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.lang.reflect.Proxy;
@@ -74,6 +75,27 @@ class InFlightAiHubRunRegistryTest {
         assertThat(startedRun.get()
             .isTerminated()).isTrue();
         assertThat(registry.tryStart("thread-1", "run-2")).isEmpty();
+    }
+
+    @Test
+    void testAThreadIdOfAnotherTenantNeitherAttachesToNorBlocksItsRun() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+
+        Optional<InFlightRun> tenantRun = TenantContext.callWithTenantId(
+            "tenant_a", () -> registry.tryStart("thread-1", "run-1"));
+
+        assertThat(tenantRun).isPresent();
+
+        TenantContext.runWithTenantId("tenant_b", () -> {
+            assertThat(registry.attach("thread-1")).isEmpty();
+            assertThat(registry.isInFlight("thread-1")).isFalse();
+            assertThat(registry.cancel("thread-1")).isFalse();
+            assertThat(registry.tryStart("thread-1", "run-2")).isPresent();
+        });
+
+        assertThat(tenantRun.get()
+            .isTerminated()).isFalse();
+        assertThat(TenantContext.callWithTenantId("tenant_a", () -> registry.isInFlight("thread-1"))).isTrue();
     }
 
     @Test
@@ -402,6 +424,34 @@ class InFlightAiHubRunRegistryTest {
 
         assertThat(registry.cancel("thread-1", "run-1")).isTrue();
         assertThat(registry.isInFlight("thread-1")).isTrue();
+    }
+
+    @Test
+    void testADelayedCancelOfAFinishedRunDoesNotCancelTheThreadsNextRun() {
+        InFlightAiHubRunRegistry registry = newRegistry();
+
+        InFlightRun firstRun = registry.tryStart("thread-1", "run-1")
+            .orElseThrow();
+
+        firstRun.complete();
+
+        InFlightRun nextRun = registry.tryStart("thread-1", "run-2")
+            .orElseThrow();
+
+        assertThat(registry.cancel("thread-1", "run-1")).isFalse();
+        assertThat(nextRun.isTerminated()).isFalse();
+        assertThat(registry.isInFlight("thread-1")).isTrue();
+    }
+
+    @Test
+    void testCancelWithoutRunIdCancelsTheRegisteredRunWhateverItsId() {
+        InFlightAiHubRunRegistry registry = newRegistry();
+
+        InFlightRun run = registry.tryStart("thread-1", "run-1")
+            .orElseThrow();
+
+        assertThat(registry.cancel("thread-1", null)).isTrue();
+        assertThat(run.isTerminated()).isTrue();
     }
 
     @Test

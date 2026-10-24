@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.agent;
 
 import com.agui.core.event.BaseEvent;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -92,10 +93,11 @@ public class InFlightAiHubRunRegistry {
 
     public Optional<InFlightRun> tryStart(String threadId, @Nullable String runId) {
         AtomicBoolean started = new AtomicBoolean();
+        String cancelledRunKey = runId == null ? null : tenantKey(runId);
 
         InFlightRun run = runs.asMap()
-            .compute(threadId, (key, existing) -> {
-                if (isRetired(key) || existing != null && existing.holdsThread(Instant.now())) {
+            .compute(tenantKey(threadId), (key, existing) -> {
+                if (isRetiredKey(key) || existing != null && existing.holdsThread(Instant.now())) {
                     return existing;
                 }
 
@@ -105,8 +107,8 @@ public class InFlightAiHubRunRegistry {
 
                 InFlightRun newRun = new InFlightRun(threadId, runId, releaseActionExecutor);
 
-                if (runId != null && cancelledRunIds.asMap()
-                    .remove(runId) != null) {
+                if (cancelledRunKey != null && cancelledRunIds.asMap()
+                    .remove(cancelledRunKey) != null) {
 
                     log.debug("tryStart for threadId={} runId={} matched a cancel tombstone; born terminated",
                         threadId, runId);
@@ -126,14 +128,37 @@ public class InFlightAiHubRunRegistry {
         return cancel(threadId, null);
     }
 
+    /**
+     * Terminates the live run for {@code threadId}, completes its subscribers and signals its agent to stop (see
+     * {@link #stopRequested}). Returns {@code true} when a live run was cancelled, {@code false} when none existed. The
+     * run keeps holding the thread until its agent stops; events it emits meanwhile are dropped because the run's sink
+     * is terminal.
+     *
+     * <p>
+     * When {@code runId} is supplied it is recorded as a tombstone, so a Stop that reaches the server before the agent
+     * POST registers the run still terminates it (see {@link #tryStart}), and only a registered run with that id is
+     * cancelled, so a delayed Stop never ends the thread's next turn. Without a {@code runId} the thread's live run is
+     * cancelled whatever its id.
+     * </p>
+     */
     public boolean cancel(String threadId, @Nullable String runId) {
-        if (runId != null && !runId.isBlank()) {
-            cancelledRunIds.put(runId, Boolean.TRUE);
+        boolean runIdSupplied = runId != null && !runId.isBlank();
+
+        if (runIdSupplied) {
+            cancelledRunIds.put(tenantKey(runId), Boolean.TRUE);
         }
 
-        InFlightRun run = runs.getIfPresent(threadId);
+        InFlightRun run = runs.getIfPresent(tenantKey(threadId));
 
         if (run == null || run.isTerminated()) {
+            return false;
+        }
+
+        if (runIdSupplied && !runId.equals(run.getRunId())) {
+            log.debug(
+                "Ignoring cancel for threadId={} runId={}: the registered run is runId={}", threadId, runId,
+                run.getRunId());
+
             return false;
         }
 
@@ -143,13 +168,13 @@ public class InFlightAiHubRunRegistry {
     }
 
     public Mono<Void> stopRequested(String threadId) {
-        InFlightRun run = runs.getIfPresent(threadId);
+        InFlightRun run = runs.getIfPresent(tenantKey(threadId));
 
         return run == null ? Mono.never() : run.stopRequested();
     }
 
     public Optional<Flux<BaseEvent>> attach(String threadId) {
-        InFlightRun run = runs.getIfPresent(threadId);
+        InFlightRun run = runs.getIfPresent(tenantKey(threadId));
 
         if (run == null) {
             return Optional.empty();
@@ -159,16 +184,18 @@ public class InFlightAiHubRunRegistry {
     }
 
     public void runWhenReleased(String threadId, Runnable action) {
-        InFlightRun run = runs.getIfPresent(threadId);
+        String key = tenantKey(threadId);
+
+        InFlightRun run = runs.getIfPresent(key);
 
         DeferResult deferResult = run == null
-            ? DeferResult.NOT_HELD : run.deferUntilReleased(action, () -> isRetired(threadId));
+            ? DeferResult.NOT_HELD : run.deferUntilReleased(action, () -> isRetiredKey(key));
 
         if (deferResult == DeferResult.QUEUED) {
             return;
         }
 
-        if (deferResult == DeferResult.REFUSED || isRetired(threadId)) {
+        if (deferResult == DeferResult.REFUSED || isRetiredKey(key)) {
             log.debug("Refused a deferred action for retired threadId={}", threadId);
 
             return;
@@ -186,12 +213,14 @@ public class InFlightAiHubRunRegistry {
      * when the delete rolls back.
      */
     public boolean retireThread(String threadId) {
-        retiredThreadIds.put(threadId, Boolean.TRUE);
+        String key = tenantKey(threadId);
+
+        retiredThreadIds.put(key, Boolean.TRUE);
 
         AtomicReference<@Nullable InFlightRun> runReference = new AtomicReference<>();
 
         runs.asMap()
-            .compute(threadId, (key, run) -> {
+            .compute(key, (cacheKey, run) -> {
                 if (run != null) {
                     run.discardReleaseActions();
 
@@ -213,17 +242,25 @@ public class InFlightAiHubRunRegistry {
     }
 
     public void reinstateThread(String threadId) {
-        retiredThreadIds.invalidate(threadId);
+        retiredThreadIds.invalidate(tenantKey(threadId));
     }
 
     public boolean isRetired(String threadId) {
-        return retiredThreadIds.getIfPresent(threadId) != null;
+        return isRetiredKey(tenantKey(threadId));
     }
 
     public boolean isInFlight(String threadId) {
-        InFlightRun run = runs.getIfPresent(threadId);
+        InFlightRun run = runs.getIfPresent(tenantKey(threadId));
 
         return run != null && run.holdsThread(Instant.now());
+    }
+
+    private boolean isRetiredKey(String key) {
+        return retiredThreadIds.getIfPresent(key) != null;
+    }
+
+    private static String tenantKey(String id) {
+        return TenantCacheKeyUtils.getKey(id);
     }
 
     private static Cache<String, InFlightRun> buildDefaultCache() {
