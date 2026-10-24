@@ -32,6 +32,12 @@ public final class ComponentLogEntry {
     @Id
     private @Nullable Long id;
 
+    @Column("cluster_element_call_id")
+    private @Nullable String clusterElementCallId;
+
+    @Column("cluster_element_workflow_node_name")
+    private @Nullable String clusterElementWorkflowNodeName;
+
     @Column("component_name")
     private @Nullable String componentName;
 
@@ -74,6 +80,8 @@ public final class ComponentLogEntry {
     public ComponentLogEntry(int scope, long jobId, long taskExecutionId, LogEntry logEntry) {
         LogEntry.Level logEntryLevel = logEntry.level();
 
+        this.clusterElementCallId = logEntry.clusterElementCallId();
+        this.clusterElementWorkflowNodeName = logEntry.clusterElementWorkflowNodeName();
         this.componentName = logEntry.componentName();
         this.componentOperationName = logEntry.componentOperationName();
         this.exceptionMessage = logEntry.exceptionMessage();
@@ -127,7 +135,8 @@ public final class ComponentLogEntry {
     public LogEntry toLogEntry() {
         return new LogEntry(
             loggedAt, level == null ? null : LogEntry.Level.values()[level], componentName, componentOperationName,
-            taskExecutionId, triggerExecutionId, message, exceptionType, exceptionMessage, stackTrace);
+            taskExecutionId, triggerExecutionId, message, exceptionType, exceptionMessage, stackTrace,
+            clusterElementCallId, clusterElementWorkflowNodeName);
     }
 
     @Override

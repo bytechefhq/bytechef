@@ -29,6 +29,8 @@ type LogEntry {
     exceptionType: String
     exceptionMessage: String
     stackTrace: String
+    clusterElementCallId: String
+    clusterElementWorkflowNodeName: String
 }
 
 type LogPage {
@@ -48,4 +50,5 @@ input LogFilterInput {
     fromTimestamp: String
     toTimestamp: String
     searchText: String
+    clusterElementCallId: String
 }
