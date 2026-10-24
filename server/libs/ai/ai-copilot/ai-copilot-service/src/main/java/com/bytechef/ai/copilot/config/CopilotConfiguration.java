@@ -72,7 +72,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -95,6 +97,9 @@ import org.springframework.core.io.Resource;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class CopilotConfiguration {
+
+    static final Set<String> CLUSTER_ELEMENT_LOOKUP_TOOL_NAMES = Set.of(
+        "getAction", "getClusterElement", "searchClusterElements");
 
     private static final String BUILD_WORKFLOW_SUBAGENT_ASK_SECTION = """
 
@@ -836,17 +841,18 @@ public class CopilotConfiguration {
     @Bean
     ChatClient workflowEditorBuildSubAgentChatClient(
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
+        ComponentTools componentTools, ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
 
         return buildWorkflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools, hasAskTool(subAgentAskRelayProvider), List.of());
+            chatModel, projectWorkflowTools, taskTools, scriptTools, componentTools,
+            hasAskTool(subAgentAskRelayProvider), List.of());
     }
 
     @Bean
     IntelligentToolChatClientFactory workflowEditorBuildSubAgentChatClientFactory(
         @Qualifier("workflowEditorBuildSubAgentChatClient") ChatClient workflowEditorBuildSubAgentChatClient,
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider,
+        ComponentTools componentTools, ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider,
         WebSearchToolCallbackProvider webSearchToolCallbackProvider) {
 
         boolean askToolAvailable = hasAskTool(subAgentAskRelayProvider);
@@ -861,15 +867,15 @@ public class CopilotConfiguration {
 
             return buildWorkflowEditorBuildSubAgentChatClient(
                 candidateChatModel == null ? chatModel : candidateChatModel, projectWorkflowTools, taskTools,
-                scriptTools, askToolAvailable, webSearchToolCallbacks);
+                scriptTools, componentTools, askToolAvailable, webSearchToolCallbacks);
         };
     }
 
     private ChatClient buildWorkflowEditorBuildSubAgentChatClient(
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        boolean askToolAvailable, List<ToolCallback> webSearchToolCallbacks) {
+        ComponentTools componentTools, boolean askToolAvailable, List<ToolCallback> webSearchToolCallbacks) {
 
-        List<ToolCallback> toolCallbacks = new ArrayList<>();
+        List<ToolCallback> toolCallbacks = new ArrayList<>(clusterElementLookupToolCallbacks(componentTools));
 
         toolCallbacks.add(
             new LookupComponentPropertyOptionsToolCallback(
@@ -884,6 +890,13 @@ public class CopilotConfiguration {
                     projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools))
             .defaultToolCallbacks(toolCallbacks)
             .build();
+    }
+
+    static List<ToolCallback> clusterElementLookupToolCallbacks(ComponentTools componentTools) {
+        return Arrays.stream(ToolCallbacks.from(componentTools))
+            .filter(toolCallback -> CLUSTER_ELEMENT_LOOKUP_TOOL_NAMES.contains(toolCallback.getToolDefinition()
+                .name()))
+            .toList();
     }
 
     private static boolean hasAskTool(ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
