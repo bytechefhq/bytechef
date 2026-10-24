@@ -318,7 +318,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         </div>
                                     </TooltipTrigger>
 
-                                    <TooltipContent>Last Published Date</TooltipContent>
+                                    <TooltipContent side="left">Last Published Date</TooltipContent>
                                 </Tooltip>
                             </div>
                         )}
