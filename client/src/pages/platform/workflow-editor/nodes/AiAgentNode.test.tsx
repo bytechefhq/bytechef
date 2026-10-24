@@ -11,6 +11,10 @@ import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedSto
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import AiAgentNode from './AiAgentNode';
 
+const {testNodeStatesState} = vi.hoisted(() => ({
+    testNodeStatesState: {value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}>},
+}));
+
 vi.mock('@xyflow/react', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@xyflow/react')>()),
     Handle: ({type}: {type: string}) => <div data-testid={`handle-${type}`} />,
@@ -34,6 +38,10 @@ vi.mock('../providers/workflowEditorProvider', () => ({
 
 vi.mock('@/shared/queries/platform/workflowNodeDescriptions.queries', () => ({
     useGetWorkflowNodeDescriptionQuery: () => ({data: undefined}),
+}));
+
+vi.mock('../hooks/useWorkflowTestNodeStates', () => ({
+    default: () => testNodeStatesState.value,
 }));
 
 vi.mock('../hooks/useNodeClick', () => ({
@@ -96,6 +104,29 @@ describe('AiAgentNode', () => {
         useWorkflowDataStore.setState({
             workflow: {definition: '{}', id: 'workflow-1', nodeNames: [], tasks: [], triggers: [], version: 1},
         });
+
+        testNodeStatesState.value = {};
+    });
+
+    it("shows the agent's own test status on the compact card", () => {
+        testNodeStatesState.value = {aiAgent_1: {status: 'COMPLETED'}};
+
+        const {container} = renderNode(AI_AGENT_DATA);
+
+        expect(container.querySelector('.border-green-500')).not.toBeNull();
+    });
+
+    it('rings a tool icon on the compact card by the outcome of its calls', () => {
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'dialog'});
+
+        testNodeStatesState.value = {httpClient_1: {status: 'FAILED'}};
+
+        const {container} = renderNode({
+            ...AI_AGENT_DATA,
+            clusterElements: {tools: [{name: 'httpClient_1', type: 'httpClient/v1/get'}]},
+        } as unknown as NodeDataType);
+
+        expect(container.querySelector('li.border-red-500')).not.toBeNull();
     });
 
     it('expands a collapsed cluster root back into its frame', async () => {

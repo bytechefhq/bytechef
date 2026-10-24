@@ -22,6 +22,7 @@ import {extractClusterElementIcons} from '../../cluster-element-editor/utils/clu
 import useClusterElementsViewMode from '../hooks/useClusterElementsViewMode';
 import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useNodeClickHandler from '../hooks/useNodeClick';
+import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
@@ -29,8 +30,10 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {mapHandlePosition} from '../utils/directionUtils';
+import getClusterElementIconStatuses from '../utils/getClusterElementIconStatuses';
 import {getNodeLabel} from '../utils/getNodeLabel';
 import {getTask} from '../utils/getTask';
+import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import pasteNode from '../utils/pasteNode';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
@@ -39,6 +42,7 @@ import {toggleNodeDisabled} from '../utils/toggleNodeDisabled';
 import ClusterFrameShell from './ClusterFrameShell';
 import DisabledNodeBadge from './DisabledNodeBadge';
 import styles from './NodeTypes.module.css';
+import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
 
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [infoCardOpen, setInfoCardOpen] = useState(false);
@@ -108,6 +112,18 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             remainingIcons: uniqueIconsList.slice(5),
         };
     }, [data.clusterElements]);
+
+    const workflowTestNodeStates = useWorkflowTestNodeStates();
+
+    const testNodeState = workflowTestNodeStates[data.workflowNodeName];
+
+    const clusterElementIconStatuses = useMemo(
+        () =>
+            data.clusterElements && !Array.isArray(data.clusterElements)
+                ? getClusterElementIconStatuses(data.clusterElements, workflowTestNodeStates)
+                : {},
+        [data.clusterElements, workflowTestNodeStates]
+    );
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
@@ -422,9 +438,15 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         >
                             <PopoverTrigger asChild>
                                 <Button
-                                    className="flex h-auto min-h-18 flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
+                                    className={twMerge(
+                                        'flex h-auto min-h-18 flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary',
+                                        testNodeState && 'relative',
+                                        getTestNodeStateBorderClassName(testNodeState)
+                                    )}
                                     onClick={handleNodeClick}
                                 >
+                                    {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
+
                                     <span className="self-center text-content-neutral-primary [&_svg]:size-9">
                                         {data.icon ? (
                                             data.icon
@@ -444,7 +466,19 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                                 <Tooltip key={index}>
                                                     <TooltipTrigger asChild>
                                                         <li
-                                                            className="mr-2 flex items-center justify-center rounded-full border bg-surface-neutral-primary p-1 [&_svg]:size-5"
+                                                            className={twMerge(
+                                                                'mr-2 flex items-center justify-center rounded-full border bg-surface-neutral-primary p-1 [&_svg]:size-5',
+                                                                iconUrlObject &&
+                                                                    getTestNodeStateBorderClassName(
+                                                                        clusterElementIconStatuses[iconUrlObject.icon]
+                                                                            ? {
+                                                                                  status: clusterElementIconStatuses[
+                                                                                      iconUrlObject.icon
+                                                                                  ],
+                                                                              }
+                                                                            : undefined
+                                                                    )
+                                                            )}
                                                             key={index}
                                                         >
                                                             {iconUrlObject ? (
