@@ -18,6 +18,16 @@ import {
     IntegrationInstanceFromJSON,
     IntegrationInstanceToJSON,
 } from '../models/IntegrationInstance';
+import {
+    type ProvisionIntegrationInstanceRequest,
+    ProvisionIntegrationInstanceRequestFromJSON,
+    ProvisionIntegrationInstanceRequestToJSON,
+} from '../models/ProvisionIntegrationInstanceRequest';
+import {
+    type ProvisionableIntegration,
+    ProvisionableIntegrationFromJSON,
+    ProvisionableIntegrationToJSON,
+} from '../models/ProvisionableIntegration';
 
 export interface DeleteIntegrationInstanceRequest {
     /**
@@ -57,6 +67,24 @@ export interface GetIntegrationInstanceRequest {
      * The id of an integration instance.
      */
     id: number;
+}
+
+export interface GetProvisionableIntegrationsRequest {
+    /**
+     * The id of a connected user.
+     */
+    connectedUserId: number;
+}
+
+export interface ProvisionIntegrationInstanceOperationRequest {
+    /**
+     * The id of a connected user.
+     */
+    connectedUserId: number;
+    /**
+     * 
+     */
+    provisionIntegrationInstanceRequest: ProvisionIntegrationInstanceRequest;
 }
 
 /**
@@ -270,6 +298,114 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
      */
     async getIntegrationInstance(requestParameters: GetIntegrationInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstance> {
         const response = await this.getIntegrationInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getProvisionableIntegrations without sending the request
+     */
+    async getProvisionableIntegrationsRequestOpts(requestParameters: GetProvisionableIntegrationsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['connectedUserId'] == null) {
+            throw new runtime.RequiredError(
+                'connectedUserId',
+                'Required parameter "connectedUserId" was null or undefined when calling getProvisionableIntegrations().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/connected-users/{connectedUserId}/provisionable-integrations`;
+        urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get the integrations that can be provisioned to the connected user.
+     * Get the integrations that can be provisioned to the connected user
+     */
+    async getProvisionableIntegrationsRaw(requestParameters: GetProvisionableIntegrationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProvisionableIntegration>>> {
+        const requestOptions = await this.getProvisionableIntegrationsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ProvisionableIntegrationFromJSON));
+    }
+
+    /**
+     * Get the integrations that can be provisioned to the connected user.
+     * Get the integrations that can be provisioned to the connected user
+     */
+    async getProvisionableIntegrations(requestParameters: GetProvisionableIntegrationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProvisionableIntegration>> {
+        const response = await this.getProvisionableIntegrationsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for provisionIntegrationInstance without sending the request
+     */
+    async provisionIntegrationInstanceRequestOpts(requestParameters: ProvisionIntegrationInstanceOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['connectedUserId'] == null) {
+            throw new runtime.RequiredError(
+                'connectedUserId',
+                'Required parameter "connectedUserId" was null or undefined when calling provisionIntegrationInstance().'
+            );
+        }
+
+        if (requestParameters['provisionIntegrationInstanceRequest'] == null) {
+            throw new runtime.RequiredError(
+                'provisionIntegrationInstanceRequest',
+                'Required parameter "provisionIntegrationInstanceRequest" was null or undefined when calling provisionIntegrationInstance().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/connected-users/{connectedUserId}/integration-instances`;
+        urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ProvisionIntegrationInstanceRequestToJSON(requestParameters['provisionIntegrationInstanceRequest']),
+        };
+    }
+
+    /**
+     * Provision an integration instance for the connected user on a chosen integration instance configuration.
+     * Provision an integration instance for the connected user
+     */
+    async provisionIntegrationInstanceRaw(requestParameters: ProvisionIntegrationInstanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.provisionIntegrationInstanceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * Provision an integration instance for the connected user on a chosen integration instance configuration.
+     * Provision an integration instance for the connected user
+     */
+    async provisionIntegrationInstance(requestParameters: ProvisionIntegrationInstanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+        const response = await this.provisionIntegrationInstanceRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

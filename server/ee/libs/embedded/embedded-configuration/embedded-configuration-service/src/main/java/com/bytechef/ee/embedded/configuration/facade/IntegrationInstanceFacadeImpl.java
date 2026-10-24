@@ -43,6 +43,7 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -318,22 +319,65 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
             workflow.getId());
 
+        List<WorkflowTrigger> enabledWorkflowTriggers = new ArrayList<>();
+
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 PlatformType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
                 integrationWorkflow.getUuidAsString(), workflowTrigger.getName());
 
-            triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(
-                    MapUtils.concat(
-                        (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
-                        (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
-                    evaluator),
-                getConnectionId(integrationInstanceConfiguration.getIntegrationId(),
-                    integrationInstanceConfiguration.getId(), integrationInstanceWorkflow.getIntegrationInstanceId(),
-                    workflow.getId(), workflowTrigger),
-                getWebhookUrl(workflowExecutionId), integrationInstanceConfiguration.getEnvironmentId());
+            try {
+                triggerLifecycleFacade.executeTriggerEnable(
+                    workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
+                    workflowTrigger.evaluateParameters(
+                        MapUtils.concat(
+                            (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
+                            (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
+                        evaluator),
+                    getConnectionId(integrationInstanceConfiguration.getIntegrationId(),
+                        integrationInstanceConfiguration.getId(),
+                        integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(), workflowTrigger),
+                    getWebhookUrl(workflowExecutionId), integrationInstanceConfiguration.getEnvironmentId());
+            } catch (RuntimeException exception) {
+                disableEnabledWorkflowTriggers(
+                    integrationInstanceWorkflow, integrationInstanceConfigurationWorkflow,
+                    integrationInstanceConfiguration, integrationWorkflow, workflow, enabledWorkflowTriggers,
+                    exception);
+
+                throw exception;
+            }
+
+            enabledWorkflowTriggers.add(workflowTrigger);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void disableEnabledWorkflowTriggers(
+        IntegrationInstanceWorkflow integrationInstanceWorkflow,
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
+        IntegrationInstanceConfiguration integrationInstanceConfiguration, IntegrationWorkflow integrationWorkflow,
+        Workflow workflow, List<WorkflowTrigger> enabledWorkflowTriggers, RuntimeException enableFailure) {
+
+        for (WorkflowTrigger enabledWorkflowTrigger : enabledWorkflowTriggers) {
+            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+                PlatformType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
+                integrationWorkflow.getUuidAsString(), enabledWorkflowTrigger.getName());
+
+            try {
+                triggerLifecycleFacade.executeTriggerDisable(
+                    workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(enabledWorkflowTrigger.getType()),
+                    enabledWorkflowTrigger.evaluateParameters(
+                        MapUtils.concat(
+                            (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
+                            (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
+                        evaluator),
+                    getConnectionId(
+                        integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
+                        integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(),
+                        enabledWorkflowTrigger));
+            } catch (RuntimeException exception) {
+                enableFailure.addSuppressed(exception);
+            }
         }
     }
 

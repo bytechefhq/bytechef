@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectedUserServiceImpl implements ConnectedUserService {
 
+    private static final int MAX_LENGTH = 256;
+
     private final ConnectedUserRepository connectedUserRepository;
 
     @SuppressFBWarnings("EI")
@@ -48,16 +52,43 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     public ConnectedUser createConnectedUser(String externalId, Environment environment) {
-        if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(externalId)) {
-            throw new IllegalArgumentException(
-                "externalId '%s' is reserved and cannot be used for a connected user".formatted(externalId));
-        }
+        validateNotReserved(externalId);
 
         ConnectedUser connectedUser = new ConnectedUser();
 
         connectedUser.setEnabled(true);
         connectedUser.setEnvironment(environment);
         connectedUser.setExternalId(externalId);
+
+        return connectedUserRepository.save(connectedUser);
+    }
+
+    @Override
+    public ConnectedUser createConnectedUser(
+        String externalId, Environment environment, @Nullable String name, @Nullable String email,
+        @Nullable Map<String, String> metadata) {
+
+        validateExternalId(externalId);
+
+        String normalizedName = normalizeName(name);
+        String normalizedEmail = normalizeEmail(email);
+        Map<String, String> normalizedMetadata = metadata == null ? Map.of() : metadata;
+
+        validateMetadata(normalizedMetadata);
+
+        if (fetchConnectedUser(externalId, environment).isPresent()) {
+            throw new IllegalArgumentException(
+                "A connected user with externalId '%s' already exists".formatted(externalId));
+        }
+
+        ConnectedUser connectedUser = new ConnectedUser();
+
+        connectedUser.setEmail(normalizedEmail);
+        connectedUser.setEnabled(true);
+        connectedUser.setEnvironment(environment);
+        connectedUser.setExternalId(externalId);
+        connectedUser.setMetadata(normalizedMetadata);
+        connectedUser.setName(normalizedName);
 
         return connectedUserRepository.save(connectedUser);
     }
@@ -148,5 +179,99 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
         connectedUser.setMetadata(MapUtils.concat(connectedUser.getMetadata(), filteredMetadata));
 
         connectedUserRepository.save(connectedUser);
+    }
+
+    @Override
+    public ConnectedUser updateConnectedUser(
+        long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version) {
+
+        ConnectedUser connectedUser = getConnectedUser(id);
+
+        if (connectedUser.getVersion() != version) {
+            throw new OptimisticLockingFailureException("Connected user " + id + " was modified");
+        }
+
+        String normalizedName = normalizeName(name);
+        String normalizedEmail = normalizeEmail(email);
+        Map<String, String> normalizedMetadata = metadata == null ? Map.of() : metadata;
+
+        validateMetadata(normalizedMetadata);
+
+        connectedUser.setEmail(normalizedEmail);
+        connectedUser.setMetadata(normalizedMetadata);
+        connectedUser.setName(normalizedName);
+
+        return connectedUserRepository.save(connectedUser);
+    }
+
+    public static void validateExternalId(String externalId) {
+        if (externalId == null || externalId.isBlank()) {
+            throw new IllegalArgumentException("externalId is required");
+        }
+
+        if (!externalId.equals(externalId.strip())) {
+            throw new IllegalArgumentException("externalId '%s' must not have leading or trailing whitespace"
+                .formatted(externalId));
+        }
+
+        if (externalId.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException("externalId must not be longer than " + MAX_LENGTH + " characters");
+        }
+
+        validateNotReserved(externalId);
+    }
+
+    private static void validateNotReserved(String externalId) {
+        if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(externalId)) {
+            throw new IllegalArgumentException(
+                "externalId '%s' is reserved and cannot be used for a connected user".formatted(externalId));
+        }
+    }
+
+    private static String normalizeEmail(@Nullable String email) {
+        String normalizedEmail = normalizeOptional(email, "email");
+
+        if (normalizedEmail != null && !normalizedEmail.contains("@")) {
+            throw new IllegalArgumentException("email '%s' is not a valid email address".formatted(normalizedEmail));
+        }
+
+        return normalizedEmail;
+    }
+
+    private static String normalizeName(@Nullable String name) {
+        return normalizeOptional(name, "name");
+    }
+
+    private static String normalizeOptional(@Nullable String value, String fieldName) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        if (value.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException(fieldName + " must not be longer than " + MAX_LENGTH + " characters");
+        }
+
+        return value;
+    }
+
+    private static void validateMetadata(Map<String, String> metadata) {
+        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (key == null || key.length() > MAX_LENGTH) {
+                throw new IllegalArgumentException(
+                    "metadata keys must not be longer than " + MAX_LENGTH + " characters");
+            }
+
+            if (value == null) {
+                throw new IllegalArgumentException("metadata value for key '%s' must not be null".formatted(key));
+            }
+
+            if (value.length() > MAX_LENGTH) {
+                throw new IllegalArgumentException(
+                    "metadata value for key '%s' must not be longer than %d characters".formatted(key, MAX_LENGTH));
+            }
+        }
     }
 }

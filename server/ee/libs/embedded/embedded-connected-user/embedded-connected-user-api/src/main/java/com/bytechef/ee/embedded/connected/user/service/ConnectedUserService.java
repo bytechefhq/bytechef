@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 
 /**
@@ -25,6 +26,10 @@ public interface ConnectedUserService {
     ConnectedUser createConnectedUser(String externalId, long environmentId);
 
     ConnectedUser createConnectedUser(String externalId, Environment environment);
+
+    ConnectedUser createConnectedUser(
+        String externalId, Environment environment, @Nullable String name, @Nullable String email,
+        @Nullable Map<String, String> metadata);
 
     void deleteConnectedUser(long id);
 
@@ -47,4 +52,7 @@ public interface ConnectedUserService {
     List<ConnectedUser> getConnectedUsers(List<Long> ids);
 
     void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata);
+
+    ConnectedUser updateConnectedUser(
+        long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version);
 }

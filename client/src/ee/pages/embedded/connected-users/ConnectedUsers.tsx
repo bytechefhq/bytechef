@@ -8,6 +8,8 @@ import TablePagination from '@/components/TablePagination';
 import {Calendar} from '@/components/ui/calendar';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import ConnectedUserCreateDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserCreateDialog';
+import ConnectedUserImportDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserImportDialog';
 import ConnectedUserTable from '@/ee/pages/embedded/connected-users/components/ConnectedUserTable';
 import ConnectedUsersFilterTitle from '@/ee/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
 import ConnectedUserSheet from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
@@ -22,7 +24,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {format} from 'date-fns';
-import {CalendarIcon, UsersIcon} from 'lucide-react';
+import {CalendarIcon, PlusIcon, UploadIcon, UsersIcon} from 'lucide-react';
 import {HTMLAttributes, useState} from 'react';
 import {DateRange} from 'react-day-picker';
 import {useForm} from 'react-hook-form';
@@ -106,6 +108,9 @@ const ConnectedUsers = () => {
     const [pageNumber, setPageNumber] = useState<number | undefined>(
         searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined
     );
+
+    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const [importDialogOpen, setImportDialogOpen] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -195,6 +200,22 @@ const ConnectedUsers = () => {
             header={
                 <Header
                     position="main"
+                    right={
+                        <div className="flex items-center gap-2">
+                            <Button
+                                icon={<UploadIcon />}
+                                label="Import"
+                                onClick={() => setImportDialogOpen(true)}
+                                variant="outline"
+                            />
+
+                            <Button
+                                icon={<PlusIcon />}
+                                label="New connected user"
+                                onClick={() => setCreateDialogOpen(true)}
+                            />
+                        </div>
+                    }
                     title={
                         <ConnectedUsersFilterTitle
                             filterData={{
@@ -332,6 +353,10 @@ const ConnectedUsers = () => {
             </PageLoader>
 
             <ConnectedUserSheet />
+
+            {createDialogOpen && <ConnectedUserCreateDialog onClose={() => setCreateDialogOpen(false)} />}
+
+            {importDialogOpen && <ConnectedUserImportDialog onClose={() => setImportDialogOpen(false)} />}
         </LayoutContainer>
     );
 };

@@ -27,6 +27,10 @@ public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType
         new IntegrationInstanceConfigurationErrorType(103);
     public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_EXISTS =
         new IntegrationInstanceConfigurationErrorType(104);
+    public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_DISABLED =
+        new IntegrationInstanceConfigurationErrorType(105);
+    public static final IntegrationInstanceConfigurationErrorType WORKFLOW_NOT_IN_CONFIGURATION =
+        new IntegrationInstanceConfigurationErrorType(106);
 
     private IntegrationInstanceConfigurationErrorType(int errorKey) {
         super(IntegrationInstanceConfiguration.class, errorKey);

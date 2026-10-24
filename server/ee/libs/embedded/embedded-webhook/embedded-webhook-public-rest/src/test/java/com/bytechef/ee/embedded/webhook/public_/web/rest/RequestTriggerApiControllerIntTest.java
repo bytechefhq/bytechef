@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.webhook.public_.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -27,8 +28,10 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -83,6 +86,9 @@ class RequestTriggerApiControllerIntTest {
 
     @Autowired
     private IntegrationInstanceService integrationInstanceService;
+
+    @Autowired
+    private IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
 
     @Autowired
     private IntegrationWorkflowService integrationWorkflowService;
@@ -163,8 +169,8 @@ class RequestTriggerApiControllerIntTest {
     void testAutomationBridgeUnsupportedOperationExceptionReturnsNotFoundAndIsLoggedOnceAcrossTwoCalls() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-unsupported"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-unsupported"), any()))
+            .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenThrow(new UnsupportedOperationException());
 
@@ -180,8 +186,8 @@ class RequestTriggerApiControllerIntTest {
     void testUnsupportedOperationExceptionPastTheReferenceFacadeIsNotReportedAsNotFound() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-copy"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-copy"), any()))
+            .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(copyModeFor(300L, true, false)));
         when(projectWorkflowService.getProjectWorkflow(300L))
@@ -198,8 +204,8 @@ class RequestTriggerApiControllerIntTest {
     void testUnknownWorkflowFallsThroughToTheAutomationBridge() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-2"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-2"), any()))
+            .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of());
 
@@ -213,8 +219,8 @@ class RequestTriggerApiControllerIntTest {
     void testExistingReferenceDispatchesAgainstTheAutomationWorkflowWithAutomationWorkflowExecutionId() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-3"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-3"), any()))
+            .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("uuid-3", 42L, true, false)));
         when(projectWorkflowService.getLastPublishedWorkflowId("uuid-3"))
@@ -241,10 +247,10 @@ class RequestTriggerApiControllerIntTest {
     void testDisabledAndDanglingReferencesReturnByteIdenticalNotFoundResponses() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-5"), any()))
-            .thenReturn(Optional.empty());
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-6"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-5"), any()))
+            .thenReturn(List.of());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-6"), any()))
+            .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("uuid-5", 42L, false, false), referenceFor("uuid-6", 42L, true, true)));
 
@@ -262,8 +268,8 @@ class RequestTriggerApiControllerIntTest {
     void testEnabledNonDanglingReferenceWithNullProjectDeploymentIdReturnsNotFound() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-8"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-8"), any()))
+            .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("uuid-8", null, true, false)));
 
@@ -277,8 +283,8 @@ class RequestTriggerApiControllerIntTest {
     void testCrossUserResolutionUsesOnlyTheCallersConnectedUserIdentity() {
         stubConnectedUser("login-a", 10L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-9"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-9"), any()))
+            .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(10L))
             .thenReturn(List.of(referenceFor("uuid-9", 42L, true, false)));
         when(projectWorkflowService.getLastPublishedWorkflowId("uuid-9"))
@@ -306,8 +312,9 @@ class RequestTriggerApiControllerIntTest {
         ProjectWorkflow projectWorkflow = new ProjectWorkflow(
             6L, 2, "copy-wf-1", UUID.fromString("00000000-0000-0000-0000-000000000201"));
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq(projectWorkflow.getUuidAsString()), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(),
+            eq(projectWorkflow.getUuidAsString()), any()))
+                .thenReturn(List.of());
         when(projectWorkflowService.getProjectWorkflow(200L))
             .thenReturn(projectWorkflow);
         when(projectDeploymentService.getProjectDeploymentId(6L, Environment.PRODUCTION))
@@ -350,8 +357,8 @@ class RequestTriggerApiControllerIntTest {
 
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor(workflowUuid, 42L, true, false), otherCopy, ownCopy));
-        when(integrationWorkflowService.fetchLastWorkflowId(eq(workflowUuid), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq(workflowUuid), any()))
+            .thenReturn(List.of());
         when(projectWorkflowService.getProjectWorkflow(401L))
             .thenReturn(otherProjectWorkflow);
         when(projectWorkflowService.getProjectWorkflow(400L))
@@ -380,8 +387,8 @@ class RequestTriggerApiControllerIntTest {
     void testReferenceResolutionWinsOverACopyMadeFromTheSameTemplate() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("template-uuid-5"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("template-uuid-5"), any()))
+            .thenReturn(List.of());
 
         ConnectedUserProjectWorkflow copyOfTemplate = copyModeFor(500L, true, false);
 
@@ -413,8 +420,8 @@ class RequestTriggerApiControllerIntTest {
     void testAutomationWorkflowUuidOfAnExistingCopyDispatchesThatCopy() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("template-uuid-2"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("template-uuid-2"), any()))
+            .thenReturn(List.of());
 
         ConnectedUserProjectWorkflow existingCopy = copyModeFor(301L, true, false);
 
@@ -454,10 +461,10 @@ class RequestTriggerApiControllerIntTest {
     void testUnactivatedAutomationWorkflowTemplateReturnsTheSameNotFoundAsAnUnknownUuidAndProvisionsNothing() {
         stubConnectedUser("user-1", 1L);
 
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("template-uuid-3"), any()))
-            .thenReturn(Optional.empty());
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("unknown-uuid-3"), any()))
-            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("template-uuid-3"), any()))
+            .thenReturn(List.of());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("unknown-uuid-3"), any()))
+            .thenReturn(List.of());
 
         ConnectedUserProjectWorkflow unrelatedCopy = copyModeFor(303L, true, false);
 
@@ -483,6 +490,103 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
+    @WithMockUser(username = "user-1")
+    void testPinnedCustomerDispatchesAgainstItsOwnInstanceVersion() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(1L, "uuid-1", Environment.PRODUCTION))
+            .thenReturn(List.of(instance(7L, true)));
+        when(integrationWorkflowService.getWorkflowId(7L, "uuid-1"))
+            .thenReturn("integration-wf-v1");
+        when(workflowService.getWorkflow("integration-wf-v1"))
+            .thenReturn(requestTriggerWorkflow());
+
+        expectDispatched(WORKFLOW_PATH, "uuid-1");
+
+        assertThat(captureDispatchedWorkflowExecutionId().getJobPrincipalId()).isEqualTo(7L);
+
+        verify(integrationWorkflowService, never()).fetchLastWorkflowId(any(), any());
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testSeveralMatchingInstancesPrefersTheEnabledOneWithTheHighestId() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(1L, "uuid-1", Environment.PRODUCTION))
+            .thenReturn(List.of(instance(9L, false), instance(8L, true), instance(3L, true)));
+        when(integrationWorkflowService.getWorkflowId(8L, "uuid-1"))
+            .thenReturn("integration-wf-8");
+        when(workflowService.getWorkflow("integration-wf-8"))
+            .thenReturn(requestTriggerWorkflow());
+
+        expectDispatched(WORKFLOW_PATH, "uuid-1");
+
+        assertThat(captureDispatchedWorkflowExecutionId().getJobPrincipalId()).isEqualTo(8L);
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testSeveralMatchingInstancesPreferTheOneWhoseWorkflowIsEnabled() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(1L, "uuid-1", Environment.PRODUCTION))
+            .thenReturn(List.of(instance(9L, true), instance(8L, true)));
+        when(integrationWorkflowService.getWorkflowId(9L, "uuid-1"))
+            .thenReturn("integration-wf-9");
+        when(integrationWorkflowService.getWorkflowId(8L, "uuid-1"))
+            .thenReturn("integration-wf-8");
+        when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(9L, "integration-wf-9"))
+            .thenReturn(Optional.of(instanceWorkflow(false)));
+        when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(8L, "integration-wf-8"))
+            .thenReturn(Optional.of(instanceWorkflow(true)));
+        when(workflowService.getWorkflow("integration-wf-9"))
+            .thenReturn(requestTriggerWorkflow());
+        when(workflowService.getWorkflow("integration-wf-8"))
+            .thenReturn(requestTriggerWorkflow());
+
+        expectDispatched(WORKFLOW_PATH, "uuid-1");
+
+        assertThat(captureDispatchedWorkflowExecutionId().getJobPrincipalId()).isEqualTo(8L);
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testNoInstanceForUuidFallsThroughToTheAutomationBridge() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(1L, "uuid-none", Environment.PRODUCTION))
+            .thenReturn(List.of());
+        when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of());
+
+        expectNotFoundWithoutBody("uuid-none");
+
+        verify(connectedUserWorkflowReferenceFacade).getConnectedUserWorkflows(1L);
+        verify(integrationWorkflowService, never()).getWorkflowId(anyLong(), anyString());
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testOnlyDisabledMatchingInstancesFallThroughToTheAutomationBridgeWithoutDispatching() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(1L, "uuid-1", Environment.PRODUCTION))
+            .thenReturn(List.of(instance(9L, false), instance(8L, false)));
+        when(integrationWorkflowService.getWorkflowId(anyLong(), eq("uuid-1")))
+            .thenReturn("integration-wf-1");
+        when(workflowService.getWorkflow("integration-wf-1"))
+            .thenReturn(requestTriggerWorkflow());
+        when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of());
+
+        expectNotFoundWithoutBody("uuid-1");
+
+        verify(connectedUserWorkflowReferenceFacade).getConnectedUserWorkflows(1L);
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
     @WithMockUser(username = "ext-1")
     void testExecuteWorkflowForAnExternalUserIdRunsAsThatConnectedUser() {
         stubConnectedUser("ext-1", 1L);
@@ -491,7 +595,8 @@ class RequestTriggerApiControllerIntTest {
         expectDispatched(EXTERNAL_USER_WORKFLOW_PATH, "ext-1", "uuid-1");
 
         verify(connectedUserService).getConnectedUser("ext-1", Environment.PRODUCTION);
-        verify(integrationInstanceService).getIntegrationInstance(1L, "integration-wf-1", Environment.PRODUCTION);
+        verify(integrationInstanceService).getIntegrationInstancesByWorkflowUuid(
+            1L, "uuid-1", Environment.PRODUCTION);
 
         WorkflowExecutionId workflowExecutionId = captureDispatchedWorkflowExecutionId();
 
@@ -564,21 +669,33 @@ class RequestTriggerApiControllerIntTest {
     }
 
     private void stubIntegrationWorkflow() {
-        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-1"), any()))
-            .thenReturn(Optional.of("integration-wf-1"));
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(1L, "uuid-1", Environment.PRODUCTION))
+            .thenReturn(List.of(instance(2L, true)));
+        when(integrationWorkflowService.getWorkflowId(2L, "uuid-1"))
+            .thenReturn("integration-wf-1");
+        when(workflowService.getWorkflow("integration-wf-1"))
+            .thenReturn(requestTriggerWorkflow());
+    }
 
+    private static IntegrationInstance instance(long id, boolean enabled) {
         IntegrationInstance integrationInstance = new IntegrationInstance();
 
-        integrationInstance.setId(2L);
+        integrationInstance.setEnabled(enabled);
+        integrationInstance.setId(id);
 
-        when(integrationInstanceService.getIntegrationInstance(1L, "integration-wf-1", Environment.PRODUCTION))
-            .thenReturn(integrationInstance);
-        when(workflowService.getWorkflow("integration-wf-1"))
-            .thenReturn(
-                new Workflow(
-                    "{\"label\":\"Integration Workflow\",\"triggers\":[{\"name\":\"trigger_1\",\"type\":\"request/v1\"}],"
-                        + "\"tasks\":[]}",
-                    Workflow.Format.JSON));
+        return integrationInstance;
+    }
+
+    private static IntegrationInstanceWorkflow instanceWorkflow(boolean enabled) {
+        IntegrationInstanceWorkflow integrationInstanceWorkflow = new IntegrationInstanceWorkflow();
+
+        integrationInstanceWorkflow.setEnabled(enabled);
+
+        return integrationInstanceWorkflow;
+    }
+
+    private static Workflow requestTriggerWorkflow() {
+        return requestTriggerWorkflow("trigger_1");
     }
 
     private static ConnectedUserProjectWorkflow copyModeFor(

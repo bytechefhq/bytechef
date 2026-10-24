@@ -34,6 +34,20 @@ import {
     McpIntegrationInstanceToolToJSON,
     McpIntegrationInstanceToolToJSONTyped,
 } from './McpIntegrationInstanceTool';
+import type { ConnectionConfig } from './ConnectionConfig';
+import {
+    ConnectionConfigFromJSON,
+    ConnectionConfigFromJSONTyped,
+    ConnectionConfigToJSON,
+    ConnectionConfigToJSONTyped,
+} from './ConnectionConfig';
+import type { IntegrationWorkflow } from './IntegrationWorkflow';
+import {
+    IntegrationWorkflowFromJSON,
+    IntegrationWorkflowFromJSONTyped,
+    IntegrationWorkflowToJSON,
+    IntegrationWorkflowToJSONTyped,
+} from './IntegrationWorkflow';
 
 /**
  * The integration instance represents a configured integration for a specific user, containing connection and status information
@@ -57,6 +71,22 @@ export interface IntegrationInstance {
      * If an integration instance is enabled or not
      */
     enabled: boolean;
+    /**
+     * The workflows of the integration instance configuration this instance belongs to.
+     */
+    readonly availableWorkflows?: Array<IntegrationWorkflow>;
+    /**
+     * 
+     */
+    connectionConfig?: ConnectionConfig;
+    /**
+     * The id of the integration instance configuration this instance belongs to.
+     */
+    readonly integrationInstanceConfigurationId?: number;
+    /**
+     * The integration version of the configuration this instance belongs to.
+     */
+    readonly integrationVersion?: number;
     /**
      * The array of MCP tools for this integration instance.
      */
@@ -95,6 +125,10 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
         'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
         'enabled': json['enabled'],
+        'availableWorkflows': json['availableWorkflows'] == null ? undefined : ((json['availableWorkflows'] as Array<any>).map(IntegrationWorkflowFromJSON)),
+        'connectionConfig': json['connectionConfig'] == null ? undefined : ConnectionConfigFromJSON(json['connectionConfig']),
+        'integrationInstanceConfigurationId': json['integrationInstanceConfigurationId'] == null ? undefined : json['integrationInstanceConfigurationId'],
+        'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
         'mcpTools': json['mcpTools'] == null ? undefined : ((json['mcpTools'] as Array<any>).map(McpIntegrationInstanceToolFromJSON)),
         'mcpWorkflows': json['mcpWorkflows'] == null ? undefined : ((json['mcpWorkflows'] as Array<any>).map(IntegrationInstanceWorkflowFromJSON)),
         'workflows': json['workflows'] == null ? undefined : ((json['workflows'] as Array<any>).map(IntegrationInstanceWorkflowFromJSON)),
@@ -105,7 +139,7 @@ export function IntegrationInstanceToJSON(json: any): IntegrationInstance {
     return IntegrationInstanceToJSONTyped(json, false);
 }
 
-export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'mcpTools'|'mcpWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'availableWorkflows'|'integrationInstanceConfigurationId'|'integrationVersion'|'mcpTools'|'mcpWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -115,6 +149,7 @@ export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance,
         'id': value['id'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
         'enabled': value['enabled'],
+        'connectionConfig': ConnectionConfigToJSON(value['connectionConfig']),
         'workflows': value['workflows'] == null ? undefined : ((value['workflows'] as Array<any>).map(IntegrationInstanceWorkflowToJSON)),
     };
 }

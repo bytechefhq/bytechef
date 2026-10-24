@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
+import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,11 @@ import org.springframework.util.Assert;
 @Transactional
 @ConditionalOnEEVersion
 public class IntegrationInstanceConfigurationServiceImpl implements IntegrationInstanceConfigurationService {
+
+    public static final Comparator<IntegrationInstanceConfiguration> SELF_SERVE_ORDER = Comparator
+        .comparing(IntegrationInstanceConfiguration::getIntegrationVersion,
+            Comparator.nullsFirst(Comparator.naturalOrder()))
+        .thenComparing(IntegrationInstanceConfiguration::getId);
 
     private final IntegrationInstanceConfigurationRepository integrationInstanceConfigurationRepository;
 
@@ -62,9 +68,12 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
     public IntegrationInstanceConfiguration getIntegrationIntegrationInstanceConfiguration(
         long id, Environment environment, boolean enabled) {
 
-        return OptionalUtils.get(
-            integrationInstanceConfigurationRepository.findByIntegrationIdAndEnvironmentAndEnabled(
-                id, environment.ordinal(), enabled));
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationRepository.findAllByIntegrationIdAndEnvironmentAndEnabled(
+                id, environment.ordinal(), enabled);
+
+        return OptionalUtils.get(integrationInstanceConfigurations.stream()
+            .max(SELF_SERVE_ORDER));
     }
 
     @Override

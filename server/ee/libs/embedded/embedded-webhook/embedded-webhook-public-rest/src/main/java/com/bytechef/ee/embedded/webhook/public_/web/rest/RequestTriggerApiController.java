@@ -17,8 +17,10 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -40,6 +42,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,6 +78,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     private final HttpServletRequest httpServletRequest;
     private final HttpServletResponse httpServletResponse;
     private final IntegrationInstanceService integrationInstanceService;
+    private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
@@ -90,6 +94,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
         ProjectDeploymentService projectDeploymentService, TempFileStorage tempFileStorage,
         WebhookWorkflowExecutor webhookWorkflowExecutor, IntegrationInstanceService integrationInstanceService,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationWorkflowService integrationWorkflowService, ProjectWorkflowService projectWorkflowService,
         WorkflowService workflowService) {
 
@@ -102,6 +107,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
         this.integrationInstanceService = integrationInstanceService;
+        this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
@@ -127,11 +133,15 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        Optional<String> integrationWorkflowId = integrationWorkflowService.fetchLastWorkflowId(
-            workflowUuid, environment);
+        List<IntegrationInstance> enabledIntegrationInstances = integrationInstanceService
+            .getIntegrationInstancesByWorkflowUuid(connectedUser.getId(), workflowUuid, environment)
+            .stream()
+            .filter(IntegrationInstance::isEnabled)
+            .sorted(Comparator.comparing(IntegrationInstance::getId, Comparator.reverseOrder()))
+            .toList();
 
-        if (integrationWorkflowId.isPresent()) {
-            return executeIntegrationWorkflow(connectedUser, workflowUuid, integrationWorkflowId.get(), environment);
+        if (!enabledIntegrationInstances.isEmpty()) {
+            return executeIntegrationWorkflow(workflowUuid, enabledIntegrationInstances);
         }
 
         Optional<List<ConnectedUserProjectWorkflow>> connectedUserProjectWorkflowsOptional =
@@ -151,10 +161,35 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     }
 
     private ResponseEntity<Object> executeIntegrationWorkflow(
-        ConnectedUser connectedUser, String workflowUuid, String workflowId, Environment environment) {
+        String workflowUuid, List<IntegrationInstance> enabledIntegrationInstances) {
 
-        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
-            connectedUser.getId(), workflowId, environment);
+        IntegrationInstance integrationInstance = null;
+        String workflowId = null;
+
+        if (enabledIntegrationInstances.size() > 1) {
+            for (IntegrationInstance enabledIntegrationInstance : enabledIntegrationInstances) {
+                String enabledInstanceWorkflowId = integrationWorkflowService.getWorkflowId(
+                    enabledIntegrationInstance.getId(), workflowUuid);
+
+                boolean workflowEnabled = integrationInstanceWorkflowService
+                    .fetchIntegrationInstanceWorkflow(enabledIntegrationInstance.getId(), enabledInstanceWorkflowId)
+                    .map(IntegrationInstanceWorkflow::isEnabled)
+                    .orElse(false);
+
+                if (workflowEnabled) {
+                    integrationInstance = enabledIntegrationInstance;
+                    workflowId = enabledInstanceWorkflowId;
+
+                    break;
+                }
+            }
+        }
+
+        if (integrationInstance == null) {
+            integrationInstance = enabledIntegrationInstances.getFirst();
+
+            workflowId = integrationWorkflowService.getWorkflowId(integrationInstance.getId(), workflowUuid);
+        }
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 

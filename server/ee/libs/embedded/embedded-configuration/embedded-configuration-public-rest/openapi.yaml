@@ -2250,6 +2250,24 @@ components:
         - $ref: "#/components/schemas/IntegrationInstanceBasic"
         - type: "object"
           properties:
+            availableWorkflows:
+              description: "The workflows of the integration instance configuration this instance belongs to."
+              type: "array"
+              items:
+                $ref: '#/components/schemas/IntegrationWorkflow'
+              readOnly: true
+            connectionConfig:
+              $ref: "#/components/schemas/ConnectionConfig"
+            integrationInstanceConfigurationId:
+              description: "The id of the integration instance configuration this instance belongs to."
+              type: "integer"
+              format: "int64"
+              readOnly: true
+            integrationVersion:
+              description: "The integration version of the configuration this instance belongs to."
+              type: "integer"
+              format: "int32"
+              readOnly: true
             mcpTools:
               description: "The array of MCP tools for this integration instance."
               type: "array"

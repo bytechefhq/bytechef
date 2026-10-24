@@ -480,3 +480,77 @@ describe('useConnectDialog reauthorize mode', () => {
         expect(onReauthorized).toHaveBeenCalledWith(70);
     });
 });
+
+describe('useConnectDialog workflows view', () => {
+    let renderMock: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+        renderMock = vi.fn();
+        vi.mocked(createRoot).mockReturnValue({render: renderMock, unmount: vi.fn()} as unknown as ReturnType<
+            typeof createRoot
+        >);
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    const openOnInstance = async (instance: Record<string, unknown>) => {
+        global.fetch = vi.fn().mockResolvedValue(
+            jsonResponse({
+                ...slackIntegration([]),
+                integrationInstances: [{credentialStatus: 'VALID', enabled: true, id: 5, ...instance}],
+                workflows: [{label: 'V2', workflowUuid: 'w-v2'}],
+            })
+        );
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                integrationId: '12',
+                integrationInstanceId: '5',
+                jwtToken: 'ey',
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        return lastRenderedProps(renderMock);
+    };
+
+    const getWorkflowUuids = (props: {mergedWorkflows: Array<{workflowUuid: string}>}) =>
+        props.mergedWorkflows.map((workflow) => workflow.workflowUuid);
+
+    it("uses the current instance's availableWorkflows instead of the integration workflows", async () => {
+        const workflowUuids = getWorkflowUuids(
+            await openOnInstance({
+                availableWorkflows: [{label: 'V1', workflowUuid: 'w-v1'}],
+                workflows: [{enabled: true, workflowUuid: 'w-v1'}],
+            })
+        );
+
+        expect(workflowUuids).toEqual(['w-v1']);
+    });
+
+    it('falls back to the integration workflows when the instance has no availableWorkflows', async () => {
+        const workflowUuids = getWorkflowUuids(await openOnInstance({workflows: []}));
+
+        expect(workflowUuids).toEqual(['w-v2']);
+    });
+
+    it("uses the current instance's connectionConfig instead of the integration one", async () => {
+        const props = await openOnInstance({
+            connectionConfig: {authorizationType: 'API_KEY', inputs: [{label: 'Key', name: 'key', required: true}]},
+            workflows: [],
+        });
+
+        expect(props.properties).toEqual([{label: 'Key', name: 'key', required: true}]);
+    });
+
+    it('falls back to the integration connectionConfig when the instance has none', async () => {
+        const props = await openOnInstance({workflows: []});
+
+        expect(props.properties).toEqual([]);
+    });
+});
