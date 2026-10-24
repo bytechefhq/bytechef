@@ -12,12 +12,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
+import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import org.junit.jupiter.api.Test;
@@ -37,7 +42,8 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 /**
  * The {@code buildWorkflow} and {@code importWorkflow} delegates run their own sub-agent, whose tool calls never pass
  * the hub's approval gate. The hub therefore hands those sub-agents a chat client that never offers a tool the gate
- * gates by default, so a gated tool such as {@code deleteWorkflow} cannot be reached through a delegation.
+ * gates, by default or by a workspace REQUIRE rule, so a gated tool such as {@code deleteWorkflow} cannot be reached
+ * through a delegation.
  *
  * @version ee
  *
@@ -52,22 +58,14 @@ class AiHubDelegateGatedToolFilterTest {
 
     private static final List<String> UNGATED_TOOL_NAMES = List.of("createWorkflow", "updateWorkflow", "validate");
 
+    private static final long WORKSPACE_ID = 7L;
+
     @Test
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
     void testHubDelegateSubAgentNeverOffersAGatedTool() throws Exception {
         AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
 
-        fixtures.buildAgent();
-
-        ArgumentCaptor<BiFunction> chatClientDecoratorCaptor = ArgumentCaptor.forClass(BiFunction.class);
-
-        verify(fixtures.intelligentToolCatalog)
-            .getByNames(anySet(), eq(IntelligentToolVariant.BUILD), chatClientDecoratorCaptor.capture(), any());
-
         BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator =
-            chatClientDecoratorCaptor.getValue();
+            captureChatClientDecorator(fixtures);
 
         PromptCapturingChatModel chatModel = new PromptCapturingChatModel();
         AtomicInteger gatedToolInvocations = new AtomicInteger();
@@ -92,6 +90,57 @@ class AiHubDelegateGatedToolFilterTest {
             .content();
 
         assertThat(chatModel.lastOfferedToolNames()).containsAll(GATED_TOOL_NAMES);
+    }
+
+    @Test
+    void testHubDelegateSubAgentNeverOffersAToolTheWorkspaceRequiresApprovalFor() throws Exception {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        when(fixtures.policy.decide(WORKSPACE_ID))
+            .thenReturn(new AiHubToolApprovalPolicy.Decision(Set.of("saveWorkflowTestConnection"), Set.of()));
+
+        BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator =
+            captureChatClientDecorator(fixtures);
+
+        PromptCapturingChatModel chatModel = new PromptCapturingChatModel();
+        AtomicInteger requiredToolInvocations = new AtomicInteger();
+
+        ChatClient subAgentChatClient = ChatClient.builder(chatModel)
+            .defaultTools(
+                toolCallback("saveWorkflowTestConnection", requiredToolInvocations),
+                toolCallback("createWorkflow", new AtomicInteger()))
+            .build();
+
+        ChatClient hubSubAgentChatClient = chatClientDecorator.apply(subAgentChatClient, null);
+
+        Map<String, Object> toolContext = AgentToolInvocationContext.builder()
+            .workspaceId(WORKSPACE_ID)
+            .build()
+            .toToolContext();
+
+        hubSubAgentChatClient.prompt("Bind the Slack connection")
+            .toolContext(toolContext)
+            .call()
+            .content();
+
+        assertThat(chatModel.lastOfferedToolNames()).containsExactly("createWorkflow");
+        assertThat(requiredToolInvocations).hasValue(0);
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private static BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> captureChatClientDecorator(
+        AiHubAgentFixtures fixtures) throws Exception {
+
+        fixtures.buildAgent();
+
+        ArgumentCaptor<BiFunction> chatClientDecoratorCaptor = ArgumentCaptor.forClass(BiFunction.class);
+
+        verify(fixtures.intelligentToolCatalog)
+            .getByNames(anySet(), eq(IntelligentToolVariant.BUILD), chatClientDecoratorCaptor.capture(), any());
+
+        return chatClientDecoratorCaptor.getValue();
     }
 
     private static List<ToolCallback> subAgentToolCallbacks(AtomicInteger gatedToolInvocations) {

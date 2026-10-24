@@ -38,6 +38,7 @@ import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubGatedToolFilterAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
@@ -89,7 +90,7 @@ import tools.jackson.databind.json.JsonMapper;
  * workflow content), the deployment write tools, every picker, {@code openWorkflowTab}, the workflow chat tools
  * ({@code openWorkflowChatTab}, {@code listChatWorkflows}, {@code createWorkflowChat}), and the {@code buildWorkflow} /
  * {@code importWorkflow} delegates, which are the only way it authors workflow content. The delegates' sub-agents never
- * see a tool the approval gate gates by default ({@link AiHubGatedToolFilterAdvisor}).
+ * see a tool the approval gate gates, by default or by a workspace rule ({@link AiHubGatedToolFilterAdvisor}).
  * </p>
  *
  * <p>
@@ -177,8 +178,9 @@ public class AiHubConfiguration {
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
-        SecurityContextRehydrator securityContextRehydrator,
-        AiHubApprovalGate approvalGate, ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
+        SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
+        AiHubToolApprovalPolicy toolApprovalPolicy,
+        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
@@ -198,7 +200,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
-                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient),
+                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
                 (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
                     new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
 

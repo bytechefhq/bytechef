@@ -209,8 +209,8 @@ public final class AiHubAgentFixtures {
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
             artifactRecorder,
-            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(), overrideChatClientResolverProvider,
-            webSearchToolCallbackProviderProvider());
+            securityContextRehydrator, approvalGate, policy, inFlightRunRegistryProvider(),
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
     }
 
     @SuppressWarnings("unchecked")
