@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.definition.ai.agent;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.observation.ObservationRegistry;
+import java.util.List;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -55,7 +57,8 @@ public final class ClusterElementFailureAttributingAdvisor implements CallAdviso
         }
 
         try {
-            return callAdvisor.adviseCall(chatClientRequest, callAdvisorChain);
+            return callAdvisor.adviseCall(
+                chatClientRequest, new ClaimingCallAdvisorChain(callAdvisorChain, target));
         } catch (RuntimeException exception) {
             ClusterElementFailureRecording.record(target, workflowNodeName, componentName, exception);
 
@@ -71,7 +74,10 @@ public final class ClusterElementFailureAttributingAdvisor implements CallAdviso
             throw new IllegalStateException(delegate.getName() + " is not a StreamAdvisor");
         }
 
-        return streamAdvisor.adviseStream(chatClientRequest, streamAdvisorChain)
+        Flux<ChatClientResponse> responses = streamAdvisor.adviseStream(
+            chatClientRequest, new ClaimingStreamAdvisorChain(streamAdvisorChain, target));
+
+        return responses
             .doOnError(
                 throwable -> ClusterElementFailureRecording.record(
                     target, workflowNodeName, componentName, throwable));
@@ -85,5 +91,75 @@ public final class ClusterElementFailureAttributingAdvisor implements CallAdviso
     @Override
     public int getOrder() {
         return delegate.getOrder();
+    }
+
+    private static void claim(ClusterElementCallTarget target, Throwable throwable) {
+        ClusterElementCallRecorder recorder = target.recorder();
+
+        recorder.claimFailure(target.taskExecutionId(), throwable);
+    }
+
+    private record ClaimingCallAdvisorChain(CallAdvisorChain chain, ClusterElementCallTarget target)
+        implements CallAdvisorChain {
+
+        @Override
+        public ChatClientResponse nextCall(ChatClientRequest chatClientRequest) {
+            try {
+                return chain.nextCall(chatClientRequest);
+            } catch (RuntimeException exception) {
+                claim(target, exception);
+
+                throw exception;
+            }
+        }
+
+        @Override
+        public List<CallAdvisor> getCallAdvisors() {
+            return chain.getCallAdvisors();
+        }
+
+        @Override
+        public CallAdvisorChain copy(CallAdvisor after) {
+            return new ClaimingCallAdvisorChain(chain.copy(after), target);
+        }
+
+        @Override
+        public ObservationRegistry getObservationRegistry() {
+            return chain.getObservationRegistry();
+        }
+    }
+
+    private record ClaimingStreamAdvisorChain(StreamAdvisorChain chain, ClusterElementCallTarget target)
+        implements StreamAdvisorChain {
+
+        @Override
+        public Flux<ChatClientResponse> nextStream(ChatClientRequest chatClientRequest) {
+            Flux<ChatClientResponse> responses;
+
+            try {
+                responses = chain.nextStream(chatClientRequest);
+            } catch (RuntimeException exception) {
+                claim(target, exception);
+
+                throw exception;
+            }
+
+            return responses.doOnError(throwable -> claim(target, throwable));
+        }
+
+        @Override
+        public List<StreamAdvisor> getStreamAdvisors() {
+            return chain.getStreamAdvisors();
+        }
+
+        @Override
+        public StreamAdvisorChain copy(StreamAdvisor after) {
+            return new ClaimingStreamAdvisorChain(chain.copy(after), target);
+        }
+
+        @Override
+        public ObservationRegistry getObservationRegistry() {
+            return chain.getObservationRegistry();
+        }
     }
 }

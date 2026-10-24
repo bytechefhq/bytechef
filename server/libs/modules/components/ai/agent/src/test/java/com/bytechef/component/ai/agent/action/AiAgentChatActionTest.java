@@ -259,6 +259,72 @@ class AiAgentChatActionTest {
     }
 
     @Test
+    void testUnknownToolNameDoesNotTurnChatMemoryRed() throws Exception {
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(new InMemoryChatMemoryRepository())
+            .build();
+
+        ChatMemoryFunction.Result chatMemoryResult = ChatMemoryFunction.Result.of(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .build(),
+            chatMemory);
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = createGuardedChatActionDefinition(
+            new ArrayList<>(), callNumber -> toolCallResponse("inventedTool", FIRST_TOOL_CALL_ID), chatMemoryResult,
+            true);
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(chatActionDefinition);
+
+        assertThatThrownBy(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true, true, true),
+            createRecordingActionContext(new AtomicReference<>()))).hasMessageContaining("inventedTool");
+
+        ClusterElementCallDrain drain = ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+
+        assertThat(drain.records()).filteredOn(
+            callRecord -> callRecord.status() == ClusterElementCallRecord.Status.FAILED)
+            .extracting(ClusterElementCallRecord::workflowNodeName)
+            .doesNotContain("chatMemory_1", "rag_1");
+    }
+
+    @Test
+    void testRagAdvisorFailureIsRecordedOnTheRagElement() throws Exception {
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(new InMemoryChatMemoryRepository())
+            .build();
+
+        ChatMemoryFunction.Result chatMemoryResult = ChatMemoryFunction.Result.of(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .build(),
+            chatMemory);
+
+        List<Prompt> prompts = new ArrayList<>();
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = createGuardedChatActionDefinition(
+            prompts, callNumber -> finalAnswer(), chatMemoryResult, new FailingRagAdvisor());
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(chatActionDefinition);
+
+        assertThatThrownBy(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true, true, true),
+            createRecordingActionContext(new AtomicReference<>()))).hasMessageContaining("vector store unavailable");
+
+        ClusterElementCallDrain drain = ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+
+        List<ClusterElementCallRecord> failedRecords = drain.records()
+            .stream()
+            .filter(callRecord -> callRecord.status() == ClusterElementCallRecord.Status.FAILED)
+            .toList();
+
+        assertThat(failedRecords).hasSize(1);
+        assertThat(failedRecords.getFirst()
+            .workflowNodeName()).isEqualTo("rag_1");
+        assertThat(prompts).isEmpty();
+    }
+
+    @Test
     void testPerformSuspendsAndResumeContinuesFromPersistedState() throws Exception {
         List<Prompt> prompts = new ArrayList<>();
 
@@ -754,6 +820,14 @@ class AiAgentChatActionTest {
         List<Prompt> prompts, Function<Integer, ChatResponse> responseFunction,
         ChatMemoryFunction.@Nullable Result chatMemoryResult, boolean withRag) throws Exception {
 
+        return createGuardedChatActionDefinition(
+            prompts, responseFunction, chatMemoryResult, withRag ? new PassThroughAdvisor("rag", 0) : null);
+    }
+
+    private static AiAgentChatAction.ChatActionDefinitionWrapper createGuardedChatActionDefinition(
+        List<Prompt> prompts, Function<Integer, ChatResponse> responseFunction,
+        ChatMemoryFunction.@Nullable Result chatMemoryResult, @Nullable CallAdvisor ragAdvisor) throws Exception {
+
         ClusterElementDefinitionService clusterElementDefinitionService = createClusterElementDefinitionService(
             createChatModel(prompts, responseFunction), chatMemoryResult);
 
@@ -770,10 +844,9 @@ class AiAgentChatActionTest {
         when(clusterElementDefinitionService.<GuardrailsFunction>getClusterElement(
             eq("testComponent"), eq(1), eq("testGuardrail"))).thenReturn(guardrailsFunction);
 
-        if (withRag) {
+        if (ragAdvisor != null) {
             RagFunction ragFunction = (
-                inputParameters, connectionParameters, extensions,
-                componentConnections) -> new PassThroughAdvisor("rag", 0);
+                inputParameters, connectionParameters, extensions, componentConnections) -> ragAdvisor;
 
             when(clusterElementDefinitionService.<RagFunction>getClusterElement(
                 eq("testComponent"), eq(1), eq("testRag"))).thenReturn(ragFunction);
@@ -877,6 +950,24 @@ class AiAgentChatActionTest {
         @Override
         public int getOrder() {
             return order;
+        }
+    }
+
+    private static final class FailingRagAdvisor implements CallAdvisor {
+
+        @Override
+        public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
+            throw new IllegalStateException("vector store unavailable");
+        }
+
+        @Override
+        public String getName() {
+            return "failingRag";
+        }
+
+        @Override
+        public int getOrder() {
+            return 0;
         }
     }
 
