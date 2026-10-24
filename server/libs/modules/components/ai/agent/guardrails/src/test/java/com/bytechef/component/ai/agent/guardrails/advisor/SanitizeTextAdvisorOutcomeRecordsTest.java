@@ -18,6 +18,7 @@ package com.bytechef.component.ai.agent.guardrails.advisor;
 
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.SANITIZE_WITHHELD_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +38,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.MaskResult
 import com.bytechef.platform.component.definition.ai.agent.guardrails.PreflightMasking;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,7 +78,8 @@ class SanitizeTextAdvisorOutcomeRecordsTest {
     void testInputRedactionRecordsFrameAndSanitizer() {
         GuardrailSanitizerFunction pii = masking(
             (text, context) -> text.contains("a@b.c")
-                ? MaskResult.entities(Map.of("EMAIL", List.of("a@b.c"), "PHONE", List.of("555-1234")))
+                ? MaskResult.entities(
+                    Map.of("EMAIL", List.of("a@b.c", "x@y.z"), "PHONE", List.of("555-1234")))
                 : MaskResult.unchanged());
 
         SanitizeTextAdvisor advisor = builderWithTarget()
@@ -89,7 +92,7 @@ class SanitizeTextAdvisorOutcomeRecordsTest {
         when(chain.nextCall(any())).thenReturn(chainResponse("fine"));
 
         ClusterElementCallScope.callWith(
-            agentRef, () -> advisor.adviseCall(request("mail a@b.c or call 555-1234"), chain));
+            agentRef, () -> advisor.adviseCall(request("mail a@b.c or x@y.z or call 555-1234"), chain));
 
         List<ClusterElementCallRecord> records = drainRecords();
 
@@ -102,13 +105,13 @@ class SanitizeTextAdvisorOutcomeRecordsTest {
         assertThat(frame.componentName()).isEqualTo("sanitizeText");
         assertThat(frame.status()).isEqualTo(Status.REDACTED);
         assertThat(frame.parentId()).isEqualTo("agent-call");
-        assertThat(parse(frame.output())).isEqualTo(Map.of("side", "INPUT", "maskCount", 2));
+        assertThat(parse(frame.output())).isEqualTo(Map.of("side", "INPUT", "maskCount", 3));
 
         assertThat(sanitizer.workflowNodeName()).isEqualTo("pii_1");
         assertThat(sanitizer.componentName()).isEqualTo("pii");
         assertThat(sanitizer.status()).isEqualTo(Status.REDACTED);
         assertThat(sanitizer.parentId()).isEqualTo(frame.id());
-        assertThat(parse(sanitizer.output())).isEqualTo(Map.of("side", "INPUT", "maskCount", 2));
+        assertThat(parse(sanitizer.output())).isEqualTo(Map.of("side", "INPUT", "maskCount", 3));
     }
 
     @Test
@@ -303,6 +306,86 @@ class SanitizeTextAdvisorOutcomeRecordsTest {
             .output())).isEqualTo(Map.of("side", "OUTPUT", "maskCount", 2));
         assertThat(parse(records.get(1)
             .output())).isEqualTo(Map.of("side", "OUTPUT", "maskCount", 2));
+    }
+
+    @Test
+    void testRepeatedValueCountsEveryMask() {
+        GuardrailSanitizerFunction pii = masking(
+            (text, context) -> text.contains("a@b.c")
+                ? MaskResult.entities(Map.of("EMAIL", List.of("a@b.c")))
+                : MaskResult.unchanged());
+
+        SanitizeTextAdvisor advisor = builderWithTarget()
+            .add(element("pii_1", "pii/v1/pii"), pii, EMPTY, EMPTY, EMPTY, EMPTY, Map.of(), null)
+            .build();
+
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+
+        when(chain.nextCall(any())).thenReturn(chainResponse("fine"));
+
+        advisor.adviseCall(request("mail a@b.c, then a@b.c again"), chain);
+
+        List<ClusterElementCallRecord> records = drainRecords();
+
+        assertThat(records).hasSize(2);
+        assertThat(parse(records.get(0)
+            .output())).isEqualTo(Map.of("side", "INPUT", "maskCount", 2));
+        assertThat(parse(records.get(1)
+            .output())).isEqualTo(Map.of("side", "INPUT", "maskCount", 2));
+    }
+
+    @Test
+    void testDetectedValueMissingFromTheTextRecordsNothing() {
+        GuardrailSanitizerFunction pii = masking(
+            (text, context) -> MaskResult.entities(Map.of("EMAIL", List.of("a@b.c"))));
+
+        SanitizeTextAdvisor advisor = builderWithTarget()
+            .add(element("pii_1", "pii/v1/pii"), pii, EMPTY, EMPTY, EMPTY, EMPTY, Map.of(), null)
+            .build();
+
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+
+        when(chain.nextCall(any())).thenReturn(chainResponse("fine"));
+
+        advisor.adviseCall(request("hello"), chain);
+
+        assertThat(drainRecords()).isEmpty();
+    }
+
+    @Test
+    void testStreamErrorStillRecordsEarlierRedactions() {
+        GuardrailSanitizerFunction pii = masking(
+            (text, context) -> text.contains("a@b.c")
+                ? MaskResult.entities(Map.of("EMAIL", List.of("a@b.c")))
+                : MaskResult.unchanged());
+
+        SanitizeTextAdvisor advisor = builderWithTarget()
+            .add(element("pii_1", "pii/v1/pii"), pii, OUTPUT_ONLY, EMPTY, EMPTY, EMPTY, Map.of(), null)
+            .build();
+
+        StreamAdvisorChain chain = mock(StreamAdvisorChain.class);
+        IllegalStateException providerError = new IllegalStateException("provider down");
+
+        when(chain.nextStream(any())).thenReturn(
+            Flux.concat(Flux.just(chainResponse("first a@b.c")), Flux.error(providerError)));
+
+        List<ChatClientResponse> responses = new ArrayList<>();
+
+        assertThatThrownBy(() -> advisor.adviseStream(request("hello"), chain)
+            .doOnNext(responses::add)
+            .blockLast()).isSameAs(providerError);
+
+        assertThat(responses).hasSize(1);
+
+        List<ClusterElementCallRecord> records = drainRecords();
+
+        assertThat(records).hasSize(2);
+        assertThat(records.get(0)
+            .status()).isEqualTo(Status.REDACTED);
+        assertThat(parse(records.get(0)
+            .output())).isEqualTo(Map.of("side", "OUTPUT", "maskCount", 1));
+        assertThat(records.get(1)
+            .workflowNodeName()).isEqualTo("pii_1");
     }
 
     @Test

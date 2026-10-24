@@ -72,6 +72,15 @@ class MaskEntityMapUtilsTest {
     }
 
     @Test
+    void testCountMatchesCountsEveryOccurrenceAndOverlapsOnce() {
+        Map<String, List<String>> entities = Map.of(
+            "EMAIL", List.of("a@b.com"), "NAME", List.of("John", "John Smith"));
+
+        assertThat(MaskEntityMapUtils.countMatches("a@b.com, a@b.com and John Smith", entities)).isEqualTo(3);
+        assertThat(MaskEntityMapUtils.countMatches("nothing here", entities)).isZero();
+    }
+
+    @Test
     void testApplyToSkipsNullAndEmptyValues() {
         // Null / empty values must not cause infinite replacement or NPE — the detector may emit entries that turn out
         // to be structurally empty.
