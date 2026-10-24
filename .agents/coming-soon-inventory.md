@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**46 whole-page** (20 hidden) · **30 partial** pages (7 with a commented-out section)
+**42 whole-page** (19 hidden) · **30 partial** pages (7 with a commented-out section)
 
 ---
 
@@ -55,7 +55,6 @@ Both are reversible and neither deletes anything.
 | Guardrails | [`/platform/automation/settings/ai-agents/guardrails`](/platform/automation/settings/ai-agents/guardrails) | EE | **hidden** |
 | System Prompt | [`/platform/automation/settings/ai-agents/system-prompt`](/platform/automation/settings/ai-agents/system-prompt) | EE | **hidden** |
 | AI Hub Connectors | [`/platform/automation/settings/ai-hub-connectors`](/platform/automation/settings/ai-hub-connectors) | EE | **hidden** |
-| API Keys | [`/platform/automation/settings/api-keys`](/platform/automation/settings/api-keys) | EE | visible |
 | Git Configuration | [`/platform/automation/settings/git-configuration`](/platform/automation/settings/git-configuration) | EE | visible |
 | Users | [`/platform/automation/settings/users`](/platform/automation/settings/users) | EE | visible |
 
@@ -67,7 +66,6 @@ Both are reversible and neither deletes anything.
 | Automation workflows | [`/platform/embedded/build/automations/automation-workflows`](/platform/embedded/build/automations/automation-workflows) | EE | visible |
 | Theming and Localization | [`/platform/embedded/build/theming-and-localization`](/platform/embedded/build/theming-and-localization) | — | visible |
 | Unified API | [`/platform/embedded/build/unified-api`](/platform/embedded/build/unified-api) | — | **hidden** |
-| Field Mapping | [`/platform/embedded/build/workflows/field-mapping`](/platform/embedded/build/workflows/field-mapping) | — | visible |
 
 ### Platform Settings
 
@@ -82,15 +80,13 @@ Both are reversible and neither deletes anything.
 | Identity Providers | [`/platform/settings/identity-providers`](/platform/settings/identity-providers) | — | visible |
 | License | [`/platform/settings/license`](/platform/settings/license) | EE | visible |
 | MCP Server | [`/platform/settings/mcp-server`](/platform/settings/mcp-server) | CE | visible |
-| OAuth2 Clients | [`/platform/settings/oauth2-clients`](/platform/settings/oauth2-clients) | EE | **hidden** |
-| Users | [`/platform/settings/users`](/platform/settings/users) | — | visible |
+| OAuth2 Clients | [`/platform/settings/oauth2-clients`](/platform/settings/oauth2-clients) | EE | visible |
 
 ### Self-Hosted
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | Distributed (Coordinator/Worker) | [`/platform/use-bytechef/self-hosted/installation/distributed`](/platform/use-bytechef/self-hosted/installation/distributed) | CE | **hidden** |
-| Crash Recovery | [`/platform/use-bytechef/self-hosted/management/crash-recovery`](/platform/use-bytechef/self-hosted/management/crash-recovery) | CE | visible |
 
 ### Your Account
 
