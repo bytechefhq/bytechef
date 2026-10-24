@@ -126,11 +126,6 @@ const COLUMN_SPINE_HALF_WIDTH = 45;
 // Air between a trigger's estimated label end and the next trigger's icon.
 const TRIGGER_LABEL_CLEARANCE = 30;
 
-/**
- * Dagre lays trigger fan-in edges out with minlen 2, leaving room for the bus
- * and the edge's add button between the trigger row and the first task. ELK
- * has no per-edge length, so the chain below the row moves down one layer.
- */
 function extendTriggerFanInGap(allNodes: Node[], edges: Edge[], direction: LayoutDirectionType): void {
     const hasTriggerFanIn = edges.some((edge) => (edge.data as Record<string, unknown> | undefined)?.triggerFanIn);
 
