@@ -54,6 +54,7 @@ In the workflow editor, Ask mode has:
 
 - Full context of the current workflow definition
 - The last execution error on the workflow
+- Read-only access to the workflow's runs: it lists recent executions and reads one in full (each task's input, output and error), so "debug the latest failed execution of this workflow" works from the editor
 - Read-only access to component and task definitions
 - Grounding in the ByteChef documentation (see [How Copilot grounds answers](#how-copilot-grounds-answers))
 - Web search through the providers an admin enabled on [Settings → AI → Web Search](/platform/settings/web-search) (Brave Search, Firecrawl); without one, Ask mode has no web search
@@ -67,6 +68,8 @@ Build mode has full access to **create and modify** content on the current surfa
 > discover the right components → configure them → pre-validate each task → build → validate the full workflow → deploy
 
 It fixes any validation errors before proceeding, and can deploy the finished workflow directly from the conversation.
+
+Build mode reads executions too. Asked to debug a failed run, it explains what failed and suggests a fix, and changes the workflow only after you confirm.
 
 ### Interactive prompts
 
