@@ -18,10 +18,12 @@ package com.bytechef.automation.ai.a2a.server.security.web.authentication;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
@@ -47,16 +49,18 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
     private final ApiKeyService apiKeyService;
     private final A2aServerService a2aServerService;
     private final McpApiKeyEntityRepository mcpApiKeyEntityRepository;
+    private final PermissionService permissionService;
     private final WorkspaceApiKeyService workspaceApiKeyService;
 
     @SuppressFBWarnings("EI")
     public AutomationA2AServerApiKeyAuthenticationProvider(
         ApiKeyService apiKeyService, AuthorityService authorityService, A2aServerService a2aServerService,
-        UserService userService, WorkspaceApiKeyService workspaceApiKeyService) {
+        PermissionService permissionService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService) {
 
         this.apiKeyService = apiKeyService;
         this.a2aServerService = a2aServerService;
         this.mcpApiKeyEntityRepository = new McpApiKeyEntityRepository(apiKeyService, authorityService, userService);
+        this.permissionService = permissionService;
         this.workspaceApiKeyService = workspaceApiKeyService;
     }
 
@@ -112,11 +116,18 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid API key");
         }
 
+        Authentication apiKeyAuthentication = ApiKeyAuthenticationToken.authenticated(
+            mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
+
+        if (!isWorkspaceMember(apiKeyAuthentication, a2aServerWorkspaceId)) {
+            throw new BadCredentialsException("Invalid API key");
+        }
+
         checkEnabled(a2aServer);
 
         apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
 
-        return ApiKeyAuthenticationToken.authenticated(mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
+        return apiKeyAuthentication;
     }
 
     @Override
@@ -128,6 +139,11 @@ public class AutomationA2AServerApiKeyAuthenticationProvider implements Authenti
         if (!a2aServer.isEnabled()) {
             throw new McpServerDisabledException(McpServerDisabledException.A2A_SERVER_MESSAGE);
         }
+    }
+
+    private boolean isWorkspaceMember(Authentication apiKeyAuthentication, long workspaceId) {
+        return SecurityUtils.runAs(
+            apiKeyAuthentication, () -> permissionService.getMyWorkspaceRole(workspaceId) != null);
     }
 
     private A2aServer getA2aServer(@Nullable String a2aServerSecretKey) {

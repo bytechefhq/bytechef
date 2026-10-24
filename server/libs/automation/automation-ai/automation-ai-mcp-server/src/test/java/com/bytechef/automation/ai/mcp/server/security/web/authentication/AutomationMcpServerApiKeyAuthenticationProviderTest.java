@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -33,6 +34,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpServerDisabledException;
@@ -47,6 +49,8 @@ import org.springaicommunity.mcp.security.server.apikey.ApiKeyImpl;
 import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -57,14 +61,15 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     private final ApiKeyService apiKeyService = mock(ApiKeyService.class);
     private final AuthorityService authorityService = mock(AuthorityService.class);
     private final McpServerService mcpServerService = mock(McpServerService.class);
+    private final PermissionService permissionService = mock(PermissionService.class);
     private final UserService userService = mock(UserService.class);
     private final WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
     private final WorkspaceMcpServerService workspaceMcpServerService = mock(WorkspaceMcpServerService.class);
 
     private final AutomationMcpServerApiKeyAuthenticationProvider automationMcpServerApiKeyAuthenticationProvider =
         new AutomationMcpServerApiKeyAuthenticationProvider(
-            apiKeyService, authorityService, mcpServerService, userService, workspaceApiKeyService,
-            workspaceMcpServerService);
+            apiKeyService, authorityService, mcpServerService, permissionService, userService,
+            workspaceApiKeyService, workspaceMcpServerService);
 
     @Test
     void testAuthenticateWithValidAutomationApiKeySucceeds() {
@@ -100,6 +105,34 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
 
         assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
             () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+    }
+
+    @Test
+    void testAuthenticateChecksWorkspaceMembershipAsTheApiKeyOwner() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        Authentication authentication =
+            automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken());
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        assertThat(authentication.isAuthenticated()).isTrue();
+        assertThat(securityContext.getAuthentication()).isNull();
+        verify(permissionService).getMyWorkspaceRole(1L);
+    }
+
+    @Test
+    void testAuthenticateWithApiKeyOfAnOwnerNoLongerInTheWorkspaceFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        when(permissionService.getMyWorkspaceRole(1L)).thenReturn(null);
+
+        assertThatExceptionOfType(BadCredentialsException.class)
+            .isThrownBy(() -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()))
+            .withMessage("Invalid API key");
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -327,5 +360,9 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
         when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
         when(workspaceApiKeyService.fetchApiKeyWorkspaceId(7L)).thenReturn(Optional.of(1L));
         when(workspaceMcpServerService.fetchMcpServerWorkspaceId(9L)).thenReturn(Optional.of(1L));
+        when(permissionService.getMyWorkspaceRole(1L)).thenAnswer(invocation -> SecurityUtils.fetchCurrentUserLogin()
+            .filter("admin@localhost.com"::equals)
+            .map(login -> "EDITOR")
+            .orElse(null));
     }
 }
