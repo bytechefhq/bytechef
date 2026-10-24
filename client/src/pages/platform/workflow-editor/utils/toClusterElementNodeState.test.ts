@@ -39,4 +39,49 @@ describe('toClusterElementNodeState', () => {
             )
         ).toEqual({clusterElement: true, durationMillis: 31, error: 'boom', status: 'FAILED'});
     });
+
+    it.each(['BLOCKED', 'REDACTED', 'WITHHELD'] as const)('maps a %s call without a duration', (status) => {
+        expect(
+            toClusterElementNodeState({
+                endDate: '2026-10-23T10:00:00.412Z',
+                startDate: '2026-10-23T10:00:00Z',
+                status,
+            })
+        ).toEqual({clusterElement: true, status});
+    });
+
+    it.each(['BLOCKED', 'WITHHELD'] as const)('keeps a %s state when a later call completes', (status) => {
+        expect(
+            toClusterElementNodeState(
+                {endDate: '2026-10-23T10:00:00.412Z', startDate: '2026-10-23T10:00:00Z', status: 'COMPLETED'},
+                {clusterElement: true, status}
+            )
+        ).toEqual({clusterElement: true, status});
+    });
+
+    it('keeps a blocked state when a later call starts', () => {
+        expect(toClusterElementNodeState({status: 'STARTED'}, {clusterElement: true, status: 'BLOCKED'})).toEqual({
+            clusterElement: true,
+            status: 'BLOCKED',
+        });
+    });
+
+    it('keeps a blocked state when a later call is redacted', () => {
+        expect(toClusterElementNodeState({status: 'REDACTED'}, {clusterElement: true, status: 'BLOCKED'})).toEqual({
+            clusterElement: true,
+            status: 'BLOCKED',
+        });
+    });
+
+    it('keeps a failed state when a later call is blocked', () => {
+        expect(
+            toClusterElementNodeState({status: 'BLOCKED'}, {clusterElement: true, error: 'boom', status: 'FAILED'})
+        ).toEqual({clusterElement: true, error: 'boom', status: 'FAILED'});
+    });
+
+    it('lets a failed call replace a blocked state', () => {
+        expect(
+            toClusterElementNodeState({error: 'boom', status: 'FAILED'}, {clusterElement: true, status: 'BLOCKED'})
+        ).toMatchObject({error: 'boom', status: 'FAILED'});
+    });
 });

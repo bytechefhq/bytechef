@@ -180,4 +180,44 @@ describe('buildNodeStatesFromTaskExecutions', () => {
             var_1: {durationMillis: 2000, error: undefined, status: 'COMPLETED'},
         });
     });
+
+    it.each(['BLOCKED', 'REDACTED', 'WITHHELD'] as const)('colours a cluster element call that was %s', (status) => {
+        const nodeStates = buildNodeStatesFromTaskExecutions(
+            [
+                {
+                    ...taskExecution('aiAgent_1', 'COMPLETED', 0, 5),
+                    clusterElementCalls: [{name: 'guardrails_1', status}],
+                },
+            ],
+            false
+        );
+
+        expect(nodeStates.guardrails_1.status).toBe(status);
+    });
+
+    it('ranks withheld above blocked and blocked above running, and failed above all', () => {
+        const nodeStates = buildNodeStatesFromTaskExecutions(
+            [
+                {
+                    ...taskExecution('aiAgent_1', 'COMPLETED', 0, 5),
+                    clusterElementCalls: [
+                        {name: 'a', status: 'COMPLETED'},
+                        {name: 'a', status: 'REDACTED'},
+                        {name: 'a', status: 'BLOCKED'},
+                        {name: 'a', status: 'COMPLETED'},
+                        {name: 'b', status: 'BLOCKED'},
+                        {name: 'b', status: 'WITHHELD'},
+                        {name: 'b', status: 'BLOCKED'},
+                        {name: 'c', status: 'WITHHELD'},
+                        {name: 'c', status: 'FAILED'},
+                    ],
+                },
+            ],
+            true
+        );
+
+        expect(nodeStates.a.status).toBe('BLOCKED');
+        expect(nodeStates.b.status).toBe('WITHHELD');
+        expect(nodeStates.c.status).toBe('FAILED');
+    });
 });

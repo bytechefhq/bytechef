@@ -1243,4 +1243,31 @@ describe('useWorkflowTestStream', () => {
 
         expect(() => act(() => onClose())).not.toThrow();
     });
+
+    it.each([
+        ['cluster_element_blocked', 'BLOCKED'],
+        ['cluster_element_redacted', 'REDACTED'],
+        ['cluster_element_withheld', 'WITHHELD'],
+    ])('routes %s events to the call handler', (eventName, status) => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers[eventName]({
+                callId: 'a',
+                callStatus: status,
+                componentName: 'checkForViolations',
+                name: 'checkForViolations_1',
+                status,
+                taskExecutionId: '10',
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('checkForViolations_1', {
+            clusterElement: true,
+            status,
+        });
+        expect(mockWorkflowTestClusterElementCallRecords['10'][0]).toMatchObject({id: 'a', status});
+    });
 });

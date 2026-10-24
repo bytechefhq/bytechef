@@ -25,6 +25,18 @@ export default function toClusterElementNodeState(
         return {...current, clusterElement: true};
     }
 
+    if (call.status === 'BLOCKED' || call.status === 'REDACTED' || call.status === 'WITHHELD') {
+        if (call.status === 'REDACTED' && (current?.status === 'BLOCKED' || current?.status === 'WITHHELD')) {
+            return {...current, clusterElement: true};
+        }
+
+        return {clusterElement: true, status: call.status};
+    }
+
+    if (call.status !== 'FAILED' && (current?.status === 'BLOCKED' || current?.status === 'WITHHELD')) {
+        return {...current, clusterElement: true};
+    }
+
     if (call.status !== 'COMPLETED' && call.status !== 'FAILED') {
         return {clusterElement: true, status: 'RUNNING'};
     }

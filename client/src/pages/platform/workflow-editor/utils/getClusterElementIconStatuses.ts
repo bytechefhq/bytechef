@@ -10,9 +10,12 @@ import {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
 type NodeStatusType = WorkflowTestNodeStateI['status'];
 
 const STATUS_PRIORITY: Record<NodeStatusType, number> = {
+    BLOCKED: 3,
     COMPLETED: 0,
-    FAILED: 2,
-    RUNNING: 1,
+    FAILED: 5,
+    REDACTED: 1,
+    RUNNING: 2,
+    WITHHELD: 4,
 };
 
 export default function getClusterElementIconStatuses(
