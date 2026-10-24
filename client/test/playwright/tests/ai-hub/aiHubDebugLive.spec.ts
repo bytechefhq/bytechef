@@ -40,7 +40,7 @@ const FAILING_WORKFLOW = {
         {
             label: 'Fetch orders',
             name: 'httpClient_1',
-            parameters: {responseType: {responseFormat: 'JSON'}, uri: 'http://127.0.0.1:1/orders'},
+            parameters: {responseType: {responseFormat: 'JSON'}, uri: 'https://api.example.com/orders'},
             type: 'httpClient/v1/get',
         },
     ],
