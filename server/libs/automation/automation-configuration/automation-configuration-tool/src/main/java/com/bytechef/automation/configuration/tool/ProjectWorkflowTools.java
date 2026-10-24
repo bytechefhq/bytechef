@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.configuration.tool.model.WorkflowInfo;
+import com.bytechef.automation.configuration.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
@@ -239,6 +240,12 @@ public class ProjectWorkflowTools {
             ProjectWorkflowErrorType.CREATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowErrorType.CREATE_WORKFLOW);
 
+        ProjectWorkflowInfo filledProjectWorkflowInfo = fillEmptyTargetWorkflow(projectId, definition, toolContext);
+
+        if (filledProjectWorkflowInfo != null) {
+            return filledProjectWorkflowInfo;
+        }
+
         try {
             ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, definition);
 
@@ -267,6 +274,59 @@ public class ProjectWorkflowTools {
                 "Failed to create project workflow: " + e.getMessage(), e,
                 ProjectWorkflowErrorType.CREATE_WORKFLOW);
         }
+    }
+
+    /**
+     * Saves the definition into the still-empty workflow the build request named, when it belongs to the project the
+     * builder is creating a workflow in, so a build never leaves the caller's workflow empty next to a second one.
+     */
+    private @Nullable ProjectWorkflowInfo fillEmptyTargetWorkflow(
+        long projectId, String definition, @Nullable ToolContext toolContext) {
+
+        String targetWorkflowId = toolContext == null
+            ? null : WorkflowPersistCaptureUtils.fetchTargetWorkflowId(toolContext.getContext());
+
+        if (targetWorkflowId == null) {
+            return null;
+        }
+
+        ProjectWorkflowDTO targetProjectWorkflowDTO;
+
+        try {
+            if (projectWorkflowFacade.getWorkflowProjectId(targetWorkflowId) != projectId) {
+                return null;
+            }
+
+            targetProjectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(targetWorkflowId);
+        } catch (RuntimeException exception) {
+            log.debug("fillEmptyTargetWorkflow({}): the target workflow could not be read", targetWorkflowId,
+                exception);
+
+            return null;
+        }
+
+        if (hasTasks(targetProjectWorkflowDTO.getDefinition())) {
+            return null;
+        }
+
+        ProjectWorkflowDTO updatedProjectWorkflowDTO = projectWorkflowFacade.updateWorkflow(
+            targetProjectWorkflowDTO.getId(), definition, targetProjectWorkflowDTO.getVersion());
+
+        captureUpdatedWorkflow(toolContext, targetWorkflowId, updatedProjectWorkflowDTO, definition);
+
+        return new ProjectWorkflowInfo(
+            updatedProjectWorkflowDTO.getProjectWorkflowId(), projectId, updatedProjectWorkflowDTO.getProjectVersion(),
+            targetWorkflowId, updatedProjectWorkflowDTO.getWorkflowUuid(), updatedProjectWorkflowDTO.getCreatedDate(),
+            updatedProjectWorkflowDTO.getLastModifiedDate());
+    }
+
+    private static boolean hasTasks(@Nullable String definition) {
+        if (definition == null || definition.isBlank()) {
+            return false;
+        }
+
+        return JsonUtils.readMap(definition)
+            .get("tasks") instanceof List<?> tasks && !tasks.isEmpty();
     }
 
     @Tool(description = "Delete a workflow. Returns a confirmation message.")
