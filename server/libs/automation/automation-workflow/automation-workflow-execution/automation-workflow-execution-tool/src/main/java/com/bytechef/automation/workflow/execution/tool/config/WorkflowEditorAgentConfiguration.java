@@ -115,6 +115,9 @@ public class WorkflowEditorAgentConfiguration {
           Never create an empty or default "Manual" placeholder workflow and fill it in afterwards; the single
           create call must carry the whole workflow.
 
+        Both calls validate the definition first. If they report errors, nothing was saved: fix them and make the
+        same call again.
+
         If you are given both, the `workflowId` wins — update it. Never create a second workflow for a project you
         were already pointed at.
 
@@ -122,7 +125,8 @@ public class WorkflowEditorAgentConfiguration {
         nor a `projectId`, say so plainly and tell the caller to create or choose the project first, then re-invoke
         you with its `projectId`.
 
-        After persisting, call `getWorkflow(workflowId)` to confirm, then continue with step 8 as written. The
+        A successful save stored exactly the definition you sent; do not re-read it with `getWorkflow`. Continue
+        with step 8 as written. The
         `workflowId | projectId | projectWorkflowId` line is REQUIRED on both branches — `createProjectWorkflow`
         returns all three ids.
         """;
