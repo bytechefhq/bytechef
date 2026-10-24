@@ -15,6 +15,7 @@ import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.AgentPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.DataSyncPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
@@ -133,7 +134,8 @@ class PermissionScopeRegistryTest {
 
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
-                new AgentPermissionScopeProvider(), new DeploymentPermissionScopeProvider(),
+                new AgentPermissionScopeProvider(), new DataSyncPermissionScopeProvider(),
+                new DeploymentPermissionScopeProvider(),
                 new McpPermissionScopeProvider(), new ProjectPermissionScopeProvider(),
                 new WorkflowPermissionScopeProvider()));
 
