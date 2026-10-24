@@ -77,6 +77,14 @@ Click a configuration workflow to open a side panel with two tabs:
 - **Executions** - the workflow's executions in this configuration, a page at a time, with a **Connected user** column that names whose instance ran. Click an execution to see its step-by-step results; the refresh button reloads the list.
 - **Workflow** - a read-only view of the workflow.
 
+### Several Configurations of One Integration
+
+An environment can have more than one enabled configuration of the same integration, for example one on version 3 and one on version 4 while you move customers across.
+
+- **Self-serve users get the enabled configuration with the highest version.** When a connected user connects an integration on their own (through the Connect dialog, the integration marketplace, or the embedded API), ByteChef uses that one. If two enabled configurations have the same version, the most recently created one wins. The provisioning dialog marks it **Self-serve**.
+- **An admin can put a connected user on any enabled configuration.** [Provisioning an integration](/platform/embedded/monitor/connected-users#provisioning-an-integration) from the connected user's sheet lets you choose the configuration, so a customer can stay on an older version, or use a configuration with different settings.
+- **Each instance keeps its own configuration.** A connected user's existing instances keep the configuration they were created on; enabling a newer configuration does not move them. The user's embedded UI shows each instance's own workflows and authorization.
+
 ### Filtering Configurations
 
 Use the left sidebar to narrow the list:
