@@ -51,6 +51,38 @@ describe('WorkflowTaskExecutionItem', () => {
         });
     });
 
+    describe('outcome rows', () => {
+        const createOutcomeExecution = (clusterElementCallOutcome: string) =>
+            createTaskExecution({
+                clusterElementCallId: 'call-1',
+                clusterElementCallOutcome,
+                parentTaskExecutionId: '42',
+                status: 'COMPLETED',
+            } as Partial<TaskExecution>);
+
+        it('shows the ban shield for a blocked row', () => {
+            const {container} = render(<WorkflowTaskExecutionItem taskExecution={createOutcomeExecution('BLOCKED')} />);
+
+            expect(container.querySelector('svg.lucide-shield-ban.text-amber-500')).toBeInTheDocument();
+        });
+
+        it('shows the alert shield for a withheld row', () => {
+            const {container} = render(
+                <WorkflowTaskExecutionItem taskExecution={createOutcomeExecution('WITHHELD')} />
+            );
+
+            expect(container.querySelector('svg.lucide-shield-alert.text-amber-500')).toBeInTheDocument();
+        });
+
+        it('shows the eraser for a redacted row', () => {
+            const {container} = render(
+                <WorkflowTaskExecutionItem taskExecution={createOutcomeExecution('REDACTED')} />
+            );
+
+            expect(container.querySelector('svg.lucide-eraser.text-sky-500')).toBeInTheDocument();
+        });
+    });
+
     describe('status icon integration', () => {
         it('should render status icon from utility for completed task', () => {
             const taskExecution = createTaskExecution({
