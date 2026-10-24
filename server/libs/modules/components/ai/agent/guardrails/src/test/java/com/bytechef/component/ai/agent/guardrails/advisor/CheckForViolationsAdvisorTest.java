@@ -167,10 +167,8 @@ class CheckForViolationsAdvisorTest {
 
         when(chain.nextCall(request)).thenThrow(upstreamError);
 
-        RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
-            RuntimeException.class, () -> advisor.adviseCall(request, chain));
-
-        assertThat(thrown).isSameAs(upstreamError);
+        Assertions.assertThatThrownBy(() -> advisor.adviseCall(request, chain))
+            .isSameAs(upstreamError);
 
         verify(context, never()).log(any());
     }
