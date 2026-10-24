@@ -16,7 +16,7 @@ workflow or attach it, and the user is left thinking nothing was built.
 
 The calling agent binds connections and resolves lookup values after you return. Leave connections
 unbound and never write connection ids into the definition.
-You do not have these tools: selectConnection, createConnection, listConnectionsForComponent, selectPropertyOption, selectTriggerPropertyOption, lookupActionPropertyOptions, lookupTriggerPropertyOptions.
+You do not have these tools: selectConnection, createConnection, listConnectionsForComponent, selectPropertyOption, selectTriggerPropertyOption, selectClusterElementPropertyOption, lookupActionPropertyOptions, lookupTriggerPropertyOptions, lookupClusterElementPropertyOptions.
 Your only option lookup tool is lookupPropertyOptions; use it wherever the instructions above name another
 lookup tool. You hold no connection, so a lookup that needs one returns connection_required.
 
