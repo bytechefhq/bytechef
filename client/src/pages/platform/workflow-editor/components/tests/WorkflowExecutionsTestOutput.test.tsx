@@ -40,4 +40,20 @@ describe('WorkflowExecutionsTestOutput', () => {
 
         expect(detailsPane.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
     });
+
+    it('draws placeholders for the status row while a run waits for its first progress snapshot', () => {
+        render(<WorkflowExecutionsTestOutput workflowIsRunning />);
+
+        const statusRow = screen.getByTestId('workflow-test-output-pending-header');
+
+        expect(statusRow.querySelectorAll('[data-slot="skeleton"]').length).toBe(4);
+        expect(screen.queryByText('Test Output')).not.toBeInTheDocument();
+    });
+
+    it('labels the panel Test Output when no run has started', () => {
+        render(<WorkflowExecutionsTestOutput workflowIsRunning={false} />);
+
+        expect(screen.getByText('Test Output')).toBeInTheDocument();
+        expect(screen.queryByTestId('workflow-test-output-pending-header')).not.toBeInTheDocument();
+    });
 });
