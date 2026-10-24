@@ -7,6 +7,7 @@ import {
     answerInteractiveCards,
     createDataTableThroughApi,
     deleteConnectionThroughApi,
+    deleteProjectThroughApi,
     dropDataTableThroughApi,
     listConnections,
     readHubWorkflow,
@@ -23,6 +24,8 @@ import getRandomString from '../../utils/getRandomString';
 const test = mergeTests(loginTest(), projectTest, workflowTest);
 
 const LIVE_TURN_TIMEOUT = 840000;
+
+const TURN_START_TIMEOUT = 15000;
 
 const shortName = (prefix: string) => `${prefix}_${getRandomString().slice(0, 8)}`;
 
@@ -50,6 +53,10 @@ async function openLiveCopilot(page: Page, workflow: {projectId: string; workflo
     await copilotPanel.setBuildMode(true);
 
     const waitForTurnEnd = async () => {
+        await expect(copilotPanel.stopGeneratingButton)
+            .toBeVisible({timeout: TURN_START_TIMEOUT})
+            .catch(() => undefined);
+
         await expect(copilotPanel.stopGeneratingButton).toBeHidden({timeout: LIVE_TURN_TIMEOUT});
 
         await expect(copilotPanel.sendButton).toBeVisible();
@@ -186,6 +193,8 @@ test.describe('@live Copilot cards', () => {
                 ).toContain(connection!.id);
             });
         } finally {
+            await deleteProjectThroughApi(page, Number(workflow.projectId));
+
             for (const connection of await listConnections(page, {
                 componentName: 'mistral',
                 environmentId,

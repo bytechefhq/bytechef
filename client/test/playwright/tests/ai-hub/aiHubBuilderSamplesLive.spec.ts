@@ -64,6 +64,8 @@ function readStructuredResult<ResultType>(toolCallResult: McpToolCallResultI): R
 
 const LIVE_TURN_TIMEOUT = 840000;
 
+const TURN_START_TIMEOUT = 15000;
+
 const NEW_WORKFLOW_ANSWER = /new workflow/i;
 
 const NOT_YET_ANSWER = /^(not yet|no\b|review)/i;
@@ -208,6 +210,14 @@ const SAMPLES: SampleI[] = [
     },
 ];
 
+async function readOnlyProjectWorkflowNodes(page: Page, projectId: number): Promise<WorkflowNodeI[]> {
+    const workflowIds = await listProjectWorkflowIds(page, projectId);
+
+    expect(workflowIds, `project ${projectId} holds exactly the one workflow that was built`).toHaveLength(1);
+
+    return readWorkflowNodes(page, workflowIds[0]);
+}
+
 async function expectSampleBuilt(sample: SampleI, workflowNodes: WorkflowNodeI[]): Promise<void> {
     const nodeTypes = workflowNodes.map((workflowNode) => workflowNode.type);
 
@@ -270,9 +280,7 @@ test.describe('@live Builder samples', () => {
 
                 expect(project, `project ${projectName} was created`).toBeDefined();
 
-                const [workflowId] = await listProjectWorkflowIds(page, project!.id);
-
-                await expectSampleBuilt(sample, await readWorkflowNodes(page, workflowId));
+                await expectSampleBuilt(sample, await readOnlyProjectWorkflowNodes(page, project!.id));
             } finally {
                 const project = await findProjectByName(page, workspaceId, projectName);
 
@@ -296,6 +304,10 @@ test.describe('@live Builder samples', () => {
             await copilotPanel.setBuildMode(true);
 
             const waitForCopilotTurnEnd = async () => {
+                await expect(copilotPanel.stopGeneratingButton)
+                    .toBeVisible({timeout: TURN_START_TIMEOUT})
+                    .catch(() => undefined);
+
                 await expect(copilotPanel.stopGeneratingButton).toBeHidden({timeout: LIVE_TURN_TIMEOUT});
 
                 await expect(copilotPanel.sendButton).toBeVisible();
@@ -354,11 +366,7 @@ test.describe('@live Builder samples', () => {
 
                 expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
 
-                const [workflowId] = await listProjectWorkflowIds(page, mcpProject.id);
-
-                expect(workflowId, 'buildWorkflow created the workflow in the project').toBeDefined();
-
-                await expectSampleBuilt(sample, await readWorkflowNodes(page, workflowId));
+                await expectSampleBuilt(sample, await readOnlyProjectWorkflowNodes(page, mcpProject.id));
             } finally {
                 if (projectId !== undefined) {
                     await deleteProjectThroughApi(page, projectId);
