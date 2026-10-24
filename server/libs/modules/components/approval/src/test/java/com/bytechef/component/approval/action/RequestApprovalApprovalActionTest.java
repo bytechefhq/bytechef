@@ -58,7 +58,7 @@ import org.mockito.ArgumentCaptor;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-class ApprovalRequestApprovalActionTest {
+class RequestApprovalApprovalActionTest {
 
     private static final ApprovalLinks APPROVAL_LINKS = new ApprovalLinks(
         "https://example.com/api", "abc", "https://example.com/api/job/resume/abc",
@@ -68,7 +68,7 @@ class ApprovalRequestApprovalActionTest {
     void testPerformRoutesApprovalChannelThroughTokenRefreshAwareService() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
@@ -105,7 +105,7 @@ class ApprovalRequestApprovalActionTest {
 
     @Test
     void testResumePerformAlwaysOutputsACommentAndAnApprover() throws Exception {
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(
             mock(ClusterElementDefinitionService.class));
 
         ResumePerformFunction resumePerformFunction = (ResumePerformFunction) actionDefinition.getResumePerform()
@@ -151,7 +151,7 @@ class ApprovalRequestApprovalActionTest {
 
     @Test
     void testResumePerformOutputsEveryFormInputWithItsDeclaredType() throws Exception {
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(
             mock(ClusterElementDefinitionService.class));
 
         ResumePerformFunction resumePerformFunction = (ResumePerformFunction) actionDefinition.getResumePerform()
@@ -180,7 +180,7 @@ class ApprovalRequestApprovalActionTest {
 
     @Test
     void testPerformMarksTheSuspendAsAnApproval() throws Exception {
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(
             mock(ClusterElementDefinitionService.class));
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
@@ -211,7 +211,7 @@ class ApprovalRequestApprovalActionTest {
     void testPerformDeliversRemainingChannelsWhenOneFails() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
@@ -257,7 +257,7 @@ class ApprovalRequestApprovalActionTest {
     void testPerformFailsWhenEveryChannelFails() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
@@ -305,7 +305,7 @@ class ApprovalRequestApprovalActionTest {
     void testPerformPublishesExpiresAtToChannels() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
@@ -363,7 +363,7 @@ class ApprovalRequestApprovalActionTest {
     private static Map<String, ?> deliverToTelegram(ApprovalLinks approvalLinks) throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
@@ -399,7 +399,7 @@ class ApprovalRequestApprovalActionTest {
     void testPerformUsesConfiguredExpiry() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
@@ -434,7 +434,7 @@ class ApprovalRequestApprovalActionTest {
     void testPerformDefaultsExpiryToSixtyDays() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
@@ -469,7 +469,7 @@ class ApprovalRequestApprovalActionTest {
     void testPerformInEditorEnvironmentWithoutJobIdSuspendsWithoutEmitting() throws Exception {
         ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
 
-        ModifiableActionDefinition actionDefinition = ApprovalRequestApprovalAction.of(clusterElementDefinitionService);
+        ModifiableActionDefinition actionDefinition = RequestApprovalApprovalAction.of(clusterElementDefinitionService);
 
         MultipleConnectionsPerformFunction performFunction = (MultipleConnectionsPerformFunction) actionDefinition
             .getPerform()
