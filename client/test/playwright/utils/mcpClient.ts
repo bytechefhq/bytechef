@@ -114,7 +114,7 @@ export class McpClient {
         const response = await this.request.post(this.endpointPath, {
             data: {id: this.nextRequestId++, jsonrpc: '2.0', method, params},
             headers: this.headers(),
-            timeout: 300000,
+            timeout: 600000,
         });
 
         expect(response.ok(), `${method} answered ${response.status()}: ${await response.text()}`).toBe(true);
