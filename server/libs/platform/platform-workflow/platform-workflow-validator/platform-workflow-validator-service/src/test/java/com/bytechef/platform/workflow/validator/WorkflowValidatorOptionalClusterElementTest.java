@@ -96,7 +96,7 @@ class WorkflowValidatorOptionalClusterElementTest {
         validate(workflow, errors, warnings);
 
         assertEquals(
-            "[aiAgent_1] Cluster element slot 'widgets' does not exist on aiAgent/v1/chat; its slots are " +
+            "[aiAgent_1] Cluster element 'widgets' is not a slot of aiAgent/v1/chat; its slots are " +
                 "chatMemory, guardrails, model, rag, tools",
             errors.toString());
         assertEquals("", warnings.toString());
