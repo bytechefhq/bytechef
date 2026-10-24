@@ -188,7 +188,7 @@ const SAMPLES: SampleI[] = [
         forbiddenNodeTypes: [/^pgVector\//, /^pinecone\//],
         instruction:
             'When I upload a PDF through a webhook, split it ' +
-            'into chunks, embed them with OpenAI and load them into our knowledge base.',
+            'into chunks and load them into our built-in knowledge base.',
         name: 'Knowledge base: load an uploaded PDF',
     },
     {
