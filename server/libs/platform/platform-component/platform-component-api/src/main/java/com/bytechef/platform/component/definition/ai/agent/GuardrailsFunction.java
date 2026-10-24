@@ -45,4 +45,19 @@ public interface GuardrailsFunction {
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections, Context context,
         List<Message> conversationHistory) throws Exception;
+
+    /**
+     * @param workflowNodeName the workflow node name of this guardrails cluster element
+     * @param componentName    the component name of this guardrails cluster element
+     * @return the guardrails advisor
+     */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    default Advisor apply(
+        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+        Map<String, ComponentConnection> componentConnections, Context context, List<Message> conversationHistory,
+        String workflowNodeName, String componentName) throws Exception {
+
+        return apply(
+            inputParameters, connectionParameters, extensions, componentConnections, context, conversationHistory);
+    }
 }
