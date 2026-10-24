@@ -956,10 +956,12 @@ export interface InteractiveCardAnswerI {
 export async function answerInteractiveCards(
     page: Page,
     {
+        answerPickers = true,
         chooseOption = (cardText, optionNames) => optionNames[0],
         readLastMessage,
         waitForTurnEnd,
     }: {
+        answerPickers?: boolean;
         chooseOption?: (cardText: string, optionNames: string[]) => string;
         readLastMessage: () => Locator;
         waitForTurnEnd: () => Promise<void>;
@@ -976,6 +978,10 @@ export async function answerInteractiveCards(
         const picker = lastMessage.getByRole('combobox');
 
         if ((await picker.count()) > 0 && (await picker.first().isEnabled())) {
+            if (!answerPickers) {
+                break;
+            }
+
             await picker.first().click();
 
             const firstOption = page.getByRole('option').first();
