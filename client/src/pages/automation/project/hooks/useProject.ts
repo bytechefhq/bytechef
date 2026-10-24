@@ -331,6 +331,8 @@ export const useProject = () => {
 
             setWorkflowTestExecution(parentWorkflowTestExecution);
             setParentWorkflowTestExecution(undefined);
+        } else {
+            useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
         }
 
         const storedExecution = useWorkflowEditorStore.getState().workflowTestExecution;
