@@ -78,10 +78,25 @@ const WorkflowExecutionsTestOutput = ({
     return (
         <div className="flex h-full w-full flex-col rounded-lg border border-stroke-neutral-secondary bg-background">
             <div className="flex items-center justify-between border-b border-stroke-neutral-primary">
-                {job ? (
-                    <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
-                ) : (
-                    <span className="flex w-full items-center gap-x-3 px-3 py-4 text-sm uppercase">Test Output</span>
+                {job && <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />}
+
+                {!job && workflowIsRunning && (
+                    <div
+                        className="flex w-full items-center gap-x-3 px-3 py-3"
+                        data-testid="workflow-test-output-pending-header"
+                    >
+                        <Skeleton className="h-6 w-28 rounded-full" />
+
+                        <Skeleton className="h-4 w-36" />
+
+                        <Skeleton className="h-4 w-28" />
+
+                        <Skeleton className="h-4 w-28" />
+                    </div>
+                )}
+
+                {!job && !workflowIsRunning && (
+                    <span className="flex h-12 w-full items-center gap-x-3 px-3 text-sm uppercase">Test Output</span>
                 )}
 
                 {onCloseClick && (
