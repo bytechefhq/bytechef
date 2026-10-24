@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,6 +29,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -275,6 +278,31 @@ class ContextTest {
             eq(JOB_ID), eq(TASK_EXECUTION_ID), batchArgumentCaptor.capture());
 
         return batchArgumentCaptor.getValue();
+    }
+
+    @Test
+    void testStampsLogEntriesWithTheCurrentCall() {
+        ClusterElementCallRef ref = new ClusterElementCallRef("call-1", "tool_1");
+
+        ClusterElementCallScope.callWith(ref, () -> {
+            context.log(log -> log.info("inside"));
+
+            return null;
+        });
+
+        context.log(log -> log.info("outside"));
+        context.flushLogEntries();
+
+        List<LogEntry> stored = capturedBatch();
+
+        assertEquals("call-1", stored.get(0)
+            .clusterElementCallId());
+        assertEquals("tool_1", stored.get(0)
+            .clusterElementWorkflowNodeName());
+        assertNull(stored.get(1)
+            .clusterElementCallId());
+        assertNull(stored.get(1)
+            .clusterElementWorkflowNodeName());
     }
 
     @SuppressWarnings("unchecked")

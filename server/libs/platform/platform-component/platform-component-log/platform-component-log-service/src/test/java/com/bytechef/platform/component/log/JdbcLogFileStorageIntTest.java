@@ -58,8 +58,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 class JdbcLogFileStorageIntTest {
 
-    private static final String CHANGELOG = "classpath:config/liquibase/changelog/platform/execution/" +
-        "20261026000000_platform_execution_added_component_log_entry_table.xml";
+    private static final List<String> CHANGELOGS = List.of(
+        "classpath:config/liquibase/changelog/platform/execution/" +
+            "20261026000000_platform_execution_added_component_log_entry_table.xml",
+        "classpath:config/liquibase/changelog/platform/execution/" +
+            "20261030000000_platform_execution_added_component_log_entry_cluster_element_call_columns.xml");
 
     @Container
     private static final PostgreSQLContainer<?> postgreSql = new PostgreSQLContainer<>("postgres:16-alpine");
@@ -131,6 +134,24 @@ class JdbcLogFileStorageIntTest {
             jobLogFileStorage.storeLogEntry(1L, 8L, createLogEntry(LogEntry.Level.DEBUG, "other task", 8L));
 
             assertThat(jobLogFileStorage.readLogEntries(1L, 7L)).containsExactly(first, second);
+        }
+
+        @Test
+        void testKeepsTheClusterElementCallThatWroteAnEntry() {
+            LogEntry logEntry = LogEntry.builder()
+                .timestamp(truncatedNow())
+                .level(LogEntry.Level.INFO)
+                .componentName("httpClient")
+                .componentOperationName("get")
+                .taskExecutionId(7L)
+                .message("tool call")
+                .clusterElementCallId("call-1")
+                .clusterElementWorkflowNodeName("httpClient_1")
+                .build();
+
+            jobLogFileStorage.storeLogEntry(1L, 7L, logEntry);
+
+            assertThat(jobLogFileStorage.readLogEntries(1L, 7L)).containsExactly(logEntry);
         }
 
         @Test
@@ -254,14 +275,16 @@ class JdbcLogFileStorageIntTest {
     }
 
     private static void migrate(DataSource dataSource, String schema) throws Exception {
-        SpringLiquibase springLiquibase = new SpringLiquibase();
+        for (String changelog : CHANGELOGS) {
+            SpringLiquibase springLiquibase = new SpringLiquibase();
 
-        springLiquibase.setChangeLog(CHANGELOG);
-        springLiquibase.setDataSource(dataSource);
-        springLiquibase.setDefaultSchema(schema);
-        springLiquibase.setResourceLoader(new DefaultResourceLoader());
+            springLiquibase.setChangeLog(changelog);
+            springLiquibase.setDataSource(dataSource);
+            springLiquibase.setDefaultSchema(schema);
+            springLiquibase.setResourceLoader(new DefaultResourceLoader());
 
-        springLiquibase.afterPropertiesSet();
+            springLiquibase.afterPropertiesSet();
+        }
     }
 
     private static Instant truncatedNow() {

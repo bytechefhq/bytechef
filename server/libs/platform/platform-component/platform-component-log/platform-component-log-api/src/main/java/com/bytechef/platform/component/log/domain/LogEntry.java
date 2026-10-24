@@ -30,7 +30,8 @@ import org.jspecify.annotations.Nullable;
 public record LogEntry(
     Instant timestamp, Level level, String componentName, @Nullable String componentOperationName, long taskExecutionId,
     @Nullable Long triggerExecutionId, String message, @Nullable String exceptionType,
-    @Nullable String exceptionMessage, @Nullable String stackTrace) {
+    @Nullable String exceptionMessage, @Nullable String stackTrace, @Nullable String clusterElementCallId,
+    @Nullable String clusterElementWorkflowNodeName) {
 
     public enum Level {
         TRACE(0),
@@ -76,6 +77,8 @@ public record LogEntry(
         private String exceptionType;
         private String exceptionMessage;
         private String stackTrace;
+        private @Nullable String clusterElementCallId;
+        private @Nullable String clusterElementWorkflowNodeName;
 
         public Builder timestamp(Instant timestamp) {
             this.timestamp = timestamp;
@@ -130,10 +133,23 @@ public record LogEntry(
             return this;
         }
 
+        public Builder clusterElementCallId(@Nullable String clusterElementCallId) {
+            this.clusterElementCallId = clusterElementCallId;
+
+            return this;
+        }
+
+        public Builder clusterElementWorkflowNodeName(@Nullable String clusterElementWorkflowNodeName) {
+            this.clusterElementWorkflowNodeName = clusterElementWorkflowNodeName;
+
+            return this;
+        }
+
         public LogEntry build() {
             return new LogEntry(
                 timestamp, level, componentName, componentOperationName,
-                taskExecutionId, triggerExecutionId, message, exceptionType, exceptionMessage, stackTrace);
+                taskExecutionId, triggerExecutionId, message, exceptionType, exceptionMessage, stackTrace,
+                clusterElementCallId, clusterElementWorkflowNodeName);
         }
 
         @SuppressFBWarnings("INFORMATION_EXPOSURE_THROUGH_AN_ERROR_MESSAGE")
