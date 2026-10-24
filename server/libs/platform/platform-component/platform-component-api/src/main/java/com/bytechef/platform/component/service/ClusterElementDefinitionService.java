@@ -99,6 +99,20 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters);
 
+    /**
+     * Returns {@code true} when the cluster element's owning component declares a connection definition. Used by the
+     * shared component-interaction tooling (the in-editor Copilot) - e.g. the
+     * {@code lookupClusterElementPropertyOptions} tool callback - to decide whether a property-options lookup must
+     * carry a {@code connectionId}.
+     *
+     * @param componentName      the name of the component
+     * @param componentVersion   the version of the component
+     * @param clusterElementName the name of the cluster element (accepted for symmetry with sibling methods; the
+     *                           connection requirement is currently a component-level concern)
+     * @return {@code true} when the component declares a {@code ConnectionDefinition}, {@code false} otherwise
+     */
+    boolean clusterElementDefinesConnection(String componentName, int componentVersion, String clusterElementName);
+
     <T> T getClusterElement(String componentName, int componentVersion, String clusterElementName);
 
     ClusterElementDefinition getClusterElementDefinition(String componentName, String clusterElementName);
@@ -111,12 +125,30 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
 
     List<ClusterElementDefinition> getClusterElementDefinitions(ClusterElementType clusterElementType);
 
+    List<ClusterElementDefinition> getClusterElementDefinitions(String componentName, int componentVersion);
+
     List<ClusterElementDefinition> getClusterElementDefinitions(
         String componentName, int componentVersion, ClusterElementType clusterElementType);
 
     ClusterElementType getClusterElementType(
         String rootComponentName, int rootComponentVersion, String clusterElementTypeName);
 
+    /**
+     * Returns the lookup-depends-on paths for a cluster element property's OptionsDataSource, or an empty list when the
+     * property has no dynamic options OR cannot be resolved. {@code propertyName} accepts the same dotted paths as
+     * {@code TriggerDefinitionService#getPropertyLookupDependsOn}.
+     */
+    List<String> getPropertyLookupDependsOn(
+        String componentName, int componentVersion, String clusterElementName, String propertyName);
+
     List<ClusterElementDefinition> getRootClusterElementDefinitions(
         String rootComponentName, int rootComponentVersion, String clusterElementTypeName);
+
+    /**
+     * Returns true when the named cluster element property has a dynamic OptionsDataSource. The "not found" and "found
+     * but no data source" cases are intentionally indistinguishable: both yield the safest fallback (the lookup gate
+     * emits {@code no_options_for_property}).
+     */
+    boolean propertyHasOptionsDataSource(
+        String componentName, int componentVersion, String clusterElementName, String propertyName);
 }
