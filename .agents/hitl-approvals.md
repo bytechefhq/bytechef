@@ -10,8 +10,8 @@ User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-l
 - **Two primitives, disjoint jobs.** **Approval** is a decision: resume data carries a boolean `approved`, plus
   `comment` (valid on BOTH outcomes) and `approvedBy`. **AskUserQuestion** (`aiAgentUtils` `askUserQuestion` tool)
   is LLM clarification and resumes with `STREAMING_RESUME`. Typing in chat NEVER resolves an approval.
-- **The approval step** is `approval/v1/requestApproval` (`ApprovalRequestApprovalAction`) plus the same action
-  as an agent TOOLS element (`ApprovalRequestApprovalTool`, same component). Both take `APPROVAL_CHANNELS`
+- **The approval step** is `approval/v1/requestApproval` (`RequestApprovalApprovalAction`) plus the same action
+  as an agent TOOLS element (`RequestApprovalApprovalTool`, same component). Both take `APPROVAL_CHANNELS`
   children (`ApprovalComponentDefinition`). Expiry comes from `expiresIn`/`expiresInUnit` (HOURS/DAYS); blank means
   `ActionContextAware.DEFAULT_APPROVAL_EXPIRY` (60 days). The suspend's continue parameters carry `formUrl`,
   `approvalRaisedAt` and `APPROVAL_RESUME=true`. The tool also stores its own inputs under

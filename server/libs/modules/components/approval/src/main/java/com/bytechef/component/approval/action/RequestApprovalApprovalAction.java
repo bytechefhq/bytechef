@@ -98,9 +98,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-public class ApprovalRequestApprovalAction {
+public class RequestApprovalApprovalAction {
 
-    private static final Logger log = LoggerFactory.getLogger(ApprovalRequestApprovalAction.class);
+    private static final Logger log = LoggerFactory.getLogger(RequestApprovalApprovalAction.class);
 
     private static final String APPROVED = "approved";
     private static final String APPROVED_BY = "approvedBy";
@@ -109,12 +109,12 @@ public class ApprovalRequestApprovalAction {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
 
-    private ApprovalRequestApprovalAction(ClusterElementDefinitionService clusterElementDefinitionService) {
+    private RequestApprovalApprovalAction(ClusterElementDefinitionService clusterElementDefinitionService) {
         this.clusterElementDefinitionService = clusterElementDefinitionService;
     }
 
     public static ModifiableActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
-        ApprovalRequestApprovalAction approvalRequestApprovalAction = new ApprovalRequestApprovalAction(
+        RequestApprovalApprovalAction requestApprovalApprovalAction = new RequestApprovalApprovalAction(
             clusterElementDefinitionService);
 
         return action("requestApproval")
@@ -246,10 +246,10 @@ public class ApprovalRequestApprovalAction {
                         option("Days", EXPIRES_IN_UNIT_DAYS))
                     .defaultValue(EXPIRES_IN_UNIT_DAYS)
                     .required(false))
-            .output(ApprovalRequestApprovalAction::output)
+            .output(RequestApprovalApprovalAction::output)
             .help("", "https://docs.bytechef.io/reference/components/approval_v1#request-approval")
-            .perform((MultipleConnectionsPerformFunction) approvalRequestApprovalAction::perform)
-            .resumePerform(ApprovalRequestApprovalAction::resumePerform);
+            .perform((MultipleConnectionsPerformFunction) requestApprovalApprovalAction::perform)
+            .resumePerform(RequestApprovalApprovalAction::resumePerform);
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
