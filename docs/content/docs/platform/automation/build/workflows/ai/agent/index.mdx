@@ -314,6 +314,30 @@ Tools turn workflow components into actions the agent can call mid-conversation.
 | Script | [script/v1](/reference/components/script_v1) | Run custom Python, JavaScript, or Ruby as a tool when no built-in action fits. |
 | AI Agent | [aiAgent/v1](/reference/components/ai-agent_v1) | Let one agent call another as a tool, for the agent-of-agents compositions described above - a sub-agent owns a self-contained domain and returns a result to its caller. |
 
+### Seeing which tools ran
+
+> **Coming soon.** Tool calls are coloured on the workflow canvas, live while a
+> [test run](/platform/automation/build/workflows/workflows#run-test-and-the-output-panel) executes and
+> afterwards on the [execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows)
+> of a deployed run.
+
+A tool turns blue while the agent calls it, then green with its duration when the call returns, or red
+when the call throws an error; its wire from the Tools slot follows. What counts:
+
+- **Only tools are coloured.** The model, memory, RAG and guardrail elements stay plain, and so does a
+  tool the agent never chose to call.
+- **A Task Tool sub-agent is coloured too**, along with the tools it calls - including a sub-agent
+  running in the background, which can finish after its agent's task has.
+- **Failure means the call threw.** A tool that returns an error message as its result has completed;
+  the model reads that result and decides what to do next.
+- **Red stays red.** A tool that failed once stays red for the rest of the run, even if a later call
+  succeeds or the agent recovers and finishes.
+- **A tool called several times** in one run of the agent shows the time from its first call to its
+  last, and stays blue while any of its calls is still running; when the agent itself runs again, in a
+  loop for example, the times add up. A call waiting on a human-in-the-loop answer stays blue until it
+  resumes.
+- **Simulated calls** are coloured like real ones.
+
 ### Supplying tool parameters with fromAi
 
 When you attach a tool, you see its full input form, and for every parameter you decide **who fills it**:

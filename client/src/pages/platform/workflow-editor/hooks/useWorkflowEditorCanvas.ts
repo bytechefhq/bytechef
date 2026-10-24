@@ -17,6 +17,7 @@ import {Node, NodeChange, XYPosition} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import ClusterElementEdge from '../../cluster-element-editor/edges/ClusterElementEdge';
 import LabeledClusterElementsEdge from '../../cluster-element-editor/edges/LabeledClusterElementsEdge';
 import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
@@ -29,6 +30,7 @@ import useOverlayPanelsViewport from '../hooks/useOverlayPanelsViewport';
 import useStickyNotes from '../hooks/useStickyNotes';
 import ClusterRootNode from '../nodes/ClusterRootNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
+import ReadOnlyClusterElementNode from '../nodes/ReadOnlyClusterElementNode';
 import ReadOnlyNode from '../nodes/ReadOnlyNode';
 import ReadOnlyPlaceholderNode from '../nodes/ReadOnlyPlaceholderNode';
 import StickyNoteNode from '../nodes/StickyNoteNode';
@@ -185,6 +187,7 @@ const useWorkflowEditorCanvas = ({
             clusterRoot: ClusterRootNode,
             placeholder: PlaceholderNode,
             readonly: ReadOnlyNode,
+            readonlyClusterElement: ReadOnlyClusterElementNode,
             readonlyPlaceholder: ReadOnlyPlaceholderNode,
             stickyNote: StickyNoteNode,
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
@@ -198,6 +201,7 @@ const useWorkflowEditorCanvas = ({
 
     const edgeTypes = useMemo(
         () => ({
+            clusterElement: ClusterElementEdge,
             labeledBranchCase: LabeledBranchCaseEdge,
             labeledClusterElementsEdge: LabeledClusterElementsEdge,
             placeholder: PlaceholderEdge,

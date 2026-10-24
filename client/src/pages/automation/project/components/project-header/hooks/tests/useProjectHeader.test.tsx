@@ -19,10 +19,13 @@ const hoisted = vi.hoisted(() => {
             workflowTestChatPanelOpen: false,
         },
         editorSpies: {
+            removeWorkflowTestNodeState: vi.fn(),
+            resetWorkflowTestNodeStates: vi.fn(),
             setShowBottomPanelOpen: vi.fn(),
             setWorkflowIsRunning: vi.fn(),
             setWorkflowTestExecution: vi.fn(),
             showBottomPanel: false,
+            workflowTestNodeStates: {},
         },
         nodePanelSpies: {
             setCurrentNode: vi.fn(),
@@ -400,5 +403,18 @@ describe('useProjectHeader', () => {
         );
 
         expect(result.current.hasUnpublishedChanges).toBe(true);
+    });
+
+    it('clears the test output and the node colors of the last run when switching to another workflow', () => {
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})
+        );
+
+        act(() => {
+            result.current.handleProjectWorkflowValueChange(7);
+        });
+
+        expect(hoisted.editorSpies.setWorkflowTestExecution).toHaveBeenCalledWith(undefined);
+        expect(hoisted.editorSpies.resetWorkflowTestNodeStates).toHaveBeenCalledWith(undefined);
     });
 });

@@ -6,6 +6,8 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import styles from './NodeTypes.module.css';
+import TaskDispatcherGhostBarHalves from './TaskDispatcherGhostBarHalves';
+import useTaskDispatcherGhostBarStatuses from './useTaskDispatcherGhostBarStatuses';
 
 // ELK's iteration rings flip their content to the TOP edge in LR (see
 // getRingContentSign in elkLayoutUtils): the rail leaves from the bar's
@@ -16,22 +18,30 @@ import styles from './NodeTypes.module.css';
 // dagre make every ring connector double back in box-shaped detours.
 const LR_FLIPPED_RING_BAR_PATTERN = /-(loop|each|map)-(top|bottom)-ghost$/;
 
-const TaskDispatcherTopGhostNode = ({id}: {id: string}) => {
+const TaskDispatcherTopGhostNode = ({data, id}: {data?: unknown; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const lastAppliedLayoutEngine = useLayoutEngineStore((state) => state.lastAppliedLayoutEngine);
     const isHorizontal = layoutDirection === 'LR';
     const isFlippedRingBar = isHorizontal && lastAppliedLayoutEngine === 'elk' && LR_FLIPPED_RING_BAR_PATTERN.test(id);
 
+    const {leftStatus, rightStatus} = useTaskDispatcherGhostBarStatuses(id, data, false);
+
     return (
         <div
             className={twMerge(
-                'nodrag',
-                isHorizontal ? 'h-[72px] w-0.5' : 'h-0.5 w-[72px]',
+                'nodrag flex',
+                isHorizontal ? 'h-[72px] w-0.5 flex-col' : 'h-0.5 w-[72px]',
                 'bg-stroke-neutral-tertiary'
             )}
             data-nodetype="taskDispatcherTopGhostNode"
             key={id}
         >
+            <TaskDispatcherGhostBarHalves
+                isFlippedRingBar={isFlippedRingBar}
+                leftStatus={leftStatus}
+                rightStatus={rightStatus}
+            />
+
             <Handle
                 className={twMerge(styles.handle)}
                 id={`${id}-top`}

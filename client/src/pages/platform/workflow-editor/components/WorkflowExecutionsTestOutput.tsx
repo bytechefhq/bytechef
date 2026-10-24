@@ -1,6 +1,7 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {Skeleton} from '@/components/ui/skeleton';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
     TruncatedLabel,
@@ -89,17 +90,57 @@ const WorkflowExecutionsTestOutput = ({
 
             <div className="relative size-full">
                 <div className="absolute inset-0 overflow-y-auto">
-                    {workflowIsRunning && (
-                        <div className="flex size-full items-center justify-center gap-x-1 p-3">
-                            <span className="flex animate-spin text-gray-400">
-                                <RefreshCwIcon className="size-5" />
-                            </span>
+                    {workflowIsRunning && !workflowTestExecution?.job && (
+                        <div className="size-full" data-testid="workflow-test-output-pending">
+                            <ResizablePanelGroup orientation="horizontal">
+                                <ResizablePanel
+                                    className="flex flex-col overflow-hidden"
+                                    defaultSize={resizablePanelSize}
+                                >
+                                    <div className="flex h-9 items-center gap-1 px-3 py-2">
+                                        <RefreshCwIcon className="size-3 shrink-0 animate-spin text-content-neutral-secondary" />
 
-                            <span className="text-content-neutral-secondary">Workflow is running...</span>
+                                        <span className="text-xs leading-4 font-medium text-content-neutral-secondary">
+                                            Starting
+                                        </span>
+                                    </div>
+
+                                    <div className="ml-3 space-y-2 pr-4">
+                                        <Skeleton className="h-14 w-full" />
+
+                                        <Skeleton className="h-14 w-full" />
+                                    </div>
+                                </ResizablePanel>
+
+                                <ResizableHandle className="bg-surface-neutral-secondary" />
+
+                                <ResizablePanel className="flex min-h-0 flex-col">
+                                    <div
+                                        className="flex flex-col gap-4 p-4"
+                                        data-testid="workflow-test-output-pending-details"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <Skeleton className="h-5 w-48" />
+
+                                            <Skeleton className="h-4 w-32" />
+                                        </div>
+
+                                        <Skeleton className="h-9 w-56" />
+
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-3/4" />
+
+                                            <Skeleton className="h-4 w-1/2" />
+
+                                            <Skeleton className="h-4 w-2/3" />
+                                        </div>
+                                    </div>
+                                </ResizablePanel>
+                            </ResizablePanelGroup>
                         </div>
                     )}
 
-                    {!workflowIsRunning && (
+                    {(!workflowIsRunning || workflowTestExecution?.job) && (
                         <>
                             {workflowTestExecution?.job && jobFailedWithNoExecutions && (
                                 <div className="flex-1 p-4">
@@ -140,6 +181,9 @@ const WorkflowExecutionsTestOutput = ({
                                                         ? [triggerExecution?.id || '']
                                                         : [selectedExecution?.id || ''])
                                                 }
+                                                // Uncontrolled, so a failure that shows up in a later snapshot of the
+                                                // same run only gets expanded by remounting.
+                                                key={`${job?.id}-${deepestFailedExecution?.path.join('/') ?? ''}`}
                                                 type="multiple"
                                             >
                                                 {triggerExecution && (

@@ -9,6 +9,8 @@ import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import useCanvasDropzone from '../hooks/useCanvasDropzone';
+import useWorkflowIsRunning from '../hooks/useWorkflowIsRunning';
+import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -18,11 +20,13 @@ import pasteNode from '../utils/pasteNode';
 import AddBranchChip from './AddBranchChip';
 import BinaryCaseLabel from './BinaryCaseLabel';
 import BranchCaseLabel from './BranchCaseLabel';
+import styles from './WorkflowEdge.module.css';
 import computeBinaryCaseLabel from './computeBinaryCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
 import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
 import {getTriggerFanInBusCenter, getTriggerFanInButtonPosition} from './computeTriggerFanIn';
+import getExecutedEdgeStatus from './getExecutedEdgeStatus';
 
 export default function WorkflowEdge({
     data,
@@ -170,6 +174,10 @@ export default function WorkflowEdge({
 
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
+    const workflowIsRunning = useWorkflowIsRunning();
+    const workflowTestNodeStates = useWorkflowTestNodeStates();
+
+    const executedEdgeStatus = getExecutedEdgeStatus(sourceNode, targetNode, workflowTestNodeStates);
 
     const edgeClusterElementType = (data as Record<string, unknown>)?.clusterElementType;
 
@@ -222,7 +230,12 @@ export default function WorkflowEdge({
     return (
         <>
             <BaseEdge
-                className="fill-none stroke-stroke-neutral-tertiary stroke-2"
+                className={twMerge(
+                    'fill-none stroke-stroke-neutral-tertiary stroke-2',
+                    workflowIsRunning && styles.runningPath,
+                    executedEdgeStatus === 'COMPLETED' && 'stroke-green-500',
+                    executedEdgeStatus === 'FAILED' && 'stroke-red-500'
+                )}
                 id={id}
                 markerEnd={markerEnd}
                 path={edgePath}

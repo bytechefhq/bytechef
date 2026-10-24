@@ -238,6 +238,35 @@ components:
           type: "string"
         required:
           type: "boolean"
+    ClusterElementCall:
+      description: "The outcome of the calls a task made to one of its cluster elements."
+      type: "object"
+      required:
+        - "name"
+        - "startDate"
+        - "status"
+      properties:
+        endDate:
+          description: "The time the last call ended."
+          type: "string"
+          format: "date-time"
+        error:
+          description: "The error message of the first failed call."
+          type: "string"
+        name:
+          description: "The workflow node name of the cluster element."
+          type: "string"
+        startDate:
+          description: "The time the first call started."
+          type: "string"
+          format: "date-time"
+        status:
+          description: "FAILED if any call failed, otherwise the state of the latest call."
+          type: "string"
+          enum:
+            - "STARTED"
+            - "COMPLETED"
+            - "FAILED"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"
@@ -583,6 +612,12 @@ components:
         childJob:
           description: "The job associated with the task execution."
           $ref: "#/components/schemas/Job"
+        clusterElementCalls:
+          description: "The calls the task made to the cluster elements it chooses to call, such as an AI agent's tools."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ClusterElementCall"
+          readOnly: true
     TriggerExecution:
       description: "Adds execution semantics to a trigger."
       type: "object"

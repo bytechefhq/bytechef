@@ -38,6 +38,17 @@ class ToolSuspensionTest {
     private static final Instant EXPIRES_AT = Instant.parse("2026-10-04T00:00:00Z");
 
     @Test
+    void testIsToolSuspensionFailure() {
+        ToolSuspensionException toolSuspensionException = new ToolSuspensionException(
+            "suspended", new IllegalStateException("cause"));
+
+        assertThat(ToolSuspension.isToolSuspensionFailure(toolSuspensionException)).isTrue();
+        assertThat(ToolSuspension.isToolSuspensionFailure(new RuntimeException("wrapped", toolSuspensionException)))
+            .isTrue();
+        assertThat(ToolSuspension.isToolSuspensionFailure(new IllegalStateException("boom"))).isFalse();
+    }
+
+    @Test
     void testSuspendedToolResultIsRecordedInTheSuspendAndRecognized() {
         ActionContextAware actionContextAware = createSuspendedActionContext();
 

@@ -71,7 +71,9 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.message.broker.memory.MemoryMessageBroker.Receiver;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.message.route.MessageRoute;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
+import com.bytechef.platform.worker.task.ClusterElementCallsTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
@@ -991,6 +993,7 @@ public class JobSyncExecutor {
             new CallableResponseTaskExecutionPostOutputProcessor(),
             new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
             new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
+            new ClusterElementCallsTaskExecutionPostOutputProcessor(ClusterElementCallRecorder.getInstance()),
             new SuspendTaskExecutionPostOutputProcessor(null),
             new WebhookResponseTaskExecutionPostOutputProcessor());
     }

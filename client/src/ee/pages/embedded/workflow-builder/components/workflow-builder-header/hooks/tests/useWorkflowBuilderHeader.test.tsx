@@ -19,10 +19,13 @@ const hoisted = vi.hoisted(() => {
             workflowTestChatPanelOpen: false,
         },
         editorSpies: {
+            removeWorkflowTestNodeState: vi.fn(),
+            resetWorkflowTestNodeStates: vi.fn(),
             setShowBottomPanelOpen: vi.fn(),
             setWorkflowIsRunning: vi.fn(),
             setWorkflowTestExecution: vi.fn(),
             showBottomPanel: false,
+            workflowTestNodeStates: {},
         },
         nodePanelSpies: {
             setCurrentNode: vi.fn(),

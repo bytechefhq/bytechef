@@ -5,6 +5,7 @@ apis/index.ts
 docs/ApprovalForm.md
 docs/ApprovalFormApi.md
 docs/ApprovalFormInput.md
+docs/ClusterElementCall.md
 docs/ComponentConnection.md
 docs/ExecutionError.md
 docs/FieldOption.md
@@ -23,6 +24,7 @@ docs/WorkflowTrigger.md
 index.ts
 models/ApprovalForm.ts
 models/ApprovalFormInput.ts
+models/ClusterElementCall.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
 models/FieldOption.ts

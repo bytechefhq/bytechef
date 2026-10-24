@@ -117,10 +117,14 @@ public class TaskWorker {
 
         Future<?> future = taskExecutor.submit(() -> {
             try {
-                eventPublisher.publishEvent(
-                    new TaskStartedApplicationEvent(
-                        Validate.notNull(taskExecution.getJobId(), "id"),
-                        Validate.notNull(taskExecution.getId(), "id")));
+                TaskStartedApplicationEvent taskStartedApplicationEvent = new TaskStartedApplicationEvent(
+                    Validate.notNull(taskExecution.getJobId(), "id"), Validate.notNull(taskExecution.getId(), "id"));
+
+                if (taskExecution.getStartDate() == null) {
+                    taskExecution.setStartDate(taskStartedApplicationEvent.getCreateDate());
+                }
+
+                eventPublisher.publishEvent(taskStartedApplicationEvent);
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
@@ -210,6 +214,8 @@ public class TaskWorker {
                 }
             }
 
+            notifyTaskExecutionFinished(taskExecution);
+
             if (output == null) {
                 taskExecution.setOutput(null);
             } else {
@@ -292,9 +298,22 @@ public class TaskWorker {
 
         taskExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
+        taskExecution.setEndDate(Instant.now());
         taskExecution.setStatus(Status.FAILED);
 
+        notifyTaskExecutionFinished(taskExecution);
+
         eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
+    }
+
+    private void notifyTaskExecutionFinished(TaskExecution taskExecution) {
+        for (TaskExecutionPostOutputProcessor taskExecutionPostOutputProcessor : taskExecutionPostOutputProcessors) {
+            try {
+                taskExecutionPostOutputProcessor.onTaskExecutionFinished(taskExecution);
+            } catch (RuntimeException exception) {
+                log.error(exception.getMessage(), exception);
+            }
+        }
     }
 
     long calculateTimeout(TaskExecution taskExecution) {
