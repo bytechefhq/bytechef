@@ -19,7 +19,6 @@ package com.bytechef.automation.configuration.search;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.search.SearchAssetProvider;
@@ -66,7 +65,8 @@ class WorkflowSearchAssetProvider implements SearchAssetProvider {
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getLatestProjectWorkflows()
             .stream()
-            .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+            .filter(projectWorkflow -> !projectWorkflow.getType()
+                .isGenerated())
             .filter(projectWorkflow -> projectIds.contains(projectWorkflow.getProjectId()))
             .toList();
 

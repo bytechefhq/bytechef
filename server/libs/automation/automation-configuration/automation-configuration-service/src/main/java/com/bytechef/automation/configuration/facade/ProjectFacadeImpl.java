@@ -22,7 +22,6 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -443,7 +442,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
         return projectWorkflowService.getProjectWorkflows(getVisibleWorkspaceProjectIds(workspaceId))
             .stream()
-            .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+            .filter(projectWorkflow -> !projectWorkflow.getType()
+                .isGenerated())
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
             .toList();
@@ -690,7 +690,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private List<ProjectWorkflow> getOrdinaryProjectWorkflows(long projectId, int projectVersion) {
         return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
             .stream()
-            .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+            .filter(projectWorkflow -> !projectWorkflow.getType()
+                .isGenerated())
             .toList();
     }
 
@@ -738,7 +739,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
             List<ProjectWorkflow> allProjectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds)
                 .stream()
-                .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+                .filter(projectWorkflow -> !projectWorkflow.getType()
+                    .isGenerated())
                 .toList();
 
             List<Category> categories = categoryService.getCategories(

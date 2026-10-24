@@ -21,5 +21,9 @@ package com.bytechef.automation.configuration.domain;
  */
 public enum ProjectWorkflowType {
 
-    WORKFLOW, AI_AGENT
+    WORKFLOW, AI_AGENT, DATA_SYNC;
+
+    public boolean isGenerated() {
+        return this != WORKFLOW;
+    }
 }

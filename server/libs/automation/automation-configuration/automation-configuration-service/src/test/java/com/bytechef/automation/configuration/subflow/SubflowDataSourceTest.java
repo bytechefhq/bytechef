@@ -171,6 +171,8 @@ class SubflowDataSourceTest {
     void testGetSubWorkflowsReturnsCallableWorkflows() {
         ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
 
+        when(projectWorkflow.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
+
         when(projectWorkflow.getWorkflowId()).thenReturn(WORKFLOW_ID);
         when(projectWorkflow.getProjectId()).thenReturn(1L);
         when(projectWorkflow.getUuidAsString()).thenReturn(WORKFLOW_UUID);
@@ -210,11 +212,15 @@ class SubflowDataSourceTest {
     void testGetSubWorkflowsFiltersNonCallableWorkflows() {
         ProjectWorkflow callableProjectWorkflow = mock(ProjectWorkflow.class);
 
+        when(callableProjectWorkflow.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
+
         when(callableProjectWorkflow.getWorkflowId()).thenReturn("callable-workflow-id");
         when(callableProjectWorkflow.getProjectId()).thenReturn(1L);
         when(callableProjectWorkflow.getUuidAsString()).thenReturn("callable-uuid");
 
         ProjectWorkflow nonCallableProjectWorkflow = mock(ProjectWorkflow.class);
+
+        when(nonCallableProjectWorkflow.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
 
         when(nonCallableProjectWorkflow.getWorkflowId()).thenReturn("non-callable-workflow-id");
 
@@ -273,14 +279,32 @@ class SubflowDataSourceTest {
     }
 
     @Test
+    void testGetSubWorkflowsExcludesDataSyncWorkflows() {
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getType()).thenReturn(ProjectWorkflowType.DATA_SYNC);
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of(projectWorkflow));
+
+        List<SubflowEntry> result =
+            subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void testGetSubWorkflowsFiltersBySearch() {
         ProjectWorkflow projectWorkflow1 = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow1.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
 
         when(projectWorkflow1.getWorkflowId()).thenReturn("wf1");
         when(projectWorkflow1.getProjectId()).thenReturn(1L);
         when(projectWorkflow1.getUuidAsString()).thenReturn("uuid1");
 
         ProjectWorkflow projectWorkflow2 = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow2.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
 
         when(projectWorkflow2.getWorkflowId()).thenReturn("wf2");
         when(projectWorkflow2.getProjectId()).thenReturn(2L);
@@ -336,6 +360,8 @@ class SubflowDataSourceTest {
     void testGetSubWorkflowsHandlesNullWorkflowLabel() {
         ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
 
+        when(projectWorkflow.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
+
         when(projectWorkflow.getWorkflowId()).thenReturn(WORKFLOW_ID);
         when(projectWorkflow.getProjectId()).thenReturn(1L);
         when(projectWorkflow.getUuidAsString()).thenReturn(WORKFLOW_UUID);
@@ -372,6 +398,8 @@ class SubflowDataSourceTest {
     @Test
     void testGetSubWorkflowsReturnsAllWithEmptySearch() {
         ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
 
         when(projectWorkflow.getWorkflowId()).thenReturn(WORKFLOW_ID);
         when(projectWorkflow.getProjectId()).thenReturn(1L);

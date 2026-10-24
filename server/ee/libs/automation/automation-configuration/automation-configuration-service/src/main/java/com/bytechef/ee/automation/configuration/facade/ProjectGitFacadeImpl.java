@@ -13,7 +13,6 @@ import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOpe
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
@@ -206,7 +205,8 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     private List<ProjectWorkflow> getOrdinaryProjectWorkflows(long projectId, int projectVersion) {
         return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
             .stream()
-            .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+            .filter(projectWorkflow -> !projectWorkflow.getType()
+                .isGenerated())
             .toList();
     }
 }
