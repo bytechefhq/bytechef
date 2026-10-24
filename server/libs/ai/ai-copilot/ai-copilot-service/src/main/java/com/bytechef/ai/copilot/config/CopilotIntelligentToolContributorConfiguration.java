@@ -21,6 +21,7 @@ import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback.TargetWorkflowManager;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.PersistedWorkflowChecker;
 import com.bytechef.ai.copilot.tool.ProjectWorkflowAgentToolCallback;
 import com.bytechef.ai.copilot.tool.SkillsAgentToolCallback;
 import com.bytechef.ai.copilot.tool.WorkflowExecutionAgentToolCallback;
@@ -73,7 +74,8 @@ class CopilotIntelligentToolContributorConfiguration {
         @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") //
         ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
         ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
-        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider) {
+        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider,
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider) {
 
         SubAgentChatModelResolver chatModelResolver = chatModelResolverProvider.getIfAvailable();
         TargetWorkflowManager targetWorkflowManager = getTargetWorkflowManager(
@@ -85,7 +87,8 @@ class CopilotIntelligentToolContributorConfiguration {
                 Set.of(IntelligentToolScope.PROJECT),
                 variant -> factoryForVariant(
                     variant, workflowEditorAskFactoryProvider, workflowEditorBuildFactoryProvider),
-                chatClientFactory -> new ProjectWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)),
+                chatClientFactory -> new ProjectWorkflowAgentToolCallback(
+                    chatClientFactory, chatModelResolver, persistedWorkflowCheckerProvider.getIfAvailable())),
             new SimpleIntelligentToolDefinition(
                 "importWorkflow", CopilotAgentType.IMPORT_WORKFLOW, Set.of(IntelligentToolScope.PROJECT),
                 variant -> variant == IntelligentToolVariant.BUILD

@@ -141,7 +141,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
             emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
             emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
-            emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)));
+            emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)),
+            emptyProvider());
 
         IntelligentToolDefinition converterDefinition = definitionNamed(
             contributor.getIntelligentToolDefinitions(), "importWorkflow");
@@ -179,7 +180,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         IntelligentToolContributor contributor = configuration.copilotIntelligentToolContributor(
             emptyProvider(), emptyProvider(), present((IntelligentToolChatClientFactory) chatModel -> chatClient),
             emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
-            emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)));
+            emptyProvider(), emptyProvider(), present(new ProjectWorkflowLifecycleTools(projectWorkflowTools)),
+            emptyProvider());
 
         IntelligentToolDefinition converterDefinition = definitionNamed(
             contributor.getIntelligentToolDefinitions(), "importWorkflow");
@@ -213,7 +215,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)),
-            emptyProvider());
+            emptyProvider(), emptyProvider());
 
         List<IntelligentToolDefinition> definitions = contributor.getIntelligentToolDefinitions();
 
@@ -380,7 +382,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)), present(mock(SubAgentChatModelResolver.class)),
-            emptyProvider());
+            emptyProvider(), emptyProvider());
 
         return contributor.getIntelligentToolDefinitions();
     }
@@ -407,7 +409,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             present(codeEditorBuild.factory()), present(skillsAsk.factory()), present(skillsBuild.factory()),
             present(workflowExecutionBuild.factory()),
             present(mock(SubAgentChatModelResolver.class)),
-            emptyProvider());
+            emptyProvider(), emptyProvider());
 
         Map<String, ChatClient> beanClientsByKey = Map.ofEntries(
             Map.entry("workflowEditorAsk", workflowEditorAsk.beanClient()),
