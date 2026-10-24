@@ -43,7 +43,12 @@ import {
     readGraphQlOperationName,
 } from '../../utils/copilotUtils';
 import getRandomString from '../../utils/getRandomString';
-import {McpClient, type McpToolCallResultI, toolResultText} from '../../utils/mcpClient';
+import {
+    McpClient,
+    type McpToolCallResultI,
+    buildWorkflowAnsweringQuestions,
+    toolResultText,
+} from '../../utils/mcpClient';
 import workflowChatMemory from './fixtures/workflow-chat-memory.json';
 
 export const test = mergeTests(loginTest(), aiHubChatsTest, projectTest, workflowTest);
@@ -956,7 +961,7 @@ test.describe('@live AI Hub', () => {
 
                     projectIdsToDelete.push(mcpProject.id);
 
-                    const buildResult = await mcpClient.callTool('buildWorkflow', {
+                    const buildResult = await buildWorkflowAnsweringQuestions(mcpClient, {
                         request: `Create a new workflow in project ${mcpProject.id} that, ${PARITY_INSTRUCTION}`,
                         workspaceId: workspaces[0].id,
                     });
