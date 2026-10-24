@@ -27,6 +27,14 @@ function mergeTaskExecution(
         merged = {...merged, clusterElementCallRecords};
     }
 
+    if (taskExecution.children) {
+        const children = mergeTaskExecutions(taskExecution.children, recordsByTaskExecutionId);
+
+        if (children !== taskExecution.children) {
+            merged = {...merged, children};
+        }
+    }
+
     if (taskExecution.iterations) {
         let iterationsChanged = false;
 
@@ -42,6 +50,14 @@ function mergeTaskExecution(
 
         if (iterationsChanged) {
             merged = {...merged, iterations};
+        }
+    }
+
+    if (taskExecution.childJob?.taskExecutions) {
+        const taskExecutions = mergeTaskExecutions(taskExecution.childJob.taskExecutions, recordsByTaskExecutionId);
+
+        if (taskExecutions !== taskExecution.childJob.taskExecutions) {
+            merged = {...merged, childJob: {...taskExecution.childJob, taskExecutions}};
         }
     }
 
