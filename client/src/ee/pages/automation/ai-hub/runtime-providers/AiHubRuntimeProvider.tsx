@@ -520,7 +520,8 @@ export const terminateOrphanRunningToolCalls = (chatId: string | undefined): voi
  * earlier text or a tool call opens a new assistant message, and each tool call attaches to the assistant message
  * current at its start. A tool error, a failed workflow tab open or a malformed interactive payload raises the retry
  * banner only when the run finishes without a later successful call of a tool with the same name; any such success counts as the recovery, whatever its arguments, since a model
- * retrying a failed call usually changes them. A run that fails shows its run error bubble instead of the banner, and a
+ * retrying a failed call usually changes them. A later interactive card (a question, a picker, a connection or an
+ * approval card) also counts as the recovery of every earlier failure, since the turn then waits on the user. A run that fails shows its run error bubble instead of the banner, and a
  * user Stop shows neither.
  */
 export const buildAiHubSubscriber = ({
@@ -657,6 +658,8 @@ export const buildAiHubSubscriber = ({
             content: [{data: dataPart.data, type: dataPart.type as `data-${string}`}],
             role: 'assistant',
         });
+
+        unrecoveredToolFailures.clear();
 
         if (dataPart.type === 'data-tool-approval-request' && subscriberChatId != null) {
             aiHubChatsStore.getState().setActivityState(subscriberChatId, 'paused');
