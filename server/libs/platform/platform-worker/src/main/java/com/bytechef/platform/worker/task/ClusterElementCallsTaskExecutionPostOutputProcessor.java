@@ -20,9 +20,11 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallDrain;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.workflow.execution.constant.TaskExecutionMetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,8 +48,9 @@ public class ClusterElementCallsTaskExecutionPostOutputProcessor implements Task
         ClusterElementCallDrain drain = recorder.drain(Validate.notNull(taskExecution.getId(), "id"));
 
         Map<String, ClusterElementCall> drainedCalls = drain.calls();
+        List<ClusterElementCallRecord> drainedRecords = drain.records();
 
-        if (drainedCalls.isEmpty()) {
+        if (drainedCalls.isEmpty() && drainedRecords.isEmpty()) {
             return;
         }
 
@@ -60,6 +63,15 @@ public class ClusterElementCallsTaskExecutionPostOutputProcessor implements Task
                 .stream()
                 .sorted(Comparator.comparing(ClusterElementCall::startDate))
                 .map(ClusterElementCall::toMap)
+                .toList());
+
+        List<ClusterElementCallRecord> records = ClusterElementCallRecord.merge(
+            getStoredRecords(taskExecution), drainedRecords);
+
+        taskExecution.putMetadata(
+            TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS,
+            records.stream()
+                .map(ClusterElementCallRecord::toMap)
                 .toList());
     }
 
@@ -85,5 +97,25 @@ public class ClusterElementCallsTaskExecutionPostOutputProcessor implements Task
         }
 
         return storedCalls;
+    }
+
+    private static List<ClusterElementCallRecord> getStoredRecords(TaskExecution taskExecution) {
+        Map<String, ?> metadata = taskExecution.getMetadata();
+
+        List<ClusterElementCallRecord> storedRecords = new ArrayList<>();
+
+        if (metadata.get(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS) instanceof List<?> records) {
+            for (Object record : records) {
+                if (record instanceof Map<?, ?> recordMap) {
+                    @SuppressWarnings("unchecked")
+                    ClusterElementCallRecord clusterElementCallRecord = ClusterElementCallRecord.fromMap(
+                        (Map<String, ?>) recordMap);
+
+                    storedRecords.add(clusterElementCallRecord);
+                }
+            }
+        }
+
+        return storedRecords;
     }
 }
