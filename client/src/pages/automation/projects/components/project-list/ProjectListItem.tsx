@@ -489,7 +489,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     </div>
                                 </TooltipTrigger>
 
-                                <TooltipContent>Last Modified Date</TooltipContent>
+                                <TooltipContent side="left">Last Published Date</TooltipContent>
                             </Tooltip>
                         </div>
 
