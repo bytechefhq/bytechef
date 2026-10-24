@@ -45,6 +45,39 @@ describe('withLiveClusterElementCallRecords', () => {
         expect(merged?.job?.taskExecutions?.[0].iterations?.[0][0].clusterElementCallRecords).toEqual([live]);
     });
 
+    it('adds live calls to an agent inside a condition branch', () => {
+        const live: ClusterElementCallRecord = {id: 'b', status: 'STARTED'};
+        const sibling = {children: [{id: 30}], id: 3} as unknown as TaskExecution;
+        const execution = {
+            job: {
+                taskExecutions: [{children: [{id: 10}], id: 1}, sibling],
+            },
+        } as unknown as WorkflowTestExecution;
+
+        const merged = withLiveClusterElementCallRecords(execution, {'10': [live]});
+
+        expect(merged?.job?.taskExecutions?.[0].children?.[0].clusterElementCallRecords).toEqual([live]);
+        expect(merged?.job?.taskExecutions?.[1]).toBe(sibling);
+    });
+
+    it('adds live calls to an agent inside a subflow', () => {
+        const live: ClusterElementCallRecord = {id: 'b', status: 'STARTED'};
+        const sibling = {childJob: {taskExecutions: [{id: 30}]}, id: 3} as unknown as TaskExecution;
+        const execution = {
+            job: {
+                taskExecutions: [{childJob: {id: 7, taskExecutions: [{id: 10}]}, id: 1}, sibling],
+            },
+        } as unknown as WorkflowTestExecution;
+
+        const merged = withLiveClusterElementCallRecords(execution, {'10': [live]});
+
+        const childJob = merged?.job?.taskExecutions?.[0].childJob;
+
+        expect(childJob?.id).toBe(7);
+        expect(childJob?.taskExecutions?.[0].clusterElementCallRecords).toEqual([live]);
+        expect(merged?.job?.taskExecutions?.[1]).toBe(sibling);
+    });
+
     it('leaves an execution without live calls untouched', () => {
         const execution = buildExecution({id: 10} as unknown as TaskExecution);
 
