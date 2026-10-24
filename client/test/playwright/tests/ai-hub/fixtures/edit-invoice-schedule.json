@@ -8,8 +8,10 @@
             "name": "trigger_1",
             "type": "schedule/v1/everyDay",
             "parameters": {
+                "dayOfWeek": [1, 2, 3, 4, 5, 6, 7],
                 "hour": 8,
-                "minute": 0
+                "minute": 0,
+                "timezone": "UTC"
             }
         }
     ],
