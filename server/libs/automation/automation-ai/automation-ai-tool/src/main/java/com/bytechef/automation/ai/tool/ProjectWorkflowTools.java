@@ -362,9 +362,9 @@ public class ProjectWorkflowTools {
     public String saveWorkflowTestConnection(
         @ToolParam(description = "The id of the workflow the node belongs to") String workflowId,
         @ToolParam(
-            description = "The workflow node (task or trigger) name the connection is for, e.g. 'sendChannelMessage_1'") String workflowNodeName,
+            description = "The workflow node the connection is for: a task or trigger name, e.g. 'sendChannelMessage_1', or the name of a cluster element inside it, e.g. an AI Agent's model 'model_1'") String workflowNodeName,
         @ToolParam(
-            description = "The connection key declared in the node's 'connections' block — usually the component name, e.g. 'slack'") String connectionKey,
+            description = "The connection key declared in the node's 'connections' block, usually the component name, e.g. 'slack'. Ignored for a cluster element, whose own name is its key") String connectionKey,
         @ToolParam(description = "The id of the connection the user picked") long connectionId,
         ToolContext toolContext) {
 
@@ -412,10 +412,9 @@ public class ProjectWorkflowTools {
                 connectionKey, connectionId, e);
 
             throw new ExecutionException(
-                ("Could not bind connection %d to node '%s' (key '%s'): %s. This node was NOT connected — tell the "
-                    + "user and do not report it as done. If it is an AI model or other element inside an AI Agent, it "
-                    + "must be connected from the workflow editor. Otherwise verify the connection exists in the "
-                    + "current environment and that the connection key matches the node.")
+                ("Could not bind connection %d to node '%s' (key '%s'): %s. This node was NOT connected; tell the "
+                    + "user and do not report it as done. Verify the node name, that the connection exists in the "
+                    + "current environment, and that the connection key matches the node.")
                         .formatted(connectionId, workflowNodeName, connectionKey, e.getMessage()),
                 e, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION);
         }
