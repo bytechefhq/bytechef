@@ -320,6 +320,8 @@ Tools turn workflow components into actions the agent can call mid-conversation.
 > [test run](/platform/automation/build/workflows/workflows#run-test-and-the-output-panel) executes and
 > afterwards on the [execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows)
 > of a deployed run.
+>
+> The tool call rows described below are coming soon too.
 
 A tool turns blue while the agent calls it, then green with its duration when the call returns, or red
 when the call throws an error; its wire from the Tools slot follows. What counts:
@@ -344,7 +346,7 @@ execution detail:
 - **One row per call**, in the order the calls happened. A tool called several times gets numbered
   rows, such as `fetch_ok` and `fetch_ok #2`.
 - **Selecting a row** shows that call's **Input**, **Output** or **Error**, and its **Logs** show only
-  the entries from that call. The agent's own **Logs** tab is unchanged.
+  the entries from that call. A tool backed by an external provider, such as an MCP Client tool, has no logs of its own, so its **Logs** tab is empty. The agent's own **Logs** tab is unchanged.
 - **Rows appear live.** During a test run a row shows up as soon as the call starts, and fills in when
   it returns.
 - **A Task Tool sub-agent is a row too**, with the tools it called nested under it.
