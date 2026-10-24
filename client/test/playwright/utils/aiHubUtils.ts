@@ -824,3 +824,115 @@ export async function listProjectWorkflowIds(page: Page, projectId: number): Pro
 
     return ((await response.json()) as Array<{id: string}>).map((workflow) => workflow.id);
 }
+
+export interface WorkflowNodeI {
+    name: string;
+    parameters: Record<string, unknown>;
+    type: string;
+}
+
+const isWorkflowNode = (value: unknown): value is WorkflowNodeI =>
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as {type?: unknown}).type === 'string' &&
+    /^[A-Za-z0-9]+\/v\d+/.test((value as {type: string}).type);
+
+function collectWorkflowNodes(value: unknown, workflowNodes: WorkflowNodeI[]): void {
+    if (Array.isArray(value)) {
+        value.forEach((item) => collectWorkflowNodes(item, workflowNodes));
+
+        return;
+    }
+
+    if (typeof value !== 'object' || value === null) {
+        return;
+    }
+
+    if (isWorkflowNode(value)) {
+        workflowNodes.push({
+            name: String((value as {name?: unknown}).name ?? ''),
+            parameters: ((value as {parameters?: unknown}).parameters ?? {}) as Record<string, unknown>,
+            type: value.type,
+        });
+    }
+
+    Object.values(value).forEach((child) => collectWorkflowNodes(child, workflowNodes));
+}
+
+/**
+ * Reads every node of a saved workflow: triggers, tasks, the tasks nested in task dispatchers, and every cluster
+ * element, at any depth.
+ */
+export async function readWorkflowNodes(page: Page, workflowId: string): Promise<WorkflowNodeI[]> {
+    const response = await page.request.get(`${WORKFLOWS_API_PATH}/${workflowId}`);
+
+    await expectOk(response, `reading workflow ${workflowId}`);
+
+    const workflow = (await response.json()) as {definition?: string};
+    const definition = JSON.parse(workflow.definition ?? '{}') as {tasks?: unknown[]; triggers?: unknown[]};
+    const workflowNodes: WorkflowNodeI[] = [];
+
+    collectWorkflowNodes([...(definition.triggers ?? []), ...(definition.tasks ?? [])], workflowNodes);
+
+    return workflowNodes;
+}
+
+export async function createDataTableThroughApi(
+    page: Page,
+    {
+        baseName,
+        columns,
+        environmentId,
+        workspaceId,
+    }: {baseName: string; columns: Array<{name: string; type: string}>; environmentId: number; workspaceId: number}
+): Promise<string> {
+    await postGraphQl(
+        page,
+        'mutation createDataTable($input: CreateDataTableInput!) { createDataTable(input: $input) }',
+        {
+            input: {baseName, columns, environmentId: String(environmentId), workspaceId: String(workspaceId)},
+        }
+    );
+
+    const data = await postGraphQl<{dataTables: Array<{baseName: string; id: string}>}>(
+        page,
+        'query dataTables($environmentId: ID!, $workspaceId: ID!) { dataTables(environmentId: $environmentId, workspaceId: $workspaceId) { id baseName } }',
+        {environmentId: String(environmentId), workspaceId: String(workspaceId)}
+    );
+
+    const dataTable = data.dataTables.find((candidate) => candidate.baseName === baseName);
+
+    expect(dataTable, `data table ${baseName} was not created`).toBeDefined();
+
+    return dataTable!.id;
+}
+
+export async function dropDataTableThroughApi(
+    page: Page,
+    {environmentId, tableId}: {environmentId: number; tableId: string}
+): Promise<void> {
+    const response = await page.request.post('/graphql', {
+        data: {
+            query: 'mutation dropDataTable($input: RemoveTableInput!) { dropDataTable(input: $input) }',
+            variables: {input: {environmentId: String(environmentId), tableId}},
+        },
+        headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
+    });
+
+    if (!response.ok()) {
+        console.warn(`Failed to drop data table ${tableId}: ${response.status()}`);
+    }
+}
+
+export async function listConnections(
+    page: Page,
+    {componentName, environmentId, workspaceId}: {componentName: string; environmentId: number; workspaceId: number}
+): Promise<Array<{id: number; name: string}>> {
+    const response = await page.request.get(
+        `/api/automation/internal/workspaces/${workspaceId}/connections?componentName=${componentName}&environmentId=${environmentId}`
+    );
+
+    await expectOk(response, `listing ${componentName} connections`);
+
+    return (await response.json()) as Array<{id: number; name: string}>;
+}

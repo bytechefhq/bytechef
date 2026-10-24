@@ -1,0 +1,348 @@
+import {type Page, expect, mergeTests} from '@playwright/test';
+
+import {loginTest} from '../../fixtures';
+import {AiHubPage} from '../../pages/aiHubPage';
+import {
+    type AiHubChatRefI,
+    calledToolNames,
+    createAnthropicConnectionThroughApi,
+    createDataTableThroughApi,
+    deleteConnectionThroughApi,
+    deleteProjectThroughApi,
+    dropDataTableThroughApi,
+    findProjectByName,
+    listConnections,
+    listProjectWorkflowIds,
+    readAppEnvironmentId,
+    readChatToolEvents,
+    readWorkflowNodes,
+    waitForHubWorkspaceId,
+} from '../../utils/aiHubUtils';
+import {hideReactQueryDevtools} from '../../utils/copilotUtils';
+import getRandomString from '../../utils/getRandomString';
+
+const test = mergeTests(loginTest());
+
+const LIVE_TURN_TIMEOUT = 840000;
+
+const CARD_CHROME_BUTTON_NAMES = new Set(['Copy', 'Dismiss', 'Other…', 'Refresh', 'Retry']);
+
+const MAX_QUESTION_ROUNDS = 4;
+
+interface LiveHubI {
+    aiHubPage: AiHubPage;
+    environmentId: number;
+    workspaceId: number;
+}
+
+async function openLiveHub(page: Page): Promise<LiveHubI> {
+    await hideReactQueryDevtools(page);
+
+    const aiHubPage = new AiHubPage(page);
+    const hubWorkspaceId = waitForHubWorkspaceId(page);
+
+    await aiHubPage.goto();
+
+    const workspaceId = await hubWorkspaceId;
+
+    await aiHubPage.setBuildMode(true);
+
+    return {aiHubPage, environmentId: await readAppEnvironmentId(page), workspaceId};
+}
+
+const liveTurn = async (aiHubPage: AiHubPage, text: string) => {
+    await aiHubPage.sendAndWaitForTurnEnd(text, LIVE_TURN_TIMEOUT);
+
+    await expect(aiHubPage.runErrors).toHaveCount(0);
+};
+
+const shortName = (prefix: string) => `${prefix}_${getRandomString().slice(0, 8)}`;
+
+const currentChat = (aiHubPage: AiHubPage, workspaceId: number): Omit<AiHubChatRefI, 'threadId'> => ({
+    id: aiHubPage.currentChatId(),
+    workspaceId,
+});
+
+async function readProjectWorkflowNodes(page: Page, workspaceId: number, projectName: string) {
+    const project = await findProjectByName(page, workspaceId, projectName);
+
+    expect(project, `project ${projectName} was created`).toBeDefined();
+
+    const [workflowId] = await listProjectWorkflowIds(page, project!.id);
+
+    return readWorkflowNodes(page, workflowId);
+}
+
+async function readLastToolResults(page: Page, chat: Omit<AiHubChatRefI, 'threadId'>, toolName: string) {
+    const toolEvents = await readChatToolEvents(page, chat);
+    const toolCallIds = toolEvents
+        .filter((toolEvent) => toolEvent.kind === 'call' && toolEvent.name === toolName)
+        .map((toolEvent) => toolEvent.id);
+
+    return toolEvents
+        .filter((toolEvent) => toolEvent.kind === 'result' && toolCallIds.includes(toolEvent.id))
+        .map((toolEvent) => toolEvent.response ?? '');
+}
+
+/**
+ * Answers the question cards the turn ends with, one round at a time, until the last assistant message offers no more
+ * options. Returns the answers given, keyed by the question card's text.
+ */
+async function answerQuestionCards(
+    aiHubPage: AiHubPage,
+    chooseOption: (cardText: string, optionNames: string[]) => string
+): Promise<Map<string, string>> {
+    const answers = new Map<string, string>();
+
+    for (let round = 0; round < MAX_QUESTION_ROUNDS; round++) {
+        const lastMessage = aiHubPage.assistantMessages.last();
+        const optionNames = (await lastMessage.getByRole('button').allInnerTexts())
+            .map((optionName) => optionName.trim())
+            .filter(
+                (optionName) =>
+                    optionName && !CARD_CHROME_BUTTON_NAMES.has(optionName) && !optionName.startsWith('Connect ')
+            );
+
+        if (optionNames.length === 0) {
+            break;
+        }
+
+        const cardText = await lastMessage.innerText();
+        const optionName = chooseOption(cardText, optionNames);
+
+        answers.set(cardText, optionName);
+
+        await lastMessage.getByRole('button', {exact: true, name: optionName}).click();
+
+        await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+
+        await expect(aiHubPage.runErrors).toHaveCount(0);
+    }
+
+    return answers;
+}
+
+async function deleteProjectByName(page: Page, workspaceId: number, projectName: string) {
+    const project = await findProjectByName(page, workspaceId, projectName);
+
+    if (project) {
+        await deleteProjectThroughApi(page, project.id);
+    }
+}
+
+test.describe('@live AI Hub cards', () => {
+    test.skip(!process.env.PLAYWRIGHT_LIVE, 'Set PLAYWRIGHT_LIVE=1 to run against a live server and model');
+
+    test.describe.configure({timeout: 1200000});
+
+    test('a question the builder asks is answered from its card and the answer reaches the workflow', async ({
+        authenticatedPage: page,
+    }) => {
+        const {aiHubPage, workspaceId} = await openLiveHub(page);
+        const projectName = shortName('hub_question');
+
+        try {
+            await liveTurn(
+                aiHubPage,
+                `Create a new project "${projectName}" with a workflow: when a webhook receives a new signup ` +
+                    '(name, email, plan), post a message about it to Slack. I have not decided which Slack channel ' +
+                    'yet, so ask me which channel to use before you finish the workflow.'
+            );
+
+            let pickedChannel: string | undefined;
+
+            await answerQuestionCards(aiHubPage, (cardText, optionNames) => {
+                if (/channel/i.test(cardText)) {
+                    pickedChannel = optionNames[0];
+                }
+
+                return optionNames[0];
+            });
+
+            expect(pickedChannel, 'the builder asked for the channel').toBeDefined();
+
+            const workflowNodes = await readProjectWorkflowNodes(page, workspaceId, projectName);
+            const slackNode = workflowNodes.find((workflowNode) => workflowNode.type.startsWith('slack/v1/'));
+
+            expect(slackNode, 'the workflow posts to Slack').toBeDefined();
+
+            expect(JSON.stringify(slackNode!.parameters)).toContain(pickedChannel!.replace(/^#/, ''));
+        } finally {
+            await deleteProjectByName(page, workspaceId, projectName);
+        }
+    });
+
+    test('Connect creates a connection from the card and the agent binds it to the model inside the agent', async ({
+        authenticatedPage: page,
+    }) => {
+        const {aiHubPage, environmentId, workspaceId} = await openLiveHub(page);
+        const projectName = shortName('hub_connect');
+        const connectionName = shortName('mistral_card');
+
+        expect(
+            await listConnections(page, {componentName: 'mistral', environmentId, workspaceId}),
+            'the Connect card only appears when no Mistral connection exists yet'
+        ).toHaveLength(0);
+
+        try {
+            await liveTurn(
+                aiHubPage,
+                `Create a new project "${projectName}" with a workflow: a chat agent that answers questions with a ` +
+                    'Mistral model (mistral-large-latest). Then help me connect Mistral.'
+            );
+
+            await answerQuestionCards(aiHubPage, (cardText, optionNames) => optionNames[0]);
+
+            await test.step('Create the connection from the Connect card', async () => {
+                await aiHubPage.assistantMessages.last().getByRole('button', {name: 'Connect Mistral'}).click();
+
+                const dialog = page.getByRole('dialog', {name: 'Create Connection'});
+
+                await dialog.getByRole('textbox', {name: 'Name'}).fill(connectionName);
+                await dialog.getByRole('textbox', {name: 'Token *'}).fill(`mistral-playwright-${getRandomString()}`);
+                await dialog.getByRole('button', {name: 'Save'}).click();
+
+                await expect(page.getByText(/Connection ready/).last()).toBeVisible({timeout: 60000});
+            });
+
+            await test.step('The agent binds it to the model element', async () => {
+                await liveTurn(aiHubPage, `I created the ${connectionName} connection. Bind it to the workflow.`);
+
+                const bindResults = await readLastToolResults(
+                    page,
+                    currentChat(aiHubPage, workspaceId),
+                    'saveWorkflowTestConnection'
+                );
+
+                expect(bindResults.at(-1), 'the model connection was bound').toMatch(/has been bound/);
+            });
+        } finally {
+            await deleteProjectByName(page, workspaceId, projectName);
+
+            for (const connection of await listConnections(page, {
+                componentName: 'mistral',
+                environmentId,
+                workspaceId,
+            })) {
+                if (connection.name === connectionName) {
+                    await deleteConnectionThroughApi(page, connection.id);
+                }
+            }
+        }
+    });
+
+    test('a property option card lists the real data tables and the pick reaches the workflow', async ({
+        authenticatedPage: page,
+    }) => {
+        const {aiHubPage, environmentId, workspaceId} = await openLiveHub(page);
+        const projectName = shortName('hub_table_pick');
+        const tableNames = [shortName('ledger'), shortName('archive')];
+        const tableIds: string[] = [];
+
+        try {
+            for (const tableName of tableNames) {
+                tableIds.push(
+                    await createDataTableThroughApi(page, {
+                        baseName: tableName,
+                        columns: [{name: 'note', type: 'STRING'}],
+                        environmentId,
+                        workspaceId,
+                    })
+                );
+            }
+
+            await liveTurn(
+                aiHubPage,
+                `Create a new project "${projectName}" with a workflow: a manual trigger, then add a record with a ` +
+                    '"note" field set to "hello" to one of my existing data tables. Do not create a table; let me ' +
+                    'pick which existing data table to use.'
+            );
+
+            const pickedTableName = tableNames[1];
+            const lastMessage = aiHubPage.assistantMessages.last();
+            const optionPicker = lastMessage.getByRole('combobox');
+
+            if ((await optionPicker.count()) > 0) {
+                await optionPicker.first().click();
+
+                await page.getByRole('option', {name: pickedTableName}).click();
+            } else {
+                await lastMessage.getByRole('button', {exact: true, name: pickedTableName}).click();
+            }
+
+            await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+
+            const workflowNodes = await readProjectWorkflowNodes(page, workspaceId, projectName);
+            const createRecordsNode = workflowNodes.find(
+                (workflowNode) => workflowNode.type === 'dataTable/v1/createRecords'
+            );
+
+            expect(createRecordsNode?.parameters.table).toBe(pickedTableName);
+
+            expect(calledToolNames(await readChatToolEvents(page, currentChat(aiHubPage, workspaceId)))).toContain(
+                'lookupActionPropertyOptions'
+            );
+        } finally {
+            await deleteProjectByName(page, workspaceId, projectName);
+
+            for (const tableId of tableIds) {
+                await dropDataTableThroughApi(page, {environmentId, tableId});
+            }
+        }
+    });
+
+    test('the connection picker binds an existing connection to the model inside an agent', async ({
+        authenticatedPage: page,
+    }) => {
+        const {aiHubPage, environmentId, workspaceId} = await openLiveHub(page);
+        const projectName = shortName('hub_model_pick');
+        const connectionNames = [shortName('anthropic_a'), shortName('anthropic_b')];
+        const connectionIds: number[] = [];
+
+        try {
+            for (const connectionName of connectionNames) {
+                connectionIds.push(
+                    await createAnthropicConnectionThroughApi(page, {
+                        apiKey: `sk-ant-playwright-${getRandomString()}`,
+                        environmentId,
+                        name: connectionName,
+                        workspaceId,
+                    })
+                );
+            }
+
+            await liveTurn(
+                aiHubPage,
+                `Create a new project "${projectName}" with a workflow: a chat agent that answers questions with an ` +
+                    'Anthropic Claude model (claude-sonnet-4-5). Let me pick which Anthropic connection the model ' +
+                    'uses.'
+            );
+
+            await answerQuestionCards(aiHubPage, (cardText, optionNames) => optionNames[0]);
+
+            const connectionPicker = page.getByRole('combobox').filter({hasText: /Choose Anthropic connection/});
+
+            await expect(connectionPicker.last()).toBeVisible();
+
+            await connectionPicker.last().click();
+
+            await page.getByRole('option', {name: connectionNames[1]}).click();
+
+            await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+
+            const bindResults = await readLastToolResults(
+                page,
+                currentChat(aiHubPage, workspaceId),
+                'saveWorkflowTestConnection'
+            );
+
+            expect(bindResults.at(-1), 'the picked connection was bound to the model').toMatch(/has been bound/);
+        } finally {
+            await deleteProjectByName(page, workspaceId, projectName);
+
+            for (const connectionId of connectionIds) {
+                await deleteConnectionThroughApi(page, connectionId);
+            }
+        }
+    });
+});
