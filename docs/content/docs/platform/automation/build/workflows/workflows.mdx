@@ -549,6 +549,19 @@ The icon button after **Publish** and **Deploy** (tooltip: "Show the current wor
 execution output") toggles the Output panel open or closed on its own, so you can revisit the last
 run's result without triggering a new one.
 
+> **Coming soon.** The canvas follows a test run as it executes. A task turns blue while it runs, then
+> green with its duration when it completes or red when it fails, and the wires along the path the run
+> took are coloured the same way, so a branch the run did not take stays grey. A task that runs more
+> than once, inside a loop for example, shows its total time once the run has finished. Stopping a run,
+> or a run that fails, clears the tasks that were still running. The Output panel lays out its task
+> list and details panes as soon as the run starts, filling them in as tasks report back.
+>
+> The tools an [AI Agent](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran)
+> calls are coloured the same way inside its frame and in the cluster element dialog. When the agent is
+> drawn as a compact card, the card takes the agent's own status and each element icon gets a ring in
+> the colour of the elements behind it - red if any of them failed, blue if any is still running,
+> otherwise green.
+
 ### Settings menu
 
 The gear icon at the right end of the header opens the settings menu, with a **Workflow** tab for the
