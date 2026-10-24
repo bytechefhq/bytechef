@@ -46,6 +46,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
@@ -182,6 +183,62 @@ class ProjectWorkflowToolsTest {
 
             assertThatCode(() -> tools.updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext))
                 .doesNotThrowAnyException();
+        }
+
+        @Test
+        void testCreateProjectWorkflowFillsTheEmptyWorkflowTheBuildRequestNamed() {
+            List<Map<String, Object>> captures = Collections.synchronizedList(new ArrayList<>());
+
+            when(toolContext.getContext()).thenReturn(Map.of(
+                "bytechef.workflowEditor.persistedWorkflows", captures,
+                "bytechef.workflowEditor.targetWorkflowId", "wf-target"));
+            when(projectWorkflowFacade.getWorkflowProjectId("wf-target")).thenReturn(7L);
+            when(projectWorkflowFacade.getProjectWorkflow("wf-target")).thenReturn(buildDto("wf-target", 66L, 2));
+            when(projectWorkflowFacade.updateWorkflow("wf-target", DEFINITION, 2))
+                .thenReturn(buildDto("wf-target", 66L, 3));
+
+            ProjectWorkflowInfo projectWorkflowInfo = newTools().createProjectWorkflow(7L, DEFINITION, toolContext);
+
+            assertThat(projectWorkflowInfo.workflowId()).isEqualTo("wf-target");
+            assertThat(captures).hasSize(1);
+            assertThat(captures.get(0))
+                .containsEntry("created", false)
+                .containsEntry("workflowId", "wf-target");
+
+            verify(projectWorkflowFacade, never()).addWorkflow(anyLong(), anyString());
+        }
+
+        @Test
+        void testCreateProjectWorkflowLeavesANamedWorkflowThatAlreadyHasTasks() {
+            Workflow workflow = new Workflow(
+                "wf-target", """
+                    {"label": "Built", "tasks": [{"name": "logger_1", "type": "logger/v1/info", "parameters": {}}]}""",
+                Workflow.Format.JSON);
+
+            when(toolContext.getContext()).thenReturn(Map.of("bytechef.workflowEditor.targetWorkflowId", "wf-target"));
+            when(projectWorkflowFacade.getWorkflowProjectId("wf-target")).thenReturn(7L);
+            when(projectWorkflowFacade.getProjectWorkflow("wf-target"))
+                .thenReturn(new ProjectWorkflowDTO(workflow, new ProjectWorkflow(66L), false));
+            when(projectWorkflowFacade.addWorkflow(7L, DEFINITION)).thenReturn(buildProjectWorkflow(55L, 7L, "wf-new"));
+
+            ProjectWorkflowInfo projectWorkflowInfo = newTools().createProjectWorkflow(7L, DEFINITION, toolContext);
+
+            assertThat(projectWorkflowInfo.workflowId()).isEqualTo("wf-new");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
+
+        @Test
+        void testCreateProjectWorkflowIgnoresANamedWorkflowOfAnotherProject() {
+            when(toolContext.getContext()).thenReturn(Map.of("bytechef.workflowEditor.targetWorkflowId", "wf-target"));
+            when(projectWorkflowFacade.getWorkflowProjectId("wf-target")).thenReturn(8L);
+            when(projectWorkflowFacade.addWorkflow(7L, DEFINITION)).thenReturn(buildProjectWorkflow(55L, 7L, "wf-new"));
+
+            ProjectWorkflowInfo projectWorkflowInfo = newTools().createProjectWorkflow(7L, DEFINITION, toolContext);
+
+            assertThat(projectWorkflowInfo.workflowId()).isEqualTo("wf-new");
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflow("wf-target");
         }
     }
 
@@ -756,6 +813,37 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
+        void testSearchWorkflowsSearchesAGivenProjectTheCallerCanView() {
+            PermissionService permissionService = mock(PermissionService.class);
+
+            when(permissionService.hasWorkspaceScopeForProject(10L, ScopedProjectGuard.WORKFLOW_VIEW))
+                .thenReturn(true);
+            when(projectWorkflowFacade.getProjectWorkflows(10L)).thenReturn(List.of(buildDto("wf-1", 1L, 1)));
+
+            List<WorkflowInfo> result =
+                newToolsCheckedBy(permissionService).searchWorkflows("flow", 10L, null, toolContext);
+
+            assertThat(result).hasSize(1);
+        }
+
+        @Test
+        void testSearchWorkflowsRejectsAGivenProjectTheCallerCannotView() {
+            PermissionService permissionService = mock(PermissionService.class);
+
+            when(permissionService.hasWorkspaceScopeForProject(10L, ScopedProjectGuard.WORKFLOW_VIEW))
+                .thenReturn(false);
+
+            ProjectWorkflowTools tools = newToolsCheckedBy(permissionService);
+
+            assertThatCode(() -> tools.searchWorkflows("flow", 10L, null, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("Project 10 was not found or you do not have access to it.");
+
+            verify(projectWorkflowFacade, never()).getProjectWorkflows(anyLong());
+            verify(projectFacade, never()).getWorkspaceProjectWorkflows(anyLong());
+        }
+
+        @Test
         void testSearchWorkflowsRequiresAProjectOrAWorkspace() {
             when(toolContext.getContext()).thenReturn(Map.of());
 
@@ -892,6 +980,14 @@ class ProjectWorkflowToolsTest {
 
     private ProjectWorkflowTools newTools() {
         return newTools(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private ProjectWorkflowTools newToolsCheckedBy(PermissionService permissionService) {
+        return new ProjectWorkflowTools(
+            componentDefinitionFacade, projectFacade, projectWorkflowFacade,
+            new ScopedProjectGuard(permissionService, projectWorkflowService, scopedConnectionGuard),
+            mock(ObjectProvider.class), workspaceConnectionFacade, workspaceFacade);
     }
 
     @SuppressWarnings("unchecked")
