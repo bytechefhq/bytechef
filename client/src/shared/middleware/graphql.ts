@@ -927,6 +927,84 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 
 export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, enforceToolAuthorization: boolean, authenticationRequired: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null, mcpTools: Array<{ id: string } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
+export type CreateDataSyncMutationVariables = Exact<{
+  input: Types.CreateDataSyncInput;
+}>;
+
+
+export type CreateDataSyncMutation = { createDataSync: { id: string, projectId: string } };
+
+export type DataSyncQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DataSyncQuery = { dataSync: { id: string, name: string, title: string, description: string | null, workspaceId: string | null, projectId: string, uuid: string, projectWorkflowUuid: string, triggerType: Types.DataSyncTriggerType, triggerParameters: any, unpublishedChanges: boolean, lastPublishedVersion: number, publishedDate: string | null, lastModifiedDate: string | null, draftWorkflowId: string, elements: Array<{ id: string, kind: Types.DataSyncElementKind, componentName: string, componentVersion: number, operationName: string, parameters: any, connectionId: string | null }> } | null };
+
+export type DataSyncDeploymentsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type DataSyncDeploymentsQuery = { dataSyncDeployments: Array<{ id: string, name: string, dataSyncId: string, dataSyncTitle: string, projectId: string, environmentId: number, enabled: boolean, projectVersion: number, triggerType: Types.DataSyncTriggerType, workflowId: string, lastExecutionDate: string | null }> };
+
+export type DataSyncVersionsQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DataSyncVersionsQuery = { dataSyncVersions: Array<{ version: number, description: string | null, publishedDate: string | null, status: string }> };
+
+export type DataSyncsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type DataSyncsQuery = { dataSyncs: Array<{ id: string, name: string, title: string, description: string | null, projectId: string, projectWorkflowUuid: string, triggerType: Types.DataSyncTriggerType, triggerParameters: any, unpublishedChanges: boolean, lastPublishedVersion: number, publishedDate: string | null, lastModifiedDate: string | null, elements: Array<{ id: string, kind: Types.DataSyncElementKind, componentName: string, componentVersion: number, operationName: string }> }> };
+
+export type DeleteDataSyncMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteDataSyncMutation = { deleteDataSync: boolean };
+
+export type RunDataSyncDeploymentMutationVariables = Exact<{
+  id: string | number;
+  projectDeploymentId: string | number;
+}>;
+
+
+export type RunDataSyncDeploymentMutation = { runDataSyncDeployment: string };
+
+export type SetDataSyncElementMutationVariables = Exact<{
+  input: Types.SetDataSyncElementInput;
+}>;
+
+
+export type SetDataSyncElementMutation = { setDataSyncElement: { id: string, kind: Types.DataSyncElementKind, componentName: string, componentVersion: number, operationName: string, parameters: any, connectionId: string | null } };
+
+export type UpdateDataSyncMutationVariables = Exact<{
+  input: Types.UpdateDataSyncInput;
+}>;
+
+
+export type UpdateDataSyncMutation = { updateDataSync: { id: string, title: string, description: string | null } };
+
+export type UpdateDataSyncElementMutationVariables = Exact<{
+  input: Types.UpdateDataSyncElementInput;
+}>;
+
+
+export type UpdateDataSyncElementMutation = { updateDataSyncElement: boolean };
+
+export type UpdateDataSyncTriggerMutationVariables = Exact<{
+  input: Types.UpdateDataSyncTriggerInput;
+}>;
+
+
+export type UpdateDataSyncTriggerMutation = { updateDataSyncTrigger: boolean };
+
 export type AddDataTableColumnMutationVariables = Exact<{
   input: Types.AddColumnInput;
 }>;
@@ -5637,6 +5715,304 @@ export const useWorkspaceMcpServersQuery = <
       {
     queryKey: ['workspaceMcpServers', variables],
     queryFn: fetcher<WorkspaceMcpServersQuery, WorkspaceMcpServersQueryVariables>(WorkspaceMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateDataSyncDocument = new TypedDocumentString(`
+    mutation createDataSync($input: CreateDataSyncInput!) {
+  createDataSync(input: $input) {
+    id
+    projectId
+  }
+}
+    `);
+
+export const useCreateDataSyncMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateDataSyncMutation, TError, CreateDataSyncMutationVariables, TContext>) => {
+    
+    return useMutation<CreateDataSyncMutation, TError, CreateDataSyncMutationVariables, TContext>(
+      {
+    mutationKey: ['createDataSync'],
+    mutationFn: (variables?: CreateDataSyncMutationVariables) => fetcher<CreateDataSyncMutation, CreateDataSyncMutationVariables>(CreateDataSyncDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DataSyncDocument = new TypedDocumentString(`
+    query dataSync($id: ID!) {
+  dataSync(id: $id) {
+    id
+    name
+    title
+    description
+    workspaceId
+    projectId
+    uuid
+    projectWorkflowUuid
+    triggerType
+    triggerParameters
+    elements {
+      id
+      kind
+      componentName
+      componentVersion
+      operationName
+      parameters
+      connectionId
+    }
+    unpublishedChanges
+    lastPublishedVersion
+    publishedDate
+    lastModifiedDate
+    draftWorkflowId
+  }
+}
+    `);
+
+export const useDataSyncQuery = <
+      TData = DataSyncQuery,
+      TError = unknown
+    >(
+      variables: DataSyncQueryVariables,
+      options?: Omit<UseQueryOptions<DataSyncQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataSyncQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataSyncQuery, TError, TData>(
+      {
+    queryKey: ['dataSync', variables],
+    queryFn: fetcher<DataSyncQuery, DataSyncQueryVariables>(DataSyncDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataSyncDeploymentsDocument = new TypedDocumentString(`
+    query dataSyncDeployments($workspaceId: ID!) {
+  dataSyncDeployments(workspaceId: $workspaceId) {
+    id
+    name
+    dataSyncId
+    dataSyncTitle
+    projectId
+    environmentId
+    enabled
+    projectVersion
+    triggerType
+    workflowId
+    lastExecutionDate
+  }
+}
+    `);
+
+export const useDataSyncDeploymentsQuery = <
+      TData = DataSyncDeploymentsQuery,
+      TError = unknown
+    >(
+      variables: DataSyncDeploymentsQueryVariables,
+      options?: Omit<UseQueryOptions<DataSyncDeploymentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataSyncDeploymentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataSyncDeploymentsQuery, TError, TData>(
+      {
+    queryKey: ['dataSyncDeployments', variables],
+    queryFn: fetcher<DataSyncDeploymentsQuery, DataSyncDeploymentsQueryVariables>(DataSyncDeploymentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataSyncVersionsDocument = new TypedDocumentString(`
+    query dataSyncVersions($id: ID!) {
+  dataSyncVersions(id: $id) {
+    version
+    description
+    publishedDate
+    status
+  }
+}
+    `);
+
+export const useDataSyncVersionsQuery = <
+      TData = DataSyncVersionsQuery,
+      TError = unknown
+    >(
+      variables: DataSyncVersionsQueryVariables,
+      options?: Omit<UseQueryOptions<DataSyncVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataSyncVersionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataSyncVersionsQuery, TError, TData>(
+      {
+    queryKey: ['dataSyncVersions', variables],
+    queryFn: fetcher<DataSyncVersionsQuery, DataSyncVersionsQueryVariables>(DataSyncVersionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataSyncsDocument = new TypedDocumentString(`
+    query dataSyncs($workspaceId: ID!) {
+  dataSyncs(workspaceId: $workspaceId) {
+    id
+    name
+    title
+    description
+    projectId
+    projectWorkflowUuid
+    triggerType
+    triggerParameters
+    elements {
+      id
+      kind
+      componentName
+      componentVersion
+      operationName
+    }
+    unpublishedChanges
+    lastPublishedVersion
+    publishedDate
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useDataSyncsQuery = <
+      TData = DataSyncsQuery,
+      TError = unknown
+    >(
+      variables: DataSyncsQueryVariables,
+      options?: Omit<UseQueryOptions<DataSyncsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataSyncsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataSyncsQuery, TError, TData>(
+      {
+    queryKey: ['dataSyncs', variables],
+    queryFn: fetcher<DataSyncsQuery, DataSyncsQueryVariables>(DataSyncsDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteDataSyncDocument = new TypedDocumentString(`
+    mutation deleteDataSync($id: ID!) {
+  deleteDataSync(id: $id)
+}
+    `);
+
+export const useDeleteDataSyncMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteDataSyncMutation, TError, DeleteDataSyncMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteDataSyncMutation, TError, DeleteDataSyncMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteDataSync'],
+    mutationFn: (variables?: DeleteDataSyncMutationVariables) => fetcher<DeleteDataSyncMutation, DeleteDataSyncMutationVariables>(DeleteDataSyncDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RunDataSyncDeploymentDocument = new TypedDocumentString(`
+    mutation runDataSyncDeployment($id: ID!, $projectDeploymentId: ID!) {
+  runDataSyncDeployment(id: $id, projectDeploymentId: $projectDeploymentId)
+}
+    `);
+
+export const useRunDataSyncDeploymentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RunDataSyncDeploymentMutation, TError, RunDataSyncDeploymentMutationVariables, TContext>) => {
+    
+    return useMutation<RunDataSyncDeploymentMutation, TError, RunDataSyncDeploymentMutationVariables, TContext>(
+      {
+    mutationKey: ['runDataSyncDeployment'],
+    mutationFn: (variables?: RunDataSyncDeploymentMutationVariables) => fetcher<RunDataSyncDeploymentMutation, RunDataSyncDeploymentMutationVariables>(RunDataSyncDeploymentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetDataSyncElementDocument = new TypedDocumentString(`
+    mutation setDataSyncElement($input: SetDataSyncElementInput!) {
+  setDataSyncElement(input: $input) {
+    id
+    kind
+    componentName
+    componentVersion
+    operationName
+    parameters
+    connectionId
+  }
+}
+    `);
+
+export const useSetDataSyncElementMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetDataSyncElementMutation, TError, SetDataSyncElementMutationVariables, TContext>) => {
+    
+    return useMutation<SetDataSyncElementMutation, TError, SetDataSyncElementMutationVariables, TContext>(
+      {
+    mutationKey: ['setDataSyncElement'],
+    mutationFn: (variables?: SetDataSyncElementMutationVariables) => fetcher<SetDataSyncElementMutation, SetDataSyncElementMutationVariables>(SetDataSyncElementDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateDataSyncDocument = new TypedDocumentString(`
+    mutation updateDataSync($input: UpdateDataSyncInput!) {
+  updateDataSync(input: $input) {
+    id
+    title
+    description
+  }
+}
+    `);
+
+export const useUpdateDataSyncMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateDataSyncMutation, TError, UpdateDataSyncMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateDataSyncMutation, TError, UpdateDataSyncMutationVariables, TContext>(
+      {
+    mutationKey: ['updateDataSync'],
+    mutationFn: (variables?: UpdateDataSyncMutationVariables) => fetcher<UpdateDataSyncMutation, UpdateDataSyncMutationVariables>(UpdateDataSyncDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateDataSyncElementDocument = new TypedDocumentString(`
+    mutation updateDataSyncElement($input: UpdateDataSyncElementInput!) {
+  updateDataSyncElement(input: $input)
+}
+    `);
+
+export const useUpdateDataSyncElementMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateDataSyncElementMutation, TError, UpdateDataSyncElementMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateDataSyncElementMutation, TError, UpdateDataSyncElementMutationVariables, TContext>(
+      {
+    mutationKey: ['updateDataSyncElement'],
+    mutationFn: (variables?: UpdateDataSyncElementMutationVariables) => fetcher<UpdateDataSyncElementMutation, UpdateDataSyncElementMutationVariables>(UpdateDataSyncElementDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateDataSyncTriggerDocument = new TypedDocumentString(`
+    mutation updateDataSyncTrigger($input: UpdateDataSyncTriggerInput!) {
+  updateDataSyncTrigger(input: $input)
+}
+    `);
+
+export const useUpdateDataSyncTriggerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateDataSyncTriggerMutation, TError, UpdateDataSyncTriggerMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateDataSyncTriggerMutation, TError, UpdateDataSyncTriggerMutationVariables, TContext>(
+      {
+    mutationKey: ['updateDataSyncTrigger'],
+    mutationFn: (variables?: UpdateDataSyncTriggerMutationVariables) => fetcher<UpdateDataSyncTriggerMutation, UpdateDataSyncTriggerMutationVariables>(UpdateDataSyncTriggerDocument, variables)(),
     ...options
   }
     )};

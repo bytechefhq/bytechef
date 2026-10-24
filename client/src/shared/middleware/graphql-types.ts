@@ -945,6 +945,13 @@ export type CreateApiConnectorInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateDataSyncInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  title: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type CreateDataTableInput = {
   baseName: Scalars['String']['input'];
   columns: Array<ColumnInput>;
@@ -1025,6 +1032,71 @@ export type CustomComponentTriggerDefinition = {
   description?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   title?: Maybe<Scalars['String']['output']>;
+};
+
+export type DataSync = {
+  __typename?: 'DataSync';
+  description?: Maybe<Scalars['String']['output']>;
+  draftWorkflowId: Scalars['String']['output'];
+  elements: Array<DataSyncElement>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  lastPublishedVersion: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  projectId: Scalars['ID']['output'];
+  projectWorkflowUuid: Scalars['String']['output'];
+  publishedDate?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+  triggerParameters?: Maybe<Scalars['Map']['output']>;
+  triggerType: DataSyncTriggerType;
+  unpublishedChanges: Scalars['Boolean']['output'];
+  uuid: Scalars['String']['output'];
+  workspaceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type DataSyncDeployment = {
+  __typename?: 'DataSyncDeployment';
+  dataSyncId: Scalars['ID']['output'];
+  dataSyncTitle: Scalars['String']['output'];
+  enabled: Scalars['Boolean']['output'];
+  environmentId: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  projectId: Scalars['ID']['output'];
+  projectVersion: Scalars['Int']['output'];
+  triggerType: DataSyncTriggerType;
+  workflowId: Scalars['String']['output'];
+};
+
+export type DataSyncElement = {
+  __typename?: 'DataSyncElement';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
+  kind: DataSyncElementKind;
+  operationName: Scalars['String']['output'];
+  parameters?: Maybe<Scalars['Map']['output']>;
+};
+
+export enum DataSyncElementKind {
+  Destination = 'DESTINATION',
+  Processor = 'PROCESSOR',
+  Source = 'SOURCE'
+}
+
+export enum DataSyncTriggerType {
+  Manual = 'MANUAL',
+  Schedule = 'SCHEDULE'
+}
+
+export type DataSyncVersion = {
+  __typename?: 'DataSyncVersion';
+  description?: Maybe<Scalars['String']['output']>;
+  publishedDate?: Maybe<Scalars['String']['output']>;
+  status: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
 };
 
 export type DataTable = {
@@ -1765,6 +1837,7 @@ export type Mutation = {
   createApprovalTask?: Maybe<ApprovalTask>;
   createAutomationWorkflowProject: Scalars['ID']['output'];
   createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
+  createDataSync: DataSync;
   createDataTable: Scalars['Boolean']['output'];
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
   createEmbeddedMcpServer?: Maybe<McpServer>;
@@ -1805,6 +1878,7 @@ export type Mutation = {
   deleteConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
+  deleteDataSync: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -1852,9 +1926,11 @@ export type Mutation = {
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
+  runDataSyncDeployment: Scalars['ID']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  setDataSyncElement: DataSyncElement;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
@@ -1893,6 +1969,9 @@ export type Mutation = {
   updateAutomationWorkflowProject: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
+  updateDataSync: DataSync;
+  updateDataSyncElement: Scalars['Boolean']['output'];
+  updateDataSyncTrigger: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -2062,6 +2141,11 @@ export type MutationCreateAutomationWorkflowProjectWorkflowArgs = {
   definition?: InputMaybe<Scalars['String']['input']>;
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   projectId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateDataSyncArgs = {
+  input: CreateDataSyncInput;
 };
 
 
@@ -2239,6 +2323,11 @@ export type MutationDeleteConnectedUserProjectWorkflowArgs = {
 
 
 export type MutationDeleteCustomComponentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteDataSyncArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2496,6 +2585,12 @@ export type MutationRenameDataTableColumnArgs = {
 };
 
 
+export type MutationRunDataSyncDeploymentArgs = {
+  id: Scalars['ID']['input'];
+  projectDeploymentId: Scalars['ID']['input'];
+};
+
+
 export type MutationSaveClusterElementTestConfigurationConnectionArgs = {
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
@@ -2523,6 +2618,11 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSetDataSyncElementArgs = {
+  input: SetDataSyncElementInput;
 };
 
 
@@ -2722,6 +2822,21 @@ export type MutationUpdateAutomationWorkflowProjectWorkflowArgs = {
 export type MutationUpdateAutomationWorkflowProjectWorkflowPermissionExpressionArgs = {
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateDataSyncArgs = {
+  input: UpdateDataSyncInput;
+};
+
+
+export type MutationUpdateDataSyncElementArgs = {
+  input: UpdateDataSyncElementInput;
+};
+
+
+export type MutationUpdateDataSyncTriggerArgs = {
+  input: UpdateDataSyncTriggerInput;
 };
 
 
@@ -3237,6 +3352,10 @@ export type Query = {
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
   customComponents: Array<CustomComponent>;
+  dataSync?: Maybe<DataSync>;
+  dataSyncDeployments: Array<DataSyncDeployment>;
+  dataSyncVersions: Array<DataSyncVersion>;
+  dataSyncs: Array<DataSync>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
   dataTableTags: Array<Tag>;
@@ -3672,6 +3791,26 @@ export type QueryCustomComponentArgs = {
 
 export type QueryCustomComponentDefinitionArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryDataSyncArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryDataSyncDeploymentsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryDataSyncVersionsArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryDataSyncsArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -4177,6 +4316,16 @@ export type SelectedEndpointInput = {
   path: Scalars['String']['input'];
 };
 
+export type SetDataSyncElementInput = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  dataSyncId: Scalars['ID']['input'];
+  kind: DataSyncElementKind;
+  operationName: Scalars['String']['input'];
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+};
+
 export type SharedProject = {
   __typename?: 'SharedProject';
   description?: Maybe<Scalars['String']['output']>;
@@ -4352,6 +4501,24 @@ export type UpdateApiConnectorInput = {
   icon?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateDataSyncElementInput = {
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+};
+
+export type UpdateDataSyncInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateDataSyncTriggerInput = {
+  id: Scalars['ID']['input'];
+  triggerParameters?: InputMaybe<Scalars['Map']['input']>;
+  triggerType: DataSyncTriggerType;
 };
 
 export type UpdateDataTableTagsInput = {
