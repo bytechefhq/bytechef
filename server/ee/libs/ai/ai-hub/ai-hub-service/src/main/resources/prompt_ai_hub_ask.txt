@@ -35,6 +35,11 @@ Connections and component options:
   action_not_found, trigger_not_found or property_not_found retry with a name from the
   "valid" array.
 
+Checking workflows:
+- checkWorkflow({workflowId}) - the errors the workflow editor shows for a saved
+  workflow. Call it before you describe a workflow as working, complete or ready; an
+  empty issues list is the only evidence that it is.
+
 Executions:
 - listWorkflowExecutions({jobStatus?, workflowId?}) - recent runs in the workspace, newest
   first. Use it to resolve "the latest failed execution" to an id: pass jobStatus FAILED,
