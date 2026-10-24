@@ -44,7 +44,8 @@ public record TaskExecutionDTO(
     int progress, int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis,
     Instant startDate, TaskExecution.Status status, int taskNumber, String title, String type,
     WorkflowTask workflowTask, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations,
-    JobDTO childJob, List<ClusterElementCallDTO> clusterElementCalls) {
+    JobDTO childJob, List<ClusterElementCallDTO> clusterElementCalls,
+    List<ClusterElementCallRecordDTO> clusterElementCallRecords) {
 
     public TaskExecutionDTO(
         TaskExecution taskExecution, String title, String icon, Map<String, ?> input, Object output, JobDTO childJob) {
@@ -58,7 +59,8 @@ public record TaskExecutionDTO(
             taskExecution.getRetryAttempts(), taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(),
             taskExecution.getRetryDelayMillis(), taskExecution.getStartDate(), taskExecution.getStatus(),
             taskExecution.getTaskNumber(), title, taskExecution.getType(), taskExecution.getWorkflowTask(),
-            List.of(), List.of(), childJob, ClusterElementCallDTO.fromMetadata(taskExecution.getMetadata()));
+            List.of(), List.of(), childJob, ClusterElementCallDTO.fromMetadata(taskExecution.getMetadata()),
+            ClusterElementCallRecordDTO.fromMetadata(taskExecution.getMetadata()));
     }
 
     private TaskExecutionDTO(
@@ -74,7 +76,8 @@ public record TaskExecutionDTO(
             taskExecutionDTO.retryAttempts(), taskExecutionDTO.retryDelay(), taskExecutionDTO.retryDelayFactor(),
             taskExecutionDTO.retryDelayMillis(), taskExecutionDTO.startDate(), taskExecutionDTO.status(),
             taskExecutionDTO.taskNumber(), taskExecutionDTO.title(), taskExecutionDTO.type(),
-            taskExecutionDTO.workflowTask(), children, iterations, childJob, taskExecutionDTO.clusterElementCalls());
+            taskExecutionDTO.workflowTask(), children, iterations, childJob, taskExecutionDTO.clusterElementCalls(),
+            taskExecutionDTO.clusterElementCallRecords());
     }
 
     public static List<TaskExecutionDTO> buildHierarchy(List<TaskExecutionDTO> taskExecutionDTOS) {

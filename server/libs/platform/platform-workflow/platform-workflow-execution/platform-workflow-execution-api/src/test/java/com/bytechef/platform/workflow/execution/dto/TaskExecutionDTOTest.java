@@ -202,4 +202,46 @@ class TaskExecutionDTOTest {
             .clusterElementCalls()).extracting(ClusterElementCallDTO::name)
                 .containsExactly("httpClient_1");
     }
+
+    @Test
+    void testReadsClusterElementCallRecordsFromMetadata() {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(10L)
+            .workflowTask(new WorkflowTask(Map.of("name", "aiAgent_1", "type", "aiAgent/v1/chat")))
+            .build();
+        taskExecution.putMetadata(
+            TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS,
+            List.of(
+                Map.of(
+                    "id", "call-1", "status", "COMPLETED", "workflowNodeName", "subAgent_1", "componentName",
+                    "agent", "toolName", "research", "startDate", "2026-10-23T10:00:00Z", "endDate",
+                    "2026-10-23T10:00:05Z", "input", "{\"q\":1}", "output", "\"done\""),
+                Map.of(
+                    "id", "call-2", "status", "FAILED", "parentId", "call-1", "workflowNodeName", "slack_1",
+                    "startDate", "2026-10-23T10:00:01Z", "endDate", "2026-10-23T10:00:02Z", "error", "boom")));
+
+        TaskExecutionDTO taskExecutionDTO =
+            new TaskExecutionDTO(taskExecution, "AI Agent", "icon", Map.of(), null, null);
+
+        assertThat(taskExecutionDTO.clusterElementCallRecords()).containsExactly(
+            new ClusterElementCallRecordDTO(
+                "call-1", null, "subAgent_1", "agent", "research", "COMPLETED",
+                Instant.parse("2026-10-23T10:00:00Z"), Instant.parse("2026-10-23T10:00:05Z"), "{\"q\":1}",
+                "\"done\"", null),
+            new ClusterElementCallRecordDTO(
+                "call-2", "call-1", "slack_1", null, null, "FAILED", Instant.parse("2026-10-23T10:00:01Z"),
+                Instant.parse("2026-10-23T10:00:02Z"), null, null, "boom"));
+    }
+
+    @Test
+    void testNoClusterElementCallRecordsIsEmptyList() {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(10L)
+            .workflowTask(new WorkflowTask(Map.of("name", "aiAgent_1", "type", "aiAgent/v1/chat")))
+            .build();
+
+        TaskExecutionDTO taskExecutionDTO = new TaskExecutionDTO(taskExecution, "Task", "icon", Map.of(), null, null);
+
+        assertThat(taskExecutionDTO.clusterElementCallRecords()).isEmpty();
+    }
 }
