@@ -91,7 +91,7 @@ const variants: Record<StyleType, string> = {
       `,
     'success-outline': `
         border-stroke-success-primary
-        bg-surface-success-secondary
+        bg-surface-success-secondary-hover
         text-content-success-primary
         `,
     'warning-filled': `
@@ -110,7 +110,7 @@ const variants: Record<StyleType, string> = {
        `,
     'destructive-outline': `
         border-stroke-destructive-primary
-        bg-surface-destructive-secondary
+        bg-surface-destructive-secondary-hover
         text-content-destructive-primary
        `,
 };

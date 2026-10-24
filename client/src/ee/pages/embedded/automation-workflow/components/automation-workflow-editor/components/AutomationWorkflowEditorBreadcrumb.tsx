@@ -21,8 +21,8 @@ const AutomationWorkflowEditorBreadcrumb = ({itemSelect, project}: AutomationWor
                             <h1 className="truncate">{project.name}</h1>
 
                             <Badge
-                                className="flex space-x-1 bg-surface-neutral-primary"
-                                styleType={project.published ? 'success-outline' : 'outline-outline'}
+                                className="flex space-x-1 border-transparent"
+                                styleType={project.published ? 'success-outline' : 'secondary-filled'}
                                 weight="semibold"
                             >
                                 <span>V{project.published ? project.lastPublishedVersion : project.version}</span>
