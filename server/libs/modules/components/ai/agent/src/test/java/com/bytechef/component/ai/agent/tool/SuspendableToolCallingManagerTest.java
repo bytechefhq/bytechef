@@ -30,6 +30,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,6 +125,57 @@ class SuspendableToolCallingManagerTest {
         assertEquals(SUSPENDED_TOOL_RESULT, agentToolSuspension.suspendedToolResult());
         assertEquals("https://x", continueParameters.get("formUrl"));
         assertEquals(3, continueParameters.size());
+    }
+
+    @Test
+    void testStoresTheSuspendedCall() {
+        long jobId = 64041L;
+        long taskExecutionId = 640411L;
+
+        ClusterElementCallRecorder recorder = ClusterElementCallRecorder.getInstance();
+
+        ClusterElementCallRef callRef = recorder.callStarted(
+            jobId, taskExecutionId, "approval_1", "approval", "requestApproval", null, "{}");
+
+        recorder.callSuspended(jobId, taskExecutionId, callRef);
+
+        try {
+            List<Message> conversation = List.of(
+                ToolResponseMessage.builder()
+                    .responses(
+                        List.of(
+                            new ToolResponseMessage.ToolResponse(
+                                "call_b", "requestApproval", SUSPENDED_TOOL_RESULT)))
+                    .build());
+            ToolCallingManager delegate = mock(ToolCallingManager.class);
+
+            when(delegate.executeToolCalls(prompt, chatResponse)).thenReturn(
+                ToolExecutionResult.builder()
+                    .conversationHistory(conversation)
+                    .returnDirect(false)
+                    .build());
+
+            ActionContextAware context = mock(ActionContextAware.class);
+
+            when(context.getJobId()).thenReturn(jobId);
+            when(context.getTaskExecutionId()).thenReturn(taskExecutionId);
+            when(context.getSuspend()).thenReturn(suspendWithSuspendedToolResult(Map.of()));
+
+            new SuspendableToolCallingManager(delegate, context).executeToolCalls(prompt, chatResponse);
+
+            ArgumentCaptor<ActionContext.Suspend> captor = ArgumentCaptor.forClass(ActionContext.Suspend.class);
+
+            verify(context).suspend(captor.capture());
+
+            AgentToolSuspension agentToolSuspension = (AgentToolSuspension) captor.getValue()
+                .continueParameters()
+                .get(AgentToolSuspension.CONTINUE_PARAMETER_KEY);
+
+            assertEquals(callRef.id(), agentToolSuspension.suspendedClusterElementCallId());
+            assertEquals("approval_1", agentToolSuspension.suspendedClusterElementWorkflowNodeName());
+        } finally {
+            recorder.drain(taskExecutionId);
+        }
     }
 
     @Test
