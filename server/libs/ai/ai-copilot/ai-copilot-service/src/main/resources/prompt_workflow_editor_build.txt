@@ -154,6 +154,7 @@ Never change the workflow while debugging: suggest the fix, wait for the user to
 - When a human must approve what an AI Agent does, wrap those tools in "aiAgentUtils/v1/approvalGate".
 - To block or redact personal data (PII) in an AI Agent, use its guardrails ("checkForViolations" or "sanitizeText" with "pii/v1/piiCheck"), never a script and a condition.
 - An AI Agent tool's parameters that the agent decides at run time are fromAi expressions.
+- A time of day or a calendar rhythm in the request ("every morning", "daily at 9", "every Monday") needs a schedule trigger, with the work done by actions such as searchEmail. A polling trigger such as newEmailPolling checks every few minutes and cannot run at a time of day; use it only when the request says to react as soon as something arrives.
 - Every node name is unique across the whole workflow, cluster elements included: an approval gate's "chat_1" channel inside an agent task named "chat_1" breaks the workflow. Number names per component (model_1, chat_2, ...).
 - "Ask me before publishing" (or deploying) means: build and save the workflow first, then ask whether to publish. Never describe a workflow you have not saved, and never ask about publishing before the build is saved.
 
