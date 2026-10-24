@@ -23,10 +23,16 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.firecrawl.action.FirecrawlCrawlAction;
+import com.bytechef.component.firecrawl.action.FirecrawlCreateBrowserSessionAction;
+import com.bytechef.component.firecrawl.action.FirecrawlDeleteBrowserSessionAction;
+import com.bytechef.component.firecrawl.action.FirecrawlExecuteBrowserCodeAction;
 import com.bytechef.component.firecrawl.action.FirecrawlGetCrawlStatusAction;
+import com.bytechef.component.firecrawl.action.FirecrawlInteractAction;
+import com.bytechef.component.firecrawl.action.FirecrawlListBrowserSessionsAction;
 import com.bytechef.component.firecrawl.action.FirecrawlMapAction;
 import com.bytechef.component.firecrawl.action.FirecrawlScrapeAction;
 import com.bytechef.component.firecrawl.action.FirecrawlSearchAction;
+import com.bytechef.component.firecrawl.action.FirecrawlStopInteractAction;
 import com.bytechef.component.firecrawl.connection.FirecrawlConnection;
 import com.google.auto.service.AutoService;
 
@@ -44,16 +50,28 @@ public class FirecrawlComponentHandler implements ComponentHandler {
         .connection(FirecrawlConnection.CONNECTION_DEFINITION)
         .actions(
             FirecrawlCrawlAction.ACTION_DEFINITION,
+            FirecrawlCreateBrowserSessionAction.ACTION_DEFINITION,
+            FirecrawlDeleteBrowserSessionAction.ACTION_DEFINITION,
+            FirecrawlExecuteBrowserCodeAction.ACTION_DEFINITION,
             FirecrawlGetCrawlStatusAction.ACTION_DEFINITION,
+            FirecrawlInteractAction.ACTION_DEFINITION,
+            FirecrawlListBrowserSessionsAction.ACTION_DEFINITION,
             FirecrawlMapAction.ACTION_DEFINITION,
             FirecrawlScrapeAction.ACTION_DEFINITION,
-            FirecrawlSearchAction.ACTION_DEFINITION)
+            FirecrawlSearchAction.ACTION_DEFINITION,
+            FirecrawlStopInteractAction.ACTION_DEFINITION)
         .clusterElements(
             tool(FirecrawlCrawlAction.ACTION_DEFINITION),
+            tool(FirecrawlCreateBrowserSessionAction.ACTION_DEFINITION),
+            tool(FirecrawlDeleteBrowserSessionAction.ACTION_DEFINITION),
+            tool(FirecrawlExecuteBrowserCodeAction.ACTION_DEFINITION),
             tool(FirecrawlGetCrawlStatusAction.ACTION_DEFINITION),
+            tool(FirecrawlInteractAction.ACTION_DEFINITION),
+            tool(FirecrawlListBrowserSessionsAction.ACTION_DEFINITION),
             tool(FirecrawlMapAction.ACTION_DEFINITION),
             tool(FirecrawlScrapeAction.ACTION_DEFINITION),
-            tool(FirecrawlSearchAction.ACTION_DEFINITION))
+            tool(FirecrawlSearchAction.ACTION_DEFINITION),
+            tool(FirecrawlStopInteractAction.ACTION_DEFINITION))
         .customAction(true)
         .customActionHelp("Firecrawl API", "https://docs.firecrawl.dev/api-reference/introduction")
         .version(1);
