@@ -64,6 +64,27 @@ class LookupPropertyTrackerTest {
     }
 
     @Test
+    void testIgnoresAClusterElementPropertyThePickerAlreadyResolved() {
+        ToolContext toolContext = newToolContext();
+
+        LookupPropertyTracker.record(
+            toolContext, "getClusterElement", "{}",
+            "{\"knowledgeBaseId\": { \"value\": \"integer\", \"lookupRequired\": true, \"lookupDependsOn\": [] }}");
+
+        assertThat(LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, List.of("Which knowledge base should the agent search?"))).isEqualTo("knowledgeBaseId");
+
+        LookupPropertyTracker.record(
+            toolContext, "selectClusterElementPropertyOption",
+            "{\"componentName\":\"knowledgeBase\",\"clusterElementName\":\"vectorStore\"," +
+                "\"propertyName\":\"knowledgeBaseId\"}",
+            "{\"kind\":\"select-property-option\"}");
+
+        assertThat(LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, List.of("Which knowledge base should the agent search?"))).isNull();
+    }
+
+    @Test
     void testKeepsAPropertyUnresolvedAfterOnlyALookup() {
         ToolContext toolContext = newToolContext();
 
