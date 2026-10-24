@@ -971,12 +971,12 @@ test.describe('AI Hub regressions', () => {
             const hubRun = await stubAgUiRun(page, AI_HUB_CHAT_URL, [
                 [
                     runStarted(),
+                    textMessage('Building the workflow.'),
                     toolCall(
                         'buildWorkflow',
                         {instructions: 'Post hello to Slack'},
                         JSON.stringify({error: 'Component slack/v9 does not exist'})
                     ),
-                    textMessage('That did not work.'),
                     runEndGate,
                     runFinished(),
                 ],
@@ -990,7 +990,7 @@ test.describe('AI Hub regressions', () => {
             await test.step('Assert no banner while the run continues', async () => {
                 await aiHubPage.send('Build a Slack workflow');
 
-                await expect(page.getByText('That did not work.')).toBeVisible();
+                await expect(page.getByText('Building the workflow.')).toBeVisible();
 
                 await expect(aiHubPage.retryBanner).toHaveCount(0);
             });
@@ -1044,6 +1044,76 @@ test.describe('AI Hub regressions', () => {
             await aiHubPage.sendAndWaitForTurnEnd('Build a Slack workflow');
 
             await expect(page.getByText('The workflow is ready.')).toBeVisible();
+
+            await expect(aiHubPage.retryBanner).toHaveCount(0);
+
+            expect(await readRetryBannerAppearances(page)).toEqual([]);
+        });
+
+        test('a tool failure the model goes on to explain shows no banner', async ({authenticatedPage: page}) => {
+            await stubAgUiRun(page, AI_HUB_CHAT_URL, [
+                completedTurn(
+                    toolCall(
+                        'buildWorkflow',
+                        {instructions: 'Post hello to Slack'},
+                        JSON.stringify({error: 'Component slack/v9 does not exist'})
+                    ),
+                    textMessage('Slack v9 does not exist, so I could not build the workflow.')
+                ),
+            ]);
+
+            const aiHubPage = new AiHubPage(page);
+
+            await recordRetryBannerAppearances(page);
+
+            await aiHubPage.goto();
+
+            await aiHubPage.sendAndWaitForTurnEnd('Build a Slack workflow');
+
+            await expect(page.getByText('Slack v9 does not exist, so I could not build the workflow.')).toBeVisible();
+
+            await expect(aiHubPage.retryBanner).toHaveCount(0);
+
+            expect(await readRetryBannerAppearances(page)).toEqual([]);
+        });
+
+        test('a tool failure the turn answers with a question card shows no banner', async ({
+            authenticatedPage: page,
+        }) => {
+            await stubAgUiRun(page, AI_HUB_CHAT_URL, [
+                completedTurn(
+                    toolCall(
+                        'buildWorkflow',
+                        {instructions: 'Post hello to Slack'},
+                        JSON.stringify({error: 'Component slack/v9 does not exist'})
+                    ),
+                    toolCall(
+                        'askUserQuestion',
+                        {questions: []},
+                        JSON.stringify({
+                            awaitingAnswer: true,
+                            kind: 'ask-user-question',
+                            questions: [
+                                {
+                                    multiSelect: false,
+                                    options: [{label: 'Slack'}, {label: 'Microsoft Teams'}],
+                                    question: 'Which chat app should receive the message?',
+                                },
+                            ],
+                        })
+                    )
+                ),
+            ]);
+
+            const aiHubPage = new AiHubPage(page);
+
+            await recordRetryBannerAppearances(page);
+
+            await aiHubPage.goto();
+
+            await aiHubPage.sendAndWaitForTurnEnd('Build a Slack workflow');
+
+            await expect(page.getByText('Which chat app should receive the message?')).toBeVisible();
 
             await expect(aiHubPage.retryBanner).toHaveCount(0);
 
