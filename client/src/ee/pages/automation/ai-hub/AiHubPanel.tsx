@@ -136,12 +136,7 @@ const AiHubPanel = () => {
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="Chat options"
-                                icon={<MoreVerticalIcon />}
-                                size="icon"
-                                variant="ghost"
-                            />
+                            <Button aria-label="Chat options" icon={<MoreVerticalIcon />} size="icon" variant="ghost" />
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
