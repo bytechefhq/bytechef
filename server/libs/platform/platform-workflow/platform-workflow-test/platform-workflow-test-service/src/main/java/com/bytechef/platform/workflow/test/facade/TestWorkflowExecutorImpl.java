@@ -598,6 +598,9 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             case STARTED -> "cluster_element_started";
             case COMPLETED -> "cluster_element_completed";
             case FAILED -> "cluster_element_failed";
+            case BLOCKED -> "cluster_element_blocked";
+            case REDACTED -> "cluster_element_redacted";
+            case WITHHELD -> "cluster_element_withheld";
         };
     }
 

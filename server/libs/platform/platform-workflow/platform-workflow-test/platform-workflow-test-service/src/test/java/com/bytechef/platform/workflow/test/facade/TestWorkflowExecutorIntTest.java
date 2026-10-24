@@ -614,6 +614,83 @@ class TestWorkflowExecutorIntTest {
     }
 
     @Test
+    void executeAsyncForwardsOutcomeEventsUnderTheirOwnNames() throws Exception {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "agent", "type": "testComponent/v1/block", "parameters": {"gate": "agent"}}
+                    ]
+                }
+                """);
+
+        RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
+
+        CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
+            () -> testWorkflowExecutor.executeAsync(
+                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                (key, future) -> future.join(), key -> {}));
+
+        TaskGate taskGate = taskGates.get("agent");
+
+        assertThat(taskGate.awaitEntered(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+        assertThat(sseStreamBridge.awaitEvent(isEvent("task_started"), TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
+
+        long jobId = getStartedJobId(sseStreamBridge);
+
+        List<Map<String, Object>> taskStartedPayloads = getTaskEventPayloads(sseStreamBridge, "task_started");
+
+        Map<String, Object> taskStartedPayload = taskStartedPayloads.getFirst();
+
+        long taskExecutionId = Long.parseLong((String) taskStartedPayload.get("taskExecutionId"));
+
+        ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
+
+        try {
+            clusterElementCallRecorder.recordOutcome(
+                jobId, taskExecutionId, "guardrails_1", "guardrails", null, ClusterElementCallRecord.Status.BLOCKED,
+                "{\"side\":\"INPUT\",\"matchCount\":2}", null);
+            clusterElementCallRecorder.recordOutcome(
+                jobId, taskExecutionId, "guardrails_2", "guardrails", null, ClusterElementCallRecord.Status.REDACTED,
+                "{\"side\":\"OUTPUT\",\"maskCount\":3}", null);
+            clusterElementCallRecorder.recordOutcome(
+                jobId, taskExecutionId, "guardrails_3", "guardrails", null, ClusterElementCallRecord.Status.WITHHELD,
+                "{\"side\":\"OUTPUT\",\"reason\":\"unsafe\"}", null);
+
+            assertThat(
+                sseStreamBridge.awaitEvent(isEvent("cluster_element_withheld"), TIMEOUT_SECONDS, TimeUnit.SECONDS))
+                    .isTrue();
+
+            taskGate.release();
+
+            executeAsyncFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } finally {
+            clusterElementCallRecorder.drain(taskExecutionId);
+        }
+
+        List<String> clusterElementEventNames = sseStreamBridge.getEventNames()
+            .stream()
+            .filter(eventName -> eventName.startsWith("cluster_element_"))
+            .toList();
+
+        assertThat(clusterElementEventNames)
+            .containsExactly("cluster_element_blocked", "cluster_element_redacted", "cluster_element_withheld");
+
+        List<Map<String, Object>> blockedPayloads = getTaskEventPayloads(sseStreamBridge, "cluster_element_blocked");
+        List<Map<String, Object>> redactedPayloads = getTaskEventPayloads(
+            sseStreamBridge, "cluster_element_redacted");
+        List<Map<String, Object>> withheldPayloads = getTaskEventPayloads(
+            sseStreamBridge, "cluster_element_withheld");
+
+        assertThat(blockedPayloads.getFirst()).containsEntry("callStatus", "BLOCKED")
+            .containsEntry("output", "{\"side\":\"INPUT\",\"matchCount\":2}");
+        assertThat(redactedPayloads.getFirst()).containsEntry("callStatus", "REDACTED")
+            .containsEntry("output", "{\"side\":\"OUTPUT\",\"maskCount\":3}");
+        assertThat(withheldPayloads.getFirst()).containsEntry("callStatus", "WITHHELD")
+            .containsEntry("output", "{\"side\":\"OUTPUT\",\"reason\":\"unsafe\"}");
+    }
+
+    @Test
     void executeAsyncSendsStartAndResultEvents() {
         String workflowId = createWorkflow(getEchoWorkflowDefinition());
 
