@@ -1749,7 +1749,7 @@ export type EditorJobFileLogsQueryVariables = Exact<{
 }>;
 
 
-export type EditorJobFileLogsQuery = { editorJobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
+export type EditorJobFileLogsQuery = { editorJobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, clusterElementCallId: string | null, clusterElementWorkflowNodeName: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
 
 export type EditorJobFileLogsExistQueryVariables = Exact<{
   jobId: string | number;
@@ -1774,7 +1774,7 @@ export type JobFileLogsQueryVariables = Exact<{
 }>;
 
 
-export type JobFileLogsQuery = { jobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
+export type JobFileLogsQuery = { jobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, clusterElementCallId: string | null, clusterElementWorkflowNodeName: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
 
 export type JobFileLogsExistQueryVariables = Exact<{
   jobId: string | number;
@@ -8685,6 +8685,8 @@ export const EditorJobFileLogsDocument = new TypedDocumentString(`
       componentOperationName
       taskExecutionId
       triggerExecutionId
+      clusterElementCallId
+      clusterElementWorkflowNodeName
       message
       exceptionType
       exceptionMessage
@@ -8781,6 +8783,8 @@ export const JobFileLogsDocument = new TypedDocumentString(`
       componentOperationName
       taskExecutionId
       triggerExecutionId
+      clusterElementCallId
+      clusterElementWorkflowNodeName
       message
       exceptionType
       exceptionMessage
