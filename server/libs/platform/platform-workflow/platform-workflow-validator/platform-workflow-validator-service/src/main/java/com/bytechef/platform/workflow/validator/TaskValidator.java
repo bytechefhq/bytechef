@@ -177,16 +177,16 @@ class TaskValidator {
 
             if (clusterElementJsonNode.isArray()) {
                 for (JsonNode clusterElementItemJsonNode : clusterElementJsonNode) {
-                    validateClusterElement(clusterElementItemJsonNode, parentPath, context);
+                    validateClusterElement(clusterElementItemJsonNode, fieldName, parentPath, context);
                 }
             } else {
-                validateClusterElement(clusterElementJsonNode, parentPath, context);
+                validateClusterElement(clusterElementJsonNode, fieldName, parentPath, context);
             }
         }
     }
 
     private static void validateClusterElement(
-        JsonNode clusterElementJsonNode, String parentPath, ValidationContext context) {
+        JsonNode clusterElementJsonNode, String slotKey, String parentPath, ValidationContext context) {
 
         if (!clusterElementJsonNode.isObject() || !clusterElementJsonNode.has("type") ||
             !clusterElementJsonNode.has("name")) {
@@ -198,10 +198,43 @@ class TaskValidator {
 
         String elementName = nameJsonNode.asString();
 
+        if (!checkClusterElementType(clusterElementJsonNode, elementName, slotKey, context)) {
+            return;
+        }
+
         String elementPath = PropertyUtils.buildPropertyPath(parentPath, elementName);
 
         validateClusterElementParameters(clusterElementJsonNode, elementPath, context);
         validateClusterElements(clusterElementJsonNode, elementPath, context);
+    }
+
+    private static boolean checkClusterElementType(
+        JsonNode clusterElementJsonNode, String elementName, String slotKey, ValidationContext context) {
+
+        JsonNode typeJsonNode = clusterElementJsonNode.get("type");
+
+        String elementType = typeJsonNode.asString();
+
+        Set<String> slotKeys = context.getClusterElementSlotKeys(elementType);
+
+        if (slotKeys == null) {
+            return true;
+        }
+
+        if (slotKeys.isEmpty()) {
+            StringUtils.appendWithNewline(
+                ValidationErrorUtils.unknownClusterElementType(elementName, elementType), context.getErrors());
+
+            return false;
+        }
+
+        if (!slotKeys.contains(slotKey)) {
+            StringUtils.appendWithNewline(
+                ValidationErrorUtils.clusterElementInWrongSlot(elementName, elementType, slotKey, slotKeys),
+                context.getErrors());
+        }
+
+        return true;
     }
 
     private static void checkClusterElementKeys(JsonNode taskJsonNode, ValidationContext context) {
