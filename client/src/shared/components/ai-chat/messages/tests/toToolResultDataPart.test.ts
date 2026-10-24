@@ -30,6 +30,46 @@ describe('toToolResultDataPart', () => {
         }
     });
 
+    it('maps select-property-option for selectClusterElementPropertyOption', () => {
+        const result = toToolResultDataPart(
+            'selectClusterElementPropertyOption',
+            JSON.stringify({
+                awaitingAnswer: true,
+                componentName: 'knowledgeBase',
+                kind: 'select-property-option',
+                options: [{label: 'Product docs', value: 12}],
+                propertyName: 'knowledgeBaseId',
+                truncated: false,
+            })
+        );
+
+        expect(result?.ok).toBe(true);
+
+        if (result?.ok) {
+            expect(result.type).toBe('data-select-property-option');
+            expect(result.data).toEqual({
+                componentName: 'knowledgeBase',
+                kind: 'select-property-option',
+                options: [{label: 'Product docs', value: 12}],
+                propertyName: 'knowledgeBaseId',
+                truncated: false,
+            });
+        }
+    });
+
+    it('returns an error result when selectClusterElementPropertyOption returns a failure envelope', () => {
+        const result = toToolResultDataPart(
+            'selectClusterElementPropertyOption',
+            JSON.stringify({clusterElementName: 'rag', error: 'cluster_element_not_found', valid: ['vectorStore']})
+        );
+
+        expect(result?.ok).toBe(false);
+
+        if (result && !result.ok) {
+            expect(result.toolName).toBe('selectClusterElementPropertyOption');
+        }
+    });
+
     it('maps select-connection', () => {
         const r = toToolResultDataPart(
             'selectConnection',
