@@ -1,3 +1,4 @@
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {
     useDeleteClusterElementParameterMutation,
@@ -90,6 +91,18 @@ function getCachedProjectWorkflows(queryClient: QueryClient) {
 describe('useProject', () => {
     afterEach(() => {
         vi.clearAllMocks();
+    });
+
+    it('clears the last test run colours when the workflow is opened', () => {
+        useWorkflowEditorStore.setState({
+            workflowTestNodeStates: {logger_1: {status: 'COMPLETED'}},
+            workflowTestNodeStatesWorkflowId: 'workflow-b',
+        });
+
+        renderUseProjectWithCachedWorkflows();
+
+        expect(useWorkflowEditorStore.getState().workflowTestNodeStates).toEqual({});
+        expect(useWorkflowEditorStore.getState().workflowTestNodeStatesWorkflowId).toBeUndefined();
     });
 
     it.each(parameterMutationHooks)(
