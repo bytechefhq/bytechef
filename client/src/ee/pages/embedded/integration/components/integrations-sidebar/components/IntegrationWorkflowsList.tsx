@@ -53,7 +53,11 @@ const IntegrationWorkflowsList = ({
                     </Tooltip>
 
                     {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
-                        <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
+                        <Badge
+                            className="flex space-x-1 border-transparent"
+                            styleType="success-outline"
+                            weight="semibold"
+                        >
                             <span>V{integration.lastIntegrationVersion - 1}</span>
 
                             <span>PUBLISHED</span>
