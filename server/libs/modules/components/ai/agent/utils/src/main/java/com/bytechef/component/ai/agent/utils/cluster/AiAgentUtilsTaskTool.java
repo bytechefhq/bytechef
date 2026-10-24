@@ -38,6 +38,8 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallTarget;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingChatModel;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -96,7 +98,7 @@ public class AiAgentUtilsTaskTool {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-        ChatModel defaultChatModel = resolveChatModel(clusterElementMap, componentConnections);
+        ChatModel defaultChatModel = resolveChatModel(clusterElementMap, componentConnections, context);
 
         List<ClusterElement> subagentClusterElements = clusterElementMap.getClusterElements(SUBAGENT);
 
@@ -105,7 +107,7 @@ public class AiAgentUtilsTaskTool {
         ClusterElementSubagentExecutor subagentExecutor = new ClusterElementSubagentExecutor(
             defaultChatModel,
             subagentClusterElement -> resolveChatModel(
-                ClusterElementMap.of(subagentClusterElement.getExtensions()), componentConnections),
+                ClusterElementMap.of(subagentClusterElement.getExtensions()), componentConnections, context),
             subagentClusterElement -> buildSubagentToolCallbacks(
                 subagentClusterElement, componentConnections, context));
 
@@ -164,7 +166,8 @@ public class AiAgentUtilsTaskTool {
 
     @Nullable
     private ChatModel resolveChatModel(
-        ClusterElementMap clusterElementMap, Map<String, ComponentConnection> componentConnections) {
+        ClusterElementMap clusterElementMap, Map<String, ComponentConnection> componentConnections,
+        Context context) {
 
         Optional<ClusterElement> modelElement = clusterElementMap.fetchClusterElement(MODEL);
 
@@ -202,6 +205,13 @@ public class AiAgentUtilsTaskTool {
                         element.getComponentVersion(), returnedType));
         }
 
-        return chatModel;
+        Optional<ClusterElementCallTarget> clusterElementCallTarget = ClusterElementCallTarget.of(context);
+
+        if (clusterElementCallTarget.isEmpty()) {
+            return chatModel;
+        }
+
+        return new ClusterElementFailureAttributingChatModel(
+            chatModel, element.getWorkflowNodeName(), element.getComponentName(), clusterElementCallTarget.get());
     }
 }
