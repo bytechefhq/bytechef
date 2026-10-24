@@ -77,7 +77,8 @@ function clearProgressSnapshot() {
  * completes coordinator-side and never emits a task lifecycle SSE event, so without this pass its node -- and every
  * edge touching it -- would stay uncolored after a run even though it executed. The whole execution tree is walked,
  * not just the top level: a condition inside a loop iteration or another condition's branch is exactly such a
- * dispatcher. Streamed states win — only missing (or still-RUNNING) entries are filled in.
+ * dispatcher. Streamed statuses win: only missing (or still-RUNNING) entries are filled in, and a finished node only
+ * takes the result's duration, which adds up a node that ran more than once.
  */
 function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecution) {
     const {setWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
@@ -85,9 +86,16 @@ function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecuti
     const resultNodeStates = buildNodeStatesFromTaskExecutions(workflowTestExecution.job?.taskExecutions, false);
 
     for (const [name, nodeState] of Object.entries(resultNodeStates)) {
-        const existingStatus = workflowTestNodeStates[name]?.status;
+        const existingNodeState = workflowTestNodeStates[name];
 
-        if (existingStatus === 'COMPLETED' || existingStatus === 'FAILED') {
+        if (existingNodeState?.status === 'COMPLETED' || existingNodeState?.status === 'FAILED') {
+            if (
+                nodeState.durationMillis !== undefined &&
+                nodeState.durationMillis !== existingNodeState.durationMillis
+            ) {
+                setWorkflowTestNodeState(name, {...existingNodeState, durationMillis: nodeState.durationMillis});
+            }
+
             continue;
         }
 
