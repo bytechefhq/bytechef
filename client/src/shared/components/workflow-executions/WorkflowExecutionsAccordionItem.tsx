@@ -5,7 +5,9 @@ import LazyTaskExecutionChildren, {
 } from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import TaskExecutionChildrenList from '@/shared/components/workflow-executions/TaskExecutionChildrenList';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
+import toClusterElementCallTaskExecutions from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {TaskExecution as PlatformTaskExecution} from '@/shared/middleware/platform/workflow/execution';
 import {type ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -58,16 +60,29 @@ const WorkflowExecutionsAccordionItem = ({
 
     const taskExecution = isTaskExecution(execution) ? execution : undefined;
 
-    const hasChildren = taskExecution?.children && taskExecution.children.length > 0;
+    const childExecutions: TaskExecution[] = useMemo(() => {
+        if (!taskExecution) {
+            return [];
+        }
+
+        if (taskExecution.children && taskExecution.children.length > 0) {
+            return taskExecution.children;
+        }
+
+        return toClusterElementCallTaskExecutions(taskExecution as PlatformTaskExecution) as TaskExecution[];
+    }, [taskExecution]);
+
+    const hasChildren = childExecutions.length > 0;
     const hasIterations = taskExecution?.iterations && taskExecution.iterations.length > 0;
     const remainingIterationCount = (taskExecution?.iterations?.length ?? 0) - visibleIterationCount;
     const hasMoreIterations = remainingIterationCount > 0;
     const hasPreviousTaskExecutions = previousTaskExecutions.length > 0;
 
     const hasLazyChildren = (taskExecution?.childCount ?? 0) > 0;
+    const hasClusterElementCallChildren = !hasLazyChildren && hasChildren;
 
     const isExpandable = lazy
-        ? hasLazyChildren || hasPreviousTaskExecutions
+        ? hasLazyChildren || hasClusterElementCallChildren || hasPreviousTaskExecutions
         : hasChildren || hasIterations || hasPreviousTaskExecutions;
     const isSelected = selectedExecutionId === execution.id;
 
@@ -155,7 +170,7 @@ const WorkflowExecutionsAccordionItem = ({
                 className="border-l border-stroke-neutral-secondary p-0 pl-4"
                 onClick={(event) => event.stopPropagation()}
             >
-                {lazy ? (
+                {lazy && !hasClusterElementCallChildren ? (
                     hasLazyChildren && (
                         <LazyTaskExecutionChildren
                             defaultValue={defaultValue}
@@ -178,7 +193,7 @@ const WorkflowExecutionsAccordionItem = ({
                         remainingCount={remainingIterationCount}
                         selectedExecutionId={selectedExecutionId}
                     >
-                        {taskExecution.children}
+                        {childExecutions}
                     </TaskExecutionChildrenList>
                 )}
 
