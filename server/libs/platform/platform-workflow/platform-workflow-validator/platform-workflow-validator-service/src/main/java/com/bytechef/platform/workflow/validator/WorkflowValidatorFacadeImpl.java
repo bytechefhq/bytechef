@@ -163,6 +163,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             new HashMap<>(), nodeOutputMaps.outputMap(), nodeOutputMaps.variableOutputMap(), new HashMap<>(), errors,
             warnings);
 
+        WorkflowValidator.validateNodeTypesExist(workflow, this::nodeTypeExists, errors);
+
         if (workflowId != null) {
             appendMissingConnections(workflow, workflowId, environmentId, errors);
         }
@@ -220,6 +222,37 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     @Override
     public List<String> getReservedNodeNames(String workflow) {
         return WorkflowValidator.getReservedNodeNames(workflow);
+    }
+
+    private boolean nodeTypeExists(String type, String kind) {
+        try {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+            String operation = workflowNodeType.operation();
+
+            if ("trigger".equals(kind)) {
+                if (operation == null) {
+                    return false;
+                }
+
+                TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+                    workflowNodeType.name(), workflowNodeType.version(), operation);
+
+                return operation.equalsIgnoreCase(triggerDefinition.getName());
+            } else if (operation != null) {
+                ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+                    workflowNodeType.name(), workflowNodeType.version(), operation);
+
+                return operation.equalsIgnoreCase(actionDefinition.getName());
+            } else {
+                taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                    workflowNodeType.name(), workflowNodeType.version());
+            }
+
+            return true;
+        } catch (Exception exception) {
+            return false;
+        }
     }
 
     private List<PropertyInfo> getTaskProperties(String taskType, String kind) {
