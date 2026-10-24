@@ -34,6 +34,8 @@ vi.mock('../hooks', () => ({
     }),
 }));
 
+const initialDialogStoreState = usePropertyCodeEditorDialogStore.getState();
+
 // The toolbar only ever renders inside the code editor dialog, and its DialogClose needs that context.
 const renderWithProviders = (ui: React.ReactElement) => {
     return render(
@@ -60,6 +62,8 @@ describe('PropertyCodeEditorDialogToolbar', () => {
     });
 
     afterEach(() => {
+        usePropertyCodeEditorDialogStore.setState(initialDialogStoreState, true);
+
         resetAll();
         vi.clearAllMocks();
     });
