@@ -20,6 +20,13 @@ import {
     ExecutionErrorToJSON,
     ExecutionErrorToJSONTyped,
 } from './ExecutionError';
+import type { ClusterElementCallRecord } from './ClusterElementCallRecord';
+import {
+    ClusterElementCallRecordFromJSON,
+    ClusterElementCallRecordFromJSONTyped,
+    ClusterElementCallRecordToJSON,
+    ClusterElementCallRecordToJSONTyped,
+} from './ClusterElementCallRecord';
 import type { WorkflowTask } from './WorkflowTask';
 import {
     WorkflowTaskFromJSON,
@@ -172,6 +179,10 @@ export interface TaskExecution {
      * The calls the task made to the cluster elements it chooses to call, such as an AI agent's tools.
      */
     readonly clusterElementCalls?: Array<ClusterElementCall>;
+    /**
+     * The individual calls the task made to the cluster elements it chooses to call, in call order.
+     */
+    readonly clusterElementCallRecords?: Array<ClusterElementCallRecord>;
 }
 
 
@@ -240,6 +251,7 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'childJob': json['childJob'] == null ? undefined : JobFromJSON(json['childJob']),
         'childCount': json['childCount'] == null ? undefined : json['childCount'],
         'clusterElementCalls': json['clusterElementCalls'] == null ? undefined : ((json['clusterElementCalls'] as Array<any>).map(ClusterElementCallFromJSON)),
+        'clusterElementCallRecords': json['clusterElementCallRecords'] == null ? undefined : ((json['clusterElementCallRecords'] as Array<any>).map(ClusterElementCallRecordFromJSON)),
     };
 }
 
@@ -247,7 +259,7 @@ export function TaskExecutionToJSON(json: any): TaskExecution {
     return TaskExecutionToJSONTyped(json, false);
 }
 
-export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'title'|'retryDelayMillis'|'type'|'childCount'|'clusterElementCalls'> | null, ignoreDiscriminator: boolean = false): any {
+export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'title'|'retryDelayMillis'|'type'|'childCount'|'clusterElementCalls'|'clusterElementCallRecords'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

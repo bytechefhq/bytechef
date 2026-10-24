@@ -38,6 +38,7 @@ Name | Type
 `childJob` | [Job](Job.md)
 `childCount` | number
 `clusterElementCalls` | [Array&lt;ClusterElementCall&gt;](ClusterElementCall.md)
+`clusterElementCallRecords` | [Array&lt;ClusterElementCallRecord&gt;](ClusterElementCallRecord.md)
 
 ## Example
 
@@ -77,6 +78,7 @@ const example = {
   "childJob": null,
   "childCount": null,
   "clusterElementCalls": null,
+  "clusterElementCallRecords": null,
 } satisfies TaskExecution
 
 console.log(example)

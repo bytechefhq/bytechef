@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ClusterElementCall';
+export * from './ClusterElementCallRecord';
 export * from './ComponentConnection';
 export * from './ExecutionError';
 export * from './FieldOption';
