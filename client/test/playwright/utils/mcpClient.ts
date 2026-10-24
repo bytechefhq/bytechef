@@ -49,10 +49,10 @@ export class McpClient {
     private readonly environment: string;
     private readonly request: APIRequestContext;
 
-    constructor(request: APIRequestContext, secretKey: string) {
+    constructor(request: APIRequestContext, secretKey: string, bearerToken?: string) {
         this.request = request;
         this.endpointPath = `/api/management/${secretKey}/mcp`;
-        this.bearerToken = process.env.PLAYWRIGHT_MCP_BEARER_TOKEN;
+        this.bearerToken = bearerToken ?? process.env.PLAYWRIGHT_MCP_BEARER_TOKEN;
         this.environment = process.env.PLAYWRIGHT_MCP_ENVIRONMENT ?? 'DEVELOPMENT';
     }
 
