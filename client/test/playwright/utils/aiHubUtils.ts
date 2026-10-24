@@ -937,7 +937,16 @@ export async function listConnections(
     return (await response.json()) as Array<{id: number; name: string}>;
 }
 
-const CARD_CHROME_BUTTON_NAMES = new Set(['Copy', 'Dismiss', 'More', 'Other…', 'Refresh', 'Retry']);
+const CARD_CHROME_BUTTON_NAMES = new Set([
+    'Copy',
+    'Dismiss',
+    'More',
+    'Next',
+    'Other…',
+    'Refresh',
+    'Retry',
+    'Submit all',
+]);
 
 const MAX_CARD_ROUNDS = 5;
 
@@ -950,8 +959,8 @@ export interface InteractiveCardAnswerI {
 
 /**
  * Answers the interactive cards a turn ends with, one round at a time, until the last assistant message offers nothing
- * more to answer: a question card's option buttons, or a picker card's combobox (its first option). Returns each card's
- * text with the answer given.
+ * more to answer: a question card's option buttons or checkboxes, or a picker card's combobox (its first option).
+ * Returns each card's text with the answer given.
  */
 export async function answerInteractiveCards(
     page: Page,
@@ -990,6 +999,26 @@ export async function answerInteractiveCards(
             await firstOption.click();
 
             answers.push({answer: optionName, cardText});
+
+            await waitForTurnEnd();
+
+            continue;
+        }
+
+        const checkboxLabels = lastMessage.locator('label').filter({has: page.getByRole('checkbox')});
+
+        if ((await checkboxLabels.count()) > 0) {
+            const checkboxNames = (await checkboxLabels.allInnerTexts()).map(
+                (checkboxName) => checkboxName.trim().split('\n')[0]
+            );
+
+            const answer = chooseOption(cardText, checkboxNames);
+
+            answers.push({answer, cardText});
+
+            await checkboxLabels.nth(checkboxNames.indexOf(answer)).getByRole('checkbox').check();
+
+            await lastMessage.getByRole('button', {name: /^(Next|Submit all)$/}).click();
 
             await waitForTurnEnd();
 
