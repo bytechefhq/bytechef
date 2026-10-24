@@ -6,7 +6,12 @@ import getTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getTes
 import toClusterElementNodeState from '@/pages/platform/workflow-editor/utils/toClusterElementNodeState';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
-import {JobStatusEnum, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {
+    ClusterElementCallRecord,
+    ClusterElementCallRecordFromJSON,
+    JobStatusEnum,
+    WorkflowTestExecution,
+} from '@/shared/middleware/platform/workflow/test';
 import {WorkflowTestExecutionFromJSON} from '@/shared/middleware/platform/workflow/test/models/WorkflowTestExecution';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {AskUserQuestionEventI, formatAskUserQuestionMessage} from '@/shared/util/assistant-message-utils';
@@ -23,12 +28,19 @@ export interface UseWorkflowTestStreamProps {
 }
 
 interface TaskLifecyclePayloadI {
+    callId?: string;
+    callStatus?: string;
+    componentName?: string;
     endDate?: string;
     error?: string;
+    input?: string;
     name?: string;
+    output?: string;
+    parentCallId?: string;
     startDate?: string;
     status?: string;
     taskExecutionId?: string;
+    toolName?: string;
 }
 
 function computeDurationMillis(startDate?: string, endDate?: string): number | undefined {
@@ -129,9 +141,16 @@ function handleClusterElementCall(data: unknown): string | undefined {
         return undefined;
     }
 
-    const {setWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
+    const {setWorkflowTestNodeState, upsertWorkflowTestClusterElementCallRecord, workflowTestNodeStates} =
+        useWorkflowEditorStore.getState();
 
     setWorkflowTestNodeState(payload.name, toClusterElementNodeState(payload, workflowTestNodeStates[payload.name]));
+
+    const record = toClusterElementCallRecord(payload);
+
+    if (record && payload.taskExecutionId) {
+        upsertWorkflowTestClusterElementCallRecord(payload.taskExecutionId, record);
+    }
 
     return payload.name;
 }
@@ -160,6 +179,26 @@ function applyProgressNodeStates(workflowTestExecution: WorkflowTestExecution, p
 
         setWorkflowTestNodeState(name, nodeState);
     }
+}
+
+function toClusterElementCallRecord(payload: TaskLifecyclePayloadI): ClusterElementCallRecord | undefined {
+    if (!payload.callId || !payload.callStatus) {
+        return undefined;
+    }
+
+    return ClusterElementCallRecordFromJSON({
+        componentName: payload.componentName,
+        endDate: payload.endDate,
+        error: payload.callStatus === 'FAILED' ? payload.error : undefined,
+        id: payload.callId,
+        input: payload.input,
+        output: payload.output,
+        parentId: payload.parentCallId,
+        startDate: payload.startDate,
+        status: payload.callStatus,
+        toolName: payload.toolName,
+        workflowNodeName: payload.name,
+    });
 }
 
 function parseTaskLifecyclePayload(data: unknown): TaskLifecyclePayloadI | undefined {

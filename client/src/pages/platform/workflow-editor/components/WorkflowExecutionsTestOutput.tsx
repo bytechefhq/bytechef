@@ -19,6 +19,8 @@ import {RefreshCwIcon, RefreshCwOffIcon, WorkflowIcon, XIcon} from 'lucide-react
 import {useCallback, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import withLiveClusterElementCallRecords from '../utils/withLiveClusterElementCallRecords';
 import useWorkflowExecutions from './properties/hooks/useWorkflowExecutions';
 
 interface WorkflowExecutionsTestOutputProps {
@@ -36,6 +38,15 @@ const WorkflowExecutionsTestOutput = ({
     workflowIsRunning,
     workflowTestExecution,
 }: WorkflowExecutionsTestOutputProps) => {
+    const workflowTestClusterElementCallRecords = useWorkflowEditorStore(
+        (state) => state.workflowTestClusterElementCallRecords
+    );
+
+    const mergedWorkflowTestExecution = useMemo(
+        () => withLiveClusterElementCallRecords(workflowTestExecution, workflowTestClusterElementCallRecords),
+        [workflowTestExecution, workflowTestClusterElementCallRecords]
+    );
+
     const {
         activeTab,
         deepestFailedExecution,
@@ -54,7 +65,7 @@ const WorkflowExecutionsTestOutput = ({
         subflowStack,
         taskExecutions,
         triggerExecution,
-    } = useWorkflowExecutions({workflowTestExecution});
+    } = useWorkflowExecutions({workflowTestExecution: mergedWorkflowTestExecution});
 
     const breadcrumbItems = useMemo<BreadcrumbEntryI[]>(() => {
         if (subflowStack.length === 0) {
