@@ -42,6 +42,22 @@ public final class WorkflowPersistCaptureUtils {
         return context;
     }
 
+    public static @Nullable String fetchLastWorkflowId(Map<String, Object> context) {
+        Object holder = context.get(PERSISTED_WORKFLOW_CAPTURE_KEY);
+
+        if (!(holder instanceof List<?> captures)) {
+            return null;
+        }
+
+        synchronized (captures) {
+            if (captures.isEmpty() || !(captures.getLast() instanceof Map<?, ?> entry)) {
+                return null;
+            }
+
+            return entry.get("workflowId") instanceof String workflowId ? workflowId : null;
+        }
+    }
+
     public static boolean isUpdated(Map<String, Object> context, String workflowId) {
         Object holder = context.get(PERSISTED_WORKFLOW_CAPTURE_KEY);
 
