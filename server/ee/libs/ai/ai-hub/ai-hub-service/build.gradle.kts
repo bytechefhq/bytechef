@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-tool"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     implementation(project(":spring-ai:spring-ag-ui:integrations:spring-ai"))
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
