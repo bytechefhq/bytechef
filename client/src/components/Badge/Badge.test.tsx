@@ -64,7 +64,9 @@ describe('Badge variants', () => {
     it('should render a success outline badge if styleType is set to success-outline', () => {
         render(<Badge label="Badge" styleType="success-outline" />);
 
-        expect(screen.getByText('Badge')).toHaveClass('bg-surface-success-secondary text-content-success-primary');
+        expect(screen.getByText('Badge')).toHaveClass(
+            'bg-surface-success-secondary-hover text-content-success-primary'
+        );
         expect(screen.getByText('Badge')).toHaveClass('border-stroke-success-primary');
     });
 
@@ -91,7 +93,7 @@ describe('Badge variants', () => {
         render(<Badge label="Badge" styleType="destructive-outline" />);
 
         expect(screen.getByText('Badge')).toHaveClass(
-            'bg-surface-destructive-secondary text-content-destructive-primary'
+            'bg-surface-destructive-secondary-hover text-content-destructive-primary'
         );
         expect(screen.getByText('Badge')).toHaveClass('border-stroke-destructive-primary');
     });
@@ -214,7 +216,7 @@ describe('Badge with all props combined', () => {
         expect(screen.getByText('Badge')).toBeInTheDocument();
         expect(container.querySelector('svg')).toBeInTheDocument();
         expect(screen.getByText('Badge')).toHaveClass('font-semibold');
-        expect(screen.getByText('Badge')).toHaveClass('bg-surface-success-secondary');
+        expect(screen.getByText('Badge')).toHaveClass('bg-surface-success-secondary-hover');
         expect(screen.getByText('Badge')).toHaveClass('text-content-success-primary');
         expect(screen.getByText('Badge')).toHaveClass('ring-1');
     });

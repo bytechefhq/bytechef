@@ -13,9 +13,9 @@ const ProjectTitle = ({project}: {project: Project}) => {
 
                     {project && (
                         <Badge
-                            className="flex space-x-1 bg-surface-neutral-primary"
+                            className="flex space-x-1 border-transparent"
                             styleType={
-                                project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'outline-outline'
+                                project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'secondary-filled'
                             }
                             weight="semibold"
                         >
