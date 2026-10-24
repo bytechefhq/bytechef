@@ -19,6 +19,7 @@ package com.bytechef.platform.component.log;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -337,6 +338,53 @@ class LogFileStorageTest {
         assertEquals(List.of("from before"), messagesOf(logEntries));
         assertEquals(null, logEntries.get(0)
             .triggerExecutionId());
+    }
+
+    @Test
+    void testClusterElementCallFieldsSurviveWriteAndRead() {
+        FileEntry taskFile = new FileEntry("10.jsonl", "file://test/1/10.jsonl");
+        LogEntry stamped = LogEntry.builder()
+            .timestamp(Instant.parse("2026-09-04T10:00:00Z"))
+            .level(LogEntry.Level.INFO)
+            .componentName("httpClient")
+            .taskExecutionId(10L)
+            .message("stamped")
+            .clusterElementCallId("call-1")
+            .clusterElementWorkflowNodeName("tool_1")
+            .build();
+
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(true);
+        when(fileStorageService.getFileEntry(JOB_DIR, "10.jsonl")).thenReturn(taskFile);
+        when(fileStorageService.readFileToBytes(JOB_DIR, taskFile))
+            .thenReturn(jsonLine(stamped).getBytes(StandardCharsets.UTF_8));
+        when(fileStorageService.fileExists(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(false);
+
+        LogEntry logEntry = logFileStorage.readLogEntries(JOB_ID, 10L)
+            .get(0);
+
+        assertEquals("call-1", logEntry.clusterElementCallId());
+        assertEquals("tool_1", logEntry.clusterElementWorkflowNodeName());
+    }
+
+    @Test
+    void testAStoredLineWithoutClusterElementCallFieldsReadsWithBothNull() {
+        FileEntry taskFile = new FileEntry("10.jsonl", "file://test/1/10.jsonl");
+        String legacyLine =
+            "{\"timestamp\":\"2026-09-04T10:00:00Z\",\"level\":\"INFO\",\"componentName\":\"httpClient\","
+                + "\"taskExecutionId\":10,\"message\":\"from before\"}\n";
+
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(true);
+        when(fileStorageService.getFileEntry(JOB_DIR, "10.jsonl")).thenReturn(taskFile);
+        when(fileStorageService.readFileToBytes(JOB_DIR, taskFile))
+            .thenReturn(legacyLine.getBytes(StandardCharsets.UTF_8));
+        when(fileStorageService.fileExists(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(false);
+
+        LogEntry logEntry = logFileStorage.readLogEntries(JOB_ID, 10L)
+            .get(0);
+
+        assertEquals("from before", logEntry.message());
+        assertNull(logEntry.clusterElementCallId());
+        assertNull(logEntry.clusterElementWorkflowNodeName());
     }
 
     @Test

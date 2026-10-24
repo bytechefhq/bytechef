@@ -31,6 +31,8 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
@@ -891,6 +893,13 @@ class ContextImpl implements Context, LogEntryBufferAware {
                 .taskExecutionId(getStorageTaskExecutionId())
                 .triggerExecutionId(triggerExecutionId)
                 .message(message);
+
+            ClusterElementCallRef clusterElementCallRef = ClusterElementCallScope.current();
+
+            if (clusterElementCallRef != null) {
+                builder.clusterElementCallId(clusterElementCallRef.id())
+                    .clusterElementWorkflowNodeName(clusterElementCallRef.workflowNodeName());
+            }
 
             if (exception != null) {
                 builder.exception(exception);
