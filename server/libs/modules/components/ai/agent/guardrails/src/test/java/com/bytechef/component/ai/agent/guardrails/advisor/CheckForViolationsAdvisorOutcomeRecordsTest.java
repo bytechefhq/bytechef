@@ -180,6 +180,28 @@ class CheckForViolationsAdvisorOutcomeRecordsTest {
     }
 
     @Test
+    void testCrashedCheckErrorOmitsTheExceptionMessage() {
+        GuardrailCheckFunction crashing = (text, context) -> {
+            throw new IllegalStateException("leaked-user-text");
+        };
+
+        CheckForViolationsAdvisor advisor = builderWithTarget()
+            .add(element("keywords_1", "keywords/v1/keywords"), crashing, EMPTY, EMPTY, EMPTY, EMPTY, Map.of(), null)
+            .build();
+
+        advisor.adviseCall(request("anything"), mock(CallAdvisorChain.class));
+
+        List<ClusterElementCallRecord> records = drainRecords();
+
+        assertThat(records)
+            .filteredOn(callRecord -> callRecord.status() == Status.FAILED)
+            .singleElement()
+            .satisfies(callRecord -> assertThat(callRecord.error())
+                .contains("IllegalStateException")
+                .doesNotContain("leaked-user-text"));
+    }
+
+    @Test
     void testSharedModelFailureLeavesTheCheckBlockedNotFailed() {
         RuntimeException providerError = new RuntimeException("provider down");
 
