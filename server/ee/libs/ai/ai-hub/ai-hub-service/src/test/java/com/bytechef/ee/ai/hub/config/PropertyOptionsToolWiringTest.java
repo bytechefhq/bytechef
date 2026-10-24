@@ -33,10 +33,10 @@ class PropertyOptionsToolWiringTest {
         assertThat(toolNames(askAgent))
             .contains(
                 "listConnectionsForComponent", "lookupActionPropertyOptions", "lookupTriggerPropertyOptions",
-                "askUserQuestion")
+                "lookupClusterElementPropertyOptions", "askUserQuestion")
             .doesNotContain(
-                "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption", "createConnection",
-                "lookupPropertyOptions");
+                "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption",
+                "selectClusterElementPropertyOption", "createConnection", "lookupPropertyOptions");
     }
 
     @Test
@@ -47,8 +47,9 @@ class PropertyOptionsToolWiringTest {
         assertThat(toolNames(buildAgent))
             .contains(
                 "listConnectionsForComponent", "selectConnection", "lookupActionPropertyOptions",
-                "lookupTriggerPropertyOptions", "selectPropertyOption", "selectTriggerPropertyOption",
-                "askUserQuestion", "createConnection")
+                "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions", "selectPropertyOption",
+                "selectTriggerPropertyOption", "selectClusterElementPropertyOption", "askUserQuestion",
+                "createConnection")
             .doesNotContain("lookupPropertyOptions");
     }
 

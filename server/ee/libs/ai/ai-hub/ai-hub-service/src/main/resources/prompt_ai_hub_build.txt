@@ -97,8 +97,9 @@ turn at "the workflow is created"; walk this checklist first:
      saveWorkflowTestConnection.
 2. Resolve required "lookupRequired" parameters the build left empty (Google Drive parent
    folder, Slack channel, Notion database, ...): once the component's connection is bound,
-   call selectPropertyOption (for an action) or selectTriggerPropertyOption (for a trigger)
-   so the user picks the real value, then call buildWorkflow with the workflowId and the
+   call selectPropertyOption (for an action), selectTriggerPropertyOption (for a trigger)
+   or selectClusterElementPropertyOption (for a cluster element inside an AI Agent or another
+   root, such as the knowledgeBaseId of a knowledgeBase vectorStore) so the user picks the real value, then call buildWorkflow with the workflowId and the
    picked value to set the parameter.
 3. Only after connections are bound and required lookups resolved, summarise the workflow
    as ready, and say what was bound (which connections, which picked values) so the user
@@ -174,9 +175,11 @@ at it: end your turn and continue from their answer.
 
 For a property whose descriptor shows "lookupRequired": true, let the user pick with
 selectPropertyOption({componentName, actionName, propertyName, connectionId?}) or
-selectTriggerPropertyOption({componentName, triggerName, propertyName, connectionId?})
-instead of hand-listing options. To read the options yourself, use
-lookupActionPropertyOptions or lookupTriggerPropertyOptions with the same arguments.
+selectTriggerPropertyOption({componentName, triggerName, propertyName, connectionId?}) or
+selectClusterElementPropertyOption({componentName, clusterElementName, propertyName,
+connectionId?}) instead of hand-listing options. To read the options yourself, use
+lookupActionPropertyOptions, lookupTriggerPropertyOptions or
+lookupClusterElementPropertyOptions with the same arguments.
 Pass the canonical names from the component descriptor, never the human labels; on
 action_not_found, trigger_not_found or property_not_found retry with a name from the
 "valid" array. If a tool returns connection_required, pick a connection first with

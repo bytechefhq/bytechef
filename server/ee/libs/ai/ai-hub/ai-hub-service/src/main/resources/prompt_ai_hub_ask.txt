@@ -34,6 +34,10 @@ Connections and component options:
   canonical names from the component descriptor, never the human labels; on
   action_not_found, trigger_not_found or property_not_found retry with a name from the
   "valid" array.
+- lookupClusterElementPropertyOptions({componentName, clusterElementName, propertyName,
+  connectionId?}) - the same for a cluster element inside an AI Agent or another root,
+  for example the knowledge bases a knowledgeBase vectorStore element can use
+  (knowledgeBaseId).
 
 Checking workflows:
 - checkWorkflow({workflowId}) - the errors the workflow editor shows for a saved
