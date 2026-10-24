@@ -27,6 +27,7 @@ import {createPortal} from 'react-dom';
 import {twMerge} from 'tailwind-merge';
 
 interface WorkflowExecutionLogsContentProps {
+    clusterElementCallId?: string;
     isEditorEnvironment?: boolean;
     jobId?: string;
     taskExecutionId?: string;
@@ -34,7 +35,7 @@ interface WorkflowExecutionLogsContentProps {
     triggerExecutionId?: string;
 }
 
-type LogsPageType = JobFileLogsQuery['jobFileLogs'];
+type LogsPageType = TriggerExecutionFileLogsQuery['triggerExecutionFileLogs'];
 
 interface LogsQueryResultI<TData> {
     data?: TData;
@@ -232,6 +233,7 @@ const LogEntryRow = ({collapsed, entry, showComponentName}: LogEntryRowProps) =>
 };
 
 const WorkflowExecutionLogsContent = ({
+    clusterElementCallId,
     isEditorEnvironment,
     jobId,
     taskExecutionId,
@@ -246,7 +248,11 @@ const WorkflowExecutionLogsContent = ({
     const [size] = useState(100);
 
     const isTriggerLogs = !isEditorEnvironment && !!triggerExecutionId;
-    const jobLogsFilter = taskExecutionId ? {taskExecutionId} : null;
+    const jobLogsFilter = taskExecutionId
+        ? clusterElementCallId
+            ? {clusterElementCallId, taskExecutionId}
+            : {taskExecutionId}
+        : null;
 
     const productionQuery = useJobFileLogsQuery(
         {
