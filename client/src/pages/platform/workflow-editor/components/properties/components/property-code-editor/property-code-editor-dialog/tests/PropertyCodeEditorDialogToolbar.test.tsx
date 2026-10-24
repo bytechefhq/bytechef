@@ -1,9 +1,10 @@
 import {Dialog} from '@/components/Dialog';
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyCodeEditorDialogToolbar from '../PropertyCodeEditorDialogToolbar';
+import {usePropertyCodeEditorDialogStore} from '../stores/usePropertyCodeEditorDialogStore';
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -61,6 +62,28 @@ describe('PropertyCodeEditorDialogToolbar', () => {
     afterEach(() => {
         resetAll();
         vi.clearAllMocks();
+    });
+
+    describe('side panel toggle', () => {
+        it('shows the same panel icon whether the side panel is shown or hidden', () => {
+            act(() => usePropertyCodeEditorDialogStore.setState({rightPanelOpen: true}));
+
+            const {unmount} = renderWithProviders(<PropertyCodeEditorDialogToolbar {...defaultProps} />);
+
+            expect(screen.getByRole('button', {name: 'Hide side panel'}).querySelector('svg')).toHaveClass(
+                'lucide-panel-right'
+            );
+
+            unmount();
+
+            act(() => usePropertyCodeEditorDialogStore.setState({rightPanelOpen: false}));
+
+            renderWithProviders(<PropertyCodeEditorDialogToolbar {...defaultProps} />);
+
+            expect(screen.getByRole('button', {name: 'Show side panel'}).querySelector('svg')).toHaveClass(
+                'lucide-panel-right'
+            );
+        });
     });
 
     describe('rendering', () => {
