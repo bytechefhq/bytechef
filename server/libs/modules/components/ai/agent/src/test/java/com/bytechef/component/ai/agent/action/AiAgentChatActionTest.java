@@ -35,8 +35,13 @@ import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.te
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toPersistedContinueParameters;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolCall;
 import static com.bytechef.component.ai.agent.action.AiAgentResumeTestSupport.toolCallResponse;
+import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.RESPONSE_PROMPT;
+import static com.bytechef.platform.ai.constant.AiAgentSimulationConstants.TOOL_SIMULATIONS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -58,6 +63,7 @@ import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallDra
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
+import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
@@ -67,6 +73,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -322,6 +329,128 @@ class AiAgentChatActionTest {
         assertThat(failedRecords.getFirst()
             .workflowNodeName()).isEqualTo("rag_1");
         assertThat(prompts).isEmpty();
+    }
+
+    @Test
+    void testChatMemorySetUpFailureIsRecordedOnTheMemoryElement() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+
+        ClusterElementDefinitionService clusterElementDefinitionService = createClusterElementDefinitionService(
+            createChatModel(prompts, callNumber -> finalAnswer()), null);
+
+        ChatMemoryFunction chatMemoryFunction = (
+            inputParameters, connectionParameters, extensions, componentConnections) -> {
+
+            throw new IllegalStateException("memory store unreachable");
+        };
+
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(
+            AiAgentChatAction.of(
+                mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager()));
+
+        Throwable throwable = catchThrowable(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(true),
+            createRecordingActionContext(new AtomicReference<>())));
+
+        assertThat(throwable).isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Failed to initialize chat memory advisor")
+            .hasMessageContaining("memory store unreachable");
+
+        assertSingleSetUpFailure("chatMemory_1", throwable.getMessage());
+        assertThat(prompts).isEmpty();
+    }
+
+    @Test
+    void testRagSetUpFailureIsRecordedOnTheRagElement() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+
+        ClusterElementDefinitionService clusterElementDefinitionService = createClusterElementDefinitionService(
+            createChatModel(prompts, callNumber -> finalAnswer()), null);
+
+        RagFunction ragFunction = (inputParameters, connectionParameters, extensions, componentConnections) -> {
+            throw new IllegalStateException("vector store unreachable");
+        };
+
+        when(clusterElementDefinitionService.<RagFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testRag"))).thenReturn(ragFunction);
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(
+            AiAgentChatAction.of(
+                mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager()));
+
+        Throwable throwable = catchThrowable(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false, false, true),
+            createRecordingActionContext(new AtomicReference<>())));
+
+        assertThat(throwable).isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Failed to initialize RAG advisor")
+            .hasMessageContaining("vector store unreachable");
+
+        assertSingleSetUpFailure("rag_1", throwable.getMessage());
+        assertThat(prompts).isEmpty();
+    }
+
+    @Test
+    void testModelSetUpFailureIsRecordedOnTheModelElement() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+
+        ClusterElementDefinitionService clusterElementDefinitionService = createClusterElementDefinitionService(
+            createChatModel(prompts, callNumber -> finalAnswer()), null);
+
+        ModelFunction modelFunction = mock(ModelFunction.class);
+
+        when(modelFunction.apply(any(), any(), anyBoolean()))
+            .thenThrow(new IllegalArgumentException("model is required"));
+        when(clusterElementDefinitionService.<ModelFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testModel"))).thenReturn(modelFunction);
+
+        MultipleConnectionsPerformFunction performFunction = getPerformFunction(
+            AiAgentChatAction.of(
+                mock(AiAgentToolFacade.class), clusterElementDefinitionService, createToolCallingManager()));
+
+        Throwable throwable = catchThrowable(() -> performFunction.apply(
+            createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false),
+            createRecordingActionContext(new AtomicReference<>())));
+
+        assertThat(throwable).isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Failed to initialize model for cluster element")
+            .hasMessageContaining("model is required");
+
+        assertSingleSetUpFailure("model_1", throwable.getMessage());
+        assertThat(prompts).isEmpty();
+    }
+
+    @Test
+    void testFailingToolSimulationDoesNotFailTheModel() throws Exception {
+        List<Prompt> prompts = new ArrayList<>();
+
+        AiAgentChatAction.ChatActionDefinitionWrapper chatActionDefinition = createChatActionDefinition(
+            prompts, callNumber -> switch (callNumber) {
+                case 1 -> lookUpToolCallResponse();
+                case 2 -> throw new IllegalArgumentException("unknown simulation model");
+                default -> finalAnswer();
+            });
+
+        Map<String, Object> inputParameterValues = new HashMap<>(createInputParameters("TEXT").toMap());
+
+        inputParameterValues.put(
+            TOOL_SIMULATIONS, Map.of(LOOK_UP_TOOL_NAME, Map.of(RESPONSE_PROMPT, "Return a customer")));
+
+        Object result = getPerformFunction(chatActionDefinition).apply(
+            MockParametersFactory.create(inputParameterValues), createConnectionParameters(), createExtensions(false),
+            createRecordingActionContext(new AtomicReference<>()));
+
+        assertThat(result).isEqualTo(FINAL_ANSWER);
+        assertThat(prompts).hasSize(3);
+
+        ClusterElementCallDrain drain = ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+
+        assertThat(drain.records()).noneMatch(
+            callRecord -> callRecord.status() == ClusterElementCallRecord.Status.FAILED);
     }
 
     @Test
@@ -787,6 +916,25 @@ class AiAgentChatActionTest {
             mock(ActionContext.class));
 
         assertThat(performResult).isEqualTo(FINAL_ANSWER);
+    }
+
+    private static void assertSingleSetUpFailure(String workflowNodeName, String error) {
+        ClusterElementCallDrain drain = ClusterElementCallRecorder.getInstance()
+            .drain(TASK_EXECUTION_ID);
+
+        List<ClusterElementCallRecord> failedRecords = drain.records()
+            .stream()
+            .filter(callRecord -> callRecord.status() == ClusterElementCallRecord.Status.FAILED)
+            .toList();
+
+        assertThat(failedRecords).hasSize(1);
+
+        ClusterElementCallRecord failedRecord = failedRecords.getFirst();
+
+        assertThat(failedRecord.workflowNodeName()).isEqualTo(workflowNodeName);
+        assertThat(failedRecord.componentName()).isEqualTo("testComponent");
+        assertThat(failedRecord.parentId()).isNull();
+        assertThat(failedRecord.error()).isEqualTo(error);
     }
 
     private static AiAgentChatAction.ChatActionDefinitionWrapper createChatActionDefinition(
