@@ -20,7 +20,6 @@ import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.NodeValidationIssue;
-import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueKind;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueSeverity;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,7 +59,7 @@ class EditorPersistedWorkflowChecker implements PersistedWorkflowChecker {
                 issues.add(
                     new Issue(
                         nodeValidationIssue.nodeName(), nodeValidationIssue.message(),
-                        nodeValidationIssue.kind() == WorkflowIssueKind.MISSING_CONNECTION));
+                        nodeValidationIssue.userAction()));
             }
         }
 

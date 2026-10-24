@@ -38,7 +38,6 @@ import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
-import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueKind;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -348,17 +347,7 @@ public class ProjectWorkflowTools {
                 definition, workflowId,
                 environment == null ? Environment.DEVELOPMENT.ordinal() : environment.ordinal());
 
-        List<String> missingConnectionMessages = workflowValidationResult.nodeIssues()
-            .stream()
-            .filter(nodeValidationIssue -> nodeValidationIssue.kind() == WorkflowIssueKind.MISSING_CONNECTION)
-            .map(WorkflowValidatorFacade.NodeValidationIssue::message)
-            .toList();
-
-        List<String> errors = workflowValidationResult.errors()
-            .stream()
-            .filter(error -> missingConnectionMessages.stream()
-                .noneMatch(error::contains))
-            .toList();
+        List<String> errors = workflowValidationResult.savingErrors();
 
         if (!errors.isEmpty()) {
             throw new ExecutionException(
