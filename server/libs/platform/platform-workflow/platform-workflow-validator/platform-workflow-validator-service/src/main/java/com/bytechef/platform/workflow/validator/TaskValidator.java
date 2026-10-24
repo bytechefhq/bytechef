@@ -278,8 +278,8 @@ class TaskValidator {
             for (String presentKey : clusterElementsJsonNode.propertyNames()) {
                 if (!clusterElementKeys.contains(presentKey)) {
                     StringUtils.appendWithNewline(
-                        ValidationErrorUtils.undefinedClusterElement(presentKey, taskName),
-                        context.getWarnings());
+                        ValidationErrorUtils.undefinedClusterElementSlot(presentKey, taskType, clusterElementKeys),
+                        context.getErrors());
                 }
             }
         }
