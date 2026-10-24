@@ -19,11 +19,16 @@ function formatTestNodeDuration(durationMillis: number): string {
 }
 
 interface WorkflowTestNodeStatusProps {
+    durationPlacement?: 'bottom' | 'top';
     hideStatusBadge?: boolean;
     testNodeState: WorkflowTestNodeStateI;
 }
 
-const WorkflowTestNodeStatus = ({hideStatusBadge, testNodeState}: WorkflowTestNodeStatusProps) => (
+const WorkflowTestNodeStatus = ({
+    durationPlacement = 'bottom',
+    hideStatusBadge,
+    testNodeState,
+}: WorkflowTestNodeStatusProps) => (
     <>
         {!hideStatusBadge && (
             <span
@@ -44,7 +49,12 @@ const WorkflowTestNodeStatus = ({hideStatusBadge, testNodeState}: WorkflowTestNo
         )}
 
         {testNodeState.durationMillis != null && testNodeState.status !== 'RUNNING' && (
-            <span className="absolute -bottom-2.5 left-1/2 z-10 -translate-x-1/2 rounded-full border border-stroke-neutral-tertiary bg-surface-neutral-primary px-1.5 text-xs leading-4 text-content-neutral-secondary">
+            <span
+                className={twMerge(
+                    'absolute z-10 rounded-full border border-stroke-neutral-tertiary bg-surface-neutral-primary px-1.5 text-xs leading-4 text-content-neutral-secondary',
+                    durationPlacement === 'bottom' ? '-bottom-2.5 left-1/2 -translate-x-1/2' : '-top-2.5 right-5'
+                )}
+            >
                 {formatTestNodeDuration(testNodeState.durationMillis)}
             </span>
         )}
