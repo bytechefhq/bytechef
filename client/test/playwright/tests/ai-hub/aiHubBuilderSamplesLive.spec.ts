@@ -366,6 +366,8 @@ test.describe('@live Builder samples', () => {
                     workspaceId: workspaces[0].id,
                 });
 
+                await test.info().attach('buildWorkflow reply', {body: toolResultText(buildResult)});
+
                 expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
 
                 await expectSampleBuilt(sample, await readOnlyProjectWorkflowNodes(page, mcpProject.id));
