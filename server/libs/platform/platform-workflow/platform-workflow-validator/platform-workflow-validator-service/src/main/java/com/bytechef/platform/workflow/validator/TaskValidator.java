@@ -49,6 +49,12 @@ class TaskValidator {
     private TaskValidator() {
     }
 
+    static boolean isWellFormedType(String type) {
+        Matcher matcher = TYPE_PATTERN.matcher(type);
+
+        return matcher.matches();
+    }
+
     /**
      * Template method defining the validation algorithm for all tasks. Works directly with the legacy StringBuilder
      * approach for full backward compatibility.
