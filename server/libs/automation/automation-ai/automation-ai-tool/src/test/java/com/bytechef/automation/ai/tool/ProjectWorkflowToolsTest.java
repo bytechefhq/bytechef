@@ -180,6 +180,25 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
+        void testCreateProjectWorkflowSavesADefinitionThatRefersToAResourceTheUserHasYetToCreate() {
+            String missingResource = "Resource referenced by property 'knowledgeBaseId' is not available: 1";
+
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), any(), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(
+                    List.of("[rag_1] " + missingResource), List.of(),
+                    List.of(
+                        new WorkflowValidatorFacade.NodeValidationIssue(
+                            "rag_1", "knowledgeBaseId", WorkflowValidatorFacade.WorkflowIssueKind.MISSING_RESOURCE,
+                            WorkflowValidatorFacade.WorkflowIssueSeverity.ERROR, missingResource))));
+            when(projectWorkflowFacade.addWorkflow(7L, DEFINITION)).thenReturn(buildProjectWorkflow(55L, 7L, "wf-1"));
+
+            ProjectWorkflowInfo projectWorkflowInfo = newTools(null, workflowValidatorFacade)
+                .createProjectWorkflow(7L, DEFINITION, toolContext);
+
+            assertThat(projectWorkflowInfo.workflowId()).isEqualTo("wf-1");
+        }
+
+        @Test
         void testUpdateWorkflowSavesAValidDefinitionAndReturnsItsWarnings() {
             when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(buildDto("wf-uuid-2", 88L, 3));
             when(projectWorkflowFacade.updateWorkflow("wf-uuid-2", DEFINITION, 3))
