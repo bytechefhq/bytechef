@@ -42,6 +42,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall.Status;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.worker.config.PlatformWorkerConfiguration;
 import com.bytechef.platform.workflow.execution.constant.TaskExecutionMetadataConstants;
@@ -109,10 +110,13 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
             long jobId = Objects.requireNonNull(clonedTaskExecution.getJobId());
             long taskExecutionId = Objects.requireNonNull(clonedTaskExecution.getId());
 
-            recorder.callStarted(jobId, taskExecutionId, "httpClient_1");
-            recorder.callCompleted(jobId, taskExecutionId, "httpClient_1");
-            recorder.callStarted(jobId, taskExecutionId, "slack_1");
-            recorder.callFailed(jobId, taskExecutionId, "slack_1", "boom");
+            ClusterElementCallRef httpClientRef = start(jobId, taskExecutionId, "httpClient_1");
+
+            recorder.callCompleted(jobId, taskExecutionId, httpClientRef, "ok");
+
+            ClusterElementCallRef slackRef = start(jobId, taskExecutionId, "slack_1");
+
+            recorder.callFailed(jobId, taskExecutionId, slackRef, "boom");
 
             return "output";
         });
@@ -142,8 +146,9 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
             long jobId = Objects.requireNonNull(clonedTaskExecution.getJobId());
             long taskExecutionId = Objects.requireNonNull(clonedTaskExecution.getId());
 
-            recorder.callStarted(jobId, taskExecutionId, "httpClient_1");
-            recorder.callCompleted(jobId, taskExecutionId, "httpClient_1");
+            ClusterElementCallRef ref = start(jobId, taskExecutionId, "httpClient_1");
+
+            recorder.callCompleted(jobId, taskExecutionId, ref, "ok");
 
             return "output";
         });
@@ -162,7 +167,7 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
         Map<String, String> output = Map.of("response", "text");
 
         testTaskHandlerRegistry.register("recordStartedCallWithMapOutput/v1", clonedTaskExecution -> {
-            recorder.callStarted(
+            start(
                 Objects.requireNonNull(clonedTaskExecution.getJobId()),
                 Objects.requireNonNull(clonedTaskExecution.getId()), "httpClient_1");
 
@@ -182,7 +187,7 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
         TaskExecution taskExecution = createTaskExecution("recordStartedCall/v1");
 
         testTaskHandlerRegistry.register("recordStartedCall/v1", clonedTaskExecution -> {
-            recorder.callStarted(
+            start(
                 Objects.requireNonNull(clonedTaskExecution.getJobId()),
                 Objects.requireNonNull(clonedTaskExecution.getId()), "httpClient_1");
 
@@ -216,6 +221,10 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
         Map<String, ?> metadata = completedTaskExecution.getMetadata();
 
         assertFalse(metadata.containsKey(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALLS));
+    }
+
+    private ClusterElementCallRef start(long jobId, long taskExecutionId, String workflowNodeName) {
+        return recorder.callStarted(jobId, taskExecutionId, workflowNodeName, "component", "tool", null, "input");
     }
 
     private static TaskExecution createTaskExecution(String type) {

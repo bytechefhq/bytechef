@@ -19,6 +19,7 @@ package com.bytechef.platform.worker.task;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallDrain;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.workflow.execution.constant.TaskExecutionMetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,7 +43,9 @@ public class ClusterElementCallsTaskExecutionPostOutputProcessor implements Task
 
     @Override
     public void onTaskExecutionFinished(TaskExecution taskExecution) {
-        Map<String, ClusterElementCall> drainedCalls = recorder.drain(Validate.notNull(taskExecution.getId(), "id"));
+        ClusterElementCallDrain drain = recorder.drain(Validate.notNull(taskExecution.getId(), "id"));
+
+        Map<String, ClusterElementCall> drainedCalls = drain.calls();
 
         if (drainedCalls.isEmpty()) {
             return;

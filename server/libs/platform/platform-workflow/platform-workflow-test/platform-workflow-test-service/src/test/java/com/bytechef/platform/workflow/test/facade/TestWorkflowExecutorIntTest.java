@@ -32,6 +32,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -416,8 +417,10 @@ class TestWorkflowExecutorIntTest {
         ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
 
         try {
-            clusterElementCallRecorder.callStarted(jobId, taskExecutionId, "httpClient_1");
-            clusterElementCallRecorder.callFailed(jobId, taskExecutionId, "httpClient_1", "boom");
+            ClusterElementCallRef clusterElementCallRef = clusterElementCallRecorder.callStarted(
+                jobId, taskExecutionId, "httpClient_1", "httpClient", null, null, null);
+
+            clusterElementCallRecorder.callFailed(jobId, taskExecutionId, clusterElementCallRef, "boom");
 
             assertThat(
                 sseStreamBridge.awaitEvent(isEvent("cluster_element_failed"), TIMEOUT_SECONDS, TimeUnit.SECONDS))
@@ -427,7 +430,7 @@ class TestWorkflowExecutorIntTest {
 
             executeAsyncFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-            clusterElementCallRecorder.callStarted(jobId, taskExecutionId, "slack_1");
+            clusterElementCallRecorder.callStarted(jobId, taskExecutionId, "slack_1", "slack", null, null, null);
         } finally {
             clusterElementCallRecorder.drain(taskExecutionId);
         }
