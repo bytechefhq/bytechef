@@ -457,6 +457,17 @@ export const terminateOrphanRunningToolCalls = (chatId: string | undefined): voi
     aiChatToolCallStore.getState().failRunningInChat(chatId, {reason: 'Run finished with no result event'}, 'aborted');
 };
 
+/**
+ * Builds an AG-UI subscriber that streams text into assistant messages, records every tool call in the per-tool-
+ * call store, opens workflow tabs, and turns interactive tool results into data parts. A text message that follows
+ * earlier text or a tool call opens a new assistant message, and each tool call attaches to the assistant message
+ * current at its start. A tool error, a failed workflow tab open or a malformed interactive payload raises the retry
+ * banner only when the run finishes without a later successful call of a tool with the same name; any such success counts as the recovery, whatever its arguments, since a model
+ * retrying a failed call usually changes them. Later assistant text, or a later interactive card (a question, a
+ * picker, a connection or an approval card), also counts as the recovery of every earlier failure: the model has told
+ * the user what happened or the turn waits on the user. A run that fails shows its run error bubble instead of the banner, and a
+ * user Stop shows neither.
+ */
 export const buildAiHubSubscriber = ({
     addMessage,
     appendToLastAssistantMessage,
@@ -683,6 +694,8 @@ export const buildAiHubSubscriber = ({
             }
 
             currentAssistantMessageHasOutput = true;
+
+            unrecoveredToolFailures.clear();
         },
         onTextMessageStartEvent: () => {
             if (isStaleChat()) {
