@@ -1,6 +1,7 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {Skeleton} from '@/components/ui/skeleton';
 import SubflowExecutionBreadcrumb, {
     BreadcrumbEntryI,
     TruncatedLabel,
@@ -90,12 +91,31 @@ const WorkflowExecutionsTestOutput = ({
             <div className="relative size-full">
                 <div className="absolute inset-0 overflow-y-auto">
                     {workflowIsRunning && !workflowTestExecution?.job && (
-                        <div className="flex size-full items-center justify-center gap-x-1 p-3">
-                            <span className="flex animate-spin text-gray-400">
-                                <RefreshCwIcon className="size-5" />
-                            </span>
+                        <div className="size-full" data-testid="workflow-test-output-pending">
+                            <ResizablePanelGroup orientation="horizontal">
+                                <ResizablePanel
+                                    className="flex flex-col overflow-hidden"
+                                    defaultSize={resizablePanelSize}
+                                >
+                                    <div className="flex h-9 items-center gap-1 px-3 py-2">
+                                        <RefreshCwIcon className="size-3 shrink-0 animate-spin text-content-neutral-secondary" />
 
-                            <span className="text-content-neutral-secondary">Workflow is running...</span>
+                                        <span className="text-xs leading-4 font-medium text-content-neutral-secondary">
+                                            Starting
+                                        </span>
+                                    </div>
+
+                                    <div className="ml-3 space-y-2 pr-4">
+                                        <Skeleton className="h-14 w-full" />
+
+                                        <Skeleton className="h-14 w-full" />
+                                    </div>
+                                </ResizablePanel>
+
+                                <ResizableHandle className="bg-surface-neutral-secondary" />
+
+                                <ResizablePanel className="flex min-h-0 flex-col" />
+                            </ResizablePanelGroup>
                         </div>
                     )}
 
