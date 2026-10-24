@@ -111,7 +111,10 @@ class ValidationErrorUtils {
             "'; it belongs under " + String.join(" or ", new TreeSet<>(slotKeys));
     }
 
-    public static String undefinedClusterElement(String elementKey, String taskName) {
-        return "Cluster element '" + elementKey + "' are not defined in task " + taskName;
+    public static String undefinedClusterElementSlot(
+        String elementKey, String taskType, Collection<String> clusterElementKeys) {
+
+        return "Cluster element slot '" + elementKey + "' does not exist on " + taskType + "; its slots are " +
+            String.join(", ", new TreeSet<>(clusterElementKeys));
     }
 }
