@@ -6,15 +6,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {
-    PanelRightCloseIcon,
-    PanelRightOpenIcon,
-    PlayIcon,
-    SaveIcon,
-    SparklesIcon,
-    SquareIcon,
-    XIcon,
-} from 'lucide-react';
+import {PanelRightIcon, PlayIcon, SaveIcon, SparklesIcon, SquareIcon, XIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface PropertyCodeEditorDialogToolbarProps {
@@ -106,7 +98,8 @@ const PropertyCodeEditorDialogToolbar = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
-                            icon={rightPanelOpen ? <PanelRightCloseIcon /> : <PanelRightOpenIcon />}
+                            aria-label={rightPanelOpen ? 'Hide side panel' : 'Show side panel'}
+                            icon={<PanelRightIcon />}
                             onClick={() => setRightPanelOpen(!rightPanelOpen)}
                             size="icon"
                             variant="ghost"

@@ -4,7 +4,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import {PanelRightCloseIcon, PanelRightOpenIcon} from 'lucide-react';
+import {PanelRightIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
@@ -70,9 +70,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                                     <TooltipTrigger asChild>
                                         <Button
                                             aria-label={workflowPanelVisible ? 'Hide workflow' : 'Show workflow'}
-                                            icon={
-                                                workflowPanelVisible ? <PanelRightCloseIcon /> : <PanelRightOpenIcon />
-                                            }
+                                            icon={<PanelRightIcon />}
                                             onClick={() => setWorkflowPanelVisible(!workflowPanelVisible)}
                                             size="iconSm"
                                             variant="ghost"

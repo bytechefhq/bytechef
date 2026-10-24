@@ -91,6 +91,25 @@ describe('WorkflowExecutionDetail', () => {
         expect(screen.getByTestId('sheet-content')).toBeInTheDocument();
     });
 
+    it('shows the same panel icon whether the workflow panel is shown or hidden', () => {
+        executionQueryMock.mockReturnValue({
+            data: {id: 5, job: {id: '5', taskExecutions: []}, workflow: {label: 'Order intake'}},
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
+
+        const showWorkflowIcon = screen.getByRole('button', {name: 'Show workflow'}).querySelector('svg');
+
+        expect(showWorkflowIcon).toHaveClass('lucide-panel-right');
+
+        fireEvent.click(screen.getByRole('button', {name: 'Show workflow'}));
+
+        const hideWorkflowIcon = screen.getByRole('button', {name: 'Hide workflow'}).querySelector('svg');
+
+        expect(hideWorkflowIcon).toHaveClass('lucide-panel-right');
+    });
+
     it('leaves the panel out until there is a job or a trigger execution to show', () => {
         executionQueryMock.mockReturnValue({
             data: {id: 5, workflow: {label: 'Order intake'}},
