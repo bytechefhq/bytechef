@@ -123,12 +123,14 @@ const WorkflowTriggerAndComponentsRow = ({
                         <TooltipContent>{triggerData.componentName}</TooltipContent>
                     </Tooltip>
 
-                    {triggerData.description ? (
+                    {fitToWidth || triggerData.description ? (
                         <Tooltip>
                             <TooltipTrigger asChild>{triggerBadge}</TooltipTrigger>
 
                             <TooltipContent className="max-w-xs text-sm" side="right">
-                                {triggerData.description}
+                                {fitToWidth && <div className="font-semibold">{triggerLabel}</div>}
+
+                                {triggerData.description && <div>{triggerData.description}</div>}
                             </TooltipContent>
                         </Tooltip>
                     ) : (
