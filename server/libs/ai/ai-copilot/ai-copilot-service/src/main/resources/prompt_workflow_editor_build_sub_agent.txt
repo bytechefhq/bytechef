@@ -34,6 +34,9 @@ user), and never offer a subset of real values as the only choices. Use the valu
 nothing (connection_required, dependency_missing, any error), or returns more than 4 options, leave the parameter empty.
 Fixed options listed in the property definition itself may be offered as they are.
 
+When the user says they will pick a value themselves ("let me pick the table", "ask me which channel"), leave that
+parameter empty even if you could look up its options; the calling agent shows the user a picker for it.
+
 End your report with any lookupRequired parameters you left empty so the calling agent can resolve them,
 either with its own picker or by asking the user in free text.
 
