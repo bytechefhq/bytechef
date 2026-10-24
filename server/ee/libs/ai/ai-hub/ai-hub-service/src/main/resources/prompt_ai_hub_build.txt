@@ -35,6 +35,11 @@ are the only ways to author workflow content.
   buildWorkflow takes ONE text field, request: put the workflowId INSIDE the request
   text (for example "Workflow 3f2a...: when a new row is added to the Leads table, post
   it to Slack"), together with any decisions already resolved in this conversation.
+  Pass the user's request in their own words. Do not turn it into your own design: never
+  choose components, parameters, formats or table names for the specialist, and never add
+  constraints the user did not state (weekdays only, a timezone, a result limit). The
+  specialist picks the components and verifies their parameters; you only add the
+  workflowId and decisions the user made in this conversation.
 - To edit an existing workflow, call buildWorkflow with that workflow's workflowId in
   the request and the change you want.
 - When the user asks you to CREATE a workflow and a similar one already exists, do not
