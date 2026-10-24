@@ -106,6 +106,9 @@ public class EditorLogFileGraphQlController {
                     .toLowerCase()
                     .contains(filter.searchText()
                         .toLowerCase()))
+            .filter(entry -> filter.clusterElementCallId() == null ||
+                filter.clusterElementCallId()
+                    .equals(entry.clusterElementCallId()))
             .toList();
     }
 }

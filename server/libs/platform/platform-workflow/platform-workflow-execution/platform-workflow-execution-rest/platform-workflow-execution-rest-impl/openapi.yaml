@@ -267,6 +267,53 @@ components:
             - "STARTED"
             - "COMPLETED"
             - "FAILED"
+    ClusterElementCallRecord:
+      description: "One call a task made to one of its cluster elements, such as an AI agent's tool or sub-agent."
+      type: "object"
+      required:
+        - "id"
+        - "status"
+      properties:
+        componentName:
+          description: "The name of the component the called cluster element belongs to."
+          type: "string"
+        endDate:
+          description: "The time the call ended."
+          type: "string"
+          format: "date-time"
+        error:
+          description: "The error message of a failed call."
+          type: "string"
+        id:
+          description: "The unique identifier of the call."
+          type: "string"
+        input:
+          description: "The input of the call, capped in length."
+          type: "string"
+        output:
+          description: "The output of the call, capped in length."
+          type: "string"
+        parentId:
+          description: "The identifier of the call this call is nested under, such as a sub-agent call."
+          type: "string"
+        startDate:
+          description: "The time the call started."
+          type: "string"
+          format: "date-time"
+        status:
+          description: "The state of the call."
+          type: "string"
+          enum:
+            - "STARTED"
+            - "SUSPENDED"
+            - "COMPLETED"
+            - "FAILED"
+        toolName:
+          description: "The name of the tool that was called."
+          type: "string"
+        workflowNodeName:
+          description: "The workflow node name of the cluster element."
+          type: "string"
     ExecutionError:
       description: "Contains information about an error that happened during execution."
       type: "object"
@@ -617,6 +664,12 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ClusterElementCall"
+          readOnly: true
+        clusterElementCallRecords:
+          description: "The individual calls the task made to the cluster elements it chooses to call, in call order."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ClusterElementCallRecord"
           readOnly: true
     TriggerExecution:
       description: "Adds execution semantics to a trigger."

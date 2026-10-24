@@ -79,7 +79,7 @@ class LogFileGraphQlControllerTest {
             logEntry(now.plusSeconds(1), LogEntry.Level.ERROR, "the one that matters")));
 
         LogPage page = controller.triggerExecutionFileLogs(
-            77L, new LogFilterInput(LogEntry.Level.WARN, null, null, null, null, null), null, null);
+            77L, new LogFilterInput(LogEntry.Level.WARN, null, null, null, null, null, null), null, null);
 
         assertEquals(List.of("the one that matters"), page.content()
             .stream()
@@ -111,7 +111,33 @@ class LogFileGraphQlControllerTest {
         verifyNoInteractions(triggerLogFileStorage);
     }
 
+    @Test
+    void testFiltersByClusterElementCallId() {
+        Instant now = Instant.parse("2026-09-04T10:00:00Z");
+
+        when(logFileStorage.readLogEntriesByJobId(1L)).thenReturn(List.of(
+            logEntry(now, LogEntry.Level.INFO, "from a", "a"),
+            logEntry(now.plusSeconds(1), LogEntry.Level.INFO, "from b", "b"),
+            logEntry(now.plusSeconds(2), LogEntry.Level.INFO, "from nobody", null)));
+
+        LogPage filtered = controller.jobFileLogs(
+            1L, new LogFilterInput(null, null, null, null, null, null, "a"), null, null);
+        LogPage unfiltered = controller.jobFileLogs(1L, null, null, null);
+
+        assertEquals(List.of("from a"), filtered.content()
+            .stream()
+            .map(LogEntry::message)
+            .toList());
+        assertEquals(3, unfiltered.totalElements());
+    }
+
     private static LogEntry logEntry(Instant timestamp, LogEntry.Level level, String message) {
+        return logEntry(timestamp, level, message, null);
+    }
+
+    private static LogEntry logEntry(
+        Instant timestamp, LogEntry.Level level, String message, String clusterElementCallId) {
+
         return LogEntry.builder()
             .timestamp(timestamp)
             .level(level)
@@ -119,6 +145,7 @@ class LogFileGraphQlControllerTest {
             .taskExecutionId(77L)
             .triggerExecutionId(77L)
             .message(message)
+            .clusterElementCallId(clusterElementCallId)
             .build();
     }
 }

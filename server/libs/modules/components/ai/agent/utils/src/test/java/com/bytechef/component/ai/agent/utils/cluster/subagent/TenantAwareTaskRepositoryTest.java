@@ -18,6 +18,8 @@ package com.bytechef.component.ai.agent.utils.cluster.subagent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.tenant.TenantContext;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,6 +87,26 @@ class TenantAwareTaskRepositoryTest {
         assertThat(backgroundTask.waitForCompletion(5000L)).isTrue();
 
         assertThat(backgroundTenantId.get()).isEqualTo("bytechef_000042");
+    }
+
+    @Test
+    void testCarriesTheCurrentCallToTheBackgroundTask() throws Exception {
+        TenantAwareTaskRepository taskRepository = new TenantAwareTaskRepository(executorService);
+
+        ClusterElementCallRef ref = new ClusterElementCallRef("call-1", "subagent_1");
+        AtomicReference<ClusterElementCallRef> backgroundRef = new AtomicReference<>();
+
+        BackgroundTask backgroundTask = ClusterElementCallScope.callWith(
+            ref,
+            () -> taskRepository.putTask("task-1", () -> {
+                backgroundRef.set(ClusterElementCallScope.current());
+
+                return "done";
+            }));
+
+        assertThat(backgroundTask.waitForCompletion(5000L)).isTrue();
+
+        assertThat(backgroundRef.get()).isEqualTo(ref);
     }
 
     @Test

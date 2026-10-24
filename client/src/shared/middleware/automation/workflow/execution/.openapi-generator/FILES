@@ -2,6 +2,7 @@ apis/TriggerFormApi.ts
 apis/WorkflowExecutionApi.ts
 apis/index.ts
 docs/ClusterElementCall.md
+docs/ClusterElementCallRecord.md
 docs/ComponentConnection.md
 docs/ExecutionError.md
 docs/FieldOption.md
@@ -27,6 +28,7 @@ docs/WorkflowTask.md
 docs/WorkflowTrigger.md
 index.ts
 models/ClusterElementCall.ts
+models/ClusterElementCallRecord.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
 models/FieldOption.ts

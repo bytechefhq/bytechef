@@ -132,6 +132,9 @@ public class LogFileGraphQlController {
                     .toLowerCase()
                     .contains(filter.searchText()
                         .toLowerCase()))
+            .filter(entry -> filter.clusterElementCallId() == null ||
+                filter.clusterElementCallId()
+                    .equals(entry.clusterElementCallId()))
             .toList();
     }
 
@@ -141,7 +144,8 @@ public class LogFileGraphQlController {
         Long taskExecutionId,
         String fromTimestamp,
         String toTimestamp,
-        String searchText) {
+        String searchText,
+        String clusterElementCallId) {
     }
 
     @SuppressFBWarnings("EI")

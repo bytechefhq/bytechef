@@ -20,6 +20,37 @@ function createTaskExecution(overrides: Partial<TaskExecution> = {}): TaskExecut
 }
 
 describe('WorkflowTaskExecutionItem', () => {
+    describe('cluster element call rows', () => {
+        const createCallExecution = (clusterElementCallNote?: string) =>
+            createTaskExecution({
+                clusterElementCallId: 'call-1',
+                clusterElementCallNote,
+                endDate: undefined,
+                parentTaskExecutionId: '42',
+                status: 'STARTED',
+            } as Partial<TaskExecution>);
+
+        it('shows the note and no spinner for a call still running when its agent finished', () => {
+            const {container} = render(
+                <WorkflowTaskExecutionItem
+                    jobStatus="STARTED"
+                    taskExecution={createCallExecution('Still running when the agent finished')}
+                />
+            );
+
+            expect(screen.getByText('Still running when the agent finished')).toBeInTheDocument();
+            expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+        });
+
+        it('keeps the spinner for a running call without a note', () => {
+            const {container} = render(
+                <WorkflowTaskExecutionItem jobStatus="STARTED" taskExecution={createCallExecution()} />
+            );
+
+            expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+        });
+    });
+
     describe('status icon integration', () => {
         it('should render status icon from utility for completed task', () => {
             const taskExecution = createTaskExecution({

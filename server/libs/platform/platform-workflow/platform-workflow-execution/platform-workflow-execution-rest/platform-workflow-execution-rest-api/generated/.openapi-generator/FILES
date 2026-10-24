@@ -7,6 +7,7 @@ src/main/java/com/bytechef/platform/workflow/execution/web/rest/TriggerExecution
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ApprovalFormInputModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ApprovalFormModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ClusterElementCallModel.java
+src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ClusterElementCallRecordModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/ExecutionErrorModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/JobBasicModel.java
 src/main/java/com/bytechef/platform/workflow/execution/web/rest/model/JobConnectionModel.java

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 
@@ -30,7 +31,8 @@ import org.springframework.ai.chat.messages.ToolResponseMessage;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AgentToolSuspension(
-    ConversationState conversation, String pendingToolCallId, String suspendedToolResult) {
+    ConversationState conversation, String pendingToolCallId, String suspendedToolResult,
+    @Nullable String suspendedClusterElementCallId, @Nullable String suspendedClusterElementWorkflowNodeName) {
 
     public static final String CONTINUE_PARAMETER_KEY = "__bytechef_agent_tool_suspension__";
 

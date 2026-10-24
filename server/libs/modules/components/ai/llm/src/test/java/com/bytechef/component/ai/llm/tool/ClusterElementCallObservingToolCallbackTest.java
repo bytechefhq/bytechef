@@ -24,13 +24,25 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.platform.ai.tool.ToolSuspension;
+import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent.Type;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord.Status;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
@@ -50,19 +62,43 @@ class ClusterElementCallObservingToolCallbackTest {
     @BeforeEach
     void beforeEach() {
         recorder.addListener(1, events::add);
+
+        when(delegate.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("get")
+                .inputSchema("{}")
+                .build());
+    }
+
+    @AfterEach
+    void afterEach() {
+        recorder.drain(10);
     }
 
     @Test
-    void testReportsCompleted() {
-        when(delegate.call("{}")).thenReturn("result");
+    void testRecordsInputOutputAndToolName() {
+        when(delegate.call("{\"q\":1}")).thenReturn("result");
 
-        String result = createToolCallback(null).call("{}");
+        String result = createToolCallback(null).call("{\"q\":1}");
 
         assertThat(result).isEqualTo("result");
         assertThat(getTypes()).containsExactly(Type.STARTED, Type.COMPLETED);
         assertThat(events.getFirst()
             .call()
             .workflowNodeName()).isEqualTo("httpClient_1");
+
+        List<ClusterElementCallRecord> records = recorder.drain(10)
+            .records();
+
+        assertThat(records).hasSize(1);
+
+        ClusterElementCallRecord callRecord = records.getFirst();
+
+        assertThat(callRecord.status()).isEqualTo(Status.COMPLETED);
+        assertThat(callRecord.input()).isEqualTo("{\"q\":1}");
+        assertThat(callRecord.output()).isEqualTo("result");
+        assertThat(callRecord.toolName()).isEqualTo("get");
+        assertThat(callRecord.componentName()).isEqualTo("httpClient");
     }
 
     @Test
@@ -84,8 +120,36 @@ class ClusterElementCallObservingToolCallbackTest {
         assertThatThrownBy(() -> createToolCallback(null).call("{}")).isSameAs(exception);
         assertThat(getTypes()).containsExactly(Type.STARTED, Type.FAILED);
         assertThat(events.getLast()
-            .call()
+            .record()
             .error()).isEqualTo("boom");
+
+        ClusterElementCallRecord callRecord = recorder.drain(10)
+            .records()
+            .getFirst();
+
+        assertThat(callRecord.status()).isEqualTo(Status.FAILED);
+        assertThat(callRecord.error()).isEqualTo("boom");
+        assertThat(callRecord.input()).isEqualTo("{}");
+        assertThat(callRecord.toolName()).isEqualTo("get");
+    }
+
+    @Test
+    void testSuspensionFailureIsRecordedAsFailed() {
+        ToolSuspensionException exception = new ToolSuspensionException(
+            "The approval request could not be sent: boom", new RuntimeException("boom"));
+
+        when(delegate.call("{}")).thenThrow(exception);
+
+        assertThatThrownBy(() -> createToolCallback(null).call("{}")).isSameAs(exception);
+
+        List<ClusterElementCallRecord> records = recorder.drain(10)
+            .records();
+
+        assertThat(records).hasSize(1);
+        assertThat(records.getFirst()
+            .status()).isEqualTo(Status.FAILED);
+        assertThat(records.getFirst()
+            .error()).isEqualTo("The approval request could not be sent: boom");
     }
 
     @Test
@@ -98,7 +162,45 @@ class ClusterElementCallObservingToolCallbackTest {
     }
 
     @Test
-    void testSuspendedResultReportsNoOutcome() {
+    void testBindsTheCallWhileTheToolRuns() {
+        AtomicReference<ClusterElementCallRef> seen = new AtomicReference<>();
+
+        when(delegate.call("{}")).thenAnswer(invocation -> {
+            seen.set(ClusterElementCallScope.current());
+
+            return "result";
+        });
+
+        createToolCallback(null).call("{}");
+
+        ClusterElementCallRecord callRecord = recorder.drain(10)
+            .records()
+            .getFirst();
+
+        assertThat(seen.get()).isNotNull();
+        assertThat(seen.get()
+            .id()).isEqualTo(callRecord.id());
+        assertThat(seen.get()
+            .workflowNodeName()).isEqualTo("httpClient_1");
+        assertThat(ClusterElementCallScope.current()).isNull();
+    }
+
+    @Test
+    void testTakesItsParentFromTheEnclosingCall() {
+        when(delegate.call("{}")).thenReturn("result");
+
+        ClusterElementCallRef parentRef = new ClusterElementCallRef("parent-id", "aiAgent_2");
+
+        ClusterElementCallScope.callWith(parentRef, () -> createToolCallback(null).call("{}"));
+
+        assertThat(recorder.drain(10)
+            .records()
+            .getFirst()
+            .parentId()).isEqualTo("parent-id");
+    }
+
+    @Test
+    void testSuspendedResultMarksTheCallSuspended() {
         Suspend suspend = new Suspend(
             Map.of(ToolSuspension.SUSPENDED_TOOL_RESULT, "suspended-result"), Instant.parse("2026-10-24T10:00:00Z"));
 
@@ -107,6 +209,60 @@ class ClusterElementCallObservingToolCallbackTest {
         createToolCallback(suspend).call("{}");
 
         assertThat(getTypes()).containsExactly(Type.STARTED);
+
+        ClusterElementCallRef suspendedRef = recorder.findSuspendedCall(10)
+            .orElseThrow();
+
+        List<ClusterElementCallRecord> records = recorder.drain(10)
+            .records();
+
+        assertThat(records).hasSize(1);
+        assertThat(records.getFirst()
+            .status()).isEqualTo(Status.SUSPENDED);
+        assertThat(records.getFirst()
+            .id()).isEqualTo(suspendedRef.id());
+    }
+
+    @Test
+    void testConcurrentCallsKeepTheirOwnScope() throws Exception {
+        CountDownLatch bothStarted = new CountDownLatch(2);
+        List<String> seenIds = new CopyOnWriteArrayList<>();
+
+        when(delegate.call("{}")).thenAnswer(invocation -> {
+            bothStarted.countDown();
+
+            assertThat(bothStarted.await(5, TimeUnit.SECONDS)).isTrue();
+
+            ClusterElementCallRef current = ClusterElementCallScope.current();
+
+            seenIds.add(current == null ? "none" : current.id());
+
+            return "result";
+        });
+
+        ToolCallback toolCallback = createToolCallback(null);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        try {
+            Future<String> first = executorService.submit(() -> toolCallback.call("{}"));
+            Future<String> second = executorService.submit(() -> toolCallback.call("{}"));
+
+            first.get(10, TimeUnit.SECONDS);
+            second.get(10, TimeUnit.SECONDS);
+        } finally {
+            executorService.shutdownNow();
+        }
+
+        List<ClusterElementCallRecord> records = recorder.drain(10)
+            .records();
+
+        assertThat(records).hasSize(2);
+        assertThat(records).extracting(ClusterElementCallRecord::parentId)
+            .containsOnlyNulls();
+        assertThat(seenIds).containsExactlyInAnyOrderElementsOf(
+            records.stream()
+                .map(ClusterElementCallRecord::id)
+                .toList());
     }
 
     @Test
@@ -133,12 +289,13 @@ class ClusterElementCallObservingToolCallbackTest {
         List<ToolCallback> toolCallbacks = List.of(delegate);
 
         assertThat(
-            ClusterElementCallObservingToolCallback.wrap(toolCallbacks, "httpClient_1", mock(ActionContext.class)))
-                .isSameAs(toolCallbacks);
+            ClusterElementCallObservingToolCallback.wrap(
+                toolCallbacks, "httpClient_1", "httpClient", mock(ActionContext.class))).isSameAs(toolCallbacks);
     }
 
     private ToolCallback createToolCallback(Suspend suspend) {
-        return new ClusterElementCallObservingToolCallback(delegate, "httpClient_1", 1, 10, recorder, () -> suspend);
+        return new ClusterElementCallObservingToolCallback(
+            delegate, "httpClient_1", "httpClient", 1, 10, recorder, () -> suspend);
     }
 
     private List<Type> getTypes() {

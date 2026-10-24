@@ -106,6 +106,9 @@ class AiAgentUtilsTaskToolTest {
         assertThat(events).extracting(event -> event.call()
             .workflowNodeName())
             .containsOnly("httpClient_9");
+        assertThat(events).extracting(event -> event.record()
+            .componentName())
+            .containsOnly("httpClient");
     }
 
     private static ToolCallback namedToolCallback(String toolName) {

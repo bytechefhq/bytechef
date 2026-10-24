@@ -1,9 +1,11 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, TaskExecution} from '@/shared/middleware/platform/workflow/execution';
+import {CircleDashedIcon} from 'lucide-react';
 
 interface WorkflowTaskExecutionItemProps {
     attemptLabel?: string;
@@ -15,7 +17,14 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: Wor
     const {endDate, icon, startDate, status, title, workflowTask} = taskExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
-    const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobStatus));
+    const callNote = isClusterElementCallTaskExecution(taskExecution)
+        ? taskExecution.clusterElementCallNote
+        : undefined;
+    const statusIcon = callNote ? (
+        <CircleDashedIcon className="size-4 text-muted-foreground" />
+    ) : (
+        getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobStatus))
+    );
 
     return (
         <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">
@@ -31,6 +40,8 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: Wor
                         <span className="text-xs text-muted-foreground">
                             ({workflowTask?.name || workflowTask?.type})
                         </span>
+
+                        {callNote && <span className="text-xs text-muted-foreground">{callNote}</span>}
                     </div>
                 </div>
             </div>

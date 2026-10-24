@@ -37,6 +37,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
+import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.ai.agent.tool.ConversationState;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.JsonSchemaValidationAdvisor;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
@@ -45,11 +47,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
@@ -59,6 +63,7 @@ import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -108,7 +113,9 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class AbstractAiAgentChatActionTest {
 
     private static final long TOOL_CALL_JOB_ID = 6333L;
@@ -1562,6 +1569,8 @@ class AbstractAiAgentChatActionTest {
         AutoCloseable handle = ClusterElementCallRecorder.getInstance()
             .addListener(TOOL_CALL_JOB_ID, events::add);
 
+        List<ClusterElementCallRecord> records;
+
         try {
 
             List<ToolCallback> toolCallbacks = buildToolCallbacks(Map.of(), "httpClient_1", "slack_1");
@@ -1570,15 +1579,72 @@ class AbstractAiAgentChatActionTest {
         } finally {
             handle.close();
 
-            ClusterElementCallRecorder.getInstance()
-                .drain(TOOL_CALL_TASK_EXECUTION_ID);
+            records = ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID)
+                .records();
         }
+
+        assertThat(records).extracting(ClusterElementCallRecord::componentName)
+            .containsExactly("httpClient");
 
         assertThat(events).extracting(ClusterElementCallEvent::type)
             .containsExactly(ClusterElementCallEvent.Type.STARTED, ClusterElementCallEvent.Type.COMPLETED);
         assertThat(events).extracting(event -> event.call()
             .workflowNodeName())
             .containsOnly("httpClient_1");
+    }
+
+    @Test
+    void testResumeCompletesTheSuspendedCall() throws Exception {
+        stubModelLookup();
+
+        String suspendedToolResult = createSuspendedToolResult();
+
+        ActionContext.Suspend suspend = new ActionContext.Suspend(
+            Map.of(
+                AgentToolSuspension.CONTINUE_PARAMETER_KEY,
+                new AgentToolSuspension(
+                    ConversationState.from(
+                        List.of(
+                            ToolResponseMessage.builder()
+                                .responses(
+                                    List.of(
+                                        new ToolResponseMessage.ToolResponse(
+                                            "call-1", "requestApproval", suspendedToolResult)))
+                                .build())),
+                    "call-1", suspendedToolResult, "id-1", "approval_1")),
+            Instant.now());
+
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "model_1", new ComponentConnection("testComponent", 1, 1L, Map.of(), null));
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+
+        List<ClusterElementCallRecord> records;
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            action.buildResumedRequestSpec(
+                MockParametersFactory.create(Map.of()), connectionParameters,
+                MockParametersFactory.create(Map.of("clusterElements", Map.of("model", buildModelClusterElement()))),
+                MockParametersFactory.create(new HashMap<String, Object>(suspend.continueParameters())),
+                MockParametersFactory.create(Map.of("approved", true)), null, createToolCallActionContext());
+        } finally {
+            records = ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID)
+                .records();
+        }
+
+        assertThat(records).hasSize(1);
+        assertThat(records.getFirst()
+            .id()).isEqualTo("id-1");
+        assertThat(records.getFirst()
+            .status()).isEqualTo(ClusterElementCallRecord.Status.COMPLETED);
+        assertThat(records.getFirst()
+            .output()).isEqualTo("{\"approved\":true}");
     }
 
     @Test
@@ -1645,13 +1711,13 @@ class AbstractAiAgentChatActionTest {
         List<Map<String, Object>> toolElements = new ArrayList<>();
 
         for (String workflowNodeName : workflowNodeNames) {
-            toolElements.add(buildToolClusterElement(workflowNodeName, "otherComponent/v1/otherTool"));
+            toolElements.add(buildToolClusterElement(workflowNodeName, "httpClient/v1/get"));
         }
 
         clusterElements.put("tools", toolElements);
 
         when(clusterElementDefinitionService.<MultipleConnectionsToolFunction>getClusterElement(
-            eq("otherComponent"), eq(1), eq("otherTool")))
+            eq("httpClient"), eq(1), eq("get")))
                 .thenReturn(mock(MultipleConnectionsToolFunction.class));
         when(aiAgentToolFacade.getFunctionToolCallback(any(ClusterElement.class), anyMap(), any(), any()))
             .thenAnswer(invocation -> namedToolCallback(
@@ -1675,6 +1741,14 @@ class AbstractAiAgentChatActionTest {
 
             return ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getToolCallbacks();
         }
+    }
+
+    private static String createSuspendedToolResult() {
+        ActionContextAware suspendingContext = mock(ActionContextAware.class);
+
+        when(suspendingContext.getSuspend()).thenReturn(new ActionContext.Suspend(Map.of(), Instant.now()));
+
+        return ToolSuspension.suspendedToolResult(suspendingContext);
     }
 
     private static ActionContextAware createToolCallActionContext() {

@@ -67,6 +67,49 @@ describe('WorkflowExecutionsAccordionItem', () => {
         expect(screen.getByRole('button')).not.toHaveAttribute('aria-expanded');
     });
 
+    it("shows an agent's tool calls as nested rows", async () => {
+        const onExecutionClick = vi.fn();
+        const agentExecution = {
+            ...createTaskExecution('21', 'COMPLETED'),
+            clusterElementCallRecords: [
+                {
+                    id: 'call-1',
+                    startDate: new Date('2026-09-07T18:47:01Z'),
+                    status: 'COMPLETED',
+                    toolName: 'fetch_ok',
+                    workflowNodeName: 'tools_1',
+                },
+                {
+                    id: 'call-2',
+                    startDate: new Date('2026-09-07T18:47:02Z'),
+                    status: 'COMPLETED',
+                    toolName: 'fetch_ok',
+                    workflowNodeName: 'tools_1',
+                },
+            ],
+        } as TaskExecution;
+
+        render(
+            <Accordion type="multiple">
+                <WorkflowExecutionsAccordionItem
+                    execution={agentExecution}
+                    onExecutionClick={onExecutionClick}
+                    selectedExecutionId=""
+                >
+                    <WorkflowTaskExecutionItem taskExecution={agentExecution} />
+                </WorkflowExecutionsAccordionItem>
+            </Accordion>
+        );
+
+        await userEvent.click(screen.getByText('Condition'));
+        await userEvent.click(screen.getByText('fetch_ok #1'));
+
+        expect(screen.getByText('fetch_ok #2')).toBeInTheDocument();
+        expect(onExecutionClick).toHaveBeenLastCalledWith(
+            expect.objectContaining({id: 'call-1', title: 'fetch_ok #1'})
+        );
+    });
+
     describe('loop iterations', () => {
         let intersectionCallbacks: Array<{callback: IntersectionObserverCallback; element: Element}>;
 

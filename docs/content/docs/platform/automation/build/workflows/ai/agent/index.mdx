@@ -320,6 +320,8 @@ Tools turn workflow components into actions the agent can call mid-conversation.
 > [test run](/platform/automation/build/workflows/workflows#run-test-and-the-output-panel) executes and
 > afterwards on the [execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows)
 > of a deployed run.
+>
+> The tool call rows described below are coming soon too.
 
 A tool turns blue while the agent calls it, then green with its duration when the call returns, or red
 when the call throws an error; its wire from the Tools slot follows. What counts:
@@ -337,6 +339,28 @@ when the call throws an error; its wire from the Tools slot follows. What counts
   loop for example, the times add up. A call waiting on a human-in-the-loop answer stays blue until it
   resumes.
 - **Simulated calls** are coloured like real ones.
+
+Each tool call is also a row of its own under the agent's task row, in the test output and in the
+execution detail:
+
+- **One row per call**, in the order the calls happened. A tool called several times gets numbered
+  rows, such as `fetch_ok` and `fetch_ok #2`.
+- **Selecting a row** shows that call's **Input**, **Output** or **Error**, and its **Logs** show only
+  the entries from that call. A tool backed by an external provider, such as an MCP Client tool, has no logs of its own, so its **Logs** tab is empty. The agent's own **Logs** tab is unchanged.
+- **Rows appear live.** During a test run a row shows up as soon as the call starts, and fills in when
+  it returns.
+- **A Task Tool sub-agent nests three levels deep.** The agent's `Task` call is a row (its **Input** is
+  the prompt, its **Output** the result), the sub-agent run is nested under it, and the tools the
+  sub-agent called are nested under that run. A background run's result is collected by separate Task
+  output calls, which are rows under the agent.
+- **Long values are cut off.** An input or output over 65,536 characters is truncated, and ends with a
+  marker giving the original length.
+- **A call waiting on a human** reads "Waiting for a response", and completes with the answer when the
+  run resumes.
+- **A background sub-agent's call** that was still running when the agent finished reads "Still running
+  when the agent finished".
+- **Only tools and Task Tool sub-agents get rows.** The model, memory, RAG and guardrail elements do
+  not.
 
 ### Supplying tool parameters with fromAi
 

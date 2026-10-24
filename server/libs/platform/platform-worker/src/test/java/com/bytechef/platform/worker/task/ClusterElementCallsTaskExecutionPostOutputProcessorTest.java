@@ -19,11 +19,14 @@ package com.bytechef.platform.worker.task;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall.Status;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.workflow.execution.constant.TaskExecutionMetadataConstants;
 import java.time.Instant;
 import java.util.List;
@@ -43,10 +46,13 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorTest {
     void testWritesDrainedCallsToMetadata() {
         TaskExecution taskExecution = createTaskExecution();
 
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
-        recorder.callStarted(1, 10, "slack_1");
-        recorder.callFailed(1, 10, "slack_1", "boom");
+        ClusterElementCallRef httpRef = start("httpClient_1");
+
+        recorder.callCompleted(1, 10, httpRef, "ok");
+
+        ClusterElementCallRef slackRef = start("slack_1");
+
+        recorder.callFailed(1, 10, slackRef, "boom");
 
         processor.onTaskExecutionFinished(taskExecution);
 
@@ -61,6 +67,33 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorTest {
     }
 
     @Test
+    void testWritesRecordsToMetadata() {
+        TaskExecution taskExecution = createTaskExecution();
+
+        ClusterElementCallRef firstRef = start("httpClient_1");
+
+        recorder.callCompleted(1, 10, firstRef, "first");
+
+        ClusterElementCallRef secondRef = start("slack_1");
+
+        recorder.callCompleted(1, 10, secondRef, "second");
+
+        processor.onTaskExecutionFinished(taskExecution);
+
+        List<Map<String, ?>> records = getRecordMaps(taskExecution);
+
+        assertEquals(2, records.size());
+        assertEquals(firstRef.id(), records.get(0)
+            .get("id"));
+        assertEquals("first", records.get(0)
+            .get("output"));
+        assertEquals(secondRef.id(), records.get(1)
+            .get("id"));
+        assertTrue(taskExecution.getMetadata()
+            .containsKey(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALLS));
+    }
+
+    @Test
     void testMergesWithExistingMetadata() {
         TaskExecution taskExecution = createTaskExecution();
 
@@ -72,8 +105,9 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorTest {
                 new ClusterElementCall("httpClient_1", Status.FAILED, startDate, startDate.plusSeconds(1), "boom")
                     .toMap()));
 
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
+        ClusterElementCallRef ref = start("httpClient_1");
+
+        recorder.callCompleted(1, 10, ref, "ok");
 
         processor.onTaskExecutionFinished(taskExecution);
 
@@ -85,10 +119,40 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorTest {
     }
 
     @Test
+    void testMergesRecordsWithStoredOnes() {
+        TaskExecution taskExecution = createTaskExecution();
+
+        Instant startDate = Instant.parse("2026-10-23T10:00:00Z");
+
+        taskExecution.putMetadata(
+            TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS,
+            List.of(
+                new ClusterElementCallRecord(
+                    "a", null, "httpClient_1", "httpClient", "get", ClusterElementCallRecord.Status.SUSPENDED,
+                    startDate, null, "stored input", null, null)
+                        .toMap()));
+
+        recorder.callCompleted(1, 10, new ClusterElementCallRef("a", "httpClient_1"), "answer");
+
+        processor.onTaskExecutionFinished(taskExecution);
+
+        List<Map<String, ?>> records = getRecordMaps(taskExecution);
+
+        assertEquals(1, records.size());
+
+        ClusterElementCallRecord record = ClusterElementCallRecord.fromMap(records.get(0));
+
+        assertEquals("a", record.id());
+        assertEquals(ClusterElementCallRecord.Status.COMPLETED, record.status());
+        assertEquals("stored input", record.input());
+        assertEquals("answer", record.output());
+    }
+
+    @Test
     void testLeavesOutputUnchanged() {
         Object output = Map.of("response", "text");
 
-        recorder.callStarted(1, 10, "httpClient_1");
+        start("httpClient_1");
 
         assertSame(output, processor.process(createTaskExecution(), output));
     }
@@ -97,7 +161,7 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorTest {
     void testProcessLeavesCallsForTheFinishedHook() {
         TaskExecution taskExecution = createTaskExecution();
 
-        recorder.callStarted(1, 10, "httpClient_1");
+        start("httpClient_1");
 
         assertEquals("output", processor.process(taskExecution, "output"));
         assertFalse(taskExecution.getMetadata()
@@ -117,6 +181,18 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorTest {
 
         assertFalse(taskExecution.getMetadata()
             .containsKey(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALLS));
+        assertFalse(taskExecution.getMetadata()
+            .containsKey(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS));
+    }
+
+    private ClusterElementCallRef start(String workflowNodeName) {
+        return recorder.callStarted(1, 10, workflowNodeName, "component", "tool", null, "input");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Map<String, ?>> getRecordMaps(TaskExecution taskExecution) {
+        return (List<Map<String, ?>>) taskExecution.getMetadata()
+            .get(TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS);
     }
 
     private static TaskExecution createTaskExecution() {
