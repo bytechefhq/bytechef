@@ -114,7 +114,28 @@ const WorkflowExecutionsTestOutput = ({
 
                                 <ResizableHandle className="bg-surface-neutral-secondary" />
 
-                                <ResizablePanel className="flex min-h-0 flex-col" />
+                                <ResizablePanel className="flex min-h-0 flex-col">
+                                    <div
+                                        className="flex flex-col gap-4 p-4"
+                                        data-testid="workflow-test-output-pending-details"
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <Skeleton className="h-5 w-48" />
+
+                                            <Skeleton className="h-4 w-32" />
+                                        </div>
+
+                                        <Skeleton className="h-9 w-56" />
+
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-3/4" />
+
+                                            <Skeleton className="h-4 w-1/2" />
+
+                                            <Skeleton className="h-4 w-2/3" />
+                                        </div>
+                                    </div>
+                                </ResizablePanel>
                             </ResizablePanelGroup>
                         </div>
                     )}

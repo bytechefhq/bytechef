@@ -32,4 +32,12 @@ describe('WorkflowExecutionsTestOutput', () => {
         expect(screen.queryByText('Workflow is running...')).not.toBeInTheDocument();
         expect(screen.getByTestId('workflow-test-output-pending')).toBeInTheDocument();
     });
+
+    it('draws placeholders in the details pane while a run waits for its first progress snapshot', () => {
+        render(<WorkflowExecutionsTestOutput workflowIsRunning />);
+
+        const detailsPane = screen.getByTestId('workflow-test-output-pending-details');
+
+        expect(detailsPane.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
+    });
 });
