@@ -18,6 +18,8 @@ package com.bytechef.platform.component.definition.ai.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,10 +28,13 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisor;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 /**
  * @author Ivica Cardic
@@ -51,7 +56,7 @@ class ClusterElementFailureAttributingAdvisorTest {
         RuntimeException exception = new RuntimeException("store unavailable");
         CallAdvisor delegate = mock(CallAdvisor.class);
 
-        when(delegate.adviseCall(request, chain)).thenThrow(exception);
+        when(delegate.adviseCall(eq(request), any())).thenThrow(exception);
 
         CallAdvisor advisor = new ClusterElementFailureAttributingAdvisor(delegate, "chatMemory_1", "simple", target);
 
@@ -86,6 +91,63 @@ class ClusterElementFailureAttributingAdvisorTest {
     }
 
     @Test
+    void testFailureFromBelowIsNotAttributedToTheAdvisor() {
+        RuntimeException exception = new IllegalStateException("No ToolCallback found for tool name: invented");
+
+        when(chain.nextCall(request)).thenThrow(exception);
+
+        CallAdvisor advisor = new ClusterElementFailureAttributingAdvisor(
+            new PassThroughAdvisor(), "chatMemory_1", "simple", target);
+
+        assertThatThrownBy(() -> advisor.adviseCall(request, chain)).isSameAs(exception);
+        assertThat(recorder.drain(2L)
+            .records()).isEmpty();
+    }
+
+    @Test
+    void testStreamFailureFromBelowIsNotAttributedToTheAdvisor() {
+        RuntimeException exception = new IllegalStateException("No ToolCallback found for tool name: invented");
+        StreamAdvisorChain streamAdvisorChain = mock(StreamAdvisorChain.class);
+
+        when(streamAdvisorChain.nextStream(request)).thenReturn(Flux.error(exception));
+
+        StreamAdvisor advisor = new ClusterElementFailureAttributingAdvisor(
+            new PassThroughAdvisor(), "chatMemory_1", "simple", target);
+
+        StepVerifier.create(advisor.adviseStream(request, streamAdvisorChain))
+            .expectErrorMatches(throwable -> throwable == exception)
+            .verify();
+
+        assertThat(recorder.drain(2L)
+            .records()).isEmpty();
+    }
+
+    @Test
+    void testStreamOwnFailureIsRecordedOnce() {
+        RuntimeException exception = new RuntimeException("store unavailable");
+        StreamAdvisor delegate = mock(StreamAdvisor.class);
+        StreamAdvisorChain streamAdvisorChain = mock(StreamAdvisorChain.class);
+
+        when(delegate.adviseStream(eq(request), any()))
+            .thenReturn(Flux.error(exception));
+
+        StreamAdvisor advisor = new ClusterElementFailureAttributingAdvisor(delegate, "chatMemory_1", "simple", target);
+
+        StepVerifier.create(advisor.adviseStream(request, streamAdvisorChain))
+            .expectErrorMatches(throwable -> throwable == exception)
+            .verify();
+
+        List<ClusterElementCallRecord> records = recorder.drain(2L)
+            .records();
+
+        assertThat(records).hasSize(1);
+        assertThat(records.getFirst()
+            .status()).isEqualTo(Status.FAILED);
+        assertThat(records.getFirst()
+            .workflowNodeName()).isEqualTo("chatMemory_1");
+    }
+
+    @Test
     void testOrderAndNameDelegate() {
         CallAdvisor delegate = new PassThroughAdvisor();
         ClusterElementFailureAttributingAdvisor advisor = new ClusterElementFailureAttributingAdvisor(
@@ -106,7 +168,7 @@ class ClusterElementFailureAttributingAdvisorTest {
 
     @Test
     void testNonStreamAdvisorDelegateIsRejectedForAStream() {
-        CallAdvisor delegate = new PassThroughAdvisor();
+        CallAdvisor delegate = mock(CallAdvisor.class);
         ClusterElementFailureAttributingAdvisor advisor = new ClusterElementFailureAttributingAdvisor(
             delegate, "chatMemory_1", "simple", target);
 
@@ -114,13 +176,20 @@ class ClusterElementFailureAttributingAdvisorTest {
             .isInstanceOf(IllegalStateException.class);
     }
 
-    private static final class PassThroughAdvisor implements CallAdvisor {
+    private static final class PassThroughAdvisor implements CallAdvisor, StreamAdvisor {
 
         @Override
-        public org.springframework.ai.chat.client.ChatClientResponse adviseCall(
+        public ChatClientResponse adviseCall(
             ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
 
             return callAdvisorChain.nextCall(chatClientRequest);
+        }
+
+        @Override
+        public Flux<ChatClientResponse> adviseStream(
+            ChatClientRequest chatClientRequest, StreamAdvisorChain streamAdvisorChain) {
+
+            return streamAdvisorChain.nextStream(chatClientRequest);
         }
 
         @Override
