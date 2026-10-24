@@ -44,11 +44,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.LongConsumer;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
@@ -72,6 +75,10 @@ public class WebhookBridgeAgent extends LocalAgent {
      * the hub's session id, because both memories can live in the same session store.
      */
     private static final String CONVERSATION_ID_PREFIX = "workflow-chat:";
+
+    private static final String WORKFLOW_QUESTION_TOOL_CALL_ID_PREFIX = "workflow-question-";
+
+    private static final String WORKFLOW_QUESTION_TOOL_NAME = "askWorkflowQuestion";
 
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final AiHubChatService chatService;
@@ -161,6 +168,7 @@ public class WebhookBridgeAgent extends LocalAgent {
         }
 
         String userMessage = lastUserMessage(input.messages());
+        String userMessageId = lastUserMessageId(input.messages());
 
         if (userMessage == null) {
             emitError(input, subscriber, "No user message found in agent input");
@@ -175,15 +183,18 @@ public class WebhookBridgeAgent extends LocalAgent {
         String messageId = UUID.randomUUID()
             .toString();
 
-        WorkflowChatTurnStopper stopper = new WorkflowChatTurnStopper(
-            chat.getId(), TenantContext.getCurrentTenantId(), jobFacade);
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        WorkflowChatTurnStopper streamedJobStopper = new WorkflowChatTurnStopper(
+            chat.getId(), tenantId, streamedJobStopAction());
 
         String pendingResumeUrl = resumeRegistry.consume(chat.getThreadId());
 
         if (pendingResumeUrl != null) {
             recordTurn("resume", chat);
 
-            handleResume(input, pendingResumeUrl, userMessage, chat, subscriber, messageId, stopper);
+            handleResume(
+                input, pendingResumeUrl, userMessage, userMessageId, chat, subscriber, messageId, streamedJobStopper);
 
             return;
         }
@@ -201,6 +212,10 @@ public class WebhookBridgeAgent extends LocalAgent {
 
         recordTurn(streamingPath ? "streaming" : "sync", chat);
 
+        WorkflowChatTurnStopper stopper = streamingPath
+            ? streamedJobStopper
+            : new WorkflowChatTurnStopper(chat.getId(), tenantId, webhookWorkflowExecutor::stopSyncJob);
+
         String threadId = chat.getThreadId();
         AgUiStreamBridge[] bridgeReference = new AgUiStreamBridge[1];
 
@@ -213,7 +228,9 @@ public class WebhookBridgeAgent extends LocalAgent {
                 AgUiStreamBridge currentBridge = bridgeReference[0];
 
                 if (currentBridge != null && streamingPath) {
-                    persistTurnToChatMemory(threadId, userMessage, currentBridge.getAccumulatedAssistantText());
+                    persistTurnToChatMemory(
+                        threadId, userMessage, userMessageId, currentBridge.getAccumulatedAssistantText(),
+                        currentBridge.getAskedQuestion());
                 }
             } finally {
                 finalizeRun(input, subscriber);
@@ -227,7 +244,9 @@ public class WebhookBridgeAgent extends LocalAgent {
         bridgeReference[0] = bridge;
 
         if (!streamingPath) {
-            executeSync(workflowExecutionId, webhookRequest, bridge, subscriber, messageId, chat, userMessage);
+            executeSync(
+                workflowExecutionId, webhookRequest, bridge, subscriber, messageId, chat, userMessage, userMessageId,
+                stopper);
 
             return;
         }
@@ -237,6 +256,16 @@ public class WebhookBridgeAgent extends LocalAgent {
         } catch (RuntimeException exception) {
             bridge.onError(exception);
         }
+    }
+
+    private @Nullable LongConsumer streamedJobStopAction() {
+        JobFacade currentJobFacade = jobFacade;
+
+        if (currentJobFacade == null) {
+            return null;
+        }
+
+        return currentJobFacade::stopJob;
     }
 
     private boolean hasStreamingTask(WorkflowExecutionId workflowExecutionId) {
@@ -277,7 +306,8 @@ public class WebhookBridgeAgent extends LocalAgent {
 
     private void executeSync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, AgUiStreamBridge bridge,
-        AgentSubscriber subscriber, String messageId, AiHubChat chat, String userMessageText) {
+        AgentSubscriber subscriber, String messageId, AiHubChat chat, String userMessageText,
+        @Nullable String userMessageId, WorkflowChatTurnStopper stopper) {
 
         try {
             if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
@@ -290,9 +320,10 @@ public class WebhookBridgeAgent extends LocalAgent {
                 return;
             }
 
-            Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+            Object outputs = webhookWorkflowExecutor.executeSync(
+                workflowExecutionId, webhookRequest, stopper::onJobId);
 
-            handleSyncOutputs(outputs, bridge, subscriber, messageId, chat, userMessageText);
+            handleSyncOutputs(outputs, bridge, subscriber, messageId, chat, userMessageText, userMessageId);
         } catch (RuntimeException exception) {
             bridge.onError(exception);
         }
@@ -337,8 +368,8 @@ public class WebhookBridgeAgent extends LocalAgent {
      * </p>
      */
     private void handleResume(
-        RunAgentInput input, String resumeUrl, String userMessage, AiHubChat chat, AgentSubscriber subscriber,
-        String messageId, WorkflowChatTurnStopper stopper) {
+        RunAgentInput input, String resumeUrl, String userMessage, @Nullable String userMessageId, AiHubChat chat,
+        AgentSubscriber subscriber, String messageId, WorkflowChatTurnStopper stopper) {
 
         Disposable stopSubscription = subscribeToStop(input.threadId(), stopper);
 
@@ -394,7 +425,9 @@ public class WebhookBridgeAgent extends LocalAgent {
             if (contentType.startsWith("text/event-stream")) {
                 streamResumeBody(response.body(), bridge);
 
-                persistTurnToChatMemory(chat.getThreadId(), userMessage, bridge.getAccumulatedAssistantText());
+                persistTurnToChatMemory(
+                    chat.getThreadId(), userMessage, userMessageId, bridge.getAccumulatedAssistantText(),
+                    bridge.getAskedQuestion());
 
                 bridge.onComplete();
 
@@ -403,7 +436,8 @@ public class WebhookBridgeAgent extends LocalAgent {
 
             String body = collectBodyLines(response.body());
 
-            handleSyncOutputs(parseResponseBody(body), bridge, subscriber, messageId, chat, userMessage);
+            handleSyncOutputs(
+                parseResponseBody(body), bridge, subscriber, messageId, chat, userMessage, userMessageId);
         } catch (InterruptedException interruptedException) {
             Thread currentThread = Thread.currentThread();
 
@@ -491,14 +525,15 @@ public class WebhookBridgeAgent extends LocalAgent {
 
     private void handleSyncOutputs(
         @Nullable Object outputs, AgUiStreamBridge bridge, AgentSubscriber subscriber, String messageId,
-        AiHubChat chat, String userMessageText) {
+        AiHubChat chat, String userMessageText, @Nullable String userMessageId) {
 
         if (outputs instanceof Map<?, ?> outputMap
             && (outputMap.containsKey("ask_user_question") || outputMap.containsKey("questions"))) {
 
             bridge.onEvent(outputMap);
 
-            persistTurnToChatMemory(chat.getThreadId(), userMessageText, null);
+            persistTurnToChatMemory(
+                chat.getThreadId(), userMessageText, userMessageId, null, bridge.getAskedQuestion());
 
             bridge.onComplete();
 
@@ -508,7 +543,8 @@ public class WebhookBridgeAgent extends LocalAgent {
         String message = extractMessage(outputs);
 
         if (bridge.hasStarted()) {
-            persistTurnToChatMemory(chat.getThreadId(), userMessageText, message);
+            persistTurnToChatMemory(
+                chat.getThreadId(), userMessageText, userMessageId, message, bridge.getAskedQuestion());
 
             bridge.onComplete();
 
@@ -533,7 +569,8 @@ public class WebhookBridgeAgent extends LocalAgent {
 
         subscriber.onNewMessage(assistantMessage);
 
-        persistTurnToChatMemory(chat.getThreadId(), userMessageText, message);
+        persistTurnToChatMemory(
+            chat.getThreadId(), userMessageText, userMessageId, message, bridge.getAskedQuestion());
 
         bridge.onComplete();
     }
@@ -580,8 +617,15 @@ public class WebhookBridgeAgent extends LocalAgent {
             envelopePreview);
     }
 
+    /**
+     * Persists a user/assistant exchange to the AI Hub session store, keyed by the chat's thread id, so the chat thread
+     * survives a page reload. The bridge bypasses the LLM agent's memory advisors, so without this a workflow chat
+     * would have no persisted history. A question the workflow asked is stored as a tool call and its result, the shape
+     * the chat history restores a question card from. Best-effort: a store failure is logged and the turn continues.
+     */
     private void persistTurnToChatMemory(
-        String threadId, String userMessageText, @Nullable String assistantMessageText) {
+        String threadId, String userMessageText, @Nullable String userMessageId,
+        @Nullable String assistantMessageText, @Nullable Map<?, ?> askedQuestion) {
 
         try {
             SessionRepository sessionRepository = sessionMemory.sessionRepository();
@@ -597,11 +641,15 @@ public class WebhookBridgeAgent extends LocalAgent {
                         .build());
             }
 
-            sessionRepository.appendEvent(
-                SessionEvent.builder()
-                    .sessionId(threadId)
-                    .message(new UserMessage(userMessageText))
-                    .build());
+            SessionEvent.Builder userEventBuilder = SessionEvent.builder()
+                .sessionId(threadId)
+                .message(new UserMessage(userMessageText));
+
+            if (isUnusedClientMessageId(sessionRepository, threadId, userMessageId)) {
+                userEventBuilder.id(userMessageId);
+            }
+
+            sessionRepository.appendEvent(userEventBuilder.build());
 
             if (assistantMessageText != null && !assistantMessageText.isBlank()) {
                 sessionRepository.appendEvent(
@@ -610,9 +658,58 @@ public class WebhookBridgeAgent extends LocalAgent {
                         .message(new org.springframework.ai.chat.messages.AssistantMessage(assistantMessageText))
                         .build());
             }
+
+            Map<String, Object> questionResult = toQuestionResult(askedQuestion);
+
+            if (questionResult != null) {
+                appendQuestionEvents(sessionRepository, threadId, questionResult);
+            }
         } catch (RuntimeException exception) {
             log.warn("Failed to persist workflow-chat turn to session memory for threadId {}", threadId, exception);
         }
+    }
+
+    private void appendQuestionEvents(
+        SessionRepository sessionRepository, String threadId, Map<String, Object> questionResult) {
+
+        String toolCallId = WORKFLOW_QUESTION_TOOL_CALL_ID_PREFIX + UUID.randomUUID();
+
+        sessionRepository.appendEvent(
+            SessionEvent.builder()
+                .sessionId(threadId)
+                .message(org.springframework.ai.chat.messages.AssistantMessage.builder()
+                    .content("")
+                    .toolCalls(List.of(
+                        new org.springframework.ai.chat.messages.AssistantMessage.ToolCall(
+                            toolCallId, "function", WORKFLOW_QUESTION_TOOL_NAME, "{}")))
+                    .build())
+                .build());
+
+        sessionRepository.appendEvent(
+            SessionEvent.builder()
+                .sessionId(threadId)
+                .message(ToolResponseMessage.builder()
+                    .responses(List.of(
+                        new ToolResponseMessage.ToolResponse(
+                            toolCallId, WORKFLOW_QUESTION_TOOL_NAME, jsonMapper.writeValueAsString(questionResult))))
+                    .build())
+                .build());
+    }
+
+    private static @Nullable Map<String, Object> toQuestionResult(@Nullable Map<?, ?> askedQuestion) {
+        if (askedQuestion == null || !(askedQuestion.get("questions") instanceof List<?> questions)) {
+            return null;
+        }
+
+        Map<String, Object> questionResult = new HashMap<>();
+
+        questionResult.put("answerFormat", "plain");
+        questionResult.put(
+            "awaitingAnswer", askedQuestion.get("resumeUrl") instanceof String resumeUrl && !resumeUrl.isBlank());
+        questionResult.put("kind", "ask-user-question");
+        questionResult.put("questions", questions);
+
+        return questionResult;
     }
 
     /**
@@ -760,6 +857,44 @@ public class WebhookBridgeAgent extends LocalAgent {
 
     private static String conversationId(AiHubChat chat) {
         return CONVERSATION_ID_PREFIX + chat.getThreadId();
+    }
+
+    private static boolean isUnusedClientMessageId(
+        SessionRepository sessionRepository, String threadId, @Nullable String userMessageId) {
+
+        if (userMessageId == null || !isUuid(userMessageId)) {
+            return false;
+        }
+
+        return sessionRepository.findEvents(threadId, EventFilter.all())
+            .stream()
+            .noneMatch(sessionEvent -> userMessageId.equals(sessionEvent.getId()));
+    }
+
+    private static boolean isUuid(String value) {
+        try {
+            return UUID.fromString(value)
+                .toString()
+                .equals(value);
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+    private static @Nullable String lastUserMessageId(@Nullable List<BaseMessage> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return null;
+        }
+
+        for (int index = messages.size() - 1; index >= 0; index--) {
+            BaseMessage message = messages.get(index);
+
+            if (message != null && Role.user.equals(message.getRole())) {
+                return message.getId();
+            }
+        }
+
+        return null;
     }
 
     private static @Nullable String lastUserMessage(@Nullable List<BaseMessage> messages) {
