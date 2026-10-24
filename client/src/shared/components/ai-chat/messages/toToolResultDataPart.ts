@@ -40,7 +40,7 @@ interface SelectConnectionResultI {
 interface SelectPropertyOptionResultI {
     componentName: string;
     kind: 'select-property-option';
-    options: Array<{label: string; value: string}>;
+    options: Array<{label: string; value: number | string}>;
     propertyName: string;
     truncated?: boolean;
 }
@@ -102,7 +102,11 @@ export function toToolResultDataPart(toolCallName: string, eventContent: string)
         };
     }
 
-    if (toolCallName === 'selectPropertyOption' || toolCallName === 'selectTriggerPropertyOption') {
+    if (
+        toolCallName === 'selectPropertyOption' ||
+        toolCallName === 'selectTriggerPropertyOption' ||
+        toolCallName === 'selectClusterElementPropertyOption'
+    ) {
         const parsed = parseJson<SelectPropertyOptionResultI>(eventContent, 'selectPropertyOption result');
 
         if (!parsed || parsed.kind !== 'select-property-option' || !Array.isArray(parsed.options)) {
