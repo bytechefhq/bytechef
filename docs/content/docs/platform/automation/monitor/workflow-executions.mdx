@@ -76,8 +76,9 @@ The detail opens as two panes:
 > On a normal run an agent's model, chat memory, RAG and guardrail elements stay grey. The element that
 > raised an error turns red and the agent fails, including an error from below a guardrail. A Check for
 > Violations check that blocked the input or output turns amber with its frame, and the agent stays green
-> with a Blocked badge. A Sanitize Text sanitizer that changed the text turns blue with the number of
-> masked values; one that crashed turns red, its frame amber, and the agent shows a Withheld badge. These
+> with a Blocked badge. A Sanitize Text sanitizer that changed the text turns blue, and its row's Details
+> show how many values were masked; one that crashed turns red, its frame amber, and the agent shows a
+> Withheld badge. These
 > rows show a Details tab with the side (input or output) and the match count or confidence score, never the matched or redacted text.
 
 <Callout type="warn">
