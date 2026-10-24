@@ -55,6 +55,16 @@ class ClusterElementCallRecordTest {
     }
 
     @Test
+    void testToMapFromMapRoundTripsOutcomeStatuses() {
+        for (Status status : List.of(Status.BLOCKED, Status.REDACTED, Status.WITHHELD)) {
+            ClusterElementCallRecord callRecord = new ClusterElementCallRecord(
+                "id-1", null, "guardrails_1", "checkForViolations", null, status, START, START, null, "{}", null);
+
+            assertEquals(callRecord, ClusterElementCallRecord.fromMap(callRecord.toMap()));
+        }
+    }
+
+    @Test
     void testMergesRecordsById() {
         ClusterElementCallRecord existingA = new ClusterElementCallRecord(
             "a", null, "n", "c", "t", Status.STARTED, START, null, "i", null, null);

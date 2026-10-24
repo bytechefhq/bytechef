@@ -26,12 +26,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -118,6 +121,57 @@ public final class ClusterElementCallRecorder {
         record(jobId, taskExecutionId, Type.FAILED, ref, null, null, null, null, null, error);
     }
 
+    public ClusterElementCallRef recordOutcome(
+        long jobId, long taskExecutionId, String workflowNodeName, @Nullable String componentName,
+        @Nullable String parentId, ClusterElementCallRecord.Status status, @Nullable String details,
+        @Nullable String error) {
+
+        if (status != ClusterElementCallRecord.Status.FAILED && status != ClusterElementCallRecord.Status.BLOCKED &&
+            status != ClusterElementCallRecord.Status.REDACTED && status != ClusterElementCallRecord.Status.WITHHELD) {
+
+            throw new IllegalArgumentException("Not an outcome status: " + status);
+        }
+
+        ClusterElementCallRef ref = new ClusterElementCallRef(UUID.randomUUID()
+            .toString(), workflowNodeName);
+
+        TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.get(
+            TenantCacheKeyUtils.getKey(taskExecutionId), key -> new TaskExecutionCalls());
+
+        synchronized (taskExecutionCalls) {
+            ClusterElementCall merged = taskExecutionCalls.recordOutcomeAggregate(
+                workflowNodeName, Status.valueOf(status.name()), ClusterElementCallRecord.cap(error));
+            ClusterElementCallRecord callRecord = taskExecutionCalls.recordOutcomeCall(
+                ref, componentName, parentId, status, details, error);
+
+            notifyListeners(new ClusterElementCallEvent(
+                jobId, taskExecutionId, Type.valueOf(status.name()), merged, callRecord));
+        }
+
+        return ref;
+    }
+
+    public boolean claimFailure(long taskExecutionId, Throwable throwable) {
+        TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.get(
+            TenantCacheKeyUtils.getKey(taskExecutionId), key -> new TaskExecutionCalls());
+
+        synchronized (taskExecutionCalls) {
+            Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+
+            for (Throwable current = throwable; current != null && visited.add(current); current = current
+                .getCause()) {
+
+                if (taskExecutionCalls.claimedFailures.contains(current)) {
+                    return false;
+                }
+            }
+
+            taskExecutionCalls.claimedFailures.add(throwable);
+
+            return true;
+        }
+    }
+
     public void callSuspended(long jobId, long taskExecutionId, ClusterElementCallRef ref) {
         TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.get(
             TenantCacheKeyUtils.getKey(taskExecutionId), key -> new TaskExecutionCalls());
@@ -157,13 +211,16 @@ public final class ClusterElementCallRecorder {
     }
 
     private static ClusterElementCall mergeCall(ClusterElementCall existing, ClusterElementCall incoming) {
-        boolean failed = existing.status() == Status.FAILED;
+        boolean keepExisting = existing.status() == Status.FAILED ||
+            ((existing.status() == Status.BLOCKED || existing.status() == Status.WITHHELD) &&
+                (incoming.status() == Status.COMPLETED || incoming.status() == Status.STARTED ||
+                    incoming.status() == Status.REDACTED));
 
         Instant endDate = incoming.endDate() == null ? existing.endDate() : incoming.endDate();
 
         return new ClusterElementCall(
-            existing.workflowNodeName(), failed ? Status.FAILED : incoming.status(), existing.startDate(), endDate,
-            failed ? existing.error() : incoming.error());
+            existing.workflowNodeName(), keepExisting ? existing.status() : incoming.status(), existing.startDate(),
+            endDate, keepExisting ? existing.error() : incoming.error());
     }
 
     private void record(
@@ -210,6 +267,7 @@ public final class ClusterElementCallRecorder {
         private final Map<String, ClusterElementCall> calls = new LinkedHashMap<>();
         private final Map<String, Integer> inFlightCounts = new HashMap<>();
         private final Map<String, ClusterElementCallRecord> records = new LinkedHashMap<>();
+        private final Set<Throwable> claimedFailures = Collections.newSetFromMap(new IdentityHashMap<>());
         private @Nullable ClusterElementCallRef suspendedRef;
 
         private void suspend(ClusterElementCallRef ref) {
@@ -252,6 +310,10 @@ public final class ClusterElementCallRecorder {
                 case FAILED -> new ClusterElementCallRecord(
                     ref.id(), null, ref.workflowNodeName(), null, null, ClusterElementCallRecord.Status.FAILED, null,
                     now, null, null, ClusterElementCallRecord.cap(error));
+                case BLOCKED, REDACTED, WITHHELD -> new ClusterElementCallRecord(
+                    ref.id(), parentId, ref.workflowNodeName(), componentName, toolName,
+                    ClusterElementCallRecord.Status.valueOf(type.name()), now, now, null,
+                    ClusterElementCallRecord.cap(output), ClusterElementCallRecord.cap(error));
             };
 
             ClusterElementCallRecord stored = transition;
@@ -278,7 +340,11 @@ public final class ClusterElementCallRecorder {
 
             int inFlightCount = inFlightCounts.getOrDefault(workflowNodeName, 0);
 
-            inFlightCount = type == Type.STARTED ? inFlightCount + 1 : Math.max(inFlightCount - 1, 0);
+            if (type == Type.STARTED) {
+                inFlightCount++;
+            } else if (type == Type.COMPLETED || type == Type.FAILED) {
+                inFlightCount = Math.max(inFlightCount - 1, 0);
+            }
 
             inFlightCounts.put(workflowNodeName, inFlightCount);
 
@@ -287,9 +353,36 @@ public final class ClusterElementCallRecorder {
                 case COMPLETED -> new ClusterElementCall(
                     workflowNodeName, inFlightCount > 0 ? Status.STARTED : Status.COMPLETED, now, now, null);
                 case FAILED -> new ClusterElementCall(workflowNodeName, Status.FAILED, now, now, error);
+                case BLOCKED, REDACTED, WITHHELD -> new ClusterElementCall(
+                    workflowNodeName, Status.valueOf(type.name()), now, now, error);
             };
 
             return calls.merge(workflowNodeName, transition, ClusterElementCallRecorder::mergeCall);
+        }
+
+        private ClusterElementCall recordOutcomeAggregate(
+            String workflowNodeName, Status status, @Nullable String error) {
+
+            Instant now = Instant.now();
+
+            return calls.merge(
+                workflowNodeName, new ClusterElementCall(workflowNodeName, status, now, now, error),
+                ClusterElementCallRecorder::mergeCall);
+        }
+
+        private ClusterElementCallRecord recordOutcomeCall(
+            ClusterElementCallRef ref, @Nullable String componentName, @Nullable String parentId,
+            ClusterElementCallRecord.Status status, @Nullable String details, @Nullable String error) {
+
+            Instant now = Instant.now();
+
+            ClusterElementCallRecord outcome = new ClusterElementCallRecord(
+                ref.id(), parentId, ref.workflowNodeName(), componentName, null, status, now, now, null,
+                ClusterElementCallRecord.cap(details), ClusterElementCallRecord.cap(error));
+
+            records.put(ref.id(), outcome);
+
+            return outcome;
         }
     }
 }
