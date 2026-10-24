@@ -19,6 +19,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     schemaMappings.set(
         mapOf(
             "ClusterElementCall" to "com.bytechef.platform.workflow.execution.web.rest.model.ClusterElementCallModel",
+            "ClusterElementCallRecord" to "com.bytechef.platform.workflow.execution.web.rest.model.ClusterElementCallRecordModel",
             "ComponentConnection" to "com.bytechef.platform.configuration.web.rest.model.ComponentConnection",
             "ComponentDefinitionBasic" to "com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasic",
             "ExecutionError" to "com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel",

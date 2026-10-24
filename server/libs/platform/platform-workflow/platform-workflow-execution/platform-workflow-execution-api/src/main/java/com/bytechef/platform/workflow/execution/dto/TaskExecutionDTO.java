@@ -45,7 +45,8 @@ public record TaskExecutionDTO(
     int progress, int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis,
     Instant startDate, TaskExecution.Status status, int taskNumber, String title, String type,
     WorkflowTask workflowTask, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations,
-    JobDTO childJob, @Nullable Integer childCount, List<ClusterElementCallDTO> clusterElementCalls) {
+    JobDTO childJob, @Nullable Integer childCount, List<ClusterElementCallDTO> clusterElementCalls,
+    List<ClusterElementCallRecordDTO> clusterElementCallRecords) {
 
     public TaskExecutionDTO(
         TaskExecution taskExecution, String title, String icon, Map<String, ?> input, Object output, JobDTO childJob) {
@@ -59,7 +60,8 @@ public record TaskExecutionDTO(
             taskExecution.getRetryAttempts(), taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(),
             taskExecution.getRetryDelayMillis(), taskExecution.getStartDate(), taskExecution.getStatus(),
             taskExecution.getTaskNumber(), title, taskExecution.getType(), taskExecution.getWorkflowTask(),
-            List.of(), List.of(), childJob, null, ClusterElementCallDTO.fromMetadata(taskExecution.getMetadata()));
+            List.of(), List.of(), childJob, null, ClusterElementCallDTO.fromMetadata(taskExecution.getMetadata()),
+            ClusterElementCallRecordDTO.fromMetadata(taskExecution.getMetadata()));
     }
 
     private TaskExecutionDTO(
@@ -76,7 +78,7 @@ public record TaskExecutionDTO(
             taskExecutionDTO.retryDelayMillis(), taskExecutionDTO.startDate(), taskExecutionDTO.status(),
             taskExecutionDTO.taskNumber(), taskExecutionDTO.title(), taskExecutionDTO.type(),
             taskExecutionDTO.workflowTask(), children, iterations, childJob, childCount,
-            taskExecutionDTO.clusterElementCalls());
+            taskExecutionDTO.clusterElementCalls(), taskExecutionDTO.clusterElementCallRecords());
     }
 
     public TaskExecutionDTO withChildCount(@Nullable Integer childCount) {
@@ -88,7 +90,7 @@ public record TaskExecutionDTO(
             createdBy, createdDate, endDate, error, executionTime, null, id, input, jobId, lastModifiedBy,
             lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay,
             retryDelayFactor, retryDelayMillis, startDate, status, taskNumber, title, type, workflowTask, children,
-            iterations, childJob, childCount, clusterElementCalls);
+            iterations, childJob, childCount, clusterElementCalls, clusterElementCallRecords);
     }
 
     public static boolean isLoopType(@Nullable String type) {
