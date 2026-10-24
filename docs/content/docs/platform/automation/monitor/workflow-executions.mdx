@@ -62,6 +62,12 @@ The detail opens as two panes:
 - **Right** - the workflow rendered read-only on the canvas, so the selected task is visible in the
   context of the whole workflow.
 
+> **Coming soon.** The read-only canvas is coloured from the stored run: each task that ran is green
+> with its duration or red if it failed, the wires along the path the run took follow, and tasks the
+> run never reached stay grey. A task that ran more than once shows its total time. Each AI Agent is
+> drawn as a frame holding its elements, and the tools it called are coloured the same way, so a failed
+> run shows which tool failed.
+
 <Callout type="warn">
     Task inputs and outputs are recorded verbatim. They are serialized to JSON and stored as-is, with
     no redaction of sensitive values - a password, token, or customer record that a task receives or
