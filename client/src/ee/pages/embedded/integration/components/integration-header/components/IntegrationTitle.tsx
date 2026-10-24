@@ -15,11 +15,11 @@ const IntegrationTitle = ({integration}: {integration: Integration}) => {
 
                     {integration && (
                         <Badge
-                            className="flex space-x-1 bg-surface-neutral-primary"
+                            className="flex space-x-1 border-transparent"
                             styleType={
                                 integration.lastStatus === IntegrationStatus.Published
                                     ? 'success-outline'
-                                    : 'outline-outline'
+                                    : 'secondary-filled'
                             }
                             weight="semibold"
                         >
