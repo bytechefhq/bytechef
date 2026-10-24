@@ -85,6 +85,7 @@ public class AnthropicChatAction {
             .cacheOptions(
                 AnthropicCacheOptions.builder()
                     .strategy(AnthropicCacheStrategy.CONVERSATION_HISTORY)
+                    .cacheToolResults(true)
                     .build());
 
         if (inputParameters.getBoolean(THINKING, false)) {
