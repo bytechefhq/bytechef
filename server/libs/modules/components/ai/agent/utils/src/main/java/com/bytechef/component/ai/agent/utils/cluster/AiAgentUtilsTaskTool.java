@@ -135,7 +135,7 @@ public class AiAgentUtilsTaskTool {
                 ClusterElementCallObservingToolCallback.wrap(
                     clusterElementToolCallbacks.build(
                         toolClusterElement, componentConnections, (ActionContext) context),
-                    toolClusterElement.getWorkflowNodeName(), context));
+                    toolClusterElement.getWorkflowNodeName(), toolClusterElement.getComponentName(), context));
         }
 
         return toolCallbacks;
