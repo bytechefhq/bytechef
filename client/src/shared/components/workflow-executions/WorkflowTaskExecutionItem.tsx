@@ -4,6 +4,10 @@ import {
     useExecutionDuration,
 } from '@/shared/components/workflow-executions/hooks/useExecutionDuration';
 import {
+    ClusterElementCallTaskExecutionI,
+    isClusterElementCallTaskExecution,
+} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
+import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
@@ -24,6 +28,9 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: Work
         startDate,
     });
 
+    const callNote = isClusterElementCallTaskExecution(taskExecution)
+        ? (taskExecution as ClusterElementCallTaskExecutionI).clusterElementCallNote
+        : undefined;
     const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobEnded));
 
     return (
@@ -40,6 +47,8 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: Work
                         <span className="text-xs text-muted-foreground">
                             ({workflowTask?.name || workflowTask?.type})
                         </span>
+
+                        {callNote && <span className="text-xs text-muted-foreground">{callNote}</span>}
                     </div>
                 </div>
             </div>
