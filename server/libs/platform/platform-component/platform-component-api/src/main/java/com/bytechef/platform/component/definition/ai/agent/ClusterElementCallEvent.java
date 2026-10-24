@@ -17,11 +17,13 @@
 package com.bytechef.platform.component.definition.ai.agent;
 
 /**
- * A call transition of a cluster element; {@link #call()} carries the element's merged state after the transition.
+ * A call transition of a cluster element; {@link #call()} carries the element's merged state after the transition and
+ * {@link #record()} the individual call that made it.
  *
  * @author Ivica Cardic
  */
-public record ClusterElementCallEvent(long jobId, long taskExecutionId, Type type, ClusterElementCall call) {
+public record ClusterElementCallEvent(long jobId, long taskExecutionId, Type type, ClusterElementCall call,
+    ClusterElementCallRecord record) {
 
     public enum Type {
         STARTED, COMPLETED, FAILED

@@ -25,10 +25,13 @@ import com.github.benmanes.caffeine.cache.Ticker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -98,28 +101,59 @@ public final class ClusterElementCallRecorder {
         });
     }
 
-    public void callCompleted(long jobId, long taskExecutionId, String workflowNodeName) {
-        record(jobId, taskExecutionId, Type.COMPLETED, workflowNodeName, null);
+    public ClusterElementCallRef callStarted(
+        long jobId, long taskExecutionId, String workflowNodeName, String componentName, @Nullable String toolName,
+        @Nullable String parentId, @Nullable String input) {
+
+        ClusterElementCallRef ref = new ClusterElementCallRef(UUID.randomUUID()
+            .toString(), workflowNodeName);
+
+        record(jobId, taskExecutionId, Type.STARTED, ref, componentName, toolName, parentId, input, null, null);
+
+        return ref;
     }
 
-    public void callFailed(long jobId, long taskExecutionId, String workflowNodeName, @Nullable String error) {
-        record(jobId, taskExecutionId, Type.FAILED, workflowNodeName, error);
+    public void callCompleted(long jobId, long taskExecutionId, ClusterElementCallRef ref, @Nullable String output) {
+        record(jobId, taskExecutionId, Type.COMPLETED, ref, null, null, null, null, output, null);
     }
 
-    public void callStarted(long jobId, long taskExecutionId, String workflowNodeName) {
-        record(jobId, taskExecutionId, Type.STARTED, workflowNodeName, null);
+    public void callFailed(long jobId, long taskExecutionId, ClusterElementCallRef ref, String error) {
+        record(jobId, taskExecutionId, Type.FAILED, ref, null, null, null, null, null, error);
     }
 
-    public Map<String, ClusterElementCall> drain(long taskExecutionId) {
+    public void callSuspended(long jobId, long taskExecutionId, ClusterElementCallRef ref) {
+        TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.get(
+            TenantCacheKeyUtils.getKey(taskExecutionId), key -> new TaskExecutionCalls());
+
+        synchronized (taskExecutionCalls) {
+            taskExecutionCalls.suspend(ref);
+        }
+    }
+
+    public Optional<ClusterElementCallRef> findSuspendedCall(long taskExecutionId) {
+        TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.getIfPresent(
+            TenantCacheKeyUtils.getKey(taskExecutionId));
+
+        if (taskExecutionCalls == null) {
+            return Optional.empty();
+        }
+
+        synchronized (taskExecutionCalls) {
+            return Optional.ofNullable(taskExecutionCalls.suspendedRef);
+        }
+    }
+
+    public ClusterElementCallDrain drain(long taskExecutionId) {
         TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.asMap()
             .remove(TenantCacheKeyUtils.getKey(taskExecutionId));
 
         if (taskExecutionCalls == null) {
-            return Map.of();
+            return new ClusterElementCallDrain(Map.of(), List.of());
         }
 
         synchronized (taskExecutionCalls) {
-            return new HashMap<>(taskExecutionCalls.calls);
+            return new ClusterElementCallDrain(
+                new HashMap<>(taskExecutionCalls.calls), new ArrayList<>(taskExecutionCalls.records.values()));
         }
     }
 
@@ -134,18 +168,22 @@ public final class ClusterElementCallRecorder {
     }
 
     private void record(
-        long jobId, long taskExecutionId, Type type, String workflowNodeName, @Nullable String error) {
+        long jobId, long taskExecutionId, Type type, ClusterElementCallRef ref, @Nullable String componentName,
+        @Nullable String toolName, @Nullable String parentId, @Nullable String input, @Nullable String output,
+        @Nullable String error) {
 
         TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.get(
             TenantCacheKeyUtils.getKey(taskExecutionId), key -> new TaskExecutionCalls());
 
         synchronized (taskExecutionCalls) {
-            ClusterElementCall merged = taskExecutionCalls.record(type, workflowNodeName, error);
+            ClusterElementCall merged = taskExecutionCalls.record(type, ref.workflowNodeName(), error);
+            ClusterElementCallRecord callRecord = taskExecutionCalls.recordCall(
+                type, ref, componentName, toolName, parentId, input, output, error);
 
             notifyListeners(new ClusterElementCallEvent(
                 jobId, taskExecutionId, Type.valueOf(merged.status()
                     .name()),
-                merged));
+                merged, callRecord));
         }
     }
 
@@ -172,6 +210,66 @@ public final class ClusterElementCallRecorder {
 
         private final Map<String, ClusterElementCall> calls = new LinkedHashMap<>();
         private final Map<String, Integer> inFlightCounts = new HashMap<>();
+        private final Map<String, ClusterElementCallRecord> records = new LinkedHashMap<>();
+        private @Nullable ClusterElementCallRef suspendedRef;
+
+        private void suspend(ClusterElementCallRef ref) {
+            ClusterElementCallRecord existing = records.get(ref.id());
+
+            if (existing != null) {
+                records.put(
+                    ref.id(),
+                    new ClusterElementCallRecord(
+                        existing.id(), existing.parentId(), existing.workflowNodeName(), existing.componentName(),
+                        existing.toolName(), ClusterElementCallRecord.Status.SUSPENDED, existing.startDate(),
+                        existing.endDate(), existing.input(), existing.output(), existing.error()));
+            } else {
+                records.put(
+                    ref.id(),
+                    new ClusterElementCallRecord(
+                        ref.id(), null, ref.workflowNodeName(), null, null, ClusterElementCallRecord.Status.SUSPENDED,
+                        null, null, null, null, null));
+            }
+
+            suspendedRef = ref;
+        }
+
+        private ClusterElementCallRecord recordCall(
+            Type type, ClusterElementCallRef ref, @Nullable String componentName, @Nullable String toolName,
+            @Nullable String parentId, @Nullable String input, @Nullable String output, @Nullable String error) {
+
+            Instant now = Instant.now();
+
+            ClusterElementCallRecord existing = records.get(ref.id());
+
+            ClusterElementCallRecord transition = switch (type) {
+                case STARTED -> new ClusterElementCallRecord(
+                    ref.id(), parentId, ref.workflowNodeName(), componentName, toolName,
+                    ClusterElementCallRecord.Status.STARTED, now, null, ClusterElementCallRecord.cap(input), null,
+                    null);
+                case COMPLETED -> new ClusterElementCallRecord(
+                    ref.id(), null, ref.workflowNodeName(), null, null, ClusterElementCallRecord.Status.COMPLETED,
+                    null, now, null, ClusterElementCallRecord.cap(output), null);
+                case FAILED -> new ClusterElementCallRecord(
+                    ref.id(), null, ref.workflowNodeName(), null, null, ClusterElementCallRecord.Status.FAILED, null,
+                    now, null, null, ClusterElementCallRecord.cap(error));
+            };
+
+            ClusterElementCallRecord stored = existing == null
+                ? transition
+                : ClusterElementCallRecord.merge(List.of(existing), List.of(transition))
+                    .getFirst();
+
+            records.put(ref.id(), stored);
+
+            if (type != Type.STARTED && suspendedRef != null && suspendedRef.id()
+                .equals(ref.id())) {
+
+                suspendedRef = null;
+            }
+
+            return stored;
+        }
 
         private ClusterElementCall record(Type type, String workflowNodeName, @Nullable String error) {
             Instant now = Instant.now();

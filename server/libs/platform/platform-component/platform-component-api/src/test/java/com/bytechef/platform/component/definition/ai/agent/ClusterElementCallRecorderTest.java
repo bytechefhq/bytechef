@@ -19,7 +19,9 @@ package com.bytechef.platform.component.definition.ai.agent;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall.Status;
@@ -29,6 +31,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -54,10 +57,12 @@ class ClusterElementCallRecorderTest {
 
     @Test
     void testStartedThenCompleted() {
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
+        ClusterElementCallRef ref = start(recorder, null);
 
-        Map<String, ClusterElementCall> calls = recorder.drain(10);
+        recorder.callCompleted(1, 10, ref, null);
+
+        Map<String, ClusterElementCall> calls = recorder.drain(10)
+            .calls();
 
         assertEquals(1, calls.size());
 
@@ -72,12 +77,14 @@ class ClusterElementCallRecorderTest {
 
     @Test
     void testFailedIsSticky() {
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callFailed(1, 10, "httpClient_1", "boom");
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
+        recorder.callFailed(1, 10, start(recorder, null), "boom");
+
+        ClusterElementCallRef second = start(recorder, null);
+
+        recorder.callCompleted(1, 10, second, null);
 
         ClusterElementCall call = recorder.drain(10)
+            .calls()
             .get("httpClient_1");
 
         assertEquals(Status.FAILED, call.status());
@@ -86,11 +93,15 @@ class ClusterElementCallRecorderTest {
 
     @Test
     void testDrainRemoves() {
-        recorder.callStarted(1, 10, "httpClient_1");
+        start(recorder, null);
 
         recorder.drain(10);
 
-        assertTrue(recorder.drain(10)
+        ClusterElementCallDrain drain = recorder.drain(10);
+
+        assertTrue(drain.calls()
+            .isEmpty());
+        assertTrue(drain.records()
             .isEmpty());
     }
 
@@ -103,12 +114,11 @@ class ClusterElementCallRecorderTest {
 
         recorder.addListener(2, otherJobEvents::add);
 
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
+        recorder.callCompleted(1, 10, start(recorder, null), null);
 
         handle.close();
 
-        recorder.callStarted(1, 10, "httpClient_1");
+        start(recorder, null);
 
         assertEquals(
             List.of(Type.STARTED, Type.COMPLETED),
@@ -131,7 +141,7 @@ class ClusterElementCallRecorderTest {
             throw new IllegalStateException("listener failed");
         });
 
-        assertDoesNotThrow(() -> recorder.callStarted(1, 10, "httpClient_1"));
+        assertDoesNotThrow(() -> start(recorder, null));
     }
 
     @Test
@@ -144,8 +154,7 @@ class ClusterElementCallRecorderTest {
         try {
             for (int index = 0; index < threadCount; index++) {
                 executorService.execute(() -> {
-                    recorder.callStarted(1, 10, "httpClient_1");
-                    recorder.callCompleted(1, 10, "httpClient_1");
+                    recorder.callCompleted(1, 10, start(recorder, null), null);
 
                     countDownLatch.countDown();
                 });
@@ -156,27 +165,36 @@ class ClusterElementCallRecorderTest {
             executorService.shutdownNow();
         }
 
-        assertEquals(Status.COMPLETED, recorder.drain(10)
+        ClusterElementCallDrain drain = recorder.drain(10);
+
+        assertEquals(Status.COMPLETED, drain.calls()
             .get("httpClient_1")
             .status());
+        assertEquals(threadCount, drain.records()
+            .size());
     }
 
     @Test
     void testOverlappingCallsStayStartedUntilTheLastOneEnds() {
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
+        start(recorder, null);
+
+        ClusterElementCallRef second = start(recorder, null);
+
+        recorder.callCompleted(1, 10, second, null);
 
         assertEquals(Status.STARTED, recorder.drain(10)
+            .calls()
             .get("httpClient_1")
             .status());
 
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
+        ClusterElementCallRef third = start(recorder, null);
+        ClusterElementCallRef fourth = start(recorder, null);
+
+        recorder.callCompleted(1, 10, third, null);
+        recorder.callCompleted(1, 10, fourth, null);
 
         assertEquals(Status.COMPLETED, recorder.drain(10)
+            .calls()
             .get("httpClient_1")
             .status());
     }
@@ -187,12 +205,15 @@ class ClusterElementCallRecorderTest {
 
         recorder.addListener(1, events::add);
 
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
-        recorder.callFailed(1, 10, "httpClient_1", "boom");
-        recorder.callStarted(1, 10, "httpClient_1");
-        recorder.callCompleted(1, 10, "httpClient_1");
+        ClusterElementCallRef first = start(recorder, null);
+        ClusterElementCallRef second = start(recorder, null);
+
+        recorder.callCompleted(1, 10, first, null);
+        recorder.callFailed(1, 10, second, "boom");
+
+        ClusterElementCallRef third = start(recorder, null);
+
+        recorder.callCompleted(1, 10, third, null);
 
         for (ClusterElementCallEvent event : events) {
             assertEquals(event.type()
@@ -214,6 +235,7 @@ class ClusterElementCallRecorderTest {
         List<Type> types = new CopyOnWriteArrayList<>();
         CountDownLatch inStartedListener = new CountDownLatch(1);
         CountDownLatch releaseStartedListener = new CountDownLatch(1);
+        ClusterElementCallRef ref = new ClusterElementCallRef("id-1", "httpClient_1");
 
         recorder.addListener(1, event -> {
             if (event.type() == Type.STARTED) {
@@ -235,11 +257,11 @@ class ClusterElementCallRecorderTest {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
         try {
-            executorService.execute(() -> recorder.callStarted(1, 10, "httpClient_1"));
+            executorService.execute(() -> start(recorder, null));
 
             assertTrue(inStartedListener.await(10, TimeUnit.SECONDS));
 
-            Future<?> completed = executorService.submit(() -> recorder.callCompleted(1, 10, "httpClient_1"));
+            Future<?> completed = executorService.submit(() -> recorder.callCompleted(1, 10, ref, null));
 
             try {
                 completed.get(300, TimeUnit.MILLISECONDS);
@@ -261,16 +283,18 @@ class ClusterElementCallRecorderTest {
     void testTenantsAreSeparate() {
         TenantContext.setCurrentTenantId("tenantA");
 
-        recorder.callStarted(1, 10, "httpClient_1");
+        start(recorder, null);
 
         TenantContext.setCurrentTenantId("tenantB");
 
         assertTrue(recorder.drain(10)
+            .calls()
             .isEmpty());
 
         TenantContext.setCurrentTenantId("tenantA");
 
         assertEquals(1, recorder.drain(10)
+            .calls()
             .size());
     }
 
@@ -312,12 +336,159 @@ class ClusterElementCallRecorderTest {
 
         ClusterElementCallRecorder expiringRecorder = new ClusterElementCallRecorder(nanos::get);
 
-        expiringRecorder.callStarted(1, 10, "httpClient_1");
+        start(expiringRecorder, null);
 
         nanos.addAndGet(Duration.ofHours(2)
             .toNanos());
 
         assertTrue(expiringRecorder.drain(10)
+            .records()
             .isEmpty());
+    }
+
+    @Test
+    void testRecordsEachCallWithItsInputAndOutput() {
+        ClusterElementCallRef first =
+            recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, "{\"a\":1}");
+        ClusterElementCallRef second =
+            recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, "{\"a\":2}");
+
+        recorder.callCompleted(1, 10, first, "out1");
+        recorder.callCompleted(1, 10, second, "out2");
+
+        List<ClusterElementCallRecord> records = recorder.drain(10)
+            .records();
+
+        assertEquals(2, records.size());
+        assertNotEquals(records.get(0)
+            .id(),
+            records.get(1)
+                .id());
+        assertEquals(first.id(), records.get(0)
+            .id());
+        assertEquals(second.id(), records.get(1)
+            .id());
+        assertEquals(UUID.fromString(first.id())
+            .toString(), first.id());
+
+        assertEquals("{\"a\":1}", records.get(0)
+            .input());
+        assertEquals("out1", records.get(0)
+            .output());
+        assertEquals("{\"a\":2}", records.get(1)
+            .input());
+        assertEquals("out2", records.get(1)
+            .output());
+
+        for (ClusterElementCallRecord callRecord : records) {
+            assertEquals("httpClient", callRecord.componentName());
+            assertEquals(ClusterElementCallRecord.Status.COMPLETED, callRecord.status());
+        }
+
+        assertTrue(recorder.drain(10)
+            .records()
+            .isEmpty());
+    }
+
+    @Test
+    void testFailedCallKeepsItsError() {
+        recorder.callFailed(1, 10, start(recorder, null), "boom");
+
+        ClusterElementCallRecord callRecord = recorder.drain(10)
+            .records()
+            .getFirst();
+
+        assertEquals(ClusterElementCallRecord.Status.FAILED, callRecord.status());
+        assertEquals("boom", callRecord.error());
+        assertNotNull(callRecord.endDate());
+    }
+
+    @Test
+    void testRecordsTheParentCall() {
+        ClusterElementCallRef parent = start(recorder, null);
+
+        recorder.callStarted(1, 10, "httpClient_2", "httpClient", "get", parent.id(), null);
+
+        List<ClusterElementCallRecord> records = recorder.drain(10)
+            .records();
+
+        assertNull(records.get(0)
+            .parentId());
+        assertEquals(parent.id(), records.get(1)
+            .parentId());
+        assertEquals("get", records.get(1)
+            .toolName());
+    }
+
+    @Test
+    void testSuspendedCallIsFoundAndStoredAsSuspended() {
+        ClusterElementCallRef ref = start(recorder, null);
+
+        recorder.callSuspended(1, 10, ref);
+
+        assertEquals(ref, recorder.findSuspendedCall(10)
+            .orElseThrow());
+        assertTrue(recorder.findSuspendedCall(11)
+            .isEmpty());
+
+        assertEquals(ClusterElementCallRecord.Status.SUSPENDED, recorder.drain(10)
+            .records()
+            .getFirst()
+            .status());
+    }
+
+    @Test
+    void testCompletingAnUnknownCallRecordsAPartialRecord() {
+        recorder.callCompleted(1, 10, new ClusterElementCallRef("id-1", "httpClient_1"), "out");
+
+        ClusterElementCallRecord callRecord = recorder.drain(10)
+            .records()
+            .getFirst();
+
+        assertEquals("id-1", callRecord.id());
+        assertEquals("httpClient_1", callRecord.workflowNodeName());
+        assertEquals(ClusterElementCallRecord.Status.COMPLETED, callRecord.status());
+        assertEquals("out", callRecord.output());
+        assertNotNull(callRecord.endDate());
+        assertNull(callRecord.startDate());
+    }
+
+    @Test
+    void testEventsCarryTheCallRecord() {
+        List<ClusterElementCallEvent> events = new CopyOnWriteArrayList<>();
+
+        recorder.addListener(1, events::add);
+
+        ClusterElementCallRef ref = recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, "in");
+
+        recorder.callCompleted(1, 10, ref, "out");
+
+        assertEquals("in", events.get(0)
+            .record()
+            .input());
+        assertEquals("out", events.get(1)
+            .record()
+            .output());
+        assertEquals(events.get(0)
+            .record()
+            .id(),
+            events.get(1)
+                .record()
+                .id());
+    }
+
+    @Test
+    void testCapsRecordedValues() {
+        recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, "x".repeat(70_000));
+
+        assertEquals(
+            ClusterElementCallRecord.cap("x".repeat(70_000)), recorder.drain(10)
+                .records()
+                .getFirst()
+                .input());
+    }
+
+    private static ClusterElementCallRef start(ClusterElementCallRecorder recorder, String input) {
+        return recorder.callStarted(1, 10, "httpClient_1", "httpClient", null, null, input);
     }
 }
