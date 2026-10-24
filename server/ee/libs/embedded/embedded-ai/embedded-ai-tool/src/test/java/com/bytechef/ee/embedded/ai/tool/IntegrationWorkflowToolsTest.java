@@ -9,6 +9,10 @@ package com.bytechef.ee.embedded.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,10 +20,12 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.ee.embedded.ai.tool.model.CreatedIntegrationWorkflowInfo;
 import com.bytechef.ee.embedded.ai.tool.model.IntegrationWorkflowInfo;
+import com.bytechef.ee.embedded.ai.tool.model.IntegrationWorkflowSaveInfo;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -47,6 +54,9 @@ class IntegrationWorkflowToolsTest {
 
     @Mock
     private IntegrationWorkflowFacade integrationWorkflowFacade;
+
+    @Mock
+    private WorkflowValidatorFacade workflowValidatorFacade;
 
     @Test
     void testGetWorkflow() {
@@ -153,10 +163,38 @@ class IntegrationWorkflowToolsTest {
         when(integrationWorkflowFacade.updateWorkflow("wf-1", DEFINITION, 3))
             .thenReturn(buildDto("wf-1", 55L, 1, 4));
 
-        IntegrationWorkflowInfo result = newTools().updateWorkflow("wf-1", DEFINITION, 3);
+        IntegrationWorkflowSaveInfo result = newTools().updateWorkflow("wf-1", DEFINITION, 3);
 
         verify(integrationWorkflowFacade).updateWorkflow("wf-1", DEFINITION, 3);
         assertThat(result.version()).isEqualTo(4);
+    }
+
+    @Test
+    void testUpdateWorkflowSavesNothingWhenTheDefinitionHasErrors() {
+        when(integrationWorkflowFacade.getIntegrationWorkflow("wf-1")).thenReturn(buildDto("wf-1", 55L, 1, 3));
+        when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), eq("wf-1"), anyLong())).thenReturn(
+            new WorkflowValidatorFacade.WorkflowValidationResult(
+                List.of("[slack_1] Field 'channel' is required"), List.of()));
+
+        assertThatThrownBy(() -> newTools(workflowValidatorFacade).updateWorkflow("wf-1", DEFINITION, 3))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("Nothing was saved")
+            .hasMessageContaining("[slack_1] Field 'channel' is required");
+
+        verify(integrationWorkflowFacade, never()).updateWorkflow("wf-1", DEFINITION, 3);
+    }
+
+    @Test
+    void testCreateIntegrationWorkflowSavesNothingWhenTheDefinitionHasErrors() {
+        when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), isNull(), anyLong())).thenReturn(
+            new WorkflowValidatorFacade.WorkflowValidationResult(
+                List.of("[slack_1] Field 'channel' is required"), List.of()));
+
+        assertThatThrownBy(() -> newTools(workflowValidatorFacade).createIntegrationWorkflow(7L, DEFINITION))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("Nothing was saved");
+
+        verify(integrationWorkflowFacade, never()).addWorkflow(7L, DEFINITION);
     }
 
     @Test
@@ -185,7 +223,18 @@ class IntegrationWorkflowToolsTest {
     }
 
     private IntegrationWorkflowTools newTools() {
-        return new IntegrationWorkflowTools(integrationWorkflowFacade);
+        return newTools(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private IntegrationWorkflowTools newTools(WorkflowValidatorFacade workflowValidatorFacade) {
+        ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider = mock(ObjectProvider.class);
+
+        if (workflowValidatorFacade != null) {
+            when(workflowValidatorFacadeProvider.getIfAvailable()).thenReturn(workflowValidatorFacade);
+        }
+
+        return new IntegrationWorkflowTools(integrationWorkflowFacade, workflowValidatorFacadeProvider);
     }
 
     private static IntegrationWorkflowDTO buildDto(

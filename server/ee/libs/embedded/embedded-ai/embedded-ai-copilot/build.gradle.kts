@@ -20,5 +20,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
     testImplementation(project(":server:libs:test:test-support"))
 }
