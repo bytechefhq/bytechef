@@ -249,6 +249,15 @@ describe('AiHubPanel', () => {
         expect(aiHubTabsStore.getState().rightPanelOpen).toBe(true);
     });
 
+    it('shows the plain right-panel icon on the open-panel control', () => {
+        renderPanel();
+
+        const openButton = screen.getByRole('button', {name: 'Open resource panel'});
+
+        expect(openButton.querySelector('svg.lucide-panel-right')).not.toBeNull();
+        expect(openButton.querySelector('svg.lucide-panel-right-open')).toBeNull();
+    });
+
     it('hides the open-panel control while the panel is open', () => {
         aiHubTabsStore.setState({rightPanelOpen: true});
 
