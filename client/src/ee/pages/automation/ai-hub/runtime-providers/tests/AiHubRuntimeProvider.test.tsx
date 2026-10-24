@@ -1157,6 +1157,25 @@ describe('buildAiHubSubscriber', () => {
             expect(aiChatToolCallStore.getState().toolCalls['call-retry']!.status).toBe('success');
         });
 
+        it('does not raise the retry banner for a tool error followed by a question card', () => {
+            const subscriber = createSubscriber({
+                getLastUserMessage: vi.fn().mockReturnValue('Post signups to Slack'),
+            });
+
+            deliverToolResult(
+                subscriber,
+                'call-lookup',
+                'lookupActionPropertyOptions',
+                JSON.stringify({error: 'lookupActionPropertyOptions failed (ConfigurationException)'})
+            );
+            deliverToolResult(subscriber, 'call-ask', 'askUserQuestion', JSON.stringify(askUserQuestionPayload));
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+            expect(aiChatToolCallStore.getState().toolCalls['call-lookup']!.status).toBe('error');
+        });
+
         it('shows only the run error bubble, not the retry banner, when the run fails after a tool error', () => {
             const addMessage = vi.fn();
             const subscriber = createSubscriber({
