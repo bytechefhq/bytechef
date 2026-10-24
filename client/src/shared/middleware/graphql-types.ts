@@ -1401,6 +1401,8 @@ export type KnowledgeBaseTagsEntry = {
 
 export type LogEntry = {
   __typename?: 'LogEntry';
+  clusterElementCallId?: Maybe<Scalars['String']['output']>;
+  clusterElementWorkflowNodeName?: Maybe<Scalars['String']['output']>;
   componentName: Scalars['String']['output'];
   componentOperationName?: Maybe<Scalars['String']['output']>;
   exceptionMessage?: Maybe<Scalars['String']['output']>;
@@ -1414,6 +1416,7 @@ export type LogEntry = {
 };
 
 export type LogFilterInput = {
+  clusterElementCallId?: InputMaybe<Scalars['String']['input']>;
   componentName?: InputMaybe<Scalars['String']['input']>;
   fromTimestamp?: InputMaybe<Scalars['String']['input']>;
   minLevel?: InputMaybe<LogLevel>;
