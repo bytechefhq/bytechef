@@ -118,12 +118,10 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             return blockedResponse(request, inputOutcome);
         }
 
-        ChatClientResponse response;
+        ChatClientResponse response = chain.nextCall(request);
         CheckOutcome outputOutcome;
 
         try {
-            response = chain.nextCall(request);
-
             outputOutcome = runOutputChecks(request, response, true);
         } catch (OutOfMemoryError error) {
             throw error;
@@ -164,8 +162,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
 
                 return Flux.just(response);
             })
-            .takeUntil(CheckForViolationsAdvisor::isBlockedResponse)
-            .onErrorResume(error -> Flux.just(failClosedResponse(request, error)));
+            .takeUntil(CheckForViolationsAdvisor::isBlockedResponse);
     }
 
     private CheckOutcome safeRunChecks(ChatClientRequest request) {

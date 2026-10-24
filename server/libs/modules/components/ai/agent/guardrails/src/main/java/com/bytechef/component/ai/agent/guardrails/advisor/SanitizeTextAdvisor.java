@@ -110,17 +110,7 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
             return withheldResponse(request);
         }
 
-        ChatClientResponse response;
-
-        try {
-            response = chain.nextCall(sanitizedRequest);
-        } catch (OutOfMemoryError error) {
-            throw error;
-        } catch (Throwable throwable) {
-            LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
-
-            return withheldResponse(request);
-        }
+        ChatClientResponse response = chain.nextCall(sanitizedRequest);
 
         try {
             return rewriteResponse(response);
@@ -148,12 +138,27 @@ public final class SanitizeTextAdvisor implements CallAdvisor, StreamAdvisor {
         }
 
         return chain.nextStream(sanitizedRequest)
-            .map(this::rewriteResponse)
-            .onErrorResume(error -> {
-                LlmClassifierUtils.restoreInterruptIfWrapped(error);
+            .map(response -> safeRewriteResponse(request, response))
+            .takeUntil(SanitizeTextAdvisor::isWithheldResponse);
+    }
 
-                return Flux.just(withheldResponse(request));
-            });
+    private ChatClientResponse safeRewriteResponse(ChatClientRequest request, ChatClientResponse response) {
+        try {
+            return rewriteResponse(response);
+        } catch (OutOfMemoryError error) {
+            throw error;
+        } catch (Throwable throwable) {
+            LlmClassifierUtils.restoreInterruptIfWrapped(throwable);
+
+            return withheldResponse(request);
+        }
+    }
+
+    private static boolean isWithheldResponse(ChatClientResponse response) {
+        ChatResponse chatResponse = response.chatResponse();
+
+        return chatResponse != null && chatResponse.getMetadata()
+            .containsKey(SANITIZE_WITHHELD_KEY);
     }
 
     String sanitizeForTesting(String text) {

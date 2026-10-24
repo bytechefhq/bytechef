@@ -152,6 +152,59 @@ class CheckForViolationsAdvisorTest {
     }
 
     @Test
+    void testCallUpstreamErrorPropagates() {
+        Context context = mock(Context.class);
+
+        CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
+            .blockedMessage("BLOCKED")
+            .add("noop", (text, checkContext) -> Optional.empty(), null, null, null)
+            .context(context)
+            .build();
+
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+        ChatClientRequest request = requestWithUser("hello");
+        RuntimeException upstreamError = new RuntimeException("upstream 503");
+
+        when(chain.nextCall(request)).thenThrow(upstreamError);
+
+        RuntimeException thrown = org.junit.jupiter.api.Assertions.assertThrows(
+            RuntimeException.class, () -> advisor.adviseCall(request, chain));
+
+        assertThat(thrown).isSameAs(upstreamError);
+
+        verify(context, never()).log(any());
+    }
+
+    @Test
+    void testOutputCheckCrashStillBlocks() {
+        CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
+            .blockedMessage("BLOCKED")
+            .add("noop", (text, checkContext) -> Optional.empty(), null, null, null)
+            .context(mock(Context.class))
+            .build();
+
+        ChatResponse crashingChatResponse = mock(ChatResponse.class);
+
+        when(crashingChatResponse.getResults()).thenThrow(new RuntimeException("results unavailable"));
+
+        ChatClientResponse modelResponse = ChatClientResponse.builder()
+            .chatResponse(crashingChatResponse)
+            .build();
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+        ChatClientRequest request = requestWithUser("hello");
+
+        when(chain.nextCall(request)).thenReturn(modelResponse);
+
+        ChatClientResponse response = advisor.adviseCall(request, chain);
+
+        ChatResponse blockedChatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+        Generation result = Objects.requireNonNull(blockedChatResponse.getResult(), "result");
+
+        assertThat(result.getOutput()
+            .getText()).isEqualTo("BLOCKED");
+    }
+
+    @Test
     void testExceptionInCheckFailsClosed() {
         GuardrailCheckFunction throwing = (text, context) -> {
             throw new RuntimeException("simulated failure");
