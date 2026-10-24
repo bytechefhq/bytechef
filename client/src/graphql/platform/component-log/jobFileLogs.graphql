@@ -7,6 +7,8 @@ query jobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) 
             componentOperationName
             taskExecutionId
             triggerExecutionId
+            clusterElementCallId
+            clusterElementWorkflowNodeName
             message
             exceptionType
             exceptionMessage
