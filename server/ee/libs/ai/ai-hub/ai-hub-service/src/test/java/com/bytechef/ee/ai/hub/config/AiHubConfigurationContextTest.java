@@ -38,6 +38,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubContinuationStarter;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalFacade;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalFacadeImpl;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicyImpl;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalRuleFacade;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalRuleFacadeImpl;
@@ -250,6 +251,7 @@ class AiHubConfigurationContextTest {
             .withBean(AiHubChatArtifactRecorder.class, () -> fixtures.artifactRecorder)
             .withBean(SecurityContextRehydrator.class, () -> fixtures.securityContextRehydrator)
             .withBean(AiHubApprovalGate.class, () -> fixtures.approvalGate)
+            .withBean(AiHubToolApprovalPolicy.class, () -> fixtures.policy)
             .withBean(AiHubChatService.class, () -> fixtures.chatService)
             .withBean(AiHubChatAccessPolicy.class, () -> fixtures.chatAccessPolicy)
             .withBean(ProjectDeploymentFacade.class, () -> fixtures.projectDeploymentFacade)
