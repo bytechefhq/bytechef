@@ -171,6 +171,7 @@ class WorkflowValidatorOptionsTest {
     void testScheduleDayOfWeekThroughValidateWorkflow() {
         TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
 
+        when(triggerDefinition.getName()).thenReturn("everyDay");
         doReturn(List.of(Property.toProperty(scheduleDayOfWeek()))).when(triggerDefinition)
             .getProperties();
         when(triggerDefinitionService.getTriggerDefinition("schedule", 1, "everyDay")).thenReturn(triggerDefinition);
@@ -201,6 +202,7 @@ class WorkflowValidatorOptionsTest {
 
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
 
+        when(actionDefinition.getName()).thenReturn("getRows");
         doReturn(List.of(sheetNameProperty)).when(actionDefinition)
             .getProperties();
         when(actionDefinitionService.getActionDefinition("googleSheets", 1, "getRows")).thenReturn(actionDefinition);

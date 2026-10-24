@@ -344,7 +344,7 @@ class WorkflowValidatorClusterElementsTest {
                 errors, warnings);
 
             assertEquals("""
-                [aiAgent_1] Cluster element slot 'guardsnails' does not exist on aiAgent/v1/chat; its slots are \
+                [aiAgent_1] Cluster element 'guardsnails' is not a slot of aiAgent/v1/chat; its slots are \
                 chatMemory, guardrails, model, rag, tools""",
                 errors.toString());
             assertEquals("[aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1",
@@ -451,7 +451,7 @@ class WorkflowValidatorClusterElementsTest {
                 errors, warnings);
 
             assertEquals("""
-                [aiAgent_1] Cluster element slot 'model' does not exist on couchbase/v1/vectorStore; its slots are \
+                [aiAgent_1] Cluster element 'model' is not a slot of couchbase/v1/vectorStore; its slots are \
                 documentReader, documentTransformer, embedding""",
                 errors.toString());
             assertEquals("[aiAgent_1] Cluster element 'embedding' is missing from task couchbase_1",
