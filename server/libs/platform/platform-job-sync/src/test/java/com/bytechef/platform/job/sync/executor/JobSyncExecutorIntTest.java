@@ -65,6 +65,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCall;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.config.JobSyncExecutorIntTestConfiguration;
 import com.bytechef.platform.workflow.execution.constant.TaskExecutionMetadataConstants;
@@ -844,11 +845,12 @@ class JobSyncExecutorIntTest {
 
         return new SuspendAwareSseEmitterHandler(
             sseEmitter -> {
-                clusterElementCallRecorder.callStarted(jobId, taskExecutionId, STREAMED_TOOL_NAME);
+                ClusterElementCallRef clusterElementCallRef = clusterElementCallRecorder.callStarted(
+                    jobId, taskExecutionId, STREAMED_TOOL_NAME, "component", "tool", null, "input");
 
                 sseEmitter.send(Map.of("text", "streamed"));
 
-                clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, STREAMED_TOOL_NAME);
+                clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, clusterElementCallRef, "output");
 
                 sseEmitter.complete();
             },
