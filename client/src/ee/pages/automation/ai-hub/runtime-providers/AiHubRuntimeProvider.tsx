@@ -1045,6 +1045,13 @@ export const projectMessagesWithToolCalls = (
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => message;
 
+/**
+ * True while the chat thread and workspace a pending request was sent for are still the focused ones, so a late
+ * response is applied only to the transcript it belongs to.
+ */
+export const isRequestTargetStillFocused = (threadId: string | undefined, workspaceId: number | undefined): boolean =>
+    useAiHubStore.getState().chatId === threadId && useWorkspaceStore.getState().currentWorkspaceId === workspaceId;
+
 const isAbortError = (error: unknown, signal: AbortSignal) =>
     (error instanceof DOMException && error.name === 'AbortError') ||
     (error instanceof Error && error.name === 'AbortError') ||
@@ -1137,7 +1144,9 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
                 aiHubChatsStore.getState().clearActivityState(currentChatId);
 
-                useAiHubStore.getState().markToolApprovalResolved(approvalId, conflictResolution);
+                if (isRequestTargetStillFocused(currentChatId, currentWorkspaceId)) {
+                    useAiHubStore.getState().markToolApprovalResolved(approvalId, conflictResolution);
+                }
 
                 return conflictResolution;
             }
@@ -1145,6 +1154,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             aiHubChatsStore.getState().clearActivityState(currentChatId);
 
             const {approval, continuationStarted, runId} = result.resolveAiHubToolApproval;
+
+            if (!isRequestTargetStillFocused(currentChatId, currentWorkspaceId)) {
+                return {executionError: approval.executionError, status: approval.status};
+            }
 
             useAiHubStore.getState().markToolApprovalResolved(approvalId, {
                 executionError: approval.executionError,
@@ -1398,6 +1411,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         addMessage(stampOptimisticTurnMarker({content: input, id: userMessageId, role: 'user'}, optimisticTurnMarker));
 
+        let chatSwitchedDuringCreate = false;
+
         const turnStarted = await bootstrapAiHubTurnRunState({
             createChatIfNeeded: async () => {
                 if (aiHubChatsStore.getState().currentChatId != null) {
@@ -1412,12 +1427,23 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                     workspaceId: currentWorkspaceId,
                 });
 
-                aiHubChatsStore.getState().setCurrentChatId(newChat.id);
-                aiHubChatsStore.getState().consumeDraftLlmSelection(newChat.id);
-
                 queryClient.invalidateQueries({
                     queryKey: AiHubChatsKeys.list(currentWorkspaceId, currentEnvironmentId, 'ACTIVE'),
                 });
+
+                const focusedChatId = aiHubChatsStore.getState().currentChatId;
+
+                if (
+                    !isRequestTargetStillFocused(chatId, currentWorkspaceId) ||
+                    (focusedChatId != null && focusedChatId !== newChat.id)
+                ) {
+                    chatSwitchedDuringCreate = true;
+
+                    return;
+                }
+
+                aiHubChatsStore.getState().setCurrentChatId(newChat.id);
+                aiHubChatsStore.getState().consumeDraftLlmSelection(newChat.id);
             },
             markRunning: () => markChatRunning(runId),
             revertOnFailure: (error) => {
@@ -1429,16 +1455,20 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                     aiHubChatsStore.getState().clearActivityState(chatId);
                 }
 
-                useAiHubStore.getState().resetMessages();
-
                 console.error('Failed to auto-create chat on first message:', error);
-
-                if (isChatThreadConflictError(error)) {
-                    useAiHubStore.getState().generateChatId();
-                }
 
                 if (!(error instanceof GraphQlResponseError)) {
                     toast.error(`Failed to start chat: ${errorMessage}`);
+                }
+
+                if (!isRequestTargetStillFocused(chatId, currentWorkspaceId)) {
+                    return;
+                }
+
+                useAiHubStore.getState().resetMessages();
+
+                if (isChatThreadConflictError(error)) {
+                    useAiHubStore.getState().generateChatId();
                 }
 
                 runtime.thread.composer.setText(input);
@@ -1446,6 +1476,16 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         });
 
         if (!turnStarted) {
+            return;
+        }
+
+        if (chatSwitchedDuringCreate) {
+            aiHubRunStateStore.getState().setChatRunning(chatId, false);
+
+            if (chatId != null) {
+                aiHubChatsStore.getState().clearActivityState(chatId);
+            }
+
             return;
         }
 
