@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -90,6 +91,15 @@ public class AutomationMcpServerSecurityIntTestConfiguration {
     }
 
     @Bean
+    PermissionService permissionService() {
+        PermissionService permissionService = mock(PermissionService.class);
+
+        when(permissionService.getMyWorkspaceRole(anyLong())).thenReturn("EDITOR");
+
+        return permissionService;
+    }
+
+    @Bean
     WorkspaceApiKeyService workspaceApiKeyService() {
         WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
 
@@ -110,7 +120,8 @@ public class AutomationMcpServerSecurityIntTestConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(
         HttpSecurity http, ApiKeyService apiKeyService, AuthorityService authorityService,
-        McpServerService mcpServerService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+        McpServerService mcpServerService, PermissionService permissionService, UserService userService,
+        WorkspaceApiKeyService workspaceApiKeyService,
         WorkspaceMcpServerService workspaceMcpServerService) throws Exception {
 
         return http
@@ -119,7 +130,7 @@ public class AutomationMcpServerSecurityIntTestConfiguration {
             .with(
                 new AutomationMcpServerSecurityConfigurer(
                     apiKeyService, authorityService, () -> List.of(Environment.values()), mcpServerService,
-                    userService, workspaceApiKeyService, workspaceMcpServerService),
+                    permissionService, userService, workspaceApiKeyService, workspaceMcpServerService),
                 Customizer.withDefaults())
             .build();
     }

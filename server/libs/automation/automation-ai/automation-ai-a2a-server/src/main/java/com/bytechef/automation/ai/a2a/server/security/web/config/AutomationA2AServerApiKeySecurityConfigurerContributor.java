@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.a2a.server.security.web.config;
 
 import com.bytechef.automation.ai.a2a.server.security.web.configurer.AutomationA2AServerSecurityConfigurer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -39,18 +40,21 @@ public class AutomationA2AServerApiKeySecurityConfigurerContributor implements S
     private final AuthorityService authorityService;
     private final EnvironmentService environmentService;
     private final A2aServerService a2aServerService;
+    private final PermissionService permissionService;
     private final UserService userService;
     private final WorkspaceApiKeyService workspaceApiKeyService;
 
     @SuppressFBWarnings("EI")
     public AutomationA2AServerApiKeySecurityConfigurerContributor(
         ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
-        A2aServerService a2aServerService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService) {
+        A2aServerService a2aServerService, PermissionService permissionService, UserService userService,
+        WorkspaceApiKeyService workspaceApiKeyService) {
 
         this.apiKeyService = apiKeyService;
         this.authorityService = authorityService;
         this.environmentService = environmentService;
         this.a2aServerService = a2aServerService;
+        this.permissionService = permissionService;
         this.userService = userService;
         this.workspaceApiKeyService = workspaceApiKeyService;
     }
@@ -59,6 +63,7 @@ public class AutomationA2AServerApiKeySecurityConfigurerContributor implements S
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         return (T) new AutomationA2AServerSecurityConfigurer(
-            apiKeyService, authorityService, environmentService, a2aServerService, userService, workspaceApiKeyService);
+            apiKeyService, authorityService, environmentService, a2aServerService, permissionService, userService,
+            workspaceApiKeyService);
     }
 }
