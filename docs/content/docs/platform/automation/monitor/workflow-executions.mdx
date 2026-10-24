@@ -67,6 +67,11 @@ The detail opens as two panes:
 > run never reached stay grey. A task that ran more than once shows its total time. Each AI Agent is
 > drawn as a frame holding its elements, and the tools it called are coloured the same way, so a failed
 > run shows which tool failed.
+>
+> Each tool the agent called is also a row nested under the agent's task, and a Task Tool sub-agent's
+> tool calls nest under it. Selecting a row shows that call's Input, Output or Error, and its Logs show
+> only that call's entries. See
+> [Seeing which tools ran](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran).
 
 <Callout type="warn">
     Task inputs and outputs are recorded verbatim. They are serialized to JSON and stored as-is, with

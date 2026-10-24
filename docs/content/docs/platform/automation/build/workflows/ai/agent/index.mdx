@@ -338,6 +338,25 @@ when the call throws an error; its wire from the Tools slot follows. What counts
   resumes.
 - **Simulated calls** are coloured like real ones.
 
+Each tool call is also a row of its own under the agent's task row, in the test output and in the
+execution detail:
+
+- **One row per call**, in the order the calls happened. A tool called several times gets numbered
+  rows, such as `fetch_ok` and `fetch_ok #2`.
+- **Selecting a row** shows that call's **Input**, **Output** or **Error**, and its **Logs** show only
+  the entries from that call. The agent's own **Logs** tab is unchanged.
+- **Rows appear live.** During a test run a row shows up as soon as the call starts, and fills in when
+  it returns.
+- **A Task Tool sub-agent is a row too**, with the tools it called nested under it.
+- **Long values are cut off.** An input or output over 65,536 characters is truncated, and ends with a
+  marker giving the original length.
+- **A call waiting on a human** reads "Waiting for a response", and completes with the answer when the
+  run resumes.
+- **A background sub-agent's call** that was still running when the agent finished reads "Still running
+  when the agent finished".
+- **Only tools and Task Tool sub-agents get rows.** The model, memory, RAG and guardrail elements do
+  not.
+
 ### Supplying tool parameters with fromAi
 
 When you attach a tool, you see its full input form, and for every parameter you decide **who fills it**:
