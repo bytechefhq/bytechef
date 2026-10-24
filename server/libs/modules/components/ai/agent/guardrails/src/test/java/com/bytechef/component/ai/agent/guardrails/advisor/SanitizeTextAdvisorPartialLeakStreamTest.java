@@ -66,7 +66,8 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
         ChatClientRequest request = requestWithUser("hello");
 
         when(streamChain.nextStream(any(ChatClientRequest.class)))
-            .thenReturn(Flux.just(assistantResponse("first chunk"), assistantResponse("second chunk")));
+            .thenReturn(Flux.just(assistantResponse("first chunk"), assistantResponse("second chunk"),
+                assistantResponse("third chunk")));
 
         List<ChatClientResponse> responses = Objects.requireNonNull(
             advisor.adviseStream(request, streamChain)
@@ -75,7 +76,7 @@ class SanitizeTextAdvisorPartialLeakStreamTest {
             "responses");
 
         assertThat(responses)
-            .as("first chunk reached the caller before the failure; remainder must be swapped to a withheld placeholder")
+            .as("first chunk reached the caller before the failure; remainder must be swapped to a withheld placeholder and nothing may follow it")
             .hasSize(2);
 
         ChatResponse firstChatResponse = Objects.requireNonNull(
