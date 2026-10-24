@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.a2a.server.security.web.configurer;
 import com.bytechef.automation.ai.a2a.server.security.web.authentication.A2aApiKeyAuthenticationConverter;
 import com.bytechef.automation.ai.a2a.server.security.web.authentication.AutomationA2AServerApiKeyAuthenticationProvider;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -39,13 +40,15 @@ public class AutomationA2AServerSecurityConfigurer extends McpApiKeyHttpConfigur
 
     public AutomationA2AServerSecurityConfigurer(
         ApiKeyService apiKeyService, AuthorityService authorityService, EnvironmentService environmentService,
-        A2aServerService a2aServerService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService) {
+        A2aServerService a2aServerService, PermissionService permissionService, UserService userService,
+        WorkspaceApiKeyService workspaceApiKeyService) {
 
         super(
             PATH_PATTERN, A2A_SERVER_SECRET_PATTERN, null,
             new A2aApiKeyAuthenticationConverter(environmentService, "/api/automation/a2a/"),
             new AutomationA2AServerApiKeyAuthenticationProvider(
-                apiKeyService, authorityService, a2aServerService, userService, workspaceApiKeyService),
+                apiKeyService, authorityService, a2aServerService, permissionService, userService,
+                workspaceApiKeyService),
             AUTHENTICATED_OR_ANONYMOUS_TYPES);
     }
 }

@@ -17,12 +17,14 @@
 package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
@@ -48,18 +50,20 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
     private final ApiKeyService apiKeyService;
     private final McpApiKeyEntityRepository mcpApiKeyEntityRepository;
     private final McpServerService mcpServerService;
+    private final PermissionService permissionService;
     private final WorkspaceApiKeyService workspaceApiKeyService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public AutomationMcpServerApiKeyAuthenticationProvider(
         ApiKeyService apiKeyService, AuthorityService authorityService, McpServerService mcpServerService,
-        UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+        PermissionService permissionService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
         this.apiKeyService = apiKeyService;
         this.mcpApiKeyEntityRepository = new McpApiKeyEntityRepository(apiKeyService, authorityService, userService);
         this.mcpServerService = mcpServerService;
+        this.permissionService = permissionService;
         this.workspaceApiKeyService = workspaceApiKeyService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
@@ -106,7 +110,13 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
             throw new BadCredentialsException("Invalid API key");
         }
 
-        if (!isSameWorkspace(mcpApiKeyEntity.getApiKeyId(), mcpServer.getId())) {
+        long workspaceId = fetchSharedWorkspaceId(mcpApiKeyEntity.getApiKeyId(), mcpServer.getId())
+            .orElseThrow(() -> new BadCredentialsException("Invalid API key"));
+
+        Authentication apiKeyAuthentication = ApiKeyAuthenticationToken.authenticated(
+            mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
+
+        if (!isWorkspaceMember(apiKeyAuthentication, workspaceId)) {
             throw new BadCredentialsException("Invalid API key");
         }
 
@@ -114,7 +124,7 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
 
         apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
 
-        return ApiKeyAuthenticationToken.authenticated(mcpApiKeyEntity, mcpApiKeyEntity.getAuthorities());
+        return apiKeyAuthentication;
     }
 
     @Override
@@ -128,11 +138,21 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
         }
     }
 
-    private boolean isSameWorkspace(long apiKeyId, Long mcpServerId) {
+    private Optional<Long> fetchSharedWorkspaceId(long apiKeyId, Long mcpServerId) {
         Optional<Long> apiKeyWorkspaceId = workspaceApiKeyService.fetchApiKeyWorkspaceId(apiKeyId);
 
-        return apiKeyWorkspaceId.isPresent() &&
-            Objects.equals(apiKeyWorkspaceId, workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId));
+        if (apiKeyWorkspaceId.isEmpty() ||
+            !Objects.equals(apiKeyWorkspaceId, workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId))) {
+
+            return Optional.empty();
+        }
+
+        return apiKeyWorkspaceId;
+    }
+
+    private boolean isWorkspaceMember(Authentication apiKeyAuthentication, long workspaceId) {
+        return SecurityUtils.runAs(
+            apiKeyAuthentication, () -> permissionService.getMyWorkspaceRole(workspaceId) != null);
     }
 
     private McpServer getMcpServer(@Nullable String mcpServerSecretKey) {

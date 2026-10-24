@@ -32,6 +32,7 @@ import com.bytechef.automation.ai.a2a.server.security.web.configurer.AutomationA
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.Property;
@@ -439,6 +440,15 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             }
 
             @Bean
+            PermissionService permissionService() {
+                PermissionService permissionService = mock(PermissionService.class);
+
+                when(permissionService.getMyWorkspaceRole(anyLong())).thenReturn("EDITOR");
+
+                return permissionService;
+            }
+
+            @Bean
             WorkspaceApiKeyService workspaceApiKeyService() {
                 WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
 
@@ -473,7 +483,8 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             @Bean
             SecurityFilterChain securityFilterChain(
                 HttpSecurity http, ApiKeyService apiKeyService, AuthorityService authorityService,
-                PropertyService propertyService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+                PropertyService propertyService, PermissionService permissionService, UserService userService,
+                WorkspaceApiKeyService workspaceApiKeyService,
                 WorkspaceMcpServerService workspaceMcpServerService) throws Exception {
 
                 return http
@@ -700,6 +711,15 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             }
 
             @Bean
+            PermissionService permissionService() {
+                PermissionService permissionService = mock(PermissionService.class);
+
+                when(permissionService.getMyWorkspaceRole(anyLong())).thenReturn("EDITOR");
+
+                return permissionService;
+            }
+
+            @Bean
             WorkspaceApiKeyService workspaceApiKeyService() {
                 WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
 
@@ -731,7 +751,8 @@ class ManagementMcpServerSecurityConfigurerIntTest {
             SecurityFilterChain securityFilterChain(
                 HttpSecurity http, A2aServerService a2aServerService, ApiKeyService apiKeyService,
                 AuthorityService authorityService, McpServerService mcpServerService, PropertyService propertyService,
-                UserService userService, WorkspaceApiKeyService workspaceApiKeyService,
+                PermissionService permissionService, UserService userService,
+                WorkspaceApiKeyService workspaceApiKeyService,
                 WorkspaceMcpServerService workspaceMcpServerService) throws Exception {
 
                 EnvironmentService environmentService = () -> List.of(Environment.values());
@@ -741,12 +762,14 @@ class ManagementMcpServerSecurityConfigurerIntTest {
                         .permitAll())
                     .with(
                         new AutomationMcpServerSecurityConfigurer(
-                            apiKeyService, authorityService, environmentService, mcpServerService, userService,
+                            apiKeyService, authorityService, environmentService, mcpServerService, permissionService,
+                            userService,
                             workspaceApiKeyService, workspaceMcpServerService),
                         Customizer.withDefaults())
                     .with(
                         new AutomationA2AServerSecurityConfigurer(
-                            apiKeyService, authorityService, environmentService, a2aServerService, userService,
+                            apiKeyService, authorityService, environmentService, a2aServerService, permissionService,
+                            userService,
                             workspaceApiKeyService),
                         Customizer.withDefaults())
                     .with(
