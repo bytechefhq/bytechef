@@ -143,7 +143,8 @@ Client: `useTruncateChatMessages`.
 `RunStopAdvisor` ends the model stream with `takeUntilOther(stopRequested)`. The cancelled run still holds the thread
 (draining guard, `holdsThread`) until its agent reports it stopped or `DRAIN_TIMEOUT` (2 minutes) passes, so a new
 turn or a truncation never overlaps a stopped run that is still writing. The runId is tombstoned so a Stop that beats
-the turn's POST still stops it.
+the turn's POST still stops it, and a Stop with a runId cancels only the registered run with that id, so a delayed
+Stop never ends the next turn. A Stop without a runId cancels whatever run holds the thread.
 
 Deleting a chat registers its rollback hook, then retires its thread (`InFlightAiHubRunRegistry.retireThread`):
 queued continuations are dropped, later ones, new runs and turns (404) are refused, and the live run is cancelled
