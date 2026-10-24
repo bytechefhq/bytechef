@@ -10,6 +10,11 @@ import {
     toolCall,
 } from '../../utils/agUiStreamStub';
 import {openWorkflowEditorCopilot, prepareCopilot, stubWorkspaceConnections} from '../../utils/copilotUtils';
+import {
+    PROPERTY_OPTION_CARD_CASES,
+    pickedOptionMessage,
+    propertyOptionCardCall,
+} from '../../utils/propertyOptionCardCases';
 
 export const test = mergeTests(loginTest(), projectTest, workflowTest);
 
@@ -216,6 +221,45 @@ test.describe('Copilot interactive pickers', () => {
             });
         });
     });
+
+    for (const propertyOptionCardCase of PROPERTY_OPTION_CARD_CASES) {
+        test(`${propertyOptionCardCase.toolName} card lists the options and sends the picked value`, async ({
+            authenticatedPage: page,
+            workflow,
+        }) => {
+            const [firstOption, pickedOption] = propertyOptionCardCase.options;
+
+            const copilotRun = await stubCopilotRun(page, COPILOT_WORKFLOW_EDITOR_CHAT_URL, [
+                completedTurn(propertyOptionCardCall(propertyOptionCardCase)),
+                completedTurn(textMessage(`Using ${pickedOption.label}.`)),
+            ]);
+
+            const copilotPanel = await openWorkflowEditorCopilot(page, workflow);
+
+            await test.step('Render the property option picker', async () => {
+                await copilotPanel.sendAndWaitForTurnEnd(propertyOptionCardCase.request);
+
+                await copilotPanel.root.getByRole('combobox').click();
+
+                await expect(page.getByRole('option', {name: firstOption.label})).toBeVisible();
+
+                await page.getByRole('option', {name: pickedOption.label}).click();
+
+                await expect(copilotPanel.root.getByText(`Picked: ${pickedOption.label}`, {exact: true})).toBeVisible();
+            });
+
+            await test.step('Assert the picked value is sent', async () => {
+                await expect.poll(() => copilotRun.requests.length).toBe(2);
+
+                expect(lastMessageOf(await copilotRun.waitForRequest(1))).toMatchObject({
+                    content: pickedOptionMessage(pickedOption),
+                    role: 'user',
+                });
+
+                await expect(copilotPanel.root.getByText(`Using ${pickedOption.label}.`)).toBeVisible();
+            });
+        });
+    }
 
     test('ask-user-question card sends the answer as a User picked message', async ({
         authenticatedPage: page,

@@ -20,6 +20,11 @@ import {
 } from '../../utils/aiHubUtils';
 import {stubGraphQlOperation, stubWorkspaceConnections} from '../../utils/copilotUtils';
 import {type TestWorkflowI} from '../../utils/projectUtils';
+import {
+    PROPERTY_OPTION_CARD_CASES,
+    pickedOptionMessage,
+    propertyOptionCardCall,
+} from '../../utils/propertyOptionCardCases';
 
 export const test = mergeTests(loginTest(), aiHubChatsTest, projectTest, workflowTest);
 
@@ -263,6 +268,46 @@ test.describe('AI Hub building a workflow', () => {
 
         await expect(page.getByText('Messages go to #random.')).toBeVisible();
     });
+
+    for (const propertyOptionCardCase of PROPERTY_OPTION_CARD_CASES) {
+        test(`a ${propertyOptionCardCase.toolName} result renders an option card whose pick is sent`, async ({
+            authenticatedPage: page,
+        }) => {
+            const [firstOption, pickedOption] = propertyOptionCardCase.options;
+
+            await prepareAiHub(page);
+
+            const hubRun = await stubAgUiRun(page, AI_HUB_CHAT_URL, [
+                completedTurn(propertyOptionCardCall(propertyOptionCardCase)),
+                completedTurn(textMessage(`Using ${pickedOption.label}.`)),
+            ]);
+
+            const aiHubPage = new AiHubPage(page);
+
+            await aiHubPage.goto();
+
+            await test.step('Assert the option card lists both options', async () => {
+                await aiHubPage.sendAndWaitForTurnEnd(propertyOptionCardCase.request);
+
+                await page.getByRole('combobox').click();
+
+                await expect(page.getByRole('option', {name: firstOption.label})).toBeVisible();
+            });
+
+            await test.step('Pick an option and assert it is sent', async () => {
+                await page.getByRole('option', {name: pickedOption.label}).click();
+
+                await expect(page.getByText(`Picked: ${pickedOption.label}`, {exact: true})).toBeVisible();
+
+                expect(lastMessageOf(await hubRun.waitForRequest(1))).toMatchObject({
+                    content: pickedOptionMessage(pickedOption),
+                    role: 'user',
+                });
+
+                await expect(page.getByText(`Using ${pickedOption.label}.`)).toBeVisible();
+            });
+        });
+    }
 
     test('an ambiguous build asks a question in the hub and the answer continues the build', async ({
         authenticatedPage: page,
