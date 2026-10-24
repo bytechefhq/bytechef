@@ -17,11 +17,12 @@ const workflowComponentDefinitions = {
     slack: {icon: '<svg />', name: 'slack', title: 'Slack'},
 };
 
-const renderRow = (workflow: Parameters<typeof WorkflowTriggerAndComponentsRow>[0]['workflow']) =>
+const renderRow = (workflow: Parameters<typeof WorkflowTriggerAndComponentsRow>[0]['workflow'], fitToWidth?: boolean) =>
     render(
         <TooltipProvider>
             <WorkflowTriggerAndComponentsRow
                 filteredComponentNames={['googleMail', 'slack', 'openAi']}
+                fitToWidth={fitToWidth}
                 workflow={workflow}
                 workflowComponentDefinitions={workflowComponentDefinitions}
                 workflowTaskDispatcherDefinitions={{}}
@@ -80,5 +81,29 @@ describe('WorkflowTriggerAndComponentsRow', () => {
         renderRow({triggers: [], workflowTriggerComponentNames: []});
 
         expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(3);
+    });
+
+    it('lets a long trigger label truncate when the row fits to its width', () => {
+        renderRow(
+            {
+                triggers: [{label: 'Auto Respond with HTTP 200 Status', type: 'webhook/v1/autoRespondWithHTTP200'}],
+                workflowTriggerComponentNames: ['webhook'],
+            },
+            true
+        );
+
+        const label = screen.getByText('Auto Respond with HTTP 200 Status');
+
+        expect(label).toHaveClass('truncate');
+        expect(label.closest('.min-w-0')).not.toBeNull();
+    });
+
+    it('keeps the trigger label whole when the row does not fit to its width', () => {
+        renderRow({
+            triggers: [{label: 'Auto Respond with HTTP 200 Status', type: 'webhook/v1/autoRespondWithHTTP200'}],
+            workflowTriggerComponentNames: ['webhook'],
+        });
+
+        expect(screen.getByText('Auto Respond with HTTP 200 Status')).not.toHaveClass('truncate');
     });
 });

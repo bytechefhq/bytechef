@@ -149,7 +149,7 @@ const ProjectDeploymentWorkflowListItem = ({
     return (
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
             <div className="flex min-w-0 flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
-                <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1">
+                <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1 sm:w-80 sm:shrink-0">
                     <div className="flex min-w-0 items-center gap-2">
                         <Tooltip>
                             <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start">
@@ -218,10 +218,11 @@ const ProjectDeploymentWorkflowListItem = ({
                     </div>
                 </div>
 
-                <div className="ml-6 flex items-center gap-1">
+                <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
                     <WorkflowTriggerAndComponentsRow
                         className="hidden sm:flex"
                         filteredComponentNames={filteredComponentNames}
+                        fitToWidth
                         workflow={workflow}
                         workflowComponentDefinitions={workflowComponentDefinitions}
                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
