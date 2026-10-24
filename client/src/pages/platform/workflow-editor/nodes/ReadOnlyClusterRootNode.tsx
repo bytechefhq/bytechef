@@ -49,7 +49,7 @@ const ReadOnlyClusterRootNode = ({data, id}: {data: NodeDataType; id: string}) =
                 )}
                 style={{width: `${nodeWidth}px`}}
             >
-                {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
+                {testNodeState && <WorkflowTestNodeStatus durationPlacement="top" testNodeState={testNodeState} />}
 
                 {data.icon ? data.icon : <ComponentIcon className="size-9 text-content-neutral-primary" />}
 

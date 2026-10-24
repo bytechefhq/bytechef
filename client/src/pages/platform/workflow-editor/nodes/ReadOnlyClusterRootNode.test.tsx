@@ -8,7 +8,9 @@ import ReadOnlyClusterRootNode from './ReadOnlyClusterRootNode';
 vi.mock('./ClusterFrameShell', () => ({default: ({children}: {children: React.ReactNode}) => <div>{children}</div>}));
 vi.mock('./ClusterSlotHandles', () => ({default: () => null}));
 vi.mock('./DisabledNodeBadge', () => ({default: () => <span data-testid="disabled-node-badge" />}));
-vi.mock('../hooks/useWorkflowTestNodeStates', () => ({default: () => ({})}));
+const {testNodeStatesState} = vi.hoisted(() => ({testNodeStatesState: {value: {} as Record<string, unknown>}}));
+
+vi.mock('../hooks/useWorkflowTestNodeStates', () => ({default: () => testNodeStatesState.value}));
 vi.mock('../../cluster-element-editor/utils/clusterElementsUtils', async (importOriginal) => ({
     ...(await importOriginal<object>()),
     getFilteredClusterElementTypes: () => [{name: 'model'}, {name: 'tools'}],
@@ -49,6 +51,16 @@ describe('ReadOnlyClusterRootNode', () => {
         );
 
         expect(screen.getByTestId('disabled-node-badge')).toBeInTheDocument();
+    });
+
+    it('shows its duration beside the status badge, clear of the slot labels under the card', () => {
+        testNodeStatesState.value = {aiAgent_1: {durationMillis: 2700, status: 'COMPLETED'}};
+
+        render(<ReadOnlyClusterRootNode data={BASE_DATA} id="aiAgent_1" />);
+
+        expect(screen.getByText('2.7s')).toHaveClass('-top-2.5');
+
+        testNodeStatesState.value = {};
     });
 
     it('leaves an enabled root unmuted', () => {

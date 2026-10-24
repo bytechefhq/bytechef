@@ -192,7 +192,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 <div
                     className={twMerge(
                         'nodrag invisible absolute top-0 -left-8 z-10 group-hover:visible data-[open=true]:visible',
-                        isClusterElement && !isNestedClusterRoot && 'top-0 left-12'
+                        isClusterElement && !isNestedClusterRoot && 'top-0 left-0'
                     )}
                     data-open={nodeMenuOpen}
                     onMouseDown={(event) => event.stopPropagation()}
@@ -275,7 +275,14 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                 nodeWidth,
                             })}
                         >
-                            {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
+                            {testNodeState && (
+                                <WorkflowTestNodeStatus
+                                    durationPlacement={
+                                        isMainRootClusterElement || isNestedClusterRoot ? 'top' : 'bottom'
+                                    }
+                                    testNodeState={testNodeState}
+                                />
+                            )}
 
                             <div
                                 className={twMerge(
@@ -398,6 +405,10 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
                             'absolute top-full ml-0 items-center text-center',
                         isClusterElement && !isNestedClusterRoot && 'w-auto max-w-[130px] min-w-0',
+                        ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
+                            testNodeState?.durationMillis != null &&
+                            testNodeState.status !== 'RUNNING' &&
+                            'mt-3',
                         isHorizontal && isRegularNode && 'w-auto max-w-[150px] min-w-0'
                     )}
                 >

@@ -24,7 +24,9 @@ const {
     editorStoreState: {renamingNodeName: undefined as string | undefined},
     popoverMenuMock: vi.fn(),
     recordedContextMenuProps: {value: undefined as Record<string, unknown> | undefined},
-    testNodeStatesState: {value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}>},
+    testNodeStatesState: {
+        value: {} as Record<string, {durationMillis?: number; status: 'RUNNING' | 'COMPLETED' | 'FAILED'}>,
+    },
 }));
 
 // Render the context menu as a passthrough so the node content (and its rename input) is asserted directly.
@@ -145,6 +147,17 @@ const MANUAL_TRIGGER_DATA = {
     workflowNodeName: 'trigger_3',
 } as unknown as NodeDataType;
 
+const HTTP_CLIENT_TOOL_DATA = {
+    clusterElementName: 'get',
+    clusterElementType: 'tools',
+    componentName: 'httpClient',
+    label: 'get',
+    name: 'httpClient_1',
+    operationName: 'get',
+    version: 1,
+    workflowNodeName: 'httpClient_1',
+} as unknown as NodeDataType;
+
 function renderNode(data: NodeDataType = NESTED_CLUSTER_ROOT_DATA, id = 'approval_1') {
     const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
@@ -188,6 +201,47 @@ describe('WorkflowNode', () => {
         );
 
         expect(screen.getByRole('button', {name: 'httpClient_1 node'})).toHaveClass('border-red-500');
+    });
+
+    it('keeps the label of a called cluster element clear of its duration', () => {
+        testNodeStatesState.value = {httpClient_1: {durationMillis: 704, status: 'COMPLETED'}};
+
+        renderNode(HTTP_CLIENT_TOOL_DATA, 'httpClient_1');
+
+        expect(screen.getByText('httpClient_1').closest('.top-full')).toHaveClass('mt-3');
+    });
+
+    it('leaves the label of a cluster element that was not called in place', () => {
+        renderNode(HTTP_CLIENT_TOOL_DATA, 'httpClient_1');
+
+        expect(screen.getByText('httpClient_1').closest('.top-full')).not.toHaveClass('mt-3');
+    });
+
+    it('keeps the label under a task of a horizontal layout clear of its duration', () => {
+        directionStoreState.layoutDirection = 'LR';
+        testNodeStatesState.value = {var_1: {durationMillis: 0, status: 'COMPLETED'}};
+
+        renderNode(
+            {
+                componentName: 'var',
+                label: 'Start',
+                name: 'var_1',
+                operationName: 'set',
+                workflowNodeName: 'var_1',
+            } as unknown as NodeDataType,
+            'var_1'
+        );
+
+        expect(screen.getByText('var_1').closest('.top-full')).toHaveClass('mt-3');
+    });
+
+    it('keeps the node actions of a cluster element clear of its status badge', () => {
+        const {container} = renderNode(HTTP_CLIENT_TOOL_DATA, 'httpClient_1');
+
+        const nodeMenu = container.querySelector('[data-open]');
+
+        expect(nodeMenu).toHaveClass('left-0');
+        expect(nodeMenu).not.toHaveClass('left-12');
     });
 
     it('points the trigger replace popover at the trigger it replaces', () => {
@@ -359,6 +413,20 @@ describe('WorkflowNode', () => {
             );
 
             expect(recordedContextMenuProps.value).toBeDefined();
+        });
+
+        it('shows its duration beside the status badge, clear of the slot labels under the card', () => {
+            testNodeStatesState.value = {aiAgent_1: {durationMillis: 2700, status: 'COMPLETED'}};
+
+            renderNode(
+                {
+                    ...MAIN_ROOT_DATA,
+                    clusterFrame: {clusterRootId: 'aiAgent_1', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
+                } as NodeDataType,
+                'aiAgent_1'
+            );
+
+            expect(screen.getByText('2.7s')).toHaveClass('-top-2.5');
         });
 
         it('carries no node menu inside the dialog, whose chrome owns those actions', () => {
