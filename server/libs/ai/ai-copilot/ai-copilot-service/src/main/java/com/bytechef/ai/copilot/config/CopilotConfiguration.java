@@ -156,7 +156,8 @@ public class CopilotConfiguration {
         You are a one-shot subagent. Your caller gives you EITHER a `workflowId` (the workflow already exists) OR a
         `projectId` (the workflow does not exist yet).
 
-        Build and validate the COMPLETE converted definition first, then persist it with ONE call:
+        Build the COMPLETE converted definition first, then persist it with ONE call. The call validates the
+        definition first; if it reports errors, nothing was saved: fix them and make the same call again.
 
         - Given a `workflowId` (a leading `Target workflowId:` line counts) - `getWorkflow(workflowId)` for its
           current `version`, then `updateWorkflow(workflowId, workflow, version)`.
