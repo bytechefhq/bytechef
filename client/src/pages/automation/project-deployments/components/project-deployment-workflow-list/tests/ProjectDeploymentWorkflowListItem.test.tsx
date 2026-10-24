@@ -127,11 +127,21 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(rowPropsMock).toHaveBeenLastCalledWith(
             expect.objectContaining({
                 className: 'hidden sm:flex',
+                fitToWidth: true,
                 workflow,
                 workflowComponentDefinitions: {},
                 workflowTaskDispatcherDefinitions: {},
             })
         );
+    });
+
+    it('keeps the name column one width so every row starts its icons at the same position', () => {
+        renderListItem('Subflow');
+
+        const nameColumn = screen.getByText('workflow1').closest('.max-w-80');
+
+        expect(nameColumn).toHaveClass('sm:w-80', 'sm:shrink-0');
+        expect(nameColumn?.nextElementSibling).toHaveClass('min-w-0');
     });
 
     it('aligns the workflow name tooltip to the start of the name', async () => {

@@ -86,20 +86,24 @@ const WorkflowTriggerAndComponentsRow = ({
         return filteredComponentNames.slice(triggerCount);
     }, [filteredComponentNames, workflow.workflowTriggerComponentNames]);
 
+    const triggerLabel = triggerData?.label || triggerData?.componentName || '';
+
     const triggerBadge = (
-        <div className="shrink-0">
-            <Badge
-                label={triggerData?.label || triggerData?.componentName || ''}
-                styleType="outline-outline"
-                weight="semibold"
-            />
+        <div className={fitToWidth ? 'min-w-0' : 'shrink-0'}>
+            {fitToWidth ? (
+                <Badge className="max-w-full" styleType="outline-outline" weight="semibold">
+                    <span className="truncate">{triggerLabel}</span>
+                </Badge>
+            ) : (
+                <Badge label={triggerLabel} styleType="outline-outline" weight="semibold" />
+            )}
         </div>
     );
 
     return (
         <div className={twMerge('flex items-center gap-1', fitToWidth && 'min-w-0', className)}>
             {triggerData && (
-                <div className="flex shrink-0 items-center gap-1">
+                <div className={twMerge('flex items-center gap-1', fitToWidth ? 'min-w-0' : 'shrink-0')}>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">

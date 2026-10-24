@@ -96,7 +96,15 @@ const WorkflowComponentsList = ({
     );
 
     return (
-        <div className={twMerge('flex', fitToWidth && 'min-w-0 flex-1 overflow-hidden')} ref={containerRef}>
+        <div
+            className={twMerge(
+                'flex',
+                fitToWidth && 'min-w-0 flex-1 overflow-hidden',
+                fitToWidth && filteredComponentNames.length > 0 && 'min-w-7'
+            )}
+            data-slot="workflow-components-list"
+            ref={containerRef}
+        >
             <div className={twMerge('flex', collapseOnSmallViewport && 'hidden 2xl:flex')}>
                 {memoizedFilteredComponentNamesList.icons.map((name) => (
                     <WorkflowComponentsIcon

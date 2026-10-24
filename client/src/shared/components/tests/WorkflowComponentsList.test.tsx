@@ -55,4 +55,16 @@ describe('WorkflowComponentsList', () => {
 
         expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(5);
     });
+
+    it('keeps room for the pill when a neighbour takes the rest of the row', () => {
+        const {container} = renderList(0);
+
+        expect(container.querySelector('[data-slot="workflow-components-list"]')).toHaveClass('min-w-7');
+    });
+
+    it('reserves no room when not fitting to width', () => {
+        const {container} = renderList(0, false);
+
+        expect(container.querySelector('[data-slot="workflow-components-list"]')).not.toHaveClass('min-w-7');
+    });
 });
