@@ -25,8 +25,10 @@ import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -41,13 +43,14 @@ import org.springframework.beans.factory.ObjectProvider;
 class InteractivePickerToolCallbacksTest {
 
     @Test
-    void testWriteExposesTheEightPickersInOrder() {
+    void testWriteExposesTheTenPickersInOrder() {
         InteractivePickerToolCallbacks pickers = pickers(null);
 
         assertThat(names(pickers.write())).containsExactly(
             "listConnectionsForComponent", "selectConnection", "lookupActionPropertyOptions",
-            "lookupTriggerPropertyOptions", "selectPropertyOption", "selectTriggerPropertyOption",
-            "askUserQuestion", "createConnection");
+            "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions", "selectPropertyOption",
+            "selectTriggerPropertyOption", "selectClusterElementPropertyOption", "askUserQuestion",
+            "createConnection");
     }
 
     @Test
@@ -56,15 +59,15 @@ class InteractivePickerToolCallbacksTest {
 
         assertThat(names(pickers.read())).containsExactly(
             "listConnectionsForComponent", "lookupActionPropertyOptions", "lookupTriggerPropertyOptions",
-            "askUserQuestion");
+            "lookupClusterElementPropertyOptions", "askUserQuestion");
     }
 
     @Test
     void testEmbeddedListerDoesNotChangeTheExposedPickers() {
         InteractivePickerToolCallbacks pickers = pickers(mock(CopilotConnectionLister.class));
 
-        assertThat(names(pickers.write())).hasSize(8);
-        assertThat(names(pickers.read())).hasSize(4);
+        assertThat(names(pickers.write())).hasSize(10);
+        assertThat(names(pickers.read())).hasSize(5);
     }
 
     @Test
@@ -93,7 +96,8 @@ class InteractivePickerToolCallbacksTest {
             mock(ConnectionDefinitionService.class), mock(WorkspaceConnectionFacade.class),
             mock(ComponentDefinitionService.class), mock(ActionDefinitionService.class),
             mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
-            mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class), provider,
+            mock(TriggerDefinitionFacade.class), mock(ClusterElementDefinitionService.class),
+            mock(ClusterElementDefinitionFacade.class), mock(PropertyOptionsResolver.class), provider,
             mock(ScopedConnectionGuard.class));
     }
 }
