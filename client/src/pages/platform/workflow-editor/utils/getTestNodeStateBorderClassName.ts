@@ -8,6 +8,11 @@ export default function getTestNodeStateBorderClassName(testNodeState?: Workflow
             return 'border-green-500 hover:border-green-500';
         case 'FAILED':
             return 'border-red-500 hover:border-red-500';
+        case 'BLOCKED':
+        case 'WITHHELD':
+            return 'border-amber-500 hover:border-amber-500';
+        case 'REDACTED':
+            return 'border-sky-500 hover:border-sky-500';
         default:
             return undefined;
     }

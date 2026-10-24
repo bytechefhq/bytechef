@@ -46,4 +46,37 @@ describe('getClusterElementIconStatuses', () => {
             )
         ).toEqual({'/icons/httpClient.svg': 'COMPLETED'});
     });
+
+    it('ranks withheld above blocked and below failed', () => {
+        expect(
+            getClusterElementIconStatuses(CLUSTER_ELEMENTS, {
+                httpClient_1: {status: 'BLOCKED'},
+                httpClient_2: {status: 'WITHHELD'},
+                slack_1: {status: 'COMPLETED'},
+            })
+        ).toEqual({'/icons/httpClient.svg': 'WITHHELD', '/icons/slack.svg': 'COMPLETED'});
+
+        expect(
+            getClusterElementIconStatuses(CLUSTER_ELEMENTS, {
+                httpClient_1: {status: 'WITHHELD'},
+                httpClient_2: {status: 'FAILED'},
+            })
+        ).toEqual({'/icons/httpClient.svg': 'FAILED'});
+    });
+
+    it('ranks redacted above completed and below running', () => {
+        expect(
+            getClusterElementIconStatuses(CLUSTER_ELEMENTS, {
+                httpClient_1: {status: 'COMPLETED'},
+                httpClient_2: {status: 'REDACTED'},
+            })
+        ).toEqual({'/icons/httpClient.svg': 'REDACTED'});
+
+        expect(
+            getClusterElementIconStatuses(CLUSTER_ELEMENTS, {
+                httpClient_1: {status: 'REDACTED'},
+                httpClient_2: {status: 'RUNNING'},
+            })
+        ).toEqual({'/icons/httpClient.svg': 'RUNNING'});
+    });
 });

@@ -290,9 +290,12 @@ export function useWorkflowTestStream({
 
                 setLastAssistantMessageContent(`${formatAskUserQuestionMessage(questionEvent)}\n\n`);
             },
+            cluster_element_blocked: (data) => releaseProgressOwnership(handleClusterElementCall(data)),
             cluster_element_completed: (data) => releaseProgressOwnership(handleClusterElementCall(data)),
             cluster_element_failed: (data) => releaseProgressOwnership(handleClusterElementCall(data)),
+            cluster_element_redacted: (data) => releaseProgressOwnership(handleClusterElementCall(data)),
             cluster_element_started: (data) => releaseProgressOwnership(handleClusterElementCall(data)),
+            cluster_element_withheld: (data) => releaseProgressOwnership(handleClusterElementCall(data)),
             error: (data) => {
                 clearRunningNodeStates();
                 setWorkflowIsRunning(false);

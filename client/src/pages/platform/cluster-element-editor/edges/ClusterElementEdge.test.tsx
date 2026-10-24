@@ -8,7 +8,9 @@ import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import ClusterElementEdge from './ClusterElementEdge';
 
 const {testNodeStatesState} = vi.hoisted(() => ({
-    testNodeStatesState: {value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}>},
+    testNodeStatesState: {
+        value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED' | 'BLOCKED' | 'REDACTED' | 'WITHHELD'}>,
+    },
 }));
 
 vi.mock('@/pages/platform/workflow-editor/hooks/useWorkflowTestNodeStates', () => ({
@@ -67,6 +69,18 @@ describe('ClusterElementEdge', () => {
 
         expect(edge).toHaveClass('stroke-red-500');
         expect(edge.style.stroke).toBe('');
+    });
+
+    it.each([
+        ['BLOCKED', 'stroke-amber-500'],
+        ['REDACTED', 'stroke-sky-500'],
+        ['WITHHELD', 'stroke-amber-500'],
+    ] as const)('colours the wire of a %s element %s', (status, className) => {
+        testNodeStatesState.value = {httpClient_1: {status}};
+
+        renderEdge();
+
+        expect(screen.getByTestId('cluster-element-edge')).toHaveClass(className);
     });
 
     it('keeps the grey wire of an element that was not called', () => {
