@@ -19,6 +19,7 @@ import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -237,6 +238,7 @@ class AiHubConfigurationContextTest {
             .withBean(ChatModel.class, () -> fixtures.chatModel)
             .withBean(ReadProjectTools.class, () -> fixtures.readProjectTools)
             .withBean(ReadProjectWorkflowTools.class, () -> fixtures.readProjectWorkflowTools)
+            .withBean(WorkflowExecutionTools.class, () -> fixtures.workflowExecutionTools)
             .withBean(ProjectTools.class, () -> fixtures.projectTools)
             .withBean(ProjectWorkflowLifecycleTools.class, () -> fixtures.projectWorkflowLifecycleTools)
             .withBean(
@@ -276,6 +278,7 @@ class AiHubConfigurationContextTest {
             .withBean(ChatModel.class, () -> fixtures.chatModel)
             .withBean(ReadProjectTools.class, () -> fixtures.readProjectTools)
             .withBean(ReadProjectWorkflowTools.class, () -> fixtures.readProjectWorkflowTools)
+            .withBean(WorkflowExecutionTools.class, () -> fixtures.workflowExecutionTools)
             .withBean(ProjectTools.class, () -> fixtures.projectTools)
             .withBean(ProjectWorkflowLifecycleTools.class, () -> fixtures.projectWorkflowLifecycleTools)
             .withBean(

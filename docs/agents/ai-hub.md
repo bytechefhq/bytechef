@@ -42,12 +42,16 @@ The client records `WORKFLOW_REFERENCED` through `useRecordReferencedArtifacts` 
 
 `AiHubConfiguration` builds two `AiHubSpringAIAgent` beans, `ai_hub_ask` and `ai_hub_build`, with explicit tool
 lists (never a sweep of every `ToolCallback` bean). ASK is read only: `ReadProjectTools`,
-`ReadProjectWorkflowTools`, deployment reads, read pickers, `openWorkflowTab`, `openWorkflowChatTab`. BUILD adds
+`ReadProjectWorkflowTools`, `WorkflowExecutionTools`, deployment reads, read pickers, `openWorkflowTab`,
+`openWorkflowChatTab`. BUILD adds
 `ProjectTools`, `ProjectWorkflowLifecycleTools`, deployment writes, write pickers, the workflow chat tools
 `listChatWorkflows` and `createWorkflowChat`, and `buildWorkflow` / `importWorkflow`.
 Both modes also get, per turn, the Brave and Firecrawl tools of the web search providers enabled for the verified
 environment (`WebSearchToolCallbackProvider` through `additionalToolCallbacks`). They are read only, skip the
 approval gate and are not pinned, so an approval never resumes one.
+`WorkflowExecutionTools` (`listWorkflowExecutions`, `getWorkflowExecution`) is in both modes so the hub can
+explain a failed run. The Copilot's `debugWorkflowExecution` specialist is not given to the hub: it holds raw
+`ProjectWorkflowTools`, which the parity contract below forbids. A fix goes through `buildWorkflow`.
 The controller needs workspace role VIEWER for ASK and EDITOR for BUILD. Embedded connected users
 (`ConnectedUserAuthentication`) are refused on the REST entry points and in `AiHubWorkspaceAccess` for GraphQL.
 
