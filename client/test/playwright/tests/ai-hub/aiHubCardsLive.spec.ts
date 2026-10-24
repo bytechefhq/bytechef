@@ -83,9 +83,11 @@ async function readLastToolResults(page: Page, chat: Omit<AiHubChatRefI, 'thread
         .map((toolEvent) => toolEvent.response ?? '');
 }
 
-const answerCards = (page: Page, aiHubPage: AiHubPage, answerPickers = true) =>
+const answerCards = (page: Page, aiHubPage: AiHubPage, answerPickers = true, preferredOption?: string) =>
     answerInteractiveCards(page, {
         answerPickers,
+        chooseOption: (cardText, optionNames) =>
+            preferredOption && optionNames.includes(preferredOption) ? preferredOption : optionNames[0],
         readLastMessage: () => aiHubPage.assistantMessages.last(),
         waitForTurnEnd: () => aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT),
     });
@@ -293,18 +295,19 @@ test.describe('@live AI Hub cards', () => {
                     'knowledge base.'
             );
 
-            await answerCards(page, aiHubPage, false);
-
             const pickedKnowledgeBase = knowledgeBases[1];
+
+            await answerCards(page, aiHubPage, false, pickedKnowledgeBase.name);
+
             const optionPicker = aiHubPage.assistantMessages.last().getByRole('combobox');
 
-            await expect(optionPicker.first()).toBeVisible();
+            if ((await optionPicker.count()) > 0) {
+                await optionPicker.first().click();
 
-            await optionPicker.first().click();
+                await page.getByRole('option', {name: pickedKnowledgeBase.name}).click();
 
-            await page.getByRole('option', {name: pickedKnowledgeBase.name}).click();
-
-            await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+                await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+            }
 
             const workflowNodes = await readProjectWorkflowNodes(page, workspaceId, projectName);
             const vectorStoreNode = workflowNodes.find(
@@ -356,21 +359,19 @@ test.describe('@live AI Hub cards', () => {
                     'triggers it.'
             );
 
-            await answerCards(page, aiHubPage, false);
-
             const pickedTableName = tableNames[1];
-            const lastMessage = aiHubPage.assistantMessages.last();
-            const optionPicker = lastMessage.getByRole('combobox');
+
+            await answerCards(page, aiHubPage, false, pickedTableName);
+
+            const optionPicker = aiHubPage.assistantMessages.last().getByRole('combobox');
 
             if ((await optionPicker.count()) > 0) {
                 await optionPicker.first().click();
 
                 await page.getByRole('option', {name: pickedTableName}).click();
-            } else {
-                await lastMessage.getByRole('button', {exact: true, name: pickedTableName}).click();
-            }
 
-            await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+                await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+            }
 
             const workflowNodes = await readProjectWorkflowNodes(page, workspaceId, projectName);
             const triggerNode = workflowNodes.find(
