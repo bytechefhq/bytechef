@@ -18,7 +18,8 @@ import java.util.Set;
 public final class AiHubToolApprovalDefaults {
 
     public static final Set<String> DEFAULT_TOOL_NAMES = Set.of(
-        "deleteProject", "deleteWorkflow", "deleteProjectDeployment", "rollbackProjectDeployment", "promoteWorkflow");
+        "createProjectDeployment", "deleteProject", "deleteProjectDeployment", "deleteWorkflow", "promoteWorkflow",
+        "publishProject", "rollbackProjectDeployment", "toggleProjectDeployment", "updateProjectDeployment");
 
     private static final List<String> GATED_PREFIXES = List.of("delete", "drop", "rollback", "promote");
 
