@@ -155,7 +155,8 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
 
             Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            Map<String, Object> forwardedContext = WorkflowPersistCaptureUtils.withCaptureHolder(parentContext);
+            Map<String, Object> forwardedContext = WorkflowPersistCaptureUtils.withTargetWorkflowId(
+                WorkflowPersistCaptureUtils.withCaptureHolder(parentContext), request);
 
             ChatClient workflowEditorChatClient =
                 chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));

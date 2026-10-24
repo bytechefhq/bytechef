@@ -20,8 +20,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -30,6 +34,13 @@ import org.jspecify.annotations.Nullable;
 public final class WorkflowPersistCaptureUtils {
 
     private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
+    private static final String TARGET_WORKFLOW_ID_KEY = "bytechef.workflowEditor.targetWorkflowId";
+    private static final Pattern WORKFLOW_ID_PATTERN = Pattern.compile(
+        "\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b");
+    private static final Pattern LEADING_WORKFLOW_ID_PATTERN = Pattern.compile(
+        "^\\s*(?:target\\s+)?workflow(?:\\s*id)?\\s*[:=]?\\s*" +
+            "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\\b",
+        Pattern.CASE_INSENSITIVE);
 
     private WorkflowPersistCaptureUtils() {
     }
@@ -40,6 +51,31 @@ public final class WorkflowPersistCaptureUtils {
         context.put(PERSISTED_WORKFLOW_CAPTURE_KEY, Collections.synchronizedList(new ArrayList<Map<String, Object>>()));
 
         return context;
+    }
+
+    /**
+     * Records the workflow a build request names, when it names exactly one, so a workflow the builder creates in that
+     * workflow's project can fill it instead of becoming a second workflow.
+     */
+    public static Map<String, Object> withTargetWorkflowId(Map<String, Object> context, String request) {
+        Set<String> workflowIds = new LinkedHashSet<>();
+        Matcher matcher = WORKFLOW_ID_PATTERN.matcher(request);
+
+        while (matcher.find()) {
+            workflowIds.add(matcher.group());
+        }
+
+        Matcher leadingWorkflowIdMatcher = LEADING_WORKFLOW_ID_PATTERN.matcher(request);
+
+        if (workflowIds.size() == 1 && leadingWorkflowIdMatcher.find()) {
+            context.put(TARGET_WORKFLOW_ID_KEY, leadingWorkflowIdMatcher.group(1));
+        }
+
+        return context;
+    }
+
+    public static @Nullable String fetchTargetWorkflowId(Map<String, Object> context) {
+        return context.get(TARGET_WORKFLOW_ID_KEY) instanceof String workflowId ? workflowId : null;
     }
 
     public static @Nullable String fetchLastWorkflowId(Map<String, Object> context) {
