@@ -9,13 +9,19 @@ package com.bytechef.ee.tenant.multi.pgvector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.tenant.multi.sql.MultiTenantPgVectorDataSource;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +42,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 class MultiTenantPgVectorLoaderIntTest {
 
+    private static final String INDEX_NAME = "kb_vector_store_embedding_idx";
     private static final String TABLE_NAME = "kb_vector_store";
     private static final String TENANT_ID = "000001";
     private static final String VECTOR_SCHEMA = "bytechef_vectorstore_" + TENANT_ID;
@@ -109,5 +116,72 @@ class MultiTenantPgVectorLoaderIntTest {
             VECTOR_SCHEMA, TABLE_NAME);
 
         assertThat(tableCount).isEqualTo(1);
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    @Test
+    void testAfterPropertiesSetSkipsInitializationWhenTableExists() {
+        TenantService tenantService = mock(TenantService.class);
+
+        when(tenantService.getTenantIds()).thenReturn(List.of(TENANT_ID));
+
+        PgVectorStoreProperties properties = new PgVectorStoreProperties();
+
+        properties.setDimensions(1536);
+        properties.setIdType(PgVectorStore.PgIdType.UUID);
+        properties.setIndexType(PgVectorStore.PgIndexType.HNSW);
+        properties.setDistanceType(PgVectorStore.PgDistanceType.COSINE_DISTANCE);
+
+        MultiTenantPgVectorLoader loader = new MultiTenantPgVectorLoader(
+            tenantJdbcTemplate, properties, TABLE_NAME, tenantService);
+
+        loader.afterPropertiesSet();
+
+        JdbcTemplate spyJdbcTemplate = spy(tenantJdbcTemplate);
+
+        MultiTenantPgVectorLoader secondLoader = new MultiTenantPgVectorLoader(
+            spyJdbcTemplate, properties, TABLE_NAME, tenantService);
+
+        secondLoader.afterPropertiesSet();
+
+        verify(spyJdbcTemplate, never()).execute(anyString());
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    @Test
+    void testAfterPropertiesSetCreatesMissingIndexWhenTableExists() {
+        TenantService tenantService = mock(TenantService.class);
+
+        when(tenantService.getTenantIds()).thenReturn(List.of(TENANT_ID));
+
+        PgVectorStoreProperties properties = new PgVectorStoreProperties();
+
+        properties.setDimensions(1536);
+        properties.setIdType(PgVectorStore.PgIdType.UUID);
+        properties.setIndexType(PgVectorStore.PgIndexType.HNSW);
+        properties.setDistanceType(PgVectorStore.PgDistanceType.COSINE_DISTANCE);
+
+        MultiTenantPgVectorLoader loader = new MultiTenantPgVectorLoader(
+            tenantJdbcTemplate, properties, TABLE_NAME, tenantService);
+
+        loader.afterPropertiesSet();
+
+        plainJdbcTemplate.execute("DROP INDEX " + VECTOR_SCHEMA + "." + INDEX_NAME);
+
+        JdbcTemplate spyJdbcTemplate = spy(tenantJdbcTemplate);
+
+        MultiTenantPgVectorLoader secondLoader = new MultiTenantPgVectorLoader(
+            spyJdbcTemplate, properties, TABLE_NAME, tenantService);
+
+        secondLoader.afterPropertiesSet();
+
+        verify(spyJdbcTemplate, never()).execute(startsWith("CREATE EXTENSION"));
+        verify(spyJdbcTemplate, never()).execute(startsWith("CREATE TABLE"));
+
+        Integer indexCount = plainJdbcTemplate.queryForObject(
+            "SELECT count(*) FROM pg_indexes WHERE schemaname = ? AND indexname = ?", Integer.class, VECTOR_SCHEMA,
+            INDEX_NAME);
+
+        assertThat(indexCount).isEqualTo(1);
     }
 }
