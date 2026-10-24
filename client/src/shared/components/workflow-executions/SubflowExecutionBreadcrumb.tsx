@@ -14,8 +14,10 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {ChevronLeftIcon, WorkflowIcon} from 'lucide-react';
 import {CSSProperties, useEffect, useRef, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 interface TruncatedLabelProps {
     className?: string;
@@ -96,7 +98,10 @@ const SubflowExecutionBreadcrumb = ({items, onBackClick}: {items: BreadcrumbEntr
     }, []);
 
     return (
-        <div className="flex h-9 items-center overflow-hidden bg-surface-neutral-primary px-3 py-2" ref={containerRef}>
+        <div
+            className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'overflow-hidden bg-surface-neutral-primary')}
+            ref={containerRef}
+        >
             <Button
                 className="text-content-neutral-tertiary hover:bg-transparent hover:text-content-neutral-primary active:bg-transparent active:text-content-neutral-primary"
                 icon={<ChevronLeftIcon className="size-3 shrink-0" />}

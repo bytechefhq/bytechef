@@ -7,10 +7,12 @@ import WorkflowExecutionContent from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import WorkflowExecutionLogsContent from '@/shared/components/workflow-executions/WorkflowExecutionLogsContent';
 import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
+import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {AlertCircleIcon, ExpandIcon, ScrollTextIcon, SquarePenIcon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 interface WorkflowExecutionsTabsPanelProps {
     activeTab: TabValueType;
@@ -105,12 +107,12 @@ const WorkflowExecutionsTabsPanel = ({
 
     return (
         <Tabs
-            className="flex h-full flex-col"
+            className="flex h-full flex-col gap-0"
             defaultValue={activeTab}
             onValueChange={handleValueChange}
             value={activeTab}
         >
-            <div className="flex items-center justify-between p-3">
+            <div className={twMerge(EXECUTIONS_PANEL_HEADER_CLASS_NAME, 'justify-between')}>
                 <div className="flex items-center gap-2">
                     <div>{selectedItem?.icon && <LazyLoadSVG className="size-5" src={selectedItem?.icon || ''} />}</div>
 
