@@ -27,6 +27,7 @@ import {
     LucideIcon,
     MessagesSquareIcon,
     NetworkIcon,
+    ServerCogIcon,
     ServerIcon,
     Settings2Icon,
     SquareIcon,
@@ -44,11 +45,19 @@ import {useShallow} from 'zustand/react/shallow';
 const CopilotPanel = lazy(() => import('@/shared/components/copilot/CopilotPanel'));
 const GlobalSearchDialog = lazy(() => import('@/components/GlobalSearch/GlobalSearchDialog'));
 
+type NavigationGroupType = {
+    icon: LucideIcon;
+    name: string;
+};
+
 type NavigationType = {
+    group?: NavigationGroupType;
     name: string;
     href: string;
     icon: LucideIcon;
 };
+
+const serversNavigationGroup: NavigationGroupType = {icon: ServerCogIcon, name: 'Servers'};
 
 const automationNavigation: NavigationType[] = [
     {
@@ -67,11 +76,13 @@ const automationNavigation: NavigationType[] = [
         name: 'API Collections',
     },
     {
+        group: serversNavigationGroup,
         href: '/automation/mcp-servers',
         icon: ServerIcon,
         name: 'MCP Servers',
     },
     {
+        group: serversNavigationGroup,
         href: '/automation/a2a-servers',
         icon: NetworkIcon,
         name: 'A2A Servers',
