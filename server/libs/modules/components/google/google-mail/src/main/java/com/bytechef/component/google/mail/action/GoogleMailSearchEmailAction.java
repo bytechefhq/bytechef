@@ -34,6 +34,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.QUERY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RESULT_SIZE_ESTIMATE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
@@ -94,6 +95,12 @@ public class GoogleMailSearchEmailAction {
                     option("Forums", "forums"),
                     option("Reservations", "reservations"),
                     option("Purchases", "purchases"))
+                .required(false),
+            string(QUERY)
+                .label("Query")
+                .description(
+                    "Additional search terms in Gmail's search syntax, combined with the filters above, for example " +
+                        "has:attachment filename:pdf newer_than:1d.")
                 .required(false),
             array(LABEL_IDS)
                 .label("Labels")
@@ -170,6 +177,13 @@ public class GoogleMailSearchEmailAction {
         if (inputParameters.getString(CATEGORY) != null) {
             query.append(" category:")
                 .append(inputParameters.getString(CATEGORY));
+        }
+
+        String additionalQuery = inputParameters.getString(QUERY);
+
+        if (additionalQuery != null && !additionalQuery.isBlank()) {
+            query.append(" ")
+                .append(additionalQuery.strip());
         }
 
         return query;
