@@ -22,15 +22,24 @@ export interface ExecutedTaskI {
 type NodeStatusType = WorkflowTestNodeStateI['status'];
 
 const STATUS_PRIORITY: Record<NodeStatusType, number> = {
+    BLOCKED: 3,
     COMPLETED: 0,
-    FAILED: 2,
-    RUNNING: 1,
+    FAILED: 5,
+    REDACTED: 1,
+    RUNNING: 2,
+    WITHHELD: 4,
 };
 
 function toNodeStatus(status: string | undefined, running: boolean): NodeStatusType | undefined {
     switch (status) {
         case 'COMPLETED':
             return 'COMPLETED';
+        case 'BLOCKED':
+            return 'BLOCKED';
+        case 'REDACTED':
+            return 'REDACTED';
+        case 'WITHHELD':
+            return 'WITHHELD';
         case 'FAILED':
         case 'CANCELLED':
             return 'FAILED';

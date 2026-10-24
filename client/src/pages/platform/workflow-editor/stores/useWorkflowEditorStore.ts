@@ -14,7 +14,7 @@ export interface WorkflowTestNodeStateI {
     clusterElement?: boolean;
     durationMillis?: number;
     error?: string;
-    status: 'RUNNING' | 'COMPLETED' | 'FAILED';
+    status: 'RUNNING' | 'COMPLETED' | 'FAILED' | 'BLOCKED' | 'REDACTED' | 'WITHHELD';
 }
 
 interface ParentWorkflowTestNodeStatesI {
