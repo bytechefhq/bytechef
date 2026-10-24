@@ -127,6 +127,29 @@ const COLUMN_SPINE_HALF_WIDTH = 45;
 const TRIGGER_LABEL_CLEARANCE = 30;
 
 /**
+ * Dagre lays trigger fan-in edges out with minlen 2, leaving room for the bus
+ * and the edge's add button between the trigger row and the first task. ELK
+ * has no per-edge length, so the chain below the row moves down one layer.
+ */
+function extendTriggerFanInGap(allNodes: Node[], edges: Edge[], direction: LayoutDirectionType): void {
+    const hasTriggerFanIn = edges.some((edge) => (edge.data as Record<string, unknown> | undefined)?.triggerFanIn);
+
+    if (!hasTriggerFanIn) {
+        return;
+    }
+
+    const mainAxis = getCrossAxis(direction) === 'x' ? 'y' : 'x';
+
+    allNodes.forEach((node) => {
+        if ((node.data as NodeDataType).trigger === true || node.id === TRIGGER_PLACEHOLDER_NODE_ID) {
+            return;
+        }
+
+        node.position = {...node.position, [mainAxis]: node.position[mainAxis] + ELK_LAYER_SPACING};
+    });
+}
+
+/**
  * Triggers keep a deliberately tight 160px cross footprint so the trigger row
  * hugs the canvas center — but a long trigger label then runs under the next
  * trigger's icon. Repack the row left-to-right so each trigger clears the
@@ -2031,6 +2054,8 @@ export const getElkLayoutElements = async ({
                 [crossAxis]: barCrossCenter - targetCrossSize / 2,
             };
         });
+
+        extendTriggerFanInGap(allNodes, edges, direction);
 
         separateTriggerRow(allNodes, edges, direction);
 
