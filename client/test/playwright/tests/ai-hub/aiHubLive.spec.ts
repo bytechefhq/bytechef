@@ -50,6 +50,8 @@ export const test = mergeTests(loginTest(), aiHubChatsTest, projectTest, workflo
 
 const LIVE_TURN_TIMEOUT = 540000;
 
+const TURN_START_TIMEOUT = 15000;
+
 const MCP_SECRET_KEY = process.env.PLAYWRIGHT_MCP_SECRET_KEY ?? '';
 
 const HUB_CONFIG = process.env.PLAYWRIGHT_HUB_CONFIG ?? '';
@@ -982,6 +984,10 @@ test.describe('@live AI Hub', () => {
                     await copilotPanel.setBuildMode(true);
 
                     await copilotPanel.send(`Build this workflow: ${PARITY_INSTRUCTION}`);
+
+                    await expect(copilotPanel.stopGeneratingButton)
+                        .toBeVisible({timeout: TURN_START_TIMEOUT})
+                        .catch(() => undefined);
 
                     await expect(copilotPanel.stopGeneratingButton).toBeHidden({timeout: LIVE_TURN_TIMEOUT});
 
