@@ -166,7 +166,13 @@ public final class ClusterElementCallRecorder {
                 }
             }
 
-            taskExecutionCalls.claimedFailures.add(throwable);
+            visited.clear();
+
+            for (Throwable current = throwable; current != null && visited.add(current); current = current
+                .getCause()) {
+
+                taskExecutionCalls.claimedFailures.add(current);
+            }
 
             return true;
         }
