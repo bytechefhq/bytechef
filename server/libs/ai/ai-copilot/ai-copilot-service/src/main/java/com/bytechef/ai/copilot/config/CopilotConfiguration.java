@@ -457,7 +457,7 @@ public class CopilotConfiguration {
     WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        WebSearchToolCallbackProvider webSearchToolCallbackProvider,
+        WorkflowExecutionTools workflowExecutionTools, WebSearchToolCallbackProvider webSearchToolCallbackProvider,
         WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         Advisor questionAnswerAdvisor, PermissionService permissionService,
         SecurityContextRehydrator securityContextRehydrator,
@@ -466,8 +466,8 @@ public class CopilotConfiguration {
 
         List<Object> tools = new ArrayList<>(
             List.of(
-                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
-                workflowInstructionTools));
+                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowExecutionTools,
+                workflowValidatorTools, workflowInstructionTools));
 
         tools.addAll(interactivePickerToolCallbacks.write());
 
@@ -494,7 +494,8 @@ public class CopilotConfiguration {
     @Bean
     WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools, ScriptTools scriptTools, WorkflowService workflowService,
+        ComponentTools componentTools, TaskTools taskTools, ScriptTools scriptTools,
+        WorkflowExecutionTools workflowExecutionTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, PermissionService permissionService,
         SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -502,8 +503,8 @@ public class CopilotConfiguration {
 
         List<Object> tools = new ArrayList<>(
             List.of(
-                projectWorkflowTools, componentTools, taskTools, scriptTools, workflowValidatorTools,
-                workflowInstructionTools));
+                projectWorkflowTools, componentTools, taskTools, scriptTools, workflowExecutionTools,
+                workflowValidatorTools, workflowInstructionTools));
 
         if (dataTableTools != null) {
             tools.add(dataTableTools);
