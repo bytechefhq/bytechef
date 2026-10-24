@@ -1,4 +1,5 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {WorkflowTestNodeStateI} from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useSSE} from '@/shared/hooks/useSSE';
 import {act, renderHook} from '@testing-library/react';
@@ -14,8 +15,7 @@ const mockSetWorkflowTestNodeState = vi.fn();
 
 let mockWorkflowIsRunning = false;
 let mockWorkflowTestExecution: {job?: {status?: string}} | undefined;
-let mockWorkflowTestNodeStates: Record<string, {clusterElement?: boolean; status: 'RUNNING' | 'COMPLETED' | 'FAILED'}> =
-    {};
+let mockWorkflowTestNodeStates: Record<string, WorkflowTestNodeStateI> = {};
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
     const getStoreState = () => ({
@@ -771,8 +771,105 @@ describe('useWorkflowTestStream', () => {
             durationMillis: 1,
             status: 'COMPLETED',
         });
-        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith('condition_2', expect.anything());
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('condition_2', {
+            durationMillis: 0,
+            status: 'COMPLETED',
+        });
         expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith('logger_1', expect.anything());
+    });
+
+    it('should mark a node failed when the final result says one of its visits failed', () => {
+        mockWorkflowTestNodeStates = {logger_1: {durationMillis: 5, status: 'COMPLETED'}};
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({
+                job: {
+                    id: '1',
+                    priority: 0,
+                    status: 'COMPLETED',
+                    taskExecutions: [
+                        {
+                            iterations: [
+                                [{error: {message: 'boom'}, status: 'FAILED', workflowTask: {name: 'logger_1'}}],
+                                [{status: 'COMPLETED', workflowTask: {name: 'logger_1'}}],
+                            ],
+                            status: 'COMPLETED',
+                            workflowTask: {name: 'loop_1', type: 'loop/v1'},
+                        },
+                    ],
+                },
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith(
+            'logger_1',
+            expect.objectContaining({error: 'boom', status: 'FAILED'})
+        );
+    });
+
+    it('should take the durations a finished result adds up over repeated runs', () => {
+        mockWorkflowTestNodeStates = {
+            aiAgent_1: {durationMillis: 20, status: 'COMPLETED'},
+            httpClient_1: {clusterElement: true, durationMillis: 5, error: 'boom', status: 'FAILED'},
+        };
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        const agentTaskExecution = (startSecond: number, toolMillis: number, toolStatus: string) => ({
+            clusterElementCalls: [
+                {
+                    endDate: `2026-09-28T07:14:0${startSecond}.${String(toolMillis).padStart(3, '0')}Z`,
+                    name: 'httpClient_1',
+                    startDate: `2026-09-28T07:14:0${startSecond}.000Z`,
+                    status: toolStatus,
+                },
+            ],
+            endDate: `2026-09-28T07:14:0${startSecond}.020Z`,
+            startDate: `2026-09-28T07:14:0${startSecond}.000Z`,
+            status: 'COMPLETED',
+            workflowTask: {name: 'aiAgent_1', type: 'aiAgent/v1/chat'},
+        });
+
+        act(() => {
+            eventHandlers.result({
+                job: {
+                    id: '1',
+                    priority: 0,
+                    status: 'COMPLETED',
+                    taskExecutions: [
+                        {
+                            endDate: '2026-09-28T07:14:03.000Z',
+                            iterations: [
+                                [agentTaskExecution(1, 10, 'COMPLETED')],
+                                [agentTaskExecution(2, 5, 'FAILED')],
+                            ],
+                            startDate: '2026-09-28T07:14:00.000Z',
+                            status: 'COMPLETED',
+                            workflowTask: {name: 'loop_1', type: 'loop/v1'},
+                        },
+                    ],
+                },
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('aiAgent_1', {
+            durationMillis: 40,
+            status: 'COMPLETED',
+        });
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('httpClient_1', {
+            clusterElement: true,
+            durationMillis: 15,
+            error: 'boom',
+            status: 'FAILED',
+        });
     });
 
     it('should show a progress snapshot while the workflow is running', () => {
@@ -793,6 +890,68 @@ describe('useWorkflowTestStream', () => {
             expect.objectContaining({job: expect.objectContaining({id: '1', status: 'STARTED'})})
         );
         expect(mockSetWorkflowIsRunning).not.toHaveBeenCalledWith(false);
+    });
+
+    it('should colour a dispatcher that runs inside the coordinator from progress snapshots', () => {
+        mockWorkflowIsRunning = true;
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        const conditionSnapshot = (status: string) => ({
+            job: {
+                id: '1',
+                priority: 0,
+                status: 'STARTED',
+                taskExecutions: [{status, workflowTask: {name: 'condition_1', type: 'condition/v1'}}],
+            },
+        });
+
+        act(() => {
+            eventHandlers.progress(conditionSnapshot('STARTED'));
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('condition_1', {status: 'RUNNING'});
+
+        mockWorkflowTestNodeStates = {condition_1: {status: 'RUNNING'}};
+
+        act(() => {
+            eventHandlers.progress(conditionSnapshot('COMPLETED'));
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('condition_1', {status: 'COMPLETED'});
+    });
+
+    it('should not let a progress snapshot override a node its own task events track', () => {
+        mockWorkflowIsRunning = true;
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.task_started({name: 'logger_1'});
+        });
+
+        mockWorkflowTestNodeStates = {logger_1: {status: 'RUNNING'}};
+
+        mockSetWorkflowTestNodeState.mockClear();
+
+        act(() => {
+            eventHandlers.progress({
+                job: {
+                    id: '1',
+                    priority: 0,
+                    status: 'STARTED',
+                    taskExecutions: [{status: 'COMPLETED', workflowTask: {name: 'logger_1'}}],
+                },
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalled();
     });
 
     it('should ignore a progress snapshot that arrives after the run ended', () => {
@@ -873,6 +1032,23 @@ describe('useWorkflowTestStream', () => {
         });
 
         expect(mockSetWorkflowIsRunning).toHaveBeenCalledWith(false);
+    });
+
+    it('should clear running nodes and an in-flight snapshot when the server closes the stream without a result', () => {
+        mockWorkflowTestExecution = {job: {status: 'STARTED'}};
+        mockWorkflowTestNodeStates = {logger_1: {status: 'RUNNING'}};
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const {onClose} = (useSSE as any).mock.lastCall[1];
+
+        act(() => {
+            onClose();
+        });
+
+        expect(mockRemoveWorkflowTestNodeState).toHaveBeenCalledWith('logger_1');
+        expect(mockSetWorkflowTestExecution).toHaveBeenCalledWith(undefined);
     });
 
     it('should show the question and keep the run going when the agent asks the user a question', () => {
