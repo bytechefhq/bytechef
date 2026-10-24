@@ -110,6 +110,26 @@ class WorkflowValidatorClusterElementTypeTest {
             errors.toString());
     }
 
+    @Test
+    void validateWorkflowReportsAClusterElementUnderASlotTheTaskDoesNotHave() {
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        validate(
+            agentWorkflow(
+                model("anthropic/v1/model") + ", " + """
+                    "vectorStore": {"label": "Store", "name": "vectorStore_1", "type": "mathHelper/v1/addition", \
+                    "parameters": {}}"""),
+            errors, warnings);
+
+        assertEquals(
+            "[aiAgent_1] Cluster element slot 'vectorStore' does not exist on aiAgent/v1/chat; its slots are " +
+                "chatMemory, guardrails, model, rag, tools\n[aiAgent_1] Cluster element 'vectorStore_1' of type " +
+                "mathHelper/v1/addition cannot be placed under 'vectorStore'; it belongs under tools",
+            errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
     private static void validate(String workflow, StringBuilder errors, StringBuilder warnings) {
         WorkflowValidator.TaskDefinitionProvider taskDefinitionProvider =
             (taskType, kind) -> TASK_DEFINITION_MAP.get(taskType);
