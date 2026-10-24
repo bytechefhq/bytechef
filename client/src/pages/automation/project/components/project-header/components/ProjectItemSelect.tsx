@@ -10,13 +10,16 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useAgents from '@/pages/automation/agents/hooks/useAgents';
 import getAgentPath from '@/pages/automation/agents/utils/getAgentPath';
+import useDataSyncs from '@/pages/automation/data-syncs/hooks/useDataSyncs';
+import getDataSyncPath from '@/pages/automation/data-syncs/utils/getDataSyncPath';
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {BotIcon, ChevronDownIcon, WorkflowIcon} from 'lucide-react';
+import {ArrowLeftRightIcon, BotIcon, ChevronDownIcon, WorkflowIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 interface ProjectItemSelectProps {
     currentAgentId?: string;
+    currentDataSyncId?: string;
     currentLabel?: string;
     currentProjectWorkflowId?: number;
     onWorkflowValueChange: (projectWorkflowId: number) => void;
@@ -26,6 +29,7 @@ interface ProjectItemSelectProps {
 
 const ProjectItemSelect = ({
     currentAgentId,
+    currentDataSyncId,
     currentLabel,
     currentProjectWorkflowId,
     onWorkflowValueChange,
@@ -33,15 +37,23 @@ const ProjectItemSelect = ({
     projectWorkflows,
 }: ProjectItemSelectProps) => {
     const {agents} = useAgents();
+    const {dataSyncs} = useDataSyncs();
     const navigate = useNavigate();
 
     const projectAgents = useMemo(() => agents.filter((agent) => +agent.projectId === projectId), [agents, projectId]);
 
-    const currentValue = currentAgentId
-        ? `agent:${currentAgentId}`
-        : currentProjectWorkflowId !== undefined
-          ? `workflow:${currentProjectWorkflowId}`
-          : undefined;
+    const projectDataSyncs = useMemo(
+        () => dataSyncs.filter((dataSync) => +dataSync.projectId === projectId),
+        [dataSyncs, projectId]
+    );
+
+    const currentValue = currentDataSyncId
+        ? `dataSync:${currentDataSyncId}`
+        : currentAgentId
+          ? `agent:${currentAgentId}`
+          : currentProjectWorkflowId !== undefined
+            ? `workflow:${currentProjectWorkflowId}`
+            : undefined;
 
     const handleValueChange = (value: string) => {
         const separatorIndex = value.indexOf(':');
@@ -60,6 +72,16 @@ const ProjectItemSelect = ({
 
             if (selectedAgent) {
                 navigate(getAgentPath(selectedAgent));
+            }
+
+            return;
+        }
+
+        if (kind === 'dataSync') {
+            const selectedDataSync = projectDataSyncs.find((dataSync) => dataSync.id === id);
+
+            if (selectedDataSync) {
+                navigate(getDataSyncPath(selectedDataSync));
             }
         }
     };
@@ -120,6 +142,25 @@ const ProjectItemSelect = ({
                                     <BotIcon className="size-4 shrink-0" />
 
                                     <span className="truncate">{agent.title}</span>
+                                </DropdownMenuRadioItem>
+                            ))}
+                        </>
+                    )}
+
+                    {projectDataSyncs.length > 0 && (
+                        <>
+                            <DropdownMenuLabel>Data Syncs</DropdownMenuLabel>
+
+                            {projectDataSyncs.map((dataSync) => (
+                                <DropdownMenuRadioItem
+                                    className="cursor-pointer pl-2 data-[state=checked]:bg-surface-brand-secondary data-[state=checked]:text-content-brand-primary [&>span:first-child]:hidden"
+                                    key={dataSync.id}
+                                    title={dataSync.title.length > 55 ? dataSync.title : undefined}
+                                    value={`dataSync:${dataSync.id}`}
+                                >
+                                    <ArrowLeftRightIcon className="size-4 shrink-0" />
+
+                                    <span className="truncate">{dataSync.title}</span>
                                 </DropdownMenuRadioItem>
                             ))}
                         </>
