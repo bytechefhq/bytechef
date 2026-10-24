@@ -571,7 +571,21 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         putIfNotNull(payload, "parentCallId", clusterElementCallRecord.parentId());
         putIfNotNull(payload, "componentName", clusterElementCallRecord.componentName());
         putIfNotNull(payload, "toolName", clusterElementCallRecord.toolName());
-        putIfNotNull(payload, "input", clusterElementCallRecord.input());
+
+        if (clusterElementCallRecord.startDate() != null) {
+            payload.put("callStartDate", String.valueOf(clusterElementCallRecord.startDate()));
+        }
+
+        if (clusterElementCallRecord.endDate() != null) {
+            payload.put("callEndDate", String.valueOf(clusterElementCallRecord.endDate()));
+        }
+
+        putIfNotNull(payload, "callError", clusterElementCallRecord.error());
+
+        if (clusterElementCallRecord.status() == ClusterElementCallRecord.Status.STARTED) {
+            putIfNotNull(payload, "input", clusterElementCallRecord.input());
+        }
+
         putIfNotNull(payload, "output", clusterElementCallRecord.output());
 
         return payload;
