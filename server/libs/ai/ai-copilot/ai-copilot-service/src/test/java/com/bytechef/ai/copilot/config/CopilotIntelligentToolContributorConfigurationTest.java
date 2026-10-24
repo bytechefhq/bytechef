@@ -354,10 +354,12 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             .thenReturn(List.of(mock(ToolCallback.class)));
 
         ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider);
+            chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            subAgentAskRelayProvider);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
-            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider,
+            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            subAgentAskRelayProvider,
             webSearchToolCallbackProvider);
 
         EnvironmentContext.set(Environment.PRODUCTION);
@@ -457,13 +459,26 @@ final class CopilotIntelligentToolContributorConfigurationTest {
         ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider = emptySubAgentAskRelayProvider();
 
         ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider);
+            chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            subAgentAskRelayProvider);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
-            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider,
+            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
+            subAgentAskRelayProvider,
             mock(WebSearchToolCallbackProvider.class));
 
         return new DelegateFixture(beanClient, factory);
+    }
+
+    @Test
+    void testTheBuildWorkflowSubAgentGetsOnlyTheClusterElementLookups() {
+        List<String> toolNames = CopilotConfiguration.clusterElementLookupToolCallbacks(mock(ComponentTools.class))
+            .stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .toList();
+
+        assertThat(toolNames).containsExactlyInAnyOrder("getAction", "getClusterElement", "searchClusterElements");
     }
 
     private static DelegateFixture converterBuildFixture(

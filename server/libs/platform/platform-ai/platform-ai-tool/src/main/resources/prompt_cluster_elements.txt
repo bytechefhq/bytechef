@@ -4,6 +4,10 @@ Rules:
 - Then use searchClusterElements(clusterElementType) for each cluster element type to retrieve all possible options for that type. Not all types need to be implemented.
 - Then call getClusterElement(componentName, clusterElementName, version) to retrieve the definition for the task you need.
 - Once retrieved, nest the retrieved cluster elements task or tasks inside the action, under clusterElements property, keyed by their type.
+- A cluster element's "type" is always "<componentName>/v<version>/<clusterElementName>", built from a component and one of its cluster element names that searchClusterElements or getClusterElement returned, for example "anthropic/v1/model", "inMemoryChatMemory/v2/chatMemory", "dateHelper/v1/getCurrentDate", "csvFile/v1/reader", "script/v1/javaScript". Names are case sensitive. Never use a model name, an action of the component, or a bare "<componentName>/v<version>" as the type.
+- Put each element under the key of its own cluster element type (model, chatMemory, tools, rag, guardrails, source, processor, destination, ...). Use an array for a type that allows multiple elements and an object otherwise; getAction on the root tells you which.
+- Use the root's native cluster element types for what the request asks for, for example guardrails for blocking personal data instead of a script and a condition around the agent.
+- validateWorkflow reports a cluster element whose type does not exist or that sits under the wrong key. Fix those before you finish.
 Example of tasks with cluster elements:
 "tasks": [
   {
@@ -15,14 +19,14 @@ Example of tasks with cluster elements:
       "clusterElementTypeObject": {
         "label": "<custom label>",
         "name": "<clusterElementTypeName>_1",
-        "type": "<type from searchActions()>",
+        "type": "<componentName>/v<version>/<clusterElementName>",
         "parameters": { ... }
       },
       "clusterElementTypeArray": [
         {
           "label": "<custom label>",
           "name": "<clusterElementTypeName>_1",
-          "type": "<type from searchActions()>",
+          "type": "<componentName>/v<version>/<clusterElementName>",
           "parameters": { ... }
         }
       ]
