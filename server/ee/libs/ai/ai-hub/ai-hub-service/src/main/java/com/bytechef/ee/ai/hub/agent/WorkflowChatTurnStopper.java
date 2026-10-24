@@ -7,11 +7,11 @@
 
 package com.bytechef.ee.ai.hub.agent;
 
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Stops the workflow job of one workflow chat turn when the turn is stopped, either by the user (from
  * {@link InFlightAiHubRunRegistry#stopRequested}) or by a stream error. The two inputs arrive independently and in
- * either order: the stop and the job id (from the workflow's {@code start} event). {@link JobFacade#stopJob} runs
- * exactly once, as soon as both have happened, only for the job id this turn was handed, and under the turn's tenant,
- * because both inputs are delivered on threads that do not carry it. Both methods are idempotent and never throw, so
- * they are safe to call from the workflow's event stream. Without a {@link JobFacade} both are no-ops.
+ * either order: the stop and the job id (from the workflow's {@code start} event, or reported by a synchronous
+ * execution as soon as its job exists). The stop action runs exactly once, as soon as both have happened, only for the
+ * job id this turn was handed, and under the turn's tenant, because both inputs are delivered on threads that do not
+ * carry it. The stop action depends on how the job runs: the job facade for a streamed job, the synchronous executor
+ * for a synchronous one. Both methods are idempotent and never throw, so they are safe to call from the workflow's
+ * event stream. Without a stop action both are no-ops.
  *
  * @version ee
  *
@@ -35,17 +37,17 @@ public class WorkflowChatTurnStopper {
     private final long chatId;
     private final String tenantId;
     @Nullable
-    private final JobFacade jobFacade;
+    private final LongConsumer jobStopAction;
 
     private final AtomicReference<@Nullable Long> jobIdReference = new AtomicReference<>();
     private final AtomicBoolean stopRequested = new AtomicBoolean();
     private final AtomicBoolean stopped = new AtomicBoolean();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowChatTurnStopper(long chatId, String tenantId, @Nullable JobFacade jobFacade) {
+    public WorkflowChatTurnStopper(long chatId, String tenantId, @Nullable LongConsumer jobStopAction) {
         this.chatId = chatId;
         this.tenantId = tenantId;
-        this.jobFacade = jobFacade;
+        this.jobStopAction = jobStopAction;
     }
 
     /**
@@ -69,7 +71,7 @@ public class WorkflowChatTurnStopper {
     private void stopIfReady() {
         Long jobId = jobIdReference.get();
 
-        if (jobFacade == null || jobId == null || !stopRequested.get() || !stopped.compareAndSet(false, true)) {
+        if (jobStopAction == null || jobId == null || !stopRequested.get() || !stopped.compareAndSet(false, true)) {
             return;
         }
 
@@ -78,7 +80,7 @@ public class WorkflowChatTurnStopper {
         TenantContext.setCurrentTenantId(tenantId);
 
         try {
-            jobFacade.stopJob(jobId);
+            jobStopAction.accept(jobId);
         } catch (RuntimeException exception) {
             log.warn("Failed to stop job {} of workflow chat {}", jobId, chatId, exception);
         } finally {

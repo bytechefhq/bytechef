@@ -60,12 +60,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.LongConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.SessionEvent;
@@ -133,7 +135,7 @@ class WebhookBridgeAgentTest {
         newAgent().runAgent(parametersOf(buildInput("hello")), subscriber);
 
         assertThat(captureRunError()).contains("kind mismatch");
-        verify(executor, never()).executeSync(any(), any());
+        verify(executor, never()).executeSync(any(), any(), any());
     }
 
     @Test
@@ -150,7 +152,7 @@ class WebhookBridgeAgentTest {
             .contains("Re-enable");
         verify(subscriber, timeout(2000)).onRunFinalized(any());
         verifyNoInteractions(jobFacade);
-        verify(executor, never()).executeSync(any(), any());
+        verify(executor, never()).executeSync(any(), any(), any());
         verify(executor, never()).stream(any(), any(), any());
         verify(metrics).recordUnreachable("disabled");
     }
@@ -209,14 +211,15 @@ class WebhookBridgeAgentTest {
     void testRequestBodyCarriesConversationIdAndChatId() throws AGUIException {
         givenSyncChat();
 
-        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class)))
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
             .thenReturn(Map.of("message", "ok"));
 
         newAgent().runAgent(parametersOf(buildInput("Hello")), subscriber);
 
         ArgumentCaptor<WebhookRequest> requestCaptor = ArgumentCaptor.forClass(WebhookRequest.class);
 
-        verify(executor, timeout(2000)).executeSync(any(WorkflowExecutionId.class), requestCaptor.capture());
+        verify(executor, timeout(2000)).executeSync(any(WorkflowExecutionId.class), requestCaptor.capture(),
+            any(LongConsumer.class));
 
         WebhookRequest captured = requestCaptor.getValue();
 
@@ -247,7 +250,7 @@ class WebhookBridgeAgentTest {
 
         when(executor.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
             .thenReturn(new WebhookTriggerFlags(false, true, false, false));
-        when(executor.executeSync(any(), any())).thenReturn(Map.of("message", "done"));
+        when(executor.executeSync(any(), any(), any())).thenReturn(Map.of("message", "done"));
 
         Logger bridgeLogger = (Logger) LoggerFactory.getLogger(WebhookBridgeAgent.class);
         Level originalLevel = bridgeLogger.getLevel();
@@ -276,7 +279,7 @@ class WebhookBridgeAgentTest {
     void testSyncPathCallsExecuteSyncDirectly() throws AGUIException {
         givenSyncChat();
 
-        when(executor.executeSync(any(), any())).thenReturn(Map.of("message", "done"));
+        when(executor.executeSync(any(), any(), any())).thenReturn(Map.of("message", "done"));
 
         newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
 
@@ -288,10 +291,31 @@ class WebhookBridgeAgentTest {
     }
 
     @Test
+    void testPersistsTheUserMessageUnderItsClientMessageId() throws AGUIException {
+        givenSyncChat();
+
+        when(executor.executeSync(any(), any(), any())).thenReturn(Map.of("message", "done"));
+
+        String userMessageId = "6f1d2c3b-4a5e-4f60-8a7b-9c0d1e2f3a4b";
+
+        newAgent().runAgent(parametersOf(buildInput("hi", userMessageId)), subscriber);
+
+        verify(subscriber, timeout(2000)).onRunFinalized(any());
+
+        List<SessionEvent> userEvents = sessionRepository.findEvents(THREAD_ID, EventFilter.all())
+            .stream()
+            .filter(sessionEvent -> sessionEvent.getMessageType() == MessageType.USER)
+            .toList();
+
+        assertThat(userEvents).extracting(SessionEvent::getId)
+            .containsExactly(userMessageId);
+    }
+
+    @Test
     void testSyncExecutionFailureEndsWithARunError() throws AGUIException {
         givenSyncChat();
 
-        when(executor.executeSync(any(), any())).thenThrow(new IllegalStateException("Workflow blew up"));
+        when(executor.executeSync(any(), any(), any())).thenThrow(new IllegalStateException("Workflow blew up"));
 
         newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
 
@@ -309,7 +333,7 @@ class WebhookBridgeAgentTest {
             "headers", Map.of(),
             "statusCode", 200);
 
-        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class)))
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
             .thenReturn(Map.of(MetadataConstants.WEBHOOK_RESPONSE, webhookResponseEnvelope));
 
         newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
@@ -327,7 +351,7 @@ class WebhookBridgeAgentTest {
             "headers", Map.of(),
             "statusCode", 200);
 
-        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class)))
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
             .thenReturn(Map.of(MetadataConstants.WEBHOOK_RESPONSE, webhookResponseEnvelope));
 
         newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
@@ -339,7 +363,7 @@ class WebhookBridgeAgentTest {
     void testTopLevelMessageMapStillEmitsAssistantText() throws AGUIException {
         givenSyncChat();
 
-        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class)))
+        when(executor.executeSync(any(WorkflowExecutionId.class), any(WebhookRequest.class), any(LongConsumer.class)))
             .thenReturn(Map.of("message", "Top-level reply"));
 
         newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
@@ -351,7 +375,7 @@ class WebhookBridgeAgentTest {
     void testEmptyOutputCompletesWithTheFallbackReply() throws AGUIException {
         givenSyncChat();
 
-        when(executor.executeSync(any(), any())).thenReturn(Map.of());
+        when(executor.executeSync(any(), any(), any())).thenReturn(Map.of());
 
         newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
 
@@ -392,6 +416,39 @@ class WebhookBridgeAgentTest {
     }
 
     @Test
+    void testSyncPathPersistsTheWorkflowQuestionWithTheTurn() throws AGUIException {
+        givenSyncChat();
+
+        when(executor.executeSync(any(), any(), any())).thenReturn(workflowQuestionOutputs());
+
+        newAgent().runAgent(parametersOf(buildInput("book a room")), subscriber);
+
+        verify(subscriber, timeout(2000)).onRunFinalized(any());
+
+        assertPersistedWorkflowQuestion("book a room");
+    }
+
+    @Test
+    void testStreamingPathPersistsTheWorkflowQuestionWithTheTurn() throws AGUIException {
+        givenStreamingChat();
+
+        ArgumentCaptor<SseStreamBridge> bridgeCaptor = ArgumentCaptor.forClass(SseStreamBridge.class);
+
+        newAgent().runAgent(parametersOf(buildInput("book a room")), subscriber);
+
+        verify(executor, timeout(2000)).stream(any(), any(), bridgeCaptor.capture());
+
+        SseStreamBridge bridge = bridgeCaptor.getValue();
+
+        bridge.onEvent(workflowQuestionOutputs());
+        bridge.onComplete();
+
+        verify(subscriber, timeout(2000)).onRunFinalized(any());
+
+        assertPersistedWorkflowQuestion("book a room");
+    }
+
+    @Test
     void testStreamStartFailureEndsWithARunError() throws AGUIException {
         givenStreamingChat();
 
@@ -428,6 +485,32 @@ class WebhookBridgeAgentTest {
         stopSink.tryEmitEmpty();
 
         verify(jobFacade).stopJob(77L);
+    }
+
+    @Test
+    void testStopSignalStopsTheSyncJobOfASynchronousTurn() throws AGUIException {
+        inFlightRunRegistry = mock(InFlightAiHubRunRegistry.class);
+
+        Sinks.Empty<Void> stopSink = Sinks.empty();
+
+        when(inFlightRunRegistry.stopRequested(THREAD_ID)).thenReturn(stopSink.asMono());
+
+        givenSyncChat();
+
+        when(executor.executeSync(any(), any(), any())).thenAnswer(invocation -> {
+            LongConsumer jobIdListener = invocation.getArgument(2);
+
+            jobIdListener.accept(77L);
+
+            stopSink.tryEmitEmpty();
+
+            return Map.of("message", "stopped");
+        });
+
+        newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
+
+        verify(executor, timeout(2000)).stopSyncJob(77L);
+        verify(jobFacade, never()).stopJob(anyLong());
     }
 
     @Test
@@ -512,7 +595,7 @@ class WebhookBridgeAgentTest {
     void testResumeLinkOfAnotherTenantsChatWithTheSameIdIsNotConsumed() throws AGUIException {
         givenSyncChat();
 
-        when(executor.executeSync(any(), any())).thenReturn(Map.of("message", "fresh run"));
+        when(executor.executeSync(any(), any(), any())).thenReturn(Map.of("message", "fresh run"));
 
         String otherTenantThreadId = "a1b2c3d4-0000-4000-8000-0000000000ff";
 
@@ -521,7 +604,7 @@ class WebhookBridgeAgentTest {
         newAgent().runAgent(parametersOf(buildInput("hi")), subscriber);
 
         assertThat(captureAssistantReply()).isEqualTo("fresh run");
-        verify(executor).executeSync(any(), any());
+        verify(executor).executeSync(any(), any(), any());
         verify(metrics, never()).recordTurn("resume");
         assertThat(resumeRegistry.consume(otherTenantThreadId)).isEqualTo("https://tenant-a.example.com/resume");
     }
@@ -558,7 +641,7 @@ class WebhookBridgeAgentTest {
     void testFinishedTurnReleasesTheThreadInTheRunRegistry() throws AGUIException, InterruptedException {
         givenSyncChat();
 
-        when(executor.executeSync(any(), any())).thenReturn(Map.of("message", "done"));
+        when(executor.executeSync(any(), any(), any())).thenReturn(Map.of("message", "done"));
 
         InFlightAiHubRunRegistry.InFlightRun run = inFlightRunRegistry.tryStart(THREAD_ID, RUN_ID)
             .orElseThrow();
@@ -623,6 +706,51 @@ class WebhookBridgeAgentTest {
         return assistantMessage.getContent();
     }
 
+    @SuppressWarnings("unchecked")
+    private void assertPersistedWorkflowQuestion(String userMessageText) {
+        List<Message> messages = sessionMessages();
+
+        assertThat(messages).hasSize(3);
+        assertThat(messages.getFirst()
+            .getText()).isEqualTo(userMessageText);
+        assertThat(messages.get(1)).isInstanceOf(org.springframework.ai.chat.messages.AssistantMessage.class);
+        assertThat(messages.get(2)).isInstanceOf(ToolResponseMessage.class);
+
+        org.springframework.ai.chat.messages.AssistantMessage toolCallMessage =
+            (org.springframework.ai.chat.messages.AssistantMessage) messages.get(1);
+        ToolResponseMessage toolResponseMessage = (ToolResponseMessage) messages.get(2);
+
+        assertThat(toolCallMessage.getToolCalls()).hasSize(1);
+        assertThat(toolResponseMessage.getResponses()).hasSize(1);
+
+        org.springframework.ai.chat.messages.AssistantMessage.ToolCall toolCall = toolCallMessage.getToolCalls()
+            .getFirst();
+        ToolResponseMessage.ToolResponse toolResponse = toolResponseMessage.getResponses()
+            .getFirst();
+
+        assertThat(toolResponse.id()).isEqualTo(toolCall.id());
+        assertThat(toolResponse.name()).isEqualTo(toolCall.name());
+        assertThat(toolResponse.responseData()).doesNotContain("resume-token");
+
+        Map<String, Object> response = JsonMapper.builder()
+            .build()
+            .readValue(toolResponse.responseData(), Map.class);
+
+        assertThat(response).containsEntry("kind", "ask-user-question")
+            .containsEntry("answerFormat", "plain")
+            .containsEntry("awaitingAnswer", true)
+            .containsEntry("questions", workflowQuestionOutputs().get("questions"));
+    }
+
+    private static Map<String, Object> workflowQuestionOutputs() {
+        return Map.of(
+            "questions", List.of(
+                Map.of(
+                    "multiSelect", false, "options", List.of(Map.of("label", "Blue"), Map.of("label", "Red")),
+                    "question", "Which room?")),
+            "resumeUrl", "http://localhost/webhooks/resume/resume-token");
+    }
+
     private List<Message> sessionMessages() {
         return sessionRepository.findEvents(THREAD_ID, EventFilter.all())
             .stream()
@@ -652,9 +780,17 @@ class WebhookBridgeAgentTest {
     }
 
     private static RunAgentInput buildInput(String userMessageText) {
+        return buildInput(userMessageText, null);
+    }
+
+    private static RunAgentInput buildInput(String userMessageText, String userMessageId) {
         UserMessage userMessage = new UserMessage();
 
         userMessage.setContent(userMessageText);
+
+        if (userMessageId != null) {
+            userMessage.setId(userMessageId);
+        }
 
         return new RunAgentInput(
             THREAD_ID, RUN_ID, new State(), List.of((BaseMessage) userMessage), List.of(), List.of(), null);
