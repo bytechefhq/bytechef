@@ -36,7 +36,7 @@ export interface ClusterElementCall {
      */
     startDate: Date;
     /**
-     * FAILED if any call failed, otherwise the state of the latest call.
+     * FAILED if any call failed; BLOCKED or WITHHELD once a guardrail reported it; otherwise the state of the latest call.
      */
     status: ClusterElementCallStatusEnum;
 }
@@ -49,6 +49,9 @@ export const ClusterElementCallStatusEnum = {
     Started: 'STARTED',
     Completed: 'COMPLETED',
     Failed: 'FAILED',
+    Blocked: 'BLOCKED',
+    Redacted: 'REDACTED',
+    Withheld: 'WITHHELD',
 } as const;
 export type ClusterElementCallStatusEnum = typeof ClusterElementCallStatusEnum[keyof typeof ClusterElementCallStatusEnum];
 
