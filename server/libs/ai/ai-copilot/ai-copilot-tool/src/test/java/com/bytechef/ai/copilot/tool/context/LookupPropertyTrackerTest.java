@@ -125,6 +125,24 @@ class LookupPropertyTrackerTest {
     }
 
     @Test
+    void testMatchesAMultiWordPropertyOnlyByItsWholePhrase() {
+        ToolContext toolContext = newToolContext();
+
+        LookupPropertyTracker.record(
+            toolContext, "getClusterElement", "{}",
+            "{\"knowledgeBaseId\": { \"value\": \"integer\", \"lookupRequired\": true, \"lookupDependsOn\": [] }}");
+
+        assertThat(LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, List.of("Which knowledge base should the documents go into?"))).isEqualTo("knowledgeBaseId");
+        assertThat(LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, List.of("Which knowledge-base should the documents go into?"))).isEqualTo("knowledgeBaseId");
+        assertThat(LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, List.of("Which vector store base model should embed the pages?"))).isNull();
+        assertThat(LookupPropertyTracker.fetchUnresolvedPropertyMentionedIn(
+            toolContext, List.of("Should the answer cite its knowledge sources?"))).isNull();
+    }
+
+    @Test
     void testDoesNothingWithoutATracker() {
         ToolContext toolContext = new ToolContext(Map.of());
 
