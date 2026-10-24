@@ -1222,6 +1222,15 @@ public class WorkflowValidator {
         default List<String> getRequiredClusterElementTypes(String taskType) {
             return getClusterElementTypes(taskType);
         }
+
+        /**
+         * The slot keys a cluster element type can be placed under: empty when no such cluster element is defined,
+         * {@code null} when this provider cannot tell.
+         */
+        @Nullable
+        default Set<String> getClusterElementSlotKeys(String clusterElementType) {
+            return null;
+        }
     }
 
     @FunctionalInterface
