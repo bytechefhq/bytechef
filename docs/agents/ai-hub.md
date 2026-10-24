@@ -51,7 +51,9 @@ environment (`WebSearchToolCallbackProvider` through `additionalToolCallbacks`).
 approval gate and are not pinned, so an approval never resumes one.
 `WorkflowExecutionTools` (`listWorkflowExecutions`, `getWorkflowExecution`) and three `ComponentTools` lookups
 (`getAction`, `getTrigger`, `getClusterElement`, filtered by `COMPONENT_DEFINITION_TOOL_NAMES`) are in both modes
-so the hub can explain a failed run against the task's definition. The Copilot's `debugWorkflowExecution` specialist is not given to the hub: it holds raw
+so the hub can explain a failed run against the task's definition. `CheckWorkflowTools.checkWorkflow` runs the
+Copilot's `PersistedWorkflowChecker` (the editor's validation) on a saved workflow of the conversation's workspace;
+a workflow of another workspace answers "not found". The prompts require it before calling a workflow ready. The Copilot's `debugWorkflowExecution` specialist is not given to the hub: it holds raw
 `ProjectWorkflowTools`, which the parity contract below forbids. A fix goes through `buildWorkflow`.
 The controller needs workspace role VIEWER for ASK and EDITOR for BUILD. Embedded connected users
 (`ConnectedUserAuthentication`) are refused on the REST entry points and in `AiHubWorkspaceAccess` for GraphQL.
