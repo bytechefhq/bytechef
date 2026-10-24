@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
-import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {ClusterElementCallRecord, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -96,6 +96,9 @@ export interface WorkflowEditorI {
         workflowTestNodeStates?: Record<string, WorkflowTestNodeStateI>
     ) => void;
     workflowTestNodeStatesWorkflowId: string | undefined;
+
+    workflowTestClusterElementCallRecords: Record<string, ClusterElementCallRecord[]>;
+    upsertWorkflowTestClusterElementCallRecord: (taskExecutionId: string, record: ClusterElementCallRecord) => void;
 }
 
 const useWorkflowEditorStore = create<WorkflowEditorI>()(
@@ -249,11 +252,42 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                 }),
             resetWorkflowTestNodeStates: (workflowId, workflowTestNodeStates = {}) =>
                 set(() => ({
+                    workflowTestClusterElementCallRecords: {},
                     workflowTestNodeStates,
                     workflowTestNodeStatesWorkflowId: workflowId,
                 })),
 
             workflowTestNodeStatesWorkflowId: undefined,
+
+            workflowTestClusterElementCallRecords: {},
+            upsertWorkflowTestClusterElementCallRecord: (taskExecutionId, record) =>
+                set((state) => {
+                    const records = state.workflowTestClusterElementCallRecords[taskExecutionId] ?? [];
+                    const existingIndex = records.findIndex((existing) => existing.id === record.id);
+
+                    if (existingIndex === -1) {
+                        return {
+                            workflowTestClusterElementCallRecords: {
+                                ...state.workflowTestClusterElementCallRecords,
+                                [taskExecutionId]: [...records, record],
+                            },
+                        };
+                    }
+
+                    const definedFields = Object.fromEntries(
+                        Object.entries(record).filter(([, value]) => value !== undefined)
+                    );
+                    const nextRecords = [...records];
+
+                    nextRecords[existingIndex] = {...records[existingIndex], ...definedFields};
+
+                    return {
+                        workflowTestClusterElementCallRecords: {
+                            ...state.workflowTestClusterElementCallRecords,
+                            [taskExecutionId]: nextRecords,
+                        },
+                    };
+                }),
         }),
         {
             name: 'workflow-editor',
