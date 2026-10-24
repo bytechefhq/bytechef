@@ -95,8 +95,11 @@ class WorkflowValidatorOptionalClusterElementTest {
 
         validate(workflow, errors, warnings);
 
-        assertEquals("", errors.toString());
-        assertEquals("[aiAgent_1] Cluster element 'widgets' are not defined in task aiAgent_1", warnings.toString());
+        assertEquals(
+            "[aiAgent_1] Cluster element slot 'widgets' does not exist on aiAgent/v1/chat; its slots are " +
+                "chatMemory, guardrails, model, rag, tools",
+            errors.toString());
+        assertEquals("", warnings.toString());
     }
 
     private static void validate(String workflow, StringBuilder errors, StringBuilder warnings) {
