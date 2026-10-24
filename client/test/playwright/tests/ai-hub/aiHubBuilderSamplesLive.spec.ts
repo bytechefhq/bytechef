@@ -1,4 +1,4 @@
-import {type Locator, type Page, expect, mergeTests} from '@playwright/test';
+import {type Page, expect, mergeTests} from '@playwright/test';
 
 import {loginTest, projectTest, workflowTest} from '../../fixtures';
 import {AiHubPage} from '../../pages/aiHubPage';
@@ -6,6 +6,7 @@ import {CopilotPanel} from '../../pages/copilotPanel';
 import {WorkflowPage} from '../../pages/workflowPage';
 import {
     type WorkflowNodeI,
+    answerInteractiveCards,
     deleteProjectThroughApi,
     findProjectByName,
     listProjectWorkflowIds,
@@ -66,10 +67,6 @@ const LIVE_TURN_TIMEOUT = 840000;
 const NEW_WORKFLOW_ANSWER = /new workflow/i;
 
 const NOT_YET_ANSWER = /^(not yet|no\b|review)/i;
-
-const CARD_CHROME_BUTTON_NAMES = new Set(['Copy', 'Dismiss', 'More', 'Other…', 'Refresh', 'Retry']);
-
-const MAX_QUESTION_ROUNDS = 5;
 
 interface SampleI {
     /** Extra checks on the built nodes. */
@@ -229,34 +226,11 @@ async function expectSampleBuilt(sample: SampleI, workflowNodes: WorkflowNodeI[]
     sample.checkNodes?.(workflowNodes);
 }
 
-/**
- * Answers the question cards a turn ends with until the last assistant message offers no more options: a new workflow
- * over updating an existing one, "not yet" to a publish question, otherwise the first option.
- */
-async function answerQuestionCards(readLastMessage: () => Locator, waitForTurnEnd: () => Promise<void>): Promise<void> {
-    for (let round = 0; round < MAX_QUESTION_ROUNDS; round++) {
-        const lastMessage = readLastMessage();
-        const optionNames = (await lastMessage.getByRole('button').allInnerTexts())
-            .map((optionName) => optionName.trim())
-            .filter(
-                (optionName) =>
-                    optionName && !CARD_CHROME_BUTTON_NAMES.has(optionName) && !optionName.startsWith('Connect ')
-            );
-
-        if (optionNames.length === 0) {
-            return;
-        }
-
-        const answer =
-            optionNames.find((optionName) => NEW_WORKFLOW_ANSWER.test(optionName)) ??
-            optionNames.find((optionName) => NOT_YET_ANSWER.test(optionName)) ??
-            optionNames[0];
-
-        await lastMessage.getByRole('button', {exact: true, name: answer}).click();
-
-        await waitForTurnEnd();
-    }
-}
+/** A new workflow over updating an existing one, "not yet" to a publish question, otherwise the first option. */
+const chooseSampleAnswer = (cardText: string, optionNames: string[]) =>
+    optionNames.find((optionName) => NEW_WORKFLOW_ANSWER.test(optionName)) ??
+    optionNames.find((optionName) => NOT_YET_ANSWER.test(optionName)) ??
+    optionNames[0];
 
 const shortName = (prefix: string) => `${prefix}_${getRandomString().slice(0, 8)}`;
 
@@ -285,10 +259,11 @@ test.describe('@live Builder samples', () => {
                     LIVE_TURN_TIMEOUT
                 );
 
-                await answerQuestionCards(
-                    () => aiHubPage.assistantMessages.last(),
-                    () => aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT)
-                );
+                await answerInteractiveCards(page, {
+                    chooseOption: chooseSampleAnswer,
+                    readLastMessage: () => aiHubPage.assistantMessages.last(),
+                    waitForTurnEnd: () => aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT),
+                });
 
                 await expect(aiHubPage.runErrors).toHaveCount(0);
 
@@ -333,7 +308,11 @@ test.describe('@live Builder samples', () => {
 
             await waitForCopilotTurnEnd();
 
-            await answerQuestionCards(() => copilotPanel.assistantMessages.last(), waitForCopilotTurnEnd);
+            await answerInteractiveCards(page, {
+                chooseOption: chooseSampleAnswer,
+                readLastMessage: () => copilotPanel.assistantMessages.last(),
+                waitForTurnEnd: waitForCopilotTurnEnd,
+            });
 
             const copilotWorkflow = await readHubWorkflow(page, {
                 projectId: workflow.projectId,
