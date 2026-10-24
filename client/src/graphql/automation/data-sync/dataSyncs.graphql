@@ -1,0 +1,23 @@
+query dataSyncs($workspaceId: ID!) {
+    dataSyncs(workspaceId: $workspaceId) {
+        id
+        name
+        title
+        description
+        projectId
+        projectWorkflowUuid
+        triggerType
+        triggerParameters
+        elements {
+            id
+            kind
+            componentName
+            componentVersion
+            operationName
+        }
+        unpublishedChanges
+        lastPublishedVersion
+        publishedDate
+        lastModifiedDate
+    }
+}

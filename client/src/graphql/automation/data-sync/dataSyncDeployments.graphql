@@ -1,0 +1,15 @@
+query dataSyncDeployments($workspaceId: ID!) {
+    dataSyncDeployments(workspaceId: $workspaceId) {
+        id
+        name
+        dataSyncId
+        dataSyncTitle
+        projectId
+        environmentId
+        enabled
+        projectVersion
+        triggerType
+        workflowId
+        lastExecutionDate
+    }
+}

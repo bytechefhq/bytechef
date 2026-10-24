@@ -1,0 +1,3 @@
+mutation updateDataSyncElement($input: UpdateDataSyncElementInput!) {
+    updateDataSyncElement(input: $input)
+}

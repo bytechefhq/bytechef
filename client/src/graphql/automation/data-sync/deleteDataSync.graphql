@@ -1,0 +1,3 @@
+mutation deleteDataSync($id: ID!) {
+    deleteDataSync(id: $id)
+}

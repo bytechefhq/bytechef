@@ -1,0 +1,7 @@
+mutation updateDataSync($input: UpdateDataSyncInput!) {
+    updateDataSync(input: $input) {
+        id
+        title
+        description
+    }
+}

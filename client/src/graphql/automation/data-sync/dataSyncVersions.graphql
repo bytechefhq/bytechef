@@ -1,0 +1,8 @@
+query dataSyncVersions($id: ID!) {
+    dataSyncVersions(id: $id) {
+        version
+        description
+        publishedDate
+        status
+    }
+}

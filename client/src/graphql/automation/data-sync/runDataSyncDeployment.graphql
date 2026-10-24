@@ -1,0 +1,3 @@
+mutation runDataSyncDeployment($id: ID!, $projectDeploymentId: ID!) {
+    runDataSyncDeployment(id: $id, projectDeploymentId: $projectDeploymentId)
+}

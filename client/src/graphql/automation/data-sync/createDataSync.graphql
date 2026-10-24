@@ -1,0 +1,6 @@
+mutation createDataSync($input: CreateDataSyncInput!) {
+    createDataSync(input: $input) {
+        id
+        projectId
+    }
+}

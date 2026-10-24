@@ -1,0 +1,11 @@
+mutation setDataSyncElement($input: SetDataSyncElementInput!) {
+    setDataSyncElement(input: $input) {
+        id
+        kind
+        componentName
+        componentVersion
+        operationName
+        parameters
+        connectionId
+    }
+}

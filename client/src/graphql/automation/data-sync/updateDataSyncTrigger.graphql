@@ -1,0 +1,3 @@
+mutation updateDataSyncTrigger($input: UpdateDataSyncTriggerInput!) {
+    updateDataSyncTrigger(input: $input)
+}
