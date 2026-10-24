@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -38,6 +39,7 @@ import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
+import com.bytechef.automation.ai.tool.model.WorkflowSaveInfo;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -54,6 +56,7 @@ import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,6 +117,84 @@ class ProjectWorkflowToolsTest {
 
     @Mock
     private WorkspaceFacade workspaceFacade;
+
+    @Nested
+    class ValidateBeforeSaveTest {
+
+        @Mock
+        private WorkflowValidatorFacade workflowValidatorFacade;
+
+        @Test
+        void testCreateProjectWorkflowSavesNothingWhenTheDefinitionHasErrors() {
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), any(), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(
+                    List.of("[slack_1] Field 'channel' is required"), List.of()));
+
+            ProjectWorkflowTools tools = newTools(null, workflowValidatorFacade);
+
+            assertThatCode(() -> tools.createProjectWorkflow(7L, DEFINITION, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("Nothing was saved")
+                .hasMessageContaining("[slack_1] Field 'channel' is required");
+
+            verify(projectWorkflowFacade, never()).addWorkflow(anyLong(), anyString());
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
+
+        @Test
+        void testUpdateWorkflowSavesNothingWhenTheDefinitionHasErrors() {
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(buildDto("wf-uuid-2", 88L, 3));
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), any(), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(
+                    List.of("[slack_1] Field 'channel' is required"), List.of()));
+
+            ProjectWorkflowTools tools = newTools(null, workflowValidatorFacade);
+
+            assertThatCode(() -> tools.updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("Nothing was saved")
+                .hasMessageContaining("[slack_1] Field 'channel' is required");
+
+            verify(projectWorkflowFacade, never()).updateWorkflow(anyString(), anyString(), anyInt());
+        }
+
+        @Test
+        void testUpdateWorkflowSavesADefinitionWhoseOnlyErrorIsAMissingConnection() {
+            String missingConnection = "Missing connection for slack";
+
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(buildDto("wf-uuid-2", 88L, 3));
+            when(projectWorkflowFacade.updateWorkflow("wf-uuid-2", DEFINITION, 3))
+                .thenReturn(buildDto("wf-uuid-2", 88L, 4));
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), eq("wf-uuid-2"), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(
+                    List.of("[slack_1] " + missingConnection), List.of(),
+                    List.of(
+                        new WorkflowValidatorFacade.NodeValidationIssue(
+                            "slack_1", null, WorkflowValidatorFacade.WorkflowIssueKind.MISSING_CONNECTION,
+                            WorkflowValidatorFacade.WorkflowIssueSeverity.ERROR, missingConnection))));
+
+            WorkflowSaveInfo workflowSaveInfo = newTools(null, workflowValidatorFacade)
+                .updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext);
+
+            assertThat(workflowSaveInfo.version()).isEqualTo(4);
+        }
+
+        @Test
+        void testUpdateWorkflowSavesAValidDefinitionAndReturnsItsWarnings() {
+            when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(buildDto("wf-uuid-2", 88L, 3));
+            when(projectWorkflowFacade.updateWorkflow("wf-uuid-2", DEFINITION, 3))
+                .thenReturn(buildDto("wf-uuid-2", 88L, 4));
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), any(), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(
+                    List.of(), List.of("[slack_1] Property 'text' is empty")));
+
+            WorkflowSaveInfo workflowSaveInfo = newTools(null, workflowValidatorFacade)
+                .updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext);
+
+            assertThat(workflowSaveInfo.version()).isEqualTo(4);
+            assertThat(workflowSaveInfo.warnings()).containsExactly("[slack_1] Property 'text' is empty");
+        }
+    }
 
     @Nested
     class PersistedWorkflowCaptureTest {
@@ -277,10 +358,10 @@ class ProjectWorkflowToolsTest {
 
             stubUpdate();
 
-            WorkflowInfo workflowInfo = newTools(workflowArtifactRecorder)
+            WorkflowSaveInfo workflowSaveInfo = newTools(workflowArtifactRecorder)
                 .updateWorkflow("wf-1", DEFINITION, 3, toolContext);
 
-            assertThat(workflowInfo).isNotNull();
+            assertThat(workflowSaveInfo).isNotNull();
 
             verify(workflowArtifactRecorder).recordWorkflowArtifact(toolContext, false, "wf-1", 5L, 11L, "My Flow");
         }
@@ -330,10 +411,9 @@ class ProjectWorkflowToolsTest {
             when(projectWorkflowFacade.updateWorkflow("wf-uuid-2", DEFINITION, 3))
                 .thenReturn(buildDto("wf-uuid-2", 88L, 4));
 
-            WorkflowInfo workflowInfo = newTools().updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext);
+            WorkflowSaveInfo workflowSaveInfo = newTools().updateWorkflow("wf-uuid-2", DEFINITION, 3, toolContext);
 
-            assertThat(workflowInfo.version()).isEqualTo(4);
-            assertThat(workflowInfo.definition()).isEqualTo(DEFINITION);
+            assertThat(workflowSaveInfo.version()).isEqualTo(4);
         }
 
         @Test
@@ -381,9 +461,10 @@ class ProjectWorkflowToolsTest {
             when(projectWorkflowFacade.updateWorkflow(OWN_WORKFLOW_ID, DEFINITION, 1))
                 .thenReturn(buildDto(OWN_WORKFLOW_ID, 1L, 2));
 
-            WorkflowInfo workflowInfo = newTools().updateWorkflow(OWN_WORKFLOW_ID, DEFINITION, 1, scopedToolContext());
+            WorkflowSaveInfo workflowSaveInfo =
+                newTools().updateWorkflow(OWN_WORKFLOW_ID, DEFINITION, 1, scopedToolContext());
 
-            assertThat(workflowInfo.version()).isEqualTo(2);
+            assertThat(workflowSaveInfo.version()).isEqualTo(2);
         }
 
         @Test
@@ -987,22 +1068,34 @@ class ProjectWorkflowToolsTest {
         return new ProjectWorkflowTools(
             componentDefinitionFacade, projectFacade, projectWorkflowFacade,
             new ScopedProjectGuard(permissionService, projectWorkflowService, scopedConnectionGuard),
-            mock(ObjectProvider.class), workspaceConnectionFacade, workspaceFacade);
+            mock(ObjectProvider.class), mock(ObjectProvider.class), workspaceConnectionFacade, workspaceFacade);
+    }
+
+    private ProjectWorkflowTools newTools(WorkflowArtifactRecorder workflowArtifactRecorder) {
+        return newTools(workflowArtifactRecorder, null);
     }
 
     @SuppressWarnings("unchecked")
-    private ProjectWorkflowTools newTools(WorkflowArtifactRecorder workflowArtifactRecorder) {
+    private ProjectWorkflowTools newTools(
+        WorkflowArtifactRecorder workflowArtifactRecorder, WorkflowValidatorFacade workflowValidatorFacade) {
+
         ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider = mock(ObjectProvider.class);
 
         if (workflowArtifactRecorder != null) {
             when(workflowArtifactRecorderProvider.getIfAvailable()).thenReturn(workflowArtifactRecorder);
         }
 
+        ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider = mock(ObjectProvider.class);
+
+        if (workflowValidatorFacade != null) {
+            when(workflowValidatorFacadeProvider.getIfAvailable()).thenReturn(workflowValidatorFacade);
+        }
+
         return new ProjectWorkflowTools(
             componentDefinitionFacade, projectFacade, projectWorkflowFacade,
             new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard),
             workflowArtifactRecorderProvider,
-            workspaceConnectionFacade, workspaceFacade);
+            workflowValidatorFacadeProvider, workspaceConnectionFacade, workspaceFacade);
     }
 
     private static ProjectWorkflow buildProjectWorkflow(long id, long projectId, String workflowId) {
