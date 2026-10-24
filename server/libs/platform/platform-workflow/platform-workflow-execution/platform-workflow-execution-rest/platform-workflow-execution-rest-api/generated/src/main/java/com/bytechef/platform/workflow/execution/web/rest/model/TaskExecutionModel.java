@@ -3,6 +3,7 @@ package com.bytechef.platform.workflow.execution.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.workflow.execution.web.rest.model.ClusterElementCallModel;
+import com.bytechef.platform.workflow.execution.web.rest.model.ClusterElementCallRecordModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T23:56:46.804049+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-24T15:45:24.720816+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -140,6 +141,8 @@ public class TaskExecutionModel {
   private @Nullable JobModel childJob;
 
   private List<@Valid ClusterElementCallModel> clusterElementCalls = new ArrayList<>();
+
+  private List<@Valid ClusterElementCallRecordModel> clusterElementCallRecords = new ArrayList<>();
 
   public TaskExecutionModel() {
     super();
@@ -817,6 +820,35 @@ public class TaskExecutionModel {
     this.clusterElementCalls = clusterElementCalls;
   }
 
+  public TaskExecutionModel clusterElementCallRecords(List<@Valid ClusterElementCallRecordModel> clusterElementCallRecords) {
+    this.clusterElementCallRecords = clusterElementCallRecords;
+    return this;
+  }
+
+  public TaskExecutionModel addClusterElementCallRecordsItem(ClusterElementCallRecordModel clusterElementCallRecordsItem) {
+    if (this.clusterElementCallRecords == null) {
+      this.clusterElementCallRecords = new ArrayList<>();
+    }
+    this.clusterElementCallRecords.add(clusterElementCallRecordsItem);
+    return this;
+  }
+
+  /**
+   * The individual calls the task made to the cluster elements it chooses to call, in call order.
+   * @return clusterElementCallRecords
+   */
+  
+  @Schema(name = "clusterElementCallRecords", accessMode = Schema.AccessMode.READ_ONLY, description = "The individual calls the task made to the cluster elements it chooses to call, in call order.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElementCallRecords")
+  public List<@Valid ClusterElementCallRecordModel> getClusterElementCallRecords() {
+    return clusterElementCallRecords;
+  }
+
+  @JsonProperty("clusterElementCallRecords")
+  public void setClusterElementCallRecords(List<@Valid ClusterElementCallRecordModel> clusterElementCallRecords) {
+    this.clusterElementCallRecords = clusterElementCallRecords;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -855,12 +887,13 @@ public class TaskExecutionModel {
         Objects.equals(this.children, taskExecution.children) &&
         Objects.equals(this.iterations, taskExecution.iterations) &&
         Objects.equals(this.childJob, taskExecution.childJob) &&
-        Objects.equals(this.clusterElementCalls, taskExecution.clusterElementCalls);
+        Objects.equals(this.clusterElementCalls, taskExecution.clusterElementCalls) &&
+        Objects.equals(this.clusterElementCallRecords, taskExecution.clusterElementCallRecords);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations, childJob, clusterElementCalls);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations, childJob, clusterElementCalls, clusterElementCallRecords);
   }
 
   @Override
@@ -897,6 +930,7 @@ public class TaskExecutionModel {
     sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
     sb.append("    childJob: ").append(toIndentedString(childJob)).append("\n");
     sb.append("    clusterElementCalls: ").append(toIndentedString(clusterElementCalls)).append("\n");
+    sb.append("    clusterElementCallRecords: ").append(toIndentedString(clusterElementCallRecords)).append("\n");
     sb.append("}");
     return sb.toString();
   }
