@@ -63,16 +63,17 @@ public final class SanitizeText {
             .title("Sanitize Text")
             .description("Runs configured sanitizers over the assistant response.")
             .type(GUARDRAILS)
-            .object(() -> this::apply);
+            .object(() -> new SanitizeTextFunction());
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, Context context,
-        List<Message> conversationHistory) throws Exception {
+        Map<String, ComponentConnection> componentConnections, Context context, List<Message> conversationHistory,
+        String workflowNodeName, String componentName) throws Exception {
 
         SanitizeTextAdvisor.Builder builder = SanitizeTextAdvisor.builder()
+            .clusterElement(workflowNodeName, componentName)
             .context(context);
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
@@ -96,7 +97,7 @@ public final class SanitizeText {
             ComponentConnection connection = componentConnections.get(element.getWorkflowNodeName());
 
             builder.add(
-                element.getClusterElementName(),
+                element,
                 resolved.function(),
                 ParametersFactory.create(element.getParameters()),
                 ParametersFactory.create(connection == null ? Map.of() : connection.getParameters()),
@@ -169,6 +170,31 @@ public final class SanitizeText {
         }
 
         return false;
+    }
+
+    private final class SanitizeTextFunction implements GuardrailsFunction {
+
+        @Override
+        public Advisor apply(
+            Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections, Context context,
+            List<Message> conversationHistory) throws Exception {
+
+            return SanitizeText.this.apply(
+                inputParameters, connectionParameters, extensions, componentConnections, context, conversationHistory,
+                null, null);
+        }
+
+        @Override
+        public Advisor apply(
+            Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections, Context context, List<Message> conversationHistory,
+            String workflowNodeName, String componentName) throws Exception {
+
+            return SanitizeText.this.apply(
+                inputParameters, connectionParameters, extensions, componentConnections, context, conversationHistory,
+                workflowNodeName, componentName);
+        }
     }
 
     private record ResolvedSanitizerChild(ClusterElement element, GuardrailSanitizerFunction function) {
