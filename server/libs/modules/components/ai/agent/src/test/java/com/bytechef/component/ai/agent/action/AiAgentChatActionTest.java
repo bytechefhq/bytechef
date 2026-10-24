@@ -40,12 +40,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
+import com.bytechef.component.ai.agent.guardrails.advisor.CheckForViolationsAdvisor;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.ai.tool.ToolSuspensionException;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -58,12 +59,17 @@ import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRec
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.HumanToolResponses;
+import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
@@ -100,6 +106,7 @@ class AiAgentChatActionTest {
     private static final String FIRST_TOOL_CALL_ID = "call_1";
     private static final String SECOND_TOOL_CALL_ID = "call_2";
     private static final String THIRD_TOOL_CALL_ID = "call_3";
+    private static final String BLOCKED_MARKER = "BLOCKED-MARKER";
     private static final long JOB_ID = 6559L;
     private static final long TASK_EXECUTION_ID = 65_590L;
 
@@ -128,7 +135,10 @@ class AiAgentChatActionTest {
 
         assertThatThrownBy(() -> performFunction.apply(
             createInputParameters("TEXT"), createConnectionParameters(), createExtensions(false, true),
-            createRecordingActionContext(new AtomicReference<>()))).hasMessageContaining("invalid api key");
+            createRecordingActionContext(new AtomicReference<>())))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("invalid api key")
+                .hasMessageNotContaining(BLOCKED_MARKER);
 
         assertThat(prompts).hasSize(1);
     }
@@ -193,6 +203,7 @@ class AiAgentChatActionTest {
             createRecordingActionContext(suspendReference));
 
         assertThat(performResult).isNull();
+        assertThat(performResult).isNotEqualTo(BLOCKED_MARKER);
         assertThat(suspendReference.get()).isNotNull();
         assertThat(suspendPrompts).hasSize(1);
 
@@ -746,9 +757,15 @@ class AiAgentChatActionTest {
         ClusterElementDefinitionService clusterElementDefinitionService = createClusterElementDefinitionService(
             createChatModel(prompts, responseFunction), chatMemoryResult);
 
+        Parameters empty = MockParametersFactory.create(Map.of());
+
         GuardrailsFunction guardrailsFunction = (
             inputParameters, connectionParameters, extensions, componentConnections, context,
-            conversationHistory) -> new PassThroughAdvisor("guardrail", HIGHEST_PRECEDENCE);
+            conversationHistory) -> CheckForViolationsAdvisor.builder()
+                .context(context)
+                .blockedMessage(BLOCKED_MARKER)
+                .add("neverMatches", new NeverMatchingCheck(), empty, empty, empty)
+                .build();
 
         when(clusterElementDefinitionService.<GuardrailsFunction>getClusterElement(
             eq("testComponent"), eq(1), eq("testGuardrail"))).thenReturn(guardrailsFunction);
@@ -822,6 +839,19 @@ class AiAgentChatActionTest {
 
     private static ChatResponse suspendingToolCallResponse(String toolCallId) {
         return toolCallResponse(SUSPENDING_TOOL_NAME, toolCallId);
+    }
+
+    private static final class NeverMatchingCheck implements GuardrailCheckFunction {
+
+        @Override
+        public Optional<Violation> apply(String text, GuardrailContext context) {
+            return Optional.empty();
+        }
+
+        @Override
+        public GuardrailStage stage() {
+            return GuardrailStage.PREFLIGHT;
+        }
     }
 
     private static final class PassThroughAdvisor implements CallAdvisor {
