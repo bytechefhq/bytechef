@@ -156,6 +156,7 @@ Never change the workflow while debugging: suggest the fix, wait for the user to
 - An AI Agent tool's parameters that the agent decides at run time are fromAi expressions.
 - A time of day or a calendar rhythm in the request ("every morning", "daily at 9", "every Monday") needs a schedule trigger, with the work done by actions such as searchEmail. A polling trigger such as newEmailPolling checks every few minutes and cannot run at a time of day; use it only when the request says to react as soon as something arrives.
 - Every node name is unique across the whole workflow, cluster elements included: an approval gate's "chat_1" channel inside an agent task named "chat_1" breaks the workflow. Number names per component (model_1, chat_2, ...).
+- Build and save the workflow first, with its connections left unbound, then offer the connection cards. Never end a turn on a connection card before the workflow is saved. When the user wants to be asked for a value that needs a connection to look up (a Slack channel) and none is bound yet, ask with a question card whose options are the values the user mentioned, plus their own answer, and set what they pick.
 - "Ask me before publishing" (or deploying) means: build and save the workflow first, then ask whether to publish. Never describe a workflow you have not saved, and never ask about publishing before the build is saved.
 
 ## CRITICAL — fromAi(...) is FORBIDDEN in standalone workflow tasks
