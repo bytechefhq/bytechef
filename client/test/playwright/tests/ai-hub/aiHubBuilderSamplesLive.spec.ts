@@ -31,6 +31,30 @@ async function readManagementMcpSecretKey(page: Page): Promise<string> {
     return secretKey!;
 }
 
+const DEVELOPMENT_ENVIRONMENT_ID = '0';
+
+async function createAdminApiKey(page: Page, name: string): Promise<string> {
+    const data = await postGraphQl<{createApiKey: string}>(
+        page,
+        'mutation createApiKey($name: String!, $environmentId: ID!) { createApiKey(name: $name, environmentId: $environmentId) }',
+        {environmentId: DEVELOPMENT_ENVIRONMENT_ID, name}
+    );
+
+    return data.createApiKey;
+}
+
+async function deleteAdminApiKey(page: Page, name: string): Promise<void> {
+    const data = await postGraphQl<{adminApiKeys: Array<{id: string; name: string}>}>(
+        page,
+        'query adminApiKeys($environmentId: ID!) { adminApiKeys(environmentId: $environmentId) { id name } }',
+        {environmentId: DEVELOPMENT_ENVIRONMENT_ID}
+    );
+
+    for (const apiKey of data.adminApiKeys.filter((candidate) => candidate.name === name)) {
+        await postGraphQl(page, 'mutation deleteApiKey($id: ID!) { deleteApiKey(id: $id) }', {id: apiKey.id});
+    }
+}
+
 function readStructuredResult<ResultType>(toolCallResult: McpToolCallResultI): ResultType {
     expect(toolCallResult.isError ?? false, toolResultText(toolCallResult)).toBe(false);
 
@@ -320,7 +344,13 @@ test.describe('@live Builder samples', () => {
         });
 
         test(`Management MCP - ${sample.name}`, async ({authenticatedPage: page, request}) => {
-            const mcpClient = new McpClient(request, MCP_SECRET_KEY || (await readManagementMcpSecretKey(page)));
+            const apiKeyName = shortName('mcp_sample_key');
+            const bearerToken = process.env.PLAYWRIGHT_MCP_BEARER_TOKEN || (await createAdminApiKey(page, apiKeyName));
+            const mcpClient = new McpClient(
+                request,
+                MCP_SECRET_KEY || (await readManagementMcpSecretKey(page)),
+                bearerToken
+            );
             let projectId: number | undefined;
 
             try {
@@ -358,6 +388,8 @@ test.describe('@live Builder samples', () => {
                 if (projectId !== undefined) {
                     await deleteProjectThroughApi(page, projectId);
                 }
+
+                await deleteAdminApiKey(page, apiKeyName);
             }
         });
     }
