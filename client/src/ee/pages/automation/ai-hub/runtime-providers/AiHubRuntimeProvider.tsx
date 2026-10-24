@@ -592,6 +592,8 @@ export const buildAiHubSubscriber = ({
             role: 'assistant',
         });
 
+        unrecoveredToolFailures.clear();
+
         if (dataPart.type === 'data-tool-approval-request' && subscriberChatId != null) {
             aiHubChatsStore.getState().setActivityState(subscriberChatId, 'paused');
         }
