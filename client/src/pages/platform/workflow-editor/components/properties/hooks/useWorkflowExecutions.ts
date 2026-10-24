@@ -1,6 +1,8 @@
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {getErrorItem, getInitialSelectedItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
+import toClusterElementCallTaskExecutions from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
+import {TaskExecution as PlatformTaskExecution} from '@/shared/middleware/platform/workflow/execution';
 import {
     Job,
     JobStatusEnum,
@@ -41,7 +43,9 @@ function findTaskExecution(taskExecutions: TaskExecution[], id: string): TaskExe
         }
 
         const nestedTaskExecutions = [
-            ...(taskExecution.children ?? []),
+            ...(taskExecution.children?.length
+                ? taskExecution.children
+                : (toClusterElementCallTaskExecutions(taskExecution as PlatformTaskExecution) as TaskExecution[])),
             ...(taskExecution.iterations ?? []).flat(),
             ...(taskExecution.childJob?.taskExecutions ?? []),
         ];
