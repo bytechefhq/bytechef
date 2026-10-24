@@ -28,6 +28,7 @@ import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScopedProjectGuard;
+import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -35,6 +36,7 @@ import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
@@ -100,6 +102,8 @@ public final class AiHubAgentFixtures {
     public final SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
     public final WebSearchToolCallbackProvider webSearchToolCallbackProvider =
         mock(WebSearchToolCallbackProvider.class);
+    public final WorkflowExecutionTools workflowExecutionTools = new WorkflowExecutionTools(
+        mock(ProjectWorkflowExecutionFacade.class), mock(ScopedProjectGuard.class));
     public final AiHubSessionMemory sessionMemory = new AiHubSessionMemory(
         InMemorySessionRepository.builder()
             .build(),
@@ -178,7 +182,7 @@ public final class AiHubAgentFixtures {
         throws AGUIException {
 
         return configuration.aiHubAskSpringAIAgent(
-            sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools,
+            sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools, workflowExecutionTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
             chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
@@ -190,7 +194,7 @@ public final class AiHubAgentFixtures {
         throws AGUIException {
 
         return configuration.aiHubBuildSpringAIAgent(
-            sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools,
+            sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools, workflowExecutionTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
             artifactRecorder,
