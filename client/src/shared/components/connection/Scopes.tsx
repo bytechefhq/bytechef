@@ -44,7 +44,7 @@ const Scopes = ({onSelectedScopesChange, scopeDefinitions, selectedScopes = {}}:
                                     onCheckedChange={(checked) => handleScopeChange(scope, !!checked)}
                                 />
 
-                                <Label className="cursor-pointer" htmlFor={scope}>
+                                <Label className="min-w-0 cursor-pointer wrap-anywhere" htmlFor={scope}>
                                     {scope}
                                 </Label>
                             </li>
@@ -73,7 +73,7 @@ const Scopes = ({onSelectedScopesChange, scopeDefinitions, selectedScopes = {}}:
                                         onCheckedChange={(checked) => handleScopeChange(scope, !!checked)}
                                     />
 
-                                    <Label className="cursor-pointer" htmlFor={scope}>
+                                    <Label className="min-w-0 cursor-pointer wrap-anywhere" htmlFor={scope}>
                                         {scope}
                                     </Label>
                                 </li>

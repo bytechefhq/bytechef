@@ -499,10 +499,7 @@ const ConnectionDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent
-                onInteractOutside={(event) => event.preventDefault()}
-                size={wizardStep === 'oauth_step' ? 'md' : 'sm'}
-            >
+            <DialogContent onInteractOutside={(event) => event.preventDefault()} size="sm">
                 <DialogMain>
                     <Form {...form}>
                         <DialogHeader
