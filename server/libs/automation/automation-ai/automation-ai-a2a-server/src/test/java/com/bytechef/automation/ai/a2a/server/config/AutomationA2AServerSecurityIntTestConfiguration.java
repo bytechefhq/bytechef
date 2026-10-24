@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.a2a.server.security.web.configurer.AutomationA2AServerSecurityConfigurer;
 import com.bytechef.automation.ai.a2a.service.A2aServerService;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
@@ -79,6 +80,15 @@ public class AutomationA2AServerSecurityIntTestConfiguration {
     }
 
     @Bean
+    PermissionService permissionService() {
+        PermissionService permissionService = mock(PermissionService.class);
+
+        when(permissionService.getMyWorkspaceRole(anyLong())).thenReturn("EDITOR");
+
+        return permissionService;
+    }
+
+    @Bean
     WorkspaceApiKeyService workspaceApiKeyService() {
         WorkspaceApiKeyService workspaceApiKeyService = mock(WorkspaceApiKeyService.class);
 
@@ -90,7 +100,8 @@ public class AutomationA2AServerSecurityIntTestConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(
         HttpSecurity http, ApiKeyService apiKeyService, AuthorityService authorityService,
-        A2aServerService a2aServerService, UserService userService, WorkspaceApiKeyService workspaceApiKeyService)
+        A2aServerService a2aServerService, PermissionService permissionService, UserService userService,
+        WorkspaceApiKeyService workspaceApiKeyService)
         throws Exception {
 
         return http
@@ -99,7 +110,7 @@ public class AutomationA2AServerSecurityIntTestConfiguration {
             .with(
                 new AutomationA2AServerSecurityConfigurer(
                     apiKeyService, authorityService, () -> List.of(Environment.values()), a2aServerService,
-                    userService, workspaceApiKeyService),
+                    permissionService, userService, workspaceApiKeyService),
                 Customizer.withDefaults())
             .build();
     }
