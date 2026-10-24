@@ -59,7 +59,13 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
             throw new BadCredentialsException("Unknown API secret key", e);
         }
 
-        org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
+        Long userId = apiKey.getUserId();
+
+        if (userId == null) {
+            throw new BadCredentialsException("API key has no owner");
+        }
+
+        org.springframework.security.core.userdetails.User user = userService.fetchUser(userId)
             .map(curUser -> createSpringSecurityUser(automationApiKeyAuthenticationToken.getSecretKey(), curUser))
             .orElseThrow(() -> new UsernameNotFoundException(
                 "User with token " + automationApiKeyAuthenticationToken.getSecretKey()
