@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.config.InteractivePickerToolCallbacks;
+import com.bytechef.ai.copilot.tool.PersistedWorkflowChecker;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -36,6 +37,7 @@ import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
@@ -83,6 +85,8 @@ public final class AiHubAgentFixtures {
     public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
     public final ChatModel chatModel = mock(ChatModel.class);
     public final ComponentTools componentTools = mock(ComponentTools.class);
+    public final PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
+    public final ProjectService projectService = mock(ProjectService.class);
     public final AiHubToolApprovalPolicy policy = mock(AiHubToolApprovalPolicy.class);
     public final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
     public final ProjectFacade projectFacade = mock(ProjectFacade.class);
@@ -185,7 +189,7 @@ public final class AiHubAgentFixtures {
 
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools, workflowExecutionTools,
-            componentToolsProvider(),
+            componentToolsProvider(), persistedWorkflowCheckerProvider(), projectServiceProvider(),
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
             chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
@@ -198,7 +202,7 @@ public final class AiHubAgentFixtures {
 
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools, workflowExecutionTools,
-            componentToolsProvider(),
+            componentToolsProvider(), persistedWorkflowCheckerProvider(), projectServiceProvider(),
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
             artifactRecorder,
@@ -232,6 +236,24 @@ public final class AiHubAgentFixtures {
             return null;
         }).when(provider)
             .ifAvailable(any());
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider() {
+        ObjectProvider<PersistedWorkflowChecker> provider = mock(ObjectProvider.class);
+
+        when(provider.getIfAvailable()).thenReturn(persistedWorkflowChecker);
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectProvider<ProjectService> projectServiceProvider() {
+        ObjectProvider<ProjectService> provider = mock(ObjectProvider.class);
+
+        when(provider.getIfAvailable()).thenReturn(projectService);
 
         return provider;
     }

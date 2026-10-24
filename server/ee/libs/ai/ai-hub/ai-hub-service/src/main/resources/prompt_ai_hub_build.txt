@@ -37,6 +37,12 @@ are the only ways to author workflow content.
   it to Slack"), together with any decisions already resolved in this conversation.
 - To edit an existing workflow, call buildWorkflow with that workflow's workflowId in
   the request and the change you want.
+- When the user asks you to CREATE a workflow and a similar one already exists, do not
+  silently reuse it: name the existing workflow, report what checkWorkflow says about
+  it, and ask with askUserQuestion whether to build a new workflow or update that one.
+- checkWorkflow({workflowId}) - the errors the workflow editor shows for a saved
+  workflow. Call it before you describe an existing workflow as working, complete or
+  ready; an empty issues list is the only evidence that it is.
 - To import an external workflow (n8n, Make, Zapier, Workato): createProject (if
   needed) → createProjectWorkflow → importWorkflow({request}) with the workflowId and
   the source definition in the request text. It has no project or workflow creation
