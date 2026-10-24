@@ -579,6 +579,7 @@ describe('useWorkflowTestStream', () => {
         act(() => {
             eventHandlers.cluster_element_started({
                 callId: 'a',
+                callStartDate: '2026-10-23T10:00:00Z',
                 callStatus: 'STARTED',
                 componentName: 'httpClient',
                 name: 'httpClient_1',
@@ -591,7 +592,9 @@ describe('useWorkflowTestStream', () => {
 
         act(() => {
             eventHandlers.cluster_element_completed({
+                callEndDate: '2026-10-23T10:00:00.412Z',
                 callId: 'a',
+                callStartDate: '2026-10-23T10:00:00Z',
                 callStatus: 'COMPLETED',
                 componentName: 'httpClient',
                 endDate: '2026-10-23T10:00:00.412Z',
@@ -615,6 +618,51 @@ describe('useWorkflowTestStream', () => {
             toolName: 'get',
             workflowNodeName: 'httpClient_1',
         });
+    });
+
+    it('builds each live call from its own dates and error, not the element aggregate', () => {
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        const eventHandlers = (useSSE as any).mock.lastCall[1].eventHandlers;
+
+        act(() => {
+            eventHandlers.cluster_element_failed({
+                callEndDate: '2026-10-23T10:00:01Z',
+                callError: 'first failed',
+                callId: 'first',
+                callStartDate: '2026-10-23T10:00:00Z',
+                callStatus: 'FAILED',
+                componentName: 'httpClient',
+                endDate: '2026-10-23T10:00:01Z',
+                error: 'first failed',
+                name: 'httpClient_1',
+                startDate: '2026-10-23T10:00:00Z',
+                status: 'FAILED',
+                taskExecutionId: '10',
+            });
+        });
+
+        act(() => {
+            eventHandlers.cluster_element_started({
+                callId: 'second',
+                callStartDate: '2026-10-23T10:00:05Z',
+                callStatus: 'STARTED',
+                componentName: 'httpClient',
+                endDate: '2026-10-23T10:00:01Z',
+                error: 'first failed',
+                input: '{"q":"second"}',
+                name: 'httpClient_1',
+                startDate: '2026-10-23T10:00:00Z',
+                status: 'FAILED',
+                taskExecutionId: '10',
+            });
+        });
+
+        const secondRecord = mockWorkflowTestClusterElementCallRecords['10'].find((record) => record.id === 'second');
+
+        expect(secondRecord?.startDate).toEqual(new Date('2026-10-23T10:00:05Z'));
+        expect(secondRecord?.endDate).toBeUndefined();
+        expect(secondRecord?.error).toBeUndefined();
     });
 
     it('should keep a cluster element failed across task executions', () => {

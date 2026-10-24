@@ -26,7 +26,10 @@ export interface UseWorkflowTestStreamProps {
 }
 
 interface TaskLifecyclePayloadI {
+    callEndDate?: string;
+    callError?: string;
     callId?: string;
+    callStartDate?: string;
     callStatus?: string;
     componentName?: string;
     endDate?: string;
@@ -166,13 +169,13 @@ function toClusterElementCallRecord(payload: TaskLifecyclePayloadI): ClusterElem
 
     return ClusterElementCallRecordFromJSON({
         componentName: payload.componentName,
-        endDate: payload.endDate,
-        error: payload.callStatus === 'FAILED' ? payload.error : undefined,
+        endDate: payload.callEndDate,
+        error: payload.callError,
         id: payload.callId,
         input: payload.input,
         output: payload.output,
         parentId: payload.parentCallId,
-        startDate: payload.startDate,
+        startDate: payload.callStartDate,
         status: payload.callStatus,
         toolName: payload.toolName,
         workflowNodeName: payload.name,
