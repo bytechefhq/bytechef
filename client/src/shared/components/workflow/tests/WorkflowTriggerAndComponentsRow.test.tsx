@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
-import {render, screen} from '@/shared/util/test-utils';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {useGetComponentDefinitionQueryMock} = vi.hoisted(() => ({
@@ -96,6 +96,43 @@ describe('WorkflowTriggerAndComponentsRow', () => {
 
         expect(label).toHaveClass('truncate');
         expect(label.closest('.min-w-0')).not.toBeNull();
+    });
+
+    it('shows the full trigger label on hover when the row fits to its width', async () => {
+        renderRow(
+            {
+                triggers: [{label: 'Auto Respond with HTTP 200 Status', type: 'webhook/v1/autoRespondWithHTTP200'}],
+                workflowTriggerComponentNames: ['webhook'],
+            },
+            true
+        );
+
+        await userEvent.hover(screen.getByText('Auto Respond with HTTP 200 Status'));
+
+        const tooltip = await screen.findByRole('tooltip');
+
+        expect(tooltip).toHaveTextContent('Auto Respond with HTTP 200 Status');
+    });
+
+    it('shows the full trigger label and its description on hover when the row fits to its width', async () => {
+        useGetComponentDefinitionQueryMock.mockReturnValue({
+            data: {triggers: [{description: 'Runs when a new email arrives', name: 'newEmail', title: 'New Email'}]},
+        });
+
+        renderRow(
+            {
+                triggers: [{type: 'googleMail/v1/newEmail'}],
+                workflowTriggerComponentNames: ['googleMail'],
+            },
+            true
+        );
+
+        await userEvent.hover(screen.getByText('New Email'));
+
+        const tooltip = await screen.findByRole('tooltip');
+
+        expect(tooltip).toHaveTextContent('New Email');
+        expect(tooltip).toHaveTextContent('Runs when a new email arrives');
     });
 
     it('keeps the trigger label whole when the row does not fit to its width', () => {
