@@ -89,6 +89,10 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
         );
     }
 
+    if (existingConnections === undefined) {
+        return <div className="mt-2 text-sm text-muted-foreground">Loading {data.componentLabel} connections...</div>;
+    }
+
     const isEmpty = selectableConnections.length === 0;
 
     if (isEmpty) {
