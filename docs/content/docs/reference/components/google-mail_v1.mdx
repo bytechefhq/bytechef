@@ -539,6 +539,7 @@ Name: searchEmail
 | to | To | STRING | The address receiving the new mail | false |
 | subject | Subject | STRING | Words in the subject line | false |
 | category | Category | STRING <details> <summary> Options </summary> <span>primary</span>, <span>social</span>, <span>promotions</span>, <span>updates</span>, <span>forums</span>, <span>reservations</span>, <span>purchases</span> </details> | Messages in a certain category | false |
+| query | Query | STRING | Additional search terms in Gmail's search syntax, combined with the filters above, for example has:attachment filename:pdf newer_than:1d. | false |
 | labelIds | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have. | false |
 | includeSpamTrash | Include Spam Trash | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Include messages from SPAM and TRASH in the results. | false |
 
@@ -554,6 +555,7 @@ Name: searchEmail
     "to" : "",
     "subject" : "",
     "category" : "",
+    "query" : "",
     "labelIds" : [ "" ],
     "includeSpamTrash" : false
   },
