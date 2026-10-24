@@ -14,6 +14,7 @@ import {
     findProjectByName,
     listConnections,
     listProjectWorkflowIds,
+    postGraphQl,
     readAppEnvironmentId,
     readChatToolEvents,
     readWorkflowNodes,
@@ -244,6 +245,129 @@ test.describe('@live AI Hub cards', () => {
             ).toEqual(
                 expect.arrayContaining([expect.stringMatching(/^(lookupActionPropertyOptions|selectPropertyOption)$/)])
             );
+        } finally {
+            await deleteProjectByName(page, workspaceId, projectName);
+
+            for (const tableId of tableIds) {
+                await dropDataTableThroughApi(page, {environmentId, tableId});
+            }
+        }
+    });
+
+    test('a cluster element option card lists the real knowledge bases and the pick reaches the agent', async ({
+        authenticatedPage: page,
+    }) => {
+        const {aiHubPage, environmentId, workspaceId} = await openLiveHub(page);
+        const projectName = shortName('hub_knowledge_pick');
+        const knowledgeBases: Array<{id: string; name: string}> = [];
+
+        try {
+            for (const knowledgeBaseName of [shortName('handbook'), shortName('policies')]) {
+                const data = await postGraphQl<{createKnowledgeBase: {id: string; name: string}}>(
+                    page,
+                    'mutation createKnowledgeBase($knowledgeBase: KnowledgeBaseInput!, $environmentId: ID!, ' +
+                        '$workspaceId: ID!) { createKnowledgeBase(knowledgeBase: $knowledgeBase, ' +
+                        'environmentId: $environmentId, workspaceId: $workspaceId) { id name } }',
+                    {
+                        environmentId: String(environmentId),
+                        knowledgeBase: {name: knowledgeBaseName},
+                        workspaceId: String(workspaceId),
+                    }
+                );
+
+                knowledgeBases.push(data.createKnowledgeBase);
+            }
+
+            await liveTurn(
+                aiHubPage,
+                `Create a new project "${projectName}" with a workflow: a chat agent using an OpenAI model that ` +
+                    'answers questions with retrieval (RAG) over one of our knowledge bases. Let me pick which ' +
+                    'knowledge base.'
+            );
+
+            await answerCards(page, aiHubPage, false);
+
+            const pickedKnowledgeBase = knowledgeBases[1];
+            const optionPicker = aiHubPage.assistantMessages.last().getByRole('combobox');
+
+            await expect(optionPicker.first()).toBeVisible();
+
+            await optionPicker.first().click();
+
+            await page.getByRole('option', {name: pickedKnowledgeBase.name}).click();
+
+            await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+
+            const workflowNodes = await readProjectWorkflowNodes(page, workspaceId, projectName);
+            const vectorStoreNode = workflowNodes.find(
+                (workflowNode) => workflowNode.type === 'knowledgeBase/v1/vectorStore'
+            );
+
+            expect(String(vectorStoreNode?.parameters.knowledgeBaseId)).toBe(pickedKnowledgeBase.id);
+
+            expect(calledToolNames(await readChatToolEvents(page, currentChat(aiHubPage, workspaceId)))).toContain(
+                'selectClusterElementPropertyOption'
+            );
+        } finally {
+            await deleteProjectByName(page, workspaceId, projectName);
+
+            for (const knowledgeBase of knowledgeBases) {
+                await postGraphQl(page, 'mutation deleteKnowledgeBase($id: ID!) { deleteKnowledgeBase(id: $id) }', {
+                    id: knowledgeBase.id,
+                });
+            }
+        }
+    });
+
+    test('a trigger option card lists the real data tables and the pick reaches the trigger', async ({
+        authenticatedPage: page,
+    }) => {
+        const {aiHubPage, environmentId, workspaceId} = await openLiveHub(page);
+        const projectName = shortName('hub_trigger_pick');
+        const tableNames = [shortName('signups'), shortName('orders')];
+        const tableIds: string[] = [];
+
+        try {
+            for (const tableName of tableNames) {
+                tableIds.push(
+                    await createDataTableThroughApi(page, {
+                        baseName: tableName,
+                        columns: [{name: 'email', type: 'STRING'}],
+                        environmentId,
+                        workspaceId,
+                    })
+                );
+            }
+
+            await liveTurn(
+                aiHubPage,
+                `Create a new project "${projectName}" with a workflow: when a record is added to one of my existing ` +
+                    'data tables, log the record. Do not create a table; let me pick which existing data table ' +
+                    'triggers it.'
+            );
+
+            await answerCards(page, aiHubPage, false);
+
+            const pickedTableName = tableNames[1];
+            const lastMessage = aiHubPage.assistantMessages.last();
+            const optionPicker = lastMessage.getByRole('combobox');
+
+            if ((await optionPicker.count()) > 0) {
+                await optionPicker.first().click();
+
+                await page.getByRole('option', {name: pickedTableName}).click();
+            } else {
+                await lastMessage.getByRole('button', {exact: true, name: pickedTableName}).click();
+            }
+
+            await aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT);
+
+            const workflowNodes = await readProjectWorkflowNodes(page, workspaceId, projectName);
+            const triggerNode = workflowNodes.find(
+                (workflowNode) => workflowNode.type === 'dataTable/v1/recordCreated'
+            );
+
+            expect(triggerNode?.parameters.table).toBe(pickedTableName);
         } finally {
             await deleteProjectByName(page, workspaceId, projectName);
 
