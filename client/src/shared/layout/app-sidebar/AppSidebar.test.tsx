@@ -1,7 +1,7 @@
 import {SidebarProvider} from '@/components/ui/sidebar';
 import {render, screen} from '@/shared/util/test-utils';
 import {fireEvent} from '@testing-library/react';
-import {FolderIcon, MessagesSquareIcon} from 'lucide-react';
+import {FolderIcon, MessagesSquareIcon, NetworkIcon, ServerCogIcon, ServerIcon} from 'lucide-react';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -44,17 +44,25 @@ const navigation = [
     {href: '/automation/projects', icon: FolderIcon, name: 'Projects'},
 ];
 
+const serversGroup = {icon: ServerCogIcon, name: 'Servers'};
+
+const groupedNavigation = [
+    ...navigation,
+    {group: serversGroup, href: '/automation/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
+    {group: serversGroup, href: '/automation/a2a-servers', icon: NetworkIcon, name: 'A2A Servers'},
+];
+
 const LocationDisplay = () => {
     const {pathname} = useLocation();
 
     return <div data-testid="location">{pathname}</div>;
 };
 
-const renderSidebar = (open = true, pathname = '/automation/projects') =>
+const renderSidebar = (open = true, pathname = '/automation/projects', sidebarNavigation = navigation) =>
     render(
         <MemoryRouter initialEntries={[pathname]}>
             <SidebarProvider defaultOpen={open}>
-                <AppSidebar navigation={navigation} />
+                <AppSidebar navigation={sidebarNavigation} />
             </SidebarProvider>
 
             <LocationDisplay />
@@ -167,6 +175,57 @@ describe('AppSidebar', () => {
             fireEvent.click(screen.getByRole('button', {name: 'Switch to development'}));
 
             expect(screen.getByTestId('location')).toHaveTextContent('/automation/projects/1/project-workflows/2');
+        });
+    });
+
+    describe('groups', () => {
+        it('renders a group as a closed parent row when the route is outside it', () => {
+            renderSidebar(true, '/automation/projects', groupedNavigation);
+
+            expect(screen.getByRole('button', {name: 'Servers'})).toHaveAttribute('aria-expanded', 'false');
+            expect(screen.queryByRole('link', {name: 'MCP Servers'})).not.toBeInTheDocument();
+            expect(screen.getByRole('link', {name: 'Projects'})).toBeInTheDocument();
+        });
+
+        it('opens a group from its parent row', () => {
+            renderSidebar(true, '/automation/projects', groupedNavigation);
+
+            fireEvent.click(screen.getByRole('button', {name: 'Servers'}));
+
+            expect(screen.getByRole('link', {name: 'MCP Servers'})).toHaveAttribute('href', '/automation/mcp-servers');
+            expect(screen.getByRole('link', {name: 'A2A Servers'})).toHaveAttribute('href', '/automation/a2a-servers');
+        });
+
+        it('opens the group holding the current route', () => {
+            renderSidebar(true, '/automation/a2a-servers', groupedNavigation);
+
+            expect(screen.getByRole('button', {name: 'Servers'})).toHaveAttribute('aria-expanded', 'true');
+            expect(screen.getByRole('link', {name: 'A2A Servers'})).toHaveAttribute('data-active', 'true');
+        });
+
+        it('keeps the group holding the current route closed once the user closes it', () => {
+            renderSidebar(true, '/automation/mcp-servers', groupedNavigation);
+
+            fireEvent.click(screen.getByRole('button', {name: 'Servers'}));
+
+            expect(screen.getByRole('button', {name: 'Servers'})).toHaveAttribute('aria-expanded', 'false');
+            expect(screen.getByRole('button', {name: 'Servers'})).toHaveAttribute('data-active', 'true');
+            expect(screen.queryByRole('link', {name: 'MCP Servers'})).not.toBeInTheDocument();
+        });
+
+        it('folds a group into one rail icon on the collapsed sidebar', () => {
+            renderSidebar(false, '/automation/projects', groupedNavigation);
+
+            expect(screen.getByRole('button', {name: 'Servers'})).toBeInTheDocument();
+            expect(screen.queryByRole('link', {name: 'MCP Servers'})).not.toBeInTheDocument();
+            expect(screen.getByRole('link', {name: 'Projects'})).toBeInTheDocument();
+        });
+
+        it('renders a one-item group as a plain row on the collapsed sidebar', () => {
+            renderSidebar(false, '/automation/projects', [...navigation, groupedNavigation[2]]);
+
+            expect(screen.queryByRole('button', {name: 'Servers'})).not.toBeInTheDocument();
+            expect(screen.getByRole('link', {name: 'MCP Servers'})).toBeInTheDocument();
         });
     });
 });
