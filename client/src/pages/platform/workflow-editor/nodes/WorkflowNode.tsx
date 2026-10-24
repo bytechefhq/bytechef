@@ -264,7 +264,14 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                 nodeWidth,
                             })}
                         >
-                            {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
+                            {testNodeState && (
+                                <WorkflowTestNodeStatus
+                                    durationPlacement={
+                                        isMainRootClusterElement || isNestedClusterRoot ? 'top' : 'bottom'
+                                    }
+                                    testNodeState={testNodeState}
+                                />
+                            )}
 
                             <div
                                 className={twMerge(
@@ -383,6 +390,10 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
                             'absolute top-full ml-0 items-center text-center',
                         isClusterElement && !isNestedClusterRoot && 'mt-2 w-auto max-w-[130px] min-w-0',
+                        ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
+                            testNodeState?.durationMillis != null &&
+                            testNodeState.status !== 'RUNNING' &&
+                            'mt-3',
                         isHorizontal && isRegularNode && 'w-auto max-w-[150px] min-w-0'
                     )}
                 >
