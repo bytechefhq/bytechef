@@ -305,6 +305,8 @@ test.describe('@live Builder edits of existing workflows', () => {
                     workspaceId,
                 });
 
+                await test.info().attach('buildWorkflow reply', {body: toolResultText(buildResult)});
+
                 expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
 
                 await expectEdited(page, editCase, seededWorkflow);
