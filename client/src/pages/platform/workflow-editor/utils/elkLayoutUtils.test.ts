@@ -3501,6 +3501,40 @@ describe('trigger row label separation', () => {
         );
     });
 
+    it.each(['TB', 'LR'] as const)(
+        'gives the %s trigger fan-in one extra layer of room for its bus and add button',
+        async (direction) => {
+            const mainAxis = direction === 'TB' ? 'y' : 'x';
+
+            const singleResult = await getElkLayoutElements({
+                canvasHeight: 900,
+                canvasWidth: 1400,
+                direction,
+                edges: [edge('trigger_1', 'task1')],
+                nodes: [triggerNode('trigger_1', 'Run'), taskNode('task1')],
+            });
+
+            const fanInResult = await getElkLayoutElements({
+                canvasHeight: 900,
+                canvasWidth: 1400,
+                direction,
+                edges: [
+                    {...edge('trigger_1', 'task1'), data: {triggerFanIn: true}},
+                    {...edge('trigger_2', 'task1'), data: {triggerFanIn: true}},
+                ],
+                nodes: [triggerNode('trigger_1', 'Run'), triggerNode('trigger_2', 'Go'), taskNode('task1')],
+            });
+
+            const singleGap =
+                positionOf(singleResult.nodes, 'task1')[mainAxis] -
+                positionOf(singleResult.nodes, 'trigger_1')[mainAxis];
+            const fanInGap =
+                positionOf(fanInResult.nodes, 'task1')[mainAxis] - positionOf(fanInResult.nodes, 'trigger_1')[mainAxis];
+
+            expect(fanInGap - singleGap).toBe(52);
+        }
+    );
+
     it('keeps the tight trigger pitch when labels fit', async () => {
         const nodes: Node[] = [triggerNode('trigger_1', 'Run'), triggerNode('trigger_2', 'Go'), taskNode('task1')];
 
