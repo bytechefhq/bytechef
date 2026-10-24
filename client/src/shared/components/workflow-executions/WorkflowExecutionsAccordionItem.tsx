@@ -4,13 +4,15 @@ import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import JsonView from '@/shared/components/JsonView';
 import ExecutionAccordionButton from '@/shared/components/workflow-executions/ExecutionAccordionButton';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
+import toClusterElementCallTaskExecutions from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {
     Job,
     TaskExecution,
     TaskExecutionFromJSON,
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
-import {type ReactNode, useEffect, useState} from 'react';
+import {TaskExecution as PlatformTaskExecution} from '@/shared/middleware/platform/workflow/execution';
+import {type ReactNode, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ITERATIONS_PAGE_SIZE = 100;
@@ -54,7 +56,19 @@ const WorkflowExecutionsAccordionItem = ({
 
     const taskExecution = isTaskExecution(execution) ? execution : undefined;
 
-    const hasChildren = taskExecution?.children && taskExecution.children.length > 0;
+    const childExecutions: TaskExecution[] = useMemo(() => {
+        if (!taskExecution) {
+            return [];
+        }
+
+        if (taskExecution.children && taskExecution.children.length > 0) {
+            return taskExecution.children;
+        }
+
+        return toClusterElementCallTaskExecutions(taskExecution as PlatformTaskExecution) as TaskExecution[];
+    }, [taskExecution]);
+
+    const hasChildren = childExecutions.length > 0;
     const hasIterations = taskExecution?.iterations && taskExecution.iterations.length > 0;
     const remainingIterationCount = (taskExecution?.iterations?.length ?? 0) - visibleIterationCount;
     const hasMoreIterations = remainingIterationCount > 0;
@@ -228,7 +242,7 @@ const WorkflowExecutionsAccordionItem = ({
 
                 {!hasIterations && hasChildren && (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
-                        {taskExecution.children?.map((childTaskExecution) => (
+                        {childExecutions.map((childTaskExecution) => (
                             <WorkflowExecutionsAccordionItem
                                 defaultValue={defaultValue}
                                 execution={childTaskExecution}

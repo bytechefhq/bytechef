@@ -1,5 +1,9 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
+    ClusterElementCallTaskExecutionI,
+    isClusterElementCallTaskExecution,
+} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
+import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
@@ -15,6 +19,9 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: Wor
     const {endDate, icon, startDate, status, title, workflowTask} = taskExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
+    const callNote = isClusterElementCallTaskExecution(taskExecution)
+        ? (taskExecution as ClusterElementCallTaskExecutionI).clusterElementCallNote
+        : undefined;
     const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobStatus));
 
     return (
@@ -31,6 +38,8 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: Wor
                         <span className="text-xs text-muted-foreground">
                             ({workflowTask?.name || workflowTask?.type})
                         </span>
+
+                        {callNote && <span className="text-xs text-muted-foreground">{callNote}</span>}
                     </div>
                 </div>
             </div>
