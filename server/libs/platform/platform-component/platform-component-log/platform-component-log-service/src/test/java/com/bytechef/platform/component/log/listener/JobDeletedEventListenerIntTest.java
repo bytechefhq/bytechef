@@ -28,6 +28,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import liquibase.integration.spring.SpringLiquibase;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -55,8 +56,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 class JobDeletedEventListenerIntTest {
 
-    private static final String CHANGELOG = "classpath:config/liquibase/changelog/platform/execution/" +
-        "20261026000000_platform_execution_added_component_log_entry_table.xml";
+    private static final List<String> CHANGELOGS = List.of(
+        "classpath:config/liquibase/changelog/platform/execution/" +
+            "20261026000000_platform_execution_added_component_log_entry_table.xml",
+        "classpath:config/liquibase/changelog/platform/execution/" +
+            "20261030000000_platform_execution_added_component_log_entry_cluster_element_call_columns.xml");
 
     private static final long DELETED_JOB_ID = 1L;
     private static final long OTHER_JOB_ID = 2L;
@@ -80,13 +84,15 @@ class JobDeletedEventListenerIntTest {
 
         hikariDataSource = new HikariDataSource(hikariConfig);
 
-        SpringLiquibase springLiquibase = new SpringLiquibase();
+        for (String changelog : CHANGELOGS) {
+            SpringLiquibase springLiquibase = new SpringLiquibase();
 
-        springLiquibase.setChangeLog(CHANGELOG);
-        springLiquibase.setDataSource(hikariDataSource);
-        springLiquibase.setResourceLoader(new DefaultResourceLoader());
+            springLiquibase.setChangeLog(changelog);
+            springLiquibase.setDataSource(hikariDataSource);
+            springLiquibase.setResourceLoader(new DefaultResourceLoader());
 
-        springLiquibase.afterPropertiesSet();
+            springLiquibase.afterPropertiesSet();
+        }
 
         applicationContext = new AnnotationConfigApplicationContext();
 

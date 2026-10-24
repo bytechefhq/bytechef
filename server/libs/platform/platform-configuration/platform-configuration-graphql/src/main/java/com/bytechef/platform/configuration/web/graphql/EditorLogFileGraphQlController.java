@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -106,6 +107,8 @@ public class EditorLogFileGraphQlController {
                     .toLowerCase()
                     .contains(filter.searchText()
                         .toLowerCase()))
+            .filter(entry -> filter.clusterElementCallId() == null ||
+                Objects.equals(filter.clusterElementCallId(), entry.clusterElementCallId()))
             .toList();
     }
 }
