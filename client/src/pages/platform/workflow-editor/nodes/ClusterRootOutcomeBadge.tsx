@@ -12,7 +12,7 @@ interface ClusterRootOutcomeBadgeProps {
  */
 const ClusterRootOutcomeBadge = ({outcome}: ClusterRootOutcomeBadgeProps) => (
     <span
-        className="absolute -top-3 left-3 z-10 flex items-center gap-1 rounded-full border border-amber-500 bg-surface-neutral-primary px-2 text-xs leading-5 text-amber-500"
+        className="absolute -top-3 left-3 z-10 flex items-center gap-1 rounded-full border border-amber-500 bg-surface-neutral-primary px-2 text-xs leading-5 text-amber-500 [&_svg.lucide]:size-3"
         data-testid="cluster-root-outcome-badge"
     >
         {outcome === 'BLOCKED' ? <ShieldBanIcon className="size-3" /> : <ShieldAlertIcon className="size-3" />}

@@ -18,4 +18,10 @@ describe('ClusterRootOutcomeBadge', () => {
         expect(screen.getByTestId('cluster-root-outcome-badge')).toHaveTextContent('Withheld');
         expect(container.querySelector('svg.lucide-shield-alert')).not.toBeNull();
     });
+
+    it('keeps its icon small inside a card that sizes every svg it contains', () => {
+        render(<ClusterRootOutcomeBadge outcome="BLOCKED" />);
+
+        expect(screen.getByTestId('cluster-root-outcome-badge')).toHaveClass('[&_svg.lucide]:size-3');
+    });
 });
