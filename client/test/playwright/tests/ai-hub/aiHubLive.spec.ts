@@ -758,7 +758,7 @@ test.describe('@live AI Hub', () => {
             expect(await readProject(page, Number(project.id))).toBeDefined();
         });
 
-        test('an EXEMPT rule lifts the deleteProject gate and a REQUIRE rule gates publishProject', async ({
+        test('an EXEMPT rule lifts the deleteProject gate and a REQUIRE rule gates createProject', async ({
             authenticatedPage: page,
             project,
         }) => {
@@ -769,12 +769,11 @@ test.describe('@live AI Hub', () => {
             const existingRules = await readToolApprovalRules(page, workspaceId);
 
             test.skip(
-                existingRules.some((rule) => rule.toolName === 'publishProject'),
-                'The workspace already holds a publishProject rule'
+                existingRules.some((rule) => rule.toolName === 'createProject'),
+                'The workspace already holds a createProject rule'
             );
 
-            const gatedProjectName = shortName('hub_live_gated');
-            const gatedProjectId = await createProjectThroughApi(page, {name: gatedProjectName, workspaceId});
+            const requiredProjectName = shortName('hub_live_required');
 
             const ruleIds: string[] = [];
 
@@ -789,7 +788,7 @@ test.describe('@live AI Hub', () => {
                 ruleIds.push(
                     await createToolApprovalRuleThroughApi(page, {
                         mode: 'REQUIRE',
-                        toolName: 'publishProject',
+                        toolName: 'createProject',
                         workspaceId,
                     })
                 );
@@ -802,14 +801,14 @@ test.describe('@live AI Hub', () => {
                     await expect.poll(() => readProject(page, Number(project.id))).toBeUndefined();
                 });
 
-                await test.step('Publish waits for an approval', async () => {
-                    await liveTurn(aiHubPage, `Publish the project ${gatedProjectName} (id ${gatedProjectId}).`);
+                await test.step('Creating a project waits for an approval', async () => {
+                    await liveTurn(aiHubPage, `Create a project named ${requiredProjectName}.`);
 
                     await expect(page.getByText('Tool approval required')).toBeVisible();
 
-                    await expect(page.getByText('publishProject', {exact: true})).toBeVisible();
+                    await expect(page.getByText('createProject', {exact: true})).toBeVisible();
 
-                    expect((await readProject(page, gatedProjectId))?.lastPublishedDate ?? null).toBeNull();
+                    expect(await findProjectByName(page, workspaceId, requiredProjectName)).toBeUndefined();
 
                     await page.getByRole('button', {name: 'Reject'}).click();
 
@@ -820,7 +819,11 @@ test.describe('@live AI Hub', () => {
                     await deleteToolApprovalRuleThroughApi(page, {ruleId, workspaceId});
                 }
 
-                await deleteProjectThroughApi(page, gatedProjectId);
+                const requiredProject = await findProjectByName(page, workspaceId, requiredProjectName);
+
+                if (requiredProject) {
+                    await deleteProjectThroughApi(page, Number(requiredProject.id));
+                }
             }
         });
     });

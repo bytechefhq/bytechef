@@ -12,7 +12,8 @@ import java.util.Set;
 
 /**
  * The built-in set of AI Hub tool names that require approval with no workspace configuration at all: the destructive
- * project, workflow and deployment tools the hub registers. Beyond the explicitly listed names, a tool name whose first
+ * project, workflow and deployment tools the hub registers, and the ones that publish a project or change what a
+ * deployment runs. Beyond the explicitly listed names, a tool name whose first
  * word is a destructive verb ({@code delete}, {@code drop}, {@code rollback}, {@code promote}) is gated by prefix, so a
  * newly-added destructive catalog tool is safe by default without a code change here.
  *
@@ -29,7 +30,8 @@ import java.util.Set;
 public final class AiHubToolApprovalDefaults {
 
     public static final Set<String> DEFAULT_TOOL_NAMES = Set.of(
-        "deleteProject", "deleteWorkflow", "deleteProjectDeployment", "rollbackProjectDeployment", "promoteWorkflow");
+        "createProjectDeployment", "deleteProject", "deleteProjectDeployment", "deleteWorkflow", "promoteWorkflow",
+        "publishProject", "rollbackProjectDeployment", "toggleProjectDeployment", "updateProjectDeployment");
 
     private static final List<String> GATED_PREFIXES = List.of("delete", "drop", "rollback", "promote");
 
