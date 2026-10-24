@@ -85,12 +85,14 @@ arrives as their next message. Prefer these over free-text questions or guessed 
   connection is configured differently — e.g. an AI model exposed as a cluster element inside an AI
   Agent), say so plainly and leave that step marked as NOT done. Never state that all connections are
   bound when any bind call failed — list exactly which nodes still need a connection.
-- `lookupActionPropertyOptions` / `lookupTriggerPropertyOptions` — fetch the REAL dynamic options for a
-  property whose definition reports `lookupRequired: true` (e.g. a Slack channel). NEVER hallucinate
-  such values.
-- `selectPropertyOption` / `selectTriggerPropertyOption` — render ALL fetched options as a searchable
-  picker and let the user choose; the real option value (e.g. the channel id) is submitted, not the
-  label. Use this rather than re-typing a subset of options into a question.
+- `lookupActionPropertyOptions` / `lookupTriggerPropertyOptions` / `lookupClusterElementPropertyOptions`:
+  fetch the REAL dynamic options for a property whose definition reports `lookupRequired: true` (e.g. a
+  Slack channel, or the knowledge base of a cluster element). NEVER hallucinate such values.
+- `selectPropertyOption` / `selectTriggerPropertyOption` / `selectClusterElementPropertyOption`: render
+  ALL fetched options as a searchable picker and let the user choose; the real option value (e.g. the
+  channel id) is submitted, not the label. Use this rather than re-typing a subset of options into a
+  question. Use the cluster element variants for a property of a cluster element (e.g. `knowledgeBaseId`
+  on `knowledgeBase/v1/vectorStore`), passing its componentName and clusterElementName.
 - `askUserQuestion` — for free-form clarification or a small fixed set of choices that aren't
   connections/property options. Every option must come from data a tool actually returned.
 

@@ -38,6 +38,7 @@ import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
@@ -58,9 +59,11 @@ import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderF
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.util.PropertyUtils;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -339,6 +342,21 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     @Override
+    public boolean clusterElementDefinesConnection(
+        String componentName, int componentVersion, String clusterElementName) {
+
+        if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return false;
+        }
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        return componentDefinition.getConnection()
+            .isPresent();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getClusterElement(String componentName, int componentVersion, String clusterElementName) {
         ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
@@ -419,6 +437,21 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                         getIcon(componentDefinition)))
                     .toList()))
             .distinct()
+            .toList();
+    }
+
+    @Override
+    public List<ClusterElementDefinition> getClusterElementDefinitions(String componentName, int componentVersion) {
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        String icon = getIcon(componentDefinition);
+
+        return componentDefinition.getClusterElements()
+            .orElse(List.of())
+            .stream()
+            .map(clusterElementDefinition -> toClusterElementDefinition(
+                clusterElementDefinition, componentDefinition.getName(), componentVersion, icon))
             .toList();
     }
 
@@ -521,6 +554,62 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             rootComponentName, rootComponentVersion, clusterElementTypeName);
 
         return getClusterElementDefinitions(clusterElementType);
+    }
+
+    @Override
+    public List<String> getPropertyLookupDependsOn(
+        String componentName, int componentVersion, String clusterElementName, String propertyName) {
+
+        Property property = findClusterElementProperty(
+            componentName, componentVersion, clusterElementName, propertyName);
+
+        if (!(property instanceof OptionsDataSourceAware optionsDataSourceAware)) {
+            return List.of();
+        }
+
+        com.bytechef.platform.component.domain.OptionsDataSource optionsDataSource =
+            optionsDataSourceAware.getOptionsDataSource();
+
+        if (optionsDataSource == null) {
+            return List.of();
+        }
+
+        return optionsDataSource.getOptionsLookupDependsOn();
+    }
+
+    @Override
+    public boolean propertyHasOptionsDataSource(
+        String componentName, int componentVersion, String clusterElementName, String propertyName) {
+
+        Property property = findClusterElementProperty(
+            componentName, componentVersion, clusterElementName, propertyName);
+
+        if (!(property instanceof OptionsDataSourceAware optionsDataSourceAware)) {
+            return false;
+        }
+
+        return optionsDataSourceAware.getOptionsDataSource() != null;
+    }
+
+    private @Nullable Property findClusterElementProperty(
+        String componentName, int componentVersion, String clusterElementName, String propertyName) {
+
+        if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return null;
+        }
+
+        ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
+            componentName, componentVersion, clusterElementName);
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
+            result.clusterElementDefinition;
+
+        List<? extends BaseProperty> properties = clusterElementDefinition.getProperties()
+            .orElse(List.of());
+
+        BaseProperty property = PropertyUtils.findPropertyByPath(properties, propertyName);
+
+        return Property.toProperty((com.bytechef.component.definition.Property) property);
     }
 
     private static ConvertResult convert(

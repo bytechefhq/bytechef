@@ -127,8 +127,9 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
             return toolError(
                 ("Do not ask for '%s' with askUserQuestion: its valid values come from the component, and a "
                     + "question can show only a few of them. Call selectPropertyOption (or "
-                    + "selectTriggerPropertyOption) for it so the user picks from all the real values. Ask only the "
-                    + "other questions with askUserQuestion.").formatted(lookupPropertyName));
+                    + "selectTriggerPropertyOption, or selectClusterElementPropertyOption for a cluster element) for "
+                    + "it so the user picks from all the real values. Ask only the other questions with "
+                    + "askUserQuestion.").formatted(lookupPropertyName));
         }
 
         try {
