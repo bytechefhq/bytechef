@@ -35,6 +35,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallTarget;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingChatModel;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction;
@@ -82,17 +84,18 @@ public final class CheckForViolations {
                 string(BLOCKED_MESSAGE)
                     .label("Blocked Message")
                     .defaultValue(DEFAULT_BLOCKED_MESSAGE))
-            .object(() -> this::apply);
+            .object(() -> new CheckForViolationsFunction());
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, Context context,
-        List<Message> conversationHistory) throws Exception {
+        Map<String, ComponentConnection> componentConnections, Context context, List<Message> conversationHistory,
+        String workflowNodeName, String componentName) throws Exception {
 
         CheckForViolationsAdvisor.Builder builder = CheckForViolationsAdvisor.builder()
             .blockedMessage(inputParameters.getString(BLOCKED_MESSAGE, DEFAULT_BLOCKED_MESSAGE))
+            .clusterElement(workflowNodeName, componentName)
             .conversationHistoryMessages(conversationHistory)
             .context(context);
 
@@ -105,7 +108,7 @@ public final class CheckForViolations {
         boolean needsLlm = hasLlmChild(resolvedChildren);
 
         ChatClient sharedChatClient = needsLlm
-            ? resolveSharedChatClient(clusterElementMap, componentConnections)
+            ? resolveSharedChatClient(clusterElementMap, componentConnections, context)
             : null;
 
         if (sharedChatClient == null && needsLlm) {
@@ -117,7 +120,7 @@ public final class CheckForViolations {
             ComponentConnection connection = componentConnections.get(element.getWorkflowNodeName());
 
             builder.add(
-                element.getClusterElementName(),
+                element,
                 resolved.function(),
                 ParametersFactory.create(element.getParameters()),
                 ParametersFactory.create(connection == null ? Map.of() : connection.getParameters()),
@@ -145,7 +148,8 @@ public final class CheckForViolations {
     }
 
     private ChatClient resolveSharedChatClient(
-        ClusterElementMap clusterElementMap, Map<String, ComponentConnection> componentConnections) throws Exception {
+        ClusterElementMap clusterElementMap, Map<String, ComponentConnection> componentConnections, Context context)
+        throws Exception {
 
         Optional<ClusterElement> modelElement = clusterElementMap.fetchClusterElement(MODEL);
 
@@ -178,7 +182,15 @@ public final class CheckForViolations {
                         returnedType));
         }
 
-        return ChatClient.create(chatModel);
+        Optional<ClusterElementCallTarget> callTarget = ClusterElementCallTarget.of(context);
+
+        if (callTarget.isEmpty()) {
+            return ChatClient.create(chatModel);
+        }
+
+        return ChatClient.create(
+            new ClusterElementFailureAttributingChatModel(
+                chatModel, element.getWorkflowNodeName(), element.getComponentName(), callTarget.get()));
     }
 
     private static boolean hasLlmChild(List<ResolvedCheckChild> resolvedChildren) {
@@ -191,6 +203,31 @@ public final class CheckForViolations {
         }
 
         return false;
+    }
+
+    private final class CheckForViolationsFunction implements GuardrailsFunction {
+
+        @Override
+        public Advisor apply(
+            Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections, Context context,
+            List<Message> conversationHistory) throws Exception {
+
+            return CheckForViolations.this.apply(
+                inputParameters, connectionParameters, extensions, componentConnections, context, conversationHistory,
+                null, null);
+        }
+
+        @Override
+        public Advisor apply(
+            Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+            Map<String, ComponentConnection> componentConnections, Context context, List<Message> conversationHistory,
+            String workflowNodeName, String componentName) throws Exception {
+
+            return CheckForViolations.this.apply(
+                inputParameters, connectionParameters, extensions, componentConnections, context, conversationHistory,
+                workflowNodeName, componentName);
+        }
     }
 
     private record ResolvedCheckChild(ClusterElement element, GuardrailCheckFunction function) {
