@@ -86,7 +86,7 @@ final class IntelligentToolAskCapabilityTest {
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(IntelligentToolChatClientFactory.class)),
                 present(mock(SubAgentChatModelResolver.class)),
-                absent());
+                absent(), absent());
 
         return contributor.getIntelligentToolDefinitions();
     }

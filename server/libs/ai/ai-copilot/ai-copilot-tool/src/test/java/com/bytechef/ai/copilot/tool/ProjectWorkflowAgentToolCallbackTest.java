@@ -20,11 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
@@ -233,6 +235,105 @@ class ProjectWorkflowAgentToolCallbackTest {
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
             .asText()).contains("buildWorkflow failed");
+    }
+
+    @Test
+    void testCallReportsThatTheSavedWorkflowPassedValidation() {
+        ChatClient chatClient = savingChatClient("built");
+
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
+            chatModel -> chatClient, null, workflowId -> List.of());
+
+        String result = callback.call("{\"request\":\"build it\"}");
+
+        assertThat(result).contains("[WORKFLOW CHECK] The saved workflow passed the editor's validation.");
+        verify(chatClient, times(1)).prompt(anyString());
+    }
+
+    @Test
+    void testCallSendsTheSpecialistBackOnceToFixErrorsAndReportsWhatRemains() {
+        ChatClient chatClient = savingChatClient("built");
+
+        PersistedWorkflowChecker.Issue brokenReference = new PersistedWorkflowChecker.Issue(
+            "createRecords_1", "Property 'getEmail_1.subject' does not exist", false);
+
+        PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
+
+        when(persistedWorkflowChecker.check("wf-1")).thenReturn(List.of(brokenReference), List.of(brokenReference));
+
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
+            chatModel -> chatClient, null, persistedWorkflowChecker);
+
+        String result = callback.call("{\"request\":\"build it\"}");
+
+        ArgumentCaptor<String> promptCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(chatClient, times(2)).prompt(promptCaptor.capture());
+
+        assertThat(promptCaptor.getAllValues()
+            .getLast()).contains("workflowId=wf-1", "createRecords_1: Property 'getEmail_1.subject' does not exist");
+        assertThat(result).contains(
+            "still has errors the editor will show", "- createRecords_1: Property 'getEmail_1.subject' does not exist");
+    }
+
+    @Test
+    void testCallAsksForConnectionsWithoutSendingTheSpecialistBack() {
+        ChatClient chatClient = savingChatClient("built");
+
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
+            chatModel -> chatClient, null,
+            workflowId -> List.of(
+                new PersistedWorkflowChecker.Issue("searchEmail_1", "Missing required connection: Gmail", true)));
+
+        String result = callback.call("{\"request\":\"build it\"}");
+
+        verify(chatClient, times(1)).prompt(anyString());
+
+        assertThat(result).contains(
+            "The saved workflow is valid apart from", "- searchEmail_1: Missing required connection: Gmail");
+    }
+
+    @Test
+    void testCallKeepsTheResultWhenValidationFails() {
+        ChatClient chatClient = savingChatClient("built");
+
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
+            chatModel -> chatClient, null, workflowId -> {
+                throw new IllegalStateException("validator down");
+            });
+
+        String result = callback.call("{\"request\":\"build it\"}");
+
+        assertThat(result).startsWith("built")
+            .doesNotContain("[WORKFLOW CHECK]");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ChatClient savingChatClient(String reply) {
+        ChatClient chatClient = mock(ChatClient.class);
+        ChatClientRequestSpec requestSpec = mock(ChatClientRequestSpec.class);
+        CallResponseSpec responseSpec = mock(CallResponseSpec.class);
+
+        when(chatClient.prompt(anyString())).thenReturn(requestSpec);
+        when(requestSpec.toolContext(anyMap())).thenAnswer(invocation -> {
+            Map<String, Object> context = invocation.getArgument(0);
+
+            List<Map<String, Object>> captures =
+                (List<Map<String, Object>>) context.get("bytechef.workflowEditor.persistedWorkflows");
+
+            if (captures.isEmpty()) {
+                captures.add(
+                    Map.of(
+                        "created", true, "name", "Invoices", "projectId", 1L, "projectWorkflowId", 2L, "workflowId",
+                        "wf-1"));
+            }
+
+            return requestSpec;
+        });
+        when(requestSpec.call()).thenReturn(responseSpec);
+        when(responseSpec.content()).thenReturn(reply);
+
+        return chatClient;
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {
