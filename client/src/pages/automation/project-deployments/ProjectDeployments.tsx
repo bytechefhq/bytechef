@@ -6,16 +6,21 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AgentsFilterLeftSidebarNav, {
     getAgentsFilter,
 } from '@/pages/automation/agents/components/AgentsFilterLeftSidebarNav';
+import DataSyncsFilterLeftSidebarNav, {
+    getDataSyncsFilter,
+} from '@/pages/automation/data-syncs/components/DataSyncsFilterLeftSidebarNav';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import isScheduleTrigger from '@/pages/automation/project-deployments/components/agent-deployment-channel-list/isScheduleTrigger';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import useAgentDeployments from '@/pages/automation/project-deployments/hooks/useAgentDeployments';
+import useDataSyncDeployments from '@/pages/automation/project-deployments/hooks/useDataSyncDeployments';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
+import {DataSyncTriggerType} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
@@ -76,10 +81,17 @@ const ProjectDeployments = () => {
     };
 
     const agentsFilter = getAgentsFilter(searchParams);
+    const dataSyncsFilter = getDataSyncsFilter(searchParams);
 
-    const agentsFilterSuffix = agentsFilter ? `&agents=${agentsFilter}` : '';
+    const contentFilterSearchParam = agentsFilter
+        ? `agents=${agentsFilter}`
+        : dataSyncsFilter
+          ? `dataSyncs=${dataSyncsFilter}`
+          : undefined;
 
-    const isFiltered = filterData.id !== undefined || agentsFilter !== undefined;
+    const contentFilterSuffix = contentFilterSearchParam ? `&${contentFilterSearchParam}` : '';
+
+    const isFiltered = filterData.id !== undefined || agentsFilter !== undefined || dataSyncsFilter !== undefined;
 
     const {
         data: projects,
@@ -106,25 +118,49 @@ const ProjectDeployments = () => {
     });
 
     const {agentDeployments, agentDeploymentsError, agentDeploymentsIsLoading} = useAgentDeployments();
+    const {dataSyncDeployments, dataSyncDeploymentsError, dataSyncDeploymentsIsLoading} = useDataSyncDeployments();
 
     const filteredProjectDeployments = useMemo(() => {
-        if (!projectDeployments || !agentsFilter) {
+        if (!projectDeployments) {
             return projectDeployments;
         }
 
-        const matchingAgentDeployments =
-            agentsFilter === 'scheduled'
-                ? agentDeployments.filter((agentDeployment) =>
-                      agentDeployment.workflows.some((workflow) => workflow.triggers.some(isScheduleTrigger))
-                  )
-                : agentDeployments;
+        if (agentsFilter) {
+            const matchingAgentDeployments =
+                agentsFilter === 'scheduled'
+                    ? agentDeployments.filter((agentDeployment) =>
+                          agentDeployment.workflows.some((workflow) => workflow.triggers.some(isScheduleTrigger))
+                      )
+                    : agentDeployments;
 
-        const agentProjectDeploymentIds = new Set(
-            matchingAgentDeployments.map((agentDeployment) => +agentDeployment.id)
-        );
+            const agentProjectDeploymentIds = new Set(
+                matchingAgentDeployments.map((agentDeployment) => +agentDeployment.id)
+            );
 
-        return projectDeployments.filter((projectDeployment) => agentProjectDeploymentIds.has(projectDeployment.id!));
-    }, [agentDeployments, agentsFilter, projectDeployments]);
+            return projectDeployments.filter((projectDeployment) =>
+                agentProjectDeploymentIds.has(projectDeployment.id!)
+            );
+        }
+
+        if (dataSyncsFilter) {
+            const matchingDataSyncDeployments =
+                dataSyncsFilter === 'scheduled'
+                    ? dataSyncDeployments.filter(
+                          (dataSyncDeployment) => dataSyncDeployment.triggerType === DataSyncTriggerType.Schedule
+                      )
+                    : dataSyncDeployments;
+
+            const dataSyncProjectDeploymentIds = new Set(
+                matchingDataSyncDeployments.map((dataSyncDeployment) => +dataSyncDeployment.id)
+            );
+
+            return projectDeployments.filter((projectDeployment) =>
+                dataSyncProjectDeploymentIds.has(projectDeployment.id!)
+            );
+        }
+
+        return projectDeployments;
+    }, [agentDeployments, agentsFilter, dataSyncDeployments, dataSyncsFilter, projectDeployments]);
 
     const projectDeploymentMap: Map<number, ProjectDeployment[]> = new Map<number, ProjectDeployment[]>();
 
@@ -206,6 +242,7 @@ const ProjectDeployments = () => {
                         (projectDeployments && projectDeployments.length > 0) || isFiltered ? (
                             <ProjectDeploymentFilterTitle
                                 agentsFilter={agentsFilter}
+                                dataSyncsFilter={dataSyncsFilter}
                                 filterData={filterData}
                                 projects={projects}
                                 tags={tags}
@@ -223,18 +260,24 @@ const ProjectDeployments = () => {
                             current: filterData?.id === project.id && filterData.type === Type.Project,
                             id: project.id!,
                             name: project.name,
-                            toLink: `?projectId=${project.id}${agentsFilterSuffix}`,
+                            toLink: `?projectId=${project.id}${contentFilterSuffix}`,
                         }))}
                         leadItem={{
-                            current: !filterData?.id && filterData.type === Type.Project && !agentsFilter,
+                            current:
+                                !filterData?.id &&
+                                filterData.type === Type.Project &&
+                                !agentsFilter &&
+                                !dataSyncsFilter,
                             name: 'All Projects',
-                            toLink: agentsFilter ? `?agents=${agentsFilter}` : '',
+                            toLink: contentFilterSearchParam ? `?${contentFilterSearchParam}` : '',
                         }}
                         loading={projectsIsLoading}
                         title="Projects"
                     />
 
                     <AgentsFilterLeftSidebarNav currentAgentsFilter={agentsFilter} />
+
+                    <DataSyncsFilterLeftSidebarNav currentDataSyncsFilter={dataSyncsFilter} />
 
                     <LeftSidebarFilterNav
                         emptyMessage="No defined tags."
@@ -243,7 +286,7 @@ const ProjectDeployments = () => {
                             current: filterData?.id === tag.id && filterData.type === Type.Tag,
                             id: tag.id!,
                             name: tag.name,
-                            toLink: `?tagId=${tag.id}${agentsFilterSuffix}`,
+                            toLink: `?tagId=${tag.id}${contentFilterSuffix}`,
                         }))}
                         loading={tagsIsLoading}
                         title="Tags"
@@ -260,12 +303,14 @@ const ProjectDeployments = () => {
                     projectDeploymentsError,
                     tagsError,
                     agentsFilter ? agentDeploymentsError : null,
+                    dataSyncsFilter ? dataSyncDeploymentsError : null,
                 ]}
                 loading={
                     projectsIsLoading ||
                     projectDeploymentsIsLoading ||
                     tagsIsLoading ||
-                    (!!agentsFilter && agentDeploymentsIsLoading)
+                    (!!agentsFilter && agentDeploymentsIsLoading) ||
+                    (!!dataSyncsFilter && dataSyncDeploymentsIsLoading)
                 }
             >
                 {filteredProjectDeployments && filteredProjectDeployments.length > 0 ? (
@@ -281,7 +326,9 @@ const ProjectDeployments = () => {
                                     tags && (
                                         <ProjectDeploymentList
                                             componentDefinitions={componentDefinitions}
-                                            defaultActiveTab={agentsFilter ? 'agents' : 'workflows'}
+                                            defaultActiveTab={
+                                                agentsFilter ? 'agents' : dataSyncsFilter ? 'dataSyncs' : 'workflows'
+                                            }
                                             key={projectId}
                                             newlyCreatedDeploymentId={expandedProjectDeploymentId}
                                             project={projects.find(

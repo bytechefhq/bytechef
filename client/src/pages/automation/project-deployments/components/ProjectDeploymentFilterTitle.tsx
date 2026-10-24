@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import {AgentsFilterType} from '@/pages/automation/agents/components/AgentsFilterLeftSidebarNav';
+import {DataSyncsFilterType} from '@/pages/automation/data-syncs/components/DataSyncsFilterLeftSidebarNav';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {ReactNode} from 'react';
@@ -7,11 +8,13 @@ import {useSearchParams} from 'react-router-dom';
 
 const ProjectDeploymentFilterTitle = ({
     agentsFilter,
+    dataSyncsFilter,
     filterData,
     projects,
     tags,
 }: {
     agentsFilter?: AgentsFilterType;
+    dataSyncsFilter?: DataSyncsFilterType;
     environment?: number;
     filterData: {id?: number; type: Type};
     projects: Project[] | undefined;
@@ -41,6 +44,14 @@ const ProjectDeploymentFilterTitle = ({
             {agentsFilter && (
                 <Badge
                     label={`Agents: ${agentsFilter === 'scheduled' ? 'Scheduled' : 'All Agents'}`}
+                    styleType="primary-outline"
+                    weight="semibold"
+                />
+            )}
+
+            {dataSyncsFilter && (
+                <Badge
+                    label={`Data Syncs: ${dataSyncsFilter === 'scheduled' ? 'Scheduled' : 'All Data Syncs'}`}
                     styleType="primary-outline"
                     weight="semibold"
                 />
