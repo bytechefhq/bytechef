@@ -495,13 +495,12 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             Throwable exception = failure.exception();
 
             if (recorder.claimFailure(callTarget.taskExecutionId(), exception)) {
-                String message = exception.getMessage();
+                Class<? extends Throwable> exceptionClass = exception.getClass();
 
                 recorder.recordOutcome(
                     callTarget.jobId(), callTarget.taskExecutionId(), entry.workflowNodeName(),
                     entry.componentName(), frameRef.id(), ClusterElementCallRecord.Status.FAILED, null,
-                    resolveFailureKind(exception) + ": " + (message == null ? exception.getClass()
-                        .getSimpleName() : message));
+                    resolveFailureKind(exception) + ": " + exceptionClass.getSimpleName());
 
                 return;
             }
