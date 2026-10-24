@@ -2,6 +2,7 @@ apis/WorkflowExecutionApi.ts
 apis/index.ts
 docs/AuthorizationType.md
 docs/ClusterElementCall.md
+docs/ClusterElementCallRecord.md
 docs/ComponentConnection.md
 docs/ExecutionError.md
 docs/IntegrationBasic.md
@@ -29,6 +30,7 @@ docs/WorkflowTrigger.md
 index.ts
 models/AuthorizationType.ts
 models/ClusterElementCall.ts
+models/ClusterElementCallRecord.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
 models/IntegrationBasic.ts
