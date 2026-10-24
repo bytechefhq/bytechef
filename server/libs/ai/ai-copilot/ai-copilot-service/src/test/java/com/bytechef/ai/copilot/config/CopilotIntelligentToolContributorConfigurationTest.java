@@ -38,6 +38,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
+import com.bytechef.automation.ai.tool.DataTableTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
@@ -625,7 +626,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
                 actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
                 propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
             actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-            propertyOptionsResolver, scopedConnectionGuard);
+            propertyOptionsResolver, scopedConnectionGuard, emptyDataTableToolsProvider());
     }
 
     private static IntelligentToolDefinition definitionNamed(
@@ -682,6 +683,11 @@ final class CopilotIntelligentToolContributorConfigurationTest {
 
     @SuppressWarnings("unchecked")
     private static ObjectProvider<SubAgentAskRelay> emptySubAgentAskRelayProvider() {
+        return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<DataTableTools> emptyDataTableToolsProvider() {
         return mock(ObjectProvider.class);
     }
 }
