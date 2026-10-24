@@ -100,6 +100,8 @@ const GHOST_BAR_THICKNESS = 2;
 // the button's center, matching CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET.
 const CLUSTER_ROOT_RENDERED_MAIN_SIZE = 240;
 
+const CLUSTER_ROOT_RENDERED_LR_CROSS_SIZE = 118;
+
 // Cross-axis footprint of a case placeholder column: narrower than a full
 // 240px task column so an empty condition frame renders as a compact box
 // instead of one as wide as a fully populated frame. Kept just wide enough to
@@ -796,11 +798,12 @@ function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {heigh
     // inside) with its chain handles at left 120px — the button's CENTER — so
     // centering this rendered box in the footprint keeps handles on the chain
     // axis with no dagre-style −85/−23 compensation. Unconfigured roots render
-    // the plain 72px icon box. LR cross stays the 72px anchor band (dagre's
-    // −23 offset shows LR chain alignment targets the icon band).
+    // the plain 72px icon box. In LR the button is 118px tall with its chain
+    // handles at its vertical center, the same centering dagre's −23 offset
+    // applies.
     if (rendersClusterElements(node)) {
         if (direction === 'LR') {
-            return {height: NODE_ANCHOR_SIZE, width: CLUSTER_ROOT_RENDERED_MAIN_SIZE};
+            return {height: CLUSTER_ROOT_RENDERED_LR_CROSS_SIZE, width: CLUSTER_ROOT_RENDERED_MAIN_SIZE};
         }
 
         return {height: NODE_HEIGHT, width: CLUSTER_ROOT_RENDERED_MAIN_SIZE};
