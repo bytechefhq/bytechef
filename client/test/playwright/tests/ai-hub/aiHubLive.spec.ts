@@ -954,21 +954,16 @@ test.describe('@live AI Hub', () => {
 
                     projectIdsToDelete.push(mcpProject.id);
 
-                    const mcpWorkflow = readStructuredResult<{workflow_id: string}>(
-                        await mcpClient.callTool('createProjectWorkflow', {
-                            name: shortName('hub_parity_mcp_workflow'),
-                            projectId: mcpProject.id,
-                        })
-                    );
-
                     const buildResult = await mcpClient.callTool('buildWorkflow', {
-                        request: `Update the existing workflow with workflowId ${mcpWorkflow.workflow_id}: ${PARITY_INSTRUCTION}`,
+                        request: `Create a new workflow in project ${mcpProject.id} that, ${PARITY_INSTRUCTION}`,
                         workspaceId: workspaces[0].id,
                     });
 
                     expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
 
-                    builtTypes.mcp = await readWorkflowComponentTypes(page, mcpWorkflow.workflow_id);
+                    const [mcpWorkflowId] = await listProjectWorkflowIds(page, mcpProject.id);
+
+                    builtTypes.mcp = await readWorkflowComponentTypes(page, mcpWorkflowId);
                 });
 
                 await test.step('Build through the workflow editor Copilot', async () => {
