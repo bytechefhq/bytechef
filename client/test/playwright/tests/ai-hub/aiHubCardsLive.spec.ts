@@ -81,8 +81,9 @@ async function readLastToolResults(page: Page, chat: Omit<AiHubChatRefI, 'thread
         .map((toolEvent) => toolEvent.response ?? '');
 }
 
-const answerCards = (page: Page, aiHubPage: AiHubPage) =>
+const answerCards = (page: Page, aiHubPage: AiHubPage, answerPickers = true) =>
     answerInteractiveCards(page, {
+        answerPickers,
         readLastMessage: () => aiHubPage.assistantMessages.last(),
         waitForTurnEnd: () => aiHubPage.waitForTurnEnd(LIVE_TURN_TIMEOUT),
     });
@@ -276,7 +277,7 @@ test.describe('@live AI Hub cards', () => {
                     'uses.'
             );
 
-            await answerCards(page, aiHubPage);
+            await answerCards(page, aiHubPage, false);
 
             const connectionPicker = page.getByRole('combobox').filter({hasText: /Choose Anthropic connection/});
 
