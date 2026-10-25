@@ -38,6 +38,11 @@ src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/IntegrationI
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/IntegrationModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/IntegrationStatusModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/IntegrationVersionModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/OAuth2AuthorizationParametersModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ProvisionIntegrationInstanceRequestModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ProvisionIntegrationInstanceWorkflowModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ProvisionableIntegrationInstanceConfigurationModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ProvisionableIntegrationModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/PublishConnectedUserProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/PublishIntegrationRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/StartWebhookTriggerTest200ResponseModel.java
