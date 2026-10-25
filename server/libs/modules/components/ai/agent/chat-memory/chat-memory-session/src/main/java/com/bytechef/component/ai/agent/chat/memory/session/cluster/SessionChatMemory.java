@@ -353,10 +353,6 @@ public final class SessionChatMemory {
     record Compaction(CompactionStrategy strategy, CompactionTrigger trigger) {
     }
 
-    /**
-     * Exposes {@link SessionEventTools#conversationSearch} without its required {@code innerThought} parameter. Claude
-     * models refuse the whole turn when a tool asks them for a "deep inner monologue private to you only".
-     */
     static final class ConversationSearchTool {
 
         private final SessionEventTools sessionEventTools;
