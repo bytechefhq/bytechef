@@ -20,7 +20,8 @@ import org.springframework.core.env.MutablePropertySources;
 
 /**
  * Enables the Redis or JDBC HTTP session store selected by {@code bytechef.session.store} in the Enterprise Edition by
- * lifting the exclusion of the matching Spring Session auto-configuration.
+ * lifting the exclusion of the matching Spring Session auto-configuration. Nodes without the coordinator role serve no
+ * HTTP sessions and keep the store disabled.
  *
  * @version ee
  *
@@ -36,7 +37,9 @@ public class SessionStoreEnvironmentPostProcessor implements EnvironmentPostProc
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (!"ee".equalsIgnoreCase(environment.getProperty("bytechef.edition"))) {
+        if (!"ee".equalsIgnoreCase(environment.getProperty("bytechef.edition"))
+            || "false".equalsIgnoreCase(environment.getProperty("bytechef.coordinator.enabled"))) {
+
             return;
         }
 
@@ -61,10 +64,6 @@ public class SessionStoreEnvironmentPostProcessor implements EnvironmentPostProc
 
             source.put("spring.session.jdbc.table-name", "public.spring_session");
             source.put("spring.session.jdbc.initialize-schema", "never");
-
-            if ("false".equalsIgnoreCase(environment.getProperty("bytechef.coordinator.enabled"))) {
-                source.put("spring.session.jdbc.cleanup-cron", "-");
-            }
         }
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();

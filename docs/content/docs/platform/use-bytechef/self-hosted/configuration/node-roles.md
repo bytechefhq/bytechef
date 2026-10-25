@@ -104,7 +104,7 @@ With `REDIS` or `JDBC`, any coordinator serves any request, so the load balancer
 
 A CE node started with `REDIS` or `JDBC` does not fail. It logs at INFO `bytechef.session.store=<value> requires ByteChef Enterprise Edition; using memory sessions` and keeps memory sessions, so one configuration works in both editions.
 
-Workers and webhook nodes do not use sessions.
+Workers and webhook nodes do not use sessions, so they keep the session store disabled even when `BYTECHEF_SESSION_STORE` is set. Only nodes with the coordinator role open the Redis connection or use the JDBC tables.
 
 ## Cache invalidation
 
