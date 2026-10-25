@@ -10,6 +10,10 @@ const hoisted = vi.hoisted(() => ({
     customRoles: [] as unknown[],
     customRolesLoading: false,
     deleteMutate: vi.fn(),
+    embeddedPermissionScopeGroups: [{name: 'INTEGRATION', scopes: ['INTEGRATION_CREATE']}] as {
+        name: string;
+        scopes: string[];
+    }[],
     invalidateQueries: vi.fn(),
     permissionScopeGroups: [
         {name: 'WORKFLOW', scopes: ['WORKFLOW_VIEW', 'WORKFLOW_EDIT']},
@@ -19,6 +23,7 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    PermissionScopeSide: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
     useBuiltInRolesQuery: vi.fn(() => ({data: {builtInRoles: hoisted.builtInRoles}})),
     useCreateCustomRoleMutation: vi.fn((options: {onSuccess: () => void}) => {
         hoisted.captureCreateOnSuccess(options.onSuccess);
@@ -30,7 +35,12 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isLoading: hoisted.customRolesLoading,
     })),
     useDeleteCustomRoleMutation: vi.fn(() => ({mutate: hoisted.deleteMutate})),
-    usePermissionScopeGroupsQuery: vi.fn(() => ({data: {permissionScopeGroups: hoisted.permissionScopeGroups}})),
+    usePermissionScopeGroupsQuery: vi.fn((variables: {side: string}) => ({
+        data: {
+            permissionScopeGroups:
+                variables.side === 'EMBEDDED' ? hoisted.embeddedPermissionScopeGroups : hoisted.permissionScopeGroups,
+        },
+    })),
     useUpdateCustomRoleMutation: vi.fn(() => ({mutate: hoisted.updateMutate})),
 }));
 
@@ -44,6 +54,7 @@ const deployerRole = {
     id: '900',
     name: 'Deployer',
     scopes: ['WORKFLOW_VIEW'],
+    side: 'AUTOMATION',
 };
 
 const auditorRole = {
@@ -51,6 +62,15 @@ const auditorRole = {
     id: '901',
     name: 'Auditor',
     scopes: ['WORKFLOW_VIEW'],
+    side: 'AUTOMATION',
+};
+
+const integratorRole = {
+    description: null,
+    id: '902',
+    name: 'Integrator',
+    scopes: ['INTEGRATION_CREATE'],
+    side: 'EMBEDDED',
 };
 
 const renderOnCustomRolesTab = async () => {
@@ -63,6 +83,9 @@ describe('CustomRolesManager', () => {
     beforeEach(() => {
         windowResizeObserver();
         mockScrollIntoView();
+
+        Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || vi.fn();
+        Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || vi.fn();
 
         vi.clearAllMocks();
         hoisted.builtInRoles = [{name: 'VIEWER', scopes: ['WORKFLOW_VIEW']}];
@@ -181,8 +204,51 @@ describe('CustomRolesManager', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Create'}));
 
         expect(hoisted.createMutate).toHaveBeenCalledWith({
-            input: {description: '', name: 'Deployer', scopes: ['WORKFLOW_EDIT']},
+            input: {description: '', name: 'Deployer', scopes: ['WORKFLOW_EDIT'], side: 'AUTOMATION'},
         });
+    });
+
+    it('creates an embedded role from the embedded catalogue', async () => {
+        hoisted.customRoles = [];
+
+        await renderOnCustomRolesTab();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Create Role'}));
+        await userEvent.type(screen.getByPlaceholderText('Role name'), 'Integrator');
+
+        expect(screen.queryByText('Integration')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'Members'}));
+        await userEvent.click(screen.getByRole('option', {name: 'Embedded members'}));
+
+        expect(screen.queryByText('Workflow')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Create'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Create'}));
+
+        expect(hoisted.createMutate).toHaveBeenCalledWith({
+            input: {description: '', name: 'Integrator', scopes: ['INTEGRATION_CREATE'], side: 'EMBEDDED'},
+        });
+    });
+
+    it('shows which members each role is for', async () => {
+        hoisted.customRoles = [deployerRole, integratorRole];
+
+        await renderOnCustomRolesTab();
+
+        expect(within(screen.getByRole('row', {name: /Deployer/})).getByText('Workspace')).toBeInTheDocument();
+        expect(within(screen.getByRole('row', {name: /Integrator/})).getByText('Embedded')).toBeInTheDocument();
+    });
+
+    it('keeps the members of an existing role fixed while editing it', async () => {
+        hoisted.customRoles = [integratorRole];
+
+        await renderOnCustomRolesTab();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Edit the Integrator role'}));
+
+        expect(screen.getByRole('combobox', {name: 'Members'})).toBeDisabled();
+        expect(screen.getByRole('combobox', {name: 'Members'})).toHaveTextContent('Embedded members');
     });
 
     it('loads a role into the form for editing and saves it', async () => {
