@@ -24,6 +24,8 @@ import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -40,13 +42,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
     private final DataTableService dataTableService;
+    private final DataTableStorageService dataTableStorageService;
     private final WorkspaceDataTableService workspaceDataTableService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceDataTableFacadeImpl(
-        DataTableService dataTableService, WorkspaceDataTableService workspaceDataTableService) {
+        DataTableService dataTableService, DataTableStorageService dataTableStorageService,
+        WorkspaceDataTableService workspaceDataTableService) {
 
         this.dataTableService = dataTableService;
+        this.dataTableStorageService = dataTableStorageService;
         this.workspaceDataTableService = workspaceDataTableService;
     }
 
@@ -102,5 +107,11 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         return dataTableInfos.stream()
             .filter(dataTableInfo -> dataTableInfo.id() != null && dataTableIds.contains(dataTableInfo.id()))
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DataTableStorageUsage getStorageUsage() {
+        return dataTableStorageService.getUsage();
     }
 }

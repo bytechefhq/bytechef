@@ -18,6 +18,7 @@ package com.bytechef.automation.data.table.configuration.facade;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import java.util.List;
 
 /**
@@ -34,4 +35,6 @@ public interface WorkspaceDataTableFacade {
     void duplicateTable(long tableId, String newBaseName, long environmentId);
 
     List<DataTableInfo> listTables(long workspaceId, long environmentId);
+
+    DataTableStorageUsage getStorageUsage();
 }
