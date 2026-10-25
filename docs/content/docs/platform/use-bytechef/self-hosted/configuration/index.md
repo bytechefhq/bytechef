@@ -126,6 +126,7 @@ them, so storage cost tracks the retention policy rather than growing without bo
 |---|---|
 | [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables) | The complete, categorized reference for every setting and its default. |
 | [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers) | Choosing the broker that carries task dispatches between the coordinator and the workers. |
+| [Node roles and high availability](/platform/use-bytechef/self-hosted/configuration/node-roles) | Coordinator, worker and webhook nodes, what each edition includes, scheduler clustering, shared sessions and migrations. |
 | [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage) | Where the opaque bytes a workflow produces are kept - S3, the filesystem, or the database. |
 | [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits) *(coming soon)* | Rate limits, concurrency slots, cost caps, and resource quotas per tenant. |
 
@@ -152,10 +153,14 @@ To scale horizontally, run several ByteChef instances against the same database.
 | Concern | What to configure |
 |---|---|
 | **Encryption key** | Use `BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY` with the same `BYTECHEF_ENCRYPTION_PROPERTY_KEY` on every instance, so all replicas can decrypt the same stored credentials. |
-| **Schema migrations** | Keep `BYTECHEF_UPGRADE_ENABLED=true` on one instance only during upgrades to avoid concurrent migration attempts. |
+| **Schema migrations** | Run Liquibase once in a one-shot container (`liquibase` command, `BYTECHEF_UPGRADE_ENABLED=true`) and set `BYTECHEF_UPGRADE_ENABLED=false` on every node. |
 | **Message broker** | Move off the default in-memory broker to a shared one (`BYTECHEF_MESSAGE_BROKER_PROVIDER` = `REDIS`, `KAFKA`, `AMQP`, …) so tasks dispatched on one node can be executed on another. |
-| **Cache** | Set `BYTECHEF_CACHE_PROVIDER=REDIS` so cache state is shared instead of per-node. |
+| **Cache** | Caches stay per node on Caffeine; in EE evictions reach every node over the message broker. |
+| **Sessions** | In EE, set `BYTECHEF_SESSION_STORE` to `REDIS` or `JDBC` so any coordinator serves any request without sticky sessions. |
+| **Scheduler** | Set `BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED=true` when more than one coordinator runs (EE). |
 | **Remember-me key** | Set a single fixed `BYTECHEF_SECURITY_REMEMBER_ME_KEY` across all instances so sessions remain valid regardless of which node serves a request. |
+
+See [Node roles and high availability](/platform/use-bytechef/self-hosted/configuration/node-roles) for the full picture: what each edition includes, load balancer routing, and a ready-made Compose file.
 
 ### Splitting coordinator and worker roles
 
@@ -167,6 +172,7 @@ switch, and both default to on:
 |---|---|---|
 | `BYTECHEF_WORKER_ENABLED` | `true` | The node stops executing tasks. It keeps coordinating jobs and keeps serving the API and UI. |
 | `BYTECHEF_COORDINATOR_ENABLED` | `true` | The node becomes a **headless task executor**: no API, no GraphQL, no UI - see below. |
+| `BYTECHEF_WEBHOOK_ENABLED` | `true` | The node stops serving the public webhook endpoints (`/webhooks`, `/callback`, `/approvals`, `/job/resume`, `/file-entries/{id}/content`). |
 
 > **Disabling the coordinator also disables the API.** The switch does not gate job coordination
 > alone - it gates the application surface. Of the 224 classes behind it, 211 are controllers: 87
@@ -191,9 +197,10 @@ Three things to get right:
 - **Do not turn both off on the same node.** Nothing prevents it, and the result is an instance
   that does nothing at all.
 
-Running more than one node with the coordinator enabled is supported - they are ordinary replicas
-once the table above is satisfied - but the coordinator is rarely the bottleneck, so scale the
-executors first.
+Running more than one node with the coordinator enabled requires Enterprise Edition and a clustered
+scheduler; the coordinator is rarely the bottleneck, so scale the executors first. To give webhook
+traffic its own capacity, run dedicated webhook nodes - see
+[Node roles and high availability](/platform/use-bytechef/self-hosted/configuration/node-roles).
 
 #### Routing tasks to specific workers
 

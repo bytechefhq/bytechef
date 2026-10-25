@@ -68,7 +68,7 @@ flowchart TB
 
     subgraph INFRA["Infrastructure"]
         PG[("PostgreSQL - shared, per-domain liquibase contexts")]
-        RED[("Redis - discovery + cache")]
+        RED[("Redis - discovery")]
         MB(["Message broker - redis / amqp / kafka"])
     end
 
@@ -102,7 +102,7 @@ flowchart TB
   (`configuration`, `connection`, `execution`, `scheduler`), so they can share a single database
   instance.
 - **Redis** - required regardless of broker choice: it backs **service discovery** (apps register
-  under their `spring.application.name`) and the cache provider, and is the default message broker.
+  under their `spring.application.name`) and is the default message broker.
 - **Message broker** - `bytechef.message-broker.provider` set to one of `redis` (default in the EE
   config), `amqp` (RabbitMQ), `kafka`, or `jms`/`aws`. The `memory` provider is in-process only and
   **cannot** be used in distributed mode. All broker starters are on the worker/coordinator
@@ -141,7 +141,7 @@ Key properties served to all apps:
 |---|---|
 | `bytechef.edition` | `EE` |
 | `bytechef.message-broker.provider` | `redis` (or `amqp`, `kafka`, `jms`, `aws`) |
-| `bytechef.cache.provider` | `redis` |
+| `bytechef.cache.provider` | `caffeine` |
 | `bytechef.discovery-service.provider` | `redis` - the only supported discovery backend |
 | `bytechef.data-storage.provider` / `bytechef.workflow.output-storage.provider` | `jdbc` |
 | `bytechef.scheduler.provider` | `quartz` |
@@ -271,9 +271,9 @@ the shared database (`spring.quartz.job-store-type: jdbc`, the PostgreSQL driver
 by Quartz itself). Schedules therefore live in the database and survive a restart.
 
 <Callout type="warn">
-  Quartz **clustering is not enabled** in the shipped configuration
-  (`org.quartz.jobStore.isClustered` is never set). Run exactly one `scheduler-app` instance. Two
-  non-clustered instances sharing one job store will contend and can fire a schedule twice.
+  Quartz clustering is not enabled in the shipped `scheduler-app` configuration. Run exactly one
+  `scheduler-app` instance. Two non-clustered instances sharing one job store will contend and can fire
+  a schedule twice.
 </Callout>
 
 ### `AWS` (EventBridge Scheduler)

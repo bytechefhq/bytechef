@@ -196,7 +196,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_CACHE_PROVIDER` | Cache provider (REDIS, CAFFEINE) | `CAFFEINE` |
+| `BYTECHEF_CACHE_PROVIDER` | Cache provider (CAFFEINE) | `CAFFEINE` |
 
 ## Cloud Configuration
 
@@ -458,6 +458,14 @@ System administrator is used for accessing protected data reachable through /act
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_SCHEDULER_PROVIDER` | Scheduler provider (AWS, QUARTZ) | `QUARTZ` |
+| `BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED` | Run Quartz in clustered mode. Required when more than one coordinator runs (EE) | `false` |
+| `BYTECHEF_SCHEDULER_QUARTZ_CLUSTER_CHECKIN_INTERVAL` | How often a clustered Quartz scheduler checks in, in milliseconds | `15000` |
+
+## Session Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_SESSION_STORE` | HTTP session store (MEMORY, REDIS (EE), JDBC (EE)). REDIS and JDBC share sessions between coordinators | `MEMORY` |
 
 ## Sign Up Configuration
 
@@ -489,6 +497,7 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
+| `BYTECHEF_WEBHOOK_ENABLED` | Serve the public webhook endpoints on this node | `true` |
 | `BYTECHEF_WEBHOOK_URL` | Webhook URL | `BYTECHEF_PUBLIC_URL/webhooks/{id}` |
 
 ## Observability Configuration

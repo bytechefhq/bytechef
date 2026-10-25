@@ -16,7 +16,7 @@ single-node distribution defaults to `MEMORY`.
 | Provider | Backing system | Best fit |
 |---|---|---|
 | `MEMORY` | None - in-process | Dev, evaluation, and single-JVM production. Cannot be used across processes. |
-| `REDIS` | Redis streams | Small to mid production deployments, and instances that already run Redis as their cache provider. |
+| `REDIS` | Redis streams | Small to mid production deployments, and instances that already run Redis. |
 | `AMQP` | RabbitMQ | Production deployments that want a dedicated broker. The only provider that configures a dead-letter queue (see below). |
 | `KAFKA` | Apache Kafka | High-throughput deployments, or deployments that already run Kafka for other event streams. |
 | `JMS` | Any JMS provider | Enterprises with existing JMS infrastructure. |
@@ -60,8 +60,8 @@ which is why a bug in one cannot leak into another and why a workflow behaves th
 - **Already running Kafka?** Use `KAFKA`. Reusing infrastructure you already operate beats
   introducing a new piece.
 - **AWS-only deployment?** `AWS` (SQS) - managed, and the IAM story is straightforward.
-- **Single-region, mid-scale, no existing broker?** `REDIS`. If you already set
-  `BYTECHEF_CACHE_PROVIDER=REDIS` to share cache state across instances, this adds no new dependency.
+- **Single-region, mid-scale, no existing broker?** `REDIS`. If you already run Redis, this adds no new dependency. In EE the
+  broker also carries cache invalidation between nodes.
 - **Existing JMS or RabbitMQ estate?** `JMS` or `AMQP`.
 
 ## Operational notes
