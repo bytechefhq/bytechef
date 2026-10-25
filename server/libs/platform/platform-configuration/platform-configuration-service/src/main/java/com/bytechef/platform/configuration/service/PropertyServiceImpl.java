@@ -119,17 +119,8 @@ public class PropertyServiceImpl implements PropertyService {
 
                 propertyRepository.save(property);
             }, () -> {
-                Property property = new Property();
+                Property property = createProperty(key, scope, scopeId, environmentId);
 
-                property.setEnabled(true);
-
-                if (environmentId != null) {
-                    property.setEnvironment(environmentId.intValue());
-                }
-
-                property.setKey(key);
-                property.setScope(scope);
-                property.setScopeId(scopeId);
                 property.setValue(value);
 
                 propertyRepository.save(property);
@@ -145,11 +136,30 @@ public class PropertyServiceImpl implements PropertyService {
     public void update(
         String key, boolean enabled, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
 
-        fetchProperty(key, scope, scopeId, environmentId)
-            .ifPresent(property -> {
-                property.setEnabled(enabled);
+        Optional<Property> propertyOptional = fetchProperty(key, scope, scopeId, environmentId);
 
-                propertyRepository.save(property);
-            });
+        Property property = propertyOptional.orElseGet(() -> createProperty(key, scope, scopeId, environmentId));
+
+        property.setEnabled(enabled);
+
+        propertyRepository.save(property);
+    }
+
+    private static Property createProperty(
+        String key, Property.Scope scope, @Nullable Long scopeId, @Nullable Long environmentId) {
+
+        Property property = new Property();
+
+        property.setEnabled(true);
+
+        if (environmentId != null) {
+            property.setEnvironment(environmentId.intValue());
+        }
+
+        property.setKey(key);
+        property.setScope(scope);
+        property.setScopeId(scopeId);
+
+        return property;
     }
 }
