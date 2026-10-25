@@ -282,10 +282,17 @@ class OllamaChatActionTest {
     }
 
     @Test
-    void testCreateChatModelWithoutThinkingOmitsThinkLevel() {
-        OllamaChatOptions options = createThinkingChatOptions(Map.of(MODEL, "gpt-oss", REASONING_EFFORT, "high"));
+    void testCreateChatModelWithoutThinkingDisablesThinking() {
+        OllamaChatOptions options = createThinkingChatOptions(Map.of(MODEL, "qwen3", REASONING_EFFORT, "high"));
 
-        assertNull(options.getThinkOption());
+        assertEquals(ThinkOption.ThinkBoolean.DISABLED, options.getThinkOption());
+    }
+
+    @Test
+    void testCreateChatModelWithThinkingOffDisablesThinking() {
+        OllamaChatOptions options = createThinkingChatOptions(Map.of(MODEL, "qwen3", THINKING, false));
+
+        assertEquals(ThinkOption.ThinkBoolean.DISABLED, options.getThinkOption());
     }
 
     private OllamaChatOptions createThinkingChatOptions(Map<String, Object> inputParameters) {
