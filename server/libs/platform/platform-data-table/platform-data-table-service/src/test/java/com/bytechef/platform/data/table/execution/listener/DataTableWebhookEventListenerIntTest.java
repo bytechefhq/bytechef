@@ -649,6 +649,54 @@ class DataTableWebhookEventListenerIntTest {
     }
 
     @Test
+    void testExpiredFailureStatesArePrunedOnLaterEvents() throws Exception {
+        String baseUrl = startWebhookServer();
+
+        DataTableWebhookService.Webhook deletedWebhook = new DataTableWebhookService.Webhook(
+            1, 1, baseUrl + "/deleted", DataTableWebhookType.RECORD_DELETED, DEV_ENVIRONMENT_ID);
+
+        List<Long> ids = insertItems("Apple", "Banana");
+
+        MutableClock mutableClock = new MutableClock(Instant.now());
+
+        dataTableWebhookEventListener.setClock(mutableClock);
+
+        failureStatus.set(403);
+        failuresLeft.set(1);
+
+        dataTableRowService.deleteRow("items", ids.getFirst(), DEV_ENVIRONMENT_ID);
+
+        takeBodies(deletedBodies, 1);
+
+        await()
+            .atMost(Duration.ofSeconds(5))
+            .until(() -> dataTableWebhookEventListener.hasFailureState(deletedWebhook));
+
+        mutableClock.advance(DataTableWebhookEventListener.CONSECUTIVE_FAILURES_RETENTION.plusSeconds(1));
+
+        insertItems("Cherry");
+
+        assertFalse(dataTableWebhookEventListener.hasFailureState(deletedWebhook));
+
+        failureStatus.set(404);
+        failuresLeft.set(1);
+
+        dataTableRowService.deleteRow("items", ids.getLast(), DEV_ENVIRONMENT_ID);
+
+        takeBodies(deletedBodies, 1);
+
+        await()
+            .atMost(Duration.ofSeconds(5))
+            .until(() -> dataTableWebhookEventListener.hasFailureState(deletedWebhook));
+
+        mutableClock.advance(DataTableWebhookEventListener.CONSECUTIVE_FAILURES_RETENTION.plusSeconds(1));
+
+        insertItems("Date");
+
+        assertFalse(dataTableWebhookEventListener.hasFailureState(deletedWebhook));
+    }
+
+    @Test
     void testFailureMessagesShowOnlyTheHostOfUrls() {
         assertEquals(
             "I/O error on POST request for \"hooks.example.com\": Connection refused; see <url>",

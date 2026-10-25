@@ -87,12 +87,14 @@ public final class DataTableWebhookEventListener {
     private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
+    static final Duration CONSECUTIVE_FAILURES_RETENTION = Duration.ofHours(1);
     static final String DROPPED_OUTCOME = "dropped";
     static final String FAILED_OUTCOME = "failed";
     static final Duration INITIAL_RETRY_INTERVAL = Duration.ofSeconds(2);
     static final int MAX_CONSECUTIVE_FAILURES = 10;
     private static final int MAX_FAILURE_MESSAGE_LENGTH = 200;
     private static final int MAX_LOGGED_RECORD_IDS = 20;
+    static final Duration PRUNE_INTERVAL = Duration.ofMinutes(1);
     private static final Duration READ_TIMEOUT = Duration.ofSeconds(30);
     static final String SKIPPED_OUTCOME = "skipped";
     static final Duration SUSPENSION_DURATION = Duration.ofMinutes(5);
@@ -101,12 +103,13 @@ public final class DataTableWebhookEventListener {
     private static final Pattern URL_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9+.-]*://[^\\s\"'<>]+");
 
     private volatile Clock clock = Clock.systemUTC();
-    private final Map<SuspensionKey, Integer> consecutiveFailedCounts = new ConcurrentHashMap<>();
+    private final Map<SuspensionKey, ConsecutiveFailures> consecutiveFailures = new ConcurrentHashMap<>();
     private final DataTableWebhookService dataTableWebhookService;
     private final Semaphore deliverySemaphore;
     private final int maxPendingDeliveries;
     private final int maxPendingRows;
     private final ObjectProvider<MeterRegistry> meterRegistryProvider;
+    private volatile Instant nextPruneInstant = Instant.MIN;
     private final Map<WebhookKey, Integer> pendingDeliveryCounts = new ConcurrentHashMap<>();
     private final AtomicLong pendingRowCount = new AtomicLong();
     private final RestTemplate restTemplate = createRestTemplate();
@@ -154,6 +157,8 @@ public final class DataTableWebhookEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onDataTableWebhookEvent(DataTableWebhookEvent event) {
+        pruneExpiredFailureStates();
+
         String baseName = event.getBaseName();
         long environmentId = event.getEnvironmentId();
         List<DataTableRow> rows = event.getRows();
@@ -302,9 +307,18 @@ public final class DataTableWebhookEventListener {
     }
 
     void clearSuspensions() {
-        consecutiveFailedCounts.clear();
+        consecutiveFailures.clear();
+        nextPruneInstant = Instant.MIN;
         skipLoggedSuspendedUntilInstants.clear();
         suspendedUntilInstants.clear();
+    }
+
+    boolean hasFailureState(DataTableWebhookService.Webhook hook) {
+        SuspensionKey suspensionKey = new SuspensionKey(TenantContext.getCurrentTenantId(), hook.id(), hook.url());
+
+        return consecutiveFailures.containsKey(suspensionKey) ||
+            skipLoggedSuspendedUntilInstants.containsKey(suspensionKey) ||
+            suspendedUntilInstants.containsKey(suspensionKey);
     }
 
     void setClock(Clock clock) {
@@ -332,6 +346,35 @@ public final class DataTableWebhookEventListener {
         suspendedUntilInstants.remove(suspensionKey, suspendedUntil);
 
         return null;
+    }
+
+    private int countConsecutiveFailure(SuspensionKey suspensionKey) {
+        ConsecutiveFailures currentConsecutiveFailures = consecutiveFailures.merge(
+            suspensionKey, new ConsecutiveFailures(1, clock.instant()),
+            (existingFailures, newFailure) -> new ConsecutiveFailures(
+                existingFailures.count() + 1, newFailure.lastFailedAt()));
+
+        return currentConsecutiveFailures.count();
+    }
+
+    private void pruneExpiredFailureStates() {
+        Instant now = clock.instant();
+
+        if (now.isBefore(nextPruneInstant)) {
+            return;
+        }
+
+        nextPruneInstant = now.plus(PRUNE_INTERVAL);
+
+        Instant consecutiveFailuresExpiryInstant = now.minus(CONSECUTIVE_FAILURES_RETENTION);
+
+        consecutiveFailures.values()
+            .removeIf(failures -> !failures.lastFailedAt()
+                .isAfter(consecutiveFailuresExpiryInstant));
+        skipLoggedSuspendedUntilInstants.values()
+            .removeIf(suspendedUntil -> !now.isBefore(suspendedUntil));
+        suspendedUntilInstants.values()
+            .removeIf(suspendedUntil -> !now.isBefore(suspendedUntil));
     }
 
     private void releasePending(WebhookKey webhookKey, PendingRows pendingRows) {
@@ -377,7 +420,7 @@ public final class DataTableWebhookEventListener {
         Instant suspendedUntil = now.plus(SUSPENSION_DURATION);
 
         suspendedUntilInstants.put(suspensionKey, suspendedUntil);
-        consecutiveFailedCounts.remove(suspensionKey);
+        consecutiveFailures.remove(suspensionKey);
 
         MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable();
 
@@ -419,7 +462,7 @@ public final class DataTableWebhookEventListener {
                     return post(suspensionKey, hook, body);
                 });
 
-                consecutiveFailedCounts.remove(suspensionKey);
+                consecutiveFailures.remove(suspensionKey);
             } catch (RetryException retryException) {
                 Throwable cause = retryException.getCause();
 
@@ -461,9 +504,9 @@ public final class DataTableWebhookEventListener {
                 int consecutiveFailedCount = 0;
 
                 if (isPayloadRejected(cause)) {
-                    consecutiveFailedCounts.remove(suspensionKey);
+                    consecutiveFailures.remove(suspensionKey);
                 } else if (isEndpointFailure(cause)) {
-                    consecutiveFailedCount = consecutiveFailedCounts.merge(suspensionKey, 1, Integer::sum);
+                    consecutiveFailedCount = countConsecutiveFailure(suspensionKey);
                 }
 
                 if (isEndpointUnusable(cause) || consecutiveFailedCount >= MAX_CONSECUTIVE_FAILURES) {
@@ -878,6 +921,9 @@ public final class DataTableWebhookEventListener {
         private boolean release() {
             return remainingDeliveryCount.decrementAndGet() == 0;
         }
+    }
+
+    private record ConsecutiveFailures(int count, Instant lastFailedAt) {
     }
 
     private record SuspensionKey(String tenantId, long webhookId, String url) {
