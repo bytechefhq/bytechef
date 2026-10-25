@@ -6,6 +6,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-jdbc")
     implementation("org.springframework:spring-web")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
@@ -18,4 +19,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
+
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testRuntimeOnly("org.postgresql:postgresql")
 }
