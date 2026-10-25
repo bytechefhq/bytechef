@@ -193,6 +193,10 @@ bytechef:
       enabled: false
     two-factor-authentication:
       enabled: false
+  session:
+    # HTTP session store (memory | redis | jdbc) default: memory
+    # redis or jdbc share sessions between coordinators, so no sticky sessions are needed.
+    store: memory
   sign-up:
     activation-required: false
     enabled: true

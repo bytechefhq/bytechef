@@ -17,6 +17,7 @@
 package com.bytechef.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Redis;
 import com.bytechef.config.ApplicationProperties.Oauth2;
@@ -24,6 +25,7 @@ import com.bytechef.config.ApplicationProperties.Oauth2.ResourceServer;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.context.properties.bind.BindException;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -205,6 +207,35 @@ class ApplicationPropertiesTest {
 
         assertThat(quartz.isClustered()).isTrue();
         assertThat(quartz.getClusterCheckinInterval()).isEqualTo(20000L);
+    }
+
+    @Test
+    void testBindsSessionStore() {
+        MapConfigurationPropertySource mapConfigurationPropertySource = new MapConfigurationPropertySource(
+            Map.of("bytechef.session.store", "jdbc"));
+
+        Binder binder = new Binder(mapConfigurationPropertySource);
+
+        ApplicationProperties applicationProperties = binder.bind(
+            "bytechef", Bindable.of(ApplicationProperties.class), new NoUnboundElementsBindHandler(BindHandler.DEFAULT))
+            .get();
+
+        assertThat(applicationProperties.getSession()
+            .getStore()).isEqualTo(ApplicationProperties.Session.Store.JDBC);
+    }
+
+    @Test
+    void testRejectsUnknownSessionStore() {
+        MapConfigurationPropertySource mapConfigurationPropertySource = new MapConfigurationPropertySource(
+            Map.of("bytechef.session.store", "postgres"));
+
+        Binder binder = new Binder(mapConfigurationPropertySource);
+
+        assertThatThrownBy(() -> binder.bind(
+            "bytechef", Bindable.of(ApplicationProperties.class), new NoUnboundElementsBindHandler(BindHandler.DEFAULT))
+            .get())
+                .isInstanceOf(BindException.class)
+                .hasMessageContaining("bytechef.session.store");
     }
 
     private static ApplicationProperties bind(PropertySource<?> propertySource) {
