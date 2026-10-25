@@ -149,7 +149,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 'group relative flex min-w-60 cursor-pointer justify-center',
                 !data.taskDispatcher && 'items-center',
                 (data.trigger || isMainRootClusterElement) && 'nodrag',
-                isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1',
+                isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center',
                 isHorizontal && isRegularNode && 'min-w-0',
                 rest.className
             )}
