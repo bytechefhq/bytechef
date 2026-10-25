@@ -1,13 +1,16 @@
 import {calculateNodeWidth} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
-import {CLUSTER_ROOT_NODE_WIDTH} from '@/shared/constants';
+import {CLUSTER_ELEMENT_NODE_WIDTH, CLUSTER_ROOT_NODE_WIDTH} from '@/shared/constants';
 import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {
     CLUSTER_FRAME_HEADER_HEIGHT,
+    CLUSTER_FRAME_LABEL_OVERHANG,
+    CLUSTER_FRAME_MEMBER_ROW_Y,
     CLUSTER_FRAME_MIN_HEIGHT,
     CLUSTER_FRAME_MIN_WIDTH,
     CLUSTER_FRAME_PADDING,
+    CLUSTER_FRAME_PLACEHOLDER_Y,
     fromClusterFrameChildPosition,
     getClusterMemberSize,
     toClusterFrameChildPosition,
@@ -72,7 +75,7 @@ describe('layoutClusterFrames', () => {
         expect(rootNode.data.clusterFrame).toEqual({
             clusterRootId: ROOT_ID,
             contentOrigin: {x: CLUSTER_FRAME_PADDING, y: CLUSTER_FRAME_HEADER_HEIGHT},
-            height: 300 + ELEMENT_SIZE.height + CLUSTER_FRAME_HEADER_HEIGHT + CLUSTER_FRAME_PADDING,
+            height: CLUSTER_FRAME_HEADER_HEIGHT + 300 + ELEMENT_SIZE.height + CLUSTER_FRAME_HEADER_HEIGHT,
             width: CLUSTER_FRAME_PADDING + 400 + ELEMENT_SIZE.width + CLUSTER_FRAME_PADDING,
         });
 
@@ -170,6 +173,71 @@ describe('layoutClusterFrames', () => {
             x: -120,
             y: 200,
         });
+    });
+
+    it('places unsaved members and placeholders one main-canvas edge below the root', () => {
+        const unsavedElementNode: Node = {
+            data: {
+                clusterElementType: 'model',
+                clusterElementTypeIndex: 0,
+                parentClusterRootElementsTypeCount: 1,
+                parentClusterRootId: ROOT_ID,
+                workflowNodeName: 'model_1',
+            },
+            id: 'model_1',
+            parentId: ROOT_ID,
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        };
+
+        const result = layoutClusterFrames(
+            [buildRootNode()],
+            [],
+            {
+                edgesByRootId: {[ROOT_ID]: []},
+                nodesByRootId: {
+                    [ROOT_ID]: [
+                        unsavedElementNode,
+                        buildPlaceholderElementNode(`${ROOT_ID}-model-placeholder-0`, {x: 0, y: 140}),
+                    ],
+                },
+            },
+            {}
+        );
+
+        const clusterFrame = result.outerNodes[0].data.clusterFrame as {contentOrigin: {x: number; y: number}};
+
+        const contentYById = new Map(
+            result.memberNodes.map((memberNode) => [
+                memberNode.id,
+                fromClusterFrameChildPosition(memberNode.position, clusterFrame.contentOrigin).y,
+            ])
+        );
+
+        expect(contentYById.get('model_1')).toBe(CLUSTER_FRAME_MEMBER_ROW_Y);
+        expect(contentYById.get(`${ROOT_ID}-model-placeholder-0`)).toBe(CLUSTER_FRAME_PLACEHOLDER_Y);
+    });
+
+    it('leaves as much space below the last element label as above the root', () => {
+        const result = layoutClusterFrames(
+            [buildRootNode()],
+            [],
+            {
+                edgesByRootId: {[ROOT_ID]: []},
+                nodesByRootId: {[ROOT_ID]: [buildElementNode('model_1', {x: 0, y: 300})]},
+            },
+            {}
+        );
+
+        const clusterFrame = result.outerNodes[0].data.clusterFrame as {
+            contentOrigin: {x: number; y: number};
+            height: number;
+        };
+
+        const labelBottom =
+            clusterFrame.contentOrigin.y + 300 + CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_FRAME_LABEL_OVERHANG;
+
+        expect(clusterFrame.height - labelBottom).toBe(clusterFrame.contentOrigin.y);
     });
 
     it('keeps nested members parented to their nested root and out of frame coordinates', () => {
