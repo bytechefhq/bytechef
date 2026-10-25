@@ -24,7 +24,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "ID of the model to use.",
+      "description": "ID of the model to use. The list shows the models installed on the Ollama server.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -35,144 +35,11 @@
       "metadata": { },
       "minLength": null,
       "name": "model",
-      "options": [ {
-        "description": null,
-        "label": "codellama",
-        "value": "codellama"
-      }, {
-        "description": null,
-        "label": "dolphin-phi",
-        "value": "dolphin-phi"
-      }, {
-        "description": null,
-        "label": "gemma",
-        "value": "gemma"
-      }, {
-        "description": null,
-        "label": "gemma3",
-        "value": "gemma3"
-      }, {
-        "description": null,
-        "label": "llama2",
-        "value": "llama2"
-      }, {
-        "description": null,
-        "label": "llama2-uncensored",
-        "value": "llama2-uncensored"
-      }, {
-        "description": null,
-        "label": "llama3",
-        "value": "llama3"
-      }, {
-        "description": null,
-        "label": "llama3.1",
-        "value": "llama3.1"
-      }, {
-        "description": null,
-        "label": "llama3.2",
-        "value": "llama3.2"
-      }, {
-        "description": null,
-        "label": "llama3.2-vision",
-        "value": "llama3.2-vision"
-      }, {
-        "description": null,
-        "label": "llama3.2-vision:90b",
-        "value": "llama3.2-vision:90b"
-      }, {
-        "description": null,
-        "label": "llama3.2:1b",
-        "value": "llama3.2:1b"
-      }, {
-        "description": null,
-        "label": "llama3.2:3b",
-        "value": "llama3.2:3b"
-      }, {
-        "description": null,
-        "label": "llava",
-        "value": "llava"
-      }, {
-        "description": null,
-        "label": "mistral",
-        "value": "mistral"
-      }, {
-        "description": null,
-        "label": "mistral-nemo",
-        "value": "mistral-nemo"
-      }, {
-        "description": null,
-        "label": "moondream",
-        "value": "moondream"
-      }, {
-        "description": null,
-        "label": "mxbai-embed-large",
-        "value": "mxbai-embed-large"
-      }, {
-        "description": null,
-        "label": "neural-chat",
-        "value": "neural-chat"
-      }, {
-        "description": null,
-        "label": "nomic-embed-text",
-        "value": "nomic-embed-text"
-      }, {
-        "description": null,
-        "label": "orca-mini",
-        "value": "orca-mini"
-      }, {
-        "description": null,
-        "label": "phi",
-        "value": "phi"
-      }, {
-        "description": null,
-        "label": "phi3",
-        "value": "phi3"
-      }, {
-        "description": null,
-        "label": "qwen2.5",
-        "value": "qwen2.5"
-      }, {
-        "description": null,
-        "label": "qwen2.5:3b",
-        "value": "qwen2.5:3b"
-      }, {
-        "description": null,
-        "label": "qwen2.5vl",
-        "value": "qwen2.5vl"
-      }, {
-        "description": null,
-        "label": "qwen3-embedding:8b",
-        "value": "qwen3-embedding:8b"
-      }, {
-        "description": null,
-        "label": "qwen3:0.6b",
-        "value": "qwen3:0.6b"
-      }, {
-        "description": null,
-        "label": "qwen3:1.7b",
-        "value": "qwen3:1.7b"
-      }, {
-        "description": null,
-        "label": "qwen3:4b",
-        "value": "qwen3:4b"
-      }, {
-        "description": null,
-        "label": "qwen3:4b-thinking",
-        "value": "qwen3:4b-thinking"
-      }, {
-        "description": null,
-        "label": "qwen3:7b",
-        "value": "qwen3:7b"
-      }, {
-        "description": null,
-        "label": "qwq",
-        "value": "qwq"
-      }, {
-        "description": null,
-        "label": "starling-lm",
-        "value": "starling-lm"
-      } ],
-      "optionsDataSource": null,
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -1433,7 +1300,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "ID of the model to use.",
+      "description": "ID of the model to use. The list shows the models installed on the Ollama server.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -1444,144 +1311,11 @@
       "metadata": { },
       "minLength": null,
       "name": "model",
-      "options": [ {
-        "description": null,
-        "label": "codellama",
-        "value": "codellama"
-      }, {
-        "description": null,
-        "label": "dolphin-phi",
-        "value": "dolphin-phi"
-      }, {
-        "description": null,
-        "label": "gemma",
-        "value": "gemma"
-      }, {
-        "description": null,
-        "label": "gemma3",
-        "value": "gemma3"
-      }, {
-        "description": null,
-        "label": "llama2",
-        "value": "llama2"
-      }, {
-        "description": null,
-        "label": "llama2-uncensored",
-        "value": "llama2-uncensored"
-      }, {
-        "description": null,
-        "label": "llama3",
-        "value": "llama3"
-      }, {
-        "description": null,
-        "label": "llama3.1",
-        "value": "llama3.1"
-      }, {
-        "description": null,
-        "label": "llama3.2",
-        "value": "llama3.2"
-      }, {
-        "description": null,
-        "label": "llama3.2-vision",
-        "value": "llama3.2-vision"
-      }, {
-        "description": null,
-        "label": "llama3.2-vision:90b",
-        "value": "llama3.2-vision:90b"
-      }, {
-        "description": null,
-        "label": "llama3.2:1b",
-        "value": "llama3.2:1b"
-      }, {
-        "description": null,
-        "label": "llama3.2:3b",
-        "value": "llama3.2:3b"
-      }, {
-        "description": null,
-        "label": "llava",
-        "value": "llava"
-      }, {
-        "description": null,
-        "label": "mistral",
-        "value": "mistral"
-      }, {
-        "description": null,
-        "label": "mistral-nemo",
-        "value": "mistral-nemo"
-      }, {
-        "description": null,
-        "label": "moondream",
-        "value": "moondream"
-      }, {
-        "description": null,
-        "label": "mxbai-embed-large",
-        "value": "mxbai-embed-large"
-      }, {
-        "description": null,
-        "label": "neural-chat",
-        "value": "neural-chat"
-      }, {
-        "description": null,
-        "label": "nomic-embed-text",
-        "value": "nomic-embed-text"
-      }, {
-        "description": null,
-        "label": "orca-mini",
-        "value": "orca-mini"
-      }, {
-        "description": null,
-        "label": "phi",
-        "value": "phi"
-      }, {
-        "description": null,
-        "label": "phi3",
-        "value": "phi3"
-      }, {
-        "description": null,
-        "label": "qwen2.5",
-        "value": "qwen2.5"
-      }, {
-        "description": null,
-        "label": "qwen2.5:3b",
-        "value": "qwen2.5:3b"
-      }, {
-        "description": null,
-        "label": "qwen2.5vl",
-        "value": "qwen2.5vl"
-      }, {
-        "description": null,
-        "label": "qwen3-embedding:8b",
-        "value": "qwen3-embedding:8b"
-      }, {
-        "description": null,
-        "label": "qwen3:0.6b",
-        "value": "qwen3:0.6b"
-      }, {
-        "description": null,
-        "label": "qwen3:1.7b",
-        "value": "qwen3:1.7b"
-      }, {
-        "description": null,
-        "label": "qwen3:4b",
-        "value": "qwen3:4b"
-      }, {
-        "description": null,
-        "label": "qwen3:4b-thinking",
-        "value": "qwen3:4b-thinking"
-      }, {
-        "description": null,
-        "label": "qwen3:7b",
-        "value": "qwen3:7b"
-      }, {
-        "description": null,
-        "label": "qwq",
-        "value": "qwq"
-      }, {
-        "description": null,
-        "label": "starling-lm",
-        "value": "starling-lm"
-      } ],
-      "optionsDataSource": null,
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -2354,7 +2088,7 @@
       "advancedOption": null,
       "controlType": "SELECT",
       "defaultValue": null,
-      "description": "ID of the model to use.",
+      "description": "ID of the embedding model to use. The list shows the embedding models installed on the Ollama server.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -2365,20 +2099,11 @@
       "metadata": { },
       "minLength": null,
       "name": "model",
-      "options": [ {
-        "description": null,
-        "label": "mxbai-embed-large",
-        "value": "mxbai-embed-large"
-      }, {
-        "description": null,
-        "label": "nomic-embed-text",
-        "value": "nomic-embed-text"
-      }, {
-        "description": null,
-        "label": "qwen3-embedding:8b",
-        "value": "qwen3-embedding:8b"
-      } ],
-      "optionsDataSource": null,
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,

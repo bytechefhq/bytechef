@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +42,17 @@ import org.springframework.ai.ollama.api.OllamaApi;
  */
 class OllamaUtilsTest {
 
+    private static final String TAGS_RESPONSE = """
+        {"models":[
+            {"name":"qwen3:8b","model":"qwen3:8b","size":5225388164,"digest":"500a1f067a9f",
+                "details":{"format":"gguf","family":"qwen3","parameter_size":"8.2B","quantization_level":"Q4_K_M"}},
+            {"name":"nomic-embed-text:latest","model":"nomic-embed-text:latest","size":274302450,
+                "digest":"0a109f422b47","details":{"format":"gguf","family":"nomic-bert","parameter_size":"137M"}},
+            {"name":"llama3.2:1b","model":"llama3.2:1b","size":1321098329,"digest":"baf6a787fdff",
+                "details":{"format":"gguf","family":"llama","parameter_size":"1.2B"}}
+        ]}
+        """;
+
     private final AtomicReference<String> authorizationHeaderReference = new AtomicReference<>();
     private HttpServer httpServer;
 
@@ -51,7 +64,7 @@ class OllamaUtilsTest {
             authorizationHeaderReference.set(exchange.getRequestHeaders()
                 .getFirst("Authorization"));
 
-            byte[] body = "{\"models\":[]}".getBytes(StandardCharsets.UTF_8);
+            byte[] body = TAGS_RESPONSE.getBytes(StandardCharsets.UTF_8);
 
             exchange.getResponseHeaders()
                 .add("Content-Type", "application/json");
@@ -101,6 +114,38 @@ class OllamaUtilsTest {
         ollamaApi.listModels();
 
         assertNull(authorizationHeaderReference.get());
+    }
+
+    @Test
+    void testGetModelOptionsListsChatModelsFromServer() throws Exception {
+        assertEquals(List.of("llama3.2:1b", "qwen3:8b"), getModelOptionValues(false));
+    }
+
+    @Test
+    void testGetModelOptionsListsEmbeddingModelsFromServer() throws Exception {
+        assertEquals(List.of("nomic-embed-text:latest"), getModelOptionValues(true));
+    }
+
+    @Test
+    void testGetModelOptionsSendsBearerToken() throws Exception {
+        OllamaUtils.getModelOptions(false)
+            .apply(
+                MockParametersFactory.create(Map.of()),
+                MockParametersFactory.create(Map.of(URL, getServerUrl(), TOKEN, "secret-token")), Map.of(), null,
+                null);
+
+        assertEquals("Bearer secret-token", authorizationHeaderReference.get());
+    }
+
+    private List<String> getModelOptionValues(boolean embeddingModels) throws Exception {
+        List<? extends Option<String>> options = OllamaUtils.getModelOptions(embeddingModels)
+            .apply(
+                MockParametersFactory.create(Map.of()), MockParametersFactory.create(Map.of(URL, getServerUrl())),
+                Map.of(), null, null);
+
+        return options.stream()
+            .map(Option::getValue)
+            .toList();
     }
 
     private String getServerUrl() {
