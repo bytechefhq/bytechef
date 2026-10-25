@@ -31,6 +31,7 @@ import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
 import com.bytechef.platform.component.log.JdbcLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
+import com.bytechef.platform.coordinator.lock.SingleCoordinatorLock;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -196,6 +197,8 @@ class ServerApplicationIntTest {
         void testContextLoadsInCommunityEdition() {
             assertThat(communityEditionApplicationContext.getBeanNamesForType(WorkspaceScopeCacheService.class))
                 .isEmpty();
+            assertThat(communityEditionApplicationContext.getBeanNamesForType(SingleCoordinatorLock.class))
+                .isNotEmpty();
         }
     }
 
