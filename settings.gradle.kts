@@ -575,9 +575,7 @@ include("sdks:backend:automation:project-api")
 
 // EE
 
-include("server:ee:apps:ai-copilot-app")
 include("server:ee:apps:api-gateway-app")
-include("server:ee:apps:config-server-app")
 include("server:ee:apps:configuration-app")
 include("server:ee:apps:connection-app")
 include("server:ee:apps:coordinator-app")
