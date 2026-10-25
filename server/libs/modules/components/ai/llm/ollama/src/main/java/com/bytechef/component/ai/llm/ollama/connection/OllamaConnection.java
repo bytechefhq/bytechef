@@ -18,6 +18,7 @@ package com.bytechef.component.ai.llm.ollama.connection;
 
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -39,7 +40,13 @@ public final class OllamaConnection {
                 .properties(
                     string(URL)
                         .label("URL")
-                        .description("URL to your Ollama server")));
+                        .description("URL to your Ollama server"),
+                    string(TOKEN)
+                        .label("Token")
+                        .description(
+                            "Bearer token sent with every request, for an Ollama server behind an authenticating " +
+                                "proxy. Leave empty for a local Ollama server.")
+                        .required(false)));
 
     private OllamaConnection() {
     }
