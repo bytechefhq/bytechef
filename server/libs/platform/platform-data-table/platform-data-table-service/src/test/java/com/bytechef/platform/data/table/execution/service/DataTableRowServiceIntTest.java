@@ -1454,7 +1454,8 @@ class DataTableRowServiceIntTest {
             }
         };
 
-        return new DataTableRowServiceImpl(applicationEventPublisher, new JdbcTemplate(h2ReportingDataSource));
+        return new DataTableRowServiceImpl(
+            applicationEventPublisher, new JdbcTemplate(h2ReportingDataSource), mock(DataTableStorageService.class));
     }
 
     private DataTableRow deletedRow() {

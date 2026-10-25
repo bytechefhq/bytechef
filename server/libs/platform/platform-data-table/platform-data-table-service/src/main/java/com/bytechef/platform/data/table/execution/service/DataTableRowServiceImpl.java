@@ -21,6 +21,7 @@ import com.bytechef.commons.util.DateUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -69,6 +71,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -117,16 +120,22 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
             .withResolverStyle(ResolverStyle.STRICT)
     };
+    private static final int ESTIMATED_ROW_OVERHEAD_BYTES = 64;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DataTableStorageService dataTableStorageService;
     private final JdbcTemplate jdbcTemplate;
 
     private Boolean returningSupported;
 
     @SuppressFBWarnings("EI")
-    public DataTableRowServiceImpl(ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate) {
+    public DataTableRowServiceImpl(
+        ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate,
+        DataTableStorageService dataTableStorageService) {
+
         this.applicationEventPublisher = applicationEventPublisher;
         this.jdbcTemplate = jdbcTemplate;
+        this.dataTableStorageService = dataTableStorageService;
     }
 
     /**
@@ -322,6 +331,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @Transactional
     public void importCsv(String baseName, String csv, long environmentId) {
+        dataTableStorageService.checkWithinLimit(
+            csv == null ? 0 : csv.getBytes(StandardCharsets.UTF_8).length);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -441,6 +453,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+        dataTableStorageService.checkWithinLimit(estimateRowBytes(values));
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -626,6 +640,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+        checkUpdateWithinLimit(values, () -> getRow(baseName, id, environmentId));
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -1450,6 +1466,70 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         Assert.isTrue(normalizedName.matches("[a-z_][a-z0-9_]*"), "Invalid identifier: " + identifier);
 
         return '"' + normalizedName + '"';
+    }
+
+    private Object getValueCaseInsensitive(Map<String, Object> values, String columnName) {
+        if (values.containsKey(columnName)) {
+            return values.get(columnName);
+        }
+
+        String lowerCaseColumnName = columnName.toLowerCase(Locale.ROOT);
+
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            String key = entry.getKey();
+
+            if (lowerCaseColumnName.equals(key.toLowerCase(Locale.ROOT))) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
+    }
+
+    private void checkUpdateWithinLimit(
+        Map<String, Object> values, Supplier<DataTableRow> currentDataTableRowSupplier) {
+
+        long incomingBytes = estimateValuesBytes(values);
+
+        try {
+            dataTableStorageService.checkWithinLimit(incomingBytes);
+        } catch (DataTableStorageLimitExceededException dataTableStorageLimitExceededException) {
+            DataTableRow currentDataTableRow = currentDataTableRowSupplier.get();
+
+            if (currentDataTableRow == null) {
+                throw dataTableStorageLimitExceededException;
+            }
+
+            Map<String, Object> currentValues = new HashMap<>();
+
+            for (String columnName : values.keySet()) {
+                currentValues.put(columnName, getValueCaseInsensitive(currentDataTableRow.values(), columnName));
+            }
+
+            long growthBytes = incomingBytes - estimateValuesBytes(currentValues);
+
+            if (growthBytes > 0) {
+                dataTableStorageService.checkWithinLimit(growthBytes);
+            }
+        }
+    }
+
+    private static long estimateRowBytes(Map<String, Object> values) {
+        return ESTIMATED_ROW_OVERHEAD_BYTES + estimateValuesBytes(values);
+    }
+
+    private static long estimateValuesBytes(Map<String, Object> values) {
+        long estimatedBytes = 0;
+
+        for (Object value : values.values()) {
+            if (value != null) {
+                String stringValue = String.valueOf(value);
+
+                estimatedBytes += stringValue.getBytes(StandardCharsets.UTF_8).length;
+            }
+        }
+
+        return estimatedBytes;
     }
 
     private static DataTableRow toDataTableRow(ResultSet resultSet, List<String> columnNames) throws SQLException {
