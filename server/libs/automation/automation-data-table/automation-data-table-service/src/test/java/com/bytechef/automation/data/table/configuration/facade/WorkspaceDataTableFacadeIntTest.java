@@ -17,16 +17,22 @@
 package com.bytechef.automation.data.table.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.data.table.config.AutomationDataTableIntTestConfiguration;
 import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
 import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +55,16 @@ class WorkspaceDataTableFacadeIntTest {
     private static final List<ColumnSpec> COLUMN_SPECS = List.of(new ColumnSpec("title", ColumnType.STRING));
 
     @Autowired
+    private ApplicationProperties applicationProperties;
+
+    @Autowired
+    private DataTableRowService dataTableRowService;
+
+    @Autowired
     private DataTableService dataTableService;
+
+    @Autowired
+    private DataTableStorageService dataTableStorageService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -60,8 +75,14 @@ class WorkspaceDataTableFacadeIntTest {
     @Autowired
     private WorkspaceDataTableService workspaceDataTableService;
 
+    private long originalMaxSizeBytes;
+
     @BeforeEach
     void beforeEach() {
+        ApplicationProperties.DataTable dataTable = applicationProperties.getDataTable();
+
+        originalMaxSizeBytes = dataTable.getMaxSizeBytes();
+
         dropTestTables();
 
         for (long workspaceId : List.of(WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
@@ -75,6 +96,8 @@ class WorkspaceDataTableFacadeIntTest {
 
     @AfterEach
     void afterEach() {
+        setLimit(originalMaxSizeBytes);
+
         dropTestTables();
 
         for (long workspaceId : List.of(WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
@@ -142,6 +165,25 @@ class WorkspaceDataTableFacadeIntTest {
     }
 
     @Test
+    void testDuplicateTableIsRejectedWhenTheCopyWouldExceedTheStorageLimit() {
+        workspaceDataTableFacade.createTable("original", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow("original", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+
+        long originalDataTableId = dataTableService.getIdByBaseName("original");
+
+        limitStorageToLiveBytesPlus(0);
+
+        assertThatThrownBy(
+            () -> workspaceDataTableFacade.duplicateTable(originalDataTableId, "copy", DEV_ENVIRONMENT_ID))
+                .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::baseName)
+            .containsExactly("original");
+    }
+
+    @Test
     void testDuplicateTableAssignsCopyToSourceWorkspace() {
         workspaceDataTableFacade.createTable("events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
@@ -205,6 +247,30 @@ class WorkspaceDataTableFacadeIntTest {
         assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
             .extracting(DataTableInfo::baseName)
             .containsExactly("events");
+    }
+
+    private void limitStorageToLiveBytesPlus(long headroomBytes) {
+        List<String> physicalTableNames = jdbcTemplate.queryForList(
+            "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() AND tablename LIKE 'dt\\_%' " +
+                "ESCAPE '\\'",
+            String.class);
+
+        long liveBytes = physicalTableNames.stream()
+            .mapToLong(physicalTableName -> {
+                String[] physicalTableNameParts = physicalTableName.split("_", 3);
+
+                return dataTableStorageService.getTableBytes(
+                    physicalTableNameParts[2], Long.parseLong(physicalTableNameParts[1]));
+            })
+            .sum();
+
+        setLimit(liveBytes + headroomBytes);
+    }
+
+    private void setLimit(long maxSizeBytes) {
+        ApplicationProperties.DataTable dataTable = applicationProperties.getDataTable();
+
+        dataTable.setMaxSizeBytes(maxSizeBytes);
     }
 
     private void dropTestTables() {

@@ -37,6 +37,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import org.springframework.stereotype.Component;
 
@@ -51,11 +52,11 @@ public class DataTableComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition;
 
     public DataTableComponentHandler(
-        DataTableService dataTableService, DataTableRowService dataTableRowService,
-        DataTableWebhookService dataTableWebhookService) {
+        DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
+        DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService) {
 
         this.componentDefinition = new DataTableComponentDefinitionImpl(
-            dataTableService, dataTableRowService, dataTableWebhookService);
+            dataTableService, dataTableRowFacade, dataTableRowService, dataTableWebhookService);
     }
 
     @Override
@@ -66,21 +67,22 @@ public class DataTableComponentHandler implements ComponentHandler {
     private static class DataTableComponentDefinitionImpl extends AbstractComponentDefinitionWrapper {
 
         public DataTableComponentDefinitionImpl(
-            DataTableService dataTableService, DataTableRowService dataTableRowService,
-            DataTableWebhookService dataTableWebhookService) {
+            DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
+            DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService) {
 
-            super(buildDefinition(dataTableService, dataTableRowService, dataTableWebhookService));
+            super(buildDefinition(dataTableService, dataTableRowFacade, dataTableRowService, dataTableWebhookService));
         }
 
         private static ComponentDefinition buildDefinition(
-            DataTableService dataTableService, DataTableRowService dataTableRowService,
-            DataTableWebhookService dataTableWebhookService) {
+            DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
+            DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService) {
 
             ActionDefinition createRecordsAction = DataTableCreateRecordsAction.of(
                 dataTableService, dataTableRowService);
             ActionDefinition deleteRecordsAction = DataTableDeleteRecordsAction.of(
                 dataTableService, dataTableRowService);
-            ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(dataTableService, dataTableRowService);
+            ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(
+                dataTableService, dataTableRowFacade, dataTableRowService);
             ActionDefinition updateRecordsAction = DataTableUpdateRecordsAction.of(
                 dataTableService, dataTableRowService);
             ActionDefinition getRecordAction = DataTableGetRecordAction.of(dataTableService, dataTableRowService);

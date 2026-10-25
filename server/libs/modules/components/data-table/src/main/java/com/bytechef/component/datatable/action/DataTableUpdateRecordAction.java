@@ -34,6 +34,7 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -47,19 +48,25 @@ import java.util.Objects;
  */
 public class DataTableUpdateRecordAction {
 
-    private final DataTableService dataTableService;
+    private final DataTableRowFacade dataTableRowFacade;
     private final DataTableRowService dataTableRowService;
+    private final DataTableService dataTableService;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
+        DataTableRowService dataTableRowService) {
 
-        return new DataTableUpdateRecordAction(dataTableService, dataTableRowService).build();
+        return new DataTableUpdateRecordAction(dataTableService, dataTableRowFacade, dataTableRowService).build();
     }
 
-    private DataTableUpdateRecordAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
-        this.dataTableService = dataTableService;
+    private DataTableUpdateRecordAction(
+        DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
+        DataTableRowService dataTableRowService) {
+
+        this.dataTableRowFacade = dataTableRowFacade;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableService = dataTableService;
     }
 
     private ModifiableActionDefinition build() {
@@ -118,7 +125,7 @@ public class DataTableUpdateRecordAction {
         Map<String, Object> values = (Map<String, Object>) inputParameters.getRequired(VALUES, Map.class);
 
         return DataTableUtils.flattenRow(
-            dataTableRowService.updateRow(
+            dataTableRowFacade.updateRow(
                 baseName, id, values, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

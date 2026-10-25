@@ -27,6 +27,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import java.util.Map;
  */
 abstract class AbstractDataTableActionTest {
 
+    protected final DataTableRowFacade dataTableRowFacade = mock(DataTableRowFacade.class);
     protected final DataTableRowService dataTableRowService = mock(DataTableRowService.class);
     protected final DataTableService dataTableService = mock(DataTableService.class);
 
