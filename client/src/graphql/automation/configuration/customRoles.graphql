@@ -1,8 +1,9 @@
-query CustomRoles($workspaceId: ID) {
-    customRoles(workspaceId: $workspaceId) {
+query CustomRoles($workspaceId: ID, $side: PermissionScopeSide) {
+    customRoles(workspaceId: $workspaceId, side: $side) {
         id
         name
         description
         scopes
+        side
     }
 }
