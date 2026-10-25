@@ -18,8 +18,11 @@ package com.bytechef.platform.ai.provider.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
@@ -27,14 +30,18 @@ import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiProviderDTO;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -60,6 +67,38 @@ class AiProviderFacadeTest {
         applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
         facade = new AiProviderFacadeImpl(componentDefinitionService, propertyService, applicationProperties);
+    }
+
+    @Test
+    void testUpdateAiProviderEnabledCreatesMissingProperty() {
+        String key = Provider.OLLAMA.getKey();
+
+        when(propertyService.fetchProperty(key, Scope.PLATFORM, null, (long) ENVIRONMENT))
+            .thenReturn(Optional.empty());
+
+        facade.updateAiProvider(Provider.OLLAMA.getId(), true, ENVIRONMENT);
+
+        InOrder inOrder = inOrder(propertyService);
+
+        inOrder.verify(propertyService)
+            .save(key, Map.of(), Scope.PLATFORM, null, (long) ENVIRONMENT);
+        inOrder.verify(propertyService)
+            .update(key, true, Scope.PLATFORM, null, (long) ENVIRONMENT);
+    }
+
+    @Test
+    void testUpdateAiProviderEnabledKeepsExistingPropertyValues() {
+        String key = Provider.OLLAMA.getKey();
+
+        when(propertyService.fetchProperty(key, Scope.PLATFORM, null, (long) ENVIRONMENT))
+            .thenReturn(Optional.of(new Property()));
+
+        facade.updateAiProvider(Provider.OLLAMA.getId(), false, ENVIRONMENT);
+
+        verify(propertyService, never()).save(
+            ArgumentMatchers.anyString(), ArgumentMatchers.anyMap(), ArgumentMatchers.any(), ArgumentMatchers.any(),
+            ArgumentMatchers.anyLong());
+        verify(propertyService).update(key, false, Scope.PLATFORM, null, (long) ENVIRONMENT);
     }
 
     @Test
