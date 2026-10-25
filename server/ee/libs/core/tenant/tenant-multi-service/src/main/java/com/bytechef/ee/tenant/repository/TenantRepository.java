@@ -27,7 +27,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -54,6 +56,7 @@ public class TenantRepository {
 
     public String findTenantIdByOrganizationName(String organizationName) {
         List<String[]> tenantIds = findTenantIdsByQueryWithParam(
+            "organization",
             tenantId -> "SELECT '%s' FROM %s.organization c WHERE UPPER(c.name) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             organizationName,
@@ -106,6 +109,7 @@ public class TenantRepository {
 
     public List<String> findTenantIdsByUserEmail(String email) {
         List<String[]> tenantIds = findTenantIdsByQueryWithParam(
+            "user",
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.email) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             email,
@@ -118,6 +122,7 @@ public class TenantRepository {
 
     public List<String> findTenantIdsByUserLogin(String login) {
         List<String[]> tenantIds = findTenantIdsByQueryWithParam(
+            "user",
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.login) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             login,
@@ -130,8 +135,11 @@ public class TenantRepository {
 
     public List<Tenant> findTenants() {
         List<String[]> rows =
-            findTenantIdsByColumnNames(tenantId -> "SELECT '%s', c.id, c.name FROM %s.company c".formatted(
-                tenantId, TenantUtils.getDatabaseSchema(tenantId)), 3);
+            findTenantIdsByColumnNames(
+                "company",
+                tenantId -> "SELECT '%s', c.id, c.name FROM %s.company c".formatted(
+                    tenantId, TenantUtils.getDatabaseSchema(tenantId)),
+                3);
 
         return rows.stream()
             .map(row -> {
@@ -213,6 +221,7 @@ public class TenantRepository {
 
     public String findTenantIdByUserActivationKey(String activationKey) {
         List<String[]> tenantIds = findTenantIdsByQueryWithParam(
+            "user",
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.activation_key) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             activationKey,
@@ -232,6 +241,7 @@ public class TenantRepository {
 
     public String findTenantIdByUserResetKey(String resetKey) {
         List<String[]> tenantIds = findTenantIdsByQueryWithParam(
+            "user",
             tenantId -> "SELECT '%s' FROM %s.user u WHERE UPPER(u.reset_key) = UPPER(?)".formatted(
                 tenantId, TenantUtils.getDatabaseSchema(tenantId)),
             resetKey,
@@ -265,10 +275,10 @@ public class TenantRepository {
      */
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     protected List<String[]> findTenantIdsByQueryWithParam(
-        Function<String, String> queryTemplate, String parameter, int columns) {
+        String tableName, Function<String, String> queryTemplate, String parameter, int columns) {
 
         List<String[]> rows = new ArrayList<>();
-        List<String> tenantIds = findTenantIds();
+        List<String> tenantIds = findTenantIdsWithTable(tableName);
 
         if (tenantIds.isEmpty()) {
             return Collections.emptyList();
@@ -311,11 +321,13 @@ public class TenantRepository {
      * does not support parameterized schema names in queries.
      */
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
-    protected List<String[]> findTenantIdsByColumnNames(Function<String, String> query, int columns) {
+    protected List<String[]> findTenantIdsByColumnNames(
+        String tableName, Function<String, String> query, int columns) {
+
         List<String[]> rows = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
-            List<String> tenantIds = findTenantIds();
+            List<String> tenantIds = findTenantIdsWithTable(tableName);
 
             if (tenantIds.isEmpty()) {
                 return Collections.emptyList();
@@ -349,6 +361,43 @@ public class TenantRepository {
         }
 
         return rows;
+    }
+
+    private List<String> findTenantIdsWithTable(String tableName) {
+        List<String> tenantIds = new ArrayList<>();
+        List<String> schemaNames = findTenantIds().stream()
+            .map(TenantUtils::getDatabaseSchema)
+            .toList();
+
+        if (schemaNames.isEmpty()) {
+            return tenantIds;
+        }
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT table_schema FROM information_schema.tables WHERE table_name = ? AND table_schema = ANY (?)")) {
+
+            preparedStatement.setString(1, tableName);
+            preparedStatement.setArray(2, connection.createArrayOf("varchar", schemaNames.toArray()));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                Set<String> readySchemaNames = new HashSet<>();
+
+                while (resultSet.next()) {
+                    readySchemaNames.add(resultSet.getString(1));
+                }
+
+                for (String schemaName : schemaNames) {
+                    if (readySchemaNames.contains(schemaName)) {
+                        tenantIds.add(getTenantId(schemaName));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        return tenantIds;
     }
 
     private static String getTenantId(String schemaName) {
