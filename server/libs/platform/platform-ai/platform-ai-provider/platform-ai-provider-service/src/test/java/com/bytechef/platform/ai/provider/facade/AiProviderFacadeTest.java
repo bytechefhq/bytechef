@@ -150,10 +150,26 @@ class AiProviderFacadeTest {
         when(propertyService.fetchProperty(
             Provider.OLLAMA.getKey(), Scope.PLATFORM, null, (long) ENVIRONMENT)).thenReturn(Optional.of(property));
 
-        facade.updateAiProvider(Provider.OLLAMA.getId(), "", "", ENVIRONMENT);
+        facade.updateAiProvider(Provider.OLLAMA.getId(), null, "", ENVIRONMENT);
 
         verify(propertyService).save(
             Provider.OLLAMA.getKey(), Map.of("apiKey", "secret-token"), Scope.PLATFORM, null, (long) ENVIRONMENT);
+    }
+
+    @Test
+    void testUpdateAiProviderRemovesSavedApiKeyWhenBlankApiKeyIsSent() {
+        Property property = new Property();
+
+        property.setValue(Map.of("apiKey", "secret-token", "url", "http://ollama.internal:11434"));
+
+        when(propertyService.fetchProperty(
+            Provider.OLLAMA.getKey(), Scope.PLATFORM, null, (long) ENVIRONMENT)).thenReturn(Optional.of(property));
+
+        facade.updateAiProvider(Provider.OLLAMA.getId(), "", "http://ollama.internal:11434", ENVIRONMENT);
+
+        verify(propertyService).save(
+            Provider.OLLAMA.getKey(), Map.of("url", "http://ollama.internal:11434"), Scope.PLATFORM, null,
+            (long) ENVIRONMENT);
     }
 
     @Test
