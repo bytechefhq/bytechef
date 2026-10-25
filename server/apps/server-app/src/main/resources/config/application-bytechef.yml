@@ -75,7 +75,7 @@ bytechef:
     # separately by bytechef.worker.task.*.
     concurrency-limit: 200
   cache:
-    # Cache provider (redis | caffeine) default: caffeine
+    # Cache provider (caffeine) default: caffeine
     provider: caffeine
   coordinator:
     trigger:

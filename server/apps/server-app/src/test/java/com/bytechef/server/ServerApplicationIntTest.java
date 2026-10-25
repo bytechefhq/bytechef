@@ -60,6 +60,8 @@ import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.support.NoOpCache;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -77,6 +79,8 @@ import org.springframework.test.context.TestPropertySource;
     PostgreSQLContainerConfiguration.class, ServerApplicationIntTest.ServerApplicationIntTestConfiguration.class
 })
 class ServerApplicationIntTest {
+
+    private static final String WORKFLOW_CACHE = "com.bytechef.atlas.configuration.service.WorkflowService.workflow";
 
     private static final Class<?>[] WEBHOOK_ENDPOINT_TYPES = {
         WebhookTriggerController.class, CallbackController.class, ApprovalController.class,
@@ -237,6 +241,32 @@ class ServerApplicationIntTest {
         @Test
         void testCoordinatorControllersAreAbsent() {
             assertThat(applicationContext.getBeanNamesForType(WorkflowApiController.class)).isEmpty();
+        }
+
+        @Test
+        void testWorkflowsAreCached() {
+            CacheManager cacheManager = applicationContext.getBean(CacheManager.class);
+
+            assertThat(cacheManager.getCache(WORKFLOW_CACHE)).isNotInstanceOf(NoOpCache.class);
+        }
+    }
+
+    @Nested
+    @TestPropertySource(
+        properties = {
+            "bytechef.edition=ce", "bytechef.coordinator.enabled=false", "bytechef.worker.enabled=false",
+            "spring.quartz.scheduler-name=communityEditionWebhookNodeScheduler"
+        })
+    class CommunityEditionWebhookNode {
+
+        @Autowired
+        private ApplicationContext applicationContext;
+
+        @Test
+        void testWorkflowsAreNotCached() {
+            CacheManager cacheManager = applicationContext.getBean(CacheManager.class);
+
+            assertThat(cacheManager.getCache(WORKFLOW_CACHE)).isInstanceOf(NoOpCache.class);
         }
     }
 
