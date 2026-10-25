@@ -10,8 +10,10 @@ package com.bytechef.ee.automation.configuration.service;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.audit.EmbeddedUserAuditEvents;
 import com.bytechef.ee.automation.configuration.audit.EmbeddedUserAuditMapper;
+import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
+import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -22,9 +24,11 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +44,7 @@ import org.springframework.util.Assert;
 @ConditionalOnEEVersion
 public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
+    private final CustomRoleRepository customRoleRepository;
     private final EmbeddedUserRepository embeddedUserRepository;
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final PermissionService permissionService;
@@ -47,9 +52,10 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
     @SuppressFBWarnings("EI")
     public EmbeddedUserServiceImpl(
-        EmbeddedUserRepository embeddedUserRepository, PermissionScopeRegistry permissionScopeRegistry,
-        PermissionService permissionService, UserService userService) {
+        CustomRoleRepository customRoleRepository, EmbeddedUserRepository embeddedUserRepository,
+        PermissionScopeRegistry permissionScopeRegistry, PermissionService permissionService, UserService userService) {
 
+        this.customRoleRepository = customRoleRepository;
         this.embeddedUserRepository = embeddedUserRepository;
         this.permissionScopeRegistry = permissionScopeRegistry;
         this.permissionService = permissionService;
@@ -60,18 +66,30 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole) {
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
+        return addEmbeddedUser(userId, embeddedRole, null);
+    }
+
+    @Override
+    public EmbeddedUser addEmbeddedUser(
+        long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        validateRoleSelection(embeddedRole, customRoleId);
+
         embeddedUserRepository.lockEmbeddedUsers(userId);
 
         userService.getUser(userId);
 
-        validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
+        validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole, customRoleId);
 
         if (embeddedUserRepository.existsByUserId(userId)) {
             throw new ConfigurationException(
                 "User " + userId + " is already an embedded member", WorkspaceUserErrorType.ALREADY_MEMBER);
         }
 
-        EmbeddedUser savedEmbeddedUser = embeddedUserRepository.save(EmbeddedUser.forRole(userId, embeddedRole));
+        EmbeddedUser savedEmbeddedUser = embeddedUserRepository.save(
+            customRoleId == null
+                ? EmbeddedUser.forRole(userId, embeddedRole)
+                : EmbeddedUser.forCustomRole(userId, customRoleId));
 
         permissionService.evictEmbeddedScopeCache(userId);
 
@@ -137,14 +155,13 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
             }
 
             WorkspaceRole embeddedRole = removedEmbeddedUser.getEmbeddedRole();
+            Long customRoleId = removedEmbeddedUser.getCustomRoleId();
 
-            Assert.state(embeddedRole != null, "An embedded membership must hold a built-in role");
-
-            validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
+            validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole, customRoleId);
 
             embeddedUserRepository.delete(removedEmbeddedUser);
 
-            embeddedUserRepository.save(EmbeddedUser.forRole(userId, embeddedRole));
+            embeddedUserRepository.save(copyRole(removedEmbeddedUser, userId, null));
         } else {
             Set<Environment> remainingAdminEnvironments = resolveAdminEnvironments(memberRows);
 
@@ -179,14 +196,24 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
 
     @Override
     public EmbeddedUser setEnvironmentRole(long userId, Environment environment, WorkspaceRole embeddedRole) {
-        Assert.notNull(environment, "'environment' must not be null");
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
+
+        return setEnvironmentRole(userId, environment, embeddedRole, null);
+    }
+
+    @Override
+    public EmbeddedUser setEnvironmentRole(
+        long userId, Environment environment, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        Assert.notNull(environment, "'environment' must not be null");
+
+        validateRoleSelection(embeddedRole, customRoleId);
 
         lockEmbeddedAdmins();
 
         embeddedUserRepository.lockEmbeddedUsers(userId);
 
-        validateGrantWithinCallerScopes(List.of(environment), embeddedRole);
+        validateGrantWithinCallerScopes(List.of(environment), embeddedRole, customRoleId);
 
         List<EmbeddedUser> memberRows = embeddedUserRepository.findAllByUserId(userId);
 
@@ -209,15 +236,11 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         if (implicitEmbeddedUser.isPresent()) {
             EmbeddedUser implicit = implicitEmbeddedUser.get();
 
-            WorkspaceRole implicitRole = implicit.getEmbeddedRole();
-
-            Assert.state(implicitRole != null, "An embedded membership must hold a built-in role");
-
             embeddedUserRepository.delete(implicit);
 
             for (Environment otherEnvironment : Environment.values()) {
                 if (otherEnvironment != environment) {
-                    embeddedUserRepository.save(EmbeddedUser.forRole(userId, implicitRole, otherEnvironment));
+                    embeddedUserRepository.save(copyRole(implicit, userId, otherEnvironment));
                 }
             }
         }
@@ -230,11 +253,14 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         if (existingEmbeddedUser.isPresent()) {
             EmbeddedUser embeddedUser = existingEmbeddedUser.get();
 
-            embeddedUser.assignRole(embeddedRole);
+            assignRole(embeddedUser, embeddedRole, customRoleId);
 
             savedEmbeddedUser = embeddedUserRepository.save(embeddedUser);
         } else {
-            savedEmbeddedUser = embeddedUserRepository.save(EmbeddedUser.forRole(userId, embeddedRole, environment));
+            savedEmbeddedUser = embeddedUserRepository.save(
+                customRoleId == null
+                    ? EmbeddedUser.forRole(userId, embeddedRole, environment)
+                    : EmbeddedUser.forCustomRole(userId, customRoleId, environment));
         }
 
         permissionService.evictEmbeddedScopeCache(userId);
@@ -246,6 +272,15 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
     public EmbeddedUser updateEmbeddedUserRole(long userId, WorkspaceRole embeddedRole) {
         Assert.notNull(embeddedRole, "'embeddedRole' must not be null");
 
+        return updateEmbeddedUserRole(userId, embeddedRole, null);
+    }
+
+    @Override
+    public EmbeddedUser updateEmbeddedUserRole(
+        long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        validateRoleSelection(embeddedRole, customRoleId);
+
         lockEmbeddedAdmins();
 
         embeddedUserRepository.lockEmbeddedUsers(userId);
@@ -253,19 +288,85 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
         EmbeddedUser embeddedUser = embeddedUserRepository.findByUserIdAndEnvironmentIsNull(userId)
             .orElseThrow(() -> missingEmbeddedWideMembership(userId));
 
-        validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole);
+        validateGrantWithinCallerScopes(List.of(Environment.values()), embeddedRole, customRoleId);
 
         validateEnvironmentsKeepAnAdmin(
             List.of(embeddedUser),
             embeddedRole == WorkspaceRole.ADMIN ? EnumSet.allOf(Environment.class) : Set.of());
 
-        embeddedUser.assignRole(embeddedRole);
+        assignRole(embeddedUser, embeddedRole, customRoleId);
 
         EmbeddedUser savedEmbeddedUser = embeddedUserRepository.save(embeddedUser);
 
         permissionService.evictEmbeddedScopeCache(userId);
 
         return savedEmbeddedUser;
+    }
+
+    private static void assignRole(
+        EmbeddedUser embeddedUser, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        if (customRoleId == null) {
+            embeddedUser.assignRole(embeddedRole);
+        } else {
+            embeddedUser.assignCustomRole(customRoleId);
+        }
+    }
+
+    private static EmbeddedUser copyRole(
+        EmbeddedUser embeddedUser, long userId, @Nullable Environment environment) {
+
+        Long customRoleId = embeddedUser.getCustomRoleId();
+
+        if (customRoleId != null) {
+            return EmbeddedUser.forCustomRole(userId, customRoleId, environment);
+        }
+
+        WorkspaceRole embeddedRole = embeddedUser.getEmbeddedRole();
+
+        Assert.state(embeddedRole != null, "An embedded membership must hold a built-in or a custom role");
+
+        return EmbeddedUser.forRole(userId, embeddedRole, environment);
+    }
+
+    private Set<String> resolveGrantedScopeNames(@Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+        if (customRoleId == null) {
+            Assert.state(embeddedRole != null, "An embedded membership must hold a built-in or a custom role");
+
+            return permissionScopeRegistry.getScopeNames(embeddedRole, PermissionScopeSide.EMBEDDED);
+        }
+
+        return resolveEmbeddedScopeNames(validateEmbeddedCustomRole(customRoleId));
+    }
+
+    private Set<String> resolveEmbeddedScopeNames(CustomRole customRole) {
+        Set<String> embeddedScopeNames = new HashSet<>(customRole.getScopeNames());
+
+        embeddedScopeNames.retainAll(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED));
+
+        return embeddedScopeNames;
+    }
+
+    private CustomRole validateEmbeddedCustomRole(long customRoleId) {
+        CustomRole customRole = customRoleRepository.findById(customRoleId)
+            .orElseThrow(() -> new ConfigurationException(
+                "Custom role " + customRoleId + " does not exist", WorkspaceUserErrorType.CUSTOM_ROLE_NOT_FOUND));
+
+        if (customRole.getSide() != PermissionScopeSide.EMBEDDED) {
+            throw new ConfigurationException(
+                "Custom role " + customRoleId + " is an automation role and cannot be assigned to an embedded member",
+                WorkspaceUserErrorType.CUSTOM_ROLE_SIDE_MISMATCH);
+        }
+
+        return customRole;
+    }
+
+    private void validateRoleSelection(@Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+        if ((embeddedRole == null) == (customRoleId == null)) {
+            throw new ConfigurationException(
+                "Exactly one of a built-in role or a custom role must be supplied",
+                WorkspaceUserErrorType.ROLE_SELECTION_INVALID);
+        }
     }
 
     private void lockEmbeddedAdmins() {
@@ -339,9 +440,10 @@ public class EmbeddedUserServiceImpl implements EmbeddedUserService {
             "User " + userId + " is not an embedded member", WorkspaceUserErrorType.NOT_MEMBER);
     }
 
-    private void validateGrantWithinCallerScopes(List<Environment> environments, WorkspaceRole embeddedRole) {
-        Set<String> grantedScopeNames =
-            permissionScopeRegistry.getScopeNames(embeddedRole, PermissionScopeSide.EMBEDDED);
+    private void validateGrantWithinCallerScopes(
+        List<Environment> environments, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        Set<String> grantedScopeNames = resolveGrantedScopeNames(embeddedRole, customRoleId);
 
         for (Environment environment : environments) {
             Set<String> callerScopeNames = permissionService.getMyEmbeddedScopes(environment);
