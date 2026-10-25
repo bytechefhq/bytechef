@@ -101,6 +101,8 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .isPresent())
             .findFirst()
             .ifPresent(workflowCrudRepository -> workflowCrudRepository.deleteById(id));
+
+        refreshCache(id);
     }
 
     @Override
@@ -258,12 +260,10 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         Cache.ValueWrapper workflowValueWrapper = workflowCache.get(tenantWorkflowCacheKey);
 
-        if (workflowValueWrapper != null) {
-            if (workflow == null) {
-                workflowCache.evictIfPresent(tenantWorkflowCacheKey);
-            } else {
-                workflowCache.put(tenantWorkflowCacheKey, workflow);
-            }
+        workflowCache.evict(tenantWorkflowCacheKey);
+
+        if (workflowValueWrapper != null && workflow != null) {
+            workflowCache.put(tenantWorkflowCacheKey, workflow);
         }
 
         String tenantWorkflowsCacheKey = TenantCacheKeyUtils.getKey(WORKFLOWS_CACHE);
@@ -271,6 +271,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         Cache workflowsCache = Validate.notNull(cacheManager.getCache(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
 
         Cache.ValueWrapper workflowsValueWrapper = workflowsCache.get(tenantWorkflowsCacheKey);
+
+        workflowsCache.evict(tenantWorkflowsCacheKey);
 
         if (workflowsValueWrapper != null) {
             @SuppressWarnings("unchecked")
@@ -367,6 +369,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         Cache.ValueWrapper workflowValueWrapper = workflowCache.get(tenantWorkflowCacheKey);
 
+        workflowCache.evict(tenantWorkflowCacheKey);
+
         if (workflowValueWrapper != null) {
             workflowCache.put(tenantWorkflowCacheKey, workflow);
         }
@@ -376,6 +380,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         Cache workflowsCache = Validate.notNull(cacheManager.getCache(WORKFLOWS_CACHE), WORKFLOWS_CACHE);
 
         Cache.ValueWrapper workflowsValueWrapper = workflowsCache.get(tenantWorkflowsCacheKey);
+
+        workflowsCache.evict(tenantWorkflowsCacheKey);
 
         if (workflowsValueWrapper != null) {
             @SuppressWarnings("unchecked")

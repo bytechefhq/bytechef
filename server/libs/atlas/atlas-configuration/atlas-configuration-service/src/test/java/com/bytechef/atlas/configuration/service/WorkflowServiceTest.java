@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -29,8 +30,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,11 +53,12 @@ class WorkflowServiceTest {
 
     private static final String WORKFLOW_ID = "workflow-1";
 
+    private Cache cache;
     private CacheManager cacheManager;
 
     @BeforeEach
     void beforeEach() {
-        Cache cache = mock(Cache.class);
+        cache = mock(Cache.class);
 
         when(cache.get(anyString())).thenReturn(null);
 
@@ -179,5 +183,44 @@ class WorkflowServiceTest {
         assertSame(workflow, result.get());
 
         verify(workflowRepository, never()).findById(anyString());
+    }
+
+    @Test
+    void testUpdateEvictsWorkflowEntriesNotCachedLocally() {
+        WorkflowCrudRepository workflowCrudRepository = mockWorkflowCrudRepository();
+
+        WorkflowServiceImpl workflowService = new WorkflowServiceImpl(
+            cacheManager, List.of(workflowCrudRepository), List.of(workflowCrudRepository));
+
+        workflowService.update(WORKFLOW_ID, "{\"tasks\": []}", 0);
+
+        verifyWorkflowEntriesEvicted();
+    }
+
+    @Test
+    void testDeleteEvictsWorkflowEntries() {
+        WorkflowCrudRepository workflowCrudRepository = mockWorkflowCrudRepository();
+
+        WorkflowServiceImpl workflowService = new WorkflowServiceImpl(
+            cacheManager, List.of(workflowCrudRepository), List.of(workflowCrudRepository));
+
+        workflowService.delete(WORKFLOW_ID);
+
+        verifyWorkflowEntriesEvicted();
+    }
+
+    private static WorkflowCrudRepository mockWorkflowCrudRepository() {
+        WorkflowCrudRepository workflowCrudRepository = mock(WorkflowCrudRepository.class);
+
+        when(workflowCrudRepository.findById(WORKFLOW_ID))
+            .thenReturn(Optional.of(new Workflow(WORKFLOW_ID, "{\"tasks\": []}", Format.JSON)));
+        when(workflowCrudRepository.getSourceType()).thenReturn(SourceType.JDBC);
+
+        return workflowCrudRepository;
+    }
+
+    private void verifyWorkflowEntriesEvicted() {
+        verify(cache, atLeastOnce()).evict(TenantCacheKeyUtils.getKey(WORKFLOW_ID));
+        verify(cache, atLeastOnce()).evict(TenantCacheKeyUtils.getKey(WorkflowService.class.getName() + ".workflows"));
     }
 }
