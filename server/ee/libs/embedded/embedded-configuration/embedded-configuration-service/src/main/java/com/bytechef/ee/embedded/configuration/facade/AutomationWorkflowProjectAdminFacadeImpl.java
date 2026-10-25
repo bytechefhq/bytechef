@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCateg
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @PreAuthorize("isTenantAdmin()")
 public class AutomationWorkflowProjectAdminFacadeImpl implements AutomationWorkflowProjectAdminFacade {
 
