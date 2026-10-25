@@ -107,6 +107,25 @@ class AiProviderFacadeIntTest {
             }
         });
 
+        ollamaServer.createContext("/secured/api/tags", exchange -> {
+            byte[] body = TAGS.getBytes(StandardCharsets.UTF_8);
+
+            if (!"Bearer secret-token".equals(exchange.getRequestHeaders()
+                .getFirst("Authorization"))) {
+
+                exchange.sendResponseHeaders(401, -1);
+                exchange.close();
+
+                return;
+            }
+
+            exchange.sendResponseHeaders(200, body.length);
+
+            try (OutputStream outputStream = exchange.getResponseBody()) {
+                outputStream.write(body);
+            }
+        });
+
         ollamaServer.start();
 
         List<ComponentDefinition> componentDefinitions = Arrays.stream(Provider.values())
@@ -187,6 +206,18 @@ class AiProviderFacadeIntTest {
         assertThat(ollama.models()).containsExactly(
             new AiProviderCatalogItemDTO.Model("qwen3:8b", "qwen3:8b"),
             new AiProviderCatalogItemDTO.Model("deepseek-v4-pro:cloud", "deepseek-v4-pro:cloud"));
+    }
+
+    @Test
+    void testOllamaDefaultChatModelUsesApiKeyToListInstalledModels() {
+        String url = "http://localhost:" + ollamaServer.getAddress()
+            .getPort() + "/secured";
+
+        aiProviderFacade.updateAiProvider(Provider.OLLAMA.getId(), "secret-token", url, ENVIRONMENT);
+
+        AiDefaultModelDTO defaultModel = aiProviderFacade.getAiDefaultChatModel(ENVIRONMENT);
+
+        assertThat(defaultModel).isEqualTo(new AiDefaultModelDTO(Provider.OLLAMA.getKey(), "qwen3:8b"));
     }
 
     private void enableOllama() {
