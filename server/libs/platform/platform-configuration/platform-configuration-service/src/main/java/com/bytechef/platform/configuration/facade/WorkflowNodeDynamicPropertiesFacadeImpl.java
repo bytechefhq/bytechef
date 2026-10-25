@@ -184,7 +184,8 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 return triggerDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.name(), workflowNodeType.version(),
                     workflowNodeType.operation(), propertyName,
-                    workflowTrigger.evaluateParameters(inputs, evaluator, true), lookupDependsOnPaths, connectionId);
+                    workflowTrigger.evaluateParameters(inputs, evaluator, true), lookupDependsOnPaths, connectionId,
+                    workflowId);
             })
             .orElseGet(() -> {
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);

@@ -114,12 +114,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection) {
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection,
+        @Nullable String workflowId) {
 
         try {
             WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, componentConnection);
             TriggerContext triggerContext = contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
+                componentName, componentVersion, triggerName, null, null, workflowId, componentConnection, null, null,
+                true);
 
             com.bytechef.component.definition.TriggerDefinition.PropertiesFunction propertiesFunction =
                 getComponentPropertiesFunction(
@@ -209,8 +211,24 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable String searchText,
         @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
+        return executeOptions(
+            componentName, componentVersion, triggerName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnection, null);
+    }
+
+    @Override
+    @WithTokenRefresh(
+        errorTypeClass = TriggerDefinitionErrorType.class,
+        errorTypeField = "OPTIONS_FAILED")
+    public List<Option> executeOptions(
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        String propertyName, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        @Nullable String searchText, @ConnectionParam @Nullable ComponentConnection componentConnection,
+        @Nullable String workflowId) {
+
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
+            componentName, componentVersion, triggerName, null, null, workflowId, componentConnection, null, null,
+            true);
 
         return doExecuteOptions(
             componentName, componentVersion, triggerName, inputParameters,
@@ -223,8 +241,19 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @ComponentNameParam String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection) {
 
+        return executeOutput(componentName, componentVersion, triggerName, inputParameters, componentConnection, null);
+    }
+
+    @Override
+    @WithTokenRefresh
+    public @Nullable OutputResponse executeOutput(
+        @ComponentNameParam String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
+        @Nullable String workflowId) {
+
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, null, componentConnection, null, null, true);
+            componentName, componentVersion, triggerName, null, null, workflowId, componentConnection, null, null,
+            true);
 
         return doExecuteOutput(
             componentName, componentVersion, triggerName, inputParameters, componentConnection, triggerContext);

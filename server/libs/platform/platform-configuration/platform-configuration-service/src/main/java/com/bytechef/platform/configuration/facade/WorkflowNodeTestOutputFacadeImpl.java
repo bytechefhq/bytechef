@@ -150,9 +150,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             clusterElementTestContext.clusterElementWorkflowNodeType(), inputParameters,
             clusterElementTestContext.connectionIds(), extensions, environmentId,
             (
-                workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
+                curWorkflowId, workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
                 curEnvironmentId) -> executeClusterElement(
-                    workflowId, workflowNodeName, workflowNodeType, clusterElementWorkflowNodeName,
+                    curWorkflowId, workflowNodeName, workflowNodeType, clusterElementWorkflowNodeName,
                     curInputParameters, curConnectionIds, curExtensions, curEnvironmentId));
     }
 
@@ -180,9 +180,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflow.getId(), clusterElementWorkflowNodeName, context.clusterElementWorkflowNodeType(),
             mergedParameters, context.connectionIds(), extensions, environmentId,
             (
-                workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
+                curWorkflowId, workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
                 curEnvironmentId) -> executeClusterElement(
-                    workflowId, workflowNodeName, workflowNodeType, clusterElementWorkflowNodeName,
+                    curWorkflowId, workflowNodeName, workflowNodeType, clusterElementWorkflowNodeName,
                     curInputParameters, curConnectionIds, curExtensions, curEnvironmentId));
     }
 
@@ -377,12 +377,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     private Object executeActionPerform(
-        WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, long environmentId) {
+        String workflowId, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId) {
 
         return actionDefinitionFacade.executePerform(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
-            null, inputParameters, connectionIds, extensions, environmentId, null, true, Map.of(), null, null);
+            workflowId, inputParameters, connectionIds, extensions, environmentId, null, true, Map.of(), null, null);
     }
 
     private WorkflowNodeTestOutput executeAndSaveTestOutput(
@@ -401,7 +401,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         TestPerformFunction performFunction, @Nullable TestOutputFunction outputFunction) {
 
         Object value = performFunction.execute(
-            workflowNodeType, inputParameters, connectionIds, extensions, environmentId);
+            workflowId, workflowNodeType, inputParameters, connectionIds, extensions, environmentId);
 
         if (value == null) {
             return null;
@@ -416,7 +416,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         if (outputFunction != null && value instanceof List<?> list && list.isEmpty()) {
             outputResponse = withOutputFunctionSchema(
-                outputResponse, workflowNodeType, inputParameters, connectionIds, outputFunction);
+                workflowId, outputResponse, workflowNodeType, inputParameters, connectionIds, outputFunction);
         }
 
         return workflowNodeTestOutputService.save(
@@ -590,12 +590,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     private OutputResponse withOutputFunctionSchema(
-        OutputResponse outputResponse, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds, TestOutputFunction outputFunction) {
+        String workflowId, OutputResponse outputResponse, WorkflowNodeType workflowNodeType,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds, TestOutputFunction outputFunction) {
 
         try {
             OutputResponse functionOutputResponse = outputFunction.execute(
-                workflowNodeType, inputParameters, connectionIds);
+                workflowId, workflowNodeType, inputParameters, connectionIds);
 
             if (functionOutputResponse != null && functionOutputResponse.outputSchema() != null) {
                 return new OutputResponse(functionOutputResponse.outputSchema(), outputResponse.sampleOutput());
@@ -610,11 +610,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     private @Nullable OutputResponse executeActionOutput(
-        WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
+        String workflowId, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds) {
 
         return actionDefinitionFacade.executeOutput(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
-            connectionIds);
+            connectionIds, workflowId);
     }
 
     @FunctionalInterface
@@ -622,14 +623,15 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         @Nullable
         OutputResponse execute(
-            WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters, Map<String, Long> connectionIds);
+            String workflowId, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+            Map<String, Long> connectionIds);
     }
 
     @FunctionalInterface
     private interface TestPerformFunction {
 
         Object execute(
-            WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
+            String workflowId, WorkflowNodeType workflowNodeType, Map<String, ?> inputParameters,
             Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId);
     }
 
