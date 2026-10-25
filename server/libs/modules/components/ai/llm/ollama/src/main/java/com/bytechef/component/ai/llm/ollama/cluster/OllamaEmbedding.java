@@ -18,9 +18,9 @@ package com.bytechef.component.ai.llm.ollama.cluster;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.EMBEDDING_MODEL_PROPERTY;
-import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.platform.component.definition.ai.vectorstore.EmbeddingFunction.EMBEDDING;
 
+import com.bytechef.component.ai.llm.ollama.util.OllamaUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -46,14 +46,7 @@ public class OllamaEmbedding {
             .properties(EMBEDDING_MODEL_PROPERTY);
 
     protected static EmbeddingModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        String url = connectionParameters.getString(URL);
-
-        OllamaApi ollamaApi = (url == null || url.isEmpty())
-            ? OllamaApi.builder()
-                .build()
-            : OllamaApi.builder()
-                .baseUrl(url)
-                .build();
+        OllamaApi ollamaApi = OllamaUtils.createOllamaApi(connectionParameters);
 
         return OllamaEmbeddingModel.builder()
             .ollamaApi(ollamaApi)

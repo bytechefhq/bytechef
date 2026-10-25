@@ -84,7 +84,6 @@ import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.TRUN
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.TRUNCATE_PROPERTY;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.TYPICAL_P;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.TYPICAL_P_PROPERTY;
-import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.USE_MLOCK;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.USE_MMAP;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.USE_M_LOCK_PROPERTY;
@@ -96,6 +95,7 @@ import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.VOCA
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ollama.util.OllamaUtils;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -163,14 +163,7 @@ public class OllamaChatAction {
     public static final ChatModel CHAT_MODEL =
         (inputParameters, connectionParameters, responseFormatRequired) -> {
 
-            String url = connectionParameters.getString(URL);
-
-            OllamaApi ollamaApi = (url == null || url.isEmpty())
-                ? OllamaApi.builder()
-                    .build()
-                : OllamaApi.builder()
-                    .baseUrl(url)
-                    .build();
+            OllamaApi ollamaApi = OllamaUtils.createOllamaApi(connectionParameters);
 
             OllamaChatOptions.Builder ollamaChatOptionsBuilder = OllamaChatOptions.builder()
                 .model(inputParameters.getRequiredString(MODEL))
