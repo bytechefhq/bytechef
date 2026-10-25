@@ -284,6 +284,9 @@ describe('useDeleteDataTableAlertDialog', () => {
             expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
                 queryKey: ['dataTableTagsByTable'],
             });
+            expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
+                queryKey: ['DataTableStorageUsage'],
+            });
             expect(hoisted.mockClearTableToDelete).toHaveBeenCalled();
         });
     });
