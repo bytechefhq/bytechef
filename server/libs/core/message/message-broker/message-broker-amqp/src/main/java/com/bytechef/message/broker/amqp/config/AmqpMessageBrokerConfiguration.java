@@ -62,7 +62,11 @@ public class AmqpMessageBrokerConfiguration {
 
     @Bean
     MessageConverter jacksonAmqpMessageConverter(JsonMapper objectMapper) {
-        return new JacksonJsonMessageConverter(objectMapper);
+        JacksonJsonMessageConverter jacksonJsonMessageConverter = new JacksonJsonMessageConverter(objectMapper);
+
+        jacksonJsonMessageConverter.setJavaTypeMapper(new TrustedPackagePrefixJavaTypeMapper());
+
+        return jacksonJsonMessageConverter;
     }
 
     @Bean
