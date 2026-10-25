@@ -257,15 +257,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     public void updateAiProvider(int id, boolean enabled, int environment) {
         Provider provider = getProvider(id);
 
-        String key = provider.getKey();
-
-        if (propertyService.fetchProperty(key, Scope.PLATFORM, null, (long) environment)
-            .isEmpty()) {
-
-            propertyService.save(key, Map.of(), Scope.PLATFORM, null, (long) environment);
-        }
-
-        propertyService.update(key, enabled, Scope.PLATFORM, null, (long) environment);
+        propertyService.update(provider.getKey(), enabled, Scope.PLATFORM, null, (long) environment);
     }
 
     @Override
