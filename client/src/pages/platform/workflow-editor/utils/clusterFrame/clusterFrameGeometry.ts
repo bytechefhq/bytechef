@@ -18,7 +18,19 @@ export const CLUSTER_FRAME_BORDER_WIDTH = 2;
 export const CLUSTER_FRAME_MIN_HEIGHT = 220;
 export const CLUSTER_FRAME_MIN_WIDTH = 420;
 
-export const CLUSTER_FRAME_LABEL_OVERHANG = 40;
+export const CLUSTER_FRAME_LABEL_OVERHANG = 54;
+
+const CLUSTER_FRAME_ROOT_HEIGHT = 72;
+const CLUSTER_FRAME_HANDLE_LABEL_HEIGHT = 21;
+const CLUSTER_FRAME_EDGE_LENGTH = 80;
+
+export const CLUSTER_FRAME_MEMBER_ROW_Y =
+    CLUSTER_FRAME_ROOT_HEIGHT + CLUSTER_FRAME_HANDLE_LABEL_HEIGHT + CLUSTER_FRAME_EDGE_LENGTH;
+
+export const CLUSTER_FRAME_PLACEHOLDER_Y =
+    CLUSTER_FRAME_ROOT_HEIGHT +
+    CLUSTER_FRAME_HANDLE_LABEL_HEIGHT +
+    (CLUSTER_FRAME_EDGE_LENGTH - PLACEHOLDER_NODE_HEIGHT) / 2;
 
 interface ClusterMemberNodeDataI {
     clusterElementType?: string;
@@ -71,7 +83,7 @@ export function getClusterMemberSize(memberNode: Node): {height: number; width: 
     }
 
     if (memberNodeData?.clusterElementType) {
-        return {height: NODE_HEIGHT + CLUSTER_FRAME_LABEL_OVERHANG, width: CLUSTER_ELEMENT_NODE_WIDTH};
+        return {height: CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_FRAME_LABEL_OVERHANG, width: CLUSTER_ELEMENT_NODE_WIDTH};
     }
 
     return {
@@ -102,7 +114,10 @@ export function computeClusterFrameSize(childBoxes: ClusterMemberBoxI[]): {heigh
     const extent = computeClusterContentExtent(childBoxes);
 
     return {
-        height: Math.max(CLUSTER_FRAME_MIN_HEIGHT, CLUSTER_FRAME_HEADER_HEIGHT + extent.height + CLUSTER_FRAME_PADDING),
+        height: Math.max(
+            CLUSTER_FRAME_MIN_HEIGHT,
+            CLUSTER_FRAME_HEADER_HEIGHT + extent.height + CLUSTER_FRAME_HEADER_HEIGHT
+        ),
         width: Math.max(CLUSTER_FRAME_MIN_WIDTH, extent.width + 2 * CLUSTER_FRAME_PADDING),
     };
 }

@@ -395,12 +395,14 @@ export interface LayoutElementsResultI {
 export const getClusterElementsLayoutElements = ({
     canvasHeight,
     canvasWidth,
+    childRowY,
     currentRootPosition,
     edges,
     nodes,
 }: {
     canvasHeight: number;
     canvasWidth: number;
+    childRowY?: number;
     currentRootPosition?: {x: number; y: number};
     edges: Edge[];
     nodes: Node[];
@@ -437,7 +439,7 @@ export const getClusterElementsLayoutElements = ({
     });
 
     const placeholderY = 160;
-    const childBaseY = placeholderY + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
+    const childBaseY = childRowY ?? placeholderY + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
     const horizontalGap = CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_ELEMENT_GAP;
 
     const overlapPadding = CLUSTER_ELEMENT_OVERLAP_PADDING;
