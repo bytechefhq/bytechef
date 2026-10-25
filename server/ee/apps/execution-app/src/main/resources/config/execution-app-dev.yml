@@ -10,6 +10,6 @@ spring:
 
 bytechef:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bytechef_execution
+    url: jdbc:postgresql://localhost:5432/bytechef
     username: postgres
     password: postgres

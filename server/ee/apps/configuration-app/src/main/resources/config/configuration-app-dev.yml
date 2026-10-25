@@ -5,6 +5,6 @@ server:
 
 bytechef:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bytechef_configuration
+    url: jdbc:postgresql://localhost:5432/bytechef
     username: postgres
     password: postgres

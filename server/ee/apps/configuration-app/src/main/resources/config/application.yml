@@ -1,13 +1,10 @@
 spring:
   application:
     name: configuration-app
-#  cloud:
-#    config:
-#      discovery:
-#        enabled: true
-#        service-id: config-server-app
   config:
-    import: optional:configserver:http://localhost:6111
+    import:
+      - classpath:config/microservice.yml
+      - classpath:config/configuration-app.yml
   profiles:
     active: #spring.profiles.active#
   mail:

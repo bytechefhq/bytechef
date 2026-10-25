@@ -17,6 +17,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 
 /**
  * @version ee
@@ -30,10 +31,20 @@ import org.springframework.context.annotation.Import;
 public class ExecutionApplicationIntTest {
 
     @Autowired
+    private Environment environment;
+
+    @Autowired
     private ObjectProvider<ToolInvocationLogRetentionJob> toolInvocationLogRetentionJobProvider;
 
     @Test
     void testContextLoads() {
+    }
+
+    @Test
+    void testSharedAndAppConfigurationLoad() {
+        assertThat(environment.getProperty("spring.task.execution.thread-name-prefix"))
+            .isEqualTo("execution-app-task-");
+        assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
     }
 
     @Test
