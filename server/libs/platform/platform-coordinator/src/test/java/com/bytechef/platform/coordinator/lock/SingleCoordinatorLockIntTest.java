@@ -48,6 +48,8 @@ class SingleCoordinatorLockIntTest {
             lock.afterPropertiesSet();
 
             assertThat(lock.isHeld()).isTrue();
+
+            assertLockedInDatabase();
         } finally {
             lock.destroy();
         }
@@ -121,6 +123,8 @@ class SingleCoordinatorLockIntTest {
 
             assertThat(lock.isHeld()).isTrue();
             assertThat(shutdownCount.get()).isZero();
+
+            assertLockedInDatabase();
         } finally {
             lock.destroy();
         }
@@ -173,13 +177,21 @@ class SingleCoordinatorLockIntTest {
             shutdownCount::incrementAndGet);
     }
 
+    private void assertLockedInDatabase() {
+        SingleCoordinatorLock contender = newLock();
+
+        assertThatThrownBy(contender::afterPropertiesSet)
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(SingleCoordinatorLock.ANOTHER_COORDINATOR_MESSAGE);
+    }
+
     private static void terminateLockHolderBackend() throws SQLException {
         try (Connection adminConnection = DriverManager.getConnection(
             container.getJdbcUrl(), container.getUsername(), container.getPassword());
             Statement statement = adminConnection.createStatement()) {
 
             statement.execute(
-                "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() " +
+                "SELECT pg_terminate_backend(pid, 5000) FROM pg_stat_activity WHERE pid <> pg_backend_pid() " +
                     "AND datname = current_database() AND query LIKE '%advisory%'");
         }
     }

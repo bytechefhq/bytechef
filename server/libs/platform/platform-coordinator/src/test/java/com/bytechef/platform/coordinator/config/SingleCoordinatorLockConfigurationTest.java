@@ -21,9 +21,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.coordinator.lock.SingleCoordinatorLock;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
@@ -31,7 +35,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 class SingleCoordinatorLockConfigurationTest {
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
-        .withUserConfiguration(SingleCoordinatorLockConfiguration.class)
+        .withUserConfiguration(SingleCoordinatorLockConfiguration.class, DataSourcePropertiesConfiguration.class)
         .withBean(JdbcConnectionDetails.class, SingleCoordinatorLockConfigurationTest::h2ConnectionDetails);
 
     @Test
@@ -52,11 +56,25 @@ class SingleCoordinatorLockConfigurationTest {
             .run(context -> assertThat(context).doesNotHaveBean(SingleCoordinatorLock.class));
     }
 
+    @Test
+    void testRegisteredWithoutJdbcConnectionDetailsWhenApplicationDefinesItsOwnDataSource() {
+        new ApplicationContextRunner()
+            .withUserConfiguration(SingleCoordinatorLockConfiguration.class, DataSourcePropertiesConfiguration.class)
+            .withBean(DataSource.class, () -> mock(DataSource.class))
+            .withPropertyValues("bytechef.edition=ce", "spring.datasource.url=jdbc:h2:mem:test")
+            .run(context -> assertThat(context).hasSingleBean(SingleCoordinatorLock.class));
+    }
+
     private static JdbcConnectionDetails h2ConnectionDetails() {
         JdbcConnectionDetails jdbcConnectionDetails = mock(JdbcConnectionDetails.class);
 
         when(jdbcConnectionDetails.getJdbcUrl()).thenReturn("jdbc:h2:mem:test");
 
         return jdbcConnectionDetails;
+    }
+
+    @Configuration
+    @EnableConfigurationProperties(DataSourceProperties.class)
+    static class DataSourcePropertiesConfiguration {
     }
 }
