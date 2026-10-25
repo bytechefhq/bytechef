@@ -47,12 +47,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@SpringBootTest(properties = "bytechef.ai.vectorstore.pgvector.dimensions=768")
 @Import({
     PostgreSQLContainerConfiguration.class, ServerApplicationIntTest.ServerApplicationIntTestConfiguration.class
 })
@@ -63,6 +64,9 @@ class ServerApplicationIntTest {
 
     @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    private Environment environment;
 
     @Test
     void testContextLoads() {
@@ -92,6 +96,12 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentFacade.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentChunkFacade.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(WorkspaceKnowledgeBaseFacade.class)).isEmpty();
+    }
+
+    @Test
+    void testPgVectorDimensionsFollowBytechefProperty() {
+        assertThat(environment.getProperty("spring.ai.vectorstore.pgvector.dimensions", Integer.class))
+            .isEqualTo(768);
     }
 
     @Test
