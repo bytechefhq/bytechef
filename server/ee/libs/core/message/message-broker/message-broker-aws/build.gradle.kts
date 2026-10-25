@@ -13,6 +13,7 @@ dependencies {
 
     testImplementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     testImplementation("io.awspring.cloud:spring-cloud-aws-s3")
+    testImplementation("org.springframework.boot:spring-boot-data-redis")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:localstack")
     testImplementation(project(":server:libs:config:app-config"))
