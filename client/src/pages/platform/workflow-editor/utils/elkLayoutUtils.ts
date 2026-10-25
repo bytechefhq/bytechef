@@ -427,10 +427,11 @@ function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: nu
         // DOM box is 28px tall but 72px wide (mx-[22px] margins around the "+"),
         // so the main-axis footprint differs by direction
         mainAxisSize = direction === 'TB' ? PLACEHOLDER_NODE_HEIGHT : NODE_ANCHOR_SIZE;
-    } else if (rendersClusterElements(node)) {
-        // A configured cluster root's rendered box exceeds the 72px anchor
-        // (icon row inside the button), so its footprint keeps the same 14px
-        // slack per side that gives anchors the 80px node→node read
+    } else if ((node.data as NodeDataType)?.clusterFrame || rendersClusterElements(node)) {
+        // A cluster frame (even one whose element slots are still empty) or a
+        // configured cluster root's button exceeds the 72px anchor, so its
+        // footprint keeps the same 14px slack per side that gives anchors the
+        // 80px node→node read
         const renderedSize = getRenderedNodeSize(node, direction);
         const renderedMain = direction === 'TB' ? renderedSize.height : renderedSize.width;
 
