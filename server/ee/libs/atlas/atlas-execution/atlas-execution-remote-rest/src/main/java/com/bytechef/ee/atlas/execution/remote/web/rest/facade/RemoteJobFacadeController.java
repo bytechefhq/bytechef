@@ -12,6 +12,8 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,5 +54,22 @@ public class RemoteJobFacadeController {
         return ResponseEntity
             .noContent()
             .build();
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/resume-claimed-job")
+    public ResponseEntity<Void> resumeClaimedJob(@Valid @RequestBody ResumeClaimedJobRequest resumeClaimedJobRequest) {
+        jobFacade.resumeClaimedJob(
+            resumeClaimedJobRequest.id, resumeClaimedJobRequest.taskExecutionId, resumeClaimedJobRequest.data);
+
+        return ResponseEntity
+            .noContent()
+            .build();
+    }
+
+    @SuppressFBWarnings("EI")
+    public record ResumeClaimedJobRequest(
+        long id, @Nullable Long taskExecutionId, @Nullable Map<String, Object> data) {
     }
 }

@@ -5,4 +5,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
+
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 }
