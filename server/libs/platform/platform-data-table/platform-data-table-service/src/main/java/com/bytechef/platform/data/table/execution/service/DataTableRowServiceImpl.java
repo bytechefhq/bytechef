@@ -21,6 +21,7 @@ import com.bytechef.commons.util.DateUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import de.siegmar.fastcsv.reader.CsvReader;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -44,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -66,15 +69,22 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
 
+    private static final int ESTIMATED_ROW_OVERHEAD_BYTES = 64;
+
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DataTableStorageService dataTableStorageService;
     private final JdbcTemplate jdbcTemplate;
 
     private Boolean returningSupported;
 
     @SuppressFBWarnings("EI")
-    public DataTableRowServiceImpl(ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate) {
+    public DataTableRowServiceImpl(
+        ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate,
+        DataTableStorageService dataTableStorageService) {
+
         this.applicationEventPublisher = applicationEventPublisher;
         this.jdbcTemplate = jdbcTemplate;
+        this.dataTableStorageService = dataTableStorageService;
     }
 
     /**
@@ -202,6 +212,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     public void importCsv(String baseName, String csv, long environmentId) {
+        dataTableStorageService.checkWithinLimit(
+            csv == null ? 0 : csv.getBytes(StandardCharsets.UTF_8).length);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -292,6 +305,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+        dataTableStorageService.checkWithinLimit(estimateRowBytes(values));
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -394,6 +409,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+        checkUpdateWithinLimit(values, () -> getRow(baseName, id, environmentId));
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -582,6 +599,52 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         return null;
+    }
+
+    private void checkUpdateWithinLimit(
+        Map<String, Object> values, Supplier<DataTableRow> currentDataTableRowSupplier) {
+
+        long incomingBytes = estimateValuesBytes(values);
+
+        try {
+            dataTableStorageService.checkWithinLimit(incomingBytes);
+        } catch (DataTableStorageLimitExceededException dataTableStorageLimitExceededException) {
+            DataTableRow currentDataTableRow = currentDataTableRowSupplier.get();
+
+            if (currentDataTableRow == null) {
+                throw dataTableStorageLimitExceededException;
+            }
+
+            Map<String, Object> currentValues = new HashMap<>();
+
+            for (String columnName : values.keySet()) {
+                currentValues.put(columnName, getValueCaseInsensitive(currentDataTableRow.values(), columnName));
+            }
+
+            long growthBytes = incomingBytes - estimateValuesBytes(currentValues);
+
+            if (growthBytes > 0) {
+                dataTableStorageService.checkWithinLimit(growthBytes);
+            }
+        }
+    }
+
+    private static long estimateRowBytes(Map<String, Object> values) {
+        return ESTIMATED_ROW_OVERHEAD_BYTES + estimateValuesBytes(values);
+    }
+
+    private static long estimateValuesBytes(Map<String, Object> values) {
+        long estimatedBytes = 0;
+
+        for (Object value : values.values()) {
+            if (value != null) {
+                String stringValue = String.valueOf(value);
+
+                estimatedBytes += stringValue.getBytes(StandardCharsets.UTF_8).length;
+            }
+        }
+
+        return estimatedBytes;
     }
 
     private static DataTableRow toDataTableRow(ResultSet resultSet, List<String> columnNames) throws SQLException {
