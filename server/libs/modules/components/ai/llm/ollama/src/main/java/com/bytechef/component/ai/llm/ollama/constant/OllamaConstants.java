@@ -23,14 +23,11 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.ModelUtils;
+import com.bytechef.component.ai.llm.ollama.util.OllamaUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import org.springframework.ai.ollama.api.OllamaModel;
 
 /**
  * @author Monika Kušter
@@ -183,21 +180,15 @@ public final class OllamaConstants {
         .advancedOption(true);
     public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
-        .description("ID of the model to use.")
+        .description("ID of the model to use. The list shows the models installed on the Ollama server.")
         .required(true)
-        .options(
-            ModelUtils.getEnumOptions(
-                Arrays.stream(OllamaModel.values())
-                    .collect(Collectors.toMap(OllamaModel::getName, OllamaModel::getName))));
+        .options(OllamaUtils.getModelOptions(false));
     public static final ModifiableStringProperty EMBEDDING_MODEL_PROPERTY = string(MODEL)
         .label("Model")
-        .description("ID of the model to use.")
+        .description(
+            "ID of the embedding model to use. The list shows the embedding models installed on the Ollama server.")
         .required(true)
-        .options(
-            ModelUtils.getEnumOptions(
-                Arrays.stream(OllamaModel.values())
-                    .filter(OllamaConstants::isEmbeddingModel)
-                    .collect(Collectors.toMap(OllamaModel::getName, OllamaModel::getName))));
+        .options(OllamaUtils.getModelOptions(true));
     public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
         .label("Num predict")
         .description(
@@ -205,11 +196,5 @@ public final class OllamaConstants {
         .advancedOption(true);
 
     private OllamaConstants() {
-    }
-
-    private static boolean isEmbeddingModel(OllamaModel ollamaModel) {
-        String name = ollamaModel.getName();
-
-        return name.contains("embed");
     }
 }

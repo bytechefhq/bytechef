@@ -18,7 +18,9 @@ package com.bytechef.component.ai.llm.ollama.util;
 
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
+import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.http.HttpHeaders;
@@ -56,5 +58,25 @@ public final class OllamaUtils {
         }
 
         return ollamaApiBuilder.build();
+    }
+
+    public static ActionDefinition.OptionsFunction<String> getModelOptions(boolean embeddingModels) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            OllamaApi ollamaApi = createOllamaApi(connectionParameters);
+
+            OllamaApi.ListModelResponse listModelResponse = ollamaApi.listModels();
+
+            return listModelResponse.models()
+                .stream()
+                .map(OllamaApi.Model::name)
+                .filter(name -> isEmbeddingModel(name) == embeddingModels)
+                .sorted()
+                .map(name -> option(name, name))
+                .toList();
+        };
+    }
+
+    private static boolean isEmbeddingModel(String name) {
+        return name.contains("embed");
     }
 }
