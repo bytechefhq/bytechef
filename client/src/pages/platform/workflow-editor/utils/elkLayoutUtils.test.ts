@@ -2962,6 +2962,23 @@ describe('getElkLayoutElements with cluster roots', () => {
         expect(positionOf(result.nodes, 'task2').y - (positionOf(result.nodes, 'aiAgent_1').y + 72)).toBe(CHAIN_GAP);
     });
 
+    it('reserves the full frame of a root whose cluster element slots are still empty', async () => {
+        const nodes: Node[] = [
+            taskNode('task1'),
+            clusterRootNode('approval_1', false, {clusterFrame: {height: 240, width: 420}}),
+            taskNode('task2'),
+        ];
+
+        const edges: Edge[] = [edge('task1', 'approval_1'), edge('approval_1', 'task2')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1000, direction: 'TB', edges, nodes});
+
+        const frameTop = positionOf(result.nodes, 'approval_1').y;
+
+        expect(frameTop - (positionOf(result.nodes, 'task1').y + 72)).toBe(CHAIN_GAP);
+        expect(positionOf(result.nodes, 'task2').y - (frameTop + 240)).toBe(CHAIN_GAP);
+    });
+
     it('keeps a configured root on its branch column inside a condition', async () => {
         const nodes: Node[] = [
             conditionNode('condition_1'),
