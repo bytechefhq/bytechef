@@ -72,11 +72,21 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void resumeClaimedJob(long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
-        throw new UnsupportedOperationException();
+        loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host("execution-app")
+                .path("/remote/job-facade/resume-claimed-job")
+                .build(),
+            new ResumeClaimedJobRequest(id, taskExecutionId, data));
     }
 
     @Override
     public void stopJob(long id) {
         throw new UnsupportedOperationException();
+    }
+
+    @SuppressFBWarnings("EI")
+    public record ResumeClaimedJobRequest(
+        long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
     }
 }

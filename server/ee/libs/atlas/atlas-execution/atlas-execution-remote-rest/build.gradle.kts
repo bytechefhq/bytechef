@@ -5,4 +5,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 }
