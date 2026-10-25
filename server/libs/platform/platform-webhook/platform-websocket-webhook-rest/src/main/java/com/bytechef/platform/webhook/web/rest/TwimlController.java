@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.web.rest;
 
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
+@ConditionalOnWebhook
 @RequestMapping("/webhooks")
 class TwimlController {
 

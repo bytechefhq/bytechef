@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.webhook.web.rest;
 
-import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author Ivica Cardic
  */
 @Controller
-@ConditionalOnCoordinator
+@ConditionalOnWebhook
 public class CallbackController {
 
     private final String redirectUri;

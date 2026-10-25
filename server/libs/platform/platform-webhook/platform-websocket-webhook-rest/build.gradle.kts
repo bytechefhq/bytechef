@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework:spring-websocket")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:message:message-broker:message-broker-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

@@ -172,6 +172,21 @@ class ApplicationPropertiesTest {
         assertThat(embedded.getAllowedParentOrigins()).containsExactly("https://a.example", "https://b.example");
     }
 
+    @Test
+    void testBindsWebhookEnabled() {
+        MapConfigurationPropertySource mapConfigurationPropertySource = new MapConfigurationPropertySource(
+            Map.of("bytechef.webhook.enabled", "false"));
+
+        Binder binder = new Binder(mapConfigurationPropertySource);
+
+        ApplicationProperties applicationProperties = binder.bind(
+            "bytechef", Bindable.of(ApplicationProperties.class), new NoUnboundElementsBindHandler(BindHandler.DEFAULT))
+            .get();
+
+        assertThat(applicationProperties.getWebhook()
+            .isEnabled()).isFalse();
+    }
+
     private static ApplicationProperties bind(PropertySource<?> propertySource) {
         MutablePropertySources propertySources = new MutablePropertySources();
 

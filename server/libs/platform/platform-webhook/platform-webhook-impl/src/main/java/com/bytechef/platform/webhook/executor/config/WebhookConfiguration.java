@@ -85,8 +85,11 @@ import org.springframework.core.task.TaskExecutor;
 public class WebhookConfiguration {
 
     @Bean
-    SseStreamBridgeRegistry sseStreamBridgeRegistry(ObjectProvider<JobResumeFacade> jobResumeFacadeProvider) {
-        return new SseStreamBridgeRegistry(jobResumeFacadeProvider.getIfAvailable());
+    SseStreamBridgeRegistry sseStreamBridgeRegistry(
+        ObjectProvider<JobResumeFacade> jobResumeFacadeProvider, ObjectProvider<MessageBroker> messageBrokerProvider) {
+
+        return new SseStreamBridgeRegistry(
+            jobResumeFacadeProvider.getIfAvailable(), messageBrokerProvider.getIfAvailable());
     }
 
     @Bean

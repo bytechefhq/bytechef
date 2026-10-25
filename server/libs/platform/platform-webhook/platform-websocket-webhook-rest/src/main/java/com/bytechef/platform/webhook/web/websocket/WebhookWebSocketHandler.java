@@ -25,6 +25,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -65,6 +66,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnWebhook
 public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookWebSocketHandler.class);
