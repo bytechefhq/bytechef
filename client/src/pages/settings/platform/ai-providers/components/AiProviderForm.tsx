@@ -57,7 +57,9 @@ const AiProviderForm = ({
             environment,
             id: aiProvider.id!,
             updateAiProviderRequest: !requiresApiKey
-                ? {url: values.url}
+                ? values.apiKey
+                    ? {apiKey: values.apiKey, url: values.url}
+                    : {url: values.url}
                 : requiresEndpoint
                   ? {apiKey: values.apiKey, url: values.url}
                   : {apiKey: values.apiKey},
@@ -68,25 +70,48 @@ const AiProviderForm = ({
         <Form {...form}>
             <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
                 {!requiresApiKey ? (
-                    <FormField
-                        control={form.control}
-                        name="url"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Base URL</FormLabel>
+                    <>
+                        <FormField
+                            control={form.control}
+                            name="url"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Base URL</FormLabel>
 
-                                <FormControl>
-                                    <Input placeholder="http://localhost:11434" {...field} />
-                                </FormControl>
+                                    <FormControl>
+                                        <Input placeholder="http://localhost:11434" {...field} />
+                                    </FormControl>
 
-                                <FormDescription>
-                                    The base URL of your Ollama server. Leave blank to use http://localhost:11434.
-                                </FormDescription>
+                                    <FormDescription>
+                                        The base URL of your Ollama server. Leave blank to use http://localhost:11434.
+                                    </FormDescription>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="apiKey"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>API Key</FormLabel>
+
+                                    <FormControl>
+                                        <Input placeholder="Optional" type="password" {...field} />
+                                    </FormControl>
+
+                                    <FormDescription>
+                                        Sent as a bearer token, for an Ollama server behind an authenticating proxy or
+                                        Ollama&apos;s hosted API. Leave blank to keep the current key.
+                                    </FormDescription>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </>
                 ) : (
                     <>
                         <FormField

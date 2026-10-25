@@ -47,11 +47,12 @@ describe('AiProviderForm', () => {
         expect(screen.queryByText('Base URL')).not.toBeInTheDocument();
     });
 
-    it('asks only for a base URL when the provider needs no API key', () => {
+    it('asks for a base URL and an optional API key when the provider needs no API key', () => {
         renderForm({requiresApiKey: false});
 
         expect(screen.getByText('Base URL')).toBeInTheDocument();
-        expect(screen.queryByText('API Key')).not.toBeInTheDocument();
+        expect(screen.getByText('API Key')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Optional')).toBeInTheDocument();
     });
 
     it('asks for both when the provider needs an endpoint as well', () => {
@@ -142,6 +143,22 @@ describe('AiProviderForm', () => {
                 environment: 2,
                 id: 7,
                 updateAiProviderRequest: {url: 'http://ollama:11434'},
+            })
+        );
+    });
+
+    it('sends the API key with the URL when one is entered for a provider that needs no API key', async () => {
+        renderForm({requiresApiKey: false});
+
+        await userEvent.type(screen.getByPlaceholderText('http://localhost:11434'), 'http://ollama:11434');
+        await userEvent.type(screen.getByPlaceholderText('Optional'), 'secret-token');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(mutateMock).toHaveBeenCalledWith({
+                environment: 2,
+                id: 7,
+                updateAiProviderRequest: {apiKey: 'secret-token', url: 'http://ollama:11434'},
             })
         );
     });
