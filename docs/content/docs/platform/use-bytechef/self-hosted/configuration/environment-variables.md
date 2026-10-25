@@ -16,7 +16,7 @@ Every name below is the property path uppercased with dots **and dashes** replac
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
 | `BYTECHEF_AI_COPILOT_PROVIDER` | Chat-model provider to prefer for Copilot - accepts the short provider name (e.g. `anthropic`, `openAi`) or the full catalog key (e.g. `ai.provider.anthropic`), case-insensitively; unrecognized values fall back to auto-detection. In CE it overrides auto-detection from the configured provider API keys/endpoints. In EE it is used as the environment default provider when set, provided that provider is enabled and has a configured chat model (`BYTECHEF_AI_PROVIDER_CHAT_<PROVIDER>_OPTIONS_MODEL`); otherwise Copilot falls back to the first enabled chat provider. A per-turn model picked in the Copilot toolbar always overrides this. | - |
 | `BYTECHEF_AI_COPILOT_EMBEDDING_PROVIDER` | Embedding provider for the Copilot vector index (OLLAMA, OPENAI) | - |
-| `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider - OpenAI only; Ollama runs locally and needs none (sensitive) | - |
+| `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider - OpenAI only. With Ollama, the docs index uses `BYTECHEF_AI_PROVIDER_OLLAMA_URL` and the optional `BYTECHEF_AI_PROVIDER_OLLAMA_API_KEY` (sensitive) | - |
 
 ## AI Auto Memory Configuration
 
@@ -115,6 +115,8 @@ fragment while this heading was hidden - give it back.
 | `BYTECHEF_AI_PROVIDER_GROQ_API_KEY`          | Groq API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_MISTRAL_API_KEY`       | Mistral API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_NVIDIA_API_KEY`        | NVIDIA API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_OLLAMA_URL`            | Base URL of the Ollama server. Setting it turns Ollama on; an admin can still switch it off on the AI Providers page | `http://localhost:11434` when Ollama is enabled without one |
+| `BYTECHEF_AI_PROVIDER_OLLAMA_API_KEY`        | Optional. Sent as a bearer token, for an Ollama server behind an authenticating proxy or Ollama's hosted API (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`        | OpenAI API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_PERPLEXITY_API_KEY`    | Perplexity API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_STABILITY_API_KEY`     | Stability API key (sensitive) | - |
