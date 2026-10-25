@@ -65,6 +65,8 @@ bytechef:
             model: dall-e-3
     vectorstore:
       provider: pgvector
+      pgvector:
+        dimensions: 1536
   analytics:
     enabled: false
   async:

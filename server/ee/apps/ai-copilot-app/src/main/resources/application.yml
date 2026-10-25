@@ -19,7 +19,7 @@ spring:
           temperature: ${bytechef.ai.copilot.openai.chat.options.temperature}
     vectorstore:
       pgvector:
-        dimensions: 1536
+        dimensions: ${bytechef.ai.vectorstore.pgvector.dimensions}
         initialize-schema: true
   application:
     name: ai-copilot
@@ -57,6 +57,7 @@ bytechef:
             temperature: 0.5
       vectorstore:
         pgvector:
+          dimensions: 1536
           url: jdbc:postgresql://localhost:5432/bytechef
           username: postgres
           password: postgres
