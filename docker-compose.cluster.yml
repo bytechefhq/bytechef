@@ -1,7 +1,8 @@
 # Distributed ByteChef behind an nginx load balancer. One file covers every topology; switch with variables, never by
 # editing it.
 #
-#   export POSTGRES_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16) BYTECHEF_SECURITY_REMEMBER_ME_KEY=...
+#   export POSTGRES_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16)
+#   export BYTECHEF_SECURITY_REMEMBER_ME_KEY=...
 #
 #   # CE: 1 coordinator (also serving webhooks), 3 workers, RabbitMQ, single tenant
 #   docker compose -f docker-compose.cluster.yml up -d
@@ -12,7 +13,8 @@
 #   # EE high availability: 2 coordinators
 #   BYTECHEF_EDITION=ee BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
 #
-#   # Webhooks only on webhook nodes. There is no fallback: with every webhook node down, webhooks fail (the coordinator answers 404).
+#   # Webhooks only on webhook nodes. There is no fallback: with every webhook node down, webhooks fail (the
+#   # coordinator answers 404).
 #   BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
 #
 # - More than one coordinator requires BYTECHEF_EDITION=ee. With BYTECHEF_EDITION=ce and BYTECHEF_COORDINATORS=2, the
@@ -25,7 +27,8 @@
 #   any node can read what another node wrote. In production, mount shared storage (NFS, EFS) or use the aws provider.
 # - BYTECHEF_TENANT_MODE=multi starts the cluster in multi-tenant mode (requires BYTECHEF_EDITION=ee).
 #
-# Set BYTECHEF_IMAGE to use a locally built image. BYTECHEF_PORT and RABBITMQ_MANAGEMENT_PORT change the published ports.
+# Set BYTECHEF_IMAGE to use a locally built image. BYTECHEF_PORT and RABBITMQ_MANAGEMENT_PORT change the published
+# ports.
 #
 # Every node must get the same BYTECHEF_ENCRYPTION_KEY and BYTECHEF_SECURITY_REMEMBER_ME_KEY: a connection encrypted on
 # one node has to be readable on all of them.
@@ -123,6 +126,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       <<: *bytechef-environment
       BYTECHEF_UPGRADE_ENABLED: "true"
@@ -181,13 +188,13 @@ configs:
 
       upstream coordinators {
         zone coordinators 64k;
-        server coordinator:8080 resolve;
+        server coordinator:8080 resolve max_fails=1 fail_timeout=10s;
       }
 
       upstream webhooks {
         zone webhooks 64k;
-        server webhook:8080 resolve;
-        server coordinator:8080 resolve backup;
+        server webhook:8080 resolve max_fails=1 fail_timeout=10s;
+        server coordinator:8080 resolve backup max_fails=1 fail_timeout=10s;
       }
 
       server {
@@ -199,6 +206,9 @@ configs:
 
         location ~ ^/(webhooks|callback|approvals|job/resume|file-entries/[^/]+/content) {
           proxy_pass http://webhooks;
+          proxy_connect_timeout 2s;
+          proxy_next_upstream error timeout http_502 http_503;
+          proxy_next_upstream_tries 2;
           proxy_set_header Connection $$connection_upgrade;
           proxy_set_header Host $$host;
           proxy_set_header Upgrade $$http_upgrade;
@@ -209,6 +219,9 @@ configs:
 
         location / {
           proxy_pass http://coordinators;
+          proxy_connect_timeout 2s;
+          proxy_next_upstream error timeout http_502 http_503;
+          proxy_next_upstream_tries 2;
           proxy_set_header Connection "";
           proxy_set_header Host $$host;
           proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
