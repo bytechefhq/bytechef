@@ -181,6 +181,11 @@ public class ApplicationProperties {
     private Security security;
 
     /**
+     * HTTP session configuration
+     */
+    private Session session = new Session();
+
+    /**
      * User sign-up configuration
      */
     private SignUp signUp = new SignUp();
@@ -329,6 +334,10 @@ public class ApplicationProperties {
         return security;
     }
 
+    public Session getSession() {
+        return session;
+    }
+
     public Scheduler getScheduler() {
         return scheduler;
     }
@@ -471,6 +480,10 @@ public class ApplicationProperties {
 
     public void setSecurity(Security security) {
         this.security = security;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 
     public void setScheduler(Scheduler scheduler) {
@@ -4639,6 +4652,29 @@ public class ApplicationProperties {
             public void setClusterCheckinInterval(long clusterCheckinInterval) {
                 this.clusterCheckinInterval = clusterCheckinInterval;
             }
+        }
+    }
+
+    /**
+     * HTTP session configuration.
+     */
+    public static class Session {
+
+        public enum Store {
+            JDBC, MEMORY, REDIS
+        }
+
+        /**
+         * HTTP session store: memory, redis or jdbc. redis and jdbc require the Enterprise Edition
+         */
+        private Store store;
+
+        public Store getStore() {
+            return store;
+        }
+
+        public void setStore(Store store) {
+            this.store = store;
         }
     }
 
