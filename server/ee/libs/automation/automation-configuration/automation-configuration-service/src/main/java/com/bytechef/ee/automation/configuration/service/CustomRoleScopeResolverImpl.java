@@ -81,7 +81,7 @@ public class CustomRoleScopeResolverImpl implements CustomRoleScopeResolver {
 
         CustomRole existingCustomRole = customRole.get();
 
-        Set<String> knownScopeNames = permissionScopeRegistry.getAllScopeNames();
+        Set<String> knownScopeNames = permissionScopeRegistry.getAllScopeNames(existingCustomRole.getSide());
         Set<String> scopeNames = existingCustomRole.getScopeNames();
 
         Set<String> unknownScopeNames = scopeNames.stream()

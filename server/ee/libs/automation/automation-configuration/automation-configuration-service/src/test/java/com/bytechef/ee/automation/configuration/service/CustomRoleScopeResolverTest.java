@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,10 @@ class CustomRoleScopeResolverTest {
 
         PermissionScopeRegistry permissionScopeRegistry = mock(PermissionScopeRegistry.class);
 
-        when(permissionScopeRegistry.getAllScopeNames()).thenReturn(Set.of("CONNECTION_VIEW", "WORKFLOW_VIEW"));
+        when(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.AUTOMATION))
+            .thenReturn(Set.of("CONNECTION_VIEW", "WORKFLOW_VIEW"));
+        when(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED))
+            .thenReturn(Set.of("INTEGRATION_CREATE", "WORKFLOW_VIEW"));
 
         customRoleScopeResolver = new CustomRoleScopeResolverImpl(customRoleRepository, permissionScopeRegistry);
     }
@@ -52,6 +56,17 @@ class CustomRoleScopeResolverTest {
             .hasValueSatisfying(
                 resolvedScopes -> assertThat(resolvedScopes)
                     .containsExactlyInAnyOrder("WORKFLOW_VIEW", "CONNECTION_VIEW"));
+    }
+
+    @Test
+    void testResolveScopesReturnsTheEmbeddedScopesOfAnEmbeddedRole() {
+        CustomRole customRole = new CustomRole(
+            "Integrator", PermissionScopeSide.EMBEDDED, Set.of("INTEGRATION_CREATE", "PROJECT_CREATE"));
+
+        when(customRoleRepository.findById(3L)).thenReturn(Optional.of(customRole));
+
+        assertThat(customRoleScopeResolver.resolveScopes(3L))
+            .hasValueSatisfying(resolvedScopes -> assertThat(resolvedScopes).containsExactly("INTEGRATION_CREATE"));
     }
 
     @Test
