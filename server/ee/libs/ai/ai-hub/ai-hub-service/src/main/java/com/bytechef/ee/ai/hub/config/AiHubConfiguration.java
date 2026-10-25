@@ -50,10 +50,12 @@ import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -67,6 +69,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -142,7 +145,9 @@ public class AiHubConfiguration {
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
-        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
@@ -150,6 +155,8 @@ public class AiHubConfiguration {
 
         toolCallbacks.addAll(componentDefinitionToolCallbacks(componentToolsProvider));
         toolCallbacks.addAll(checkWorkflowToolCallbacks(persistedWorkflowCheckerProvider, projectServiceProvider));
+        toolCallbacks.addAll(
+            searchDocsToolCallbacks(embeddingProviderStatusProviderProvider, copilotPgVectorStoreProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
@@ -182,7 +189,9 @@ public class AiHubConfiguration {
         AiHubToolApprovalPolicy toolApprovalPolicy,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
-        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
@@ -190,6 +199,8 @@ public class AiHubConfiguration {
 
         toolCallbacks.addAll(componentDefinitionToolCallbacks(componentToolsProvider));
         toolCallbacks.addAll(checkWorkflowToolCallbacks(persistedWorkflowCheckerProvider, projectServiceProvider));
+        toolCallbacks.addAll(
+            searchDocsToolCallbacks(embeddingProviderStatusProviderProvider, copilotPgVectorStoreProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
@@ -315,6 +326,25 @@ public class AiHubConfiguration {
         }
 
         return List.of(ToolCallbacks.from(new CheckWorkflowTools(persistedWorkflowChecker, projectService)));
+    }
+
+    /**
+     * {@code searchDocs}, a search of the documentation the Copilot indexes. Absent when the Copilot's vector store or
+     * the embedding status is unavailable.
+     */
+    static List<ToolCallback> searchDocsToolCallbacks(
+        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
+        ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
+
+        EmbeddingProviderStatusProvider embeddingProviderStatusProvider =
+            embeddingProviderStatusProviderProvider.getIfAvailable();
+        VectorStore copilotPgVectorStore = copilotPgVectorStoreProvider.getIfAvailable();
+
+        if (embeddingProviderStatusProvider == null || copilotPgVectorStore == null) {
+            return List.of();
+        }
+
+        return List.of(ToolCallbacks.from(new SearchDocsTools(embeddingProviderStatusProvider, copilotPgVectorStore)));
     }
 
     /**
