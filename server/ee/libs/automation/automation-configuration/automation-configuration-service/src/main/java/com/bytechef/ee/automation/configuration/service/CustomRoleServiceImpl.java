@@ -15,6 +15,7 @@ import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.exception.CustomRoleErrorType;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -25,6 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,16 +61,15 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     @Override
     @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_CREATED, mapper = CustomRoleAuditMapper.class)
     public CustomRole createCustomRole(String name, String description, Set<String> scopeNames) {
-        validateScopeNames(scopeNames);
-        validateNameIsAvailable(name, null);
+        return create(name, description, PermissionScopeSide.AUTOMATION, scopeNames);
+    }
 
-        CustomRole customRole = new CustomRole(name, scopeNames);
+    @Override
+    @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_CREATED, mapper = CustomRoleAuditMapper.class)
+    public CustomRole createCustomRole(
+        String name, String description, PermissionScopeSide side, Set<String> scopeNames) {
 
-        customRole.setDescription(description);
-
-        CustomRole savedCustomRole = customRoleRepository.save(customRole);
-
-        return savedCustomRole;
+        return create(name, description, side, scopeNames);
     }
 
     @Override
@@ -110,20 +111,35 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<CustomRole> getCustomRoles(Long workspaceId, @Nullable PermissionScopeSide side) {
+        List<CustomRole> customRoles = customRoleRepository.findAll();
+
+        if (side == null) {
+            return customRoles;
+        }
+
+        return customRoles.stream()
+            .filter(customRole -> customRole.getSide() == side)
+            .toList();
+    }
+
+    @Override
     @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_UPDATED, mapper = CustomRoleAuditMapper.class)
     public CustomRole updateCustomRole(long roleId, String name, String description, Set<String> scopeNames) {
         CustomRole customRole = customRoleRepository.findById(roleId)
             .orElseThrow(() -> new ConfigurationException(
                 "Custom role " + roleId + " does not exist", CustomRoleErrorType.CUSTOM_ROLE_NOT_FOUND));
 
+        PermissionScopeSide side = customRole.getSide();
         Set<String> storedScopeNames = customRole.getScopeNames();
-        Set<String> registeredScopeNames = permissionScopeRegistry.getAllScopeNames();
+        Set<String> registeredScopeNames = permissionScopeRegistry.getAllScopeNames(side);
 
         Set<String> retainedScopeNames = scopeNames.stream()
             .filter(scopeName -> registeredScopeNames.contains(scopeName) || !storedScopeNames.contains(scopeName))
             .collect(Collectors.toSet());
 
-        validateScopeNames(retainedScopeNames);
+        validateScopeNames(retainedScopeNames, side);
 
         if (retainedScopeNames.isEmpty()) {
             throw new ConfigurationException(
@@ -176,6 +192,23 @@ public class CustomRoleServiceImpl implements CustomRoleService {
         return permissionScopeRegistry.getScopeGroups();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<PermissionScopeGroupDTO> getPermissionScopeGroups(PermissionScopeSide side) {
+        return permissionScopeRegistry.getScopeGroups(side);
+    }
+
+    private CustomRole create(String name, String description, PermissionScopeSide side, Set<String> scopeNames) {
+        validateScopeNames(scopeNames, side);
+        validateNameIsAvailable(name, null);
+
+        CustomRole customRole = new CustomRole(name, side, scopeNames);
+
+        customRole.setDescription(description);
+
+        return customRoleRepository.save(customRole);
+    }
+
     /**
      * Rejects a name another role already holds, before anything is written.
      *
@@ -220,8 +253,8 @@ public class CustomRoleServiceImpl implements CustomRoleService {
      * name must be one a module actually contributed via {@code PermissionScopeProvider}. A name no provider declares
      * is rejected here (rather than persisted and silently inert) so a typo or a removed module surfaces at write time.
      */
-    private void validateScopeNames(Set<String> scopeNames) {
-        Set<String> allScopeNames = permissionScopeRegistry.getAllScopeNames();
+    private void validateScopeNames(Set<String> scopeNames, PermissionScopeSide side) {
+        Set<String> allScopeNames = permissionScopeRegistry.getAllScopeNames(side);
 
         Set<String> unknownScopeNames = new TreeSet<>();
 
