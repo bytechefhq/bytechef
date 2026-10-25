@@ -11,6 +11,10 @@ import {Node} from '@xyflow/react';
 
 export const CLUSTER_FRAME_HEADER_HEIGHT = 40;
 
+export const CLUSTER_FRAME_CONTENT_TOP_GAP = 16;
+
+export const CLUSTER_FRAME_CONTENT_TOP = CLUSTER_FRAME_HEADER_HEIGHT + CLUSTER_FRAME_CONTENT_TOP_GAP;
+
 export const CLUSTER_FRAME_TITLE_LINE_HEIGHT = 20;
 
 export const CLUSTER_FRAME_BOTTOM_PADDING = (CLUSTER_FRAME_HEADER_HEIGHT - CLUSTER_FRAME_TITLE_LINE_HEIGHT) / 2;
@@ -55,7 +59,7 @@ export interface ClusterFrameContentOriginI {
 
 export const DEFAULT_CLUSTER_FRAME_CONTENT_ORIGIN: ClusterFrameContentOriginI = {
     x: CLUSTER_FRAME_PADDING,
-    y: CLUSTER_FRAME_HEADER_HEIGHT,
+    y: CLUSTER_FRAME_CONTENT_TOP,
 };
 
 export function toClusterFrameChildPosition(
@@ -120,7 +124,7 @@ export function computeClusterFrameSize(childBoxes: ClusterMemberBoxI[]): {heigh
     return {
         height: Math.max(
             CLUSTER_FRAME_MIN_HEIGHT,
-            CLUSTER_FRAME_HEADER_HEIGHT + extent.height + CLUSTER_FRAME_BOTTOM_PADDING
+            CLUSTER_FRAME_CONTENT_TOP + extent.height + CLUSTER_FRAME_BOTTOM_PADDING
         ),
         width: Math.max(CLUSTER_FRAME_MIN_WIDTH, extent.width + 2 * CLUSTER_FRAME_PADDING),
     };
@@ -138,6 +142,6 @@ export function computeClusterFrameContentOrigin(
 
     return {
         x: (frameWidth - extent.width) / 2 - extent.left,
-        y: CLUSTER_FRAME_HEADER_HEIGHT + Math.max(0, -extent.top),
+        y: CLUSTER_FRAME_CONTENT_TOP + Math.max(0, -extent.top),
     };
 }
