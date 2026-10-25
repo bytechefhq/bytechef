@@ -90,8 +90,6 @@ class RedisControlChannelIntTest {
 
         RedisMessageSerializer redisMessageSerializer = new RedisMessageSerializer(objectMapper);
 
-        // Subscriptions are established asynchronously after start, so publish until the deadline passes or both
-        // nodes have received the message.
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
 
         while ((nodeALatch.getCount() > 0 || nodeBLatch.getCount() > 0) && System.nanoTime() < deadline) {
