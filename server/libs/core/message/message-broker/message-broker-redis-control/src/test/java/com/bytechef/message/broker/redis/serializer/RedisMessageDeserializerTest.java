@@ -54,6 +54,16 @@ class RedisMessageDeserializerTest {
     }
 
     @Test
+    void testDeserializeRejectsJdkTypeOutsideTrustedPackages() {
+        String message = objectMapper.writeValueAsString(new RedisMessage("{}", "java.util.Timer"));
+
+        assertThatThrownBy(() -> redisMessageDeserializer.deserialize(message))
+            .isInstanceOf(SerializationException.class)
+            .hasMessageContaining("java.util.Timer")
+            .hasMessageContaining("trusted packages");
+    }
+
+    @Test
     void testDeserializeReadsBytechefType() {
         TestEvent testEvent = new TestEvent("value");
 
