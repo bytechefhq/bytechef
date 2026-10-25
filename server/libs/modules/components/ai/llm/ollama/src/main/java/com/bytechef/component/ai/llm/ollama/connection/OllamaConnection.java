@@ -33,7 +33,11 @@ public final class OllamaConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .version(1)
-        .baseUri((connectionParameters, context) -> "http://localhost:11434/")
+        .baseUri((connectionParameters, context) -> {
+            String url = connectionParameters.getString(URL);
+
+            return (url == null || url.isEmpty()) ? "http://localhost:11434/" : url;
+        })
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
