@@ -17,7 +17,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
@@ -64,6 +63,7 @@ dependencies {
     }
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
+    implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
