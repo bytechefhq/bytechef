@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.scrapeunblocker.action.ScrapeUnblockerGetMarkdownAction;
 import com.bytechef.component.scrapeunblocker.action.ScrapeUnblockerGetPageSourceAction;
 import com.bytechef.component.scrapeunblocker.action.ScrapeUnblockerGetParsedDataAction;
 import com.bytechef.component.scrapeunblocker.connection.ScrapeUnblockerConnection;
@@ -37,17 +38,19 @@ public class ScrapeUnblockerComponentHandler implements ComponentHandler {
         .title("ScrapeUnblocker")
         .version(1)
         .description(
-            "ScrapeUnblocker is a web scraping API that returns fully rendered HTML or AI-parsed JSON from any URL, " +
-                "bypassing anti-bot protection such as Cloudflare, DataDome, PerimeterX and Akamai.")
+            "ScrapeUnblocker is a web scraping API that returns fully rendered HTML, Markdown or AI-parsed JSON " +
+                "from any URL, bypassing anti-bot protection such as Cloudflare, DataDome, PerimeterX and Akamai.")
         .icon("path:assets/scrapeunblocker.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(ScrapeUnblockerConnection.CONNECTION_DEFINITION)
         .customAction(true)
-        .customActionHelp("", "https://developers.scrapeunblocker.com")
+        .customActionHelp("", "https://docs.scrapeunblocker.com")
         .actions(
+            ScrapeUnblockerGetMarkdownAction.ACTION_DEFINITION,
             ScrapeUnblockerGetPageSourceAction.ACTION_DEFINITION,
             ScrapeUnblockerGetParsedDataAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(ScrapeUnblockerGetMarkdownAction.ACTION_DEFINITION),
             tool(ScrapeUnblockerGetPageSourceAction.ACTION_DEFINITION),
             tool(ScrapeUnblockerGetParsedDataAction.ACTION_DEFINITION));
 

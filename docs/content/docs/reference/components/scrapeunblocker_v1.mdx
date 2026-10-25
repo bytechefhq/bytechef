@@ -1,6 +1,6 @@
 ---
 title: "ScrapeUnblocker"
-description: "ScrapeUnblocker is a web scraping API that returns fully rendered HTML or AI-parsed JSON from any URL, bypassing anti-bot protection such as Cloudflare, DataDome, PerimeterX and Akamai."
+description: "ScrapeUnblocker is a web scraping API that returns fully rendered HTML, Markdown or AI-parsed JSON from any URL, bypassing anti-bot protection such as Cloudflare, DataDome, PerimeterX and Akamai."
 ---
 
 
@@ -43,6 +43,50 @@ Version: 1
 
 
 ## Actions
+
+
+### Get Markdown
+Name: getMarkdown
+
+`Scrape a URL and return the page as clean Markdown for LLMs and AI agents: headings, lists, tables and absolute links, without scripts, styles, navigation or footer. Bypasses anti-bot protection such as Cloudflare, DataDome, PerimeterX and Akamai.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The URL of the page to scrape. | true |
+| proxy_country | Proxy Country | STRING | Two-letter country code for the proxy exit location (e.g. US, DE). | false |
+| time_sleep | Wait Seconds | INTEGER | Number of seconds to wait after the page loads before it is converted to Markdown. | false |
+| main_content_only | Main Content Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Keep only the main content of the page, without navigation, site header, footer and sidebars. Turn off to keep the whole page. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Markdown",
+  "name" : "getMarkdown",
+  "parameters" : {
+    "url" : "",
+    "proxy_country" : "",
+    "time_sleep" : 1,
+    "main_content_only" : false
+  },
+  "type" : "scrapeunblocker/v1/getMarkdown"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
 
 
 ### Get Page Source
