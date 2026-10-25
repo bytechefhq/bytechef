@@ -36,13 +36,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Lists the models installed on an Ollama server through its {@code GET /api/tags} endpoint, so the AI model picker and
- * the default model follow what the server actually has instead of a fixed model list.
- *
  * @author Ivica Cardic
  */
 @Component
-public class OllamaModelLister {
+public class OllamaModelClient {
 
     public static final String DEFAULT_URL = "http://localhost:11434";
 
@@ -51,27 +48,19 @@ public class OllamaModelLister {
     private static final String CAPABILITY_EMBEDDING = "embedding";
     private static final Duration TIMEOUT = Duration.ofSeconds(2);
 
-    private static final Logger log = LoggerFactory.getLogger(OllamaModelLister.class);
+    private static final Logger log = LoggerFactory.getLogger(OllamaModelClient.class);
 
     private final Map<String, CachedModels> cachedModelsMap = new ConcurrentHashMap<>();
     private final HttpClient httpClient = HttpClient.newBuilder()
         .connectTimeout(TIMEOUT)
         .build();
 
-    /**
-     * Returns the chat-capable models installed on the server, local models first, or an empty list when the server
-     * cannot be reached.
-     */
     public List<String> getChatModels(@Nullable String url, @Nullable String apiKey) {
-        return filterModelNames(getModels(url, apiKey), OllamaModelLister::isChatModel);
+        return filterModelNames(getModels(url, apiKey), OllamaModelClient::isChatModel);
     }
 
-    /**
-     * Returns the embedding models installed on the server, local models first, or an empty list when the server cannot
-     * be reached.
-     */
     public List<String> getEmbeddingModels(@Nullable String url, @Nullable String apiKey) {
-        return filterModelNames(getModels(url, apiKey), OllamaModelLister::isEmbeddingModel);
+        return filterModelNames(getModels(url, apiKey), OllamaModelClient::isEmbeddingModel);
     }
 
     private List<OllamaModel> getModels(@Nullable String url, @Nullable String apiKey) {

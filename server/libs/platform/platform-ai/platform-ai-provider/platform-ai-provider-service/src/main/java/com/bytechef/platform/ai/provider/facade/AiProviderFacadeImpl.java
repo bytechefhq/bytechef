@@ -22,7 +22,7 @@ import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderDTO;
-import com.bytechef.platform.ai.provider.ollama.OllamaModelLister;
+import com.bytechef.platform.ai.provider.ollama.OllamaModelClient;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.StringProperty;
@@ -51,17 +51,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class AiProviderFacadeImpl implements AiProviderFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
-    private final OllamaModelLister ollamaModelLister;
+    private final OllamaModelClient ollamaModelClient;
     private final PropertyService propertyService;
     private final ApplicationProperties applicationProperties;
 
     @SuppressFBWarnings("EI")
     public AiProviderFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, OllamaModelLister ollamaModelLister,
+        ComponentDefinitionService componentDefinitionService, OllamaModelClient ollamaModelClient,
         PropertyService propertyService, ApplicationProperties applicationProperties) {
 
         this.componentDefinitionService = componentDefinitionService;
-        this.ollamaModelLister = ollamaModelLister;
+        this.ollamaModelClient = ollamaModelClient;
         this.propertyService = propertyService;
         this.applicationProperties = applicationProperties;
     }
@@ -343,7 +343,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     private List<AiProviderCatalogItemDTO.Model> readOllamaChatModels(
         ComponentDefinition componentDefinition, int environment) {
 
-        List<String> installedModels = ollamaModelLister.getChatModels(
+        List<String> installedModels = ollamaModelClient.getChatModels(
             resolveUrl(Provider.OLLAMA, environment), resolveApiKey(Provider.OLLAMA, environment));
 
         if (installedModels.isEmpty()) {
@@ -360,7 +360,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
         if ((model == null || model.isBlank()) && provider == Provider.OLLAMA) {
             return getFirst(
-                ollamaModelLister.getChatModels(resolveUrl(provider, environment),
+                ollamaModelClient.getChatModels(resolveUrl(provider, environment),
                     resolveApiKey(provider, environment)));
         }
 
@@ -372,7 +372,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
         if ((model == null || model.isBlank()) && provider == Provider.OLLAMA) {
             return getFirst(
-                ollamaModelLister.getEmbeddingModels(
+                ollamaModelClient.getEmbeddingModels(
                     resolveUrl(provider, environment), resolveApiKey(provider, environment)));
         }
 
