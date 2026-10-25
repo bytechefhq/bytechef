@@ -125,6 +125,10 @@ bytechef:
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | memory | redis) default: memory
     provider: memory
+    aws:
+      # Transport for CONTROL routes, which must reach every node (redis | sqs) default: sqs
+      # sqs: one shared queue, correct for a single node only. redis: pub/sub broadcast, required with more than one node.
+      control-provider: sqs
   oauth2:
 #    predefinedApps:
 #      mailchimp:
