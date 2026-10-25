@@ -717,6 +717,13 @@ export type McpProjectsByServerIdQueryVariables = Exact<{
 
 export type McpProjectsByServerIdQuery = { mcpProjectsByServerId: Array<{ id: string, projectDeploymentId: string, mcpServerId: string, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectVersion: number | null, project: { id: string, name: string, category: { id: string | null, name: string | null } | null, tags: Array<{ id: string, name: string } | null> | null } | null, mcpProjectWorkflows: Array<{ id: string, enabled: boolean, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectDeploymentWorkflow: { id: string, enabled: boolean, inputs: any, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
 
+export type MyWorkspaceRoleQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type MyWorkspaceRoleQuery = { myWorkspaceRole: string | null };
+
 export type MyWorkspaceScopesQueryVariables = Exact<{
   workspaceId: string | number;
   environment?: Types.EnvironmentEnum | null | undefined;
@@ -5107,6 +5114,28 @@ export const useMcpProjectsByServerIdQuery = <
       {
     queryKey: ['mcpProjectsByServerId', variables],
     queryFn: fetcher<McpProjectsByServerIdQuery, McpProjectsByServerIdQueryVariables>(McpProjectsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const MyWorkspaceRoleDocument = new TypedDocumentString(`
+    query MyWorkspaceRole($workspaceId: ID!) {
+  myWorkspaceRole(workspaceId: $workspaceId)
+}
+    `);
+
+export const useMyWorkspaceRoleQuery = <
+      TData = MyWorkspaceRoleQuery,
+      TError = unknown
+    >(
+      variables: MyWorkspaceRoleQueryVariables,
+      options?: Omit<UseQueryOptions<MyWorkspaceRoleQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<MyWorkspaceRoleQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<MyWorkspaceRoleQuery, TError, TData>(
+      {
+    queryKey: ['MyWorkspaceRole', variables],
+    queryFn: fetcher<MyWorkspaceRoleQuery, MyWorkspaceRoleQueryVariables>(MyWorkspaceRoleDocument, variables),
     ...options
   }
     )};
