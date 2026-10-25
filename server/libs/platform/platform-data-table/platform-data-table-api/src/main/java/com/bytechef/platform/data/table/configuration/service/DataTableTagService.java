@@ -43,11 +43,11 @@ public interface DataTableTagService {
     List<Tag> getTags(List<Long> dataTableIds);
 
     /**
-     * Retrieves a mapping from data table base name to list of tags assigned to that table.
+     * Retrieves a mapping from data table id to list of tags assigned to that table.
      *
-     * @return a map where keys are data table base names and values are lists of Tag objects assigned to each table
+     * @return a map where keys are data table ids and values are lists of Tag objects assigned to each table
      */
-    Map<String, List<Tag>> getTagsByTableName();
+    Map<Long, List<Tag>> getTagsByTableId();
 
     /**
      * Updates the tags associated with a specific data table.

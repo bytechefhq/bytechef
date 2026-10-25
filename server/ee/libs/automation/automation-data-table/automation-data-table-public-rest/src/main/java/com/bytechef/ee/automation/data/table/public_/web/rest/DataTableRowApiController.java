@@ -85,10 +85,10 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
         "rawtypes", "unchecked"
     })
     public ResponseEntity<Page> listRows(
-        String name, @Nullable EnvironmentModel xEnvironment, @Nullable List<String> filter,
+        Long workspaceId, String name, @Nullable EnvironmentModel xEnvironment, @Nullable List<String> filter,
         @Nullable List<String> sort, @Nullable Integer pageNumber, @Nullable Integer pageSize) {
 
-        Resolved resolved = resolve(name, xEnvironment);
+        Resolved resolved = resolve(workspaceId, name, xEnvironment);
         Set<String> queryableColumns = queryableColumns(resolved.dataTableInfo());
 
         List<RowFilter> rowFilters = RowQueryParser.parseFilters(rawFilters(filter), queryableColumns);
@@ -106,9 +106,10 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<DataTableRowModel> createRow(
-        String name, CreateRowRequestModel createRowRequestModel, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, CreateRowRequestModel createRowRequestModel,
+        @Nullable EnvironmentModel xEnvironment) {
 
-        Resolved resolved = resolve(name, xEnvironment);
+        Resolved resolved = resolve(workspaceId, name, xEnvironment);
 
         RowValuesValidator.validate(createRowRequestModel.getValues(), resolved.dataTableInfo()
             .columns());
@@ -127,8 +128,10 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
     }
 
     @Override
-    public ResponseEntity<DataTableRowModel> getRow(String name, Long id, @Nullable EnvironmentModel xEnvironment) {
-        long dataTableId = support.resolveTableId(name);
+    public ResponseEntity<DataTableRowModel> getRow(
+        Long workspaceId, String name, Long id, @Nullable EnvironmentModel xEnvironment) {
+
+        long dataTableId = support.resolveTableId(workspaceId, name);
 
         DataTableRow dataTableRow =
             workspaceDataTableFacade.getRow(dataTableId, id, support.environmentId(xEnvironment));
@@ -138,9 +141,10 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<DataTableRowModel> updateRow(
-        String name, Long id, UpdateRowRequestModel updateRowRequestModel, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, Long id, UpdateRowRequestModel updateRowRequestModel,
+        @Nullable EnvironmentModel xEnvironment) {
 
-        Resolved resolved = resolve(name, xEnvironment);
+        Resolved resolved = resolve(workspaceId, name, xEnvironment);
         Map<String, Object> values = updateRowRequestModel.getValues() == null
             ? Map.of() : updateRowRequestModel.getValues();
 
@@ -168,9 +172,11 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
     }
 
     @Override
-    public ResponseEntity<Void> deleteRow(String name, Long id, @Nullable EnvironmentModel xEnvironment) {
+    public ResponseEntity<Void> deleteRow(
+        Long workspaceId, String name, Long id, @Nullable EnvironmentModel xEnvironment) {
+
         boolean deleted = workspaceDataTableFacade.deleteRow(
-            support.resolveTableId(name), id, support.environmentId(xEnvironment));
+            support.resolveTableId(workspaceId, name), id, support.environmentId(xEnvironment));
 
         if (!deleted) {
             throw new DataTableException("Row not found: id=" + id, DataTableErrorType.ROW_NOT_FOUND);
@@ -182,10 +188,12 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<DataTableRowModel> getRowByExternalId(
-        String name, String externalId, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, String externalId, @Nullable EnvironmentModel xEnvironment) {
+
+        long dataTableId = support.resolveTableId(workspaceId, name);
 
         DataTableRow dataTableRow = workspaceDataTableFacade
-            .fetchRowByExternalId(support.resolveTableId(name), externalId, support.environmentId(xEnvironment))
+            .fetchRowByExternalId(dataTableId, externalId, support.environmentId(xEnvironment))
             .orElseThrow(() -> new DataTableException(
                 "Row not found: externalId=" + externalId, DataTableErrorType.ROW_NOT_FOUND));
 
@@ -194,10 +202,10 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<DataTableRowModel> upsertRowByExternalId(
-        String name, String externalId, UpsertRowRequestModel upsertRowRequestModel,
+        Long workspaceId, String name, String externalId, UpsertRowRequestModel upsertRowRequestModel,
         @Nullable EnvironmentModel xEnvironment) {
 
-        Resolved resolved = resolve(name, xEnvironment);
+        Resolved resolved = resolve(workspaceId, name, xEnvironment);
 
         RowValuesValidator.validateExternalId(externalId);
         RowValuesValidator.validate(upsertRowRequestModel.getValues(), resolved.dataTableInfo()
@@ -212,10 +220,10 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<Void> deleteRowByExternalId(
-        String name, String externalId, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, String externalId, @Nullable EnvironmentModel xEnvironment) {
 
         boolean deleted = workspaceDataTableFacade.deleteRowByExternalId(
-            support.resolveTableId(name), externalId, support.environmentId(xEnvironment));
+            support.resolveTableId(workspaceId, name), externalId, support.environmentId(xEnvironment));
 
         if (!deleted) {
             throw new DataTableException("Row not found: externalId=" + externalId, DataTableErrorType.ROW_NOT_FOUND);
@@ -227,9 +235,10 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<BatchRowsResponseModel> batchRows(
-        String name, BatchRowsRequestModel batchRowsRequestModel, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, BatchRowsRequestModel batchRowsRequestModel,
+        @Nullable EnvironmentModel xEnvironment) {
 
-        Resolved resolved = resolve(name, xEnvironment);
+        Resolved resolved = resolve(workspaceId, name, xEnvironment);
         List<BatchRowModel> batchRowModels = batchRowsRequestModel.getRows();
 
         if (batchRowModels == null || batchRowModels.size() > MAX_BATCH_SIZE) {
@@ -269,7 +278,7 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<DeleteRowsResponseModel> deleteRows(
-        String name, List<Long> ids, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, List<Long> ids, @Nullable EnvironmentModel xEnvironment) {
 
         if (ids == null || ids.isEmpty()) {
             throw new DataTableException("ids is required", DataTableErrorType.ROW_VALUE_INVALID);
@@ -281,7 +290,7 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
         }
 
         List<Long> deletedIds = workspaceDataTableFacade.deleteRows(
-            support.resolveTableId(name), ids, support.environmentId(xEnvironment));
+            support.resolveTableId(workspaceId, name), ids, support.environmentId(xEnvironment));
 
         return ResponseEntity.ok(
             new DeleteRowsResponseModel().deletedCount(deletedIds.size())
@@ -289,27 +298,29 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
     }
 
     @Override
-    public ResponseEntity<ClearRowsResponseModel> clearRows(String name, @Nullable EnvironmentModel xEnvironment) {
+    public ResponseEntity<ClearRowsResponseModel> clearRows(
+        Long workspaceId, String name, @Nullable EnvironmentModel xEnvironment) {
+
         long deletedCount = workspaceDataTableFacade.clearRows(
-            support.resolveTableId(name), support.environmentId(xEnvironment));
+            support.resolveTableId(workspaceId, name), support.environmentId(xEnvironment));
 
         return ResponseEntity.ok(new ClearRowsResponseModel().deletedCount(deletedCount));
     }
 
     @Override
     public ResponseEntity<ImportRowsResponseModel> importRows(
-        String name, String body, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, String body, @Nullable EnvironmentModel xEnvironment) {
 
         int importedCount = workspaceDataTableFacade.importCsv(
-            support.resolveTableId(name), body, support.environmentId(xEnvironment));
+            support.resolveTableId(workspaceId, name), body, support.environmentId(xEnvironment));
 
         return ResponseEntity.ok(new ImportRowsResponseModel().importedCount(importedCount));
     }
 
     @Override
-    public ResponseEntity<String> exportRows(String name, @Nullable EnvironmentModel xEnvironment) {
+    public ResponseEntity<String> exportRows(Long workspaceId, String name, @Nullable EnvironmentModel xEnvironment) {
         String csv = workspaceDataTableFacade.exportCsv(
-            support.resolveTableId(name), support.environmentId(xEnvironment));
+            support.resolveTableId(workspaceId, name), support.environmentId(xEnvironment));
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, "text/csv;charset=UTF-8")
@@ -317,8 +328,8 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
             .body(csv);
     }
 
-    private Resolved resolve(String name, @Nullable EnvironmentModel xEnvironment) {
-        long dataTableId = support.resolveTableId(name);
+    private Resolved resolve(long workspaceId, String name, @Nullable EnvironmentModel xEnvironment) {
+        long dataTableId = support.resolveTableId(workspaceId, name);
         long environmentId = support.environmentId(xEnvironment);
 
         return new Resolved(

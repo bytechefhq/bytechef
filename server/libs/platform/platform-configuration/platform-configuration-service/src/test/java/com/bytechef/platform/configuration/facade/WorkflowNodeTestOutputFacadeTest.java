@@ -144,11 +144,13 @@ class WorkflowNodeTestOutputFacadeTest {
         when(evaluator.evaluate(anyMap(), anyMap(), anyBoolean()))
             .thenAnswer(invocation -> invocation.getArgument(0));
         when(actionDefinitionFacade.executePerform(
-            eq("postgresql"), eq(1), eq("query"), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(), anyMap(),
+            eq("postgresql"), eq(1), eq("query"), isNull(), isNull(), isNull(), isNull(), eq(WORKFLOW_ID), anyMap(),
+            anyMap(),
             any(), eq(ENVIRONMENT_ID), isNull(), eq(true), anyMap(), isNull(), isNull()))
                 .thenReturn(List.of());
-        when(actionDefinitionFacade.executeOutput(eq("postgresql"), eq(1), eq("query"), anyMap(), anyMap()))
-            .thenReturn(new OutputResponse(outputSchema, List.of()));
+        when(actionDefinitionFacade.executeOutput(eq("postgresql"), eq(1), eq("query"), anyMap(), anyMap(),
+            eq(WORKFLOW_ID)))
+                .thenReturn(new OutputResponse(outputSchema, List.of()));
 
         workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(WORKFLOW_ID, "postgresql_1", ENVIRONMENT_ID);
 

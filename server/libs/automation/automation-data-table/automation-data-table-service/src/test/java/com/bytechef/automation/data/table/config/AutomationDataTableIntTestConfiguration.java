@@ -18,6 +18,8 @@ package com.bytechef.automation.data.table.config;
 
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.tag.service.TagService;
@@ -41,6 +43,16 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class AutomationDataTableIntTestConfiguration {
+
+    @Bean
+    ProjectService projectService() {
+        return mock(ProjectService.class);
+    }
+
+    @Bean
+    ProjectWorkflowService projectWorkflowService() {
+        return mock(ProjectWorkflowService.class);
+    }
 
     @Bean
     TagService tagService() {

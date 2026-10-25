@@ -16,15 +16,12 @@
 
 package com.bytechef.platform.data.table.internal;
 
-import java.util.Locale;
-
 /**
  * Builds the physical table name for a data table.
  *
  * <p>
  * Reached through {@link com.bytechef.platform.data.table.domain.DataTableRef} rather than called directly:
- * {@code DataTableRef} is the only thing that names a physical table, and it validates the base name that goes into
- * every name built here.
+ * {@code DataTableRef} is the only thing that names a physical table.
  *
  * @author Ivica Cardic
  */
@@ -33,11 +30,7 @@ public final class PhysicalTableNaming {
     private PhysicalTableNaming() {
     }
 
-    public static String buildPhysicalName(long environmentId, String baseName) {
-        return prefix(environmentId) + baseName.toLowerCase(Locale.ROOT);
-    }
-
-    public static String prefix(long environmentId) {
-        return "dt_" + environmentId + "_";
+    public static String buildPhysicalName(long environmentId, long dataTableId) {
+        return "dt_" + environmentId + "_" + dataTableId;
     }
 }

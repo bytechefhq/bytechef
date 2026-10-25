@@ -40,13 +40,20 @@ class DataTableCreateRecordsActionTest extends AbstractDataTableActionTest {
         when(dataTableRowService.insertRow(eq(dataTableRef), anyMap()))
             .thenReturn(new DataTableRow(1, Map.of("status", "BOT")));
 
-        ModifiableActionDefinition actionDefinition = DataTableCreateRecordsAction.of(
-            dataTableService, dataTableRowService);
-
         assertEquals(
             List.of(Map.of("id", 1L, "status", "BOT")),
             perform(
-                actionDefinition,
-                Map.of("table", BASE_NAME, "records", Map.of("values", List.of(Map.of("status", "BOT"))))));
+                createActionDefinition(),
+                Map.of("table", TABLE_NAME, "records", Map.of("values", List.of(Map.of("status", "BOT"))))));
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableCreateRecordsAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "records", Map.of("values", List.of(Map.of("status", "BOT"))));
     }
 }

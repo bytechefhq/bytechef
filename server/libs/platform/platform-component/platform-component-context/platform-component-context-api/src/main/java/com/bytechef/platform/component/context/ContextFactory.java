@@ -53,6 +53,15 @@ public interface ContextFactory {
         @Nullable PlatformType type, boolean editorEnvironment);
 
     /**
+     * Creates a trigger context for an editor call that runs for a workflow, so a component can resolve the workflow it
+     * is configured in.
+     */
+    TriggerContext createTriggerContext(
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, @Nullable String workflowId, @Nullable ComponentConnection componentConnection,
+        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment);
+
+    /**
      * Creates a trigger context for a trigger that is actually running for a persisted trigger execution. Log entries
      * written through it are stored under that execution.
      */

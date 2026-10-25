@@ -18,6 +18,8 @@ package com.bytechef.component.datatable.trigger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +33,7 @@ class DataTableRecordCreatedTriggerTest extends AbstractDataTableTriggerTest {
         assertEquals(
             Map.of("id", 7, "status", "BOT"),
             webhookRequest(
-                DataTableRecordCreatedTrigger.of(null, null, null),
+                createTriggerDefinition(),
                 rowContent("RECORD_CREATED", Map.of("status", "BOT"))));
     }
 
@@ -39,6 +41,17 @@ class DataTableRecordCreatedTriggerTest extends AbstractDataTableTriggerTest {
     void testWebhookRequestWithoutPayloadReturnsContent() throws Exception {
         Map<String, Object> content = Map.of("type", "RECORD_CREATED", "table", "conversations");
 
-        assertEquals(content, webhookRequest(DataTableRecordCreatedTrigger.of(null, null, null), content));
+        assertEquals(content, webhookRequest(createTriggerDefinition(), content));
+    }
+
+    @Override
+    protected ModifiableTriggerDefinition createTriggerDefinition() {
+        return DataTableRecordCreatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService,
+            dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected DataTableWebhookType getWebhookType() {
+        return DataTableWebhookType.RECORD_CREATED;
     }
 }

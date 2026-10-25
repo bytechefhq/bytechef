@@ -44,7 +44,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId, String workflowId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
@@ -94,7 +94,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Long connectionId) {
+        Long connectionId, String workflowId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-options"),
@@ -107,7 +107,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, Long connectionId) {
+        Map<String, ?> inputParameters, Long connectionId, String workflowId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output"),

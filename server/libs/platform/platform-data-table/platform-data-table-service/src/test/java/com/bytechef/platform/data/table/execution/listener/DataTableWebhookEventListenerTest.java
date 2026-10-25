@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
@@ -46,7 +47,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringJUnitConfig(DataTableWebhookEventListenerTest.DataTableWebhookEventListenerTestConfiguration.class)
 class DataTableWebhookEventListenerTest {
 
-    private static final DataTableRef DATA_TABLE_REF = new DataTableRef("orders", 0);
+    private static final DataTableRef DATA_TABLE_REF = new DataTableRef(7L, 0);
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -134,7 +135,8 @@ class DataTableWebhookEventListenerTest {
 
         @Bean
         DataTableWebhookEventListener dataTableWebhookEventListener(DataTableWebhookService dataTableWebhookService) {
-            return new DataTableWebhookEventListener(dataTableWebhookService, mock(RestTemplate.class));
+            return new DataTableWebhookEventListener(
+                mock(DataTableService.class), dataTableWebhookService, mock(RestTemplate.class));
         }
 
         @Bean

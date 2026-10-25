@@ -45,7 +45,8 @@ public class KnowledgeBaseReferenceResolver implements ResourceReferenceResolver
 
     @Override
     @Nullable
-    public String findProblem(String reference, long environmentId) {
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    public String findProblem(String reference, long environmentId, @Nullable String workflowId) {
         long knowledgeBaseId;
 
         try {

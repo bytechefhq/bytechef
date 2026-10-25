@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
@@ -31,9 +32,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * The shape of the registry key, asserted against the database rather than against the changelog text.
  *
  * <p>
- * A name identifies one row, and the service takes that at its word: {@code fetchDataTable} asks the repository for a
- * single row by name, so a second row of the same name would not resolve ambiguously -- it would make every read of
- * that name throw. The key is what makes the singular lookup legitimate.
+ * A name identifies one row per workspace rather than one row overall: two workspaces are free to each register their
+ * own "invoices" table, and only a second row of the same name in the same workspace is rejected.
  *
  * <p>
  * Rows are written with raw SQL on purpose, because the point is what the database refuses rather than what the domain
@@ -49,18 +49,26 @@ class DataTableNameUniqueIndexIntTest {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    void testOnePoolCannotHoldTheSameNameTwice() {
-        insert("uqinvoices");
+    void testOneWorkspaceCannotHoldTheSameNameTwice() {
+        insert("uqinvoices", 1L);
 
-        assertThatThrownBy(() -> insert("uqinvoices"))
+        assertThatThrownBy(() -> insert("uqinvoices", 1L))
             .isInstanceOf(DataIntegrityViolationException.class);
     }
 
-    private void insert(String name) {
+    @Test
+    void testDifferentWorkspacesCanHoldTheSameName() {
+        insert("uqcontacts", 1L);
+
+        assertThatCode(() -> insert("uqcontacts", 2L))
+            .doesNotThrowAnyException();
+    }
+
+    private void insert(String name, Long workspaceId) {
         jdbcTemplate.update(
-            "INSERT INTO data_table (name, created_date, created_by, " +
+            "INSERT INTO data_table (name, workspace_id, created_date, created_by, " +
                 "last_modified_date, last_modified_by, version) " +
-                "VALUES (?, now(), 'test', now(), 'test', 0)",
-            name);
+                "VALUES (?, ?, now(), 'test', now(), 'test', 0)",
+            name, workspaceId);
     }
 }

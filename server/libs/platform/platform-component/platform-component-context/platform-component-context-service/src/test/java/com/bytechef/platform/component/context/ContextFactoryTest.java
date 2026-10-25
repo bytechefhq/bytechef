@@ -36,6 +36,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
+import com.bytechef.platform.component.definition.TriggerContextAware;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
@@ -94,6 +95,22 @@ class ContextFactoryTest {
         verify(triggerLogFileStorage).awaitPendingWrites(77L, 77L);
         verify(logFileStorage, never()).storeLogEntries(anyLong(), anyLong(), anyList());
         verify(editorLogFileStorage, never()).storeLogEntries(anyLong(), anyLong(), anyList());
+    }
+
+    @Test
+    void testAnEditorTriggerContextCarriesTheWorkflowId() {
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            "dataTable", 1, "recordCreated", null, null, "workflow-1", null, null, null, true);
+
+        assertThat(((TriggerContextAware) triggerContext).getWorkflowId()).isEqualTo("workflow-1");
+    }
+
+    @Test
+    void testATriggerContextWithoutAWorkflowIdReturnsNull() {
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            "webhook", 1, "newRequest", null, "workflow-uuid", null, null, PlatformType.AUTOMATION, true);
+
+        assertThat(((TriggerContextAware) triggerContext).getWorkflowId()).isNull();
     }
 
     @Test

@@ -171,7 +171,8 @@ class WorkflowNodeOptionFacadeTest {
         List<Option> expectedOptions = List.of(mock(Option.class));
 
         when(actionDefinitionFacade.executeOptions(
-            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap()))
+            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap(),
+            eq(workflowId)))
                 .thenReturn(expectedOptions);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
@@ -185,7 +186,7 @@ class WorkflowNodeOptionFacadeTest {
 
             verify(actionDefinitionFacade).executeOptions(
                 eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(),
-                anyMap());
+                anyMap(), eq(workflowId));
         }
     }
 
@@ -232,7 +233,8 @@ class WorkflowNodeOptionFacadeTest {
         List<Option> expectedOptions = List.of(mock(Option.class));
 
         when(actionDefinitionFacade.executeOptions(
-            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap()))
+            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap(),
+            eq(workflowId)))
                 .thenReturn(expectedOptions);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
@@ -248,7 +250,7 @@ class WorkflowNodeOptionFacadeTest {
 
             verify(actionDefinitionFacade).executeOptions(
                 eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(),
-                connectionIdsCaptor.capture(), anyMap());
+                connectionIdsCaptor.capture(), anyMap(), eq(workflowId));
 
             Map<String, Long> capturedConnectionIds = connectionIdsCaptor.getValue();
 
@@ -284,7 +286,8 @@ class WorkflowNodeOptionFacadeTest {
         List<Option> expectedOptions = List.of(mock(Option.class));
 
         when(triggerDefinitionFacade.executeOptions(
-            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId)))
+            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId),
+            eq(workflowId)))
                 .thenReturn(expectedOptions);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
@@ -297,7 +300,8 @@ class WorkflowNodeOptionFacadeTest {
             assertEquals(expectedOptions, result);
 
             verify(triggerDefinitionFacade).executeOptions(
-                eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId));
+                eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId),
+                eq(workflowId));
         }
     }
 

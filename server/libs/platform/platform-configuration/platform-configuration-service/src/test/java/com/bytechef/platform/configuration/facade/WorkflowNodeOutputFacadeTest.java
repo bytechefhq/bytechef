@@ -276,7 +276,7 @@ class WorkflowNodeOutputFacadeTest {
                 .thenReturn(List.of());
         when(evaluator.evaluate(any(), any(), anyBoolean()))
             .thenAnswer(invocation -> invocation.getArgument(0));
-        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), any(), any()))
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), any(), any(), eq(WORKFLOW_ID)))
             .thenThrow(new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
@@ -412,7 +412,7 @@ class WorkflowNodeOutputFacadeTest {
         when(evaluator.evaluate(any(), any(), anyBoolean()))
             .thenAnswer(invocation -> invocation.getArgument(0));
         when(triggerDefinitionFacade.executeOutput(
-            eq("dataTable"), eq(1), eq("recordUpdated"), any(), any()))
+            eq("dataTable"), eq(1), eq("recordUpdated"), any(), any(), eq(WORKFLOW_ID)))
                 .thenThrow(
                     new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
 
@@ -480,7 +480,7 @@ class WorkflowNodeOutputFacadeTest {
         OutputResponse dynamicOutput = new OutputResponse(null, Map.of("dynamic", "result"), null);
 
         when(actionDefinitionFacade.executeOutput(
-            eq("component"), eq(1), eq("action2"), any(), any()))
+            eq("component"), eq(1), eq("action2"), any(), any(), eq(WORKFLOW_ID)))
                 .thenReturn(dynamicOutput);
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
@@ -558,7 +558,7 @@ class WorkflowNodeOutputFacadeTest {
         OutputResponse dynamic2Output = new OutputResponse(null, Map.of("d2", "r2"), null);
 
         when(actionDefinitionFacade.executeOutput(
-            eq("component"), eq(1), eq("action2"), any(), any()))
+            eq("component"), eq(1), eq("action2"), any(), any(), eq(WORKFLOW_ID)))
                 .thenReturn(dynamic2Output);
 
         // action3: also dynamic output — its recursive call needs outputs for action1 and action2,
@@ -575,7 +575,7 @@ class WorkflowNodeOutputFacadeTest {
         OutputResponse dynamic3Output = new OutputResponse(null, Map.of("d3", "r3"), null);
 
         when(actionDefinitionFacade.executeOutput(
-            eq("component"), eq(1), eq("action3"), any(), any()))
+            eq("component"), eq(1), eq("action3"), any(), any(), eq(WORKFLOW_ID)))
                 .thenReturn(dynamic3Output);
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
@@ -739,7 +739,7 @@ class WorkflowNodeOutputFacadeTest {
             WORKFLOW_ID, "var_1", ENVIRONMENT_ID)).thenReturn(List.of());
         when(evaluator.evaluate(any(), any(), anyBoolean()))
             .thenAnswer(invocation -> invocation.getArgument(0));
-        when(actionDefinitionFacade.executeOutput(eq("var"), eq(1), eq("set"), any(), any()))
+        when(actionDefinitionFacade.executeOutput(eq("var"), eq(1), eq("set"), any(), any(), eq(WORKFLOW_ID)))
             .thenReturn(new OutputResponse(null, "pero"));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
@@ -815,7 +815,7 @@ class WorkflowNodeOutputFacadeTest {
             assertFalse(result.testOutputResponse());
         }
 
-        verify(actionDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any());
+        verify(actionDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any(), any());
     }
 
     @Test
@@ -844,8 +844,9 @@ class WorkflowNodeOutputFacadeTest {
             WORKFLOW_ID, "dataStorage_1", ENVIRONMENT_ID)).thenReturn(List.of());
         when(evaluator.evaluate(any(), any(), anyBoolean()))
             .thenAnswer(invocation -> invocation.getArgument(0));
-        when(actionDefinitionFacade.executeOutput(eq("dataStorage"), eq(1), eq("getValue"), any(), any()))
-            .thenReturn(new OutputResponse(null, 42));
+        when(actionDefinitionFacade.executeOutput(
+            eq("dataStorage"), eq(1), eq("getValue"), any(), any(), eq(WORKFLOW_ID)))
+                .thenReturn(new OutputResponse(null, 42));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
             workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
@@ -890,8 +891,9 @@ class WorkflowNodeOutputFacadeTest {
 
                 return map.containsKey("displayCondition") ? Map.of("displayCondition", false) : map;
             });
-        when(actionDefinitionFacade.executeOutput(eq("dataStorage"), eq(1), eq("getValue"), any(), any()))
-            .thenReturn(new OutputResponse(null, 42));
+        when(actionDefinitionFacade.executeOutput(
+            eq("dataStorage"), eq(1), eq("getValue"), any(), any(), eq(WORKFLOW_ID)))
+                .thenReturn(new OutputResponse(null, 42));
 
         try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
             workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))

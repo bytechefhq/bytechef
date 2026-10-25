@@ -38,10 +38,9 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <p>
- * Every method names its table with a {@link DataTableRef} rather than with a base name, so the table a statement
- * reaches cannot differ from the one resolution picked: there is no base name here for the service to address a table
- * with on its own. Get a ref from {@code DataTableService.fetchDataTableResolution}; see {@link DataTableRef} for the
- * one other, deliberately narrow, way to build one.
+ * Every method names its table with a {@link DataTableRef} rather than with a name, so the table a statement reaches
+ * cannot differ from the one resolution picked: there is no name here for the service to address a table with on its
+ * own. Build a ref from the id {@code DataTableService.fetchDataTable} resolved within a workspace.
  * </p>
  *
  * <p>

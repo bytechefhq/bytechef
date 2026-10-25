@@ -22,7 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,9 +39,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 @SpringBootTest(classes = DataTableIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
+@SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
 class DataTableExternalIdIndexIntTest {
 
     private static final long ENVIRONMENT_ID = 0;
+    private static final long WORKSPACE_ID = 1L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -47,29 +51,35 @@ class DataTableExternalIdIndexIntTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private String physicalName;
+
     @BeforeEach
     void beforeEach() {
-        dataTableService.dropTable("keyed", ENVIRONMENT_ID);
+        dataTableService.fetchDataTable(WORKSPACE_ID, "keyed")
+            .ifPresent(dataTable -> dataTableService.dropTable(dataTable.getId(), ENVIRONMENT_ID));
 
-        dataTableService.createTable(
-            "keyed", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID);
+        long keyedId = dataTableService.createTable(
+            WORKSPACE_ID, "keyed", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID);
+
+        physicalName = new DataTableRef(keyedId, ENVIRONMENT_ID).physicalName();
     }
 
     @Test
     void testTheSameExternalIdTwiceIsRejected() {
-        jdbcTemplate.update("INSERT INTO \"dt_0_keyed\" (\"external_id\", \"title\") VALUES ('k1', 'a')");
+        jdbcTemplate.update("INSERT INTO \"" + physicalName + "\" (\"external_id\", \"title\") VALUES ('k1', 'a')");
 
         assertThrows(
             DuplicateKeyException.class,
-            () -> jdbcTemplate.update("INSERT INTO \"dt_0_keyed\" (\"external_id\", \"title\") VALUES ('k1', 'b')"));
+            () -> jdbcTemplate
+                .update("INSERT INTO \"" + physicalName + "\" (\"external_id\", \"title\") VALUES ('k1', 'b')"));
     }
 
     @Test
     void testRowsWithoutAnExternalIdCoexist() {
-        jdbcTemplate.update("INSERT INTO \"dt_0_keyed\" (\"title\") VALUES ('a')");
-        jdbcTemplate.update("INSERT INTO \"dt_0_keyed\" (\"title\") VALUES ('b')");
+        jdbcTemplate.update("INSERT INTO \"" + physicalName + "\" (\"title\") VALUES ('a')");
+        jdbcTemplate.update("INSERT INTO \"" + physicalName + "\" (\"title\") VALUES ('b')");
 
-        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM \"dt_0_keyed\"", Integer.class);
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM \"" + physicalName + "\"", Integer.class);
 
         assertEquals(2, count);
     }
