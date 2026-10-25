@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CredentialStatusModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrationInstanceToolModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -39,6 +40,12 @@ public class IntegrationInstanceModel {
   private @Nullable CredentialStatusModel credentialStatus;
 
   private Boolean enabled;
+
+  private List<@Valid IntegrationWorkflowModel> availableWorkflows = new ArrayList<>();
+
+  private @Nullable Long integrationInstanceConfigurationId;
+
+  private @Nullable Integer integrationVersion;
 
   private List<@Valid McpIntegrationInstanceToolModel> mcpTools = new ArrayList<>();
 
@@ -141,6 +148,77 @@ public class IntegrationInstanceModel {
     this.enabled = enabled;
   }
 
+  public IntegrationInstanceModel availableWorkflows(List<@Valid IntegrationWorkflowModel> availableWorkflows) {
+    this.availableWorkflows = availableWorkflows;
+    return this;
+  }
+
+  public IntegrationInstanceModel addAvailableWorkflowsItem(IntegrationWorkflowModel availableWorkflowsItem) {
+    if (this.availableWorkflows == null) {
+      this.availableWorkflows = new ArrayList<>();
+    }
+    this.availableWorkflows.add(availableWorkflowsItem);
+    return this;
+  }
+
+  /**
+   * The workflows of the integration instance configuration this instance belongs to.
+   * @return availableWorkflows
+   */
+  @Valid 
+  @Schema(name = "availableWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflows of the integration instance configuration this instance belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("availableWorkflows")
+  public List<@Valid IntegrationWorkflowModel> getAvailableWorkflows() {
+    return availableWorkflows;
+  }
+
+  @JsonProperty("availableWorkflows")
+  public void setAvailableWorkflows(List<@Valid IntegrationWorkflowModel> availableWorkflows) {
+    this.availableWorkflows = availableWorkflows;
+  }
+
+  public IntegrationInstanceModel integrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
+    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
+    return this;
+  }
+
+  /**
+   * The id of the integration instance configuration this instance belongs to.
+   * @return integrationInstanceConfigurationId
+   */
+  
+  @Schema(name = "integrationInstanceConfigurationId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the integration instance configuration this instance belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationInstanceConfigurationId")
+  public @Nullable Long getIntegrationInstanceConfigurationId() {
+    return integrationInstanceConfigurationId;
+  }
+
+  @JsonProperty("integrationInstanceConfigurationId")
+  public void setIntegrationInstanceConfigurationId(@Nullable Long integrationInstanceConfigurationId) {
+    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
+  }
+
+  public IntegrationInstanceModel integrationVersion(@Nullable Integer integrationVersion) {
+    this.integrationVersion = integrationVersion;
+    return this;
+  }
+
+  /**
+   * The integration version of the configuration this instance belongs to.
+   * @return integrationVersion
+   */
+  
+  @Schema(name = "integrationVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The integration version of the configuration this instance belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationVersion")
+  public @Nullable Integer getIntegrationVersion() {
+    return integrationVersion;
+  }
+
+  @JsonProperty("integrationVersion")
+  public void setIntegrationVersion(@Nullable Integer integrationVersion) {
+    this.integrationVersion = integrationVersion;
+  }
+
   public IntegrationInstanceModel mcpTools(List<@Valid McpIntegrationInstanceToolModel> mcpTools) {
     this.mcpTools = mcpTools;
     return this;
@@ -158,7 +236,7 @@ public class IntegrationInstanceModel {
    * The array of MCP tools for this integration instance.
    * @return mcpTools
    */
-  
+  @Valid 
   @Schema(name = "mcpTools", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of MCP tools for this integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("mcpTools")
   public List<@Valid McpIntegrationInstanceToolModel> getMcpTools() {
@@ -187,7 +265,7 @@ public class IntegrationInstanceModel {
    * The array of MCP workflows for this integration instance.
    * @return mcpWorkflows
    */
-  
+  @Valid 
   @Schema(name = "mcpWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of MCP workflows for this integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("mcpWorkflows")
   public List<@Valid IntegrationInstanceWorkflowModel> getMcpWorkflows() {
@@ -216,7 +294,7 @@ public class IntegrationInstanceModel {
    * Get workflows
    * @return workflows
    */
-  
+  @Valid 
   @Schema(name = "workflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflows")
   public List<@Valid IntegrationInstanceWorkflowModel> getWorkflows() {
@@ -241,6 +319,9 @@ public class IntegrationInstanceModel {
         Objects.equals(this.connectionId, integrationInstance.connectionId) &&
         Objects.equals(this.credentialStatus, integrationInstance.credentialStatus) &&
         Objects.equals(this.enabled, integrationInstance.enabled) &&
+        Objects.equals(this.availableWorkflows, integrationInstance.availableWorkflows) &&
+        Objects.equals(this.integrationInstanceConfigurationId, integrationInstance.integrationInstanceConfigurationId) &&
+        Objects.equals(this.integrationVersion, integrationInstance.integrationVersion) &&
         Objects.equals(this.mcpTools, integrationInstance.mcpTools) &&
         Objects.equals(this.mcpWorkflows, integrationInstance.mcpWorkflows) &&
         Objects.equals(this.workflows, integrationInstance.workflows);
@@ -248,7 +329,7 @@ public class IntegrationInstanceModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, connectionId, credentialStatus, enabled, mcpTools, mcpWorkflows, workflows);
+    return Objects.hash(id, connectionId, credentialStatus, enabled, availableWorkflows, integrationInstanceConfigurationId, integrationVersion, mcpTools, mcpWorkflows, workflows);
   }
 
   @Override
@@ -259,6 +340,9 @@ public class IntegrationInstanceModel {
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    availableWorkflows: ").append(toIndentedString(availableWorkflows)).append("\n");
+    sb.append("    integrationInstanceConfigurationId: ").append(toIndentedString(integrationInstanceConfigurationId)).append("\n");
+    sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    mcpTools: ").append(toIndentedString(mcpTools)).append("\n");
     sb.append("    mcpWorkflows: ").append(toIndentedString(mcpWorkflows)).append("\n");
     sb.append("    workflows: ").append(toIndentedString(workflows)).append("\n");
