@@ -17,8 +17,10 @@
 #   # coordinator answers 404).
 #   BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
 #
-# - More than one coordinator requires BYTECHEF_EDITION=ee. With BYTECHEF_EDITION=ce and BYTECHEF_COORDINATORS=2, the
-#   second coordinator stops with the edition message and is restarted on every attempt.
+# - More than one coordinator requires BYTECHEF_EDITION=ee. With BYTECHEF_EDITION=ce and BYTECHEF_COORDINATORS>1, the
+#   second coordinator keeps restarting with the edition message, and the load balancer never starts because it waits
+#   for every coordinator to be healthy.
+# - The editor's webhook test (/webhooks/{id}/test/) is served by coordinators only, so nginx routes it to them.
 # - Production high availability needs managed or clustered PostgreSQL, RabbitMQ or Redis, and a load balancer. In this
 #   file they are single containers.
 # - RabbitMQ (amqp) or Redis carries messages between the nodes; BYTECHEF_MESSAGE_BROKER_PROVIDER selects it.
@@ -203,6 +205,18 @@ configs:
         proxy_buffering off;
         proxy_http_version 1.1;
         proxy_read_timeout 600s;
+
+        location ~ ^/webhooks/[^/]+/test/ {
+          proxy_pass http://coordinators;
+          proxy_connect_timeout 2s;
+          proxy_next_upstream error timeout http_502 http_503;
+          proxy_next_upstream_tries 2;
+          proxy_set_header Connection "";
+          proxy_set_header Host $$host;
+          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $$scheme;
+          proxy_set_header X-Real-IP $$remote_addr;
+        }
 
         location ~ ^/(webhooks|callback|approvals|job/resume|file-entries/[^/]+/content) {
           proxy_pass http://webhooks;

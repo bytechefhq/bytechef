@@ -51,7 +51,8 @@ Put a load balancer in front of the cluster and route by path:
 
 | Traffic | Goes to |
 |---|---|
-| The webhook paths from the table above | The webhook nodes, with the coordinators as backup. |
+| The webhook paths from the table above, except `/webhooks/{id}/test/**` | The webhook nodes, with the coordinators as backup. |
+| `/webhooks/{id}/test/**` (the editor's webhook test) | The coordinators. Only coordinators serve it. |
 | Everything else | The coordinators, round robin. |
 
 Workers serve no HTTP traffic and stay out of the load balancer pool.
