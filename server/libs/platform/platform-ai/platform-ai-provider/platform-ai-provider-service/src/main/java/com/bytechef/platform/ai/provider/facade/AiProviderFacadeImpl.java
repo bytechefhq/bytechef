@@ -267,13 +267,18 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     public void updateAiProvider(int id, String apiKey, String url, int environment) {
         Provider provider = getProvider(id);
 
-        Map<String, Object> values = new HashMap<>();
+        Map<String, Object> values = propertyService
+            .fetchProperty(provider.getKey(), Scope.PLATFORM, null, (long) environment)
+            .map(property -> new HashMap<String, Object>(property.getValue()))
+            .orElseGet(HashMap::new);
 
-        if (apiKey != null) {
+        if (apiKey != null && !apiKey.isBlank()) {
             values.put("apiKey", apiKey);
         }
 
-        if (url != null && !url.isBlank()) {
+        if (url == null || url.isBlank()) {
+            values.remove("url");
+        } else {
             values.put("url", url);
         }
 

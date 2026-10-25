@@ -40,6 +40,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
  */
 class CopilotPgVectorConfigurationTest {
 
+    private final List<String> authorizations = new CopyOnWriteArrayList<>();
     private final List<String> requestPaths = new CopyOnWriteArrayList<>();
 
     private HttpServer ollamaServer;
@@ -51,6 +52,11 @@ class CopilotPgVectorConfigurationTest {
         ollamaServer.createContext("/", exchange -> {
             requestPaths.add(exchange.getRequestURI()
                 .getPath());
+
+            String authorization = exchange.getRequestHeaders()
+                .getFirst("Authorization");
+
+            authorizations.add(authorization == null ? "" : authorization);
 
             byte[] body = "{\"model\":\"nomic-embed-text\",\"embeddings\":[[0.1,0.2,0.3]]}"
                 .getBytes(StandardCharsets.UTF_8);
@@ -74,6 +80,34 @@ class CopilotPgVectorConfigurationTest {
 
     @Test
     void testOllamaDocsEmbeddingModelUsesConfiguredUrl() {
+        ApplicationProperties applicationProperties = mockOllamaApplicationProperties();
+
+        EmbeddingModel embeddingModel = CopilotPgVectorConfiguration.copilotDocsEmbeddingModel(applicationProperties);
+
+        float[] embedding = embeddingModel.embed("ByteChef");
+
+        assertThat(embedding).containsExactly(0.1f, 0.2f, 0.3f);
+        assertThat(requestPaths).containsExactly("/api/embed");
+        assertThat(authorizations).containsExactly("");
+    }
+
+    @Test
+    void testOllamaDocsEmbeddingModelSendsConfiguredApiKeyAsBearerToken() {
+        ApplicationProperties applicationProperties = mockOllamaApplicationProperties();
+
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getOllama()
+            .getApiKey()).thenReturn("secret-token");
+
+        EmbeddingModel embeddingModel = CopilotPgVectorConfiguration.copilotDocsEmbeddingModel(applicationProperties);
+
+        embeddingModel.embed("ByteChef");
+
+        assertThat(authorizations).containsExactly("Bearer secret-token");
+    }
+
+    private ApplicationProperties mockOllamaApplicationProperties() {
         ApplicationProperties applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
         when(applicationProperties.getAi()
@@ -93,11 +127,6 @@ class CopilotPgVectorConfigurationTest {
                 + ollamaServer.getAddress()
                     .getPort());
 
-        EmbeddingModel embeddingModel = CopilotPgVectorConfiguration.copilotDocsEmbeddingModel(applicationProperties);
-
-        float[] embedding = embeddingModel.embed("ByteChef");
-
-        assertThat(embedding).containsExactly(0.1f, 0.2f, 0.3f);
-        assertThat(requestPaths).containsExactly("/api/embed");
+        return applicationProperties;
     }
 }

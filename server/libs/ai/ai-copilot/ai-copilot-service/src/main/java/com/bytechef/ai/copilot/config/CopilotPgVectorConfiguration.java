@@ -40,7 +40,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.client.RestClient;
 
 @Configuration
 @EnableJdbcRepositories(
@@ -112,14 +114,22 @@ public class CopilotPgVectorConfiguration {
                 .getOptions()
                 .getModel();
 
-            String url = ai.getProvider()
-                .getOllama()
-                .getUrl();
+            ApplicationProperties.Ai.Provider.Ollama ollama = ai.getProvider()
+                .getOllama();
+
+            String apiKey = ollama.getApiKey();
+            String url = ollama.getUrl();
 
             OllamaApi.Builder ollamaApiBuilder = OllamaApi.builder();
 
             if (url != null && !url.isBlank()) {
                 ollamaApiBuilder.baseUrl(url);
+            }
+
+            if (apiKey != null && !apiKey.isBlank()) {
+                ollamaApiBuilder.restClientBuilder(
+                    RestClient.builder()
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
             }
 
             return OllamaEmbeddingModel.builder()
