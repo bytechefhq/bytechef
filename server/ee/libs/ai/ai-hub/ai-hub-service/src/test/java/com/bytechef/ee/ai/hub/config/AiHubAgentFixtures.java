@@ -60,6 +60,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.tool.ComponentTools;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver;
 import com.bytechef.platform.component.tool.ScopedConnectionGuard;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -70,6 +71,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.ClassPathResource;
 
@@ -107,6 +109,9 @@ public final class AiHubAgentFixtures {
     public final ReadProjectTools readProjectTools = new ReadProjectTools(projectTools);
     public final ReadProjectWorkflowTools readProjectWorkflowTools = new ReadProjectWorkflowTools(projectWorkflowTools);
     public final SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
+    public final EmbeddingProviderStatusProvider embeddingProviderStatusProvider =
+        mock(EmbeddingProviderStatusProvider.class);
+    public final VectorStore copilotPgVectorStore = mock(VectorStore.class);
     public final WebSearchToolCallbackProvider webSearchToolCallbackProvider =
         mock(WebSearchToolCallbackProvider.class);
     public final WorkflowExecutionTools workflowExecutionTools = new WorkflowExecutionTools(
@@ -186,7 +191,8 @@ public final class AiHubAgentFixtures {
             componentToolsProvider(), persistedWorkflowCheckerProvider(), projectServiceProvider(),
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
             chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
-            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -201,7 +207,8 @@ public final class AiHubAgentFixtures {
             workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
             artifactRecorder,
             securityContextRehydrator, approvalGate, policy, inFlightRunRegistryProvider(),
-            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
     @SuppressWarnings("unchecked")
@@ -267,6 +274,15 @@ public final class AiHubAgentFixtures {
 
         when(provider.getIfAvailable()).thenReturn(
             new DeploymentToolCallbacksFactory(projectDeploymentFacade, mock(ProjectWorkflowService.class)));
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ObjectProvider<T> availableProvider(T bean) {
+        ObjectProvider<T> provider = mock(ObjectProvider.class);
+
+        when(provider.getIfAvailable()).thenReturn(bean);
 
         return provider;
     }

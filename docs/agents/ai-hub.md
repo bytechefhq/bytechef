@@ -53,7 +53,10 @@ approval gate and are not pinned, so an approval never resumes one.
 (`getAction`, `getTrigger`, `getClusterElement`, filtered by `COMPONENT_DEFINITION_TOOL_NAMES`) are in both modes
 so the hub can explain a failed run against the task's definition. `CheckWorkflowTools.checkWorkflow` runs the
 Copilot's `PersistedWorkflowChecker` (the editor's validation) on a saved workflow of the conversation's workspace;
-a workflow of another workspace answers "not found". The prompts require it before calling a workflow ready. The Copilot's `debugWorkflowExecution` specialist is not given to the hub: it holds raw
+a workflow of another workspace answers "not found". The prompts require it before calling a workflow ready.
+`SearchDocsTools.searchDocs` queries the Copilot's docs index (`copilotPgVectorStore`, `category == 'docs'`, top 4) in
+both modes, only when the agent asks for it, instead of a `QuestionAnswerAdvisor` that would add docs to every turn.
+It fails with a message when the verified environment has no default embedding model. The Copilot's `debugWorkflowExecution` specialist is not given to the hub: it holds raw
 `ProjectWorkflowTools`, which the parity contract below forbids. A fix goes through `buildWorkflow`.
 The controller needs workspace role VIEWER for ASK and EDITOR for BUILD. Embedded connected users
 (`ConnectedUserAuthentication`) are refused on the REST entry points and in `AiHubWorkspaceAccess` for GraphQL.
