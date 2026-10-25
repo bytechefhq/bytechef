@@ -27,6 +27,6 @@ class DataTableComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/data-table_v1.json", new DataTableComponentHandler(null, null, null).getDefinition());
+            "definition/data-table_v1.json", new DataTableComponentHandler(null, null, null, null).getDefinition());
     }
 }
