@@ -11,6 +11,10 @@ import {Node} from '@xyflow/react';
 
 export const CLUSTER_FRAME_HEADER_HEIGHT = 40;
 
+export const CLUSTER_FRAME_TITLE_LINE_HEIGHT = 20;
+
+export const CLUSTER_FRAME_BOTTOM_PADDING = (CLUSTER_FRAME_HEADER_HEIGHT - CLUSTER_FRAME_TITLE_LINE_HEIGHT) / 2;
+
 export const CLUSTER_FRAME_PADDING = 32;
 
 export const CLUSTER_FRAME_BORDER_WIDTH = 2;
@@ -18,7 +22,7 @@ export const CLUSTER_FRAME_BORDER_WIDTH = 2;
 export const CLUSTER_FRAME_MIN_HEIGHT = 220;
 export const CLUSTER_FRAME_MIN_WIDTH = 420;
 
-export const CLUSTER_FRAME_LABEL_OVERHANG = 54;
+export const CLUSTER_FRAME_LABEL_OVERHANG = 56;
 
 const CLUSTER_FRAME_ROOT_HEIGHT = 72;
 const CLUSTER_FRAME_HANDLE_LABEL_HEIGHT = 21;
@@ -116,7 +120,7 @@ export function computeClusterFrameSize(childBoxes: ClusterMemberBoxI[]): {heigh
     return {
         height: Math.max(
             CLUSTER_FRAME_MIN_HEIGHT,
-            CLUSTER_FRAME_HEADER_HEIGHT + extent.height + CLUSTER_FRAME_HEADER_HEIGHT
+            CLUSTER_FRAME_HEADER_HEIGHT + extent.height + CLUSTER_FRAME_BOTTOM_PADDING
         ),
         width: Math.max(CLUSTER_FRAME_MIN_WIDTH, extent.width + 2 * CLUSTER_FRAME_PADDING),
     };
