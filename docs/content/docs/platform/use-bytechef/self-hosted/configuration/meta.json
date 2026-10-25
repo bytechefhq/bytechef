@@ -5,6 +5,7 @@
   "pages": [
     "environment-variables",
     "message-brokers",
+    "node-roles",
     "file-storage",
     "plan-limits"
   ]
