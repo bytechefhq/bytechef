@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.LongConsumer;
 import org.springframework.data.domain.Page;
 
 public record JobServiceWrapper(JobSyncExecutor.JobFactoryFunction jobFactoryFunction) implements JobService {
@@ -54,6 +55,11 @@ public record JobServiceWrapper(JobSyncExecutor.JobFactoryFunction jobFactoryFun
     @Override
     public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
         return jobFactoryFunction.apply(jobParametersDTO);
+    }
+
+    @Override
+    public Job create(JobParametersDTO jobParametersDTO, Workflow workflow, LongConsumer jobCreatedCallback) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

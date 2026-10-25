@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,15 @@ public class RemoteJobFacadeClient implements JobFacade {
                 .path("/remote/job-facade/create-async-job")
                 .build(),
             jobParametersDTO, Long.class);
+    }
+
+    @Override
+    public long createJob(JobParametersDTO jobParametersDTO, LongConsumer jobCreatedCallback) {
+        long jobId = createJob(jobParametersDTO);
+
+        jobCreatedCallback.accept(jobId);
+
+        return jobId;
     }
 
     @Override
