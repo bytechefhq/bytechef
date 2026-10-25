@@ -82,6 +82,18 @@ class PropertyServiceIntTest {
     }
 
     @Test
+    void testUpdateEnabledCreatesMissingProperty() {
+        propertyService.update(KEY, true, Scope.PLATFORM, null, ENVIRONMENT);
+
+        Optional<Property> property = propertyService.fetchProperty(KEY, Scope.PLATFORM, null, ENVIRONMENT);
+
+        assertThat(property).hasValueSatisfying(curProperty -> {
+            assertThat(curProperty.isEnabled()).isTrue();
+            assertThat(curProperty.getValue()).isEmpty();
+        });
+    }
+
+    @Test
     void testSaveEmptyValueKeepsExistingValues() {
         propertyService.save(KEY, Map.of("url", "http://ollama:11434"), Scope.PLATFORM, null, ENVIRONMENT);
 
