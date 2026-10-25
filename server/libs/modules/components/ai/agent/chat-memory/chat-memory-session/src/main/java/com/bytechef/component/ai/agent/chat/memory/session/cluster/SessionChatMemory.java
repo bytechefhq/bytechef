@@ -61,6 +61,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.session.DefaultSessionService;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
@@ -75,6 +76,8 @@ import org.springframework.ai.session.compaction.TurnWindowCompactionStrategy;
 import org.springframework.ai.session.tool.SessionEventTools;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 
 /**
  * @author Ivica Cardic
@@ -344,10 +347,37 @@ public final class SessionChatMemory {
                 getPositiveInteger(inputParameters, SEARCH_PAGE_SIZE, DEFAULT_SEARCH_PAGE_SIZE, "Search page size"))
             .build();
 
-        return List.of(ToolCallbacks.from(sessionEventTools));
+        return List.of(ToolCallbacks.from(new ConversationSearchTool(sessionEventTools)));
     }
 
     record Compaction(CompactionStrategy strategy, CompactionTrigger trigger) {
+    }
+
+    /**
+     * Exposes {@link SessionEventTools#conversationSearch} without its required {@code innerThought} parameter. Claude
+     * models refuse the whole turn when a tool asks them for a "deep inner monologue private to you only".
+     */
+    static final class ConversationSearchTool {
+
+        private final SessionEventTools sessionEventTools;
+
+        ConversationSearchTool(SessionEventTools sessionEventTools) {
+            this.sessionEventTools = sessionEventTools;
+        }
+
+        @Tool(
+            name = "conversation_search",
+            description = "Search the full prior conversation history using case-insensitive keyword matching. " +
+                "Returns paginated results ordered chronologically.")
+        public String conversationSearch(
+            @ToolParam(description = "Keyword to search for in the conversation history.") String query,
+            @ToolParam(
+                description = "Page of results to retrieve (0-indexed). Omit or use 0 for the first page.",
+                required = false) @Nullable Integer page,
+            ToolContext toolContext) {
+
+            return sessionEventTools.conversationSearch("", query, page, toolContext);
+        }
     }
 
     private final class SessionChatMemoryFunction implements ChatMemoryFunction {

@@ -79,6 +79,7 @@ import org.springframework.ai.session.compaction.TurnCountTrigger;
 import org.springframework.ai.session.compaction.TurnWindowCompactionStrategy;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @author Ivica Cardic
@@ -145,12 +146,31 @@ class SessionChatMemoryTest {
         ToolCallback conversationSearchToolCallback = toolCallbacks.getFirst();
 
         String searchResult = conversationSearchToolCallback.call(
-            "{\"innerThought\":\"recall\",\"query\":\"alpha\"}",
+            "{\"query\":\"alpha\"}",
             new ToolContext(Map.of("chat_memory_conversation_id", CONVERSATION_ID)));
 
         assertThat(searchResult)
             .contains("alpha archived", "alpha live")
             .doesNotContain("alpha summary");
+    }
+
+    @Test
+    void testConversationSearchDoesNotAskForInnerThought() throws Exception {
+        SessionRepository sessionRepository = InMemorySessionRepository.builder()
+            .build();
+
+        ChatMemoryFunction.Result result = applySessionChatMemory(
+            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "enableConversationSearch", true));
+
+        ToolCallback conversationSearchToolCallback = result.toolCallbacks()
+            .getFirst();
+
+        ToolDefinition toolDefinition = conversationSearchToolCallback.getToolDefinition();
+
+        assertEquals("conversation_search", toolDefinition.name());
+        assertThat(toolDefinition.inputSchema())
+            .contains("\"query\"", "\"page\"")
+            .doesNotContain("innerThought");
     }
 
     @Test
