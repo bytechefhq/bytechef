@@ -2786,6 +2786,11 @@ public class ApplicationProperties {
             public static class PgVector {
 
                 /**
+                 * Width of the embedding vectors; must match the embedding model's output dimensions
+                 */
+                private int dimensions;
+
+                /**
                  * Database password
                  */
                 private String password;
@@ -2799,6 +2804,14 @@ public class ApplicationProperties {
                  * Database username
                  */
                 private String username;
+
+                public int getDimensions() {
+                    return dimensions;
+                }
+
+                public void setDimensions(int dimensions) {
+                    this.dimensions = dimensions;
+                }
 
                 public String getPassword() {
                     return password;

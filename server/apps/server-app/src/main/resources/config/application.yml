@@ -179,7 +179,7 @@ spring:
       pgvector:
         index-type: hnsw
         distance-type: cosine_distance
-        dimensions: 1536
+        dimensions: ${bytechef.ai.vectorstore.pgvector.dimensions}
         max-document-batch-size: 10000
         initialize-schema: true
   application:
