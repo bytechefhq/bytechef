@@ -1,13 +1,18 @@
 dependencies {
     implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-session-data-redis")
     implementation("org.springframework.boot:spring-boot-session-jdbc")
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis-control"))
 
     testImplementation("com.zaxxer:HikariCP")
     testImplementation("io.lettuce:lettuce-core")
+    testImplementation("io.micrometer:context-propagation")
     testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("org.apache.commons:commons-pool2")
     testImplementation("org.liquibase:liquibase-core")
+    testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.security:spring-security-web")
     testImplementation("org.springframework:spring-web")
     testImplementation("org.springframework.boot:spring-boot-data-redis")
     testImplementation("org.springframework.boot:spring-boot-jdbc")
