@@ -11,6 +11,7 @@ import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTabl
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +38,11 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
 
     @Override
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableStorageUsage getStorageUsage() {
         throw new UnsupportedOperationException();
     }
 }
