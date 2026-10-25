@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiProviderDTO;
+import com.bytechef.platform.ai.provider.ollama.OllamaModelLister;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
@@ -61,7 +62,8 @@ class AiProviderFacadeProvidersTest {
     void setUp() {
         applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
-        facade = new AiProviderFacadeImpl(componentDefinitionService, propertyService, applicationProperties);
+        facade = new AiProviderFacadeImpl(
+            componentDefinitionService, mock(OllamaModelLister.class), propertyService, applicationProperties);
     }
 
     @Test
