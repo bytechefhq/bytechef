@@ -17,8 +17,8 @@
 package com.bytechef.test.config.testcontainers;
 
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.DynamicPropertyRegistry;
 import org.testcontainers.containers.GenericContainer;
 
 /**
@@ -28,13 +28,8 @@ import org.testcontainers.containers.GenericContainer;
 public class RedisContainerConfiguration {
 
     @Bean
-    public GenericContainer<?> redisContainer(DynamicPropertyRegistry registry) {
-        GenericContainer<?> container = new GenericContainer<>("redis:8-alpine")
-            .withExposedPorts(6379);
-
-        registry.add("spring.data.redis.host=", container::getHost);
-        registry.add("spring.data.redis.port=", () -> container.getMappedPort(6379));
-
-        return container;
+    @ServiceConnection(name = "redis")
+    public GenericContainer<?> redisContainer() {
+        return new GenericContainer<>("redis:8-alpine").withExposedPorts(6379);
     }
 }
