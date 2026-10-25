@@ -18,14 +18,14 @@ package com.bytechef.platform.data.table.configuration.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.time.Instant;
 import java.util.List;
@@ -64,7 +64,7 @@ class DataTableReferenceResolverTest {
     @Test
     void tableWithoutPrimaryKeyReportsRowServiceReason() {
         when(dataTableService.listTables(0L)).thenReturn(List.of(table("conversations")));
-        when(dataTableRowService.listRows(eq("conversations"), anyInt(), anyInt(), anyLong()))
+        when(dataTableRowService.listRows(any(DataTableRef.class), anyInt(), anyInt()))
             .thenThrow(new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
 
         assertEquals(

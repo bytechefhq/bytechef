@@ -17,6 +17,8 @@
 package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.definition.BaseProperty.ResourceType;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.workflow.validator.ResourceReferenceResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,20 +48,32 @@ public class DataTableReferenceResolver implements ResourceReferenceResolver {
     @Override
     @Nullable
     public String findProblem(String reference, long environmentId) {
-        boolean exists = dataTableService.listTables(environmentId)
-            .stream()
-            .anyMatch(dataTableInfo -> reference.equalsIgnoreCase(dataTableInfo.baseName()));
+        DataTableInfo dataTableInfo = findTable(reference, environmentId);
 
-        if (!exists) {
+        if (dataTableInfo == null) {
             return "Data table '" + reference + "' does not exist in this environment";
         }
 
+        return findRowProblem(dataTableInfo, environmentId);
+    }
+
+    private @Nullable String findRowProblem(DataTableInfo dataTableInfo, long environmentId) {
+
         try {
-            dataTableRowService.listRows(reference, 1, 0, environmentId);
-        } catch (IllegalStateException e) {
-            return e.getMessage();
+            dataTableRowService.listRows(
+                new DataTableRef(dataTableInfo.baseName(), environmentId), 1, 0);
+        } catch (IllegalStateException illegalStateException) {
+            return illegalStateException.getMessage();
         }
 
         return null;
+    }
+
+    private @Nullable DataTableInfo findTable(String reference, long environmentId) {
+        return dataTableService.listTables(environmentId)
+            .stream()
+            .filter(dataTableInfo -> reference.equalsIgnoreCase(dataTableInfo.baseName()))
+            .findFirst()
+            .orElse(null);
     }
 }

@@ -17,6 +17,7 @@
 package com.bytechef.platform.data.table.execution.event;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.Map;
@@ -25,33 +26,31 @@ import org.springframework.context.ApplicationEvent;
 /**
  * Application event published when a data table change should trigger webhooks.
  *
+ * <p>
+ * Carries the table the row was written into rather than the base name it is known by, so the listener resolves the
+ * same registry row that registration hung off.
+ *
  * @author Ivica Cardic
  */
 public class DataTableWebhookEvent extends ApplicationEvent {
-
-    private final String baseName;
-    private final long environmentId;
+    @SuppressFBWarnings("SE_BAD_FIELD")
+    private final DataTableRef dataTableRef;
     private final Map<String, Object> payload;
     private final DataTableWebhookType type;
 
     @SuppressFBWarnings("EI")
     public DataTableWebhookEvent(
-        String baseName, DataTableWebhookType type, Map<String, Object> payload, long environmentId) {
+        DataTableRef dataTableRef, DataTableWebhookType type, Map<String, Object> payload) {
 
-        super(baseName);
+        super(dataTableRef);
 
-        this.baseName = baseName;
-        this.environmentId = environmentId;
+        this.dataTableRef = dataTableRef;
         this.type = type;
         this.payload = payload;
     }
 
-    public String getBaseName() {
-        return baseName;
-    }
-
-    public long getEnvironmentId() {
-        return environmentId;
+    public DataTableRef getDataTableRef() {
+        return dataTableRef;
     }
 
     public DataTableWebhookType getType() {
@@ -65,8 +64,7 @@ public class DataTableWebhookEvent extends ApplicationEvent {
     @Override
     public String toString() {
         return "DataTableWebhookEvent{" +
-            "baseName='" + baseName + '\'' +
-            ", environmentId=" + environmentId +
+            "dataTableRef=" + dataTableRef +
             ", payload=" + payload +
             ", type=" + type +
             "} " + super.toString();

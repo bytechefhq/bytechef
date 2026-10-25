@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.data.table.remote.client.service;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +24,17 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableWebhookServiceClient implements DataTableWebhookService {
 
     @Override
-    public long addWebhook(String baseName, String url, DataTableWebhookType type, long environmentId) {
+    public long addWebhook(DataTableRef dataTableRef, String url, DataTableWebhookType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Webhook> listWebhooks(String baseName, long environmentId) {
+    public List<Webhook> listWebhooks(DataTableRef dataTableRef) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Webhook> listWebhooks(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

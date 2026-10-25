@@ -20,14 +20,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
+import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,15 +42,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 
 /**
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = DataTableIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
+@RecordApplicationEvents
 class DataTableRowServiceIntTest {
 
     private static final long DEV_ENVIRONMENT_ID = 0;
+
+    private static final DataTableRef DATA_TABLE_REF =
+        new DataTableRef("rows", DEV_ENVIRONMENT_ID);
+
+    @Autowired
+    private ApplicationEvents applicationEvents;
 
     @Autowired
     private DataTableService dataTableService;
@@ -54,14 +70,14 @@ class DataTableRowServiceIntTest {
     @BeforeEach
     void beforeEach() {
         dataTableService.dropTable("rows", DEV_ENVIRONMENT_ID);
+
         dataTableService.createTable(
             "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
     }
 
     @Test
     void testInsertRowReturnsTheStoredValues() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        DataTableRow dataTableRow = dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "first"));
 
         assertNotNull(dataTableRow);
         assertEquals("first", dataTableRow.values()
@@ -70,18 +86,16 @@ class DataTableRowServiceIntTest {
 
     @Test
     void testUpdateRowReturnsTheUpdatedValues() {
-        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "first"));
 
         DataTableRow updatedDataTableRow = dataTableRowService.updateRow(
-            "rows", insertedDataTableRow.id(), Map.of("title", "second"), DEV_ENVIRONMENT_ID);
+            DATA_TABLE_REF, insertedDataTableRow.id(), Map.of("title", "second"));
 
         assertEquals(insertedDataTableRow.id(), updatedDataTableRow.id());
         assertEquals("second", updatedDataTableRow.values()
             .get("title"));
 
-        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(
-            "rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID);
+        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(DATA_TABLE_REF, insertedDataTableRow.id());
 
         assertEquals("second", fetchedDataTableRow.values()
             .get("title"));
@@ -89,19 +103,47 @@ class DataTableRowServiceIntTest {
 
     @Test
     void testDeleteRowRemovesTheRow() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        DataTableRow dataTableRow = dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "first"));
 
-        assertTrue(dataTableRowService.deleteRow("rows", dataTableRow.id(), DEV_ENVIRONMENT_ID));
+        assertTrue(dataTableRowService.deleteRow(DATA_TABLE_REF, dataTableRow.id()));
 
-        assertNull(dataTableRowService.getRow("rows", dataTableRow.id(), DEV_ENVIRONMENT_ID));
+        assertNull(dataTableRowService.getRow(DATA_TABLE_REF, dataTableRow.id()));
 
-        assertTrue(dataTableRowService.listRows("rows", 10, 0, DEV_ENVIRONMENT_ID)
+        assertTrue(dataTableRowService.listRows(DATA_TABLE_REF, 10, 0)
             .isEmpty());
     }
 
     @Test
+    void testDeleteRowsAndClearRowsPublishTheDeletedValues() {
+        DataTableRow firstDataTableRow = dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "a"));
+
+        dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "b"));
+        dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "c"));
+
+        assertEquals(
+            List.of(firstDataTableRow.id()),
+            dataTableRowService.deleteRows(DATA_TABLE_REF, List.of(firstDataTableRow.id())));
+        assertEquals(2, dataTableRowService.clearRows(DATA_TABLE_REF));
+
+        List<?> deletedTitles = applicationEvents.stream(DataTableWebhookEvent.class)
+            .filter(dataTableWebhookEvent -> dataTableWebhookEvent.getType() == DataTableWebhookType.RECORD_DELETED)
+            .map(dataTableWebhookEvent -> ((Map<?, ?>) dataTableWebhookEvent.getPayload()
+                .get("values")).get("title"))
+            .sorted(Comparator.comparing(String::valueOf))
+            .toList();
+
+        assertEquals(List.of("a", "b", "c"), deletedTitles);
+    }
+
+    @Test
+    void testGetRowOfATableMissingInTheEnvironmentIsNotFound() {
+        DataTableRef productionDataTableRef = new DataTableRef("rows", Environment.PRODUCTION.ordinal());
+
+        assertThrows(DataTableException.class, () -> dataTableRowService.getRow(productionDataTableRef, 1));
+    }
+
+    @Test
     void testDeleteRowOfMissingRowReturnsFalse() {
-        assertFalse(dataTableRowService.deleteRow("rows", Long.MAX_VALUE, DEV_ENVIRONMENT_ID));
+        assertFalse(dataTableRowService.deleteRow(DATA_TABLE_REF, Long.MAX_VALUE));
     }
 }
