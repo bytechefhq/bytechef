@@ -74,6 +74,18 @@ which is why a bug in one cannot leak into another and why a workflow behaves th
 | **Dead-letter routing** | Configured for `AMQP` only. `AmqpMessageBrokerConfiguration` declares the `system.dlq` queue and the listener registrar sets `x-dead-letter-exchange` / `x-dead-letter-routing-key` on each task queue. The other providers have no ByteChef-configured dead-letter path - configure one in the broker itself if you need it. |
 | **Worker concurrency** | Per-queue, via `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` (default `10`) and per-queue variants. |
 
+## AWS SQS control messages
+
+Some messages must reach every node, not one: task cancellation and the events behind SSE streams
+are examples. SQS queues deliver each message to a single consumer, so the `AWS` provider can send
+these messages over a different transport, chosen with `bytechef.message-broker.aws.control-provider`
+(environment variable `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER`).
+
+| Value | Behaviour |
+|---|---|
+| `sqs` (default) | Control messages go through SQS and reach only one node. Fine for a single node. |
+| `redis` | Control messages go over Redis pub/sub (for example Amazon ElastiCache), so every node receives them. Required when you run more than one node. Set the connection with `BYTECHEF_REDIS_*`. |
+
 ## Switching providers
 
 1. Drain in-flight tasks on the old broker.
