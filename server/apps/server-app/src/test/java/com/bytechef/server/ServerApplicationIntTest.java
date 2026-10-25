@@ -51,10 +51,12 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Locale;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -63,6 +65,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
 
@@ -90,8 +93,23 @@ class ServerApplicationIntTest {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private Scheduler scheduler;
+
     @Test
     void testContextLoads() {
+    }
+
+    @Test
+    void testQuartzStartsUnclusteredWithDatabaseRowLocks() throws Exception {
+        assertThat(scheduler.isStarted()).isTrue();
+        assertThat(scheduler.getMetaData()
+            .isJobStoreClustered()).isFalse();
+
+        List<String> lockNames = new JdbcTemplate(dataSource).queryForList(
+            "SELECT lock_name FROM qrtz_locks", String.class);
+
+        assertThat(lockNames).contains("TRIGGER_ACCESS");
     }
 
     @Test
@@ -186,6 +204,15 @@ class ServerApplicationIntTest {
         @Autowired
         private ApplicationContext applicationContext;
 
+        @Autowired
+        private Scheduler scheduler;
+
+        @Test
+        void testSchedulerStaysInStandby() throws Exception {
+            assertThat(scheduler.isStarted()).isFalse();
+            assertThat(scheduler.isInStandbyMode()).isTrue();
+        }
+
         @Test
         void testWebhookEndpointsArePresent() {
             for (Class<?> type : WEBHOOK_ENDPOINT_TYPES) {
@@ -236,6 +263,24 @@ class ServerApplicationIntTest {
         @Test
         void testCoordinatorControllersArePresent() {
             assertThat(applicationContext.getBeanNamesForType(WorkflowApiController.class)).isNotEmpty();
+        }
+    }
+
+    @Nested
+    @TestPropertySource(
+        properties = {
+            "bytechef.scheduler.quartz.clustered=true", "bytechef.scheduler.quartz.cluster-checkin-interval=7000",
+            "spring.quartz.scheduler-name=clusteredScheduler"
+        })
+    class ClusteredScheduler {
+
+        @Autowired
+        private Scheduler scheduler;
+
+        @Test
+        void testSchedulerIsClustered() throws Exception {
+            assertThat(scheduler.getMetaData()
+                .isJobStoreClustered()).isTrue();
         }
     }
 

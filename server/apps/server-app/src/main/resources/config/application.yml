@@ -288,7 +288,11 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
+      org.quartz.jobStore.clusterCheckinInterval: ${bytechef.scheduler.quartz.cluster-checkin-interval}
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.isClustered: ${bytechef.scheduler.quartz.clustered}
+      org.quartz.jobStore.lockHandler.class: org.quartz.impl.jdbcjobstore.StdRowLockSemaphore
+      org.quartz.scheduler.instanceId: AUTO
   task:
     execution:
       thread-name-prefix: server-app-task-

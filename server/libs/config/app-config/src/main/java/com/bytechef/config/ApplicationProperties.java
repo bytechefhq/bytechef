@@ -4592,12 +4592,57 @@ public class ApplicationProperties {
          */
         private Provider provider = Provider.QUARTZ;
 
+        /**
+         * Quartz scheduler configuration
+         */
+        private Quartz quartz = new Quartz();
+
         public Provider getProvider() {
             return provider;
         }
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+
+        public Quartz getQuartz() {
+            return quartz;
+        }
+
+        public void setQuartz(Quartz quartz) {
+            this.quartz = quartz;
+        }
+
+        /**
+         * Quartz scheduler configuration.
+         */
+        public static class Quartz {
+
+            /**
+             * Whether the Quartz job store runs in clustered mode
+             */
+            private boolean clustered;
+
+            /**
+             * How often a clustered scheduler checks in, in milliseconds
+             */
+            private long clusterCheckinInterval;
+
+            public boolean isClustered() {
+                return clustered;
+            }
+
+            public void setClustered(boolean clustered) {
+                this.clustered = clustered;
+            }
+
+            public long getClusterCheckinInterval() {
+                return clusterCheckinInterval;
+            }
+
+            public void setClusterCheckinInterval(long clusterCheckinInterval) {
+                this.clusterCheckinInterval = clusterCheckinInterval;
+            }
         }
     }
 
