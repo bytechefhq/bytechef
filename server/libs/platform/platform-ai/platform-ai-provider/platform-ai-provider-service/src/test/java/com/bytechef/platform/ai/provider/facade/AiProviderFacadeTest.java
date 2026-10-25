@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
@@ -27,10 +28,13 @@ import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiProviderDTO;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -112,6 +116,49 @@ class AiProviderFacadeTest {
         AiProviderDTO openAi = getAiProvider(Provider.OPEN_AI);
 
         assertThat(openAi.enabled()).isFalse();
+    }
+
+    @Test
+    void testUpdateAiProviderKeepsSavedApiKeyWhenNoneIsSent() {
+        Property property = new Property();
+
+        property.setValue(Map.of("apiKey", "secret-token", "url", "http://ollama.internal:11434"));
+
+        when(propertyService.fetchProperty(
+            Provider.OLLAMA.getKey(), Scope.PLATFORM, null, (long) ENVIRONMENT)).thenReturn(Optional.of(property));
+
+        facade.updateAiProvider(Provider.OLLAMA.getId(), null, "http://ollama.example:11434", ENVIRONMENT);
+
+        verify(propertyService).save(
+            Provider.OLLAMA.getKey(), Map.of("apiKey", "secret-token", "url", "http://ollama.example:11434"),
+            Scope.PLATFORM, null, (long) ENVIRONMENT);
+    }
+
+    @Test
+    void testUpdateAiProviderRemovesSavedUrlWhenBlankUrlIsSent() {
+        Property property = new Property();
+
+        property.setValue(Map.of("apiKey", "secret-token", "url", "http://ollama.internal:11434"));
+
+        when(propertyService.fetchProperty(
+            Provider.OLLAMA.getKey(), Scope.PLATFORM, null, (long) ENVIRONMENT)).thenReturn(Optional.of(property));
+
+        facade.updateAiProvider(Provider.OLLAMA.getId(), "", "", ENVIRONMENT);
+
+        verify(propertyService).save(
+            Provider.OLLAMA.getKey(), Map.of("apiKey", "secret-token"), Scope.PLATFORM, null, (long) ENVIRONMENT);
+    }
+
+    @Test
+    void testUpdateAiProviderSavesNewApiKeyAndUrl() {
+        when(propertyService.fetchProperty(
+            Provider.OLLAMA.getKey(), Scope.PLATFORM, null, (long) ENVIRONMENT)).thenReturn(Optional.empty());
+
+        facade.updateAiProvider(Provider.OLLAMA.getId(), "secret-token", "http://ollama.example:11434", ENVIRONMENT);
+
+        verify(propertyService).save(
+            Provider.OLLAMA.getKey(), Map.of("apiKey", "secret-token", "url", "http://ollama.example:11434"),
+            Scope.PLATFORM, null, (long) ENVIRONMENT);
     }
 
     private AiProviderDTO getAiProvider(Provider provider) {
