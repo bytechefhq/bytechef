@@ -133,7 +133,7 @@ fragment while this heading was hidden - give it back.
 | `BYTECHEF_AI_PROVIDER_CHAT_GROQ_OPTIONS_MODEL` | Groq chat model name | `llama-3.3-70b-versatile` |
 | `BYTECHEF_AI_PROVIDER_CHAT_MISTRAL_OPTIONS_MODEL` | Mistral chat model name | `mistral-large-latest` |
 | `BYTECHEF_AI_PROVIDER_CHAT_NVIDIA_OPTIONS_MODEL` | NVIDIA chat model name | `meta/llama-3.1-70b-instruct` |
-| `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` | Ollama chat model name (e.g., `deepseek-r1:8b`) - no default; the model must be pulled on your Ollama instance | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` | Ollama chat model name (e.g., `qwen3:8b`); the model must be pulled on your Ollama instance | First local chat model installed on the Ollama server |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPEN_AI_OPTIONS_MODEL` | OpenAI chat model name | `gpt-5.1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPEN_AI_OPTIONS_TEMPERATURE` | OpenAI chat temperature (0.0-2.0) | `1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPEN_AI_OPTIONS_REASONING_EFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
@@ -146,7 +146,7 @@ fragment while this heading was hidden - give it back.
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_PROVIDER_EMBEDDING_MISTRAL_OPTIONS_MODEL` | Mistral embedding model name | `mistral-embed` |
-| `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` | Ollama embedding model name (e.g., `qwen3-embedding:8b`) - no default; the model must be pulled on your Ollama instance | - |
+| `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` | Ollama embedding model name (e.g., `nomic-embed-text`); the model must be pulled on your Ollama instance | First embedding model installed on the Ollama server |
 | `BYTECHEF_AI_PROVIDER_EMBEDDING_OPEN_AI_OPTIONS_MODEL` | OpenAI embedding model name | `text-embedding-3-small` |
 
 ## AI Image Model Configuration
