@@ -66,15 +66,25 @@ public class SingleCoordinatorLock implements InitializingBean, DisposableBean {
             return;
         }
 
-        connection = lockConnectionFactory.getConnection();
+        Connection openedConnection = lockConnectionFactory.getConnection();
 
-        if (!tryAcquire(connection)) {
-            closeQuietly(connection);
+        boolean acquired;
 
-            connection = null;
+        try {
+            acquired = tryAcquire(openedConnection);
+        } catch (SQLException sqlException) {
+            closeQuietly(openedConnection);
+
+            throw sqlException;
+        }
+
+        if (!acquired) {
+            closeQuietly(openedConnection);
 
             throw new IllegalStateException(ANOTHER_COORDINATOR_MESSAGE);
         }
+
+        connection = openedConnection;
 
         held = true;
     }
@@ -97,10 +107,14 @@ public class SingleCoordinatorLock implements InitializingBean, DisposableBean {
 
         closeQuietly(connection);
 
-        try {
-            connection = lockConnectionFactory.getConnection();
+        Connection reopenedConnection = null;
 
-            if (tryAcquire(connection)) {
+        try {
+            reopenedConnection = lockConnectionFactory.getConnection();
+
+            connection = reopenedConnection;
+
+            if (tryAcquire(reopenedConnection)) {
                 held = true;
 
                 log.warn("Single coordinator lock was re-acquired after the connection was lost");
@@ -110,11 +124,15 @@ public class SingleCoordinatorLock implements InitializingBean, DisposableBean {
 
                 shutdownTriggered = true;
 
-                closeQuietly(connection);
+                closeQuietly(reopenedConnection);
 
                 shutdownAction.run();
             }
         } catch (SQLException sqlException) {
+            if (reopenedConnection != null) {
+                closeQuietly(reopenedConnection);
+            }
+
             log.warn("Single coordinator lock could not be re-acquired, retrying on the next check", sqlException);
         }
     }

@@ -20,7 +20,10 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.coordinator.lock.SingleCoordinatorLock;
 import java.sql.DriverManager;
+import java.util.Properties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.boot.jdbc.autoconfigure.JdbcConnectionDetails;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -34,16 +37,43 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnCoordinator
 public class SingleCoordinatorLockConfiguration {
 
+    private static final int SOCKET_TIMEOUT_SECONDS = 30;
+
     @Bean
     SingleCoordinatorLock singleCoordinatorLock(
-        JdbcConnectionDetails jdbcConnectionDetails, ConfigurableApplicationContext applicationContext) {
+        ObjectProvider<JdbcConnectionDetails> jdbcConnectionDetailsProvider, DataSourceProperties dataSourceProperties,
+        ConfigurableApplicationContext applicationContext) {
 
-        String jdbcUrl = jdbcConnectionDetails.getJdbcUrl();
+        JdbcConnectionDetails jdbcConnectionDetails = jdbcConnectionDetailsProvider.getIfAvailable();
+
+        String jdbcUrl;
+        String username;
+        String password;
+
+        if (jdbcConnectionDetails == null) {
+            jdbcUrl = dataSourceProperties.determineUrl();
+            username = dataSourceProperties.determineUsername();
+            password = dataSourceProperties.determinePassword();
+        } else {
+            jdbcUrl = jdbcConnectionDetails.getJdbcUrl();
+            username = jdbcConnectionDetails.getUsername();
+            password = jdbcConnectionDetails.getPassword();
+        }
+
+        Properties connectionProperties = new Properties();
+
+        if (username != null) {
+            connectionProperties.setProperty("user", username);
+        }
+
+        if (password != null) {
+            connectionProperties.setProperty("password", password);
+        }
+
+        connectionProperties.setProperty("socketTimeout", String.valueOf(SOCKET_TIMEOUT_SECONDS));
 
         return new SingleCoordinatorLock(
-            jdbcUrl,
-            () -> DriverManager.getConnection(
-                jdbcUrl, jdbcConnectionDetails.getUsername(), jdbcConnectionDetails.getPassword()),
+            jdbcUrl, () -> DriverManager.getConnection(jdbcUrl, connectionProperties),
             () -> Thread.ofPlatform()
                 .start(() -> System.exit(SpringApplication.exit(applicationContext, () -> 1))));
     }
