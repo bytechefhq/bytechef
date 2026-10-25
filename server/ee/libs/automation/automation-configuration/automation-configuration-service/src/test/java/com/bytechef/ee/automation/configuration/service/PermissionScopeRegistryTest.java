@@ -14,6 +14,7 @@ import com.bytechef.automation.configuration.security.constant.PermissionScopeTy
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.ee.automation.configuration.security.scope.DataTablePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
@@ -132,8 +133,9 @@ class PermissionScopeRegistryTest {
 
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
-                new DeploymentPermissionScopeProvider(), new McpPermissionScopeProvider(),
-                new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
+                new DataTablePermissionScopeProvider(), new DeploymentPermissionScopeProvider(),
+                new McpPermissionScopeProvider(), new ProjectPermissionScopeProvider(),
+                new WorkflowPermissionScopeProvider()));
 
         @Test
         void testEveryScopeNamedByAGateIsRegistered() {
@@ -154,6 +156,15 @@ class PermissionScopeRegistryTest {
             assertThat(gatedScopeNames)
                 .as("no PermissionScopeProvider may declare a scope that no @PreAuthorize gate or permission check enforces")
                 .containsAll(registeredScopeNames);
+        }
+
+        @Test
+        void testDataTableScopesAreGrantedFromViewerAndEditor() {
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).contains("DATA_TABLE_VIEW");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR)).contains(
+                "DATA_TABLE_VIEW", "DATA_TABLE_CREATE", "DATA_TABLE_EDIT");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
+                "DATA_TABLE_CREATE", "DATA_TABLE_EDIT");
         }
 
         @Test
