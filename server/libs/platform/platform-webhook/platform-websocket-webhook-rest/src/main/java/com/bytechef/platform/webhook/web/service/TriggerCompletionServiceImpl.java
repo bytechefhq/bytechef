@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.web.service;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.webhook.TriggerCompletionService;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnWebhook
 class TriggerCompletionServiceImpl implements TriggerCompletionService {
 
     private static final Logger log = LoggerFactory.getLogger(TriggerCompletionServiceImpl.class);

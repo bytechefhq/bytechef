@@ -18,8 +18,8 @@ package com.bytechef.platform.webhook.executor.config;
 
 import static com.bytechef.tenant.TenantContext.CURRENT_TENANT_ID;
 
-import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnCoordinator
+@ConditionalOnWebhook
 public class SseStreamMessageBrokerConfigurerConfiguration {
 
     @Bean

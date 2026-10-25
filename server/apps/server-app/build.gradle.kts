@@ -373,6 +373,7 @@ dependencies {
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     testImplementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
+    testImplementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     testImplementation("org.springframework.boot:spring-boot-jdbc")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:postgresql")

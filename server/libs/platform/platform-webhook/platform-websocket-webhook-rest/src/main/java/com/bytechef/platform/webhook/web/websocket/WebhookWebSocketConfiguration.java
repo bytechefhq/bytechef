@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.web.websocket;
 
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -31,6 +32,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
  * @author ByteChef
  */
 @Configuration
+@ConditionalOnWebhook
 @EnableWebSocket
 public class WebhookWebSocketConfiguration implements WebSocketConfigurer {
 

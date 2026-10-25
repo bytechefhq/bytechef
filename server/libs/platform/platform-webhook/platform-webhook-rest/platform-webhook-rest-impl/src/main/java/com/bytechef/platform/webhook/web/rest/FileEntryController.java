@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.webhook.web.rest;
 
-import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnCoordinator
+@ConditionalOnWebhook
 public class FileEntryController {
 
     private final TempFileStorage tempFileStorage;

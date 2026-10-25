@@ -206,6 +206,11 @@ public class ApplicationProperties {
     private UserGuiding userGuiding = new UserGuiding();
 
     /**
+     * Webhook node configuration for serving the public webhook endpoints
+     */
+    private Webhook webhook = new Webhook();
+
+    /**
      * Webhook URL for external integrations
      */
     private String webhookUrl;
@@ -342,6 +347,10 @@ public class ApplicationProperties {
 
     public UserGuiding getUserGuiding() {
         return userGuiding;
+    }
+
+    public Webhook getWebhook() {
+        return webhook;
     }
 
     public String getWebhookUrl() {
@@ -482,6 +491,10 @@ public class ApplicationProperties {
 
     public void setUserGuiding(UserGuiding userGuiding) {
         this.userGuiding = userGuiding;
+    }
+
+    public void setWebhook(Webhook webhook) {
+        this.webhook = webhook;
     }
 
     public void setWebhookUrl(String webhookUrl) {
@@ -4699,6 +4712,25 @@ public class ApplicationProperties {
 
         public void setContainerId(String containerId) {
             this.containerId = containerId;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+    }
+
+    /**
+     * Webhook node configuration for serving the public webhook endpoints.
+     */
+    public static class Webhook {
+
+        /**
+         * Whether the public webhook endpoints are served on this node
+         */
+        private boolean enabled;
+
+        public boolean isEnabled() {
+            return enabled;
         }
 
         public void setEnabled(boolean enabled) {

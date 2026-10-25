@@ -199,6 +199,9 @@ bytechef:
     enabled: false
   upgrade:
     enabled: true
+  webhook:
+    # Serve the public webhook endpoints (/webhooks, /callback, /approvals, /job/resume, /file-entries/{id}/content) on this node (true | false) default: true
+    enabled: true
   webhook-url:
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"

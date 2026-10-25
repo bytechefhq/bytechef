@@ -22,6 +22,9 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.ai.copilot.config.CopilotConfiguration;
 import com.bytechef.ai.copilot.config.CopilotPgVectorConfiguration;
 import com.bytechef.ai.copilot.service.CopilotVectorStoreService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
+import com.bytechef.automation.configuration.web.rest.WorkflowApiController;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
@@ -34,6 +37,16 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;
+import com.bytechef.platform.webhook.web.rest.ApprovalController;
+import com.bytechef.platform.webhook.web.rest.CallbackController;
+import com.bytechef.platform.webhook.web.rest.FileEntryController;
+import com.bytechef.platform.webhook.web.rest.JobResumeController;
+import com.bytechef.platform.webhook.web.rest.WebhookTriggerController;
+import com.bytechef.platform.webhook.web.websocket.WebhookWebSocketConfiguration;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -61,6 +74,12 @@ import org.springframework.test.context.TestPropertySource;
     PostgreSQLContainerConfiguration.class, ServerApplicationIntTest.ServerApplicationIntTestConfiguration.class
 })
 class ServerApplicationIntTest {
+
+    private static final Class<?>[] WEBHOOK_ENDPOINT_TYPES = {
+        WebhookTriggerController.class, CallbackController.class, ApprovalController.class,
+        JobResumeController.class, FileEntryController.class, WebhookWebSocketConfiguration.class,
+        twilioCallbackControllerType()
+    };
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -118,6 +137,14 @@ class ServerApplicationIntTest {
         }
     }
 
+    private static Class<?> twilioCallbackControllerType() {
+        try {
+            return Class.forName("com.bytechef.platform.webhook.web.rest.TwilioCallbackController");
+        } catch (ClassNotFoundException classNotFoundException) {
+            throw new IllegalStateException(classNotFoundException);
+        }
+    }
+
     private static boolean tableExists(DatabaseMetaData databaseMetaData, String tableName) throws Exception {
         try (ResultSet resultSet = databaseMetaData.getTables(null, null, tableName, null)) {
             if (resultSet.next()) {
@@ -136,7 +163,7 @@ class ServerApplicationIntTest {
     @TestPropertySource(properties = {
         "bytechef.edition=ce", "spring.quartz.scheduler-name=communityEditionScheduler"
     })
-    class CommunityEditionIntTest {
+    class CommunityEdition {
 
         @Autowired
         private ApplicationContext communityEditionApplicationContext;
@@ -145,6 +172,70 @@ class ServerApplicationIntTest {
         void testContextLoadsInCommunityEdition() {
             assertThat(communityEditionApplicationContext.getBeanNamesForType(WorkspaceScopeCacheService.class))
                 .isEmpty();
+        }
+    }
+
+    @Nested
+    @TestPropertySource(
+        properties = {
+            "bytechef.coordinator.enabled=false", "bytechef.worker.enabled=false",
+            "spring.quartz.scheduler-name=webhookNodeScheduler"
+        })
+    class WebhookNode {
+
+        @Autowired
+        private ApplicationContext applicationContext;
+
+        @Test
+        void testWebhookEndpointsArePresent() {
+            for (Class<?> type : WEBHOOK_ENDPOINT_TYPES) {
+                assertThat(applicationContext.getBeanNamesForType(type)).as(type.getSimpleName())
+                    .isNotEmpty();
+            }
+        }
+
+        @Test
+        void testWebhookExecutionBeansArePresent() {
+            for (Class<?> type : new Class<?>[] {
+                WebhookWorkflowExecutor.class, WebhookWorkflowSyncExecutor.class, PrincipalJobFacade.class,
+                TaskFileStorage.class, SseStreamBridgeRegistry.class, TaskHandlerRegistry.class
+            }) {
+                assertThat(applicationContext.getBeanNamesForType(type)).as(type.getSimpleName())
+                    .isNotEmpty();
+            }
+
+            assertThat(applicationContext.containsBean("sseStreamMessageBrokerConfigurer")).isTrue();
+        }
+
+        @Test
+        void testCoordinatorControllersAreAbsent() {
+            assertThat(applicationContext.getBeanNamesForType(WorkflowApiController.class)).isEmpty();
+        }
+    }
+
+    @Nested
+    @TestPropertySource(
+        properties = {
+            "bytechef.webhook.enabled=false", "spring.quartz.scheduler-name=noWebhookScheduler"
+        })
+    class CoordinatorWithoutWebhooks {
+
+        @Autowired
+        private ApplicationContext applicationContext;
+
+        @Test
+        void testWebhookEndpointsAreAbsent() {
+            for (Class<?> type : WEBHOOK_ENDPOINT_TYPES) {
+                assertThat(applicationContext.getBeanNamesForType(type)).as(type.getSimpleName())
+                    .isEmpty();
+            }
+
+            assertThat(applicationContext.containsBean("sseStreamMessageBrokerConfigurer")).isFalse();
+        }
+
+        @Test
+        void testCoordinatorControllersArePresent() {
+            assertThat(applicationContext.getBeanNamesForType(WorkflowApiController.class)).isNotEmpty();
         }
     }
 
