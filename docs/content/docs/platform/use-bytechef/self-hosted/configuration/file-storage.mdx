@@ -58,6 +58,10 @@ infrastructure and nothing extra to back up, at the cost of database bloat and l
 times as file volume grows. This is the default for data storage and workflow output storage, where
 payloads are typically small.
 
+Component execution logs (what a component writes with `context.log`) are stored as rows of the
+`component_log_entry` table with this provider, one row per log entry. With `filesystem` and `aws`
+they are stored as files.
+
 ### `aws` (S3)
 
 **Enterprise Edition.** Bytes live in an S3 bucket. Two variables select it, and both are required:
@@ -95,6 +99,7 @@ Stored as opaque bytes through file storage:
 - Trigger payloads large enough to spill out of the execution record.
 - Intermediate task values above the inline threshold.
 - Component-uploaded and component-downloaded files.
+- Component execution logs, except with `jdbc` (see [`jdbc`](#jdbc)).
 - Knowledge base documents and their chunks.
 
 Not stored through file storage:
