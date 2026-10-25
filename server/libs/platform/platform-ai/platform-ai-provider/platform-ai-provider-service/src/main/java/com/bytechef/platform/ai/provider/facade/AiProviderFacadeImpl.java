@@ -272,8 +272,12 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .map(property -> new HashMap<String, Object>(property.getValue()))
             .orElseGet(HashMap::new);
 
-        if (apiKey != null && !apiKey.isBlank()) {
-            values.put("apiKey", apiKey);
+        if (apiKey != null) {
+            if (apiKey.isBlank()) {
+                values.remove("apiKey");
+            } else {
+                values.put("apiKey", apiKey);
+            }
         }
 
         if (url == null || url.isBlank()) {
