@@ -17,6 +17,7 @@
 package com.bytechef.message.broker.redis.serializer;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.util.Assert;
 import tools.jackson.databind.ObjectMapper;
@@ -25,6 +26,8 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 public class RedisMessageDeserializer {
+
+    private static final List<String> TRUSTED_PACKAGE_PREFIXES = List.of("com.bytechef.", "java.lang.", "java.util.");
 
     private final ObjectMapper objectMapper;
 
@@ -39,7 +42,18 @@ public class RedisMessageDeserializer {
         try {
             RedisMessage redisMessage = objectMapper.readValue(string, RedisMessage.class);
 
-            return objectMapper.readValue(redisMessage.payload(), Class.forName(redisMessage.type()));
+            String type = redisMessage.type();
+
+            if (TRUSTED_PACKAGE_PREFIXES.stream()
+                .noneMatch(type::startsWith)) {
+
+                throw new SerializationException(
+                    "The class '%s' is not in the trusted packages: %s".formatted(type, TRUSTED_PACKAGE_PREFIXES));
+            }
+
+            return objectMapper.readValue(redisMessage.payload(), Class.forName(type));
+        } catch (SerializationException e) {
+            throw e;
         } catch (Exception e) {
             throw new SerializationException(e.getMessage());
         }

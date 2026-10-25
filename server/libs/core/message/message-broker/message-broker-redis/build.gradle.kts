@@ -5,5 +5,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("io.lettuce:lettuce-core")
     implementation("tools.jackson.core:jackson-databind")
+    api(project(":server:libs:core:message:message-broker:message-broker-redis-control"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-api"))
 }
