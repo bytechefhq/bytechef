@@ -203,5 +203,20 @@ describe('useDuplicateDataTableDialog', () => {
 
             expect(result.current.open).toBe(false);
         });
+
+        it('refreshes the data tables and the storage usage after a successful submit', () => {
+            const {result} = renderHook(() => useDuplicateDataTableDialog());
+
+            act(() => {
+                result.current.handleOpen('table-123', 'TestTable');
+            });
+
+            act(() => {
+                result.current.handleDuplicateSubmit();
+            });
+
+            expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['dataTables']});
+            expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['DataTableStorageUsage']});
+        });
     });
 });
