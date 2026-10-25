@@ -16,9 +16,11 @@
 
 package com.bytechef.cache.boot;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -30,6 +32,9 @@ import org.springframework.core.env.MutablePropertySources;
  */
 public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
+    private static final String DATA_REDIS_AUTO_CONFIGURATION =
+        "org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration";
+
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
@@ -37,10 +42,16 @@ public class RedisCacheEnvironmentPostProcessor implements EnvironmentPostProces
         if (Objects.equals(environment.getProperty("bytechef.cache.provider", String.class), "redis")) {
             source.put("management.health.redis.enabled", true);
 
-            source.computeIfPresent(
-                "spring.autoconfigure.exclude",
-                (k, v) -> ((String) v).replace(
-                    "org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,", ""));
+            String exclude = environment.getProperty("spring.autoconfigure.exclude");
+
+            if (exclude != null) {
+                source.put(
+                    "spring.autoconfigure.exclude",
+                    Arrays.stream(exclude.split(","))
+                        .map(String::trim)
+                        .filter(className -> !className.isEmpty() && !className.equals(DATA_REDIS_AUTO_CONFIGURATION))
+                        .collect(Collectors.joining(",")));
+            }
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Redis Cache Config", source);
