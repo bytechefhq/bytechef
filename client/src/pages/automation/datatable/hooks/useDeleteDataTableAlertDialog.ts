@@ -36,6 +36,7 @@ export default function useDeleteDataTableAlertDialog(): UseDeleteDataTableAlert
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ['dataTables']});
             void queryClient.invalidateQueries({queryKey: ['dataTableTagsByTable']});
+            void queryClient.invalidateQueries({queryKey: ['DataTableStorageUsage']});
 
             clearTableToDelete();
 
