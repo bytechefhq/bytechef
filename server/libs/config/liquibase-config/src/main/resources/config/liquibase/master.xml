@@ -56,6 +56,9 @@
     <!-- audit -->
     <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
 
+    <!-- session -->
+    <includeAll path="classpath:config/liquibase/changelog/session/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or session" />
+
     <!-- spring batch -->
     <includeAll path="${batch_changelog_path}" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or batch" />
 
