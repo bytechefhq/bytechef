@@ -1,6 +1,7 @@
 ---
 # Distributed ByteChef: 2 coordinators + 3 workers behind an nginx load balancer.
 #
+#   export POSTGRES_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16) BYTECHEF_SECURITY_REMEMBER_ME_KEY=...
 #   docker compose -f docker-compose.cluster.yml up -d
 #
 # - RabbitMQ (amqp) carries messages between coordinators and workers.
@@ -14,15 +15,15 @@
 # Requires an image that includes #6595, #6596, #6597 and #6598; set BYTECHEF_IMAGE to use a locally built one.
 # BYTECHEF_PORT and RABBITMQ_MANAGEMENT_PORT change the published ports.
 #
-# Replace BYTECHEF_ENCRYPTION_KEY and BYTECHEF_SECURITY_REMEMBER_ME_KEY before using this outside of a local test.
-# Generate a new encryption key with: openssl rand -base64 16
+# Every node must get the same BYTECHEF_ENCRYPTION_KEY and BYTECHEF_SECURITY_REMEMBER_ME_KEY: a connection encrypted on
+# one node has to be readable on all of them.
 
 x-bytechef-environment: &bytechef-environment
   BYTECHEF_CACHE_PROVIDER: redis
-  BYTECHEF_DATASOURCE_PASSWORD: postgres
+  BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
   BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
   BYTECHEF_DATASOURCE_USERNAME: postgres
-  BYTECHEF_ENCRYPTION_PROPERTY_KEY: ${BYTECHEF_ENCRYPTION_KEY:-tTB1/UBIbYLuCXVi4PPfzA==}
+  BYTECHEF_ENCRYPTION_PROPERTY_KEY: ${BYTECHEF_ENCRYPTION_KEY:?Set BYTECHEF_ENCRYPTION_KEY, e.g. openssl rand -base64 16}
   BYTECHEF_ENCRYPTION_PROVIDER: property
   BYTECHEF_FEATURE_FLAGS: ${BYTECHEF_FEATURE_FLAGS:-}
   BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR: /opt/bytechef/data/file-storage
@@ -35,7 +36,7 @@ x-bytechef-environment: &bytechef-environment
   BYTECHEF_RABBITMQ_USERNAME: guest
   BYTECHEF_REDIS_HOST: redis
   BYTECHEF_REDIS_PORT: 6379
-  BYTECHEF_SECURITY_REMEMBER_ME_KEY: ${BYTECHEF_SECURITY_REMEMBER_ME_KEY:-e48keep1this1safe3ffb2}
+  BYTECHEF_SECURITY_REMEMBER_ME_KEY: ${BYTECHEF_SECURITY_REMEMBER_ME_KEY:?Set BYTECHEF_SECURITY_REMEMBER_ME_KEY}
   BYTECHEF_TENANT_MODE: ${BYTECHEF_TENANT_MODE:-single}
   # Liquibase runs on coordinator-1 only; every other node starts after it is healthy.
   BYTECHEF_UPGRADE_ENABLED: "false"
@@ -76,7 +77,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: bytechef
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
       POSTGRES_USER: postgres
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
