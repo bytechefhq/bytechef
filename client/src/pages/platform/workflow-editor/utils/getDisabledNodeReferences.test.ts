@@ -25,6 +25,21 @@ describe('getDisabledNodeReferences', () => {
         expect(getDisabledNodeReferences(parameters, disabledTaskNames)).toEqual(['skippedTask']);
     });
 
+    it('finds a disabled task referenced by a formula without an expression wrapper', () => {
+        const disabledTaskNames = new Set(['skippedTask']);
+
+        expect(getDisabledNodeReferences({value: '=skippedTask.body'}, disabledTaskNames)).toEqual(['skippedTask']);
+        expect(getDisabledNodeReferences({value: "=concat('prefix', skippedTask.body)"}, disabledTaskNames)).toEqual([
+            'skippedTask',
+        ]);
+    });
+
+    it('ignores a disabled task name that appears only inside a formula string literal', () => {
+        const disabledTaskNames = new Set(['skippedTask']);
+
+        expect(getDisabledNodeReferences({value: "=concat('skippedTask', 'x')"}, disabledTaskNames)).toEqual([]);
+    });
+
     it('ignores a plain-text mention outside an expression', () => {
         const disabledTaskNames = new Set(['skippedTask']);
 
