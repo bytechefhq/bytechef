@@ -10,8 +10,10 @@ package com.bytechef.ee.automation.configuration.service;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -25,6 +27,12 @@ public interface CustomRoleService {
      * assignable everywhere, so creating one is a tenant-wide act.
      */
     CustomRole createCustomRole(String name, String description, Set<String> scopeNames);
+
+    /**
+     * Creates a tenant-global custom role for one side, its scopes validated against that side's catalogue. Requires
+     * tenant admin.
+     */
+    CustomRole createCustomRole(String name, String description, PermissionScopeSide side, Set<String> scopeNames);
 
     /**
      * The built-in workspace roles and the scopes each one grants, least privileged first.
@@ -54,12 +62,22 @@ public interface CustomRoleService {
     List<PermissionScopeGroupDTO> getPermissionScopeGroups();
 
     /**
+     * The permission scope catalogue of one side, grouped by the module that owns each scope.
+     */
+    List<PermissionScopeGroupDTO> getPermissionScopeGroups(PermissionScopeSide side);
+
+    /**
      * Every custom role in the tenant. The read has two audiences — tenant admins managing roles, and workspace member
      * managers populating the assignment picker — so {@code workspaceId} is pure authorization context: pass the
      * workspace being managed to read as its member manager, or {@code null} for the tenant-admin view. It never
      * filters; every role is tenant-global.
      */
     List<CustomRole> getCustomRoles(Long workspaceId);
+
+    /**
+     * Like {@link #getCustomRoles(Long)}, limited to the roles of {@code side} when it is not {@code null}.
+     */
+    List<CustomRole> getCustomRoles(Long workspaceId, @Nullable PermissionScopeSide side);
 
     /**
      * Updates a custom role. Requires tenant admin.

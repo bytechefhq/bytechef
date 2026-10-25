@@ -49,6 +49,12 @@ public class WorkspaceUserErrorType extends AbstractErrorType {
      */
     public static final WorkspaceUserErrorType NO_ENVIRONMENT_ROLE = new WorkspaceUserErrorType(110);
 
+    /**
+     * A custom role of the other side was assigned: an embedded custom role to a workspace member, or an automation
+     * custom role to an embedded member.
+     */
+    public static final WorkspaceUserErrorType CUSTOM_ROLE_SIDE_MISMATCH = new WorkspaceUserErrorType(111);
+
     private WorkspaceUserErrorType(int errorKey) {
         super(WorkspaceUser.class, errorKey);
     }

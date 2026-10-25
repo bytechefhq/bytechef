@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.service.CustomRoleService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
@@ -40,6 +41,32 @@ public class RemoteCustomRoleServiceClient implements CustomRoleService {
 
         throw new UnsupportedOperationException(
             "CustomRoleService.createCustomRole is not available on this app variant");
+    }
+
+    @Override
+    public CustomRole createCustomRole(
+        String name, String description, PermissionScopeSide side, Set<String> scopeNames) {
+
+        logError("createCustomRole");
+
+        throw new UnsupportedOperationException(
+            "CustomRoleService.createCustomRole is not available on this app variant");
+    }
+
+    @Override
+    public List<CustomRole> getCustomRoles(Long workspaceId, PermissionScopeSide side) {
+        logError("getCustomRoles");
+
+        throw new UnsupportedOperationException(
+            "CustomRoleService.getCustomRoles is not available on this app variant");
+    }
+
+    @Override
+    public List<PermissionScopeGroupDTO> getPermissionScopeGroups(PermissionScopeSide side) {
+        logError("getPermissionScopeGroups");
+
+        throw new UnsupportedOperationException(
+            "CustomRoleService.getPermissionScopeGroups is not available on this app variant");
     }
 
     @Override

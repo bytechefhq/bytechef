@@ -181,6 +181,22 @@ class PermissionScopeRegistryTest {
     }
 
     @Test
+    void testScopeGroupsArePerSide() {
+        PermissionScopeRegistry registry = new PermissionScopeRegistry(
+            List.of(
+                automationProvider(new ScopeDefinition(TestPermissionScope.WORKFLOW_VIEW, WorkspaceRole.VIEWER)),
+                embeddedProvider(new ScopeDefinition(TestPermissionScope.INTEGRATION_CREATE, WorkspaceRole.EDITOR))));
+
+        assertThat(registry.getScopeGroups(PermissionScopeSide.EMBEDDED))
+            .flatExtracting(PermissionScopeGroupDTO::scopes)
+            .containsExactly("INTEGRATION_CREATE");
+        assertThat(registry.getScopeGroups(PermissionScopeSide.AUTOMATION))
+            .flatExtracting(PermissionScopeGroupDTO::scopes)
+            .containsExactly("WORKFLOW_VIEW");
+        assertThat(registry.getScopeGroups()).isEqualTo(registry.getScopeGroups(PermissionScopeSide.AUTOMATION));
+    }
+
+    @Test
     void testAnEmbeddedOnlyScopeIsAbsentFromTheAutomationSide() {
         PermissionScopeRegistry registry = new PermissionScopeRegistry(
             List.of(

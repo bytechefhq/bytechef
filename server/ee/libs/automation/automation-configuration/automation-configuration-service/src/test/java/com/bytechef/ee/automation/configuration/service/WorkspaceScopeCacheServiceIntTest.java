@@ -109,6 +109,19 @@ class WorkspaceScopeCacheServiceIntTest {
     }
 
     @Test
+    void testGetWorkspaceScopesIgnoresEmbeddedScopeNamesOfACustomRole() {
+        createCustomRole(WorkspacePermissionIntTestConfiguration.MIXED_SIDE_CUSTOM_ROLE_ID);
+
+        workspaceUserRepository.save(
+            WorkspaceUser.forCustomRole(
+                USER_ID, workspaceId, WorkspacePermissionIntTestConfiguration.MIXED_SIDE_CUSTOM_ROLE_ID));
+
+        Set<String> scopes = workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
+
+        assertThat(scopes).containsExactly(WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_SCOPE);
+    }
+
+    @Test
     void testGetWorkspaceScopesForAnEnvironmentIsEmptyWhereTheMemberHoldsNoRole() {
         workspaceUserRepository.save(
             WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.EDITOR, Environment.DEVELOPMENT));

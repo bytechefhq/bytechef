@@ -84,6 +84,7 @@ public class WorkspacePermissionIntTestConfiguration {
 
     public static final long CUSTOM_ROLE_ID = 900L;
     public static final String CUSTOM_ROLE_SCOPE = "PROJECT_SETTINGS";
+    public static final long MIXED_SIDE_CUSTOM_ROLE_ID = 901L;
 
     @Bean
     ApplicationProperties applicationProperties() {
@@ -97,8 +98,17 @@ public class WorkspacePermissionIntTestConfiguration {
 
     @Bean
     CustomRoleScopeResolver customRoleScopeResolver() {
-        return customRoleId -> customRoleId == CUSTOM_ROLE_ID ? Optional.of(Set.of(CUSTOM_ROLE_SCOPE))
-            : Optional.empty();
+        return customRoleId -> {
+            if (customRoleId == CUSTOM_ROLE_ID) {
+                return Optional.of(Set.of(CUSTOM_ROLE_SCOPE));
+            }
+
+            if (customRoleId == MIXED_SIDE_CUSTOM_ROLE_ID) {
+                return Optional.of(Set.of(CUSTOM_ROLE_SCOPE, "INTEGRATION_CREATE"));
+            }
+
+            return Optional.empty();
+        };
     }
 
     @Bean
