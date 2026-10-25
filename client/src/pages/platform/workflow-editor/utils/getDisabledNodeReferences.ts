@@ -1,6 +1,8 @@
 import {isWorkflowTask} from './flattenDefinitionTasks';
 
 const EXPRESSION_PATTERN = /\$\{([^}]*)\}/g;
+const FORMULA_PREFIX = '=';
+const STRING_LITERAL_PATTERN = /'(?:[^'\\]|\\.)*'/g;
 
 export function getDisabledNodeReferences(parameters: unknown, disabledTaskNames: Set<string>): Array<string> {
     if (disabledTaskNames.size === 0) {
@@ -20,6 +22,16 @@ function collectDisabledNodeReferences(
     referencedTaskNames: Set<string>
 ): void {
     if (typeof value === 'string') {
+        const trimmedValue = value.trim();
+
+        if (trimmedValue.startsWith(FORMULA_PREFIX) && trimmedValue.length > FORMULA_PREFIX.length) {
+            const formulaBody = trimmedValue.slice(FORMULA_PREFIX.length).replace(STRING_LITERAL_PATTERN, "''");
+
+            addReferencedTaskNames(formulaBody, disabledTaskNames, referencedTaskNames);
+
+            return;
+        }
+
         for (const match of value.matchAll(EXPRESSION_PATTERN)) {
             addReferencedTaskNames(match[1], disabledTaskNames, referencedTaskNames);
         }
