@@ -9,15 +9,16 @@ extend type Query {
     List every custom role in the tenant. Roles are tenant-global: defined once, assignable in any
     workspace. Pass a workspaceId to read as that workspace's member manager (requires the
     WORKSPACE_MEMBER_MANAGE scope there — the id is authorization context, not a filter), or omit it
-    for the tenant-admin management view.
+    for the tenant-admin management view. Pass `side` to list only that side's roles; an embedded member
+    manager may list the EMBEDDED roles without a workspaceId.
     """
-    customRoles(workspaceId: ID): [CustomRole!]!
+    customRoles(workspaceId: ID, side: PermissionScopeSide): [CustomRole!]!
     """
     Every permission scope the server recognises, grouped by the module that owns it, for composing a
     role. Requires authentication: this is static metadata about what the server was built with,
-    identical for every tenant.
+    identical for every tenant. `side` picks the AUTOMATION (default) or EMBEDDED catalogue.
     """
-    permissionScopeGroups: [PermissionScopeGroup!]!
+    permissionScopeGroups(side: PermissionScopeSide): [PermissionScopeGroup!]!
 }
 
 extend type Mutation {
@@ -58,12 +59,22 @@ type CustomRole {
     description: String
     "Permission scope names granted by this role (e.g., WORKFLOW_VIEW, PROJECT_CREATE)"
     scopes: [String!]!
+    "Whether the role is assigned to workspace members (AUTOMATION) or embedded members (EMBEDDED)"
+    side: PermissionScopeSide!
     createdDate: String
+}
+
+"The members a custom role is for: workspace members (AUTOMATION) or embedded members (EMBEDDED)"
+enum PermissionScopeSide {
+    AUTOMATION
+    EMBEDDED
 }
 
 input CreateCustomRoleInput {
     name: String!
     description: String
+    "The members the role is for; AUTOMATION when omitted. Fixed once the role is created."
+    side: PermissionScopeSide
     "Permission scope names to grant (must be names registered by the server's PermissionScopeProvider SPI)"
     scopes: [String!]!
 }

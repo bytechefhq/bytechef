@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -815,7 +816,7 @@ class PreAuthorizeAnnotationTest {
     @Test
     void testPermissionScopeGroupsRequiresOnlyAuthentication() throws NoSuchMethodException {
         assertPreAuthorize(
-            CustomRoleFacade.class.getMethod("getPermissionScopeGroups"),
+            CustomRoleFacade.class.getMethod("getPermissionScopeGroups", PermissionScopeSide.class),
             "isAuthenticated()");
     }
 
@@ -838,7 +839,7 @@ class PreAuthorizeAnnotationTest {
     void testCustomRoleMutationsRequireTenantAdmin() throws NoSuchMethodException {
         assertPreAuthorize(
             CustomRoleFacade.class.getMethod(
-                "createCustomRole", String.class, String.class, java.util.Set.class),
+                "createCustomRole", String.class, String.class, PermissionScopeSide.class, java.util.Set.class),
             "isTenantAdmin()");
 
         assertPreAuthorize(
@@ -859,9 +860,13 @@ class PreAuthorizeAnnotationTest {
     @Test
     void testGetCustomRolesIsTieredForAssignmentReads() throws NoSuchMethodException {
         assertPreAuthorize(
-            CustomRoleFacade.class.getMethod("getCustomRoles", Long.class),
+            CustomRoleFacade.class.getMethod("getCustomRoles", Long.class, PermissionScopeSide.class),
             "(#workspaceId == null and isTenantAdmin()) or " +
-                "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE'))");
+                "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')) or " +
+                "(#workspaceId == null and " +
+                "#side == T(com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide).EMBEDDED and "
+                +
+                "(hasEmbeddedScope('EMBEDDED_VIEW') or hasEmbeddedScope('EMBEDDED_MEMBER_MANAGE')))");
     }
 
     private void assertPreAuthorize(Method interfaceMethod, String expectedExpression) {
