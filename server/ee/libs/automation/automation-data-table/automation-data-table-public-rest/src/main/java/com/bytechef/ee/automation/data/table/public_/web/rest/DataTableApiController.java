@@ -84,10 +84,8 @@ public class DataTableApiController extends AbstractDataTableApiController imple
             .toList();
         long environmentId = support.environmentId(xEnvironment);
 
-        workspaceDataTableFacade.createTable(
+        long dataTableId = workspaceDataTableFacade.createTable(
             request.getName(), request.getDescription(), columnSpecs, workspaceId, environmentId);
-
-        long dataTableId = support.resolveTableId(request.getName());
 
         if (request.getTags() != null && !request.getTags()
             .isEmpty()) {
@@ -100,17 +98,19 @@ public class DataTableApiController extends AbstractDataTableApiController imple
     }
 
     @Override
-    public ResponseEntity<DataTableModel> getDataTable(String name, @Nullable EnvironmentModel xEnvironment) {
-        long dataTableId = support.resolveTableId(name);
+    public ResponseEntity<DataTableModel> getDataTable(
+        Long workspaceId, String name, @Nullable EnvironmentModel xEnvironment) {
 
-        return ResponseEntity.ok(table(dataTableId, null, support.environmentId(xEnvironment)));
+        long dataTableId = support.resolveTableId(workspaceId, name);
+
+        return ResponseEntity.ok(table(dataTableId, workspaceId, support.environmentId(xEnvironment)));
     }
 
     @Override
     public ResponseEntity<DataTableModel> updateDataTable(
-        String name, UpdateDataTableRequestModel request, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, UpdateDataTableRequestModel request, @Nullable EnvironmentModel xEnvironment) {
 
-        long dataTableId = support.resolveTableId(name);
+        long dataTableId = support.resolveTableId(workspaceId, name);
         long environmentId = support.environmentId(xEnvironment);
 
         workspaceDataTableFacade.getTable(dataTableId, environmentId);
@@ -127,12 +127,15 @@ public class DataTableApiController extends AbstractDataTableApiController imple
             workspaceDataTableFacade.updateTags(dataTableId, tagNames == null ? List.of() : toTags(tagNames));
         }
 
-        return ResponseEntity.ok(table(dataTableId, null, environmentId));
+        return ResponseEntity.ok(table(dataTableId, workspaceId, environmentId));
     }
 
     @Override
-    public ResponseEntity<Void> deleteDataTable(String name, @Nullable EnvironmentModel xEnvironment) {
-        workspaceDataTableFacade.dropTable(support.resolveTableId(name), support.environmentId(xEnvironment));
+    public ResponseEntity<Void> deleteDataTable(
+        Long workspaceId, String name, @Nullable EnvironmentModel xEnvironment) {
+
+        workspaceDataTableFacade.dropTable(
+            support.resolveTableId(workspaceId, name), support.environmentId(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();
@@ -140,11 +143,11 @@ public class DataTableApiController extends AbstractDataTableApiController imple
 
     @Override
     public ResponseEntity<DataTableModel> createColumn(
-        String name, CreateColumnRequestModel request, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, CreateColumnRequestModel request, @Nullable EnvironmentModel xEnvironment) {
 
         DataTableApiSupport.validateColumnName(request.getName());
 
-        long dataTableId = support.resolveTableId(name);
+        long dataTableId = support.resolveTableId(workspaceId, name);
         long environmentId = support.environmentId(xEnvironment);
 
         workspaceDataTableFacade.addColumn(
@@ -154,15 +157,17 @@ public class DataTableApiController extends AbstractDataTableApiController imple
             environmentId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(table(dataTableId, null, environmentId));
+            .body(table(dataTableId, workspaceId, environmentId));
     }
 
     @Override
-    public ResponseEntity<Void> deleteColumn(String name, String column, @Nullable EnvironmentModel xEnvironment) {
+    public ResponseEntity<Void> deleteColumn(
+        Long workspaceId, String name, String column, @Nullable EnvironmentModel xEnvironment) {
+
         DataTableApiSupport.validateColumnName(column);
 
         workspaceDataTableFacade.removeColumn(
-            support.resolveTableId(name), column, support.environmentId(xEnvironment));
+            support.resolveTableId(workspaceId, name), column, support.environmentId(xEnvironment));
 
         return ResponseEntity.noContent()
             .build();
@@ -170,26 +175,24 @@ public class DataTableApiController extends AbstractDataTableApiController imple
 
     @Override
     public ResponseEntity<DataTableModel> renameColumn(
-        String name, String column, RenameColumnRequestModel request, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, String column, RenameColumnRequestModel request,
+        @Nullable EnvironmentModel xEnvironment) {
 
         DataTableApiSupport.validateColumnName(column);
         DataTableApiSupport.validateColumnName(request.getNewName());
 
-        long dataTableId = support.resolveTableId(name);
+        long dataTableId = support.resolveTableId(workspaceId, name);
         long environmentId = support.environmentId(xEnvironment);
 
         workspaceDataTableFacade.renameColumn(dataTableId, column, request.getNewName(), environmentId);
 
-        return ResponseEntity.ok(table(dataTableId, null, environmentId));
+        return ResponseEntity.ok(table(dataTableId, workspaceId, environmentId));
     }
 
-    private DataTableModel table(long dataTableId, @Nullable Long workspaceId, long environmentId) {
+    private DataTableModel table(long dataTableId, long workspaceId, long environmentId) {
         DataTableInfo dataTableInfo = workspaceDataTableFacade.getTable(dataTableId, environmentId);
 
-        long resolvedWorkspaceId = workspaceId != null
-            ? workspaceId : workspaceDataTableFacade.getWorkspaceId(dataTableId);
-
-        List<Tag> tags = workspaceDataTableFacade.getTagsByTableId(resolvedWorkspaceId)
+        List<Tag> tags = workspaceDataTableFacade.getTagsByTableId(workspaceId)
             .getOrDefault(dataTableId, List.of());
 
         return DataTableModelMapper.toModel(dataTableInfo, tags);

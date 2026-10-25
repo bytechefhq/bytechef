@@ -67,7 +67,7 @@ paths:
           $ref: "#/components/responses/Error"
         "409":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}:
+  /workspaces/{workspaceId}/data-tables/{name}:
     get:
       description: "Get a data table as it exists in the requested environment."
       summary: "Get a data table"
@@ -75,6 +75,7 @@ paths:
         - "data-table"
       operationId: "getDataTable"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       responses:
@@ -94,6 +95,7 @@ paths:
         - "data-table"
       operationId: "updateDataTable"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       requestBody:
@@ -121,6 +123,7 @@ paths:
         - "data-table"
       operationId: "deleteDataTable"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       responses:
@@ -128,7 +131,7 @@ paths:
           description: "Deleted."
         "404":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/columns:
+  /workspaces/{workspaceId}/data-tables/{name}/columns:
     post:
       description: "Add a column."
       summary: "Add a column"
@@ -136,6 +139,7 @@ paths:
         - "data-table"
       operationId: "createColumn"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       requestBody:
@@ -157,7 +161,7 @@ paths:
           $ref: "#/components/responses/Error"
         "409":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/columns/{column}:
+  /workspaces/{workspaceId}/data-tables/{name}/columns/{column}:
     delete:
       description: "Drop a column and every value stored in it. Irreversible."
       summary: "Delete a column"
@@ -165,6 +169,7 @@ paths:
         - "data-table"
       operationId: "deleteColumn"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/ColumnName"
         - $ref: "#/components/parameters/XEnvironment"
@@ -173,7 +178,7 @@ paths:
           description: "Deleted."
         "404":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/columns/{column}/rename:
+  /workspaces/{workspaceId}/data-tables/{name}/columns/{column}/rename:
     post:
       description: "Rename a column. Workflows and filters that name the old column stop matching."
       summary: "Rename a column"
@@ -181,6 +186,7 @@ paths:
         - "data-table"
       operationId: "renameColumn"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/ColumnName"
         - $ref: "#/components/parameters/XEnvironment"
@@ -203,7 +209,7 @@ paths:
           $ref: "#/components/responses/Error"
         "409":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/rows:
+  /workspaces/{workspaceId}/data-tables/{name}/rows:
     get:
       description: "Query rows. Filters are ANDed; each is `column:OPERATOR:value` with OPERATOR one of\
         \ EQ, NEQ, IN, CONTAINS, STARTS_WITH, GT, GTE, LT, LTE, BETWEEN. IN and BETWEEN take comma-separated\
@@ -214,6 +220,7 @@ paths:
         - "data-table-row"
       operationId: "listRows"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
         - name: "filter"
@@ -270,6 +277,7 @@ paths:
         - "data-table-row"
       operationId: "createRow"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       requestBody:
@@ -300,6 +308,7 @@ paths:
         - "data-table-row"
       operationId: "deleteRows"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
         - name: "ids"
@@ -324,13 +333,14 @@ paths:
           $ref: "#/components/responses/Error"
         "404":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/rows/{id}:
+  /workspaces/{workspaceId}/data-tables/{name}/rows/{id}:
     get:
       summary: "Get a row"
       tags:
         - "data-table-row"
       operationId: "getRow"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/RowId"
         - $ref: "#/components/parameters/XEnvironment"
@@ -351,6 +361,7 @@ paths:
         - "data-table-row"
       operationId: "updateRow"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/RowId"
         - $ref: "#/components/parameters/XEnvironment"
@@ -379,6 +390,7 @@ paths:
         - "data-table-row"
       operationId: "deleteRow"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/RowId"
         - $ref: "#/components/parameters/XEnvironment"
@@ -387,13 +399,14 @@ paths:
           description: "Deleted."
         "404":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/rows/by-external-id/{externalId}:
+  /workspaces/{workspaceId}/data-tables/{name}/rows/by-external-id/{externalId}:
     get:
       summary: "Get a row by external id"
       tags:
         - "data-table-row"
       operationId: "getRowByExternalId"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/ExternalId"
         - $ref: "#/components/parameters/XEnvironment"
@@ -414,6 +427,7 @@ paths:
         - "data-table-row"
       operationId: "upsertRowByExternalId"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/ExternalId"
         - $ref: "#/components/parameters/XEnvironment"
@@ -448,6 +462,7 @@ paths:
         - "data-table-row"
       operationId: "deleteRowByExternalId"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/ExternalId"
         - $ref: "#/components/parameters/XEnvironment"
@@ -456,7 +471,7 @@ paths:
           description: "Deleted."
         "404":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/rows/batch:
+  /workspaces/{workspaceId}/data-tables/{name}/rows/batch:
     post:
       description: "Insert or upsert up to 1000 rows in one transaction; one failure rolls back all of them.\
         \ Under UPSERT every row must carry an externalId."
@@ -465,6 +480,7 @@ paths:
         - "data-table-row"
       operationId: "batchRows"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       requestBody:
@@ -488,7 +504,7 @@ paths:
           $ref: "#/components/responses/Error"
         "507":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/rows/clear:
+  /workspaces/{workspaceId}/data-tables/{name}/rows/clear:
     post:
       description: "Delete every row. Irreversible."
       summary: "Clear a table"
@@ -496,6 +512,7 @@ paths:
         - "data-table-row"
       operationId: "clearRows"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       responses:
@@ -507,7 +524,7 @@ paths:
                 $ref: "#/components/schemas/ClearRowsResponse"
         "404":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/rows/import:
+  /workspaces/{workspaceId}/data-tables/{name}/rows/import:
     post:
       description: "Insert rows from CSV. The header names existing columns; an optional `external_id`\
         \ column sets each row's external id. Empty fields are null."
@@ -516,6 +533,7 @@ paths:
         - "data-table-row"
       operationId: "importRows"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       requestBody:
@@ -539,7 +557,7 @@ paths:
           $ref: "#/components/responses/Error"
         "507":
           $ref: "#/components/responses/Error"
-  /data-tables/{name}/rows/export:
+  /workspaces/{workspaceId}/data-tables/{name}/rows/export:
     get:
       description: "Export every row as CSV. `external_id` is the first column; `id` is not included."
       summary: "Export rows as CSV"
@@ -547,6 +565,7 @@ paths:
         - "data-table-row"
       operationId: "exportRows"
       parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/XEnvironment"
       responses:
@@ -671,9 +690,20 @@ components:
           $ref: "#/components/schemas/ColumnType"
     DataTable:
       type: "object"
+      required:
+        - "id"
+        - "workspaceId"
       properties:
+        id:
+          description: "The id of the data table."
+          type: "integer"
+          format: "int64"
+        workspaceId:
+          description: "The id of the workspace the table belongs to; the name is unique within it."
+          type: "integer"
+          format: "int64"
         name:
-          description: "The table name; its identity."
+          description: "The table name, unique within its workspace."
           type: "string"
         description:
           type: "string"

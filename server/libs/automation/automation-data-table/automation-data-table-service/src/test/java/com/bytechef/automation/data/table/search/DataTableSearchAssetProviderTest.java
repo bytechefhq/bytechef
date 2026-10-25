@@ -17,48 +17,65 @@
 package com.bytechef.automation.data.table.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(MockitoExtension.class)
 class DataTableSearchAssetProviderTest {
+
+    @Mock
+    private DataTableService dataTableService;
+
+    @InjectMocks
+    private DataTableSearchAssetProvider dataTableSearchAssetProvider;
 
     @Test
     void testReturnsOnlyCallerWorkspaceDataTablesUpToLimit() {
-        DataTableService dataTableService = mock(DataTableService.class);
-        WorkspaceDataTableService workspaceDataTableService = mock(WorkspaceDataTableService.class);
-
-        WorkspaceDataTable ownDataTable = mock(WorkspaceDataTable.class);
-        WorkspaceDataTable ownDataTable2 = mock(WorkspaceDataTable.class);
-
-        when(ownDataTable.getDataTableId()).thenReturn(3L);
-        when(ownDataTable2.getDataTableId()).thenReturn(4L);
-        when(workspaceDataTableService.getWorkspaceDataTables(10L)).thenReturn(List.of(ownDataTable, ownDataTable2));
-        when(dataTableService.listTables(1L)).thenReturn(
+        when(dataTableService.listAllTables(Environment.DEVELOPMENT.ordinal())).thenReturn(
             List.of(
-                createDataTableInfo(1L, "orders_foreign"), createDataTableInfo(2L, "orders_foreign_2"),
-                createDataTableInfo(3L, "orders_own"), createDataTableInfo(4L, "orders_own_2")));
+                createDataTableInfo(1L, "orders_foreign", 20L), createDataTableInfo(2L, "orders_foreign_2", 20L),
+                createDataTableInfo(3L, "orders_own", 10L), createDataTableInfo(4L, "orders_own_2", 10L)));
 
-        DataTableSearchAssetProvider dataTableSearchAssetProvider = new DataTableSearchAssetProvider(
-            dataTableService, workspaceDataTableService);
+        List<DataTableSearchResult> results = dataTableSearchAssetProvider.search("ORDERS", 1, Set.of(10L));
 
-        List<DataTableSearchResult> results = dataTableSearchAssetProvider.search("orders", 1, Set.of(10L));
-
-        assertThat(results).extracting(DataTableSearchResult::id)
-            .containsExactly(3L);
+        assertThat(results).containsExactly(new DataTableSearchResult(3L, "orders_own"));
     }
 
-    private static DataTableInfo createDataTableInfo(long id, String baseName) {
-        return new DataTableInfo(id, baseName, null, List.of(), null);
+    @Test
+    void testSkipsTablesWithoutAWorkspace() {
+        when(dataTableService.listAllTables(Environment.DEVELOPMENT.ordinal())).thenReturn(
+            List.of(createDataTableInfo(1051L, "orders", null), createDataTableInfo(1052L, "orders", 10L)));
+
+        List<DataTableSearchResult> results = dataTableSearchAssetProvider.search("orders", 10, Set.of(10L));
+
+        assertThat(results).containsExactly(new DataTableSearchResult(1052L, "orders"));
+    }
+
+    @Test
+    void testReturnsNothingWithoutAccessibleWorkspaces() {
+        List<DataTableSearchResult> results = dataTableSearchAssetProvider.search("orders", 10, Set.of());
+
+        assertThat(results).isEmpty();
+
+        verifyNoInteractions(dataTableService);
+    }
+
+    private static DataTableInfo createDataTableInfo(long id, String name, Long workspaceId) {
+        return new DataTableInfo(id, name, workspaceId, null, List.of(), Instant.EPOCH);
     }
 }

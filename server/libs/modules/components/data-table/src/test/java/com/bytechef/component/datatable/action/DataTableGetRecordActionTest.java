@@ -40,12 +40,9 @@ class DataTableGetRecordActionTest extends AbstractDataTableActionTest {
         when(dataTableRowService.getRow(eq(dataTableRef), anyLong()))
             .thenReturn(new DataTableRow(7, Map.of("staff_reply", "on my way")));
 
-        ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
-            dataTableService, dataTableRowService);
-
         assertEquals(
             Map.of("id", 7L, "staff_reply", "on my way"),
-            perform(actionDefinition, Map.of("table", BASE_NAME, "id", 7)));
+            perform(createActionDefinition(), Map.of("table", TABLE_NAME, "id", 7)));
     }
 
     @Test
@@ -54,9 +51,16 @@ class DataTableGetRecordActionTest extends AbstractDataTableActionTest {
 
         when(dataTableRowService.getRow(eq(dataTableRef), anyLong())).thenReturn(null);
 
-        ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
-            dataTableService, dataTableRowService);
+        assertNull(perform(createActionDefinition(), Map.of("table", TABLE_NAME, "id", 7)));
+    }
 
-        assertNull(perform(actionDefinition, Map.of("table", BASE_NAME, "id", 7)));
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableGetRecordAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "id", 7);
     }
 }

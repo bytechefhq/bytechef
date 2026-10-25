@@ -17,43 +17,25 @@
 package com.bytechef.platform.data.table.domain;
 
 import com.bytechef.platform.data.table.internal.PhysicalTableNaming;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import org.springframework.util.Assert;
 
 /**
- * One physical data table, fully addressed: the environment it lives in and the base name it is known by.
+ * One physical data table, fully addressed: the environment it lives in and the registry id it is known by.
  *
  * <p>
- * This is the only way to name a physical table. Every DDL and DML statement takes a ref rather than a base name, so no
- * call site can hand over a base name and leave the callee to work out the rest of the address.
- *
- * <p>
- * The base name is validated here rather than at each statement, so a ref is well formed by construction and the
- * identifier allowlist that keeps the generated SQL injection-free holds for every physical name built from one.
+ * This is the only way to name a physical table. Every DDL and DML statement takes a ref rather than a table name, so
+ * no call site can hand over a name and leave the callee to work out the rest of the address.
  *
  * @author Ivica Cardic
  */
-public record DataTableRef(String baseName, long environmentId) {
-    private static final int MAX_IDENTIFIER_BYTES = 63;
+public record DataTableRef(long dataTableId, long environmentId) {
 
     public DataTableRef {
-        Assert.hasText(baseName, "baseName must not be empty");
-
-        baseName = baseName.toLowerCase(Locale.ROOT);
-
-        Assert.isTrue(!baseName.startsWith("dt_"), "baseName must not start with 'dt_'");
-        Assert.isTrue(baseName.matches("[a-z_][a-z0-9_]*"), "Invalid base name: " + baseName);
-
-        String physicalName = PhysicalTableNaming.buildPhysicalName(environmentId, baseName);
-        byte[] bytes = physicalName.getBytes(StandardCharsets.UTF_8);
-
-        Assert.isTrue(
-            bytes.length <= MAX_IDENTIFIER_BYTES,
-            "Physical table name '" + physicalName + "' exceeds " + MAX_IDENTIFIER_BYTES + " bytes");
+        Assert.isTrue(dataTableId > 0, "dataTableId must be positive");
+        Assert.isTrue(environmentId >= 0, "environmentId must not be negative");
     }
 
     public String physicalName() {
-        return PhysicalTableNaming.buildPhysicalName(environmentId, baseName);
+        return PhysicalTableNaming.buildPhysicalName(environmentId, dataTableId);
     }
 }

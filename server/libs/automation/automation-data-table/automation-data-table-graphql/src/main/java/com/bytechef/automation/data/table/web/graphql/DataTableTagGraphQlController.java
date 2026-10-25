@@ -18,7 +18,6 @@ package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,16 +39,13 @@ import org.springframework.stereotype.Controller;
 public class DataTableTagGraphQlController {
 
     private final DataTableTagService dataTableTagService;
-    private final DataTableService dataTableService;
     private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
     @SuppressFBWarnings("EI")
     public DataTableTagGraphQlController(
-        DataTableTagService dataTableTagService, DataTableService dataTableService,
-        WorkspaceDataTableFacade workspaceDataTableFacade) {
+        DataTableTagService dataTableTagService, WorkspaceDataTableFacade workspaceDataTableFacade) {
 
         this.dataTableTagService = dataTableTagService;
-        this.dataTableService = dataTableService;
         this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
@@ -61,12 +57,11 @@ public class DataTableTagGraphQlController {
     @QueryMapping
     @PreAuthorize("isAuthenticated()")
     public List<DataTableTagsEntry> dataTableTagsByTable() {
-        Map<String, List<Tag>> tagsByTableName = dataTableTagService.getTagsByTableName();
+        Map<Long, List<Tag>> tagsByTableId = dataTableTagService.getTagsByTableId();
 
-        return tagsByTableName.entrySet()
+        return tagsByTableId.entrySet()
             .stream()
-            .map(entry -> new DataTableTagsEntry(
-                dataTableService.getIdByBaseName(entry.getKey()), entry.getValue()))
+            .map(entry -> new DataTableTagsEntry(entry.getKey(), entry.getValue()))
             .toList();
     }
 

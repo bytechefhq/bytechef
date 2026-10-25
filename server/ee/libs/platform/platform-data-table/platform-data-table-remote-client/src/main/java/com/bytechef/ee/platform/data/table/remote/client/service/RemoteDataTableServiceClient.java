@@ -12,8 +12,6 @@ import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
-import com.bytechef.platform.data.table.domain.DataTableRef;
-import com.bytechef.platform.data.table.domain.DataTableResolution;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -29,84 +27,74 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
-    public void createTable(
-        String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId) {
+    public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void addColumn(String baseName, ColumnSpec columnSpec, long environmentId) {
+    public long createTable(
+        @Nullable Long workspaceId, String name, @Nullable String description, List<ColumnSpec> columnSpecs,
+        long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void removeColumn(
-        String baseName, String columnName, long environmentId) {
+    public void dropTable(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void renameColumn(
-        String baseName, String fromColumnName, String toColumnName, long environmentId) {
+    public long duplicateTable(long dataTableId, String newName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void dropTable(String baseName, long environmentId) {
+    public Optional<DataTable> fetchDataTable(@Nullable Long workspaceId, String name) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<DataTableInfo> listTables(long environmentId) {
+    public Optional<DataTableInfo> fetchDataTableInfo(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<DataTable> fetchDataTable(String baseName) {
+    public DataTable getDataTable(long dataTableId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<DataTable> fetchDataTable(DataTableRef dataTableRef) {
+    public List<DataTable> getWorkspaceDataTables(long workspaceId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<DataTableResolution> fetchDataTableResolution(
-        String baseName, long environmentId) {
+    public List<DataTableInfo> listAllTables(long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getBaseNameById(long id) {
+    public List<DataTableInfo> listTables(@Nullable Long workspaceId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public long getIdByBaseName(String baseName) {
+    public void removeColumn(long dataTableId, String columnName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void renameTable(
-        String fromBaseName, String toBaseName, long environmentId) {
+    public void renameColumn(long dataTableId, String fromColumnName, String toColumnName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void duplicateTable(
-        String fromBaseName, String toBaseName, long environmentId) {
+    public void renameTable(long dataTableId, String newName) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<DataTableInfo> fetchDataTableInfo(
-        String baseName, long environmentId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateDescription(String baseName, @Nullable String description) {
+    public void updateDescription(long dataTableId, @Nullable String description) {
         throw new UnsupportedOperationException();
     }
 }

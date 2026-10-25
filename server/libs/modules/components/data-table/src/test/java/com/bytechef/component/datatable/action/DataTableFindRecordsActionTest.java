@@ -152,11 +152,18 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
                 List.of(
                     new DataTableRow(1, Map.of("status", "BOT")), new DataTableRow(2, Map.of("status", "CLOSED"))));
 
-        ModifiableActionDefinition actionDefinition = DataTableFindRecordsAction.of(
-            dataTableService, dataTableRowService);
-
         assertEquals(
             List.of(Map.of("id", 1L, "status", "BOT"), Map.of("id", 2L, "status", "CLOSED")),
-            perform(actionDefinition, Map.of("table", BASE_NAME)));
+            perform(createActionDefinition(), Map.of("table", TABLE_NAME)));
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableFindRecordsAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName);
     }
 }

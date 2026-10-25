@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -71,8 +73,7 @@ class DataTableRowServiceTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
 
-    private static final DataTableRef DATA_TABLE_REF =
-        new DataTableRef("conversations", 1);
+    private static final DataTableRef DATA_TABLE_REF = new DataTableRef(1051L, 0L);
 
     private DataTableRowServiceImpl dataTableRowService;
 
@@ -213,6 +214,40 @@ class DataTableRowServiceTest {
             executedSqls.stream()
                 .noneMatch(sql -> sql.contains(" RETURNING ")),
             "H2 has no RETURNING, so the row must be read after the update, got " + executedSqls);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testDeleteRowsWithoutReturningPublishesOnlyTheRowsItDeleted() throws SQLException {
+        stubH2();
+        stubQueries(null);
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class), any(Object[].class)))
+            .thenReturn(
+                List.of(new DataTableRow(7, Map.of("status", "OPEN")), new DataTableRow(8, Map.of("status", "OPEN"))));
+        when(jdbcTemplate.update(contains("DELETE FROM"), eq(7L))).thenReturn(1);
+        when(jdbcTemplate.update(contains("DELETE FROM"), eq(8L))).thenReturn(0);
+
+        assertEquals(List.of(7L), dataTableRowService.deleteRows(DATA_TABLE_REF, List.of(7L, 8L)));
+
+        assertEquals(Map.of("id", 7L, "values", Map.of("status", "OPEN")), publishedPayload());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testClearRowsWithoutReturningPublishesOnlyTheRowsItDeleted() throws SQLException {
+        stubH2();
+        stubQueries(null);
+
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
+            .thenReturn(
+                List.of(new DataTableRow(7, Map.of("status", "OPEN")), new DataTableRow(8, Map.of("status", "OPEN"))));
+        when(jdbcTemplate.update(contains("DELETE FROM"), eq(7L))).thenReturn(0);
+        when(jdbcTemplate.update(contains("DELETE FROM"), eq(8L))).thenReturn(1);
+
+        assertEquals(1L, dataTableRowService.clearRows(DATA_TABLE_REF));
+
+        assertEquals(Map.of("id", 8L, "values", Map.of("status", "OPEN")), publishedPayload());
     }
 
     @Test

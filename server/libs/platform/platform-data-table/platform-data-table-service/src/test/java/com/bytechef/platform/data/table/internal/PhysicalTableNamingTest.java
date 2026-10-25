@@ -26,20 +26,7 @@ import org.junit.jupiter.api.Test;
 class PhysicalTableNamingTest {
 
     @Test
-    void testThePhysicalNameIsThePrefixAndTheBaseName() {
-        assertThat(PhysicalTableNaming.buildPhysicalName(0, "orders")).isEqualTo("dt_0_orders");
-        assertThat(PhysicalTableNaming.buildPhysicalName(2, "orders")).isEqualTo("dt_2_orders");
-    }
-
-    @Test
-    void testThePrefixIsEverythingBeforeTheBaseName() {
-        assertThat(PhysicalTableNaming.prefix(1)).isEqualTo("dt_1_");
-        assertThat(PhysicalTableNaming.buildPhysicalName(1, "orders"))
-            .startsWith(PhysicalTableNaming.prefix(1));
-    }
-
-    @Test
-    void testAMixedCaseBaseNameIsLowercased() {
-        assertThat(PhysicalTableNaming.buildPhysicalName(0, "Orders")).isEqualTo("dt_0_orders");
+    void testBuildPhysicalNameUsesTheEnvironmentAndTheId() {
+        assertThat(PhysicalTableNaming.buildPhysicalName(2, 1051)).isEqualTo("dt_2_1051");
     }
 }

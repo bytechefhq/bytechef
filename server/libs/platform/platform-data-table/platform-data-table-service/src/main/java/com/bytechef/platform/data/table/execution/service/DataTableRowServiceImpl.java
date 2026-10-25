@@ -120,8 +120,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
+     * through {@link #escapeIdentifier(String)}, which enforces a strict allowlist pattern {@code [a-z_][a-z0-9_]*},
+     * and the physical name comes from a {@link DataTableRef} built from numeric ids, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
@@ -158,8 +158,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
+     * through {@link #escapeIdentifier(String)}, which enforces a strict allowlist pattern {@code [a-z_][a-z0-9_]*},
+     * and the physical name comes from a {@link DataTableRef} built from numeric ids, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
@@ -186,8 +186,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
+     * through {@link #escapeIdentifier(String)}, which enforces a strict allowlist pattern {@code [a-z_][a-z0-9_]*},
+     * and the physical name comes from a {@link DataTableRef} built from numeric ids, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
@@ -413,8 +413,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection. User-provided row values use parameterized queries.
+     * through {@link #escapeIdentifier(String)}, which enforces a strict allowlist pattern {@code [a-z_][a-z0-9_]*},
+     * and the physical name comes from a {@link DataTableRef} built from numeric ids, preventing SQL injection.
+     * User-provided row values use parameterized queries.
      */
     @Override
     public DataTableRow insertRow(DataTableRef dataTableRef, Map<String, Object> values) {
@@ -736,10 +737,6 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         Assert.isTrue(hasExternalIdColumn(columnSpecs), "Table " + physicalName + " has no external_id column");
 
-        if (!isReturningSupported()) {
-            return upsertRowAfterReading(dataTableRef, externalId, values, columnSpecs);
-        }
-
         List<String> allColumnNames = columnSpecs.stream()
             .map(ColumnSpec::name)
             .toList();
@@ -773,23 +770,32 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         Map<String, ColumnType> typeMap = columnTypeMap(columnSpecs);
 
-        UpsertResult upsertResult = jdbcTemplate.query(sql, ps -> {
-            int i = 1;
+        UpsertResult upsertResult;
 
-            ps.setString(i++, externalId);
+        if (isReturningSupported()) {
+            upsertResult = jdbcTemplate.query(sql, ps -> {
+                int i = 1;
 
-            for (String columnName : writtenColumnNames) {
-                ColumnType columnType = typeMap.getOrDefault(columnName.toLowerCase(Locale.ROOT), ColumnType.STRING);
+                ps.setString(i++, externalId);
 
-                setParam(ps, i++, columnType, coerceValue(columnType, getValueCaseInsensitive(values, columnName)));
-            }
-        }, resultSet -> {
-            if (!resultSet.next()) {
-                throw new IllegalStateException("Upsert returned no row");
-            }
+                for (String columnName : writtenColumnNames) {
+                    ColumnType columnType = typeMap.getOrDefault(
+                        columnName.toLowerCase(Locale.ROOT), ColumnType.STRING);
 
-            return new UpsertResult(toRow(resultSet, userColumnNames, true), resultSet.getBoolean("created"));
-        });
+                    setParam(
+                        ps, i++, columnType, coerceValue(columnType, getValueCaseInsensitive(values, columnName)));
+                }
+            }, resultSet -> {
+                if (!resultSet.next()) {
+                    throw new IllegalStateException("Upsert returned no row");
+                }
+
+                return new UpsertResult(toRow(resultSet, userColumnNames, true), resultSet.getBoolean("created"));
+            });
+        } else {
+            upsertResult = upsertRowWithoutReturning(
+                dataTableRef, externalId, values, insertColumnNames, writtenColumnNames, typeMap);
+        }
 
         Map<String, Object> payload = new HashMap<>();
 
@@ -864,22 +870,23 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String physicalName = dataTableRef.physicalName();
 
         List<ColumnSpec> columnSpecs = requireColumns(physicalName);
-
-        if (!isReturningSupported()) {
-            return deleteRowsOneByOne(dataTableRef, ids);
-        }
-
         List<String> columnNames = userColumnNames(columnSpecs);
         boolean hasExternalIdColumn = hasExternalIdColumn(columnSpecs);
 
-        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ANY(?)" + " RETURNING " +
-            selectColumns(columnNames, hasExternalIdColumn);
+        List<DataTableRow> deletedDataTableRows;
 
-        List<DataTableRow> deletedDataTableRows = jdbcTemplate.query(sql, ps -> {
-            ps.setArray(1, ps.getConnection()
-                .createArrayOf("bigint", ids.toArray()));
+        if (isReturningSupported()) {
+            String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ANY(?)" + " RETURNING " +
+                selectColumns(columnNames, hasExternalIdColumn);
 
-        }, (resultSet, rowNum) -> toRow(resultSet, columnNames, hasExternalIdColumn));
+            deletedDataTableRows = jdbcTemplate.query(sql, ps -> {
+                ps.setArray(1, ps.getConnection()
+                    .createArrayOf("bigint", ids.toArray()));
+
+            }, (resultSet, rowNum) -> toRow(resultSet, columnNames, hasExternalIdColumn));
+        } else {
+            deletedDataTableRows = deleteRowsAfterReadingRows(physicalName, ids, columnNames, hasExternalIdColumn);
+        }
 
         for (DataTableRow deletedDataTableRow : deletedDataTableRows) {
             publishDeleted(dataTableRef, deletedDataTableRow);
@@ -903,23 +910,25 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String physicalName = dataTableRef.physicalName();
 
         List<ColumnSpec> columnSpecs = requireColumns(physicalName);
-
-        if (!isReturningSupported()) {
-            List<Long> ids = jdbcTemplate.queryForList(
-                "SELECT \"id\" FROM " + escapeIdentifier(physicalName), Long.class);
-
-            return deleteRowsOneByOne(dataTableRef, ids).size();
-        }
-
         List<String> columnNames = userColumnNames(columnSpecs);
         boolean hasExternalIdColumn = hasExternalIdColumn(columnSpecs);
 
-        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE TRUE" + " RETURNING " +
-            selectColumns(columnNames, hasExternalIdColumn);
+        List<DataTableRow> deletedDataTableRows;
 
-        List<DataTableRow> deletedDataTableRows = jdbcTemplate.query(
-            sql,
-            (resultSet, rowNum) -> toRow(resultSet, columnNames, hasExternalIdColumn));
+        if (isReturningSupported()) {
+            String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE TRUE" + " RETURNING " +
+                selectColumns(columnNames, hasExternalIdColumn);
+
+            deletedDataTableRows = jdbcTemplate.query(
+                sql,
+                (resultSet, rowNum) -> toRow(resultSet, columnNames, hasExternalIdColumn));
+        } else {
+            List<DataTableRow> existingDataTableRows = jdbcTemplate.query(
+                "SELECT " + selectColumns(columnNames, hasExternalIdColumn) + " FROM " + escapeIdentifier(physicalName),
+                (resultSet, rowNum) -> toRow(resultSet, columnNames, hasExternalIdColumn));
+
+            deletedDataTableRows = deleteReadRows(physicalName, existingDataTableRows);
+        }
 
         for (DataTableRow deletedDataTableRow : deletedDataTableRows) {
             publishDeleted(dataTableRef, deletedDataTableRow);
@@ -1403,25 +1412,132 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return deletedRowCount == 0 ? null : dataTableRow;
     }
 
-    private List<Long> deleteRowsOneByOne(DataTableRef dataTableRef, List<Long> ids) {
-        return ids.stream()
-            .distinct()
-            .filter(id -> deleteRow(dataTableRef, id))
-            .toList();
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<DataTableRow> deleteRowsAfterReadingRows(
+        String physicalName, List<Long> ids, List<String> columnNames, boolean hasExternalIdColumn) {
+
+        String placeholders = ids.stream()
+            .map(id -> "?")
+            .collect(Collectors.joining(", "));
+
+        List<DataTableRow> existingDataTableRows = jdbcTemplate.query(
+            "SELECT " + selectColumns(columnNames, hasExternalIdColumn) + " FROM " + escapeIdentifier(physicalName) +
+                " WHERE \"id\" IN (" + placeholders + ")",
+            (resultSet, rowNum) -> toRow(resultSet, columnNames, hasExternalIdColumn), ids.toArray());
+
+        return deleteReadRows(physicalName, existingDataTableRows);
     }
 
-    private UpsertResult upsertRowAfterReading(
-        DataTableRef dataTableRef, String externalId, Map<String, Object> values, List<ColumnSpec> columnSpecs) {
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<DataTableRow> deleteReadRows(String physicalName, List<DataTableRow> dataTableRows) {
+        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
 
-        Optional<DataTableRow> existingDataTableRowOptional = fetchRowByExternalId(dataTableRef, externalId);
+        List<DataTableRow> deletedDataTableRows = new ArrayList<>();
 
-        if (existingDataTableRowOptional.isPresent()) {
-            DataTableRow existingDataTableRow = existingDataTableRowOptional.get();
+        for (DataTableRow dataTableRow : dataTableRows) {
+            int deletedRowCount = jdbcTemplate.update(sql, dataTableRow.id());
 
-            return new UpsertResult(updateRow(dataTableRef, existingDataTableRow.id(), values), false);
+            if (deletedRowCount > 0) {
+                deletedDataTableRows.add(dataTableRow);
+            }
         }
 
-        return new UpsertResult(insertRow(dataTableRef, values, externalId, columnSpecs), true);
+        return deletedDataTableRows;
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private UpsertResult upsertRowWithoutReturning(
+        DataTableRef dataTableRef, String externalId, Map<String, Object> values, List<String> insertColumnNames,
+        List<String> writtenColumnNames, Map<String, ColumnType> typeMap) {
+
+        String physicalName = dataTableRef.physicalName();
+
+        Optional<Long> existingId = findRowIdByExternalId(physicalName, externalId);
+
+        if (existingId.isEmpty()) {
+            String valuesClause = " (" + insertColumnNames.stream()
+                .map(this::escapeIdentifier)
+                .collect(Collectors.joining(", ")) + ") VALUES ("
+                + insertColumnNames.stream()
+                    .map(columnName -> "?")
+                    .collect(Collectors.joining(", "))
+                + ")";
+
+            PreparedStatementSetter insertPreparedStatementSetter = ps -> {
+                int i = 1;
+
+                ps.setString(i++, externalId);
+
+                setWrittenValues(ps, i, writtenColumnNames, values, typeMap);
+            };
+
+            try {
+                DataTableRow insertedDataTableRow = insertRowAfterInserting(
+                    dataTableRef, valuesClause, insertPreparedStatementSetter);
+
+                if (insertedDataTableRow == null) {
+                    throw new IllegalStateException("Upsert returned no row");
+                }
+
+                return new UpsertResult(insertedDataTableRow, true);
+            } catch (DuplicateKeyException duplicateKeyException) {
+                existingId = findRowIdByExternalId(physicalName, externalId);
+
+                if (existingId.isEmpty()) {
+                    throw duplicateKeyException;
+                }
+            }
+        }
+
+        long id = existingId.get();
+
+        if (!writtenColumnNames.isEmpty()) {
+            String setClause = writtenColumnNames.stream()
+                .map(columnName -> escapeIdentifier(columnName) + " = ?")
+                .collect(Collectors.joining(", "));
+
+            jdbcTemplate.update(
+                "UPDATE " + escapeIdentifier(physicalName) + " SET " + setClause + " WHERE \"id\" = ?",
+                (PreparedStatementSetter) ps -> {
+                    int nextIndex = setWrittenValues(ps, 1, writtenColumnNames, values, typeMap);
+
+                    ps.setLong(nextIndex, id);
+                });
+        }
+
+        DataTableRow dataTableRow = getRow(dataTableRef, id);
+
+        if (dataTableRow == null) {
+            throw new IllegalStateException("Upsert returned no row");
+        }
+
+        return new UpsertResult(dataTableRow, false);
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private Optional<Long> findRowIdByExternalId(String physicalName, String externalId) {
+        List<Long> ids = jdbcTemplate.query(
+            "SELECT \"id\" FROM " + escapeIdentifier(physicalName) + " WHERE "
+                + escapeIdentifier(ReservedColumns.EXTERNAL_ID) + " = ?",
+            (resultSet, rowNum) -> resultSet.getLong("id"), externalId);
+
+        return ids.stream()
+            .findFirst();
+    }
+
+    private int setWrittenValues(
+        PreparedStatement ps, int startIndex, List<String> writtenColumnNames, Map<String, Object> values,
+        Map<String, ColumnType> typeMap) throws SQLException {
+
+        int i = startIndex;
+
+        for (String columnName : writtenColumnNames) {
+            ColumnType columnType = typeMap.getOrDefault(columnName.toLowerCase(Locale.ROOT), ColumnType.STRING);
+
+            setParam(ps, i++, columnType, coerceValue(columnType, getValueCaseInsensitive(values, columnName)));
+        }
+
+        return i;
     }
 
     private boolean isReturningSupported() {

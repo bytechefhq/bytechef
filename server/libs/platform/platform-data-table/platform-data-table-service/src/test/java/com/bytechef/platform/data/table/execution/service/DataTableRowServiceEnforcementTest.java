@@ -34,6 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableRef;
@@ -46,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -68,7 +68,7 @@ class DataTableRowServiceEnforcementTest {
             .checkWithinLimit(anyLong());
 
         assertThatThrownBy(
-            () -> dataTableRowService.insertRow(dataTableRef("orders", 1),
+            () -> dataTableRowService.insertRow(dataTableRef(),
                 Map.of("name", "x")))
                     .isInstanceOf(DataTableStorageLimitExceededException.class);
 
@@ -81,31 +81,35 @@ class DataTableRowServiceEnforcementTest {
             .when(dataTableStorageService)
             .checkWithinLimit(anyLong());
 
-        DataTableRowServiceImpl spiedDataTableRowService = spyWithCurrentRow(Map.of());
+        assertThatThrownBy(
+            () -> spyWithCurrentRow(dataTableRowService, Map.of()).updateRow(dataTableRef(), 1,
+                Map.of("name", "x")))
+                    .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        verifyNoInteractions(jdbcTemplate);
+    }
+
+    @Test
+    void testInsertRowThatWouldCrossTheLimitIsBlocked() {
+        DataTableRowServiceImpl nearLimitDataTableRowService = createNearLimitDataTableRowService();
 
         assertThatThrownBy(
-            () -> spiedDataTableRowService.updateRow(dataTableRef("orders", 1), 1, Map.of("name", "x")))
+            () -> nearLimitDataTableRowService.insertRow(dataTableRef(), Map.of("name", "x".repeat(100))))
                 .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         verifyNoInteractions(jdbcTemplate);
     }
 
     @Test
-    void testInsertRowChecksTheEstimatedSizeOfTheRow() {
-        doThrow(new DataTableStorageLimitExceededException(52_000_000L, 52_428_800L))
-            .when(dataTableStorageService)
-            .checkWithinLimit(anyLong());
+    void testUpdateRowThatWouldCrossTheLimitIsBlocked() {
+        DataTableRowServiceImpl nearLimitDataTableRowService = spyWithCurrentRow(
+            createNearLimitDataTableRowService(), Map.of());
 
-        String largeValue = "x".repeat(10_000);
+        assertThatThrownBy(
+            () -> nearLimitDataTableRowService.updateRow(dataTableRef(), 1, Map.of("name", "x".repeat(100))))
+                .isInstanceOf(DataTableStorageLimitExceededException.class);
 
-        assertThatThrownBy(() -> dataTableRowService.insertRow(dataTableRef("orders", 1), Map.of("name", largeValue)))
-            .isInstanceOf(DataTableStorageLimitExceededException.class);
-
-        ArgumentCaptor<Long> incomingBytesCaptor = ArgumentCaptor.forClass(Long.class);
-
-        verify(dataTableStorageService).checkWithinLimit(incomingBytesCaptor.capture());
-
-        assertThat(incomingBytesCaptor.getValue()).isGreaterThan(10_000L);
+        verifyNoInteractions(jdbcTemplate);
     }
 
     @Test
@@ -114,10 +118,11 @@ class DataTableRowServiceEnforcementTest {
             .when(dataTableStorageService)
             .checkWithinLimit(anyLong());
 
-        DataTableRowServiceImpl spiedDataTableRowService = spyWithCurrentRow(Map.of("name", "x".repeat(100)));
+        DataTableRowServiceImpl spiedDataTableRowService = spyWithCurrentRow(
+            dataTableRowService, Map.of("name", "x".repeat(100)));
 
         assertThatThrownBy(
-            () -> spiedDataTableRowService.updateRow(dataTableRef("orders", 1), 1, Map.of("name", "x".repeat(10_100))))
+            () -> spiedDataTableRowService.updateRow(dataTableRef(), 1, Map.of("name", "x".repeat(10_100))))
                 .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         verify(dataTableStorageService).checkWithinLimit(10_100L);
@@ -130,14 +135,41 @@ class DataTableRowServiceEnforcementTest {
             .when(dataTableStorageService)
             .checkWithinLimit(anyLong());
 
-        DataTableRowServiceImpl spiedDataTableRowService = spyWithCurrentRow(Map.of("name", "x".repeat(10_000)));
+        DataTableRowServiceImpl spiedDataTableRowService = spyWithCurrentRow(
+            dataTableRowService, Map.of("name", "x".repeat(10_000)));
 
         Throwable throwable = catchThrowable(
-            () -> spiedDataTableRowService.updateRow(dataTableRef("orders", 1), 1, Map.of("name", "y")));
+            () -> spiedDataTableRowService.updateRow(dataTableRef(), 1, Map.of("name", "y")));
 
         assertThat(throwable).isNotInstanceOf(DataTableStorageLimitExceededException.class);
 
         verify(dataTableStorageService, times(1)).checkWithinLimit(anyLong());
+    }
+
+    @Test
+    void testUpsertRowThatWouldCrossTheLimitIsBlocked() {
+        DataTableRowServiceImpl nearLimitDataTableRowService = spy(createNearLimitDataTableRowService());
+
+        doReturn(Optional.empty()).when(nearLimitDataTableRowService)
+            .fetchRowByExternalId(any(), anyString());
+
+        assertThatThrownBy(
+            () -> nearLimitDataTableRowService.upsertRow(dataTableRef(), "ORD-1", Map.of("name", "x".repeat(100))))
+                .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        verifyNoInteractions(jdbcTemplate);
+    }
+
+    @Test
+    void testInsertRowsThatWouldCrossTheLimitIsBlocked() {
+        DataTableRowServiceImpl nearLimitDataTableRowService = createNearLimitDataTableRowService();
+
+        assertThatThrownBy(
+            () -> nearLimitDataTableRowService.insertRows(
+                dataTableRef(), List.of(new NewRow(Map.of("name", "x".repeat(100)), null)), CreateStrategy.INSERT))
+                    .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        verifyNoInteractions(jdbcTemplate);
     }
 
     @Test
@@ -147,7 +179,7 @@ class DataTableRowServiceEnforcementTest {
             .checkWithinLimit(anyLong());
 
         assertThatThrownBy(
-            () -> dataTableRowService.importCsv(dataTableRef("orders", 1), "name\nx\n"))
+            () -> dataTableRowService.importCsv(dataTableRef(), "name\nx\n"))
                 .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         verifyNoInteractions(jdbcTemplate);
@@ -169,7 +201,7 @@ class DataTableRowServiceEnforcementTest {
             .checkWithinLimit(longThat(incomingBytes -> incomingBytes > 100));
 
         assertThatThrownBy(
-            () -> dataTableRowService.importCsv(dataTableRef("orders", 1), "name\nx\ny\n"))
+            () -> dataTableRowService.importCsv(dataTableRef(), "name\nx\ny\n"))
                 .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         verify(dataTableStorageService).checkWithinLimit(130L);
@@ -185,9 +217,8 @@ class DataTableRowServiceEnforcementTest {
             Map.of("ORD-1", Map.of("name", "x".repeat(100))));
 
         assertThatThrownBy(
-            () -> spiedDataTableRowService.upsertRow(dataTableRef("orders", 1), "ORD-1",
-                Map.of("name", "x".repeat(10_100))))
-                    .isInstanceOf(DataTableStorageLimitExceededException.class);
+            () -> spiedDataTableRowService.upsertRow(dataTableRef(), "ORD-1", Map.of("name", "x".repeat(10_100))))
+                .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         verify(dataTableStorageService).checkWithinLimit(10_000L);
     }
@@ -202,7 +233,7 @@ class DataTableRowServiceEnforcementTest {
             Map.of("ORD-1", Map.of("name", "x".repeat(10_000))));
 
         Throwable throwable = catchThrowable(
-            () -> spiedDataTableRowService.upsertRow(dataTableRef("orders", 1), "ORD-1", Map.of("name", "y")));
+            () -> spiedDataTableRowService.upsertRow(dataTableRef(), "ORD-1", Map.of("name", "y")));
 
         assertThat(throwable).isNotInstanceOf(DataTableStorageLimitExceededException.class);
 
@@ -220,7 +251,7 @@ class DataTableRowServiceEnforcementTest {
 
         assertThatThrownBy(
             () -> spiedDataTableRowService.insertRows(
-                dataTableRef("orders", 1),
+                dataTableRef(),
                 List.of(
                     new NewRow(Map.of("name", "y"), "ORD-1"),
                     new NewRow(Map.of("name", "y"), "ORD-1"),
@@ -242,7 +273,7 @@ class DataTableRowServiceEnforcementTest {
 
         assertThatThrownBy(
             () -> spiedDataTableRowService.insertRows(
-                dataTableRef("orders", 1),
+                dataTableRef(),
                 List.of(
                     new NewRow(Map.of("name", "x".repeat(100)), "ORD-1"),
                     new NewRow(Map.of("name", "y"), "ORD-2")),
@@ -252,15 +283,37 @@ class DataTableRowServiceEnforcementTest {
         verify(dataTableStorageService).checkWithinLimit(70L);
     }
 
-    private static DataTableRef dataTableRef(String baseName, long environmentId) {
-        return new DataTableRef(baseName, environmentId);
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRowServiceImpl createNearLimitDataTableRowService() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getDataTable()
+            .setMaxSizeBytes(1_000L);
+
+        JdbcTemplate storageJdbcTemplate = mock(JdbcTemplate.class);
+
+        when(storageJdbcTemplate.queryForObject(eq(DataTableStorageServiceImpl.USAGE_SQL), eq(Long.class)))
+            .thenReturn(990L);
+        when(storageJdbcTemplate.queryForList(eq(DataTableStorageServiceImpl.TABLE_NAMES_SQL), eq(String.class)))
+            .thenReturn(List.of("dt_0_7"));
+        when(storageJdbcTemplate.queryForObject(startsWith("SELECT COALESCE(SUM(pg_column_size"), eq(Long.class)))
+            .thenReturn(990L);
+
+        return new DataTableRowServiceImpl(
+            eventPublisher, jdbcTemplate, new DataTableStorageServiceImpl(applicationProperties, storageJdbcTemplate));
     }
 
-    private DataTableRowServiceImpl spyWithCurrentRow(Map<String, Object> currentValues) {
+    private static DataTableRef dataTableRef() {
+        return new DataTableRef(1051L, 0L);
+    }
+
+    private static DataTableRowServiceImpl spyWithCurrentRow(
+        DataTableRowServiceImpl dataTableRowService, Map<String, Object> currentValues) {
+
         DataTableRowServiceImpl spiedDataTableRowService = spy(dataTableRowService);
 
         doReturn(new DataTableRow(1, null, currentValues)).when(spiedDataTableRowService)
-            .getRow(dataTableRef("orders", 1), 1);
+            .getRow(dataTableRef(), 1);
 
         return spiedDataTableRowService;
     }

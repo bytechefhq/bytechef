@@ -25,8 +25,8 @@ import java.util.List;
  * about specific events occurring within a data table.
  *
  * <p>
- * A registration binds to one data table, so registration and delivery both key on the table's registry row rather than
- * on its base name.
+ * A registration binds to one data table, so registration and delivery both key on the table's registry id rather than
+ * on its name.
  *
  * @author Ivica Cardic
  */
@@ -37,8 +37,8 @@ public interface DataTableWebhookService {
      * certain events occur on it.
      *
      * <p>
-     * Takes the resolved table rather than a base name, so a registration lands on the same table the registering run
-     * reads and writes, and the environment comes out of the ref for the same reason.
+     * Takes the resolved table rather than a name, so a registration lands on the same table the registering run reads
+     * and writes, and the environment comes out of the ref for the same reason.
      *
      * @param dataTableRef The table the webhook is registered against, as resolution settled it.
      * @param url          The URL that will receive the webhook notifications.
@@ -52,11 +52,11 @@ public interface DataTableWebhookService {
      * The registrations of the table {@code dataTableRef} addresses, in that ref's environment.
      *
      * <p>
-     * Resolving the ref back to its registry row is what makes delivery meet registration: {@link #addWebhook} resolves
-     * the identical way.
+     * Keyed on the ref's registry id, the same id {@link #addWebhook} registers against, which is what makes delivery
+     * meet registration.
      *
      * @param dataTableRef The table whose webhooks should be listed.
-     * @return Its registrations, or an empty list when the ref addresses no registry row.
+     * @return Its registrations in the ref's environment.
      */
     List<Webhook> listWebhooks(DataTableRef dataTableRef);
 
