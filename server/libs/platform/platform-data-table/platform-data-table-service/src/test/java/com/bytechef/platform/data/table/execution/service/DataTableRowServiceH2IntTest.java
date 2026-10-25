@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockingDetails;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
@@ -37,8 +38,12 @@ import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort.Direction;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import com.bytechef.test.config.h2.H2DataSourceConfiguration;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,20 +54,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DelegatingDataSource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Ivica Cardic
@@ -83,6 +95,9 @@ class DataTableRowServiceH2IntTest {
 
     @Autowired
     private DataTableRowService dataTableRowService;
+
+    @Autowired
+    private DataSource dataSource;
 
     @AfterEach
     void afterEach() {
@@ -612,6 +627,76 @@ class DataTableRowServiceH2IntTest {
         dateTimes.add("2026-01-10T08:00:00");
 
         assertEquals(List.of(typedId), findTypedIds(new DataTableRowFilter("created", Operation.IN, dateTimes)));
+    }
+
+    @Test
+    void testInsertRowsInATransactionChecksTheDatabaseOnTheTransactionConnection() {
+        AtomicInteger openedConnectionCount = new AtomicInteger();
+
+        DataSource countingDataSource = new DelegatingDataSource(dataSource) {
+
+            @Override
+            public Connection getConnection() throws SQLException {
+                openedConnectionCount.incrementAndGet();
+
+                return super.getConnection();
+            }
+        };
+
+        DataTableRowService transactionDataTableRowService = new DataTableRowServiceImpl(
+            mock(ApplicationEventPublisher.class), new JdbcTemplate(countingDataSource));
+        TransactionTemplate transactionTemplate = new TransactionTemplate(
+            new DataSourceTransactionManager(countingDataSource));
+
+        List<DataTableRow> insertedDataTableRows = transactionTemplate.execute(
+            transactionStatus -> transactionDataTableRowService.insertRows(
+                "items", List.of(Map.of("title", "Pear", "amount", 1), Map.of("title", "Plum", "amount", 2)),
+                DEV_ENVIRONMENT_ID));
+
+        assertEquals(2, Objects.requireNonNull(insertedDataTableRows)
+            .size());
+        assertEquals(1, openedConnectionCount.get());
+    }
+
+    @Test
+    void testInsertRowsAfterAFailedDatabaseCheckDoesNotAssumeReturningIsSupported() {
+        AtomicBoolean failDatabaseCheck = new AtomicBoolean(true);
+
+        DataSource failingDataSource = new DelegatingDataSource(dataSource) {
+
+            @Override
+            public Connection getConnection() throws SQLException {
+                Connection connection = super.getConnection();
+
+                return (Connection) Proxy.newProxyInstance(
+                    Connection.class.getClassLoader(), new Class<?>[] {
+                        Connection.class
+                },
+                    (proxy, method, arguments) -> {
+                        if (Objects.equals(method.getName(), "getMetaData") && failDatabaseCheck.getAndSet(false)) {
+                            throw new SQLException("Database metadata is unavailable");
+                        }
+
+                        try {
+                            return method.invoke(connection, arguments);
+                        } catch (InvocationTargetException invocationTargetException) {
+                            throw invocationTargetException.getCause();
+                        }
+                    });
+            }
+        };
+
+        DataTableRowService failingDataTableRowService = new DataTableRowServiceImpl(
+            mock(ApplicationEventPublisher.class), new JdbcTemplate(failingDataSource));
+
+        List<DataTableRow> firstInsertedDataTableRows = failingDataTableRowService.insertRows(
+            "items", List.of(Map.of("title", "Pear", "amount", 1)), DEV_ENVIRONMENT_ID);
+        List<DataTableRow> secondInsertedDataTableRows = failingDataTableRowService.insertRows(
+            "items", List.of(Map.of("title", "Plum", "amount", 2)), DEV_ENVIRONMENT_ID);
+
+        assertEquals(1, firstInsertedDataTableRows.size());
+        assertEquals(1, secondInsertedDataTableRows.size());
+        assertFalse(failDatabaseCheck.get());
     }
 
     @Test

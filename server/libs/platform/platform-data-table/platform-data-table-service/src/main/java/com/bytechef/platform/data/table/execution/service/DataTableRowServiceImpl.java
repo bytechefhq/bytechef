@@ -72,13 +72,14 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -1629,9 +1630,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     private boolean isReturningSupported() {
-        if (returningSupported == null) {
-            returningSupported = resolveReturningSupported();
+        if (returningSupported != null) {
+            return returningSupported;
         }
+
+        Optional<Boolean> resolvedReturningSupported = resolveReturningSupported();
+
+        if (resolvedReturningSupported.isEmpty()) {
+            return false;
+        }
+
+        returningSupported = resolvedReturningSupported.get();
 
         return returningSupported;
     }
@@ -1677,25 +1686,22 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return getRow(baseName, generatedKey.longValue(), environmentId);
     }
 
-    private boolean resolveReturningSupported() {
-        DataSource dataSource = jdbcTemplate.getDataSource();
+    private Optional<Boolean> resolveReturningSupported() {
+        try {
+            return Optional.ofNullable(jdbcTemplate.execute((ConnectionCallback<Boolean>) connection -> {
+                DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-        if (dataSource == null) {
-            return true;
-        }
+                String databaseProductName = databaseMetaData.getDatabaseProductName();
 
-        try (Connection connection = dataSource.getConnection()) {
-            DatabaseMetaData databaseMetaData = connection.getMetaData();
+                databaseProductName = databaseProductName.toLowerCase(Locale.ROOT);
 
-            String databaseProductName = databaseMetaData.getDatabaseProductName();
+                return !databaseProductName.contains("h2");
+            }));
+        } catch (DataAccessException dataAccessException) {
+            log.warn(
+                "Unable to determine the database product name, writing without RETURNING", dataAccessException);
 
-            databaseProductName = databaseProductName.toLowerCase(Locale.ROOT);
-
-            return !databaseProductName.contains("h2");
-        } catch (SQLException sqlException) {
-            log.warn("Unable to determine the database product name, assuming RETURNING is supported", sqlException);
-
-            return true;
+            return Optional.empty();
         }
     }
 
