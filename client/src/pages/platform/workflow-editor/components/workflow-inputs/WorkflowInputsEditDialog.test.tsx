@@ -88,6 +88,21 @@ afterEach(() => {
 });
 
 describe('WorkflowInputsEditDialog', () => {
+    it('should describe editing when an existing input is opened', () => {
+        render(<EditDialogHarness defaultValues={newInputDefaultValues('ticket')} />);
+
+        expect(screen.getByText('Edit Input')).toBeInTheDocument();
+        expect(screen.getByText('Edit the workflow input definition.')).toBeInTheDocument();
+        expect(screen.queryByText('Add a new workflow input definition.')).not.toBeInTheDocument();
+    });
+
+    it('should describe adding when a new input is created', () => {
+        render(<EditDialogHarness currentInputIndex={-1} defaultValues={newInputDefaultValues('ticket')} />);
+
+        expect(screen.getByText('Create a new Input')).toBeInTheDocument();
+        expect(screen.getByText('Add a new workflow input definition.')).toBeInTheDocument();
+    });
+
     it('should keep the existing test value when an input is opened for editing', async () => {
         render(
             <EditDialogHarness
