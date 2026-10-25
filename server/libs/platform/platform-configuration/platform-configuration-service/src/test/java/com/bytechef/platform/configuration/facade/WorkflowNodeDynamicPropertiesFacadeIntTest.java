@@ -405,7 +405,8 @@ class WorkflowNodeDynamicPropertiesFacadeIntTest {
         List<Property> expectedProperties = List.of(mock(Property.class));
 
         when(triggerDefinitionFacade.executeDynamicProperties(
-            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId)))
+            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId),
+            eq(workflow.getId())))
                 .thenReturn(expectedProperties);
 
         List<? extends BaseProperty> properties = workflowNodeDynamicPropertiesFacade.getWorkflowNodeDynamicProperties(
@@ -414,7 +415,8 @@ class WorkflowNodeDynamicPropertiesFacadeIntTest {
         assertThat(properties).isEqualTo(expectedProperties);
 
         verify(triggerDefinitionFacade).executeDynamicProperties(
-            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId));
+            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId),
+            eq(workflow.getId()));
     }
 
     @Test
