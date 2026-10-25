@@ -13,7 +13,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
@@ -28,6 +27,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
 
+    implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))

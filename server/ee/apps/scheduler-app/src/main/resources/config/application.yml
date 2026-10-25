@@ -2,6 +2,8 @@ spring:
   application:
     name: scheduler-app
   config:
-    import: optional:configserver:http://localhost:6111
+    import:
+      - classpath:config/microservice.yml
+      - classpath:config/scheduler-app.yml
   profiles:
     active: #spring.profiles.active#

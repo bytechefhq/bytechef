@@ -7,10 +7,14 @@
 
 package com.bytechef.scheduler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 
 /**
  * @version ee
@@ -23,7 +27,17 @@ import org.springframework.context.annotation.Import;
 })
 public class SchedulerApplicationIntTest {
 
+    @Autowired
+    private Environment environment;
+
     @Test
     void testContextLoads() {
+    }
+
+    @Test
+    void testSharedAndAppConfigurationLoad() {
+        assertThat(environment.getProperty("spring.task.execution.thread-name-prefix"))
+            .isEqualTo("scheduler-app-task-");
+        assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
     }
 }

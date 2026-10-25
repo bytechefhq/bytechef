@@ -11,12 +11,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-gateway-server-webmvc")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:jackson-config"))
     implementation(project(":server:libs:config:logback-config"))
 
+    implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
 

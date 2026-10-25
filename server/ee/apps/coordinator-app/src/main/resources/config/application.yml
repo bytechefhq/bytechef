@@ -13,6 +13,8 @@ spring:
     exclude:
       org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
   config:
-    import: optional:configserver:http://localhost:6111
+    import:
+      - classpath:config/microservice.yml
+      - classpath:config/coordinator-app.yml
   profiles:
     active: #spring.profiles.active#
