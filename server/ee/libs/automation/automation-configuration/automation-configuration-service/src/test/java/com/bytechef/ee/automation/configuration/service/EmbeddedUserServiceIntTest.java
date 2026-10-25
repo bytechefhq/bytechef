@@ -22,7 +22,9 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImp
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
+import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
+import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
@@ -95,6 +97,9 @@ class EmbeddedUserServiceIntTest {
         ADMIN, 9300L, EMBEDDED_ADMIN, 9301L, EMBEDDED_EDITOR, 9302L, MEMBER, 9303L);
 
     @Autowired
+    private CustomRoleRepository customRoleRepository;
+
+    @Autowired
     private EmbeddedUserRepository embeddedUserRepository;
 
     @Autowired
@@ -124,6 +129,97 @@ class EmbeddedUserServiceIntTest {
     @AfterEach
     void clearSecurityContext() {
         SecurityContextHolder.clearContext();
+
+        for (Long userId : USER_IDS_BY_LOGIN.values()) {
+            embeddedUserRepository.deleteByUserId(userId);
+        }
+
+        customRoleRepository.deleteAll();
+    }
+
+    @Test
+    void testAddingAMemberWithACustomRoleGrantsOnlyItsEmbeddedScopesInEveryEnvironment() {
+        authenticate(ADMIN, true);
+
+        long customRoleId =
+            createCustomRole("INTEGRATION_CREATE", "INTEGRATION_INSTANCE_CONFIGURATION_VIEW", "PROJECT_CREATE");
+
+        embeddedUserService.addEmbeddedUser(userId(MEMBER), null, customRoleId);
+
+        authenticate(MEMBER, false);
+
+        for (Environment environment : Environment.values()) {
+            assertThat(permissionService.getMyEmbeddedScopes(environment))
+                .containsExactlyInAnyOrder("INTEGRATION_CREATE", "INTEGRATION_INSTANCE_CONFIGURATION_VIEW");
+        }
+    }
+
+    @Test
+    void testAnEmbeddedEditorCannotGrantACustomRoleCarryingScopesTheyLack() {
+        authenticate(ADMIN, true);
+
+        long customRoleId = createCustomRole("EMBEDDED_MEMBER_MANAGE");
+
+        embeddedUserService.addEmbeddedUser(userId(EMBEDDED_EDITOR), WorkspaceRole.EDITOR);
+
+        authenticate(EMBEDDED_EDITOR, false);
+
+        assertThatThrownBy(() -> embeddedUserService.addEmbeddedUser(userId(MEMBER), null, customRoleId))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessageContaining("EMBEDDED_MEMBER_MANAGE");
+
+        assertThat(embeddedUserService.isEmbeddedMember(userId(MEMBER))).isFalse();
+    }
+
+    @Test
+    void testAnAutomationCustomRoleIsRefused() {
+        authenticate(ADMIN, true);
+
+        CustomRole customRole = customRoleRepository.save(
+            new CustomRole("automation-role", PermissionScopeSide.AUTOMATION, Set.of("WORKFLOW_VIEW")));
+
+        assertThatThrownBy(() -> embeddedUserService.addEmbeddedUser(userId(MEMBER), null, customRole.getId()))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("is an automation role");
+    }
+
+    @Test
+    void testTheLastEmbeddedAdminCannotMoveThemselvesOntoACustomRole() {
+        embeddedUserRepository.deleteAll();
+
+        authenticate(ADMIN, true);
+
+        long customRoleId = createCustomRole("INTEGRATION_CREATE");
+
+        embeddedUserService.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+
+        authenticate(EMBEDDED_ADMIN, false);
+
+        assertThatThrownBy(() -> embeddedUserService.updateEmbeddedUserRole(userId(EMBEDDED_ADMIN), null, customRoleId))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("last embedded admin");
+        assertThatThrownBy(
+            () -> embeddedUserService.setEnvironmentRole(
+                userId(EMBEDDED_ADMIN), Environment.PRODUCTION, null, customRoleId))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("last embedded admin");
+    }
+
+    @Test
+    void testAnEnvironmentCustomRoleAppliesOnlyInThatEnvironment() {
+        authenticate(ADMIN, true);
+
+        long customRoleId = createCustomRole("INTEGRATION_CREATE");
+
+        embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.VIEWER);
+        embeddedUserService.setEnvironmentRole(userId(MEMBER), Environment.PRODUCTION, null, customRoleId);
+
+        authenticate(MEMBER, false);
+
+        assertThat(permissionService.getMyEmbeddedScopes(Environment.PRODUCTION))
+            .containsExactly("INTEGRATION_CREATE");
+        assertThat(permissionService.getMyEmbeddedScopes(Environment.DEVELOPMENT))
+            .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER, PermissionScopeSide.EMBEDDED));
     }
 
     @Test
@@ -357,6 +453,13 @@ class EmbeddedUserServiceIntTest {
 
         assertThat(adminScopes).containsAll(viewerScopes);
         assertThat(adminScopes.size()).isGreaterThan(viewerScopes.size());
+    }
+
+    private long createCustomRole(String... scopeNames) {
+        CustomRole customRole = customRoleRepository.save(
+            new CustomRole("custom-role", PermissionScopeSide.EMBEDDED, Set.of(scopeNames)));
+
+        return customRole.getId();
     }
 
     private void seedProductionOnlyAdmin() {
