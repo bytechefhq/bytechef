@@ -110,9 +110,11 @@ Caffeine is the only cache provider, so every node keeps its own caches. In EE, 
 
 The broadcast needs a broker whose control routes reach every node: `AMQP`, `REDIS`, `KAFKA` (a consumer group per node), `JMS` (a topic), or `AWS` with `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=redis`. With `AWS` and the default `sqs` control provider, a control message reaches one node only, so cache invalidation stays off and every node keeps its caches for up to 10 minutes. The in-memory broker has a single node and needs no invalidation.
 
-## Known limitations
+### Shared state caches
 
-With more than one EE coordinator, the editor's webhook test and the embedded JWT checks can fail intermittently. Both keep state in node-local caches, so a request that lands on a different coordinator than the one that stored the state does not find it. Moving that state out of the node-local caches is tracked in [#6632](https://github.com/bytechefhq/bytechef/issues/6632). Until then, run a single coordinator if you rely on those two features.
+A few caches hold state instead of copies of stored data: the editor's webhook test (whether a test webhook is enabled and the output of its registration) and the public keys of embedded JWTs. In EE, when the message broker is not the in-memory one and a Redis connection is configured (`BYTECHEF_SESSION_STORE=redis`, the `REDIS` broker, or `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=redis`), these caches live in Redis under the key prefix `bytechef:cache:` with a 10-minute TTL, so every coordinator sees the same entries. All other caches stay in each node's memory. With the in-memory broker these caches stay in memory even when Redis is configured, which is enough because that broker runs a single node.
+
+Without Redis, these caches stay in each node's memory too. With more than one EE coordinator, the editor's webhook test and the embedded JWT checks can then fail when a request lands on a different coordinator than the one that stored the state, so configure Redis when you run more than one coordinator.
 
 ## Database migrations
 
