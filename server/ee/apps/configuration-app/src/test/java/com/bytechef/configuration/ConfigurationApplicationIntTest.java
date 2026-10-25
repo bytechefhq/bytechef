@@ -16,10 +16,14 @@
 
 package com.bytechef.configuration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Ivica Cardic
@@ -30,7 +34,17 @@ import org.springframework.context.annotation.Import;
 })
 public class ConfigurationApplicationIntTest {
 
+    @Autowired
+    private Environment environment;
+
     @Test
     void testContextLoads() {
+    }
+
+    @Test
+    void testSharedAndAppConfigurationLoad() {
+        assertThat(environment.getProperty("spring.task.execution.thread-name-prefix"))
+            .isEqualTo("configuration-app-task-");
+        assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
     }
 }
