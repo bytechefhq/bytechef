@@ -62,39 +62,45 @@ public class OllamaModelLister {
      * Returns the chat-capable models installed on the server, local models first, or an empty list when the server
      * cannot be reached.
      */
-    public List<String> getChatModels(@Nullable String url) {
-        return filterModelNames(getModels(url), OllamaModelLister::isChatModel);
+    public List<String> getChatModels(@Nullable String url, @Nullable String apiKey) {
+        return filterModelNames(getModels(url, apiKey), OllamaModelLister::isChatModel);
     }
 
     /**
      * Returns the embedding models installed on the server, local models first, or an empty list when the server cannot
      * be reached.
      */
-    public List<String> getEmbeddingModels(@Nullable String url) {
-        return filterModelNames(getModels(url), OllamaModelLister::isEmbeddingModel);
+    public List<String> getEmbeddingModels(@Nullable String url, @Nullable String apiKey) {
+        return filterModelNames(getModels(url, apiKey), OllamaModelLister::isEmbeddingModel);
     }
 
-    private List<OllamaModel> getModels(@Nullable String url) {
+    private List<OllamaModel> getModels(@Nullable String url, @Nullable String apiKey) {
         String baseUrl = normalizeUrl(url);
+        String cacheKey = apiKey == null || apiKey.isBlank() ? baseUrl : baseUrl + "#" + apiKey;
 
-        CachedModels cachedModels = cachedModelsMap.get(baseUrl);
+        CachedModels cachedModels = cachedModelsMap.get(cacheKey);
 
         if (cachedModels != null && !cachedModels.isExpired()) {
             return cachedModels.models();
         }
 
-        List<OllamaModel> models = fetchModels(baseUrl);
+        List<OllamaModel> models = fetchModels(baseUrl, apiKey);
 
-        cachedModelsMap.put(baseUrl, new CachedModels(models, System.nanoTime() + CACHE_TTL.toNanos()));
+        cachedModelsMap.put(cacheKey, new CachedModels(models, System.nanoTime() + CACHE_TTL.toNanos()));
 
         return models;
     }
 
-    private List<OllamaModel> fetchModels(String baseUrl) {
-        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(baseUrl + "/api/tags"))
+    private List<OllamaModel> fetchModels(String baseUrl, @Nullable String apiKey) {
+        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder(URI.create(baseUrl + "/api/tags"))
             .timeout(TIMEOUT)
-            .GET()
-            .build();
+            .GET();
+
+        if (apiKey != null && !apiKey.isBlank()) {
+            httpRequestBuilder.header("Authorization", "Bearer " + apiKey);
+        }
+
+        HttpRequest httpRequest = httpRequestBuilder.build();
 
         try {
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());

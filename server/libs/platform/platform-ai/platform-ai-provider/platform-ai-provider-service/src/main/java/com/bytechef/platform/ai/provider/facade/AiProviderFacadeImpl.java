@@ -343,7 +343,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     private List<AiProviderCatalogItemDTO.Model> readOllamaChatModels(
         ComponentDefinition componentDefinition, int environment) {
 
-        List<String> installedModels = ollamaModelLister.getChatModels(resolveUrl(Provider.OLLAMA, environment));
+        List<String> installedModels = ollamaModelLister.getChatModels(
+            resolveUrl(Provider.OLLAMA, environment), resolveApiKey(Provider.OLLAMA, environment));
 
         if (installedModels.isEmpty()) {
             return readChatModels(componentDefinition);
@@ -358,7 +359,9 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
         String model = resolveConfiguredChatModel(provider);
 
         if ((model == null || model.isBlank()) && provider == Provider.OLLAMA) {
-            return getFirst(ollamaModelLister.getChatModels(resolveUrl(provider, environment)));
+            return getFirst(
+                ollamaModelLister.getChatModels(resolveUrl(provider, environment),
+                    resolveApiKey(provider, environment)));
         }
 
         return model;
@@ -368,7 +371,9 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
         String model = resolveConfiguredEmbeddingModel(provider);
 
         if ((model == null || model.isBlank()) && provider == Provider.OLLAMA) {
-            return getFirst(ollamaModelLister.getEmbeddingModels(resolveUrl(provider, environment)));
+            return getFirst(
+                ollamaModelLister.getEmbeddingModels(
+                    resolveUrl(provider, environment), resolveApiKey(provider, environment)));
         }
 
         return model;

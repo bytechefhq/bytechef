@@ -69,6 +69,26 @@ class OllamaModelListerTest {
             }
         });
 
+        ollamaServer.createContext("/secured/api/tags", exchange -> {
+            String authorization = exchange.getRequestHeaders()
+                .getFirst("Authorization");
+
+            byte[] body = TAGS.getBytes(StandardCharsets.UTF_8);
+
+            if (!"Bearer secret-token".equals(authorization)) {
+                exchange.sendResponseHeaders(401, -1);
+                exchange.close();
+
+                return;
+            }
+
+            exchange.sendResponseHeaders(200, body.length);
+
+            try (OutputStream outputStream = exchange.getResponseBody()) {
+                outputStream.write(body);
+            }
+        });
+
         ollamaServer.start();
     }
 
@@ -79,13 +99,13 @@ class OllamaModelListerTest {
 
     @Test
     void testGetChatModelsListsCompletionModelsLocalFirst() {
-        assertThat(ollamaModelLister.getChatModels(getUrl()))
+        assertThat(ollamaModelLister.getChatModels(getUrl(), null))
             .containsExactly("qwen3:8b", "llama3.2:latest", "deepseek-v4-pro:cloud");
     }
 
     @Test
     void testGetEmbeddingModelsListsEmbeddingModels() {
-        assertThat(ollamaModelLister.getEmbeddingModels(getUrl() + "/"))
+        assertThat(ollamaModelLister.getEmbeddingModels(getUrl() + "/", null))
             .containsExactly("nomic-embed-text:latest", "mxbai-embed-large:latest");
     }
 
@@ -96,13 +116,24 @@ class OllamaModelListerTest {
 
         ollamaServer.stop(0);
 
-        assertThat(ollamaModelLister.getChatModels("http://localhost:" + port)).isEmpty();
+        assertThat(ollamaModelLister.getChatModels("http://localhost:" + port, null)).isEmpty();
+    }
+
+    @Test
+    void testGetChatModelsSendsApiKeyAsBearerToken() {
+        assertThat(ollamaModelLister.getChatModels(getUrl() + "/secured", "secret-token"))
+            .containsExactly("qwen3:8b", "llama3.2:latest", "deepseek-v4-pro:cloud");
+    }
+
+    @Test
+    void testGetChatModelsReturnsEmptyListWithoutApiKeyWhenServerRequiresOne() {
+        assertThat(ollamaModelLister.getChatModels(getUrl() + "/secured", null)).isEmpty();
     }
 
     @Test
     void testGetModelsCachesServerResponse() {
-        ollamaModelLister.getChatModels(getUrl());
-        ollamaModelLister.getEmbeddingModels(getUrl());
+        ollamaModelLister.getChatModels(getUrl(), null);
+        ollamaModelLister.getEmbeddingModels(getUrl(), null);
 
         assertThat(requestCount).hasValue(1);
     }
