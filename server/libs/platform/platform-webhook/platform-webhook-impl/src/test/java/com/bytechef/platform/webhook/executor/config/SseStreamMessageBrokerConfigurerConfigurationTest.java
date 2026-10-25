@@ -34,17 +34,17 @@ import com.bytechef.platform.webhook.executor.JobCompletionAwaiterImpl;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.redis.connection.DefaultMessage;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.MethodInvoker;
 
 /**
  * @author Ivica Cardic
@@ -64,14 +64,14 @@ class SseStreamMessageBrokerConfigurerConfigurationTest {
         JobCompletionAwaiterImpl jobCompletionAwaiter = new JobCompletionAwaiterImpl(jobService);
         SseStreamBridgeRegistry sseStreamBridgeRegistry = mock(SseStreamBridgeRegistry.class);
 
-        RedisMessageDeserializer redisMessageDeserializer = mock(RedisMessageDeserializer.class);
         StringRedisTemplate stringRedisTemplate = mock(StringRedisTemplate.class);
 
         doReturn(mock(StreamOperations.class)).when(stringRedisTemplate)
             .opsForStream();
 
         RedisListenerEndpointRegistrar redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
-            redisMessageDeserializer, stringRedisTemplate, mock(TaskExecutor.class));
+            mock(RedisMessageDeserializer.class), stringRedisTemplate, mock(TaskExecutor.class));
+        ControlRegistrations controlRegistrations = new ControlRegistrations();
 
         List<MessageBrokerConfigurer<?>> messageBrokerConfigurers = List.of(
             new SseStreamMessageBrokerConfigurerConfiguration().sseStreamMessageBrokerConfigurer(
@@ -80,7 +80,7 @@ class SseStreamMessageBrokerConfigurerConfigurationTest {
                 jobCompletionAwaiter));
 
         for (MessageBrokerConfigurer<?> messageBrokerConfigurer : messageBrokerConfigurers) {
-            configure(messageBrokerConfigurer, redisListenerEndpointRegistrar);
+            configure(messageBrokerConfigurer, redisListenerEndpointRegistrar, controlRegistrations);
         }
 
         CompletableFuture<Job> future = jobCompletionAwaiter.await(JOB_ID, Duration.ofSeconds(5));
@@ -90,16 +90,7 @@ class SseStreamMessageBrokerConfigurerConfigurationTest {
 
         sseStreamEvent.putMetadata(TenantContext.CURRENT_TENANT_ID, TenantContext.DEFAULT_TENANT_ID);
 
-        when(redisMessageDeserializer.deserialize("raw-event")).thenReturn(sseStreamEvent);
-
-        SseStreamMessageRoute sseStreamMessageRoute = SseStreamMessageRoute.SSE_STREAM_EVENTS;
-
-        redisListenerEndpointRegistrar.onMessage(
-            new DefaultMessage(
-                sseStreamMessageRoute.getName()
-                    .getBytes(StandardCharsets.UTF_8),
-                "raw-event".getBytes(StandardCharsets.UTF_8)),
-            null);
+        controlRegistrations.deliver(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
 
         assertThat(future.get(2, TimeUnit.SECONDS)).isEqualTo(completedJob);
 
@@ -109,12 +100,13 @@ class SseStreamMessageBrokerConfigurerConfigurationTest {
     @SuppressWarnings("unchecked")
     private static void configure(
         MessageBrokerConfigurer<?> messageBrokerConfigurer,
-        RedisListenerEndpointRegistrar redisListenerEndpointRegistrar) {
+        RedisListenerEndpointRegistrar redisListenerEndpointRegistrar, ControlRegistrations controlRegistrations) {
 
         MessageBrokerConfigurer<RedisListenerEndpointRegistrar> redisMessageBrokerConfigurer =
             (MessageBrokerConfigurer<RedisListenerEndpointRegistrar>) messageBrokerConfigurer;
 
-        redisMessageBrokerConfigurer.configure(redisListenerEndpointRegistrar, new ForwardingListenerRegistrar());
+        redisMessageBrokerConfigurer.configure(redisListenerEndpointRegistrar,
+            new ForwardingListenerRegistrar(controlRegistrations));
     }
 
     private static Job createJob(Job.Status status) {
@@ -126,15 +118,52 @@ class SseStreamMessageBrokerConfigurerConfigurationTest {
         return job;
     }
 
+    private record ControlRegistration(MessageRoute messageRoute, Object delegate, String methodName) {
+    }
+
+    private static final class ControlRegistrations {
+
+        private final List<ControlRegistration> controlRegistrations = new ArrayList<>();
+
+        private void add(MessageRoute messageRoute, Object delegate, String methodName) {
+            controlRegistrations.add(new ControlRegistration(messageRoute, delegate, methodName));
+        }
+
+        private void deliver(MessageRoute messageRoute, Object message) throws Exception {
+            for (ControlRegistration controlRegistration : controlRegistrations) {
+                if (controlRegistration.messageRoute()
+                    .getName()
+                    .equals(messageRoute.getName())) {
+
+                    MethodInvoker methodInvoker = new MethodInvoker();
+
+                    methodInvoker.setTargetObject(controlRegistration.delegate());
+                    methodInvoker.setTargetMethod(controlRegistration.methodName());
+                    methodInvoker.setArguments(message);
+
+                    methodInvoker.prepare();
+
+                    methodInvoker.invoke();
+                }
+            }
+        }
+    }
+
     private static final class ForwardingListenerRegistrar
         implements MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
+
+        private final ControlRegistrations controlRegistrations;
+
+        private ForwardingListenerRegistrar(ControlRegistrations controlRegistrations) {
+            this.controlRegistrations = controlRegistrations;
+        }
 
         @Override
         public void registerListenerEndpoint(
             RedisListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
             Object delegate, String methodName) {
 
-            listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
+            controlRegistrations.add(messageRoute, delegate, methodName);
         }
 
         @Override
