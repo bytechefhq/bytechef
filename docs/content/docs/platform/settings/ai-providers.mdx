@@ -100,8 +100,9 @@ or Ollama activated for embeddings.
 Embedding models produce vectors of different widths - `text-embedding-3-small` is 1536 dimensions,
 `text-embedding-3-large` is 3072 - and a pgvector column is declared with one width. The vector store
 ships configured for **1536 dimensions**
-(`spring.ai.vectorstore.pgvector.dimensions`), so switching to a model of a different width means
-changing that property as well; a mismatch fails at write time rather than degrading quietly.
+(`bytechef.ai.vectorstore.pgvector.dimensions`, or `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS`), so
+switching to a model of a different width means changing that property as well; a mismatch fails at
+write time rather than degrading quietly.
 
 ### Changing the embedding model
 
