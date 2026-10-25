@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,22 +41,26 @@ public class SingleCoordinatorLock implements InitializingBean, DisposableBean {
         "Another coordinator is already running. Running more than one coordinator requires ByteChef Enterprise " +
             "Edition (bytechef.edition=ee, BYTECHEF_EDITION=ee).";
 
+    private static final Duration RETRY_INTERVAL = Duration.ofSeconds(2);
+
     private static final Logger log = LoggerFactory.getLogger(SingleCoordinatorLock.class);
 
     private final boolean skipped;
     private final LockConnectionFactory lockConnectionFactory;
     private final Runnable shutdownAction;
+    private final Duration lockWait;
 
     private Connection connection;
-    private boolean held;
+    private volatile boolean held;
     private boolean shutdownTriggered;
 
     public SingleCoordinatorLock(
-        String jdbcUrl, LockConnectionFactory lockConnectionFactory, Runnable shutdownAction) {
+        String jdbcUrl, LockConnectionFactory lockConnectionFactory, Runnable shutdownAction, Duration lockWait) {
 
         this.skipped = jdbcUrl != null && jdbcUrl.startsWith("jdbc:h2:");
         this.lockConnectionFactory = lockConnectionFactory;
         this.shutdownAction = shutdownAction;
+        this.lockWait = lockWait;
     }
 
     @Override
@@ -71,7 +76,7 @@ public class SingleCoordinatorLock implements InitializingBean, DisposableBean {
         boolean acquired;
 
         try {
-            acquired = tryAcquire(openedConnection);
+            acquired = tryAcquireWithinWait(openedConnection);
         } catch (SQLException sqlException) {
             closeQuietly(openedConnection);
 
@@ -104,37 +109,15 @@ public class SingleCoordinatorLock implements InitializingBean, DisposableBean {
         }
 
         held = false;
+        shutdownTriggered = true;
 
         closeQuietly(connection);
 
-        Connection reopenedConnection = null;
+        connection = null;
 
-        try {
-            reopenedConnection = lockConnectionFactory.getConnection();
+        log.error("Single coordinator lock connection was lost; shutting down so that no other coordinator overlaps");
 
-            connection = reopenedConnection;
-
-            if (tryAcquire(reopenedConnection)) {
-                held = true;
-
-                log.warn("Single coordinator lock was re-acquired after the connection was lost");
-            } else {
-                log.error(
-                    "Another coordinator took the lock while this node's connection was down; shutting down");
-
-                shutdownTriggered = true;
-
-                closeQuietly(reopenedConnection);
-
-                shutdownAction.run();
-            }
-        } catch (SQLException sqlException) {
-            if (reopenedConnection != null) {
-                closeQuietly(reopenedConnection);
-            }
-
-            log.warn("Single coordinator lock could not be re-acquired, retrying on the next check", sqlException);
-        }
+        shutdownAction.run();
     }
 
     @Override
@@ -158,8 +141,41 @@ public class SingleCoordinatorLock implements InitializingBean, DisposableBean {
         connection = null;
     }
 
-    synchronized boolean isHeld() {
+    boolean isHeld() {
         return held;
+    }
+
+    private boolean tryAcquireWithinWait(Connection connection) throws SQLException {
+        long deadline = System.nanoTime() + lockWait.toNanos();
+
+        boolean waitLogged = false;
+
+        while (true) {
+            if (tryAcquire(connection)) {
+                return true;
+            }
+
+            long remainingNanos = deadline - System.nanoTime();
+
+            if (remainingNanos <= 0) {
+                return false;
+            }
+
+            if (!waitLogged) {
+                log.info("Another coordinator holds the lock; waiting up to {} for it to be released", lockWait);
+
+                waitLogged = true;
+            }
+
+            try {
+                TimeUnit.NANOSECONDS.sleep(Math.min(remainingNanos, RETRY_INTERVAL.toNanos()));
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+
+                return false;
+            }
+        }
     }
 
     private static boolean tryAcquire(Connection connection) throws SQLException {

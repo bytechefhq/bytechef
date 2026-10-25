@@ -20,7 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.coordinator.lock.SingleCoordinatorLock;
+import java.time.Duration;
+import java.util.Properties;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -36,6 +39,7 @@ class SingleCoordinatorLockConfigurationTest {
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
         .withUserConfiguration(SingleCoordinatorLockConfiguration.class, DataSourcePropertiesConfiguration.class)
+        .withBean(ApplicationProperties.class, SingleCoordinatorLockConfigurationTest::applicationProperties)
         .withBean(JdbcConnectionDetails.class, SingleCoordinatorLockConfigurationTest::h2ConnectionDetails);
 
     @Test
@@ -60,9 +64,29 @@ class SingleCoordinatorLockConfigurationTest {
     void testRegisteredWithoutJdbcConnectionDetailsWhenApplicationDefinesItsOwnDataSource() {
         new ApplicationContextRunner()
             .withUserConfiguration(SingleCoordinatorLockConfiguration.class, DataSourcePropertiesConfiguration.class)
+            .withBean(ApplicationProperties.class, SingleCoordinatorLockConfigurationTest::applicationProperties)
             .withBean(DataSource.class, () -> mock(DataSource.class))
             .withPropertyValues("bytechef.edition=ce", "spring.datasource.url=jdbc:h2:mem:test")
             .run(context -> assertThat(context).hasSingleBean(SingleCoordinatorLock.class));
+    }
+
+    @Test
+    void testLockConnectionPropertiesSetServerSideKeepalives() {
+        Properties properties = SingleCoordinatorLockConfiguration.lockConnectionProperties("user", "secret");
+
+        assertThat(properties.getProperty("options"))
+            .isEqualTo("-c tcp_keepalives_idle=10 -c tcp_keepalives_interval=5 -c tcp_keepalives_count=3");
+        assertThat(properties.getProperty("user")).isEqualTo("user");
+        assertThat(properties.getProperty("password")).isEqualTo("secret");
+    }
+
+    private static ApplicationProperties applicationProperties() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getCoordinator()
+            .setLockWait(Duration.ofSeconds(60));
+
+        return applicationProperties;
     }
 
     private static JdbcConnectionDetails h2ConnectionDetails() {
