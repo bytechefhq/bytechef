@@ -2,7 +2,9 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import getChatTriggerName from '@/pages/platform/workflow-editor/utils/getChatTriggerName';
+import {getErrorItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
+import {JobStatusEnum, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {hasLastAssistantMessageText} from '@/shared/util/assistant-message-utils';
 import {getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
@@ -34,6 +36,13 @@ const showErrorMessage = (errorMessage: string) => {
     } else {
         setLastAssistantMessageContent(errorMessage);
     }
+};
+
+const getFailedRunMessage = (workflowTestExecution: WorkflowTestExecution) => {
+    const errorMessage =
+        getErrorItem(workflowTestExecution)?.error?.message || workflowTestExecution.job?.error?.message;
+
+    return errorMessage ? `The run failed: ${errorMessage}` : 'The run failed.';
 };
 
 const WORKFLOW_TEST_CHAT_SUGGESTIONS: SuggestionConfig[] = [
@@ -75,8 +84,12 @@ export function WorkflowTestChatRuntimeProvider({
             showErrorMessage(errorMessage || 'An unexpected error occurred');
             setIsRunning(false);
         },
-        onResult: () => {
+        onResult: (workflowTestExecution) => {
             awaitingStreamEventRef.current = false;
+
+            if (workflowTestExecution.job?.status === JobStatusEnum.Failed) {
+                showErrorMessage(getFailedRunMessage(workflowTestExecution));
+            }
 
             setIsRunning(false);
         },
