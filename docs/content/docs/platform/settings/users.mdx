@@ -149,13 +149,20 @@ Declaring the same scope name with two different minimum roles fails the applica
 
 <EEBadge />
 
-A custom role is a named set of permission scopes, for a member who needs a combination no built-in role covers. Custom roles are **tenant-global**: a role is defined once and can be assigned to any member of any workspace.
+A custom role is a named set of permission scopes, for a member who needs a combination no built-in role covers. Custom roles are **tenant-global**: a role is defined once and can be assigned in any workspace.
 
-Custom roles are managed on the **Custom Roles** tab of **Settings → Roles**. Creating, editing and deleting them is reserved for organization admins. **Create Role** asks for a **Name**, an optional **Description**, and at least one scope from **Permissions**, grouped by module.
+Each custom role is for one kind of member, chosen as **Members** when the role is created:
+
+- **Workspace members** - a workspace role, assignable to any member of any workspace. Its permissions come from the workspace scopes.
+- **Embedded members** - an embedded role, assignable to embedded members on **Embedded → Settings → Members**. Its permissions come from the [embedded scopes](/platform/embedded/administration/users-and-roles#permission-scopes).
+
+The choice is fixed once the role exists. A workspace member can only be given a workspace role, and an embedded member only an embedded role.
+
+Custom roles are managed on the **Custom Roles** tab of **Settings → Roles**. Creating, editing and deleting them is reserved for organization admins. **Create Role** asks for a **Name**, an optional **Description**, the **Members** the role is for, and at least one scope from **Permissions**, grouped by module. The list shows which members each role is for.
 
 ![Settings - Roles - the Custom Roles tab listing two custom roles with their permissions, and the Create Role button](users/roles-custom.png)
 
-- **Deleting** a role asks for confirmation. It fails while the role is still assigned to any workspace member, so reassign those members first.
+- **Deleting** a role asks for confirmation. It fails while the role is still assigned to any workspace or embedded member, so reassign those members first.
 - **Changing a role's permissions** takes effect for every member who holds it, on their next request. Nobody has to sign out and back in. Changing only the name or description leaves permissions untouched.
 
 ### Per-environment roles
