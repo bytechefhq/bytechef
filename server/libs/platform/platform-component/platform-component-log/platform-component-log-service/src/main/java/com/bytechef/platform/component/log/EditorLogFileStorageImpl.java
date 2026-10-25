@@ -18,6 +18,7 @@ package com.bytechef.platform.component.log;
 
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -27,10 +28,15 @@ public class EditorLogFileStorageImpl implements EditorLogFileStorage {
 
     private static final String EDITOR_LOG_FILES_DIR = "editor/logs";
 
-    private final LogFileStorageImpl logFileStorage;
+    private final LogFileStorage logFileStorage;
 
     public EditorLogFileStorageImpl(FileStorageService fileStorageService) {
-        this.logFileStorage = new LogFileStorageImpl(fileStorageService, EDITOR_LOG_FILES_DIR);
+        this(new LogFileStorageImpl(fileStorageService, EDITOR_LOG_FILES_DIR));
+    }
+
+    @SuppressFBWarnings("EI")
+    public EditorLogFileStorageImpl(LogFileStorage logFileStorage) {
+        this.logFileStorage = logFileStorage;
     }
 
     @Override
