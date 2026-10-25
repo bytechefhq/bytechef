@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.webhook.web.rest;
 
-import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
@@ -52,7 +52,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnCoordinator
+@ConditionalOnWebhook
 public class JobResumeController {
 
     private static final Logger log = LoggerFactory.getLogger(JobResumeController.class);

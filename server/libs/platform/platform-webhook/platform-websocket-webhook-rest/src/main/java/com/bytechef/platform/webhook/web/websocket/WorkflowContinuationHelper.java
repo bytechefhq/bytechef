@@ -17,6 +17,7 @@
 package com.bytechef.platform.webhook.web.websocket;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnWebhook
 public class WorkflowContinuationHelper {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowContinuationHelper.class);

@@ -16,11 +16,14 @@
 
 package com.bytechef.platform.webhook.executor;
 
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
+import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.tenant.TenantContext;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
@@ -71,8 +74,14 @@ public class SseStreamBridgeRegistry {
         .expireAfterAccess(30, TimeUnit.MINUTES)
         .build();
 
+    private final Cache<String, Boolean> deliveredQuestionJobResumeIds = Caffeine.newBuilder()
+        .expireAfterWrite(30, TimeUnit.MINUTES)
+        .maximumSize(10_000)
+        .build();
+
     private final Executor executor;
     private final @Nullable JobResumeFacade jobResumeFacade;
+    private final @Nullable MessageBroker messageBroker;
     private final Cache<Long, List<PendingRegistration>> pendingRegistrations;
     private final Duration undeliveredQuestionRetryDelay;
 
@@ -82,25 +91,27 @@ public class SseStreamBridgeRegistry {
         .build();
 
     public SseStreamBridgeRegistry() {
-        this(null);
+        this(null, null);
     }
 
-    public SseStreamBridgeRegistry(@Nullable JobResumeFacade jobResumeFacade) {
+    public SseStreamBridgeRegistry(@Nullable JobResumeFacade jobResumeFacade, @Nullable MessageBroker messageBroker) {
         this(
             PENDING_REGISTRATION_TIMEOUT, Ticker.systemTicker(), ForkJoinPool.commonPool(), jobResumeFacade,
-            UNDELIVERED_QUESTION_RETRY_DELAY);
+            messageBroker, UNDELIVERED_QUESTION_RETRY_DELAY);
     }
 
     SseStreamBridgeRegistry(Duration pendingRegistrationTimeout, Ticker ticker, Executor executor) {
-        this(pendingRegistrationTimeout, ticker, executor, null, UNDELIVERED_QUESTION_RETRY_DELAY);
+        this(pendingRegistrationTimeout, ticker, executor, null, null, UNDELIVERED_QUESTION_RETRY_DELAY);
     }
 
     SseStreamBridgeRegistry(
         Duration pendingRegistrationTimeout, Ticker ticker, Executor executor,
-        @Nullable JobResumeFacade jobResumeFacade, Duration undeliveredQuestionRetryDelay) {
+        @Nullable JobResumeFacade jobResumeFacade, @Nullable MessageBroker messageBroker,
+        Duration undeliveredQuestionRetryDelay) {
 
         this.executor = executor;
         this.jobResumeFacade = jobResumeFacade;
+        this.messageBroker = messageBroker;
         this.undeliveredQuestionRetryDelay = undeliveredQuestionRetryDelay;
 
         pendingRegistrations = Caffeine.newBuilder()
@@ -135,6 +146,14 @@ public class SseStreamBridgeRegistry {
             return;
         }
 
+        if (SseStreamEvent.EVENT_TYPE_QUESTION_DELIVERED.equals(eventType)) {
+            if (sseStreamEvent.getPayload() instanceof String jobResumeId) {
+                deliveredQuestionJobResumeIds.put(jobResumeId, Boolean.TRUE);
+            }
+
+            return;
+        }
+
         CopyOnWriteArrayList<SseStreamBridge> sseStreamBridges = bridges.getIfPresent(jobId);
 
         if (sseStreamBridges == null || sseStreamBridges.isEmpty()) {
@@ -165,12 +184,16 @@ public class SseStreamBridgeRegistry {
                     }
                 }
 
-                if (!delivered && isAskUserQuestionEvent(sseStreamEvent.getPayload())) {
-                    log.warn(
-                        "The '{}' event of job {} was not delivered to any SSE connection of the job",
-                        AiAgentSseEventType.ASK_USER_QUESTION, jobId);
+                if (isAskUserQuestionEvent(sseStreamEvent.getPayload())) {
+                    if (delivered) {
+                        publishQuestionDelivered(jobId, sseStreamEvent.getPayload());
+                    } else {
+                        log.warn(
+                            "The '{}' event of job {} was not delivered to any SSE connection of the job",
+                            AiAgentSseEventType.ASK_USER_QUESTION, jobId);
 
-                    resumeWithoutAnswer(jobId, sseStreamEvent.getPayload());
+                        resumeWithoutAnswer(jobId, sseStreamEvent.getPayload());
+                    }
                 }
             }
 
@@ -328,14 +351,43 @@ public class SseStreamBridgeRegistry {
             AiAgentSseEventType.ASK_USER_QUESTION.equals(map.get(AiAgentSseEventType.EVENT_TYPE));
     }
 
-    private void resumeWithoutAnswer(long jobId, @Nullable Object payload) {
-        if (jobResumeFacade == null || !(payload instanceof Map<?, ?> map) ||
-            !(map.get("resumeUrl") instanceof String resumeUrl) || resumeUrl.isBlank()) {
+    private static @Nullable String getJobResumeId(@Nullable Object payload) {
+        if (!(payload instanceof Map<?, ?> map) || !(map.get("resumeUrl") instanceof String resumeUrl) ||
+            resumeUrl.isBlank()) {
 
+            return null;
+        }
+
+        return resumeUrl.substring(resumeUrl.lastIndexOf('/') + 1);
+    }
+
+    private void publishQuestionDelivered(long jobId, @Nullable Object payload) {
+        String jobResumeId = getJobResumeId(payload);
+
+        if (messageBroker == null || jobResumeId == null) {
             return;
         }
 
-        resumeWithoutAnswer(jobId, resumeUrl.substring(resumeUrl.lastIndexOf('/') + 1), 1);
+        SseStreamEvent sseStreamEvent = new SseStreamEvent(
+            jobId, SseStreamEvent.EVENT_TYPE_QUESTION_DELIVERED, jobResumeId);
+
+        sseStreamEvent.putMetadata(TenantContext.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+
+        try {
+            messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
+        } catch (RuntimeException exception) {
+            log.warn("Unable to report the delivered question of job {} to the other nodes", jobId, exception);
+        }
+    }
+
+    private void resumeWithoutAnswer(long jobId, @Nullable Object payload) {
+        String jobResumeId = getJobResumeId(payload);
+
+        if (jobResumeFacade == null || jobResumeId == null) {
+            return;
+        }
+
+        resumeWithoutAnswer(jobId, jobResumeId, 1);
     }
 
     private void resumeWithoutAnswer(long jobId, String jobResumeId, int attempt) {
@@ -343,6 +395,14 @@ public class SseStreamBridgeRegistry {
             undeliveredQuestionRetryDelay.toMillis(), TimeUnit.MILLISECONDS, executor);
 
         delayedExecutor.execute(() -> {
+            if (deliveredQuestionJobResumeIds.getIfPresent(jobResumeId) != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("The question of job {} was delivered by another node", jobId);
+                }
+
+                return;
+            }
+
             JobResumeOutcome jobResumeOutcome;
 
             try {

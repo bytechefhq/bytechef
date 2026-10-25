@@ -17,6 +17,7 @@
 package com.bytechef.platform.webhook.web.websocket;
 
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import org.springframework.web.socket.WebSocketSession;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnWebhook
 public class CallSessionRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(CallSessionRegistry.class);

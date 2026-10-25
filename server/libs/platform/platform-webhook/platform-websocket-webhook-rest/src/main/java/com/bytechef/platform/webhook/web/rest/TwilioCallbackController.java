@@ -16,14 +16,10 @@
 
 package com.bytechef.platform.webhook.web.rest;
 
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry;
-import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry.CallSession;
-import com.bytechef.platform.webhook.web.websocket.WorkflowContinuationHelper;
+import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
+import com.bytechef.platform.webhook.web.websocket.CallStatusHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -38,23 +34,17 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
+@ConditionalOnWebhook
 @RequestMapping("/webhooks/twilio")
 class TwilioCallbackController {
 
     private static final Logger log = LoggerFactory.getLogger(TwilioCallbackController.class);
 
-    private final CallSessionRegistry callSessionRegistry;
-    private final JobFacade jobFacade;
-    private final WorkflowContinuationHelper workflowContinuationHelper;
+    private final CallStatusHandler callStatusHandler;
 
     @SuppressFBWarnings("EI")
-    TwilioCallbackController(
-        CallSessionRegistry callSessionRegistry, JobFacade jobFacade,
-        WorkflowContinuationHelper workflowContinuationHelper) {
-
-        this.callSessionRegistry = callSessionRegistry;
-        this.jobFacade = jobFacade;
-        this.workflowContinuationHelper = workflowContinuationHelper;
+    TwilioCallbackController(CallStatusHandler callStatusHandler) {
+        this.callStatusHandler = callStatusHandler;
     }
 
     /**
@@ -95,76 +85,9 @@ class TwilioCallbackController {
                 .body("Missing required parameters: CallSid and CallStatus");
         }
 
-        callSessionRegistry.updateCallStatus(callSid, callStatus);
-
-        Optional<CallSession> sessionOptional = callSessionRegistry.getSessionByCallSid(callSid);
-
-        if (sessionOptional.isPresent()) {
-            CallSession session = sessionOptional.get();
-
-            log.info("Updated call status for active session: callSid={}, status={}, sessionId={}",
-                callSid, callStatus, session.getWebSocketSessionId());
-
-            if (isTerminalStatus(callStatus)) {
-                Long subJobId = session.getSubJobId();
-
-                if (subJobId != null) {
-                    log.info("Stopping sub-workflow for terminated call: callSid={}, subJobId={}", callSid,
-                        subJobId);
-
-                    try {
-                        jobFacade.stopJob(subJobId);
-                    } catch (Exception exception) {
-                        log.warn("Failed to stop sub-workflow: callSid={}, subJobId={}", callSid, subJobId,
-                            exception);
-                    }
-                }
-
-                String durationStr = params.get("CallDuration");
-
-                if (durationStr != null) {
-                    try {
-                        session.setCallDuration(Integer.parseInt(durationStr));
-                    } catch (NumberFormatException exception) {
-                        log.warn("Failed to parse call duration: {}", durationStr);
-                    }
-                }
-
-                session.signalCompletion();
-
-                String workflowExecutionId = session.getWorkflowExecutionId();
-
-                if (workflowExecutionId != null) {
-                    Map<String, Object> afterCallData = new LinkedHashMap<>();
-
-                    afterCallData.put("callSid", callSid);
-                    afterCallData.put("callStatus", callStatus);
-                    afterCallData.put("from", from);
-                    afterCallData.put("to", to);
-                    afterCallData.put("direction", direction);
-                    afterCallData.put("accountSid", accountSid);
-
-                    if (session.getCallDuration() != null) {
-                        afterCallData.put("callDuration", session.getCallDuration());
-                    }
-
-                    workflowContinuationHelper.createContinuationJob(workflowExecutionId, afterCallData);
-                }
-
-                log.info("Signaled completion for call: callSid={}, actionJobId={}", callSid,
-                    session.getActionJobId());
-            }
-        } else {
-            log.info("Call status update for inactive session: callSid={}, status={}", callSid, callStatus);
-        }
+        callStatusHandler.handleStatusCallback(params);
 
         return ResponseEntity.ok("OK");
-    }
-
-    private static boolean isTerminalStatus(String status) {
-        return "completed".equalsIgnoreCase(status) || "failed".equalsIgnoreCase(status) ||
-            "busy".equalsIgnoreCase(status) || "no-answer".equalsIgnoreCase(status) ||
-            "canceled".equalsIgnoreCase(status);
     }
 
     /**

@@ -32,10 +32,12 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
+import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import java.time.Duration;
@@ -44,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,7 +119,7 @@ class SseStreamBridgeRegistryTest {
         when(jobResumeFacade.resumeExpiredJob("resume-id")).thenReturn(JobResumeOutcome.OK);
 
         SseStreamBridgeRegistry registry = new SseStreamBridgeRegistry(
-            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, Duration.ZERO);
+            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, null, Duration.ZERO);
 
         registry.onSseStreamEvent(
             new SseStreamEvent(JOB_ID, SseStreamEvent.EVENT_TYPE_DATA,
@@ -133,7 +136,7 @@ class SseStreamBridgeRegistryTest {
             JobResumeOutcome.NOT_YET_SUSPENDED, JobResumeOutcome.NOT_YET_SUSPENDED, JobResumeOutcome.OK);
 
         SseStreamBridgeRegistry registry = new SseStreamBridgeRegistry(
-            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, Duration.ZERO);
+            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, null, Duration.ZERO);
 
         registry.onSseStreamEvent(
             new SseStreamEvent(JOB_ID, SseStreamEvent.EVENT_TYPE_DATA,
@@ -148,7 +151,7 @@ class SseStreamBridgeRegistryTest {
         JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
 
         SseStreamBridgeRegistry registry = new SseStreamBridgeRegistry(
-            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, Duration.ZERO);
+            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, null, Duration.ZERO);
 
         registry.register(JOB_ID, sseStreamBridge);
 
@@ -164,11 +167,74 @@ class SseStreamBridgeRegistryTest {
         JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
 
         SseStreamBridgeRegistry registry = new SseStreamBridgeRegistry(
-            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, Duration.ZERO);
+            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, null, Duration.ZERO);
 
         registry.onSseStreamEvent(new SseStreamEvent(JOB_ID, SseStreamEvent.EVENT_TYPE_DATA, questionEvent(null)));
 
         verify(jobResumeFacade, after(200).never()).resumeExpiredJob(any());
+    }
+
+    @Test
+    void testAnAskUserQuestionEventDeliveredByAnotherNodeDoesNotResumeTheJob() {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        List<SseStreamBridgeRegistry> nodeRegistries = new CopyOnWriteArrayList<>();
+
+        MessageBroker messageBroker = (route, message) -> {
+            for (SseStreamBridgeRegistry nodeRegistry : nodeRegistries) {
+                nodeRegistry.onSseStreamEvent((SseStreamEvent) message);
+            }
+        };
+
+        SseStreamBridgeRegistry otherNodeRegistry = new SseStreamBridgeRegistry(
+            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, messageBroker,
+            Duration.ofMillis(100));
+        SseStreamBridgeRegistry streamNodeRegistry = new SseStreamBridgeRegistry(
+            Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, messageBroker,
+            Duration.ofMillis(100));
+
+        nodeRegistries.add(otherNodeRegistry);
+        nodeRegistries.add(streamNodeRegistry);
+
+        streamNodeRegistry.register(JOB_ID, sseStreamBridge);
+
+        Map<String, Object> questionEvent = questionEvent("https://host/job/resume/resume-id");
+
+        messageBroker.send(
+            SseStreamMessageRoute.SSE_STREAM_EVENTS,
+            new SseStreamEvent(JOB_ID, SseStreamEvent.EVENT_TYPE_DATA, questionEvent));
+
+        verify(sseStreamBridge).onEvent(questionEvent);
+        verify(jobResumeFacade, after(500).never()).resumeExpiredJob(any());
+    }
+
+    @Test
+    void testAnAskUserQuestionEventThatNoNodeDeliversResumesTheJobOnce() {
+        JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
+        List<SseStreamBridgeRegistry> nodeRegistries = new CopyOnWriteArrayList<>();
+
+        when(jobResumeFacade.resumeExpiredJob("resume-id")).thenReturn(JobResumeOutcome.OK, JobResumeOutcome.GONE);
+
+        MessageBroker messageBroker = (route, message) -> {
+            for (SseStreamBridgeRegistry nodeRegistry : nodeRegistries) {
+                nodeRegistry.onSseStreamEvent((SseStreamEvent) message);
+            }
+        };
+
+        nodeRegistries.add(
+            new SseStreamBridgeRegistry(
+                Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, messageBroker,
+                Duration.ZERO));
+        nodeRegistries.add(
+            new SseStreamBridgeRegistry(
+                Duration.ofMinutes(2), System::nanoTime, Runnable::run, jobResumeFacade, messageBroker,
+                Duration.ZERO));
+
+        messageBroker.send(
+            SseStreamMessageRoute.SSE_STREAM_EVENTS,
+            new SseStreamEvent(
+                JOB_ID, SseStreamEvent.EVENT_TYPE_DATA, questionEvent("https://host/job/resume/resume-id")));
+
+        verify(jobResumeFacade, timeout(5000).times(2)).resumeExpiredJob("resume-id");
     }
 
     @Test
