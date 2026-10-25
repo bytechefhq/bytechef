@@ -18,15 +18,25 @@ export function clearActiveToasts() {
 const TOAST_SAFETY_TIMEOUT_MS = 30000;
 
 /*
- * A 403 on a CSRF-protected endpoint (`/graphql`, `/internal/`) is almost always a transient CSRF
- * token race rather than a real authorization failure — genuine auth failures return 401 here. The
- * token is rotated whenever the session silently re-authenticates (e.g. remember-me kicking in after
- * a session timeout), or the XSRF-TOKEN cookie has not been established yet, so a request already in
- * flight can carry a stale/empty token and be rejected. We refresh the token and replay the request
- * once before treating it as fatal. See https://github.com/bytechefhq/bytechef/issues/5189.
+ * A CSRF rejection on a CSRF-protected endpoint (`/graphql`, `/internal/`) is almost always a transient
+ * token race rather than a real authorization failure. The token is rotated whenever the session
+ * silently re-authenticates (e.g. remember-me kicking in after a session timeout), or the XSRF-TOKEN
+ * cookie has not been established yet, so a request already in flight can carry a stale/empty token and
+ * be rejected. We refresh the token and replay the request once before treating it as fatal. See
+ * https://github.com/bytechefhq/bytechef/issues/5189.
  */
 function isCsrfProtectedUrl(url: string): boolean {
     return url.includes('/graphql') || url.includes('/internal/');
+}
+
+const CSRF_REJECTED_HEADER = 'X-CSRF-Rejected';
+
+function isCsrfRejection(response: Response): boolean {
+    return response.status === 403 && response.headers?.get(CSRF_REJECTED_HEADER) === 'true';
+}
+
+function hasStreamingBody(init?: RequestInit): boolean {
+    return typeof ReadableStream !== 'undefined' && init?.body instanceof ReadableStream;
 }
 
 /*
@@ -160,10 +170,10 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
-                // A 403 on a CSRF-protected endpoint is a transient token race handled by the
-                // csrf-aware fetch wrapper below (refresh + replay, then escalate). Don't toast or
+                // A CSRF rejection on a CSRF-protected endpoint is a transient token race handled by
+                // the csrf-aware fetch wrapper below (refresh + replay, then escalate). Don't toast or
                 // log out here, otherwise the recovered request would still flash an error.
-                if (response.status === 403 && isCsrfProtectedUrl(response.url)) {
+                if (isCsrfRejection(response) && isCsrfProtectedUrl(response.url)) {
                     return response;
                 }
 
@@ -241,7 +251,7 @@ export default function useFetchInterceptor() {
 
             // A Request body may be a one-shot stream, so only replay calls made with a plain
             // url + init (which is how every GraphQL and REST call is issued here).
-            if (response.status !== 403 || input instanceof Request) {
+            if (!isCsrfRejection(response) || input instanceof Request || hasStreamingBody(init)) {
                 return response;
             }
 
@@ -257,7 +267,7 @@ export default function useFetchInterceptor() {
 
             const retriedResponse = await interceptedFetch(input, init);
 
-            if (retriedResponse.status === 403) {
+            if (isCsrfRejection(retriedResponse)) {
                 clearAuthentication();
                 clearCurrentWorkspaceId();
 
