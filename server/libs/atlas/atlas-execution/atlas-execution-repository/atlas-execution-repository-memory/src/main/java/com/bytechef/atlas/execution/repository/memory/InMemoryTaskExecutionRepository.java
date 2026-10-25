@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.comparator.Comparators;
 
 /**
@@ -279,11 +280,11 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public TaskExecution save(TaskExecution taskExecution) {
-        if (taskExecution.isNew()) {
+        boolean newTaskExecution = taskExecution.isNew();
+
+        if (newTaskExecution) {
             taskExecution.setId(Math.abs(Math.max(RandomUtils.nextLong(), Long.MIN_VALUE + 1)));
         }
-
-        TaskExecution clonedTaskExecution = clone(taskExecution);
 
         String storeKey = getStoreKey();
 
@@ -323,6 +324,12 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         }
 
         try {
+            if (!newTaskExecution) {
+                incrementVersion(store, taskExecution);
+            }
+
+            TaskExecution clonedTaskExecution = clone(taskExecution);
+
             // by id
             store.byId.put(Objects.requireNonNull(clonedTaskExecution.getId()), clonedTaskExecution);
 
@@ -382,6 +389,18 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         }
 
         return taskExecution;
+    }
+
+    private static void incrementVersion(Store store, TaskExecution taskExecution) {
+        TaskExecution storedTaskExecution = store.byId.get(Objects.requireNonNull(taskExecution.getId()));
+
+        if (storedTaskExecution != null && storedTaskExecution.getVersion() != taskExecution.getVersion()) {
+            throw new OptimisticLockingFailureException(
+                "TaskExecution with id '%s' was modified since version %d".formatted(
+                    taskExecution.getId(), taskExecution.getVersion()));
+        }
+
+        taskExecution.setVersion(taskExecution.getVersion() + 1);
     }
 
     private TaskExecution clone(TaskExecution taskExecution) {
