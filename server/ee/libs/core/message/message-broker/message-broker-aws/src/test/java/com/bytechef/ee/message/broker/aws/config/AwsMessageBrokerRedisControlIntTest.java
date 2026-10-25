@@ -129,8 +129,6 @@ class AwsMessageBrokerRedisControlIntTest {
         otherNodeControlChannel.start();
 
         try {
-            // Subscriptions are established asynchronously, so send until both nodes have received the message or
-            // the deadline passes.
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
 
             while ((CONTEXT_CONTROL_LATCH.getCount() > 0 || otherNodeLatch.getCount() > 0) &&

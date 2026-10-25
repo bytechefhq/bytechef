@@ -41,7 +41,6 @@ public class AwsMessageBrokerEnvironmentPostProcessor implements EnvironmentPost
             String controlProvider = environment.getProperty("bytechef.message-broker.aws.control-provider");
 
             if ("redis".equalsIgnoreCase(controlProvider)) {
-
                 source.putAll(DataRedisAutoConfigurationEnabler.getProperties(environment));
             }
         }
