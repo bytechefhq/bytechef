@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -45,8 +46,10 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
  */
 @Configuration
 @ConditionalOnMessageBrokerRedis
-public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartInitializingSingleton, DisposableBean,
-    MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
+public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartInitializingSingleton, SmartLifecycle,
+    DisposableBean, MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
+
+    static final int PHASE = 100;
 
     private static final Logger log = LoggerFactory.getLogger(
         RedisMessageBrokerListenerRegistrarConfiguration.class);
@@ -101,9 +104,27 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     }
 
     @Override
+    public void start() {
+    }
+
+    @Override
+    public void stop() {
+        stopListenerEndpoints();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return redisListenerEndpointRegistrar != null && redisListenerEndpointRegistrar.isRunning();
+    }
+
+    @Override
+    public int getPhase() {
+        return PHASE;
+    }
+
+    @Override
     public void destroy() {
-        redisListenerEndpointRegistrar.stop();
-        redisMessageListenerContainer.stop();
+        stopListenerEndpoints();
     }
 
     @Override
