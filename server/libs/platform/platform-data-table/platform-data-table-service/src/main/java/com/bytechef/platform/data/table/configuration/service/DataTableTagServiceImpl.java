@@ -65,6 +65,32 @@ public class DataTableTagServiceImpl implements DataTableTagService {
     }
 
     @Override
+    public List<Tag> getTags(List<Long> dataTableIds) {
+        Set<Long> ids = new HashSet<>();
+
+        for (Long dataTableId : dataTableIds) {
+            DataTable dataTable = dataTableRepository.findById(dataTableId)
+                .orElse(null);
+
+            if (dataTable == null) {
+                continue;
+            }
+
+            List<Long> tagIds = dataTable.getTagIds();
+
+            if (tagIds != null) {
+                ids.addAll(tagIds);
+            }
+        }
+
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return tagService.getTags(new ArrayList<>(ids));
+    }
+
+    @Override
     public Map<String, List<Tag>> getTagsByTableName() {
         Map<String, List<Tag>> map = new HashMap<>();
 
