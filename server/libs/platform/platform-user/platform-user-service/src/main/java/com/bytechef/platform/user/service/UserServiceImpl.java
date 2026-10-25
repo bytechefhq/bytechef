@@ -403,10 +403,8 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after 30
-     * days.
-     * <p>
-     * This is scheduled to get fired everyday, at midnight.
+     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after one
+     * month.
      */
     @Override
     public void removeOldPersistentTokens() {
@@ -642,8 +640,6 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Not activated users should be automatically deleted after 3 days.
-     * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
      */
     @Override
     public void removeNotActivatedUsers() {

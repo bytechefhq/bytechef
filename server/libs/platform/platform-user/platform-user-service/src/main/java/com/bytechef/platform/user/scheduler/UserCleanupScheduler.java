@@ -39,7 +39,7 @@ public class UserCleanupScheduler {
     }
 
     /**
-     * Persistent tokens are deleted after 30 days. Fires every day at midnight.
+     * Deletes expired persistent tokens. Fires every day at midnight.
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void removeOldPersistentTokens() {
@@ -47,7 +47,7 @@ public class UserCleanupScheduler {
     }
 
     /**
-     * Not activated users are deleted after 3 days. Fires every day at 01:00 (am).
+     * Deletes users that were never activated. Fires every day at 01:00 (am).
      */
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
