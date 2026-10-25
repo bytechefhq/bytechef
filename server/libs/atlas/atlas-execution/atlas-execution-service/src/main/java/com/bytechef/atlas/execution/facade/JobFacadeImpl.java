@@ -32,6 +32,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
@@ -91,8 +92,14 @@ public class JobFacadeImpl implements JobFacade {
 
         Map<String, Object> initialContext = new HashMap<>(job.getInputs());
 
-        for (String disabledTaskName : WorkflowTaskUtils.getDisabledTaskNames(workflow.getTasks())) {
+        List<String> disabledTaskNames = WorkflowTaskUtils.getDisabledTaskNames(workflow.getTasks());
+
+        for (String disabledTaskName : disabledTaskNames) {
             initialContext.putIfAbsent(disabledTaskName, null);
+        }
+
+        if (!disabledTaskNames.isEmpty()) {
+            initialContext.put(Evaluator.DISABLED_TASK_NAMES, disabledTaskNames);
         }
 
         contextService.push(
