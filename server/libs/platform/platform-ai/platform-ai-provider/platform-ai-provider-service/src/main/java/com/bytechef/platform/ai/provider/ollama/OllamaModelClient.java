@@ -17,6 +17,8 @@
 package com.bytechef.platform.ai.provider.ollama;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -28,7 +30,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -50,7 +51,10 @@ public class OllamaModelClient {
 
     private static final Logger log = LoggerFactory.getLogger(OllamaModelClient.class);
 
-    private final Map<String, CachedModels> cachedModelsMap = new ConcurrentHashMap<>();
+    private final Cache<String, List<OllamaModel>> modelsCache = Caffeine.newBuilder()
+        .maximumSize(100)
+        .expireAfterWrite(CACHE_TTL)
+        .build();
     private final HttpClient httpClient = HttpClient.newBuilder()
         .connectTimeout(TIMEOUT)
         .build();
@@ -67,17 +71,7 @@ public class OllamaModelClient {
         String baseUrl = normalizeUrl(url);
         String cacheKey = apiKey == null || apiKey.isBlank() ? baseUrl : baseUrl + "#" + apiKey;
 
-        CachedModels cachedModels = cachedModelsMap.get(cacheKey);
-
-        if (cachedModels != null && !cachedModels.isExpired()) {
-            return cachedModels.models();
-        }
-
-        List<OllamaModel> models = fetchModels(baseUrl, apiKey);
-
-        cachedModelsMap.put(cacheKey, new CachedModels(models, System.nanoTime() + CACHE_TTL.toNanos()));
-
-        return models;
+        return modelsCache.get(cacheKey, key -> fetchModels(baseUrl, apiKey));
     }
 
     private List<OllamaModel> fetchModels(String baseUrl, @Nullable String apiKey) {
@@ -178,13 +172,6 @@ public class OllamaModelClient {
         }
 
         return models;
-    }
-
-    private record CachedModels(List<OllamaModel> models, long expiresAtNanos) {
-
-        boolean isExpired() {
-            return System.nanoTime() - expiresAtNanos > 0;
-        }
     }
 
     private record OllamaModel(String name, List<String> capabilities, boolean remote) {
