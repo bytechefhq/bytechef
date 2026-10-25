@@ -59,10 +59,10 @@ Every provider ships with a default model per kind - chat, embedding, and (for O
 
 The page still decides **which** default applies: features where ByteChef picks the model for you - the Copilot default, the workflow converter, the property Copilot, Knowledge Base embedding, and AI Hub image generation - resolve to the first **enabled** provider in the current environment (or the provider preferred via `BYTECHEF_AI_COPILOT_PROVIDER`, when set and enabled) and use that provider's configured model. Enabling or disabling a provider per environment redirects these features at the next request, without a restart. Universal AI workflow steps are unaffected - their authors pick the model per step.
 
-Two providers have **no** default model on purpose, and are skipped by the default resolution until you set theirs explicitly:
+Two providers work differently:
 
-- **Azure OpenAI** - the "model" is your deployment name; set `BYTECHEF_AI_PROVIDER_CHAT_AZURE_OPEN_AI_OPTIONS_MODEL` to it.
-- **Ollama** - the usable models are whatever your Ollama instance has pulled; set `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` (e.g. `deepseek-r1:8b`) and, for Knowledge Base embedding, `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` (e.g. `qwen3-embedding:8b`).
+- **Azure OpenAI** has **no** default model on purpose, and is skipped by the default resolution until you set one: the "model" is your deployment name; set `BYTECHEF_AI_PROVIDER_CHAT_AZURE_OPEN_AI_OPTIONS_MODEL` to it.
+- **Ollama** uses the models installed on your Ollama server. The AI model picker lists its chat models, read live from the server. Unless you set `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` (e.g. `qwen3:8b`), the default chat model is the first **local** chat model the server reports; Ollama lists the most recently pulled model first. Cloud models (names ending in `:cloud`) are listed after local ones and never become the default. Knowledge Base embedding works the same way with the installed embedding models, or `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` (e.g. `nomic-embed-text`).
 
 <Callout title="Choosing an embedding model">
     Pick the embedding model deliberately: documents already stored in Knowledge Bases are embedded with the model that was active at upload time, and switching to a different embedding model degrades semantic search over existing documents until they are re-embedded.
@@ -79,7 +79,7 @@ Three of the catalog's providers offer them:
 |---|---|---|
 | **OpenAI** | `text-embedding-3-small` | `BYTECHEF_AI_PROVIDER_EMBEDDING_OPEN_AI_OPTIONS_MODEL` |
 | **Mistral** | `mistral-embed` | `BYTECHEF_AI_PROVIDER_EMBEDDING_MISTRAL_OPTIONS_MODEL` |
-| **Ollama** | *(none - set one explicitly)* | `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` |
+| **Ollama** | *(first embedding model installed on the server)* | `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` |
 
 The corresponding property form is `bytechef.ai.provider.embedding.<provider>.options.model`. For
 the full list of embedding keys see the
@@ -90,7 +90,8 @@ or Ollama activated for embeddings.
 
 <Callout title="Models are configuration">
     The model itself is always configuration - the AI Providers page stores credentials and
-    enablement, never model names. The API key can be configuration too
+    enablement, never model names. The one exception is Ollama with no model configured: ByteChef
+    then picks one of the models installed on the server. The API key can be configuration too
     (`BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` and friends), so a deployment can set the embedding model
     and the key it authenticates with entirely by property.
 </Callout>
