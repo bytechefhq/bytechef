@@ -16,14 +16,18 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
+import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,13 +47,29 @@ class DataTableServiceTest {
     private DataTableRepository dataTableRepository;
 
     @Mock
+    private DataTableStorageService dataTableStorageService;
+
+    @Mock
     private JdbcTemplate jdbcTemplate;
 
     private DataTableServiceImpl dataTableService;
 
     @BeforeEach
     void setUp() {
-        dataTableService = new DataTableServiceImpl(dataTableRepository, jdbcTemplate);
+        dataTableService = new DataTableServiceImpl(dataTableRepository, dataTableStorageService, jdbcTemplate);
+    }
+
+    @Test
+    void testDuplicateTableIsBlockedWhenTheCopyWouldExceedTheStorageLimit() {
+        when(dataTableStorageService.getTableBytes(anyString())).thenReturn(4_096L);
+        doThrow(new DataTableStorageLimitExceededException(52_428_800L, 52_428_800L))
+            .when(dataTableStorageService)
+            .checkWithinLimit(4_096L);
+
+        assertThatThrownBy(() -> dataTableService.duplicateTable("orders", "orders_copy", 1))
+            .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        verify(jdbcTemplate, never()).execute(anyString());
     }
 
     @Test

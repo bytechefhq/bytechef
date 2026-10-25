@@ -64,13 +64,17 @@ class DataTableRowServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
+    private DataTableStorageService dataTableStorageService;
+
+    @Mock
     private JdbcTemplate jdbcTemplate;
 
     private DataTableRowServiceImpl dataTableRowService;
 
     @BeforeEach
     void setUp() {
-        dataTableRowService = new DataTableRowServiceImpl(applicationEventPublisher, jdbcTemplate);
+        dataTableRowService = new DataTableRowServiceImpl(
+            applicationEventPublisher, jdbcTemplate, dataTableStorageService);
     }
 
     @Test
