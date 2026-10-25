@@ -22,6 +22,7 @@ import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderDTO;
+import com.bytechef.platform.ai.provider.ollama.OllamaModelLister;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.StringProperty;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,15 +51,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class AiProviderFacadeImpl implements AiProviderFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
+    private final OllamaModelLister ollamaModelLister;
     private final PropertyService propertyService;
     private final ApplicationProperties applicationProperties;
 
     @SuppressFBWarnings("EI")
     public AiProviderFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, PropertyService propertyService,
-        ApplicationProperties applicationProperties) {
+        ComponentDefinitionService componentDefinitionService, OllamaModelLister ollamaModelLister,
+        PropertyService propertyService, ApplicationProperties applicationProperties) {
 
         this.componentDefinitionService = componentDefinitionService;
+        this.ollamaModelLister = ollamaModelLister;
         this.propertyService = propertyService;
         this.applicationProperties = applicationProperties;
     }
@@ -107,7 +111,9 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                 boolean enabled =
                     property != null ? property.isEnabled() : isConfiguredInApplicationProperties(provider);
 
-                List<AiProviderCatalogItemDTO.Model> models = readChatModels(componentDefinition);
+                List<AiProviderCatalogItemDTO.Model> models = enabled && provider == Provider.OLLAMA
+                    ? readOllamaChatModels(componentDefinition, environment)
+                    : readChatModels(componentDefinition);
 
                 return new AiProviderCatalogItemDTO(
                     provider.getKey(), provider.getLabel(), componentDefinition.getIcon(), enabled,
@@ -135,7 +141,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .filter(Provider.CHAT_PROVIDERS::contains)
             .filter(provider -> providerKey == null || provider == preferredProvider)
             .map(provider -> {
-                String model = resolveDefaultChatModel(provider);
+                String model = resolveDefaultChatModel(provider, environmentId);
 
                 if (model == null || model.isBlank()) {
                     return null;
@@ -164,7 +170,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .map(aiProviderDTO -> {
                 Provider provider = getProvider(aiProviderDTO.id());
 
-                String model = resolveDefaultEmbeddingModel(provider);
+                String model = resolveDefaultEmbeddingModel(provider, environmentId);
 
                 if (model == null || model.isBlank()) {
                     return null;
@@ -334,7 +340,45 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .orElse(List.of());
     }
 
-    private String resolveDefaultChatModel(Provider provider) {
+    private List<AiProviderCatalogItemDTO.Model> readOllamaChatModels(
+        ComponentDefinition componentDefinition, int environment) {
+
+        List<String> installedModels = ollamaModelLister.getChatModels(resolveUrl(Provider.OLLAMA, environment));
+
+        if (installedModels.isEmpty()) {
+            return readChatModels(componentDefinition);
+        }
+
+        return installedModels.stream()
+            .map(installedModel -> new AiProviderCatalogItemDTO.Model(installedModel, installedModel))
+            .toList();
+    }
+
+    private String resolveDefaultChatModel(Provider provider, int environment) {
+        String model = resolveConfiguredChatModel(provider);
+
+        if ((model == null || model.isBlank()) && provider == Provider.OLLAMA) {
+            return getFirst(ollamaModelLister.getChatModels(resolveUrl(provider, environment)));
+        }
+
+        return model;
+    }
+
+    private String resolveDefaultEmbeddingModel(Provider provider, int environment) {
+        String model = resolveConfiguredEmbeddingModel(provider);
+
+        if ((model == null || model.isBlank()) && provider == Provider.OLLAMA) {
+            return getFirst(ollamaModelLister.getEmbeddingModels(resolveUrl(provider, environment)));
+        }
+
+        return model;
+    }
+
+    private static @Nullable String getFirst(List<String> models) {
+        return models.isEmpty() ? null : models.getFirst();
+    }
+
+    private String resolveConfiguredChatModel(Provider provider) {
         ApplicationProperties.Ai.Provider.Chat chat = applicationProperties.getAi()
             .getProvider()
             .getChat();
@@ -374,7 +418,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
         };
     }
 
-    private String resolveDefaultEmbeddingModel(Provider provider) {
+    private String resolveConfiguredEmbeddingModel(Provider provider) {
         ApplicationProperties.Ai.Provider.Embedding embedding = applicationProperties.getAi()
             .getProvider()
             .getEmbedding();
