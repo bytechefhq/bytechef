@@ -278,6 +278,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-security-web:automation-security-web-impl"))
+    implementation(project(":server:ee:libs:config:cache-invalidation-config"))
     implementation(project(":server:ee:libs:config:cloud-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))

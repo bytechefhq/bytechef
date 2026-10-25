@@ -603,6 +603,7 @@ include("server:ee:libs:automation:automation-task:automation-task-remote-client
 include("server:ee:libs:automation:automation-security-web:automation-security-web-impl")
 
 include("server:ee:libs:config:cloud-config")
+include("server:ee:libs:config:cache-invalidation-config")
 include("server:ee:libs:config:observability-config")
 include("server:ee:libs:config:tenant-multi-data-config")
 include("server:ee:libs:config:tenant-multi-knowledge-base-config")
