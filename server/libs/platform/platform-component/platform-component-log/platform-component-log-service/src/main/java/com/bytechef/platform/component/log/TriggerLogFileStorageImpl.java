@@ -18,6 +18,7 @@ package com.bytechef.platform.component.log;
 
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -27,10 +28,15 @@ public class TriggerLogFileStorageImpl implements TriggerLogFileStorage {
 
     private static final String TRIGGER_LOG_FILES_DIR = "logs/trigger_execution";
 
-    private final LogFileStorageImpl logFileStorage;
+    private final LogFileStorage logFileStorage;
 
     public TriggerLogFileStorageImpl(FileStorageService fileStorageService) {
-        this.logFileStorage = new LogFileStorageImpl(fileStorageService, TRIGGER_LOG_FILES_DIR);
+        this(new LogFileStorageImpl(fileStorageService, TRIGGER_LOG_FILES_DIR));
+    }
+
+    @SuppressFBWarnings("EI")
+    public TriggerLogFileStorageImpl(LogFileStorage logFileStorage) {
+        this.logFileStorage = logFileStorage;
     }
 
     @Override
