@@ -187,6 +187,26 @@ class ApplicationPropertiesTest {
             .isEnabled()).isFalse();
     }
 
+    @Test
+    void testBindsSchedulerQuartzClustering() {
+        MapConfigurationPropertySource mapConfigurationPropertySource = new MapConfigurationPropertySource(
+            Map.of(
+                "bytechef.scheduler.quartz.clustered", "true",
+                "bytechef.scheduler.quartz.cluster-checkin-interval", "20000"));
+
+        Binder binder = new Binder(mapConfigurationPropertySource);
+
+        ApplicationProperties applicationProperties = binder.bind(
+            "bytechef", Bindable.of(ApplicationProperties.class), new NoUnboundElementsBindHandler(BindHandler.DEFAULT))
+            .get();
+
+        ApplicationProperties.Scheduler.Quartz quartz = applicationProperties.getScheduler()
+            .getQuartz();
+
+        assertThat(quartz.isClustered()).isTrue();
+        assertThat(quartz.getClusterCheckinInterval()).isEqualTo(20000L);
+    }
+
     private static ApplicationProperties bind(PropertySource<?> propertySource) {
         MutablePropertySources propertySources = new MutablePropertySources();
 
