@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -410,7 +409,6 @@ public class UserServiceImpl implements UserService {
      * This is scheduled to get fired everyday, at midnight.
      */
     @Override
-    @Scheduled(cron = "0 0 0 * * ?")
     public void removeOldPersistentTokens() {
         LocalDate now = LocalDate.now();
 
@@ -648,7 +646,6 @@ public class UserServiceImpl implements UserService {
      * This is scheduled to get fired everyday, at 01:00 (am).
      */
     @Override
-    @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(
