@@ -4,6 +4,7 @@ import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {
+    CLUSTER_FRAME_BOTTOM_PADDING,
     CLUSTER_FRAME_HEADER_HEIGHT,
     CLUSTER_FRAME_LABEL_OVERHANG,
     CLUSTER_FRAME_MEMBER_ROW_Y,
@@ -11,6 +12,7 @@ import {
     CLUSTER_FRAME_MIN_WIDTH,
     CLUSTER_FRAME_PADDING,
     CLUSTER_FRAME_PLACEHOLDER_Y,
+    CLUSTER_FRAME_TITLE_LINE_HEIGHT,
     fromClusterFrameChildPosition,
     getClusterMemberSize,
     toClusterFrameChildPosition,
@@ -75,7 +77,7 @@ describe('layoutClusterFrames', () => {
         expect(rootNode.data.clusterFrame).toEqual({
             clusterRootId: ROOT_ID,
             contentOrigin: {x: CLUSTER_FRAME_PADDING, y: CLUSTER_FRAME_HEADER_HEIGHT},
-            height: CLUSTER_FRAME_HEADER_HEIGHT + 300 + ELEMENT_SIZE.height + CLUSTER_FRAME_HEADER_HEIGHT,
+            height: CLUSTER_FRAME_HEADER_HEIGHT + 300 + ELEMENT_SIZE.height + CLUSTER_FRAME_BOTTOM_PADDING,
             width: CLUSTER_FRAME_PADDING + 400 + ELEMENT_SIZE.width + CLUSTER_FRAME_PADDING,
         });
 
@@ -119,7 +121,7 @@ describe('layoutClusterFrames', () => {
 
         expect(clusterFrame.width).toBeGreaterThanOrEqual(CLUSTER_ROOT_NODE_WIDTH + CLUSTER_FRAME_PADDING);
         expect(clusterFrame.height).toBeGreaterThanOrEqual(
-            600 + ELEMENT_SIZE.height + CLUSTER_FRAME_HEADER_HEIGHT + CLUSTER_FRAME_PADDING
+            600 + ELEMENT_SIZE.height + CLUSTER_FRAME_HEADER_HEIGHT + CLUSTER_FRAME_BOTTOM_PADDING
         );
     });
 
@@ -218,7 +220,7 @@ describe('layoutClusterFrames', () => {
         expect(contentYById.get(`${ROOT_ID}-model-placeholder-0`)).toBe(CLUSTER_FRAME_PLACEHOLDER_Y);
     });
 
-    it('leaves as much space below the last element label as above the root', () => {
+    it('leaves as much space below the last element label as the header leaves below its title', () => {
         const result = layoutClusterFrames(
             [buildRootNode()],
             [],
@@ -237,7 +239,9 @@ describe('layoutClusterFrames', () => {
         const labelBottom =
             clusterFrame.contentOrigin.y + 300 + CLUSTER_ELEMENT_NODE_WIDTH + CLUSTER_FRAME_LABEL_OVERHANG;
 
-        expect(clusterFrame.height - labelBottom).toBe(clusterFrame.contentOrigin.y);
+        expect(clusterFrame.height - labelBottom).toBe(
+            (CLUSTER_FRAME_HEADER_HEIGHT - CLUSTER_FRAME_TITLE_LINE_HEIGHT) / 2
+        );
     });
 
     it('keeps nested members parented to their nested root and out of frame coordinates', () => {
