@@ -92,10 +92,20 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @throws ProviderException                             if the external systems or services are unavailable or
      *                                                       result in errors
      */
+    default List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable ComponentConnection componentConnection) {
+
+        return executeOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnection, null);
+    }
+
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection);
+        @Nullable ComponentConnection componentConnection, @Nullable String workflowId);
 
     /**
      * Executes the dynamic resolution of options for a property of an action that binds multiple connections. Behaves
@@ -118,10 +128,20 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @throws ProviderException                             if the external systems or services are unavailable or
      *                                                       result in errors
      */
+    default List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions) {
+
+        return executeOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnections, extensions, null);
+    }
+
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions);
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, @Nullable String workflowId);
 
     /**
      * Executes the defined output logic for a specific component and its version, based on the given action name, input
@@ -135,10 +155,17 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @param componentConnections a map of component connections used for external interactions
      * @return the result of the output execution as an OutputResponse object
      */
+    default @Nullable OutputResponse executeOutput(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections) {
+
+        return executeOutput(componentName, componentVersion, actionName, inputParameters, componentConnections, null);
+    }
+
     @Nullable
     OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections);
+        Map<String, ComponentConnection> componentConnections, @Nullable String workflowId);
 
     /**
      * Executes the perform logic for a specific component and its version, based on the given action name, mode type,

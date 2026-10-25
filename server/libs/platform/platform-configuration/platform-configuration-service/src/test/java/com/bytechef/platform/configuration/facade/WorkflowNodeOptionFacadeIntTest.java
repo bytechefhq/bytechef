@@ -146,7 +146,8 @@ class WorkflowNodeOptionFacadeIntTest {
         List<Option> expectedOptions = List.of(mock(Option.class));
 
         when(actionDefinitionFacade.executeOptions(
-            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap()))
+            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap(),
+            eq(workflow.getId())))
                 .thenReturn(expectedOptions);
 
         List<Option> options = workflowNodeOptionFacade.getWorkflowNodeOptions(
@@ -155,7 +156,8 @@ class WorkflowNodeOptionFacadeIntTest {
         assertThat(options).isEqualTo(expectedOptions);
 
         verify(actionDefinitionFacade).executeOptions(
-            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap());
+            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap(),
+            eq(workflow.getId()));
     }
 
     @Test
@@ -194,7 +196,8 @@ class WorkflowNodeOptionFacadeIntTest {
         List<Option> expectedOptions = List.of(mock(Option.class));
 
         when(actionDefinitionFacade.executeOptions(
-            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap()))
+            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap(),
+            eq(workflow.getId())))
                 .thenReturn(expectedOptions);
 
         List<Option> options = workflowNodeOptionFacade.getWorkflowNodeOptions(
@@ -206,7 +209,7 @@ class WorkflowNodeOptionFacadeIntTest {
 
         verify(actionDefinitionFacade).executeOptions(
             eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(),
-            connectionIdsArgumentCaptor.capture(), anyMap());
+            connectionIdsArgumentCaptor.capture(), anyMap(), eq(workflow.getId()));
 
         assertThat(connectionIdsArgumentCaptor.getValue()).containsExactly(
             Map.entry(sharedConnectionKey, agent1ConnectionId));
@@ -237,7 +240,8 @@ class WorkflowNodeOptionFacadeIntTest {
         List<Option> expectedOptions = List.of(mock(Option.class));
 
         when(triggerDefinitionFacade.executeOptions(
-            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId)))
+            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId),
+            eq(workflow.getId())))
                 .thenReturn(expectedOptions);
 
         List<Option> options = workflowNodeOptionFacade.getWorkflowNodeOptions(
@@ -246,7 +250,8 @@ class WorkflowNodeOptionFacadeIntTest {
         assertThat(options).isEqualTo(expectedOptions);
 
         verify(triggerDefinitionFacade).executeOptions(
-            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId));
+            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), isNull(), eq(connectionId),
+            eq(workflow.getId()));
     }
 
     @Test

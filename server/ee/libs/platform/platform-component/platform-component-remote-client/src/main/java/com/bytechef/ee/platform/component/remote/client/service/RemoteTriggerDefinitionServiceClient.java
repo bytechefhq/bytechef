@@ -56,7 +56,8 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, ComponentConnection componentConnection) {
+        String propertyName, List<String> lookupDependsOnPaths, ComponentConnection componentConnection,
+        String workflowId) {
 
         throw new UnsupportedOperationException();
     }
@@ -97,7 +98,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection componentConnection) {
+        ComponentConnection componentConnection, String workflowId) {
 
         throw new UnsupportedOperationException();
     }
@@ -105,7 +106,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        ComponentConnection componentConnection) {
+        ComponentConnection componentConnection, String workflowId) {
 
         throw new UnsupportedOperationException();
     }

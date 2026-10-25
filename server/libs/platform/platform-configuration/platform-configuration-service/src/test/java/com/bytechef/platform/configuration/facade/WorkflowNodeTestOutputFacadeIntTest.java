@@ -161,11 +161,14 @@ class WorkflowNodeTestOutputFacadeIntTest {
         when(triggerDefinitionService.getTriggerDefinition("manual", 1, "manual"))
             .thenReturn(mock(TriggerDefinition.class));
         when(actionDefinitionFacade.executePerform(
-            eq("postgresql"), eq(1), eq("query"), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(), anyMap(),
+            eq("postgresql"), eq(1), eq("query"), isNull(), isNull(), isNull(), isNull(), eq(workflow.getId()),
+            anyMap(),
+            anyMap(),
             any(), eq(ENVIRONMENT_ID), isNull(), eq(true), anyMap(), isNull(), isNull()))
                 .thenReturn(List.of());
-        when(actionDefinitionFacade.executeOutput(eq("postgresql"), eq(1), eq("query"), anyMap(), anyMap()))
-            .thenReturn(new OutputResponse(new ArrayProperty(ComponentDsl.array("rows")), List.of()));
+        when(actionDefinitionFacade.executeOutput(
+            eq("postgresql"), eq(1), eq("query"), anyMap(), anyMap(), eq(workflow.getId())))
+                .thenReturn(new OutputResponse(new ArrayProperty(ComponentDsl.array("rows")), List.of()));
 
         workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(workflow.getId(), "postgresql_1", ENVIRONMENT_ID);
 

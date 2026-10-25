@@ -61,7 +61,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection) {
+        @Nullable ComponentConnection componentConnection, @Nullable String workflowId) {
 
         throw new UnsupportedOperationException();
     }
@@ -70,7 +70,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions) {
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, @Nullable String workflowId) {
 
         throw new UnsupportedOperationException();
     }
@@ -78,7 +78,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections) {
+        Map<String, ComponentConnection> componentConnections, @Nullable String workflowId) {
 
         throw new UnsupportedOperationException();
     }

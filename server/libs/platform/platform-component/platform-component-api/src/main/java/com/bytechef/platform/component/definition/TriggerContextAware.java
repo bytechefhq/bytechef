@@ -59,6 +59,9 @@ public interface TriggerContextAware extends TriggerContext {
      */
     PlatformType getType();
 
+    @Nullable
+    String getWorkflowId();
+
     /**
      * Retrieves the unique identifier of the workflow associated with the current trigger context.
      *

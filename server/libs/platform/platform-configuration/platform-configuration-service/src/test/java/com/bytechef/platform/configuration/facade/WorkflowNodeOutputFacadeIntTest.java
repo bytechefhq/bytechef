@@ -257,7 +257,7 @@ class WorkflowNodeOutputFacadeIntTest {
         stubDynamicAction("action3");
         stubLoopDispatcher();
 
-        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), any(), anyMap(), anyMap()))
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), any(), anyMap(), anyMap(), eq(workflowId)))
             .thenReturn(new OutputResponse(null, Map.of("key", "value"), null));
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
@@ -274,8 +274,10 @@ class WorkflowNodeOutputFacadeIntTest {
         stubStaticActionOutput("action1", new OutputResponse(null, Map.of("field1", "value1"), null));
         stubDynamicAction("action2");
 
-        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), anyMap(), anyMap()))
-            .thenThrow(new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), anyMap(), anyMap(),
+            eq(workflowId)))
+                .thenThrow(
+                    new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
             workflowId, "action3", ENVIRONMENT_ID);
@@ -374,8 +376,10 @@ class WorkflowNodeOutputFacadeIntTest {
             .thenReturn(triggerDefinition);
         when(triggerDefinition.getOutputResponse())
             .thenReturn(new OutputResponse(null, Map.of("row", "value"), null));
-        when(triggerDefinitionFacade.executeOutput(eq("dataTable"), eq(1), eq("recordUpdated"), anyMap(), any()))
-            .thenThrow(new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
+        when(triggerDefinitionFacade.executeOutput(eq("dataTable"), eq(1), eq("recordUpdated"), anyMap(), any(),
+            eq(workflowId)))
+                .thenThrow(
+                    new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
             workflowId, "action1", ENVIRONMENT_ID);
@@ -543,8 +547,9 @@ class WorkflowNodeOutputFacadeIntTest {
         stubStaticActionOutput("action1", new OutputResponse(null, Map.of("field1", "value1"), null));
         stubDynamicAction("action2");
 
-        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), anyMap(), anyMap()))
-            .thenReturn(new OutputResponse(null, Map.of("dynamic", "result"), null));
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), anyMap(), anyMap(),
+            eq(workflowId)))
+                .thenReturn(new OutputResponse(null, Map.of("dynamic", "result"), null));
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
             workflowId, "action3", ENVIRONMENT_ID);
@@ -565,10 +570,12 @@ class WorkflowNodeOutputFacadeIntTest {
         stubDynamicAction("action2");
         stubDynamicAction("action3");
 
-        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), anyMap(), anyMap()))
-            .thenReturn(new OutputResponse(null, Map.of("d2", "r2"), null));
-        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action3"), anyMap(), anyMap()))
-            .thenReturn(new OutputResponse(null, Map.of("d3", "r3"), null));
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), anyMap(), anyMap(),
+            eq(workflowId)))
+                .thenReturn(new OutputResponse(null, Map.of("d2", "r2"), null));
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action3"), anyMap(), anyMap(),
+            eq(workflowId)))
+                .thenReturn(new OutputResponse(null, Map.of("d3", "r3"), null));
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
             workflowId, "action4", ENVIRONMENT_ID);
@@ -606,7 +613,7 @@ class WorkflowNodeOutputFacadeIntTest {
             () -> workflowNodeOutputFacade.getWorkflowNodeOutput(workflowId, "action1", ENVIRONMENT_ID))
                 .isInstanceOf(ExpressionEvaluationException.class);
 
-        verify(actionDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any());
+        verify(actionDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any(), any());
     }
 
     @Test
@@ -703,7 +710,7 @@ class WorkflowNodeOutputFacadeIntTest {
             workflowId, "var_1", "connection", 7L, false, ENVIRONMENT_ID);
 
         when(actionDefinitionFacade.executeOutput(
-            "var", 1, "set", Map.of("value", "pero"), Map.of("connection", 7L)))
+            "var", 1, "set", Map.of("value", "pero"), Map.of("connection", 7L), workflowId))
                 .thenReturn(new OutputResponse(null, "pero"));
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
@@ -734,7 +741,7 @@ class WorkflowNodeOutputFacadeIntTest {
             workflowId, "googleMail_1", "connection", 7L, false, ENVIRONMENT_ID);
 
         when(actionDefinitionFacade.executeOutput(
-            "googleMail", 1, "getEmail", Map.of("id", "42"), Map.of("connection", 7L)))
+            "googleMail", 1, "getEmail", Map.of("id", "42"), Map.of("connection", 7L), workflowId))
                 .thenReturn(new OutputResponse(null, Map.of("id", "sample id"), null, true));
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
@@ -779,7 +786,7 @@ class WorkflowNodeOutputFacadeIntTest {
         assertThat(workflowNodeOutputDTO.outputResponse()).isNull();
         assertThat(workflowNodeOutputDTO.testOutputResponse()).isFalse();
 
-        verify(actionDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any());
+        verify(actionDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any(), any());
     }
 
     @Test
@@ -796,7 +803,7 @@ class WorkflowNodeOutputFacadeIntTest {
         stubDataStorageGetValue(requiredStringProperty("key", null));
 
         when(actionDefinitionFacade.executeOutput(
-            eq("dataStorage"), eq(1), eq("getValue"), eq(Map.of("key", "counter")), anyMap()))
+            eq("dataStorage"), eq(1), eq("getValue"), eq(Map.of("key", "counter")), anyMap(), eq(workflowId)))
                 .thenReturn(new OutputResponse(null, 42));
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
@@ -820,8 +827,9 @@ class WorkflowNodeOutputFacadeIntTest {
 
         stubDataStorageGetValue(requiredStringProperty("defaultValue", "type == 'STRING'"));
 
-        when(actionDefinitionFacade.executeOutput(eq("dataStorage"), eq(1), eq("getValue"), anyMap(), anyMap()))
-            .thenReturn(new OutputResponse(null, 42));
+        when(actionDefinitionFacade.executeOutput(eq("dataStorage"), eq(1), eq("getValue"), anyMap(), anyMap(),
+            eq(workflowId)))
+                .thenReturn(new OutputResponse(null, 42));
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
             workflowId, "dataStorage_1", ENVIRONMENT_ID);
@@ -858,7 +866,7 @@ class WorkflowNodeOutputFacadeIntTest {
         assertThat(workflowNodeOutputDTO.getSampleOutput()).isEqualTo(Map.of("row", "value"));
         assertThat(workflowNodeOutputDTO.testOutputResponse()).isFalse();
 
-        verify(triggerDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any());
+        verify(triggerDefinitionFacade, never()).executeOutput(any(), anyInt(), any(), any(), any(), any());
     }
 
     @Test
@@ -1088,7 +1096,7 @@ class WorkflowNodeOutputFacadeIntTest {
         stubDynamicAction("action2");
         stubDynamicAction("action3");
 
-        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), any(), anyMap(), anyMap()))
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), any(), anyMap(), anyMap(), eq(workflowId)))
             .thenReturn(new OutputResponse(null, Map.of("key", "value"), null));
         when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("graph", 1))
             .thenReturn(mock(TaskDispatcherDefinition.class));
