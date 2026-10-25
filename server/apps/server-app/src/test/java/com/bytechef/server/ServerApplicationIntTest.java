@@ -25,6 +25,7 @@ import com.bytechef.ai.copilot.service.CopilotVectorStoreService;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -39,6 +40,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.Locale;
 import javax.sql.DataSource;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +49,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 
 /**
@@ -116,6 +119,22 @@ class ServerApplicationIntTest {
             null, null, tableName.toUpperCase(Locale.ROOT), null)) {
 
             return resultSet.next();
+        }
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+        "bytechef.edition=ce", "spring.quartz.scheduler-name=communityEditionScheduler"
+    })
+    class CommunityEditionIntTest {
+
+        @Autowired
+        private ApplicationContext communityEditionApplicationContext;
+
+        @Test
+        void testContextLoadsInCommunityEdition() {
+            assertThat(communityEditionApplicationContext.getBeanNamesForType(WorkspaceScopeCacheService.class))
+                .isEmpty();
         }
     }
 
