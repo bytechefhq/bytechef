@@ -134,8 +134,6 @@ The `server/ee/` directory contains microservices for distributed deployment:
 - Add `@version ee` Javadoc tag to all classes under `server/ee/`
 - `api-gateway-app/` - API Gateway with routing
 - `ai-gateway-app/` - AI gateway service for routing model traffic
-- `ai-copilot-app/` - AI Copilot service for workflow assistance
-- `config-server-app/` - Spring Cloud Config server
 - `configuration-app/` - Configuration management service
 - `connection-app/` - Connection management service
 - `coordinator-app/` - Workflow coordination service
