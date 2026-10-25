@@ -62,16 +62,25 @@ class SessionStoreEnvironmentPostProcessorTest {
             .contains("DataRedisAutoConfiguration", "SessionDataRedisAutoConfiguration", "Neo4jAutoConfiguration");
         assertThat(environment.getProperty("spring.session.jdbc.table-name")).isEqualTo("public.spring_session");
         assertThat(environment.getProperty("spring.session.jdbc.initialize-schema")).isEqualTo("never");
-        assertThat(environment.getProperty("spring.session.jdbc.cleanup-cron")).isNull();
     }
 
     @Test
-    void testJdbcCleanupIsDisabledOffCoordinators() {
-        StandardEnvironment environment = createEnvironment("ee", "jdbc", "bytechef.coordinator.enabled", "false");
+    void testRedisStoreIsNotEnabledOffCoordinators() {
+        assertUnchanged(createEnvironment("ee", "redis", "bytechef.coordinator.enabled", "false"));
+    }
+
+    @Test
+    void testJdbcStoreIsNotEnabledOffCoordinators() {
+        assertUnchanged(createEnvironment("ee", "jdbc", "bytechef.coordinator.enabled", "false"));
+    }
+
+    @Test
+    void testStoreIsEnabledWhenCoordinatorFlagIsTrue() {
+        StandardEnvironment environment = createEnvironment("ee", "jdbc", "bytechef.coordinator.enabled", "true");
 
         sessionStoreEnvironmentPostProcessor.postProcessEnvironment(environment, new SpringApplication());
 
-        assertThat(environment.getProperty("spring.session.jdbc.cleanup-cron")).isEqualTo("-");
+        assertThat(environment.getProperty("spring.session.jdbc.table-name")).isEqualTo("public.spring_session");
     }
 
     @Test
