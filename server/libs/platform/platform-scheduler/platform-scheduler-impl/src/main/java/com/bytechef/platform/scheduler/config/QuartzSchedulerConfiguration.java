@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.scheduler.config;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import com.bytechef.platform.scheduler.QuartzConnectionRefreshScheduler;
@@ -73,6 +74,7 @@ public class QuartzSchedulerConfiguration {
     }
 
     @Bean
+    @ConditionalOnCoordinator
     QuartzDelayer quartzDelayer(@Lazy Scheduler scheduler) {
         return new QuartzDelayer(scheduler);
     }
