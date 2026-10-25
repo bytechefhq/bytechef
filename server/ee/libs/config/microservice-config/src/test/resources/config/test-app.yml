@@ -1,0 +1,5 @@
+docs:
+  documentation-url: https://app.example
+
+test:
+  marker: base
