@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261025000001-1" author="Ivica Cardic">
+        <preConditions onFail="HALT"
+                       onFailMessage="connected_user has more than one row with the same environment and external_id; remove the duplicates before upgrading">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM (
+                    SELECT environment, external_id FROM connected_user
+                    GROUP BY environment, external_id HAVING COUNT(*) > 1
+                ) duplicate_connected_user
+            </sqlCheck>
+        </preConditions>
+
+        <addUniqueConstraint tableName="connected_user" columnNames="environment,external_id"
+                             constraintName="uk_connected_user_environment_external_id"/>
+    </changeSet>
+</databaseChangeLog>
