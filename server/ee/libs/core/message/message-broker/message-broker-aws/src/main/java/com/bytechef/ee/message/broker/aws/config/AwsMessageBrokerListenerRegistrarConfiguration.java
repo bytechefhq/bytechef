@@ -10,6 +10,7 @@ package com.bytechef.ee.message.broker.aws.config;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAws;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
+import com.bytechef.message.broker.redis.control.RedisControlChannel;
 import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.config.EndpointRegistrar;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,7 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
     private final List<MessageBrokerConfigurer<EndpointRegistrar>> messageBrokerConfigurers;
     private final MessageHandlerMethodFactory messageHandlerMethodFactory;
     private final SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory;
+    private final @Nullable RedisControlChannel redisControlChannel;
     private final List<SqsMessageListenerContainer<?>> containers = new ArrayList<>();
     private final Map<String, ControlRouteListener> controlRouteListeners = new HashMap<>();
     private final AtomicInteger endpointSequence = new AtomicInteger();
@@ -56,17 +59,23 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
     public AwsMessageBrokerListenerRegistrarConfiguration(
         @Autowired(required = false) List<MessageBrokerConfigurer<EndpointRegistrar>> messageBrokerConfigurers,
         MessageHandlerMethodFactory messageHandlerMethodFactory,
-        @Autowired(required = false) SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory) {
+        @Autowired(required = false) SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory,
+        @Autowired(required = false) @Nullable RedisControlChannel redisControlChannel) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null ? List.of() : messageBrokerConfigurers;
         this.messageHandlerMethodFactory = messageHandlerMethodFactory;
         this.sqsMessageListenerContainerFactory = sqsMessageListenerContainerFactory;
+        this.redisControlChannel = redisControlChannel;
     }
 
     @Override
     public void configure(EndpointRegistrar listenerEndpointRegistrar) {
         for (MessageBrokerConfigurer<EndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
+        }
+
+        if (redisControlChannel != null) {
+            redisControlChannel.start();
         }
     }
 
@@ -85,6 +94,12 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
 
         if (log.isTraceEnabled()) {
             log.trace("Registering AWS Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        }
+
+        if (messageRoute.isControlExchange() && redisControlChannel != null) {
+            redisControlChannel.register(messageRoute, delegate, methodName);
+
+            return;
         }
 
         if (messageRoute.isControlExchange()) {
@@ -120,6 +135,14 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
 
     @Override
     public void stopListenerEndpoints() {
+        if (redisControlChannel != null) {
+            try {
+                redisControlChannel.stop();
+            } catch (Exception e) {
+                log.warn("Failed to stop Redis control channel: {}", e.getMessage());
+            }
+        }
+
         for (SqsMessageListenerContainer<?> container : containers) {
             try {
                 container.stop();
@@ -131,6 +154,14 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
 
     @Override
     public void startListenerEndpoints() {
+        if (redisControlChannel != null) {
+            try {
+                redisControlChannel.start();
+            } catch (Exception e) {
+                log.warn("Failed to start Redis control channel: {}", e.getMessage());
+            }
+        }
+
         for (SqsMessageListenerContainer<?> container : containers) {
             try {
                 container.start();
