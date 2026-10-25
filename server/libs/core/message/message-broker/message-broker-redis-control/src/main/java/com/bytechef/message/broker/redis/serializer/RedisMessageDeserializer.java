@@ -27,7 +27,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class RedisMessageDeserializer {
 
-    private static final List<String> TRUSTED_PACKAGE_PREFIXES = List.of("com.bytechef.", "java.lang.", "java.util.");
+    private static final List<String> TRUSTED_PACKAGE_PREFIXES = List.of("com.bytechef.");
 
     private final ObjectMapper objectMapper;
 
@@ -51,7 +51,8 @@ public class RedisMessageDeserializer {
                     "The class '%s' is not in the trusted packages: %s".formatted(type, TRUSTED_PACKAGE_PREFIXES));
             }
 
-            return objectMapper.readValue(redisMessage.payload(), Class.forName(type));
+            return objectMapper.readValue(redisMessage.payload(),
+                Class.forName(type, false, getClass().getClassLoader()));
         } catch (SerializationException e) {
             throw e;
         } catch (Exception e) {
