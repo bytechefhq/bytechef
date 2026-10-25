@@ -10,6 +10,8 @@ package com.bytechef.ee.message.broker.aws.config;
 import com.bytechef.ee.message.broker.aws.AwsMessageBroker;
 import com.bytechef.ee.message.broker.aws.RedisControlSender;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAws;
+import com.bytechef.message.broker.redis.control.RedisControlChannel;
+import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.io.StringWriter;
@@ -78,6 +80,20 @@ public class AwsMessageBrokerConfiguration {
     @ConditionalOnProperty(prefix = "bytechef.message-broker.aws", name = "control-provider", havingValue = "redis")
     RedisMessageSerializer redisMessageSerializer(ObjectMapper objectMapper) {
         return new RedisMessageSerializer(objectMapper);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.message-broker.aws", name = "control-provider", havingValue = "redis")
+    RedisMessageDeserializer redisMessageDeserializer(ObjectMapper objectMapper) {
+        return new RedisMessageDeserializer(objectMapper);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.message-broker.aws", name = "control-provider", havingValue = "redis")
+    RedisControlChannel awsRedisControlChannel(
+        RedisConnectionFactory redisConnectionFactory, RedisMessageDeserializer redisMessageDeserializer) {
+
+        return new RedisControlChannel(redisConnectionFactory, redisMessageDeserializer);
     }
 
     @Bean

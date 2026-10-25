@@ -12,8 +12,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.bytechef.message.broker.redis.control.RedisControlChannel;
 import com.bytechef.message.route.MessageRoute;
 import io.awspring.cloud.sqs.config.EndpointRegistrar;
 import io.awspring.cloud.sqs.config.SqsEndpoint;
@@ -53,21 +56,61 @@ class AwsMessageBrokerListenerRegistrarConfigurationTest {
     private final EndpointRegistrar endpointRegistrar = mock(EndpointRegistrar.class);
     private final List<String> receivedPayloads = new ArrayList<>();
     private AwsMessageBrokerListenerRegistrarConfiguration awsMessageBrokerListenerRegistrarConfiguration;
+    private DefaultMessageHandlerMethodFactory messageHandlerMethodFactory;
+    private SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory;
 
     @BeforeEach
     void beforeEach() {
-        DefaultMessageHandlerMethodFactory messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
+        messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
 
         messageHandlerMethodFactory.afterPropertiesSet();
 
-        SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory =
-            mock(SqsMessageListenerContainerFactory.class);
+        sqsMessageListenerContainerFactory = mock(SqsMessageListenerContainerFactory.class);
 
         doReturn(mock(SqsMessageListenerContainer.class)).when(sqsMessageListenerContainerFactory)
             .createContainer(any(SqsEndpoint.class));
 
         awsMessageBrokerListenerRegistrarConfiguration = new AwsMessageBrokerListenerRegistrarConfiguration(
-            List.of(), messageHandlerMethodFactory, sqsMessageListenerContainerFactory);
+            List.of(), messageHandlerMethodFactory, sqsMessageListenerContainerFactory, null);
+    }
+
+    @Nested
+    class RedisControlChannelRouting {
+
+        @Test
+        void testControlRouteRegisteredOnRedisChannelWhenPresent() {
+            RedisControlChannel redisControlChannel = mock(RedisControlChannel.class);
+
+            AwsMessageBrokerListenerRegistrarConfiguration registrarConfiguration =
+                new AwsMessageBrokerListenerRegistrarConfiguration(
+                    List.of(), messageHandlerMethodFactory, sqsMessageListenerContainerFactory, redisControlChannel);
+
+            RecordingHandler delegate = new RecordingHandler();
+
+            registrarConfiguration.registerListenerEndpoint(
+                endpointRegistrar, CONTROL_MESSAGE_ROUTE, 1, delegate, "onEvent");
+
+            verify(redisControlChannel).register(CONTROL_MESSAGE_ROUTE, delegate, "onEvent");
+            verifyNoInteractions(endpointRegistrar);
+        }
+
+        @Test
+        void testRedisChannelStartedAfterConfigureAndStoppedWithListenerEndpoints() {
+            RedisControlChannel redisControlChannel = mock(RedisControlChannel.class);
+
+            AwsMessageBrokerListenerRegistrarConfiguration registrarConfiguration =
+                new AwsMessageBrokerListenerRegistrarConfiguration(
+                    List.of(), messageHandlerMethodFactory, sqsMessageListenerContainerFactory, redisControlChannel);
+
+            registrarConfiguration.configure(endpointRegistrar);
+
+            verify(redisControlChannel).start();
+            verify(redisControlChannel, never()).stop();
+
+            registrarConfiguration.stopListenerEndpoints();
+
+            verify(redisControlChannel).stop();
+        }
     }
 
     @Nested
