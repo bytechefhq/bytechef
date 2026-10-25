@@ -99,7 +99,7 @@ public class CopilotPgVectorConfiguration {
             .build();
     }
 
-    private static EmbeddingModel copilotDocsEmbeddingModel(ApplicationProperties applicationProperties) {
+    static EmbeddingModel copilotDocsEmbeddingModel(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
         ApplicationProperties.Ai.Copilot.Embedding embedding = ai.getCopilot()
@@ -112,10 +112,18 @@ public class CopilotPgVectorConfiguration {
                 .getOptions()
                 .getModel();
 
+            String url = ai.getProvider()
+                .getOllama()
+                .getUrl();
+
+            OllamaApi.Builder ollamaApiBuilder = OllamaApi.builder();
+
+            if (url != null && !url.isBlank()) {
+                ollamaApiBuilder.baseUrl(url);
+            }
+
             return OllamaEmbeddingModel.builder()
-                .ollamaApi(
-                    OllamaApi.builder()
-                        .build())
+                .ollamaApi(ollamaApiBuilder.build())
                 .options(
                     OllamaEmbeddingOptions.builder()
                         .model(model)
