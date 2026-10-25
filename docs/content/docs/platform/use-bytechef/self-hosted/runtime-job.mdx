@@ -28,7 +28,7 @@ equivalent:
 |---|---|---|
 | Execution state | PostgreSQL | In-memory repositories, discarded on exit |
 | Message broker | Redis / Kafka / SQS / RabbitMQ | In-process `memory` broker |
-| Cache | Redis or Caffeine | Caffeine |
+| Cache | Caffeine | Caffeine |
 | Connections | Encrypted credential store in the database | Passed as JSON at launch, held in memory only |
 | Triggers | Scheduler service, webhook ingress | None - the workflow starts when the process starts |
 

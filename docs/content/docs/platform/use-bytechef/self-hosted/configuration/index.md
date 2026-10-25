@@ -192,7 +192,7 @@ Three things to get right:
   pool entirely, and health-check the application nodes only.
 - **A shared message broker is required**, not optional. With the default in-memory broker an
   executor never receives work and an application node has nothing to dispatch to, so the split
-  silently produces a system that accepts jobs and never runs them. Configure the broker and cache
+  silently produces a system that accepts jobs and never runs them. Configure the broker
   from the table above *before* changing these switches.
 - **Do not turn both off on the same node.** Nothing prevents it, and the result is an instance
   that does nothing at all.

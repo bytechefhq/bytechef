@@ -85,7 +85,7 @@ that can be recovered rather than a half-finished one; see
 ## Scaling
 
 **Start with one instance and make it bigger.** A single container handles a lot, and one instance
-needs no broker, no shared cache, and no coordination.
+needs no broker, no shared file storage, and no coordination.
 
 When one instance is not enough, the constraint tells you what to do:
 
@@ -96,8 +96,9 @@ When one instance is not enough, the constraint tells you what to do:
 | Runs are slow and the database is the bottleneck | A bigger database before more instances |
 | Task execution is the bottleneck | Run more copies of the same image as headless executors - see [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles) |
 
-Running more than one instance means three settings have to agree across them: the **encryption
-key**, a **shared message broker**, and a **shared cache**. Get the encryption key wrong and
+Running more than one instance means a few settings have to agree across them: the **encryption
+key**, a **shared message broker**, **shared file storage**, and in Enterprise Edition a **shared
+session store**. Get the encryption key wrong and
 instances cannot read each other's stored credentials. See
 [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances).
 
