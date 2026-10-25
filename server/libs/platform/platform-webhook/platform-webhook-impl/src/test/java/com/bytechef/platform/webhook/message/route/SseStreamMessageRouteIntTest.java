@@ -47,8 +47,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -157,8 +155,6 @@ class SseStreamMessageRouteIntTest {
         applicationContext.registerBean(
             ObjectMapper.class, () -> JsonMapper.builder()
                 .build());
-        applicationContext.registerBean(
-            "applicationTaskExecutor", TaskExecutor.class, () -> new SimpleAsyncTaskExecutor());
         applicationContext.register(
             RedisMessageBrokerConfiguration.class, RedisMessageBrokerListenerRegistrarConfiguration.class);
 

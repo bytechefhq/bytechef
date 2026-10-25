@@ -32,9 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -60,27 +59,29 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     private final RedisMessageDeserializer redisMessageDeserializer;
     private final StringRedisTemplate stringRedisTemplate;
     private final Set<String> subscribedChannelNames = new HashSet<>();
-    private final TaskExecutor taskExecutor;
 
     @SuppressFBWarnings("EI2")
     public RedisMessageBrokerListenerRegistrarConfiguration(
         @Autowired(
             required = false) List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers,
         RedisConnectionFactory redisConnectionFactory, RedisMessageDeserializer redisMessageDeserializer,
-        StringRedisTemplate stringRedisTemplate, @Qualifier("applicationTaskExecutor") TaskExecutor taskExecutor) {
+        StringRedisTemplate stringRedisTemplate) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
             ? Collections.emptyList() : messageBrokerConfigurers;
         this.redisConnectionFactory = redisConnectionFactory;
         this.redisMessageDeserializer = redisMessageDeserializer;
         this.stringRedisTemplate = stringRedisTemplate;
-        this.taskExecutor = taskExecutor;
     }
 
     @Override
     public void afterSingletonsInstantiated() {
+        SimpleAsyncTaskExecutor listenerTaskExecutor = new SimpleAsyncTaskExecutor("redis-message-broker-listener-");
+
+        listenerTaskExecutor.setVirtualThreads(true);
+
         redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
-            redisMessageDeserializer, stringRedisTemplate, taskExecutor);
+            redisMessageDeserializer, stringRedisTemplate, listenerTaskExecutor);
 
         redisMessageListenerContainer = new RedisMessageListenerContainer();
         messageListenerAdapter = new MessageListenerAdapter(redisListenerEndpointRegistrar);
