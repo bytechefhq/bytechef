@@ -17,9 +17,11 @@
 package com.bytechef.platform.coordinator.config;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.coordinator.lock.SingleCoordinatorLock;
 import java.sql.DriverManager;
+import java.time.Duration;
 import java.util.Properties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringApplication;
@@ -37,12 +39,14 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnCoordinator
 public class SingleCoordinatorLockConfiguration {
 
+    private static final String SERVER_SIDE_KEEPALIVE_OPTIONS =
+        "-c tcp_keepalives_idle=10 -c tcp_keepalives_interval=5 -c tcp_keepalives_count=3";
     private static final int SOCKET_TIMEOUT_SECONDS = 30;
 
     @Bean
     SingleCoordinatorLock singleCoordinatorLock(
         ObjectProvider<JdbcConnectionDetails> jdbcConnectionDetailsProvider, DataSourceProperties dataSourceProperties,
-        ConfigurableApplicationContext applicationContext) {
+        ConfigurableApplicationContext applicationContext, ApplicationProperties applicationProperties) {
 
         JdbcConnectionDetails jdbcConnectionDetails = jdbcConnectionDetailsProvider.getIfAvailable();
 
@@ -60,6 +64,19 @@ public class SingleCoordinatorLockConfiguration {
             password = jdbcConnectionDetails.getPassword();
         }
 
+        Properties connectionProperties = lockConnectionProperties(username, password);
+
+        Duration lockWait = applicationProperties.getCoordinator()
+            .getLockWait();
+
+        return new SingleCoordinatorLock(
+            jdbcUrl, () -> DriverManager.getConnection(jdbcUrl, connectionProperties),
+            () -> Thread.ofPlatform()
+                .start(() -> System.exit(SpringApplication.exit(applicationContext, () -> 1))),
+            lockWait == null ? Duration.ZERO : lockWait);
+    }
+
+    public static Properties lockConnectionProperties(String username, String password) {
         Properties connectionProperties = new Properties();
 
         if (username != null) {
@@ -70,11 +87,9 @@ public class SingleCoordinatorLockConfiguration {
             connectionProperties.setProperty("password", password);
         }
 
+        connectionProperties.setProperty("options", SERVER_SIDE_KEEPALIVE_OPTIONS);
         connectionProperties.setProperty("socketTimeout", String.valueOf(SOCKET_TIMEOUT_SECONDS));
 
-        return new SingleCoordinatorLock(
-            jdbcUrl, () -> DriverManager.getConnection(jdbcUrl, connectionProperties),
-            () -> Thread.ofPlatform()
-                .start(() -> System.exit(SpringApplication.exit(applicationContext, () -> 1))));
+        return connectionProperties;
     }
 }
