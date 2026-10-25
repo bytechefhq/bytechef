@@ -28,30 +28,44 @@ import java.util.Optional;
  */
 public interface ConnectionDefinition {
 
+    int VERSION_1 = 1;
+
     /**
-     *
+     * Parameter key holding the base URI used as the prefix for the connection's HTTP requests.
      */
     String BASE_URI = "baseUri";
 
     /**
+     * Returns whether an authorization must be configured for this connection to be usable.
      *
-     * @return
+     * @return {@code true} if authorization is required, {@code false} if it is optional
      */
-    Optional<Boolean> getAuthorizationRequired();
+    default boolean getAuthorizationRequired() {
+        return true;
+    }
 
     /**
+     * Returns the authorization schemes supported by this connection.
      *
-     * @return
+     * @return the list of authorizations, or an empty list if none are defined
      */
-    Optional<List<? extends Authorization>> getAuthorizations();
+    default List<? extends Authorization> getAuthorizations() {
+        return List.of();
+    }
 
     /**
+     * Returns the optional function that resolves the base URI used as the prefix for the connection's HTTP requests.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link BaseUriFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
-    Optional<BaseUriFunction> getBaseUri();
+    default Optional<BaseUriFunction> getBaseUri() {
+        return Optional.empty();
+    }
 
-    Optional<Help> getHelp();
+    default Optional<Help> getHelp() {
+        return Optional.empty();
+    }
 
     /**
      * Returns the optional function used to process HTTP error responses and map them to {@link ProviderException}
@@ -60,50 +74,66 @@ public interface ConnectionDefinition {
      *
      * @return an {@link Optional} containing the {@link ProcessErrorResponseFunction} if defined, or empty otherwise
      */
-    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
+    default Optional<ProcessErrorResponseFunction> getProcessErrorResponse() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the input properties that define the parameters collected from the user to configure the connection.
      *
-     * @return
+     * @return the list of properties, or an empty list if none are defined
      */
-    Optional<List<? extends Property>> getProperties();
+    default List<? extends Property> getProperties() {
+        return List.of();
+    }
 
     /**
      * TODO
      *
      * @return
      */
-    Optional<TestConsumer> getTest();
+    default Optional<TestConsumer> getTest() {
+        return Optional.empty();
+    }
 
     /**
+     * Returns the version of the connection definition, used to distinguish successive revisions.
      *
-     * @return
+     * @return the connection version
      */
-    int getVersion();
+    default int getVersion() {
+        return VERSION_1;
+    }
 
     /**
-     *
+     * Functional interface that resolves the base URI used as the prefix for a connection's HTTP requests, based on the
+     * connection parameters.
      */
     @FunctionalInterface
     interface BaseUriFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the base URI for the connection.
+         *
+         * @param connectionParameters the parameters of the connection
+         * @param context              the context for the current call
+         * @return the resolved base URI
          */
         String apply(Parameters connectionParameters, Context context);
     }
 
     /**
-     *
+     * Functional interface that verifies a connection's parameters by performing a test call against the external
+     * service, throwing an exception if the connection is not valid.
      */
     @FunctionalInterface
     interface TestConsumer {
 
         /**
-         * @param connectionParameters
-         * @param context
+         * Tests the connection using the given parameters.
+         *
+         * @param connectionParameters the parameters of the connection to test
+         * @param context              the context for the current call
          */
         void accept(Parameters connectionParameters, Context context);
     }

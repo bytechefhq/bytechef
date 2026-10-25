@@ -27,7 +27,6 @@ import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -59,17 +58,16 @@ public final class ActionDefinition {
 
     public ActionDefinition(
         com.bytechef.component.definition.ActionDefinition actionDefinition, String componentName,
-        int componentVersion) {
+        Integer componentVersion) {
 
-        this.batch = actionDefinition.getBatch()
-            .orElse(false);
-        this.componentName = componentName;
-        this.componentVersion = componentVersion;
-        this.description = Validate.notNull(getDescription(actionDefinition), "description");
+        this.batch = actionDefinition.getBatch();
+        this.componentName = Objects.requireNonNull(componentName, "componentName is required");
+        this.componentVersion = Objects.requireNonNull(componentVersion, "componentVersion is required");
+        this.description = getDescription(actionDefinition);
         this.help = actionDefinition.getHelp()
             .map(Help::new)
             .orElse(null);
-        this.name = Validate.notNull(actionDefinition.getName(), "name");
+        this.name = Objects.requireNonNull(actionDefinition.getName(), "name is required");
         this.outputDefined = actionDefinition.getOutputDefinition()
             .isPresent();
         this.outputFunctionDefined = actionDefinition.getOutputDefinition()
@@ -81,10 +79,10 @@ public final class ActionDefinition {
             .orElse(null);
         this.outputFileEntry = outputResponse != null && outputResponse.outputSchema() instanceof FileEntryProperty;
         this.outputSchemaDefined = outputResponse != null && outputResponse.outputSchema() != null;
-        this.properties = CollectionUtils.map(
-            actionDefinition.getProperties()
-                .orElse(List.of()),
-            Property::toProperty);
+
+        List<? extends com.bytechef.component.definition.Property> properties = actionDefinition.getProperties();
+
+        this.properties = CollectionUtils.map(properties, Property::toProperty);
         this.resumePerformFunctionDefined = actionDefinition.getResumePerform()
             .isPresent();
         this.singleConnection = actionDefinition.getPerform()
@@ -95,7 +93,7 @@ public final class ActionDefinition {
                 perform instanceof MultipleConnectionsStreamPerformFunction ||
                 perform instanceof MultipleConnectionsSseStreamResponsePerformFunction)
             .orElse(false);
-        this.title = Validate.notNull(getTitle(actionDefinition), "title");
+        this.title = getTitle(actionDefinition);
         this.workflowNodeDescriptionDefined = actionDefinition.getWorkflowNodeDescription()
             .isPresent();
     }

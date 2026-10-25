@@ -43,11 +43,11 @@ public abstract class BaseProperty {
     }
 
     public BaseProperty(com.bytechef.definition.BaseProperty property) {
-        this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);
+        this.advancedOption = property.getAdvancedOption();
         this.description = OptionalUtils.orElse(property.getDescription(), null);
         this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
-        this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
-        this.hidden = OptionalUtils.orElse(property.getHidden(), false);
+        this.expressionEnabled = property.getExpressionEnabled();
+        this.hidden = property.getHidden();
         this.metadata = property.getMetadata();
 
         this.resourceType = getResourceType(property.getMetadata());

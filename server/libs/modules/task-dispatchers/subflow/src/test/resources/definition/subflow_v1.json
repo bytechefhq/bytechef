@@ -10,14 +10,14 @@
     "sampleOutput": null
   },
   "properties": [ {
-    "advancedOption": null,
+    "advancedOption": false,
     "controlType": "SELECT",
     "defaultValue": null,
     "description": "The sub-workflow to execute.",
     "displayCondition": null,
     "exampleValue": null,
-    "expressionEnabled": null,
-    "hidden": null,
+    "expressionEnabled": true,
+    "hidden": false,
     "label": "Workflow",
     "maxLength": null,
     "metadata": {
@@ -25,24 +25,24 @@
     },
     "minLength": null,
     "name": "workflowUuid",
-    "options": null,
+    "options": [ ],
     "optionsFunction": { },
-    "optionsLoadedDynamically": null,
+    "optionsLoadedDynamically": false,
     "placeholder": null,
     "regex": null,
     "required": false,
     "type": "STRING"
   }, {
-    "advancedOption": null,
+    "advancedOption": false,
     "description": "The input parameters for the sub-workflow.",
     "displayCondition": null,
     "dynamicPropertiesDataSource": {
       "propertiesLookupDependsOn": [ "workflowUuid" ],
       "propertiesFunction": { }
     },
-    "expressionEnabled": null,
+    "expressionEnabled": true,
     "header": null,
-    "hidden": null,
+    "hidden": false,
     "metadata": { },
     "name": "inputs",
     "required": false,

@@ -33,7 +33,6 @@ import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivona Pavela
@@ -45,9 +44,7 @@ public class NasaComponentHandler extends AbstractNasaComponentHandler {
     public List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         for (ModifiableActionDefinition modifiableActionDefinition : actionDefinitions) {
             if (Objects.equals(modifiableActionDefinition.getName(), "getPictureOfTheDay")) {
-                Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
-
-                List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
+                List<Property> properties = new ArrayList<>(modifiableActionDefinition.getProperties());
 
                 properties.addFirst(
                     string("queryType")

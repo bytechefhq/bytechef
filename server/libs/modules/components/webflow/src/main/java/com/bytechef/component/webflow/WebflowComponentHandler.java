@@ -31,7 +31,6 @@ import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -46,9 +45,7 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
             String name = modifiableActionDefinition.getName();
 
             if (Objects.equals(name, "getCollectionItem")) {
-                Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
-
-                List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
+                List<Property> properties = new ArrayList<>(modifiableActionDefinition.getProperties());
 
                 properties.addFirst(
                     string(SITE_ID)
