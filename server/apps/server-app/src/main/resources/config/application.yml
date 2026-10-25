@@ -242,9 +242,16 @@ spring:
         debug: ${bytechef.mail.debug}
         smtp:
           auth: ${bytechef.mail.auth}
+          connectiontimeout: 10000
           starttls:
             enable: ${bytechef.mail.starttls.enable}
             required: ${bytechef.mail.starttls.required}
+          timeout: 10000
+          writetimeout: 10000
+        smtps:
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
         transport:
           protocol: ${bytechef.mail.protocol}
     protocol: ${bytechef.mail.protocol}

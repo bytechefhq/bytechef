@@ -19,19 +19,25 @@ package com.bytechef.platform.coordinator.config;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.SseStreamApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
 import com.bytechef.platform.coordinator.metrics.JobExecutionCounter;
+import com.bytechef.platform.coordinator.notification.NotificationThrottle;
 import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -76,11 +82,15 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     NotificationJobStatusApplicationEventListener jobStatusApplicationEventListener(
+        ApplicationProperties applicationProperties, CacheManager cacheManager,
         Optional<JobExecutionCounter> jobExecutionCounter) {
+
+        ApplicationProperties.Mail mail = applicationProperties.getMail();
 
         return new NotificationJobStatusApplicationEventListener(
             jobExecutionCounter.orElse(null), jobService, notificationHandlerRegistry, notificationSenderRegistry,
-            notificationService);
+            notificationService,
+            getNotificationThrottle(cacheManager, mail.getFailureNotificationThrottleWindow()));
     }
 
     @Bean
@@ -88,5 +98,15 @@ public class PlatformCoordinatorConfiguration {
         MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         return new SseStreamApplicationEventListener(messageBroker, taskExecutionService);
+    }
+
+    private static NotificationThrottle getNotificationThrottle(CacheManager cacheManager, Duration window) {
+        return new NotificationThrottle(
+            getCache(cacheManager, NotificationThrottle.CLAIM_CACHE_NAME),
+            getCache(cacheManager, NotificationThrottle.SUPPRESSED_COUNT_CACHE_NAME), window);
+    }
+
+    private static Cache getCache(CacheManager cacheManager, String name) {
+        return Objects.requireNonNull(cacheManager.getCache(name), name);
     }
 }

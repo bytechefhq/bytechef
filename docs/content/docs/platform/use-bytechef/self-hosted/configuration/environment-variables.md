@@ -340,6 +340,7 @@ does not support.
 | `BYTECHEF_MAIL_AUTH` | Enable mail authentication | `false` |
 | `BYTECHEF_MAIL_BASE_URL` | Base URL for mail links | `BYTECHEF_PUBLIC_URL` |
 | `BYTECHEF_MAIL_DEBUG` | Enable mail debug | `false` |
+| `BYTECHEF_MAIL_FAILURE_NOTIFICATION_THROTTLE_WINDOW` | Minimum time between two job failed notification emails for the same notification and workflow; failures in between are counted and reported in the next email. State is kept in the cache selected by `BYTECHEF_CACHE_PROVIDER`, so instances share it with `REDIS`. Other job status notifications are not throttled. `0` disables throttling | `1h` |
 | `BYTECHEF_MAIL_FROM` | From email address | `noreply@app.bytechef.io` |
 | `BYTECHEF_MAIL_HOST` | Mail server host | `localhost` |
 | `BYTECHEF_MAIL_PASSWORD` | Mail password (sensitive) | - |
