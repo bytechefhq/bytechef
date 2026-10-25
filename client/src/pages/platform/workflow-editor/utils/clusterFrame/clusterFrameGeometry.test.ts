@@ -27,7 +27,7 @@ describe('computeClusterFrameContentOrigin', () => {
     });
 
     it('starts the content a gap below the header so the root card issue badge clears the header buttons', () => {
-        expect(DEFAULT_CLUSTER_FRAME_CONTENT_ORIGIN.y - CLUSTER_FRAME_HEADER_HEIGHT).toBe(16);
+        expect(DEFAULT_CLUSTER_FRAME_CONTENT_ORIGIN.y - CLUSTER_FRAME_HEADER_HEIGHT).toBe(8);
     });
 
     it('pushes the origin down so a member above the content top stays below the header', () => {
