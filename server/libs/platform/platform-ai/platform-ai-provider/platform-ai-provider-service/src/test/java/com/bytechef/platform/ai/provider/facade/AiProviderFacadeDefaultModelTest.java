@@ -26,7 +26,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
-import com.bytechef.platform.ai.provider.ollama.OllamaModelLister;
+import com.bytechef.platform.ai.provider.ollama.OllamaModelClient;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
@@ -64,7 +64,7 @@ class AiProviderFacadeDefaultModelTest {
         applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
         facade = new AiProviderFacadeImpl(
-            componentDefinitionService, mock(OllamaModelLister.class), propertyService, applicationProperties);
+            componentDefinitionService, mock(OllamaModelClient.class), propertyService, applicationProperties);
     }
 
     @Test

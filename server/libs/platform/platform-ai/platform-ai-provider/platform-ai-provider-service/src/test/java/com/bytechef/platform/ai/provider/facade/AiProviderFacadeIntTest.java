@@ -30,7 +30,7 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
-import com.bytechef.platform.ai.provider.ollama.OllamaModelLister;
+import com.bytechef.platform.ai.provider.ollama.OllamaModelClient;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
@@ -231,7 +231,7 @@ class AiProviderFacadeIntTest {
     @Configuration
     @EnableAutoConfiguration
     @Import({
-        AiProviderFacadeImpl.class, JacksonConfiguration.class, LiquibaseConfiguration.class, OllamaModelLister.class,
+        AiProviderFacadeImpl.class, JacksonConfiguration.class, LiquibaseConfiguration.class, OllamaModelClient.class,
         PostgreSQLContainerConfiguration.class, PropertyServiceImpl.class
     })
     static class AiProviderFacadeIntTestConfiguration {
