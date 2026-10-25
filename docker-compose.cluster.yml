@@ -1,0 +1,224 @@
+# Distributed ByteChef behind an nginx load balancer. One file covers every topology; switch with variables, never by
+# editing it.
+#
+#   export POSTGRES_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16) BYTECHEF_SECURITY_REMEMBER_ME_KEY=...
+#
+#   # CE: 1 coordinator (also serving webhooks), 3 workers, RabbitMQ, single tenant
+#   docker compose -f docker-compose.cluster.yml up -d
+#
+#   # CE with 2 separate webhook nodes (the coordinator stays the fallback for webhook traffic)
+#   BYTECHEF_WEBHOOKS=2 docker compose -f docker-compose.cluster.yml up -d
+#
+#   # EE high availability: 2 coordinators
+#   BYTECHEF_EDITION=ee BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
+#
+#   # Webhooks only on webhook nodes. There is no fallback: with every webhook node down, webhooks fail (the coordinator answers 404).
+#   BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
+#
+# - More than one coordinator requires BYTECHEF_EDITION=ee. With BYTECHEF_EDITION=ce and BYTECHEF_COORDINATORS=2, the
+#   second coordinator stops with the edition message and is restarted on every attempt.
+# - Production high availability needs managed or clustered PostgreSQL, RabbitMQ or Redis, and a load balancer. In this
+#   file they are single containers.
+# - RabbitMQ (amqp) or Redis carries messages between the nodes; BYTECHEF_MESSAGE_BROKER_PROVIDER selects it.
+# - Quartz runs in clustered mode on the shared PostgreSQL job store, so every trigger fires on exactly one node.
+# - Encryption key and remember-me key are the same on every node, and file storage is a volume all nodes mount, so
+#   any node can read what another node wrote. In production, mount shared storage (NFS, EFS) or use the aws provider.
+# - BYTECHEF_TENANT_MODE=multi starts the cluster in multi-tenant mode (requires BYTECHEF_EDITION=ee).
+#
+# Set BYTECHEF_IMAGE to use a locally built image. BYTECHEF_PORT and RABBITMQ_MANAGEMENT_PORT change the published ports.
+#
+# Every node must get the same BYTECHEF_ENCRYPTION_KEY and BYTECHEF_SECURITY_REMEMBER_ME_KEY: a connection encrypted on
+# one node has to be readable on all of them.
+
+x-bytechef-environment: &bytechef-environment
+  BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+  BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
+  BYTECHEF_DATASOURCE_USERNAME: postgres
+  # ce | ee. More than one coordinator requires ee.
+  BYTECHEF_EDITION: ${BYTECHEF_EDITION:-ce}
+  BYTECHEF_ENCRYPTION_PROPERTY_KEY: ${BYTECHEF_ENCRYPTION_KEY:?Set BYTECHEF_ENCRYPTION_KEY, e.g. openssl rand -base64 16}
+  BYTECHEF_ENCRYPTION_PROVIDER: property
+  BYTECHEF_FEATURE_FLAGS: ${BYTECHEF_FEATURE_FLAGS:-}
+  BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR: /opt/bytechef/data/file-storage
+  BYTECHEF_FILE_STORAGE_PROVIDER: filesystem
+  # amqp (RabbitMQ) | redis
+  BYTECHEF_MESSAGE_BROKER_PROVIDER: ${BYTECHEF_MESSAGE_BROKER_PROVIDER:-amqp}
+  BYTECHEF_PUBLIC_URL: ${BYTECHEF_PUBLIC_URL:-http://localhost:8080}
+  BYTECHEF_RABBITMQ_HOST: rabbitmq
+  BYTECHEF_RABBITMQ_PASSWORD: guest
+  BYTECHEF_RABBITMQ_PORT: 5672
+  BYTECHEF_RABBITMQ_USERNAME: guest
+  BYTECHEF_REDIS_HOST: redis
+  BYTECHEF_REDIS_PORT: 6379
+  # Harmless with one coordinator, required with more.
+  BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED: "true"
+  BYTECHEF_SECURITY_REMEMBER_ME_KEY: ${BYTECHEF_SECURITY_REMEMBER_ME_KEY:?Set BYTECHEF_SECURITY_REMEMBER_ME_KEY}
+  BYTECHEF_SESSION_STORE: ${BYTECHEF_SESSION_STORE:-redis}
+  # single | multi (multi requires ee)
+  BYTECHEF_TENANT_MODE: ${BYTECHEF_TENANT_MODE:-single}
+  # Liquibase runs once in the migrate service; every node starts after it completes.
+  BYTECHEF_UPGRADE_ENABLED: "false"
+  JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75
+
+x-bytechef-node: &bytechef-node
+  image: ${BYTECHEF_IMAGE:-docker.bytechef.io/bytechef/bytechef:latest}
+  restart: unless-stopped
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+    postgres:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  healthcheck:
+    test: [ "CMD", "curl", "-fs", "http://localhost:8080/actuator/health/readiness" ]
+    interval: 10s
+    timeout: 5s
+    retries: 30
+    start_period: 60s
+  mem_limit: 2g
+  volumes:
+    - file-storage:/opt/bytechef/data/file-storage
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bytechef
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+    ports:
+      # Management UI (guest / guest)
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+
+  redis:
+    image: redis:8-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    image: ${BYTECHEF_IMAGE:-docker.bytechef.io/bytechef/bytechef:latest}
+    command: [ "liquibase" ]
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *bytechef-environment
+      BYTECHEF_UPGRADE_ENABLED: "true"
+
+  coordinator:
+    <<: *bytechef-node
+    deploy:
+      replicas: ${BYTECHEF_COORDINATORS:-1}
+    environment:
+      <<: *bytechef-environment
+      BYTECHEF_COORDINATOR_ENABLED: "true"
+      BYTECHEF_WEBHOOK_ENABLED: ${BYTECHEF_COORDINATOR_WEBHOOKS:-true}
+      BYTECHEF_WORKER_ENABLED: "false"
+
+  worker:
+    <<: *bytechef-node
+    deploy:
+      replicas: ${BYTECHEF_WORKERS:-3}
+    environment:
+      <<: *bytechef-environment
+      BYTECHEF_COORDINATOR_ENABLED: "false"
+      BYTECHEF_WEBHOOK_ENABLED: "false"
+      BYTECHEF_WORKER_ENABLED: "true"
+
+  webhook:
+    <<: *bytechef-node
+    deploy:
+      # Separate webhook nodes are optional: with 0, the coordinators serve webhooks.
+      replicas: ${BYTECHEF_WEBHOOKS:-0}
+    environment:
+      <<: *bytechef-environment
+      BYTECHEF_COORDINATOR_ENABLED: "false"
+      BYTECHEF_WEBHOOK_ENABLED: "true"
+      BYTECHEF_WORKER_ENABLED: "false"
+
+  load-balancer:
+    image: nginx:1.29-alpine
+    configs:
+      - source: nginx
+        target: /etc/nginx/conf.d/default.conf
+    depends_on:
+      coordinator:
+        condition: service_healthy
+    ports:
+      - "${BYTECHEF_PORT:-8080}:80"
+
+configs:
+  nginx:
+    content: |
+      resolver 127.0.0.11 valid=10s;
+
+      map $$http_upgrade $$connection_upgrade {
+        default upgrade;
+        ''      '';
+      }
+
+      upstream coordinators {
+        zone coordinators 64k;
+        server coordinator:8080 resolve;
+      }
+
+      upstream webhooks {
+        zone webhooks 64k;
+        server webhook:8080 resolve;
+        server coordinator:8080 resolve backup;
+      }
+
+      server {
+        listen 80;
+        client_max_body_size 100m;
+        proxy_buffering off;
+        proxy_http_version 1.1;
+        proxy_read_timeout 600s;
+
+        location ~ ^/(webhooks|callback|approvals|job/resume|file-entries/[^/]+/content) {
+          proxy_pass http://webhooks;
+          proxy_set_header Connection $$connection_upgrade;
+          proxy_set_header Host $$host;
+          proxy_set_header Upgrade $$http_upgrade;
+          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $$scheme;
+          proxy_set_header X-Real-IP $$remote_addr;
+        }
+
+        location / {
+          proxy_pass http://coordinators;
+          proxy_set_header Connection "";
+          proxy_set_header Host $$host;
+          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $$scheme;
+          proxy_set_header X-Real-IP $$remote_addr;
+        }
+      }
+
+volumes:
+  file-storage:
+    driver: local
+  postgres:
+    driver: local
