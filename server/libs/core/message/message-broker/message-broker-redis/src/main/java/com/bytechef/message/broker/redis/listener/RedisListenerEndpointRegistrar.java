@@ -50,7 +50,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
     private static final String CONSUMER_GROUP = "message_event_group";
 
     private final RedisMessageDeserializer redisMessageDeserializer;
-    private volatile boolean stopped;
+    private volatile boolean stopped = true;
     private final Map<String, AtomicInteger> streamInvokerSequenceMap = new HashMap<>();
     private final Map<String, List<Consumer<String>>> streamInvokersMap = new HashMap<>();
     private final StringRedisTemplate stringRedisTemplate;
@@ -118,6 +118,10 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         this.stopped = true;
     }
 
+    public boolean isRunning() {
+        return !stopped;
+    }
+
     private void periodicallyCheckQueueForMessage() {
         while (!stopped) {
             try {
@@ -145,7 +149,11 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
                 sleep();
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                if (!stopped) {
+                    log.error(e.getMessage(), e);
+                }
+
+                sleep();
             }
         }
     }
