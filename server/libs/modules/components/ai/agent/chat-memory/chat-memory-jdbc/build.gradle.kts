@@ -12,4 +12,9 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("com.h2database:h2")
+    testImplementation("com.mysql:mysql-connector-j")
+    testImplementation("org.postgresql:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql")
+    testImplementation("org.testcontainers:postgresql")
 }
