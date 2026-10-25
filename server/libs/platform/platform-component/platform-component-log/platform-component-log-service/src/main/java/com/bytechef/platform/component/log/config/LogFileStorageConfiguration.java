@@ -26,6 +26,8 @@ import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageImpl;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.component.log.TriggerLogFileStorageImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,6 +36,16 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 class LogFileStorageConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(LogFileStorageConfiguration.class);
+
+    LogFileStorageConfiguration(ApplicationProperties applicationProperties) {
+        if (getProvider(applicationProperties) == Provider.JDBC) {
+            log.warn(
+                "The jdbc file storage provider cannot append to files, component execution logs are stored with the " +
+                    "filesystem provider instead");
+        }
+    }
 
     @Bean
     EditorLogFileStorage editorLogFileStorage(
@@ -59,9 +71,18 @@ class LogFileStorageConfiguration {
     private static FileStorageService getFileStorageService(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
-        Provider provider = applicationProperties.getFileStorage()
-            .getProvider();
+        Provider provider = getProvider(applicationProperties);
+
+        if (provider == Provider.JDBC) {
+            provider = Provider.FILESYSTEM;
+        }
 
         return fileStorageServiceRegistry.getFileStorageService(provider.name());
+    }
+
+    private static Provider getProvider(ApplicationProperties applicationProperties) {
+        ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
+
+        return fileStorage.getProvider();
     }
 }
