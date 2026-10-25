@@ -159,6 +159,7 @@ fragment while this heading was hidden - give it back.
 |---|---|---|
 | `BYTECHEF_AI_VECTORSTORE_PROVIDER` | Vector store provider (PGVECTOR) | `PGVECTOR` |
 | `BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL` | JDBC URL for the pgvector PostgreSQL database | - |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS` | Width of the stored embedding vectors. Must match the embedding model, for example `768` for Ollama's `nomic-embed-text` | `1536` |
 | `BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME` | pgvector database username (sensitive) | - |
 | `BYTECHEF_AI_VECTORSTORE_PGVECTOR_PASSWORD` | pgvector database password (sensitive) | - |
 

@@ -70,11 +70,11 @@ workload on its own instance:
 | `BYTECHEF_AI_VECTORSTORE_PROVIDER` | Vector store backend. | `PGVECTOR` |
 | `BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL` | JDBC URL of the pgvector database. Leave unset to use the main database. | - |
 | `BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME` / `_PASSWORD` | Credentials for that database. | - |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS` | Width of the stored embedding vectors. | `1536` |
 
-The index itself is configured through the Spring AI pgvector properties, which ship with an
-**HNSW** index, **cosine distance**, and **1536** dimensions - the size of the default OpenAI
-embedding model. Changing to an embedding model with a different vector width means changing
-`spring.ai.vectorstore.pgvector.dimensions` to match; see
+The index uses an **HNSW** index, **cosine distance**, and **1536** dimensions - the size of the
+default OpenAI embedding model. Changing to an embedding model with a different vector width means
+setting `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS` to match; see
 [AI Providers → Embedding models](/platform/settings/ai-providers#embedding-models).
 
 See the [AI Vectorstore configuration reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-vectorstore-configuration)
