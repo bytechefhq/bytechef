@@ -1,0 +1,185 @@
+---
+# Distributed ByteChef: 2 coordinators + 3 workers behind an nginx load balancer.
+#
+#   docker compose -f docker-compose.cluster.yml up -d
+#
+# - RabbitMQ (amqp) carries messages between coordinators and workers.
+# - Quartz runs in clustered mode on the shared PostgreSQL job store, so every trigger fires on exactly one node.
+# - Encryption key and remember-me key are the same on every node, and file storage is a volume all nodes mount, so
+#   any node can read what another node wrote. In production, mount shared storage (NFS, EFS) or use the aws provider.
+# - Caches stay local to each node; Redis broadcasts evictions, so a workflow edited through one node is not served
+#   stale by another.
+# - BYTECHEF_TENANT_MODE=multi starts the cluster in multi-tenant mode.
+#
+# Requires an image that includes #6595, #6596, #6597 and #6598; set BYTECHEF_IMAGE to use a locally built one.
+# BYTECHEF_PORT and RABBITMQ_MANAGEMENT_PORT change the published ports.
+#
+# Replace BYTECHEF_ENCRYPTION_KEY and BYTECHEF_SECURITY_REMEMBER_ME_KEY before using this outside of a local test.
+# Generate a new encryption key with: openssl rand -base64 16
+
+x-bytechef-environment: &bytechef-environment
+  BYTECHEF_CACHE_PROVIDER: redis
+  BYTECHEF_DATASOURCE_PASSWORD: postgres
+  BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
+  BYTECHEF_DATASOURCE_USERNAME: postgres
+  BYTECHEF_ENCRYPTION_PROPERTY_KEY: ${BYTECHEF_ENCRYPTION_KEY:-tTB1/UBIbYLuCXVi4PPfzA==}
+  BYTECHEF_ENCRYPTION_PROVIDER: property
+  BYTECHEF_FEATURE_FLAGS: ${BYTECHEF_FEATURE_FLAGS:-}
+  BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR: /opt/bytechef/data/file-storage
+  BYTECHEF_FILE_STORAGE_PROVIDER: filesystem
+  BYTECHEF_MESSAGE_BROKER_PROVIDER: amqp
+  BYTECHEF_PUBLIC_URL: ${BYTECHEF_PUBLIC_URL:-http://localhost:8080}
+  BYTECHEF_RABBITMQ_HOST: rabbitmq
+  BYTECHEF_RABBITMQ_PASSWORD: guest
+  BYTECHEF_RABBITMQ_PORT: 5672
+  BYTECHEF_RABBITMQ_USERNAME: guest
+  BYTECHEF_REDIS_HOST: redis
+  BYTECHEF_REDIS_PORT: 6379
+  BYTECHEF_SECURITY_REMEMBER_ME_KEY: ${BYTECHEF_SECURITY_REMEMBER_ME_KEY:-e48keep1this1safe3ffb2}
+  BYTECHEF_TENANT_MODE: ${BYTECHEF_TENANT_MODE:-single}
+  # Liquibase runs on coordinator-1 only; every other node starts after it is healthy.
+  BYTECHEF_UPGRADE_ENABLED: "false"
+  JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75
+  SPRING_APPLICATION_JSON: >-
+    {"spring": {"quartz": {"properties": {
+      "org.quartz.jobStore.isClustered": "true",
+      "org.quartz.jobStore.clusterCheckinInterval": "10000",
+      "org.quartz.scheduler.instanceId": "AUTO"}}}}
+
+x-bytechef-node: &bytechef-node
+  image: ${BYTECHEF_IMAGE:-docker.bytechef.io/bytechef/bytechef:latest}
+  restart: unless-stopped
+  healthcheck:
+    test: [ "CMD", "curl", "-fs", "http://localhost:8080/actuator/health/readiness" ]
+    interval: 10s
+    timeout: 5s
+    retries: 30
+    start_period: 60s
+  mem_limit: 2g
+  volumes:
+    - file-storage:/opt/bytechef/data/file-storage
+
+x-bytechef-coordinator-environment: &bytechef-coordinator-environment
+  <<: *bytechef-environment
+  BYTECHEF_WORKER_ENABLED: "false"
+
+x-bytechef-worker-environment: &bytechef-worker-environment
+  <<: *bytechef-environment
+  BYTECHEF_COORDINATOR_ENABLED: "false"
+
+x-depends-on-coordinator-1: &depends-on-coordinator-1
+  coordinator-1:
+    condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bytechef
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+    ports:
+      # Management UI (guest / guest)
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+
+  redis:
+    image: redis:8-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  coordinator-1:
+    <<: *bytechef-node
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *bytechef-coordinator-environment
+      BYTECHEF_UPGRADE_ENABLED: "true"
+
+  coordinator-2:
+    <<: *bytechef-node
+    depends_on: *depends-on-coordinator-1
+    environment: *bytechef-coordinator-environment
+
+  worker-1:
+    <<: *bytechef-node
+    depends_on: *depends-on-coordinator-1
+    environment: *bytechef-worker-environment
+
+  worker-2:
+    <<: *bytechef-node
+    depends_on: *depends-on-coordinator-1
+    environment: *bytechef-worker-environment
+
+  worker-3:
+    <<: *bytechef-node
+    depends_on: *depends-on-coordinator-1
+    environment: *bytechef-worker-environment
+
+  load-balancer:
+    image: nginx:1.29-alpine
+    configs:
+      - source: nginx
+        target: /etc/nginx/conf.d/default.conf
+    depends_on:
+      coordinator-1:
+        condition: service_healthy
+      coordinator-2:
+        condition: service_healthy
+    ports:
+      - "${BYTECHEF_PORT:-8080}:80"
+
+configs:
+  nginx:
+    content: |
+      upstream coordinators {
+        # Login state lives in each coordinator's HTTP session, so keep a client on one coordinator.
+        ip_hash;
+        server coordinator-1:8080 max_fails=3 fail_timeout=10s;
+        server coordinator-2:8080 max_fails=3 fail_timeout=10s;
+      }
+
+      server {
+        listen 80;
+        client_max_body_size 100m;
+
+        location / {
+          proxy_pass http://coordinators;
+          proxy_http_version 1.1;
+          proxy_set_header Connection "";
+          proxy_set_header Host $$host;
+          proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $$scheme;
+          proxy_set_header X-Real-IP $$remote_addr;
+          proxy_buffering off;
+          proxy_read_timeout 600s;
+        }
+      }
+
+volumes:
+  file-storage:
+    driver: local
+  postgres:
+    driver: local
