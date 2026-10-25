@@ -44,6 +44,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -51,6 +52,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -267,6 +269,73 @@ public class ProjectDeploymentFacadeIntTest {
                 assertThat(savedInputs.get("minutesToRun")).isEqualTo(50);
                 assertThat(savedInputs.get("serviceProviderEmail")).isEqualTo("racuni@example.com");
             });
+    }
+
+    @Test
+    public void testCreateProjectDeploymentMapsDraftWorkflowIdToDeployedVersion() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), 1)
+            .getFirst();
+        ProjectWorkflow draftProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), 2)
+            .getFirst();
+
+        assertThat(draftProjectWorkflow.getWorkflowId()).isNotEqualTo(publishedProjectWorkflow.getWorkflowId());
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            draftProjectWorkflow.getWorkflowId(), draftProjectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name("GH-6353")
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(1)
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO);
+
+        ProjectDeploymentDTO createdProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        assertThat(createdProjectDeployment.projectDeploymentWorkflows())
+            .singleElement()
+            .satisfies(projectDeploymentWorkflow -> assertThat(projectDeploymentWorkflow.workflowId())
+                .isEqualTo(publishedProjectWorkflow.getWorkflowId()));
+    }
+
+    @Test
+    public void testCreateProjectDeploymentRejectsWorkflowMissingFromDeployedVersion() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
+
+        ProjectWorkflowDTO draftOnlyProjectWorkflowDTO = projectDeploymentFacadeHelper.addTestWorkflow(projectDTO);
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            draftOnlyProjectWorkflowDTO.getId(), draftOnlyProjectWorkflowDTO.getWorkflowUuid());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name("GH-6353")
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(1)
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        assertThatThrownBy(() -> projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("does not exist in project version v=1");
     }
 
     @Disabled
