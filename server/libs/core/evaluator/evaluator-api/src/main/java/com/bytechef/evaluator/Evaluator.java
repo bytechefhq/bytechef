@@ -27,6 +27,12 @@ import org.jspecify.annotations.Nullable;
 public interface Evaluator {
 
     /**
+     * Context key listing the names of disabled workflow tasks. Property and index access on these names resolves to
+     * {@code null} instead of leaving the expression unresolved.
+     */
+    String DISABLED_TASK_NAMES = "__disabledTaskNames";
+
+    /**
      * Evaluate the {@link java.util.Map} against the provided {@link java.util.Map}.}
      *
      * @param map     The {@link java.util.Map} instance to evaluate

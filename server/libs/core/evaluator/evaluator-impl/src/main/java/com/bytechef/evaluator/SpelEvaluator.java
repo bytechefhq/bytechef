@@ -44,9 +44,6 @@ import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelMessage;
-import org.springframework.expression.spel.SpelNode;
-import org.springframework.expression.spel.ast.CompoundExpression;
-import org.springframework.expression.spel.ast.PropertyOrFieldReference;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -251,8 +248,11 @@ public class SpelEvaluator implements Evaluator {
                         String collectionItemSafeFormula = CollectionItemKeyRewriter.rewrite(
                             formula, spelExpression.getAST());
 
-                        expression = collectionItemSafeFormula.equals(formula)
-                            ? spelExpression : expressionParser.parseExpression(collectionItemSafeFormula);
+                        SpelExpression collectionItemSafeExpression = collectionItemSafeFormula.equals(formula)
+                            ? spelExpression
+                            : (SpelExpression) expressionParser.parseExpression(collectionItemSafeFormula);
+
+                        expression = nullRootSafeExpression(collectionItemSafeExpression, context);
                     } catch (ParseException parseException) {
                         if (lenient) {
                             if (log.isDebugEnabled()) {
@@ -281,6 +281,10 @@ public class SpelEvaluator implements Evaluator {
                     try {
                         expression = expressionParser.parseExpression(
                             string, new TemplateParserContext(ACCESSOR_PREFIX, ACCESSOR_SUFFIX));
+
+                        if (expression instanceof SpelExpression spelExpression) {
+                            expression = nullRootSafeExpression(spelExpression, context);
+                        }
                     } catch (ParseException parseException) {
                         if (lenient) {
                             if (log.isDebugEnabled()) {
@@ -302,10 +306,6 @@ public class SpelEvaluator implements Evaluator {
                     try {
                         return expression.getValue(createEvaluationContext(context, formulaExpression));
                     } catch (SpelEvaluationException spelEvaluationException) {
-                        if (isNavigationOnNullRoot(spelEvaluationException, expression, context)) {
-                            return null;
-                        }
-
                         if (isUnresolvedReference(spelEvaluationException)) {
                             return value;
                         }
@@ -381,34 +381,14 @@ public class SpelEvaluator implements Evaluator {
         };
     }
 
-    private static boolean isNavigationOnNullRoot(
-        SpelEvaluationException spelEvaluationException, Expression expression, Map<String, ?> context) {
+    private Expression nullRootSafeExpression(SpelExpression spelExpression, Map<String, ?> context) {
+        String expressionString = spelExpression.getExpressionString();
 
-        SpelMessage messageCode = spelEvaluationException.getMessageCode();
+        String nullRootSafeExpressionString = NullRootNavigationRewriter.rewrite(
+            expressionString, spelExpression.getAST(), context);
 
-        if (messageCode != SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE_ON_NULL &&
-            messageCode != SpelMessage.CANNOT_INDEX_INTO_NULL_VALUE) {
-
-            return false;
-        }
-
-        if (!(expression instanceof SpelExpression spelExpression)) {
-            return false;
-        }
-
-        SpelNode rootNode = spelExpression.getAST();
-
-        while (rootNode instanceof CompoundExpression && rootNode.getChildCount() > 0) {
-            rootNode = rootNode.getChild(0);
-        }
-
-        if (!(rootNode instanceof PropertyOrFieldReference propertyOrFieldReference)) {
-            return false;
-        }
-
-        String rootName = propertyOrFieldReference.getName();
-
-        return context.containsKey(rootName) && context.get(rootName) == null;
+        return nullRootSafeExpressionString.equals(expressionString)
+            ? spelExpression : expressionParser.parseExpression(nullRootSafeExpressionString);
     }
 
     private static boolean isUnresolvedReference(SpelEvaluationException spelEvaluationException) {

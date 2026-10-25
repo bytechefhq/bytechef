@@ -1102,6 +1102,7 @@ class SpelEvaluatorTest {
         Map<String, Object> context = new HashMap<>();
 
         context.put("disabledTask", null);
+        context.put(Evaluator.DISABLED_TASK_NAMES, List.of("disabledTask"));
 
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(
@@ -1114,6 +1115,38 @@ class SpelEvaluatorTest {
         assertNull(MapUtils.get(map, "nested"));
         assertNull(MapUtils.get(map, "index"));
         assertNull(MapUtils.get(map, "formula"));
+    }
+
+    @Test
+    void testNameSeededWithNullResolvesToNullInsideFunctionsAndOperators() {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put("disabledTask", null);
+        context.put(Evaluator.DISABLED_TASK_NAMES, List.of("disabledTask"));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "concatenated", "=concat('prefix', ${disabledTask.body})",
+                "compared", "=disabledTask.body == null",
+                "indexed", "=concat('a', disabledTask[0].name, 'b')"),
+            context);
+
+        assertEquals("prefix", MapUtils.get(map, "concatenated"));
+        assertEquals(Boolean.TRUE, MapUtils.get(map, "compared"));
+        assertEquals("ab", MapUtils.get(map, "indexed"));
+    }
+
+    @Test
+    void testPropertyAccessOnNullNameNotListedAsDisabledStillReturnsOriginalExpression() {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put("loop_2", null);
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("formula", "=loop_2.item + '_1'", "value", "${loop_2.item}"), context);
+
+        assertEquals("=loop_2.item + '_1'", MapUtils.get(map, "formula"));
+        assertEquals("${loop_2.item}", MapUtils.get(map, "value"));
     }
 
     @Test
