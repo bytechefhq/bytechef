@@ -82,10 +82,11 @@ public class EmbeddedUserAuditMapper implements AuditMapper {
             data.put("environment", ((Environment) environment).name());
         }
 
-        WorkspaceRole embeddedRole = (WorkspaceRole) auditInvocation.argument("embeddedRole");
+        String role = AuditRoles.describe(
+            (WorkspaceRole) auditInvocation.argument("embeddedRole"), (Long) auditInvocation.argument("customRoleId"));
 
-        if (embeddedRole != null) {
-            data.put("role", embeddedRole.name());
+        if (role != null) {
+            data.put("role", role);
         }
 
         Object captured = auditInvocation.captured();

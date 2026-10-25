@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.exception.CustomRoleErrorType;
 import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,8 +63,8 @@ public class CustomRoleGraphQlController {
     }
 
     @QueryMapping
-    public List<CustomRole> customRoles(@Argument Long workspaceId) {
-        return customRoleFacade.getCustomRoles(workspaceId);
+    public List<CustomRole> customRoles(@Argument Long workspaceId, @Argument PermissionScopeSide side) {
+        return customRoleFacade.getCustomRoles(workspaceId, side);
     }
 
     /**
@@ -73,8 +74,8 @@ public class CustomRoleGraphQlController {
      * that same registration rather than from a client reading module names out of scope names.
      */
     @QueryMapping
-    public List<PermissionScopeGroupDTO> permissionScopeGroups() {
-        return customRoleFacade.getPermissionScopeGroups();
+    public List<PermissionScopeGroupDTO> permissionScopeGroups(@Argument PermissionScopeSide side) {
+        return customRoleFacade.getPermissionScopeGroups(side == null ? PermissionScopeSide.AUTOMATION : side);
     }
 
     /**
@@ -85,7 +86,7 @@ public class CustomRoleGraphQlController {
      */
     @SchemaMapping(typeName = "CustomRole", field = "scopes")
     public Set<String> scopes(CustomRole customRole) {
-        Set<String> registeredScopeNames = customRoleFacade.getPermissionScopeGroups()
+        Set<String> registeredScopeNames = customRoleFacade.getPermissionScopeGroups(customRole.getSide())
             .stream()
             .flatMap(permissionScopeGroup -> permissionScopeGroup.scopes()
                 .stream())
@@ -101,8 +102,12 @@ public class CustomRoleGraphQlController {
     public CustomRole createCustomRole(@Argument Map<String, Object> input) {
         Set<String> scopeNames = toScopeNames(input);
 
+        Object side = input.get("side");
+
         return customRoleFacade.createCustomRole(
-            (String) input.get("name"), (String) input.get("description"), scopeNames);
+            (String) input.get("name"), (String) input.get("description"),
+            side == null ? PermissionScopeSide.AUTOMATION : PermissionScopeSide.valueOf(String.valueOf(side)),
+            scopeNames);
     }
 
     @MutationMapping
