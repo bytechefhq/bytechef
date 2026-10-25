@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:config:cache-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:modules:components:ai:llm"))

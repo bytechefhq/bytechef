@@ -55,9 +55,9 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestFacadeImpl.class);
 
-    private static final String WORKFLOW_ENABLED_CACHE =
+    public static final String WORKFLOW_ENABLED_CACHE =
         WebhookTriggerTestFacade.class.getName() + ".workflowEnabled";
-    private static final String WEBHOOK_ENABLE_OUTPUT_CACHE =
+    public static final String WEBHOOK_ENABLE_OUTPUT_CACHE =
         WebhookTriggerTestFacade.class.getName() + ".webhookEnableOutput";
 
     private final CacheManager cacheManager;
