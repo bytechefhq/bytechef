@@ -21,20 +21,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.route.MessageRoute;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.redis.connection.DefaultMessage;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.RecordId;
@@ -48,7 +44,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  */
 class RedisListenerEndpointRegistrarTest {
 
-    private static final String CHANNEL_NAME = "test_channel";
     private static final String CONSUMER_GROUP = "message_event_group";
     private static final String STREAM_NAME = "test_stream";
 
@@ -60,48 +55,11 @@ class RedisListenerEndpointRegistrarTest {
     private final StreamOperations<String, Object, Object> streamOperations = mock(StreamOperations.class);
 
     private final StringRedisTemplate stringRedisTemplate = mock(StringRedisTemplate.class);
-    private RedisListenerEndpointRegistrar redisListenerEndpointRegistrar;
 
     @BeforeEach
     void beforeEach() {
         doReturn(streamOperations).when(stringRedisTemplate)
             .opsForStream();
-
-        redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
-            redisMessageDeserializer, stringRedisTemplate, mock(TaskExecutor.class));
-    }
-
-    @Test
-    void testEveryDelegateOfAControlRouteReceivesEveryMessage() {
-        MessageRoute controlMessageRoute = new TestMessageRoute(MessageRoute.Exchange.CONTROL, CHANNEL_NAME);
-
-        redisListenerEndpointRegistrar.registerListenerEndpoint(
-            controlMessageRoute, new FirstMessageHandler(), "handle");
-        redisListenerEndpointRegistrar.registerListenerEndpoint(
-            controlMessageRoute, new SecondMessageHandler(), "handle");
-
-        when(redisMessageDeserializer.deserialize("raw-message")).thenReturn("deserialized-payload");
-
-        redisListenerEndpointRegistrar.onMessage(
-            new DefaultMessage(
-                CHANNEL_NAME.getBytes(StandardCharsets.UTF_8), "raw-message".getBytes(StandardCharsets.UTF_8)),
-            null);
-
-        assertThat(firstReceivedMessages).containsExactly("deserialized-payload");
-        assertThat(secondReceivedMessages).containsExactly("deserialized-payload");
-
-        verify(streamOperations, never()).createGroup(CHANNEL_NAME, CONSUMER_GROUP);
-    }
-
-    @Test
-    void testMessageOnAChannelWithoutDelegatesIsDropped() {
-        redisListenerEndpointRegistrar.onMessage(
-            new DefaultMessage(
-                "unknown_channel".getBytes(StandardCharsets.UTF_8), "raw-message".getBytes(StandardCharsets.UTF_8)),
-            null);
-
-        assertThat(firstReceivedMessages).isEmpty();
-        assertThat(secondReceivedMessages).isEmpty();
     }
 
     @Test

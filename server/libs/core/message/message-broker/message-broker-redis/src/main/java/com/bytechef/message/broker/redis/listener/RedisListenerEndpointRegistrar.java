@@ -19,7 +19,6 @@ package com.bytechef.message.broker.redis.listener;
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +29,6 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
@@ -43,7 +40,7 @@ import org.springframework.util.MethodInvoker;
 /**
  * @author Ivica Cardic
  */
-public class RedisListenerEndpointRegistrar implements MessageListener {
+public class RedisListenerEndpointRegistrar {
 
     private static final Logger log = LoggerFactory.getLogger(RedisListenerEndpointRegistrar.class);
 
@@ -55,7 +52,6 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
     private final Map<String, List<Consumer<String>>> streamInvokersMap = new HashMap<>();
     private final StringRedisTemplate stringRedisTemplate;
     private final TaskExecutor taskExecutor;
-    private final Map<String, List<Consumer<String>>> topicInvokersMap = new HashMap<>();
 
     @SuppressFBWarnings("EI2")
     public RedisListenerEndpointRegistrar(
@@ -67,33 +63,10 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
-    @Override
-    public void onMessage(Message message, byte[] pattern) {
-        String channelName = new String(message.getChannel(), StandardCharsets.UTF_8);
-
-        List<Consumer<String>> invokers = topicInvokersMap.get(channelName);
-
-        if (invokers == null) {
-            log.warn("No message listeners registered for channel='{}'", channelName);
-
-            return;
-        }
-
-        dispatch(invokers, new String(message.getBody(), StandardCharsets.UTF_8));
-    }
-
     public void registerListenerEndpoint(MessageRoute messageRoute, Object delegate, String methodName) {
         String routeName = messageRoute.getName();
 
         Consumer<String> invoker = (String message) -> invoke(delegate, methodName, message);
-
-        if (messageRoute.isControlExchange()) {
-            List<Consumer<String>> invokers = topicInvokersMap.computeIfAbsent(routeName, key -> new ArrayList<>());
-
-            invokers.add(invoker);
-
-            return;
-        }
 
         List<Consumer<String>> invokers = streamInvokersMap.computeIfAbsent(routeName, key -> new ArrayList<>());
 
@@ -155,12 +128,6 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
                 sleep();
             }
-        }
-    }
-
-    private void dispatch(List<Consumer<String>> invokers, String message) {
-        for (Consumer<String> invoker : invokers) {
-            invoker.accept(message);
         }
     }
 
