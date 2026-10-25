@@ -24,6 +24,8 @@ const AiProviderForm = ({
     const requiresApiKey = aiProvider.requiresApiKey ?? true;
     const requiresEndpoint = aiProvider.requiresEndpoint ?? false;
 
+    const maskedApiKey = requiresApiKey ? '' : aiProvider.apiKey || '';
+
     const formSchema = z.object({
         apiKey: requiresApiKey ? z.string().min(1, {message: 'API Key is required.'}) : z.string().optional(),
         url: requiresEndpoint ? z.string().min(1, {message: 'Endpoint is required.'}) : z.string().optional(),
@@ -31,7 +33,7 @@ const AiProviderForm = ({
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            apiKey: '',
+            apiKey: maskedApiKey,
             url: aiProvider.url ?? '',
         },
         resolver: zodResolver(formSchema),
@@ -57,9 +59,9 @@ const AiProviderForm = ({
             environment,
             id: aiProvider.id!,
             updateAiProviderRequest: !requiresApiKey
-                ? values.apiKey
-                    ? {apiKey: values.apiKey, url: values.url}
-                    : {url: values.url}
+                ? values.apiKey === maskedApiKey
+                    ? {url: values.url}
+                    : {apiKey: values.apiKey || '', url: values.url}
                 : requiresEndpoint
                   ? {apiKey: values.apiKey, url: values.url}
                   : {apiKey: values.apiKey},
@@ -104,7 +106,7 @@ const AiProviderForm = ({
 
                                     <FormDescription>
                                         Sent as a bearer token, for an Ollama server behind an authenticating proxy or
-                                        Ollama&apos;s hosted API. Leave blank to keep the current key.
+                                        Ollama&apos;s hosted API. Clear it to remove the saved key.
                                     </FormDescription>
 
                                     <FormMessage />

@@ -163,6 +163,41 @@ describe('AiProviderForm', () => {
         );
     });
 
+    it('prefills the masked API key a provider that needs no API key already has', () => {
+        renderForm({apiKey: '..........................ret123', requiresApiKey: false});
+
+        expect(screen.getByDisplayValue('..........................ret123')).toBeInTheDocument();
+    });
+
+    it('keeps the saved API key when the masked key is left unchanged', async () => {
+        renderForm({apiKey: '..........................ret123', requiresApiKey: false, url: 'http://ollama:11434'});
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(mutateMock).toHaveBeenCalledWith({
+                environment: 2,
+                id: 7,
+                updateAiProviderRequest: {url: 'http://ollama:11434'},
+            })
+        );
+    });
+
+    it('removes the saved API key when the masked key is cleared', async () => {
+        renderForm({apiKey: '..........................ret123', requiresApiKey: false, url: 'http://ollama:11434'});
+
+        await userEvent.clear(screen.getByPlaceholderText('Optional'));
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(mutateMock).toHaveBeenCalledWith({
+                environment: 2,
+                id: 7,
+                updateAiProviderRequest: {apiKey: '', url: 'http://ollama:11434'},
+            })
+        );
+    });
+
     it('closes once the update succeeds', () => {
         const {onClose} = renderForm({});
 
