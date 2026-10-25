@@ -107,7 +107,7 @@ class CatalogChatModelTest {
     void testCachesDelegatePerEnvironmentAndKey() {
         ChatModel delegate = mock(ChatModel.class);
 
-        when(delegate.call(org.mockito.ArgumentMatchers.any(Prompt.class)))
+        when(delegate.call(any(Prompt.class)))
             .thenReturn(mock(ChatResponse.class));
         when(aiProviderFacade.getAiDefaultChatModelApiKey(Environment.PRODUCTION.ordinal()))
             .thenReturn(ANTHROPIC_DEFAULT_MODEL);
