@@ -83,18 +83,24 @@ public class EmbeddedUserGraphQlController {
     }
 
     @MutationMapping
-    public EmbeddedUserView addEmbeddedUser(@Argument long userId, @Argument WorkspaceRole role) {
-        return EmbeddedUserView.stored(embeddedUserFacade.addEmbeddedUser(userId, role));
+    public EmbeddedUserView addEmbeddedUser(
+        @Argument long userId, @Argument WorkspaceRole role, @Argument Long customRoleId) {
+
+        return EmbeddedUserView.stored(embeddedUserFacade.addEmbeddedUser(userId, role, customRoleId));
     }
 
     @MutationMapping
-    public EmbeddedUserView addEmbeddedUserByEmail(@Argument String email, @Argument WorkspaceRole role) {
-        return EmbeddedUserView.stored(embeddedUserFacade.addEmbeddedUserByEmail(email, role));
+    public EmbeddedUserView addEmbeddedUserByEmail(
+        @Argument String email, @Argument WorkspaceRole role, @Argument Long customRoleId) {
+
+        return EmbeddedUserView.stored(embeddedUserFacade.addEmbeddedUserByEmail(email, role, customRoleId));
     }
 
     @MutationMapping
-    public EmbeddedUserView updateEmbeddedUserRole(@Argument long userId, @Argument WorkspaceRole role) {
-        return EmbeddedUserView.stored(embeddedUserFacade.updateEmbeddedUserRole(userId, role));
+    public EmbeddedUserView updateEmbeddedUserRole(
+        @Argument long userId, @Argument WorkspaceRole role, @Argument Long customRoleId) {
+
+        return EmbeddedUserView.stored(embeddedUserFacade.updateEmbeddedUserRole(userId, role, customRoleId));
     }
 
     @MutationMapping
@@ -104,9 +110,11 @@ public class EmbeddedUserGraphQlController {
 
     @MutationMapping
     public EmbeddedUserView setEmbeddedUserEnvironmentRole(
-        @Argument long userId, @Argument Environment environment, @Argument WorkspaceRole role) {
+        @Argument long userId, @Argument Environment environment, @Argument WorkspaceRole role,
+        @Argument Long customRoleId) {
 
-        return EmbeddedUserView.stored(embeddedUserFacade.setEnvironmentRole(userId, environment, role));
+        return EmbeddedUserView.stored(
+            embeddedUserFacade.setEnvironmentRole(userId, environment, role, customRoleId));
     }
 
     @MutationMapping

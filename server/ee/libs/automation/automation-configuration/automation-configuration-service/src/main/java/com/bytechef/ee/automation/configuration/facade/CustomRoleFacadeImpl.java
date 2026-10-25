@@ -10,11 +10,13 @@ package com.bytechef.ee.automation.configuration.facade;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.service.CustomRoleService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,8 +45,10 @@ public class CustomRoleFacadeImpl implements CustomRoleFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
-    public CustomRole createCustomRole(String name, String description, Set<String> scopeNames) {
-        return customRoleService.createCustomRole(name, description, scopeNames);
+    public CustomRole createCustomRole(
+        String name, String description, PermissionScopeSide side, Set<String> scopeNames) {
+
+        return customRoleService.createCustomRole(name, description, side, scopeNames);
     }
 
     @Override
@@ -62,17 +66,20 @@ public class CustomRoleFacadeImpl implements CustomRoleFacade {
 
     @Override
     @PreAuthorize("(#workspaceId == null and isTenantAdmin()) or " +
-        "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE'))")
+        "(#workspaceId != null and hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')) or " +
+        "(#workspaceId == null and " +
+        "#side == T(com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide).EMBEDDED and " +
+        "(hasEmbeddedScope('EMBEDDED_VIEW') or hasEmbeddedScope('EMBEDDED_MEMBER_MANAGE')))")
     @Transactional(readOnly = true)
-    public List<CustomRole> getCustomRoles(Long workspaceId) {
-        return customRoleService.getCustomRoles(workspaceId);
+    public List<CustomRole> getCustomRoles(Long workspaceId, @Nullable PermissionScopeSide side) {
+        return customRoleService.getCustomRoles(workspaceId, side);
     }
 
     @Override
     @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
-    public List<PermissionScopeGroupDTO> getPermissionScopeGroups() {
-        return customRoleService.getPermissionScopeGroups();
+    public List<PermissionScopeGroupDTO> getPermissionScopeGroups(PermissionScopeSide side) {
+        return customRoleService.getPermissionScopeGroups(side);
     }
 
     @Override

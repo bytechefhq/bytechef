@@ -76,10 +76,10 @@ class EmbeddedUserGraphQlControllerTest {
 
     @Test
     void testAddEmbeddedUserMapsTheRole() {
-        when(embeddedUserFacade.addEmbeddedUser(5L, WorkspaceRole.VIEWER))
+        when(embeddedUserFacade.addEmbeddedUser(5L, WorkspaceRole.VIEWER, null))
             .thenReturn(EmbeddedUser.forRole(5L, WorkspaceRole.VIEWER));
 
-        EmbeddedUserView view = controller.addEmbeddedUser(5L, WorkspaceRole.VIEWER);
+        EmbeddedUserView view = controller.addEmbeddedUser(5L, WorkspaceRole.VIEWER, null);
 
         assertThat(view.userId()).isEqualTo(5L);
         assertThat(view.embeddedRole()).isEqualTo(WorkspaceRole.VIEWER.name());
@@ -88,14 +88,36 @@ class EmbeddedUserGraphQlControllerTest {
 
     @Test
     void testAddEmbeddedUserByEmailMapsTheRole() {
-        when(embeddedUserFacade.addEmbeddedUserByEmail("jane@example.com", WorkspaceRole.EDITOR))
+        when(embeddedUserFacade.addEmbeddedUserByEmail("jane@example.com", WorkspaceRole.EDITOR, null))
             .thenReturn(EmbeddedUser.forRole(6L, WorkspaceRole.EDITOR));
 
-        EmbeddedUserView view = controller.addEmbeddedUserByEmail("jane@example.com", WorkspaceRole.EDITOR);
+        EmbeddedUserView view = controller.addEmbeddedUserByEmail("jane@example.com", WorkspaceRole.EDITOR, null);
 
         assertThat(view.userId()).isEqualTo(6L);
         assertThat(view.embeddedRole()).isEqualTo(WorkspaceRole.EDITOR.name());
         assertThat(view.inherited()).isFalse();
+    }
+
+    @Test
+    void testUpdateEmbeddedUserRoleMapsACustomRole() {
+        when(embeddedUserFacade.updateEmbeddedUserRole(5L, null, 7L))
+            .thenReturn(EmbeddedUser.forCustomRole(5L, 7L));
+
+        EmbeddedUserView view = controller.updateEmbeddedUserRole(5L, null, 7L);
+
+        assertThat(view.customRoleId()).isEqualTo(7L);
+        assertThat(view.embeddedRole()).isNull();
+    }
+
+    @Test
+    void testSetEmbeddedUserEnvironmentRoleMapsACustomRole() {
+        when(embeddedUserFacade.setEnvironmentRole(5L, Environment.PRODUCTION, null, 7L))
+            .thenReturn(EmbeddedUser.forCustomRole(5L, 7L, Environment.PRODUCTION));
+
+        EmbeddedUserView view = controller.setEmbeddedUserEnvironmentRole(5L, Environment.PRODUCTION, null, 7L);
+
+        assertThat(view.customRoleId()).isEqualTo(7L);
+        assertThat(view.environment()).isEqualTo(Environment.PRODUCTION.name());
     }
 
     private static User user(long id) {
