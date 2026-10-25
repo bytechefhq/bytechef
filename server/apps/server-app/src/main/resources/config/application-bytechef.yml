@@ -103,6 +103,10 @@ bytechef:
       basedir: ${user.home}/bytechef/data/file-storage
   help-hub:
     enabled: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: bytechef
   mail:
     auth: false
     base-url: ${bytechef.public-url}
@@ -144,6 +148,18 @@ bytechef:
       enabled: false
       endpoint: http://localhost:4318/v1/traces
   public-url:
+  rabbitmq:
+    host: localhost
+    password: guest
+    port: 5672
+    username: guest
+  redis:
+    database: 0
+    host: localhost
+    password:
+    port: 6379
+    # Command timeout in milliseconds
+    timeout: 60000
   resources:
     web: file:///opt/bytechef/client/
   scheduler:
