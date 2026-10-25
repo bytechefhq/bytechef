@@ -28,6 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -41,7 +42,7 @@ import org.springframework.util.MethodInvoker;
  *
  * @author Ivica Cardic
  */
-public class RedisControlChannel {
+public class RedisControlChannel implements DisposableBean {
 
     private static final Logger log = LoggerFactory.getLogger(RedisControlChannel.class);
 
@@ -58,6 +59,17 @@ public class RedisControlChannel {
 
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
         redisMessageListenerContainer.afterPropertiesSet();
+    }
+
+    @Override
+    public void destroy() {
+        stop();
+
+        try {
+            redisMessageListenerContainer.destroy();
+        } catch (Exception e) {
+            log.warn("Failed to destroy the Redis message listener container", e);
+        }
     }
 
     public boolean isRunning() {

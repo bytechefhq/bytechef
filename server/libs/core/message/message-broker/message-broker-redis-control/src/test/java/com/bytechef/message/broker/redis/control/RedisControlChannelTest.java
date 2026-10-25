@@ -17,6 +17,7 @@
 package com.bytechef.message.broker.redis.control;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -91,6 +92,17 @@ class RedisControlChannelTest {
         redisControlChannel.onMessage(CHANNEL_NAME, RAW_MESSAGE);
 
         assertThat(secondReceivedEvents).containsExactly("deserialized-event");
+    }
+
+    @Test
+    void testDestroyAfterStopAndRepeatedDestroyDoNotThrow() {
+        redisControlChannel.start();
+        redisControlChannel.stop();
+
+        assertThatCode(() -> {
+            redisControlChannel.destroy();
+            redisControlChannel.destroy();
+        }).doesNotThrowAnyException();
     }
 
     @SuppressWarnings("unused")
