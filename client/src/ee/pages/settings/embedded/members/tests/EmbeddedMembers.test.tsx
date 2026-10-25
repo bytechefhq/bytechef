@@ -1,3 +1,4 @@
+import {useCustomRolesQuery} from '@/shared/middleware/graphql';
 import {act, mockScrollIntoView, render, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -8,6 +9,7 @@ const hoisted = vi.hoisted(() => ({
     captureAddOnSuccess: vi.fn(),
     captureRemoveEnvironmentRoleOnSuccess: vi.fn(),
     captureSetEnvironmentRoleOnSuccess: vi.fn(),
+    customRoles: [{id: '902', name: 'Integrator'}] as {id: string; name: string}[],
     embeddedUsers: [] as unknown[],
     invalidateQueries: vi.fn(),
     memberViewGranted: true,
@@ -26,12 +28,14 @@ vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     EnvironmentEnum: {Development: 'DEVELOPMENT', Production: 'PRODUCTION', Staging: 'STAGING'},
+    PermissionScopeSide: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
     WorkspaceRole: {Admin: 'ADMIN', Editor: 'EDITOR', Viewer: 'VIEWER'},
     useAddEmbeddedUserByEmailMutation: vi.fn((options: {onSuccess: () => void}) => {
         hoisted.captureAddOnSuccess(options.onSuccess);
 
         return {mutate: hoisted.addEmbeddedUserByEmailMutate};
     }),
+    useCustomRolesQuery: vi.fn(() => ({data: {customRoles: hoisted.customRoles}})),
     useEmbeddedUsersQuery: vi.fn(() => ({data: {embeddedUsers: hoisted.embeddedUsers}, isLoading: false})),
     useMyEmbeddedScopesQuery: vi.fn((variables: {environment?: string}) => ({
         data: {myEmbeddedScopes: hoisted.scopesByEnvironment[variables.environment ?? ''] ?? hoisted.scopes},
@@ -93,6 +97,7 @@ describe('EmbeddedMembers', () => {
 
         vi.clearAllMocks();
 
+        hoisted.customRoles = [{id: '902', name: 'Integrator'}];
         hoisted.embeddedUsers = [member];
         hoisted.memberViewGranted = true;
         hoisted.scopes = ['EMBEDDED_MEMBER_MANAGE', 'EMBEDDED_VIEW'];
@@ -130,6 +135,99 @@ describe('EmbeddedMembers', () => {
 
         expect(invalidatedKeys).toContain('EmbeddedUsers');
         expect(invalidatedKeys).toContain('MyEmbeddedScopes');
+    });
+
+    it('testAnAdminAddsAMemberWithAnEmbeddedCustomRole', async () => {
+        render(<EmbeddedMembers />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add member'}));
+        await userEvent.type(screen.getByPlaceholderText('colleague@example.com'), 'new@example.com');
+        await userEvent.click(screen.getByRole('combobox', {name: 'Role'}));
+        await userEvent.click(screen.getByRole('option', {name: 'Integrator'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Add'}));
+
+        expect(hoisted.addEmbeddedUserByEmailMutate).toHaveBeenCalledWith({
+            customRoleId: '902',
+            email: 'new@example.com',
+        });
+    });
+
+    it('testAMemberIsMovedOntoAnEmbeddedCustomRole', async () => {
+        render(<EmbeddedMembers />);
+
+        await userEvent.click(screen.getByRole('combobox'));
+        await userEvent.click(screen.getByRole('option', {name: 'Integrator'}));
+
+        expect(hoisted.updateEmbeddedUserRoleMutate).toHaveBeenCalledWith({customRoleId: '902', userId: '10'});
+    });
+
+    it('testAMembersEmbeddedCustomRoleIsShownAsSelected', () => {
+        hoisted.embeddedUsers = [{...member, customRoleId: '902', embeddedRole: null}];
+
+        render(<EmbeddedMembers />);
+
+        expect(screen.getByRole('combobox')).toHaveTextContent('Integrator');
+    });
+
+    it('testAnEnvironmentRoleCanBeAnEmbeddedCustomRole', async () => {
+        hoisted.embeddedUsers = [developmentRole];
+
+        render(<EmbeddedMembers />);
+
+        await userEvent.click(await screen.findByRole('combobox', {name: /development role/i}));
+        await userEvent.click(screen.getByRole('option', {name: 'Integrator'}));
+
+        expect(hoisted.setEnvironmentRoleMutate).toHaveBeenCalledWith({
+            customRoleId: '902',
+            environment: 'DEVELOPMENT',
+            userId: '10',
+        });
+    });
+
+    it('testEmbeddedCustomRolesAreRequestedForAnyoneWhoSeesTheMembers', () => {
+        render(<EmbeddedMembers />);
+
+        expect(useCustomRolesQuery).toHaveBeenLastCalledWith({side: 'EMBEDDED'}, {enabled: true});
+
+        hoisted.scopes = ['EMBEDDED_VIEW'];
+
+        render(<EmbeddedMembers />);
+
+        expect(useCustomRolesQuery).toHaveBeenLastCalledWith({side: 'EMBEDDED'}, {enabled: true});
+
+        hoisted.memberViewGranted = false;
+        hoisted.scopes = [];
+
+        render(<EmbeddedMembers />);
+
+        expect(useCustomRolesQuery).toHaveBeenLastCalledWith({side: 'EMBEDDED'}, {enabled: false});
+    });
+
+    it('testAManagerOfOneEnvironmentIsOfferedCustomRolesOnlyThere', async () => {
+        hoisted.embeddedUsers = [
+            developmentRole,
+            {...member, customRoleId: '902', embeddedRole: null, environment: 'PRODUCTION', id: '3'},
+        ];
+        hoisted.scopes = ['EMBEDDED_VIEW'];
+        hoisted.scopesByEnvironment = {DEVELOPMENT: ['EMBEDDED_MEMBER_MANAGE', 'EMBEDDED_VIEW']};
+
+        render(<EmbeddedMembers />);
+
+        expect(useCustomRolesQuery).toHaveBeenLastCalledWith({side: 'EMBEDDED'}, {enabled: true});
+
+        const productionRole = screen.getByRole('combobox', {name: /production role/i});
+
+        expect(productionRole).toBeDisabled();
+        expect(productionRole).toHaveTextContent('Integrator');
+
+        await userEvent.click(screen.getByRole('combobox', {name: /development role/i}));
+        await userEvent.click(screen.getByRole('option', {name: 'Integrator'}));
+
+        expect(hoisted.setEnvironmentRoleMutate).toHaveBeenCalledWith({
+            customRoleId: '902',
+            environment: 'DEVELOPMENT',
+            userId: '10',
+        });
     });
 
     it('testSettingAProductionRoleTurnsTheMemberPerEnvironment', async () => {
