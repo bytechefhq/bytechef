@@ -4,5 +4,6 @@ mutation CreateCustomRole($input: CreateCustomRoleInput!) {
         name
         description
         scopes
+        side
     }
 }

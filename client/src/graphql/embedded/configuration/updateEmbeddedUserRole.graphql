@@ -1,6 +1,7 @@
-mutation UpdateEmbeddedUserRole($userId: ID!, $role: WorkspaceRole!) {
-    updateEmbeddedUserRole(userId: $userId, role: $role) {
+mutation UpdateEmbeddedUserRole($userId: ID!, $role: WorkspaceRole, $customRoleId: ID) {
+    updateEmbeddedUserRole(userId: $userId, role: $role, customRoleId: $customRoleId) {
         id
         embeddedRole
+        customRoleId
     }
 }
