@@ -1,5 +1,5 @@
-mutation AddEmbeddedUserByEmail($email: String!, $role: WorkspaceRole!) {
-    addEmbeddedUserByEmail(email: $email, role: $role) {
+mutation AddEmbeddedUserByEmail($email: String!, $role: WorkspaceRole, $customRoleId: ID) {
+    addEmbeddedUserByEmail(email: $email, role: $role, customRoleId: $customRoleId) {
         id
         userId
         embeddedRole
