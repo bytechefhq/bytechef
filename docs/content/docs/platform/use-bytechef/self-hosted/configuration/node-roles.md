@@ -56,6 +56,8 @@ Put a load balancer in front of the cluster and route by path:
 
 Workers serve no HTTP traffic and stay out of the load balancer pool.
 
+Every node must also share file storage: a volume all nodes mount (NFS, EFS) or the AWS provider, so any node can read what another node wrote. The encryption key and the remember-me key are the same on every node.
+
 The coordinator backup means webhooks keep working when every webhook node is down. Set `BYTECHEF_WEBHOOK_ENABLED=false` on the coordinators to remove that fallback and keep all webhook traffic on webhook nodes. With every webhook node down, webhooks then fail, and the coordinator answers `404`.
 
 In the reference nginx configuration, a request that cannot reach a coordinator within 2 seconds is retried on the next one, so a coordinator failure is visible for about 2 seconds. A request that was already sent is never replayed if it is not idempotent.
@@ -72,7 +74,7 @@ If a coordinator loses its database connection, it reconnects and takes the lock
 
 ## Scheduler clustering
 
-Only coordinators start the Quartz scheduler and fire triggers. Other nodes can still add and remove scheduled jobs in the shared job store.
+Only coordinators start the Quartz scheduler and fire triggers. Other nodes keep the scheduler in standby: they do not fire triggers, but they can still add and remove scheduled jobs in the shared job store.
 
 | Variable | Default | Purpose |
 |---|---|---|
