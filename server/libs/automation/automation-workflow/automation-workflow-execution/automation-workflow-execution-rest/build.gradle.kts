@@ -24,6 +24,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "Environment" to "com.bytechef.automation.configuration.web.rest.model.EnvironmentModel",
             "ExecutionError" to "com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel",
             "FieldOption" to "com.bytechef.platform.configuration.web.rest.model.FieldOptionModel",
+            "FocusPathElement" to "com.bytechef.platform.workflow.execution.web.rest.model.FocusPathElementModel",
             "Job" to "com.bytechef.platform.workflow.execution.web.rest.model.JobModel",
             "JobBasic" to "com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel",
             "Page" to "org.springframework.data.domain.Page",
@@ -36,6 +37,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "Project" to "com.bytechef.automation.configuration.web.rest.model.ProjectModel",
             "Tag" to "com.bytechef.automation.configuration.web.rest.model.TagModel",
             "TaskExecution" to "com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel",
+            "TaskExecutionChildrenPage" to "com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionChildrenPageModel",
             "TriggerExecution" to "com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel",
             "Webhook" to "com.bytechef.platform.workflow.execution.web.rest.model.WebhookModel",
             "WebhookRetry" to "com.bytechef.platform.workflow.execution.web.rest.model.WebhookRetryModel",
@@ -87,5 +89,6 @@ dependencies {
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:core:rest:rest-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
