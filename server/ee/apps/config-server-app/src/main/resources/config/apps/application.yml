@@ -166,8 +166,8 @@ bytechef:
     # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.
     concurrency-limit: 200
   cache:
-    # Cache provider (redis) default: redis
-    provider: redis
+    # Cache provider (caffeine) default: caffeine
+    provider: caffeine
   data-storage:
     # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc

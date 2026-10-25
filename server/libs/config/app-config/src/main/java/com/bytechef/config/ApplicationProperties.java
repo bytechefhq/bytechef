@@ -2903,10 +2903,6 @@ public class ApplicationProperties {
          */
         public enum Provider {
             /**
-             * Redis cache
-             */
-            REDIS,
-            /**
              * Caffeine in-memory cache
              */
             CAFFEINE
