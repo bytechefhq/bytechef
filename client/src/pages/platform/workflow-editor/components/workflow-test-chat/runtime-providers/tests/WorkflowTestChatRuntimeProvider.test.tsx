@@ -1,5 +1,6 @@
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {UseWorkflowTestStreamProps, useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
+import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {AppendMessage, useExternalStoreRuntime} from '@assistant-ui/react';
 import {act, render} from '@testing-library/react';
@@ -173,6 +174,72 @@ describe('WorkflowTestChatRuntimeProvider', () => {
 
         expect(messages[messages.length - 1]).toEqual({content: 'The model call failed', role: 'assistant'});
         expect(getRuntimeOptions().isRunning).toBe(false);
+    });
+
+    it('shows the failed task error when the run fails', async () => {
+        render(<WorkflowTestChatRuntimeProvider>child</WorkflowTestChatRuntimeProvider>);
+
+        await act(async () => {
+            await getRuntimeOptions().onNew(createTextMessage('Plan an offsite'));
+        });
+
+        act(() => {
+            getStreamProps().onResult!({
+                job: {
+                    status: 'FAILED',
+                    taskExecutions: [{error: {message: 'Your credit balance is too low'}, workflowTask: {}}],
+                },
+            } as unknown as WorkflowTestExecution);
+            getStreamProps().onStreamEnd!();
+        });
+
+        const {messages} = useWorkflowTestChatStore.getState();
+
+        expect(messages[messages.length - 1]).toEqual({
+            content: 'The run failed: Your credit balance is too low',
+            role: 'assistant',
+        });
+        expect(getRuntimeOptions().isRunning).toBe(false);
+    });
+
+    it('shows a generic message when the run fails without an error message', async () => {
+        render(<WorkflowTestChatRuntimeProvider>child</WorkflowTestChatRuntimeProvider>);
+
+        await act(async () => {
+            await getRuntimeOptions().onNew(createTextMessage('Plan an offsite'));
+        });
+
+        act(() => {
+            getStreamProps().onResult!({
+                job: {status: 'FAILED', taskExecutions: []},
+            } as unknown as WorkflowTestExecution);
+            getStreamProps().onStreamEnd!();
+        });
+
+        const {messages} = useWorkflowTestChatStore.getState();
+
+        expect(messages[messages.length - 1]).toEqual({content: 'The run failed.', role: 'assistant'});
+    });
+
+    it('does not show an error when the run completes', async () => {
+        render(<WorkflowTestChatRuntimeProvider>child</WorkflowTestChatRuntimeProvider>);
+
+        await act(async () => {
+            await getRuntimeOptions().onNew(createTextMessage('Hi'));
+        });
+
+        act(() => {
+            useWorkflowTestChatStore.getState().appendToLastAssistantMessage('Hello');
+
+            getStreamProps().onResult!({
+                job: {status: 'COMPLETED', taskExecutions: []},
+            } as unknown as WorkflowTestExecution);
+            getStreamProps().onStreamEnd!();
+        });
+
+        const {messages} = useWorkflowTestChatStore.getState();
+
+        expect(messages[messages.length - 1]).toEqual({content: 'Hello', role: 'assistant'});
     });
 
     it('keeps the streamed text when the stream fails part way', async () => {
