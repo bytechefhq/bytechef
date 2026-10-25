@@ -3948,9 +3948,22 @@ public class ApplicationProperties {
         }
 
         /**
+         * AWS message broker configuration
+         */
+        private Aws aws = new Aws();
+
+        /**
          * Message broker provider
          */
         private Provider provider = Provider.JMS;
+
+        public Aws getAws() {
+            return aws;
+        }
+
+        public void setAws(Aws aws) {
+            this.aws = aws;
+        }
 
         public Provider getProvider() {
             return provider;
@@ -3958,6 +3971,39 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+
+        /**
+         * AWS message broker configuration.
+         */
+        public static class Aws {
+
+            /**
+             * Available transports for CONTROL routes.
+             */
+            public enum ControlProvider {
+                /**
+                 * Redis pub/sub broadcast, required when running more than one node
+                 */
+                REDIS,
+                /**
+                 * One shared SQS queue, correct for a single node only
+                 */
+                SQS
+            }
+
+            /**
+             * Transport for CONTROL routes, which must reach every node
+             */
+            private ControlProvider controlProvider;
+
+            public ControlProvider getControlProvider() {
+                return controlProvider;
+            }
+
+            public void setControlProvider(ControlProvider controlProvider) {
+                this.controlProvider = controlProvider;
+            }
         }
     }
 

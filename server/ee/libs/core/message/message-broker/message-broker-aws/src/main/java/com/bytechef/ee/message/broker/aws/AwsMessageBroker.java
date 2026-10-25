@@ -12,6 +12,7 @@ import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.operations.SqsSendOptions;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -20,16 +21,26 @@ import io.awspring.cloud.sqs.operations.SqsTemplate;
  */
 public class AwsMessageBroker implements MessageBroker {
 
+    private final @Nullable RedisControlSender redisControlSender;
     private final SqsTemplate sqsTemplate;
 
-    @SuppressFBWarnings("EI")
-    public AwsMessageBroker(SqsTemplate sqsTemplate) {
+    @SuppressFBWarnings({
+        "EI", "EI2"
+    })
+    public AwsMessageBroker(SqsTemplate sqsTemplate, @Nullable RedisControlSender redisControlSender) {
         this.sqsTemplate = sqsTemplate;
+        this.redisControlSender = redisControlSender;
     }
 
     @Override
     public void send(MessageRoute route, Object message) {
         String routeName = route.getName();
+
+        if (redisControlSender != null && route.isControlExchange()) {
+            redisControlSender.send(routeName, message);
+
+            return;
+        }
 
         String modifiedRoute = routeName.replace(".", "-");
 

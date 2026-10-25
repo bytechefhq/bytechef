@@ -8,14 +8,21 @@
 package com.bytechef.ee.message.broker.aws.config;
 
 import com.bytechef.ee.message.broker.aws.AwsMessageBroker;
+import com.bytechef.ee.message.broker.aws.RedisControlSender;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAws;
+import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.io.StringWriter;
 import java.io.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.JacksonJsonMessageConverter;
@@ -23,6 +30,7 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
 import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -36,15 +44,46 @@ public class AwsMessageBrokerConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(AwsMessageBrokerConfiguration.class);
 
-    public AwsMessageBrokerConfiguration() {
+    public AwsMessageBrokerConfiguration(
+        @Value("${bytechef.message-broker.aws.control-provider:sqs}") String controlProvider) {
+
         if (log.isDebugEnabled()) {
             log.debug("Message broker provider type enabled: aws");
+        }
+
+        if (!"redis".equalsIgnoreCase(controlProvider)) {
+            log.warn(
+                "CONTROL routes (task cancel, SSE events) use one shared SQS queue and reach a single node; set " +
+                    "bytechef.message-broker.aws.control-provider=redis when running more than one node");
         }
     }
 
     @Bean
-    AwsMessageBroker awsMessageBroker(SqsTemplate sqsTemplate) {
-        return new AwsMessageBroker(sqsTemplate);
+    AwsMessageBroker awsMessageBroker(
+        SqsTemplate sqsTemplate, ObjectProvider<RedisControlSender> redisControlSenderObjectProvider) {
+
+        return new AwsMessageBroker(sqsTemplate, redisControlSenderObjectProvider.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.message-broker.aws", name = "control-provider", havingValue = "redis")
+    RedisControlSender redisControlSender(
+        RedisMessageSerializer redisMessageSerializer, StringRedisTemplate stringRedisTemplate) {
+
+        return (channelName, message) -> stringRedisTemplate.convertAndSend(
+            channelName, redisMessageSerializer.serialize(message));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.message-broker.aws", name = "control-provider", havingValue = "redis")
+    RedisMessageSerializer redisMessageSerializer(ObjectMapper objectMapper) {
+        return new RedisMessageSerializer(objectMapper);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.message-broker.aws", name = "control-provider", havingValue = "redis")
+    StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        return new StringRedisTemplate(redisConnectionFactory);
     }
 
     @Bean
