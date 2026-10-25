@@ -104,7 +104,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     .findFirst()
                     .orElse(null);
 
-                boolean enabled = property != null ? property.isEnabled() : hasConfigApiKey(provider);
+                boolean enabled =
+                    property != null ? property.isEnabled() : isConfiguredInApplicationProperties(provider);
 
                 List<AiProviderCatalogItemDTO.Model> models = readChatModels(componentDefinition);
 
@@ -241,7 +242,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     url = getConfigUrl(provider);
                 }
 
-                boolean enabled = property != null ? property.isEnabled() : hasConfigApiKey(provider);
+                boolean enabled =
+                    property != null ? property.isEnabled() : isConfiguredInApplicationProperties(provider);
 
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, url, enabled,
@@ -456,9 +458,19 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
         };
     }
 
-    private boolean hasConfigApiKey(Provider provider) {
+    private boolean isConfiguredInApplicationProperties(Provider provider) {
         String apiKey = getConfigApiKey(provider);
 
-        return apiKey != null && !apiKey.isBlank();
+        if (apiKey != null && !apiKey.isBlank()) {
+            return true;
+        }
+
+        if (provider.requiresApiKey()) {
+            return false;
+        }
+
+        String url = getConfigUrl(provider);
+
+        return url != null && !url.isBlank();
     }
 }
