@@ -52,11 +52,12 @@ class AiProviderFacadeTest {
     @Mock
     private PropertyService propertyService;
 
+    private ApplicationProperties applicationProperties;
     private AiProviderFacadeImpl facade;
 
     @BeforeEach
     void setUp() {
-        ApplicationProperties applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
+        applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
         facade = new AiProviderFacadeImpl(componentDefinitionService, propertyService, applicationProperties);
     }
@@ -85,6 +86,50 @@ class AiProviderFacadeTest {
                 .as("Provider %s supports embeddings iff in Provider.EMBEDDING_PROVIDERS", matchingProvider)
                 .isEqualTo(Provider.EMBEDDING_PROVIDERS.contains(matchingProvider));
         }
+    }
+
+    @Test
+    void testKeylessProviderConfiguredWithUrlInApplicationPropertiesIsEnabled() {
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getOllama()
+            .getUrl()).thenReturn("http://localhost:11434");
+
+        AiProviderDTO ollama = getAiProvider(Provider.OLLAMA);
+
+        assertThat(ollama.enabled()).isTrue();
+    }
+
+    @Test
+    void testKeylessProviderWithoutUrlInApplicationPropertiesIsDisabled() {
+        AiProviderDTO ollama = getAiProvider(Provider.OLLAMA);
+
+        assertThat(ollama.enabled()).isFalse();
+    }
+
+    @Test
+    void testKeyedProviderWithoutApiKeyInApplicationPropertiesIsDisabled() {
+        AiProviderDTO openAi = getAiProvider(Provider.OPEN_AI);
+
+        assertThat(openAi.enabled()).isFalse();
+    }
+
+    private AiProviderDTO getAiProvider(Provider provider) {
+        List<ComponentDefinition> componentDefinitions = buildComponentDefinitionsForAllProviders();
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(componentDefinitions);
+        when(propertyService.getProperties(
+            ArgumentMatchers.anyList(),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(List.of());
+
+        return facade.getAiProviders(ENVIRONMENT)
+            .stream()
+            .filter(aiProvider -> aiProvider.id() == provider.getId())
+            .findFirst()
+            .orElseThrow();
     }
 
     private List<ComponentDefinition> buildComponentDefinitionsForAllProviders() {
