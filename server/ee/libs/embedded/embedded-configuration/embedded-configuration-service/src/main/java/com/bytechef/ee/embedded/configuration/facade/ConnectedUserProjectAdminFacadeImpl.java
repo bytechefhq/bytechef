@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @PreAuthorize("isTenantAdmin()")
 public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProjectAdminFacade {
 
