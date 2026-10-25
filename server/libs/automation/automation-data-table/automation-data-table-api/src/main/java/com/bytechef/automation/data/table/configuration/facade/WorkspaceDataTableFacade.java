@@ -19,6 +19,7 @@ package com.bytechef.automation.data.table.configuration.facade;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
@@ -66,4 +67,6 @@ public interface WorkspaceDataTableFacade {
     void updateTags(long dataTableId, List<Tag> tags);
 
     List<Webhook> listWebhooks(long dataTableId, long environmentId);
+
+    DataTableStorageUsage getStorageUsage();
 }

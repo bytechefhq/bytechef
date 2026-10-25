@@ -12,6 +12,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
@@ -111,6 +112,11 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
 
     @Override
     public List<Webhook> listWebhooks(long dataTableId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableStorageUsage getStorageUsage() {
         throw new UnsupportedOperationException();
     }
 }
