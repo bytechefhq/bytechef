@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261026000000" author="Ivica Cardic">
+        <createTable tableName="component_log_entry">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="scope" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_execution_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_execution_id" type="BIGINT"/>
+            <column name="logged_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level" type="INT"/>
+            <column name="component_name" type="VARCHAR(256)"/>
+            <column name="component_operation_name" type="VARCHAR(256)"/>
+            <column name="message" type="TEXT"/>
+            <column name="exception_type" type="VARCHAR(512)"/>
+            <column name="exception_message" type="TEXT"/>
+            <column name="stack_trace" type="TEXT"/>
+        </createTable>
+
+        <createIndex tableName="component_log_entry" indexName="idx_component_log_entry_scope_job_task">
+            <column name="scope"/>
+            <column name="job_id"/>
+            <column name="task_execution_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
