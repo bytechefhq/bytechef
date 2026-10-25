@@ -105,6 +105,11 @@ public class ApplicationProperties {
     private DataStorage dataStorage;
 
     /**
+     * Data table storage configuration
+     */
+    private DataTable dataTable = new DataTable();
+
+    /**
      * Service discovery configuration
      */
     private DiscoveryService discoveryService = new DiscoveryService();
@@ -295,6 +300,10 @@ public class ApplicationProperties {
         return dataStorage;
     }
 
+    public DataTable getDataTable() {
+        return dataTable;
+    }
+
     public DiscoveryService getDiscoveryService() {
         return discoveryService;
     }
@@ -461,6 +470,10 @@ public class ApplicationProperties {
 
     public void setDataStorage(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
+    }
+
+    public void setDataTable(DataTable dataTable) {
+        this.dataTable = dataTable;
     }
 
     public void setDiscoveryService(DiscoveryService discoveryService) {
@@ -3923,6 +3936,25 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+    }
+
+    /**
+     * Data table storage configuration.
+     */
+    public static class DataTable {
+
+        /**
+         * Maximum total size in bytes of all data tables in a tenant. 0 means unlimited. Default 50 MB.
+         */
+        private long maxSizeBytes = 52_428_800L;
+
+        public long getMaxSizeBytes() {
+            return maxSizeBytes;
+        }
+
+        public void setMaxSizeBytes(long maxSizeBytes) {
+            this.maxSizeBytes = maxSizeBytes;
         }
     }
 
