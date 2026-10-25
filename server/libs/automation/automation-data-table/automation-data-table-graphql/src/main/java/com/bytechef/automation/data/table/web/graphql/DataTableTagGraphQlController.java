@@ -65,7 +65,8 @@ public class DataTableTagGraphQlController {
 
         return tagsByTableName.entrySet()
             .stream()
-            .map(entry -> new DataTableTagsEntry(dataTableService.getIdByBaseName(entry.getKey()), entry.getValue()))
+            .map(entry -> new DataTableTagsEntry(
+                dataTableService.getIdByBaseName(entry.getKey()), entry.getValue()))
             .toList();
     }
 

@@ -22,7 +22,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.util.Date;
 
 /**
@@ -32,7 +34,11 @@ public class DateUtils {
 
     private static final DateTimeFormatter[] DATE_TIME_FORMATTERS = new DateTimeFormatter[] {
         DateTimeFormatter.ISO_DATE_TIME,
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+        new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd HH:mm:ss")
+            .optionalStart()
+            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+            .optionalEnd()
+            .toFormatter(),
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
     };
 

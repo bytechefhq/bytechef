@@ -35,11 +35,14 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
+import com.bytechef.platform.data.table.domain.DataTableResolution;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.time.LocalDate;
@@ -49,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -72,21 +76,37 @@ public final class DataTableUtils {
             searchText, dataTableService);
     }
 
-    /**
-     * Returns an OptionsFunction for trigger table selection dropdowns.
-     *
-     * @param dataTableService the data table service
-     * @return an OptionsFunction that provides table options
-     */
     public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(DataTableService dataTableService) {
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
             searchText, dataTableService);
     }
 
-    public static List<Option<String>> getTableOptions(String searchText, DataTableService dataTableService) {
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEVELOPMENT.ordinal());
+    public record ResolvedDataTable(DataTableRef dataTableRef, DataTableInfo dataTableInfo) {
+    }
 
-        return dataTableInfos.stream()
+    public static ResolvedDataTable resolveDataTable(
+        DataTableService dataTableService, String baseName, long environmentId) {
+
+        return dataTableService.fetchDataTableResolution(baseName, environmentId)
+            .flatMap(dataTableResolution -> dataTableInfoOf(dataTableService, dataTableResolution, environmentId))
+            .orElseThrow(() -> new IllegalArgumentException("Data table '" + baseName + "' was not found"));
+    }
+
+    private static Optional<ResolvedDataTable> dataTableInfoOf(
+        DataTableService dataTableService, DataTableResolution dataTableResolution, long environmentId) {
+
+        return dataTableService.listTables(environmentId)
+            .stream()
+            .filter(dataTableInfo -> Objects.equals(dataTableInfo.id(), dataTableResolution.dataTableId()))
+            .findFirst()
+            .map(dataTableInfo -> new ResolvedDataTable(dataTableResolution.dataTableRef(), dataTableInfo));
+    }
+
+    public static List<Option<String>> getTableOptions(
+        String searchText, DataTableService dataTableService) {
+
+        return dataTableService.listTables(DEVELOPMENT.ordinal())
+            .stream()
             .filter(
                 dataTableInfo -> searchText == null || dataTableInfo.baseName()
                     .toLowerCase()
@@ -109,16 +129,19 @@ public final class DataTableUtils {
     public static DataTableInfo getDataTableInfo(
         DataTableService dataTableService, String baseName, long environmentId) {
 
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
-
-        return dataTableInfos.stream()
-            .filter(dataTableInfo -> {
-                String curBaseName = dataTableInfo.baseName();
-
-                return curBaseName.equalsIgnoreCase(baseName);
-            })
-            .findFirst()
+        return dataTableService.fetchDataTableResolution(baseName, environmentId)
+            .flatMap(dataTableResolution -> dataTableInfoOf(dataTableService, dataTableResolution, environmentId))
+            .map(ResolvedDataTable::dataTableInfo)
             .orElse(null);
+    }
+
+    public static long registerWebhook(
+        DataTableService dataTableService, DataTableWebhookService dataTableWebhookService, String baseName,
+        String webhookUrl, DataTableWebhookType type, long environmentId) {
+
+        ResolvedDataTable resolvedDataTable = resolveDataTable(dataTableService, baseName, environmentId);
+
+        return dataTableWebhookService.addWebhook(resolvedDataTable.dataTableRef(), webhookUrl, type);
     }
 
     /**
@@ -132,9 +155,14 @@ public final class DataTableUtils {
     public static OutputResponse createTriggerOutputResponse(
         DataTableRowService dataTableRowService, DataTableService dataTableService, String baseName) {
 
-        BaseValueProperty<?> rowSchema = rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        ResolvedDataTable resolvedDataTable =
+            resolveDataTable(dataTableService, baseName, DEVELOPMENT.ordinal());
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        DataTableInfo dataTableInfo = resolvedDataTable.dataTableInfo();
+
+        BaseValueProperty<?> rowSchema = rowObjectSchema(dataTableInfo);
+
+        List<DataTableRow> rows = dataTableRowService.listRows(resolvedDataTable.dataTableRef(), 1, 0);
 
         if (rows.isEmpty()) {
             return OutputResponse.of(rowSchema);
@@ -142,17 +170,12 @@ public final class DataTableUtils {
 
         DataTableRow firstRow = rows.getFirst();
 
-        Map<String, Object> sampleOutput = createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
+        Map<String, Object> sampleOutput = createSampleOutput(dataTableInfo, firstRow.id(), firstRow.values());
 
         return OutputResponse.of(rowSchema, sampleOutput);
     }
 
-    public static BaseValueProperty<?> rowObjectSchema(
-        DataTableService dataTableService, Environment environment, String baseName) {
-
-        DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, environment.ordinal());
-
+    public static BaseValueProperty<?> rowObjectSchema(@Nullable DataTableInfo dataTableInfo) {
         List<Property.ValueProperty<?>> properties = new ArrayList<>();
 
         properties.add(integer("id").label("ID"));
@@ -168,19 +191,15 @@ public final class DataTableUtils {
 
     /**
      * Creates a sample output map from a row's values, filling in sample values for null columns based on their types.
+     * Takes the already-resolved table for the same reason {@link #rowObjectSchema} does.
      *
-     * @param dataTableService the data table service
-     * @param environment      the environment
-     * @param baseName         the table base name
-     * @param rowId            the row id
-     * @param rowValues        the row values map (may contain null values)
+     * @param dataTableInfo the resolved table, or null when the run could not see one
+     * @param rowId         the row id
+     * @param rowValues     the row values map (may contain null values)
      * @return a map with id and all column values, with sample values for null entries
      */
     public static Map<String, Object> createSampleOutput(
-        DataTableService dataTableService, Environment environment, String baseName, long rowId,
-        Map<String, Object> rowValues) {
-
-        DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, environment.ordinal());
+        @Nullable DataTableInfo dataTableInfo, long rowId, Map<String, Object> rowValues) {
 
         Map<String, Object> sampleOutput = new HashMap<>();
 
@@ -239,9 +258,8 @@ public final class DataTableUtils {
     }
 
     /**
-     * Creates a PropertiesFunction for dynamic properties lookup based on table columns.
+     * Creates a PropertiesFunction for dynamic properties lookup based on the columns of the selected table.
      *
-     * @param dataTableService the data table service
      * @return a PropertiesFunction that returns properties based on the selected table
      */
     public static ActionDefinition.PropertiesFunction createDynamicProperties(

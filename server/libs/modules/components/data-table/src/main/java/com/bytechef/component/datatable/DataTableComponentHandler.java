@@ -68,7 +68,9 @@ public class DataTableComponentHandler implements ComponentHandler {
             DataTableService dataTableService, DataTableRowService dataTableRowService,
             DataTableWebhookService dataTableWebhookService) {
 
-            super(buildDefinition(dataTableService, dataTableRowService, dataTableWebhookService));
+            super(
+                buildDefinition(
+                    dataTableService, dataTableRowService, dataTableWebhookService));
         }
 
         private static ComponentDefinition buildDefinition(
@@ -79,10 +81,14 @@ public class DataTableComponentHandler implements ComponentHandler {
                 dataTableService, dataTableRowService);
             ActionDefinition deleteRecordsAction = DataTableDeleteRecordsAction.of(
                 dataTableService, dataTableRowService);
-            ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(dataTableService, dataTableRowService);
-            ActionDefinition getRecordAction = DataTableGetRecordAction.of(dataTableService, dataTableRowService);
-            ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(dataTableService, dataTableRowService);
-            ActionDefinition clearTableAction = DataTableClearTableAction.of(dataTableService, dataTableRowService);
+            ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(
+                dataTableService, dataTableRowService);
+            ActionDefinition getRecordAction = DataTableGetRecordAction.of(
+                dataTableService, dataTableRowService);
+            ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(
+                dataTableService, dataTableRowService);
+            ActionDefinition clearTableAction = DataTableClearTableAction.of(
+                dataTableService, dataTableRowService);
 
             return component(DATA_TABLE)
                 .title("Data Table")
@@ -104,9 +110,12 @@ public class DataTableComponentHandler implements ComponentHandler {
                     tool(findRecordsAction),
                     tool(clearTableAction))
                 .triggers(
-                    DataTableRecordCreatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordUpdatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordDeletedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService));
+                    DataTableRecordCreatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService),
+                    DataTableRecordUpdatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService),
+                    DataTableRecordDeletedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService));
         }
     }
 }

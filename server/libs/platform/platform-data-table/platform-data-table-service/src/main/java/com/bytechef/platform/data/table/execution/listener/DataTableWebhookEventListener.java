@@ -18,19 +18,23 @@ package com.bytechef.platform.data.table.execution.listener;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.backoff.ExponentialBackOff;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,6 +46,11 @@ import org.springframework.web.client.RestTemplate;
  * table and webhook type, and then executes HTTP POST requests to the retrieved webhook URLs with the event payload and
  * metadata.
  *
+ * <p>
+ * Selection is by the event's ref and its event type: the ref names the table the row was written into, and
+ * {@link DataTableWebhookService#listWebhooks(DataTableRef)} answers for it. Selecting by base name instead would not
+ * identify one registry row.
+ *
  * @author Ivica Cardic
  */
 @Component
@@ -50,22 +59,30 @@ public class DataTableWebhookEventListener {
     private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
     private final DataTableWebhookService dataTableWebhookService;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
+    @Autowired
     @SuppressFBWarnings("EI")
     public DataTableWebhookEventListener(DataTableWebhookService dataTableWebhookService) {
-        this.dataTableWebhookService = dataTableWebhookService;
+        this(dataTableWebhookService, new RestTemplate());
     }
 
-    @EventListener
+    @SuppressFBWarnings("EI")
+    DataTableWebhookEventListener(DataTableWebhookService dataTableWebhookService, RestTemplate restTemplate) {
+        this.dataTableWebhookService = dataTableWebhookService;
+        this.restTemplate = restTemplate;
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     @Async
     public void onDataTableWebhookEvent(DataTableWebhookEvent event) {
-        String baseName = event.getBaseName();
-        long environmentId = event.getEnvironmentId();
+        DataTableRef dataTableRef = event.getDataTableRef();
+
+        String baseName = dataTableRef.baseName();
         DataTableWebhookType type = event.getType();
         Map<String, Object> payload = event.getPayload();
 
-        List<DataTableWebhookService.Webhook> hooks = dataTableWebhookService.listWebhooks(baseName, environmentId)
+        List<DataTableWebhookService.Webhook> hooks = dataTableWebhookService.listWebhooks(dataTableRef)
             .stream()
             .filter(webhook -> webhook.type() == type)
             .toList();
@@ -78,7 +95,7 @@ public class DataTableWebhookEventListener {
 
         for (DataTableWebhookService.Webhook hook : hooks) {
 
-            Map<String, Object> body = new java.util.HashMap<>();
+            Map<String, Object> body = new HashMap<>();
 
             body.put("type", type.name());
             body.put("table", baseName);

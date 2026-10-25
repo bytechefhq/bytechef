@@ -8,10 +8,15 @@
 package com.bytechef.ee.platform.data.table.remote.client.service;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableRef;
+import com.bytechef.platform.data.table.domain.DataTableResolution;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,12 +29,8 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
-    public void createTable(String baseName, List<ColumnSpec> columnSpecs, long environmentId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void createTable(String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId) {
+    public void createTable(
+        String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -39,12 +40,14 @@ public class RemoteDataTableServiceClient implements DataTableService {
     }
 
     @Override
-    public void removeColumn(String baseName, String columnName, long environmentId) {
+    public void removeColumn(
+        String baseName, String columnName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId) {
+    public void renameColumn(
+        String baseName, String fromColumnName, String toColumnName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -59,6 +62,22 @@ public class RemoteDataTableServiceClient implements DataTableService {
     }
 
     @Override
+    public Optional<DataTable> fetchDataTable(String baseName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<DataTable> fetchDataTable(DataTableRef dataTableRef) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<DataTableResolution> fetchDataTableResolution(
+        String baseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String getBaseNameById(long id) {
         throw new UnsupportedOperationException();
     }
@@ -69,12 +88,25 @@ public class RemoteDataTableServiceClient implements DataTableService {
     }
 
     @Override
-    public void renameTable(String fromBaseName, String toBaseName, long environmentId) {
+    public void renameTable(
+        String fromBaseName, String toBaseName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void duplicateTable(String fromBaseName, String toBaseName, long environmentId) {
+    public void duplicateTable(
+        String fromBaseName, String toBaseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<DataTableInfo> fetchDataTableInfo(
+        String baseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateDescription(String baseName, @Nullable String description) {
         throw new UnsupportedOperationException();
     }
 }

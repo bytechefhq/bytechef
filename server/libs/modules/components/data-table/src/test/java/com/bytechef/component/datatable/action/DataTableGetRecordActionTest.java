@@ -19,10 +19,11 @@ package com.bytechef.component.datatable.action;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,9 @@ class DataTableGetRecordActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRow() throws Exception {
-        when(dataTableRowService.getRow(anyString(), anyLong(), anyLong()))
+        DataTableRef dataTableRef = stubResolvedDataTable();
+
+        when(dataTableRowService.getRow(eq(dataTableRef), anyLong()))
             .thenReturn(new DataTableRow(7, Map.of("staff_reply", "on my way")));
 
         ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
@@ -42,16 +45,18 @@ class DataTableGetRecordActionTest extends AbstractDataTableActionTest {
 
         assertEquals(
             Map.of("id", 7L, "staff_reply", "on my way"),
-            perform(actionDefinition, Map.of("table", "conversations", "id", 7)));
+            perform(actionDefinition, Map.of("table", BASE_NAME, "id", 7)));
     }
 
     @Test
     void testPerformOfMissingRecordStaysNull() throws Exception {
-        when(dataTableRowService.getRow(anyString(), anyLong(), anyLong())).thenReturn(null);
+        DataTableRef dataTableRef = stubResolvedDataTable();
+
+        when(dataTableRowService.getRow(eq(dataTableRef), anyLong())).thenReturn(null);
 
         ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
             dataTableService, dataTableRowService);
 
-        assertNull(perform(actionDefinition, Map.of("table", "conversations", "id", 7)));
+        assertNull(perform(actionDefinition, Map.of("table", BASE_NAME, "id", 7)));
     }
 }

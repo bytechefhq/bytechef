@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -50,6 +51,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.KeyHolder;
 
@@ -69,6 +71,9 @@ class DataTableRowServiceTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
 
+    private static final DataTableRef DATA_TABLE_REF =
+        new DataTableRef("conversations", 1);
+
     private DataTableRowServiceImpl dataTableRowService;
 
     @BeforeEach
@@ -81,7 +86,7 @@ class DataTableRowServiceTest {
     void testDeleteRowPublishesTheDeletedRowValues() {
         stubQueries(new DataTableRow(7, Map.of("status", "CLOSED")));
 
-        assertTrue(dataTableRowService.deleteRow("conversations", 7, 1));
+        assertTrue(dataTableRowService.deleteRow(DATA_TABLE_REF, 7));
 
         assertEquals(Map.of("id", 7L, "values", Map.of("status", "CLOSED")), publishedPayload());
     }
@@ -90,7 +95,7 @@ class DataTableRowServiceTest {
     void testDeleteRowReadsAndDeletesInASingleStatement() {
         stubQueries(new DataTableRow(7, Map.of("status", "CLOSED")));
 
-        dataTableRowService.deleteRow("conversations", 7, 1);
+        dataTableRowService.deleteRow(DATA_TABLE_REF, 7);
 
         List<String> executedSqls = executedSqls();
 
@@ -122,7 +127,7 @@ class DataTableRowServiceTest {
 
         stubQueries(new DataTableRow(7, Map.of("status", "CLOSED")));
 
-        assertTrue(dataTableRowService.deleteRow("conversations", 7, 1));
+        assertTrue(dataTableRowService.deleteRow(DATA_TABLE_REF, 7));
 
         List<String> executedSqls = executedSqls();
 
@@ -137,15 +142,16 @@ class DataTableRowServiceTest {
     @Test
     void testInsertRowInsertsAndReadsInASingleStatement() {
         stubQueries(new DataTableRow(7, Map.of("status", "CLOSED")));
+        stubReturningQuery(new DataTableRow(7, Map.of("status", "CLOSED")));
 
-        dataTableRowService.insertRow("conversations", Map.of("status", "CLOSED"), 1);
+        dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("status", "CLOSED"));
 
-        List<String> executedSqls = executedSqls();
+        List<String> executedReturningSqls = executedReturningSqls();
 
         assertTrue(
-            executedSqls.stream()
+            executedReturningSqls.stream()
                 .anyMatch(sql -> sql.startsWith("INSERT INTO") && sql.contains(" RETURNING ")),
-            "expected the row to be returned by the insert itself, got " + executedSqls);
+            "expected the row to be returned by the insert itself, got " + executedReturningSqls);
     }
 
     @Test
@@ -164,7 +170,7 @@ class DataTableRowServiceTest {
 
         stubQueries(new DataTableRow(7, Map.of("status", "CLOSED")));
 
-        dataTableRowService.insertRow("conversations", Map.of("status", "CLOSED"), 1);
+        dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("status", "CLOSED"));
 
         List<String> executedSqls = executedSqls();
 
@@ -177,15 +183,16 @@ class DataTableRowServiceTest {
     @Test
     void testUpdateRowUpdatesAndReadsInASingleStatement() {
         stubQueries(new DataTableRow(7, Map.of("status", "CLOSED")));
+        stubReturningQuery(new DataTableRow(7, Map.of("status", "CLOSED")));
 
-        dataTableRowService.updateRow("conversations", 7, Map.of("status", "CLOSED"), 1);
+        dataTableRowService.updateRow(DATA_TABLE_REF, 7, Map.of("status", "CLOSED"));
 
-        List<String> executedSqls = executedSqls();
+        List<String> executedReturningSqls = executedReturningSqls();
 
         assertTrue(
-            executedSqls.stream()
+            executedReturningSqls.stream()
                 .anyMatch(sql -> sql.startsWith("UPDATE") && sql.contains(" RETURNING ")),
-            "expected the row to be returned by the update itself, got " + executedSqls);
+            "expected the row to be returned by the update itself, got " + executedReturningSqls);
 
         verify(jdbcTemplate, never()).update(anyString(), any(PreparedStatementSetter.class));
     }
@@ -198,7 +205,7 @@ class DataTableRowServiceTest {
 
         stubQueries(new DataTableRow(7, Map.of("status", "CLOSED")));
 
-        dataTableRowService.updateRow("conversations", 7, Map.of("status", "CLOSED"), 1);
+        dataTableRowService.updateRow(DATA_TABLE_REF, 7, Map.of("status", "CLOSED"));
 
         List<String> executedSqls = executedSqls();
 
@@ -212,7 +219,7 @@ class DataTableRowServiceTest {
     void testDeleteRowOfMissingRowPublishesNothing() {
         stubQueries(null);
 
-        assertFalse(dataTableRowService.deleteRow("conversations", 7, 1));
+        assertFalse(dataTableRowService.deleteRow(DATA_TABLE_REF, 7));
 
         verifyNoInteractions(applicationEventPublisher);
     }
@@ -222,6 +229,21 @@ class DataTableRowServiceTest {
 
         verify(jdbcTemplate, atLeastOnce())
             .query(sqlCaptor.capture(), any(PreparedStatementSetter.class), any(RowMapper.class));
+
+        return sqlCaptor.getAllValues();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void stubReturningQuery(DataTableRow dataTableRow) {
+        when(jdbcTemplate.query(anyString(), any(PreparedStatementSetter.class), any(ResultSetExtractor.class)))
+            .thenReturn(dataTableRow);
+    }
+
+    private List<String> executedReturningSqls() {
+        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(jdbcTemplate, atLeastOnce())
+            .query(sqlCaptor.capture(), any(PreparedStatementSetter.class), any(ResultSetExtractor.class));
 
         return sqlCaptor.getAllValues();
     }

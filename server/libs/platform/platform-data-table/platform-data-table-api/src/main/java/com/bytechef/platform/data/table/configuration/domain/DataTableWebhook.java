@@ -29,6 +29,8 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
+ * A webhook registration, which belongs to one data table.
+ *
  * @author Ivica Cardic
  */
 @Table("data_table_webhook")

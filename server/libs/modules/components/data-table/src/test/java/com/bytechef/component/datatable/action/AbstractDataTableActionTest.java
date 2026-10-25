@@ -26,17 +26,40 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableRef;
+import com.bytechef.platform.data.table.domain.DataTableResolution;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import java.time.Instant;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 abstract class AbstractDataTableActionTest {
 
+    protected static final String BASE_NAME = "conversations";
+    protected static final long ENVIRONMENT_ID = 1;
+    protected static final long DATA_TABLE_ID = 11;
+
     protected final DataTableRowService dataTableRowService = mock(DataTableRowService.class);
     protected final DataTableService dataTableService = mock(DataTableService.class);
+
+    protected DataTableRef stubResolvedDataTable() {
+        DataTableRef dataTableRef = new DataTableRef(BASE_NAME, ENVIRONMENT_ID);
+
+        when(
+            dataTableService.fetchDataTableResolution(BASE_NAME, ENVIRONMENT_ID))
+                .thenReturn(Optional.of(new DataTableResolution(DATA_TABLE_ID, dataTableRef)));
+        when(dataTableService.listTables(ENVIRONMENT_ID))
+            .thenReturn(
+                List.of(new DataTableInfo(DATA_TABLE_ID, BASE_NAME, null, List.of(), Instant.EPOCH)));
+
+        return dataTableRef;
+    }
 
     protected static Object perform(
         ModifiableActionDefinition actionDefinition, Map<String, Object> inputParameters) throws Exception {
@@ -47,7 +70,7 @@ abstract class AbstractDataTableActionTest {
         ActionContext actionContext = mock(
             ActionContext.class, withSettings().extraInterfaces(ActionContextAware.class));
 
-        when(((ActionContextAware) actionContext).getEnvironmentId()).thenReturn(1L);
+        when(((ActionContextAware) actionContext).getEnvironmentId()).thenReturn(ENVIRONMENT_ID);
 
         Parameters parameters = MockParametersFactory.create(inputParameters);
 
