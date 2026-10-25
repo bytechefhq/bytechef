@@ -198,6 +198,57 @@ describe('AiProviderForm', () => {
         );
     });
 
+    it('prefills the masked API key a provider already has', () => {
+        renderForm({apiKey: '..........................sk1234'});
+
+        expect(screen.getByDisplayValue('..........................sk1234')).toBeInTheDocument();
+    });
+
+    it('keeps the saved API key when the masked key is left unchanged', async () => {
+        renderForm({apiKey: '..........................sk1234'});
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(mutateMock).toHaveBeenCalledWith({
+                environment: 2,
+                id: 7,
+                updateAiProviderRequest: {},
+            })
+        );
+    });
+
+    it('sends only a new endpoint when the masked API key is left unchanged', async () => {
+        renderForm({
+            apiKey: '..........................sk1234',
+            requiresApiKey: true,
+            requiresEndpoint: true,
+            url: 'https://a.example',
+        });
+
+        await userEvent.clear(screen.getByPlaceholderText('https://<resource>.openai.azure.com'));
+        await userEvent.type(screen.getByPlaceholderText('https://<resource>.openai.azure.com'), 'https://b.example');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(mutateMock).toHaveBeenCalledWith({
+                environment: 2,
+                id: 7,
+                updateAiProviderRequest: {url: 'https://b.example'},
+            })
+        );
+    });
+
+    it('refuses to submit when the masked API key of a provider that requires one is cleared', async () => {
+        renderForm({apiKey: '..........................sk1234'});
+
+        await userEvent.clear(screen.getByPlaceholderText('API Key'));
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(await screen.findByText('API Key is required.')).toBeInTheDocument();
+        expect(mutateMock).not.toHaveBeenCalled();
+    });
+
     it('closes once the update succeeds', () => {
         const {onClose} = renderForm({});
 

@@ -24,7 +24,8 @@ const AiProviderForm = ({
     const requiresApiKey = aiProvider.requiresApiKey ?? true;
     const requiresEndpoint = aiProvider.requiresEndpoint ?? false;
 
-    const maskedApiKey = requiresApiKey ? '' : aiProvider.apiKey || '';
+    const maskedApiKey = aiProvider.apiKey || '';
+    const sendsUrl = !requiresApiKey || requiresEndpoint;
 
     const formSchema = z.object({
         apiKey: requiresApiKey ? z.string().min(1, {message: 'API Key is required.'}) : z.string().optional(),
@@ -58,13 +59,10 @@ const AiProviderForm = ({
         updateAiProviderMutation.mutate({
             environment,
             id: aiProvider.id!,
-            updateAiProviderRequest: !requiresApiKey
-                ? values.apiKey === maskedApiKey
-                    ? {url: values.url}
-                    : {apiKey: values.apiKey || '', url: values.url}
-                : requiresEndpoint
-                  ? {apiKey: values.apiKey, url: values.url}
-                  : {apiKey: values.apiKey},
+            updateAiProviderRequest: {
+                ...(values.apiKey !== maskedApiKey && {apiKey: values.apiKey || ''}),
+                ...(sendsUrl && {url: values.url}),
+            },
         });
     }
 
