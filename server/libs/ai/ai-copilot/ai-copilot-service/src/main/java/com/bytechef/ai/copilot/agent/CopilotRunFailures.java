@@ -30,6 +30,8 @@ import org.springframework.security.core.AuthenticationException;
 final class CopilotRunFailures {
 
     static final String NO_PROVIDER = "No AI provider is set up for this environment, so the chat can't answer.";
+    static final String OUT_OF_CREDITS =
+        "The AI provider account is out of credits. Ask an administrator to top it up or switch providers.";
     static final String RATE_LIMITED = "The AI provider is rate limiting requests right now. Try again in a minute.";
     static final String OVERLOADED = "The AI provider is overloaded right now. Try again in a minute.";
     static final String API_KEY_REJECTED = "The AI provider rejected its API key. Ask an administrator to check it.";
@@ -75,6 +77,12 @@ final class CopilotRunFailures {
 
         if (lowerCaseMessage.startsWith("no chat provider is activated")) {
             return NO_PROVIDER;
+        }
+
+        if (lowerCaseMessage.contains("credit balance is too low") || lowerCaseMessage.contains("insufficient_quota")
+            || lowerCaseMessage.contains("exceeded your current quota")) {
+
+            return OUT_OF_CREDITS;
         }
 
         if (className.contains("ratelimit") || lowerCaseMessage.contains("rate limit")

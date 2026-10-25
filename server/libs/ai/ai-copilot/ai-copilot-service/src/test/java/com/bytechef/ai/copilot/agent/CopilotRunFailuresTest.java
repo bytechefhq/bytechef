@@ -36,6 +36,19 @@ class CopilotRunFailuresTest {
     }
 
     @Test
+    void testDescribesAnAccountOutOfCredits() {
+        RuntimeException anthropicCredits = new RuntimeException(
+            "400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit " +
+                "balance is too low to access the Anthropic API.\"}}");
+
+        assertThat(CopilotRunFailures.describe(new IllegalStateException("Chat stream failed", anthropicCredits)))
+            .isEqualTo(CopilotRunFailures.OUT_OF_CREDITS);
+        assertThat(CopilotRunFailures.describe(new RuntimeException(
+            "HTTP 429 - {\"error\":{\"message\":\"You exceeded your current quota\",\"type\":\"insufficient_quota\"}}")))
+                .isEqualTo(CopilotRunFailures.OUT_OF_CREDITS);
+    }
+
+    @Test
     void testDescribesARateLimitFoundInTheCauseChain() {
         RuntimeException rateLimit = new RuntimeException(
             "HTTP 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\"}}");
