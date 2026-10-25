@@ -1,5 +1,15 @@
-mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole!) {
-    setEmbeddedUserEnvironmentRole(userId: $userId, environment: $environment, role: $role) {
+mutation SetEmbeddedUserEnvironmentRole(
+    $userId: ID!
+    $environment: EnvironmentEnum!
+    $role: WorkspaceRole
+    $customRoleId: ID
+) {
+    setEmbeddedUserEnvironmentRole(
+        userId: $userId
+        environment: $environment
+        role: $role
+        customRoleId: $customRoleId
+    ) {
         id
         userId
         embeddedRole
