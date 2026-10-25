@@ -190,7 +190,9 @@ spring:
       org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration,
       org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration,
       org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,
-      org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration
+      org.springframework.boot.neo4j.autoconfigure.Neo4jAutoConfiguration,
+      org.springframework.boot.session.data.redis.autoconfigure.SessionDataRedisAutoConfiguration,
+      org.springframework.boot.session.jdbc.autoconfigure.JdbcSessionAutoConfiguration
   batch:
     job:
       enabled: false
