@@ -68,7 +68,7 @@ class TenantBucketS3SessionRepositoryTest {
 
     @Test
     void testCreatesValidBucketForLongTenantId() {
-        String bucketName = createBucketNameForTenant("t".repeat(80));
+        String bucketName = createBucketNameForTenant("t".repeat(63));
 
         assertThat(bucketName).matches(S3_BUCKET_NAME);
     }

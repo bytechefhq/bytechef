@@ -111,10 +111,9 @@ public abstract class BaseDataSource implements DataSource {
      * relies on this API class and does not depend on the multitenant database, this method can be safely ignored.
      * </p>
      * <p>
-     * <b>Security Note:</b> The SQL injection suppression is for schema name configuration statement that cannot be
-     * parameterized with PreparedStatement in PostgreSQL. Schema names must be included as identifiers, not as
-     * parameterized values. The tenant ID is validated to contain only alphanumeric characters, underscores, and
-     * hyphens to prevent SQL injection. This is a PostgreSQL limitation, not a security vulnerability.
+     * <b>Security Note:</b> PostgreSQL does not accept bind parameters for identifiers, so the statement is built from
+     * the constant prefix and schema names quoted by {@link SqlIdentifierUtils#quoteIdentifier(String)}. The tenant id
+     * those names derive from is validated by {@link TenantContext} when it is set.
      * </p>
      * <p>
      * The {@code public} schema is always appended as a fallback so that objects installed there (e.g. the pgvector
@@ -129,7 +128,9 @@ public abstract class BaseDataSource implements DataSource {
         String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema(getVectorSchemaSuffix());
 
         String searchPath = Objects.equals(currentDatabaseSchema, TenantContext.DEFAULT_TENANT_ID)
-            ? currentDatabaseSchema : currentDatabaseSchema + ", " + TenantContext.DEFAULT_TENANT_ID;
+            ? SqlIdentifierUtils.quoteIdentifier(currentDatabaseSchema)
+            : SqlIdentifierUtils.quoteIdentifier(currentDatabaseSchema) + ", " +
+                SqlIdentifierUtils.quoteIdentifier(TenantContext.DEFAULT_TENANT_ID);
 
         try (PreparedStatement statement =
             connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + searchPath)) {
@@ -147,5 +148,4 @@ public abstract class BaseDataSource implements DataSource {
     protected String getVectorSchemaSuffix() {
         return null;
     }
-
 }

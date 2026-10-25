@@ -29,6 +29,7 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.tenant.TenantContext;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -253,7 +254,11 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
                     if (subJobId != null) {
                         try {
-                            jobFacade.stopJob(subJobId);
+                            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(
+                                callSession.getWorkflowExecutionId());
+
+                            TenantContext.runWithTenantId(
+                                workflowExecutionId.getTenantId(), () -> jobFacade.stopJob(subJobId));
                         } catch (Exception exception) {
                             log.warn(
                                 "Failed to stop sub-workflow on WebSocket close: callSid={}, subJobId={}",
@@ -354,33 +359,35 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
             try {
                 WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(webhookIdString);
 
-                String websocketSubflowDefinition = getWebsocketSubflowDefinition(workflowExecutionId);
+                TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+                    String websocketSubflowDefinition = getWebsocketSubflowDefinition(workflowExecutionId);
 
-                if (websocketSubflowDefinition == null || websocketSubflowDefinition.isBlank()) {
-                    log.warn(
-                        "No websocket subflow definition found in trigger for callSid={}", callSid);
+                    if (websocketSubflowDefinition == null || websocketSubflowDefinition.isBlank()) {
+                        log.warn(
+                            "No websocket subflow definition found in trigger for callSid={}", callSid);
 
-                    return;
-                }
+                        return;
+                    }
 
-                log.info("Starting websocket subflow: callSid={}", callSid);
+                    log.info("Starting websocket subflow: callSid={}", callSid);
 
-                Workflow subflowWorkflow = workflowService.create(
-                    websocketSubflowDefinition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+                    Workflow subflowWorkflow = workflowService.create(
+                        websocketSubflowDefinition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
-                Map<String, Object> inputs = new LinkedHashMap<>();
+                    Map<String, Object> inputs = new LinkedHashMap<>();
 
-                inputs.put("callSid", callSid);
-                inputs.put("mainWorkflowExecutionId", webhookIdString);
+                    inputs.put("callSid", callSid);
+                    inputs.put("mainWorkflowExecutionId", webhookIdString);
 
-                JobParametersDTO jobParameters = new JobParametersDTO(subflowWorkflow.getId(), inputs);
+                    JobParametersDTO jobParameters = new JobParametersDTO(subflowWorkflow.getId(), inputs);
 
-                long subJobId = jobFacade.createJob(jobParameters);
+                    long subJobId = jobFacade.createJob(jobParameters);
 
-                callSession.setSubJobId(subJobId);
+                    callSession.setSubJobId(subJobId);
 
-                log.info(
-                    "Websocket subflow started: callSid={}, subJobId={}", callSid, subJobId);
+                    log.info(
+                        "Websocket subflow started: callSid={}, subJobId={}", callSid, subJobId);
+                });
             } catch (Exception exception) {
                 log.error("Failed to start websocket subflow: callSid={}", callSid, exception);
             }

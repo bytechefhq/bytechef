@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Test webhook trigger controller for workflow testing and development.
@@ -85,7 +86,7 @@ public class WebhookTriggerTestController {
     public ResponseEntity<?> executeWorkflow(
         @PathVariable String id, @PathVariable long environmentId, HttpServletRequest httpServletRequest) {
 
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
+        WorkflowExecutionId workflowExecutionId = parseWorkflowExecutionId(id);
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
@@ -128,6 +129,14 @@ public class WebhookTriggerTestController {
 
             return responseEntity;
         });
+    }
+
+    private static WorkflowExecutionId parseWorkflowExecutionId(String id) {
+        try {
+            return WorkflowExecutionId.parse(id);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid webhook id", illegalArgumentException);
+        }
     }
 
     private ResponseEntity<?> doValidateOnEnable(
