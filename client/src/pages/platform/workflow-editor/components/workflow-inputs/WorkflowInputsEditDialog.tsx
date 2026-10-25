@@ -68,7 +68,11 @@ const WorkflowInputsEditDialog = ({
             <DialogContent>
                 <DialogMain>
                     <DialogHeader
-                        description="Add a new workflow input definition."
+                        description={
+                            currentInputIndex === -1
+                                ? 'Add a new workflow input definition.'
+                                : 'Edit the workflow input definition.'
+                        }
                         title={`${currentInputIndex === -1 ? 'Create a new' : 'Edit'} Input`}
                     />
 
