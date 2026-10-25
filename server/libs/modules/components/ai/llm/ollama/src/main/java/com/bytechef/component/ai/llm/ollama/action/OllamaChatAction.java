@@ -208,7 +208,9 @@ public class OllamaChatAction {
 
             String reasoningEffort = ModelUtils.getReasoningEffort(inputParameters);
 
-            if (reasoningEffort != null) {
+            if (reasoningEffort == null) {
+                ollamaChatOptionsBuilder.thinkOption(ThinkOption.ThinkBoolean.DISABLED);
+            } else {
                 ollamaChatOptionsBuilder.thinkOption(new ThinkOption.ThinkLevel(reasoningEffort));
             }
 
