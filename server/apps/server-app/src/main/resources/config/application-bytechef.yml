@@ -78,6 +78,9 @@ bytechef:
     # Cache provider (caffeine) default: caffeine
     provider: caffeine
   coordinator:
+    # How long a starting CE coordinator waits for the lock of the previous coordinator, e.g. during a rolling
+    # deployment, before it stops with the edition message (default: 60s)
+    lock-wait: 60s
     trigger:
       polling:
         # Trigger polling interval in minutes (default: 5)

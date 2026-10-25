@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Redis;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.ResourceServer;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -207,6 +208,21 @@ class ApplicationPropertiesTest {
 
         assertThat(quartz.isClustered()).isTrue();
         assertThat(quartz.getClusterCheckinInterval()).isEqualTo(20000L);
+    }
+
+    @Test
+    void testBindsCoordinatorLockWait() {
+        MapConfigurationPropertySource mapConfigurationPropertySource = new MapConfigurationPropertySource(
+            Map.of("bytechef.coordinator.lock-wait", "45s"));
+
+        Binder binder = new Binder(mapConfigurationPropertySource);
+
+        ApplicationProperties applicationProperties = binder.bind(
+            "bytechef", Bindable.of(ApplicationProperties.class), new NoUnboundElementsBindHandler(BindHandler.DEFAULT))
+            .get();
+
+        assertThat(applicationProperties.getCoordinator()
+            .getLockWait()).isEqualTo(Duration.ofSeconds(45));
     }
 
     @Test

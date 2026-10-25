@@ -71,7 +71,11 @@ A CE coordinator takes a PostgreSQL advisory lock when it starts and holds it fo
 Another coordinator is already running. Running more than one coordinator requires ByteChef Enterprise Edition (bytechef.edition=ee, BYTECHEF_EDITION=ee).
 ```
 
-If a coordinator loses its database connection, it reconnects and takes the lock again. If another coordinator took the lock in between, the node shuts down. EE takes no lock.
+A starting coordinator waits for the lock before it gives up: it retries every 2 seconds for up to `BYTECHEF_COORDINATOR_LOCK_WAIT` (default `60s`) and only then stops with the message above. A running coordinator that loses its lock connection shuts down at once, so it never runs alongside a coordinator that took the lock in the meantime. The orchestrator restarts it (the reference Compose file uses `restart: unless-stopped`), and on startup it waits for the lock as above. EE takes no lock.
+
+The lock connection asks PostgreSQL for TCP keepalives, so the database releases the lock within about 25 seconds after a crashed host or a network partition instead of after the operating system's default timeout.
+
+**Rolling deployments.** Stop the old CE coordinator before the new one starts: use the Recreate strategy in Kubernetes, or stop the old container first in Docker. The new coordinator then waits up to the lock wait for the old one to release the lock. A rolling update that keeps the old coordinator running for longer than the lock wait makes the new one stop with the edition message.
 
 ## Scheduler clustering
 
