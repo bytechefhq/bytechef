@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
@@ -102,6 +103,24 @@ class WorkspaceScopeCacheServiceTest {
             .thenReturn(Optional.of(workspaceUser));
         when(customRoleScopeResolver.resolveScopes(900L))
             .thenReturn(Optional.of(Set.of("PROJECT_SETTINGS")));
+        when(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.AUTOMATION))
+            .thenReturn(Set.of("PROJECT_SETTINGS"));
+
+        Set<String> result = service.getWorkspaceScopes(USER_ID, WORKSPACE_ID);
+
+        assertThat(result).containsExactly("PROJECT_SETTINGS");
+    }
+
+    @Test
+    void testGetWorkspaceScopesIgnoresEmbeddedScopeNamesOfACustomRole() {
+        WorkspaceUser workspaceUser = WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, 900L);
+
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(workspaceUser));
+        when(customRoleScopeResolver.resolveScopes(900L))
+            .thenReturn(Optional.of(Set.of("PROJECT_SETTINGS", "INTEGRATION_CREATE")));
+        when(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.AUTOMATION))
+            .thenReturn(Set.of("PROJECT_SETTINGS"));
 
         Set<String> result = service.getWorkspaceScopes(USER_ID, WORKSPACE_ID);
 

@@ -51,7 +51,7 @@ public class PermissionScopeRegistry {
     private final Map<PermissionScopeSide, Set<String>> allScopeNamesBySide;
     private final List<BuiltInRoleDTO> builtInRoles;
     private final Map<PermissionScopeSide, Map<WorkspaceRole, Set<String>>> roleScopeNamesBySide;
-    private final List<PermissionScopeGroupDTO> scopeGroups;
+    private final Map<PermissionScopeSide, List<PermissionScopeGroupDTO>> scopeGroupsBySide;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
@@ -141,7 +141,7 @@ public class PermissionScopeRegistry {
             roleScopeNamesBySide.put(side, Collections.unmodifiableMap(roleScopeNames));
         }
 
-        this.scopeGroups = Collections.unmodifiableList(scopeGroupsBySide.get(PermissionScopeSide.AUTOMATION));
+        this.scopeGroupsBySide = Collections.unmodifiableMap(scopeGroupsBySide);
         this.allScopeNamesBySide = Collections.unmodifiableMap(allScopeNamesBySide);
         this.roleScopeNamesBySide = Collections.unmodifiableMap(roleScopeNamesBySide);
 
@@ -196,7 +196,11 @@ public class PermissionScopeRegistry {
      * boot. Used by the custom-role editor; validation uses {@link #getAllScopeNames()} against the same registration.
      */
     public List<PermissionScopeGroupDTO> getScopeGroups() {
-        return scopeGroups;
+        return getScopeGroups(PermissionScopeSide.AUTOMATION);
+    }
+
+    public List<PermissionScopeGroupDTO> getScopeGroups(PermissionScopeSide side) {
+        return scopeGroupsBySide.get(side);
     }
 
     /**
