@@ -18,6 +18,7 @@ package com.bytechef.message.broker.redis.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -137,6 +138,28 @@ class RedisListenerEndpointRegistrarTest {
 
         verify(streamOperations).acknowledge(STREAM_NAME, CONSUMER_GROUP, RecordId.of("1-0"));
         verify(streamOperations).acknowledge(STREAM_NAME, CONSUMER_GROUP, RecordId.of("2-0"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testPollingBacksOffAfterRepeatedReadFailures() throws InterruptedException {
+        RedisListenerEndpointRegistrar failingRedisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
+            redisMessageDeserializer, stringRedisTemplate, runnable -> new Thread(runnable).start());
+
+        failingRedisListenerEndpointRegistrar.registerListenerEndpoint(
+            new TestMessageRoute(MessageRoute.Exchange.MESSAGE, STREAM_NAME), new FirstMessageHandler(), "handle");
+
+        when(streamOperations.read(any(Consumer.class), any(StreamReadOptions.class), any(StreamOffset.class)))
+            .thenThrow(new IllegalStateException("LettuceConnectionFactory has been STOPPED"));
+
+        failingRedisListenerEndpointRegistrar.start();
+
+        Thread.sleep(350);
+
+        failingRedisListenerEndpointRegistrar.stop();
+
+        verify(streamOperations, atMost(5)).read(
+            any(Consumer.class), any(StreamReadOptions.class), any(StreamOffset.class));
     }
 
     private static MapRecord<String, Object, Object> createStreamRecord(String recordId, String message) {
