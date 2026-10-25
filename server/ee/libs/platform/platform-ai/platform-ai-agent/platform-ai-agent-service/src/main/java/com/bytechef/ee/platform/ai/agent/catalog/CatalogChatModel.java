@@ -19,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -55,6 +56,11 @@ public class CatalogChatModel implements ChatModel {
     @Override
     public ChatResponse call(Prompt prompt) {
         return resolveDelegate().call(prompt);
+    }
+
+    @Override
+    public ChatOptions getOptions() {
+        return resolveDelegate().getOptions();
     }
 
     @Override
