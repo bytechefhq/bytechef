@@ -18,10 +18,8 @@ package com.bytechef.cache.config;
 
 import com.bytechef.cache.interceptor.TenantKeyGenerator;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import java.time.Duration;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.cache.autoconfigure.RedisCacheManagerBuilderCustomizer;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -29,10 +27,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Ivica Cardic
@@ -43,22 +38,17 @@ public class CacheConfiguration implements CachingConfigurer {
 
     private static final String REENTRANT_LOCK_CACHE =
         "com.bytechef.platform.component.aspect.TokenRefreshHandler.reentrantLock";
+    private static final Set<String> COMMUNITY_EDITION_WEBHOOK_NODE_UNCACHED_CACHES = Set.of(
+        "com.bytechef.atlas.configuration.service.WorkflowService.workflow",
+        "com.bytechef.atlas.configuration.service.WorkflowService.workflows");
 
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef", name = "cache.provider", havingValue = "redis")
-    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
-        Class<?> clazz = getClass();
+    private final Environment environment;
 
-        return (builder) -> {
-            ClassLoader classLoader = clazz.getClassLoader();
-
-            builder.cacheDefaults(getCacheConfiguration(10, classLoader))
-                .withCacheConfiguration(REENTRANT_LOCK_CACHE, getCacheConfiguration(1, classLoader));
-        };
+    public CacheConfiguration(Environment environment) {
+        this.environment = environment;
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef", name = "cache.provider", havingValue = "caffeine")
     public CacheManager cacheManager() {
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
 
@@ -74,6 +64,10 @@ public class CacheConfiguration implements CachingConfigurer {
                 .recordStats()
                 .build());
 
+        if (isCommunityEditionWebhookNode()) {
+            return new UncachedNamesCacheManager(caffeineCacheManager, COMMUNITY_EDITION_WEBHOOK_NODE_UNCACHED_CACHES);
+        }
+
         return caffeineCacheManager;
     }
 
@@ -82,10 +76,11 @@ public class CacheConfiguration implements CachingConfigurer {
         return new TenantKeyGenerator();
     }
 
-    private static RedisCacheConfiguration getCacheConfiguration(int minutes, ClassLoader clazz) {
-        return RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(minutes))
-            .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer()))
-            .serializeValuesWith(SerializationPair.fromSerializer(new JdkSerializationRedisSerializer(clazz)));
+    private boolean isCommunityEditionWebhookNode() {
+        String edition = environment.getProperty("bytechef.edition", "ce");
+        boolean coordinatorEnabled = environment.getProperty("bytechef.coordinator.enabled", Boolean.class, true);
+        boolean webhookEnabled = environment.getProperty("bytechef.webhook.enabled", Boolean.class, true);
+
+        return "ce".equalsIgnoreCase(edition) && webhookEnabled && !coordinatorEnabled;
     }
 }
