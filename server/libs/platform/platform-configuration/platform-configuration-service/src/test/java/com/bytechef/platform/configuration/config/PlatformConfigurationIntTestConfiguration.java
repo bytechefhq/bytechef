@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.config;
 
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
@@ -81,6 +82,7 @@ public class PlatformConfigurationIntTestConfiguration {
         protected List<?> userConverters() {
             return Arrays.asList(
                 new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
                 new StringToMapWrapperConverter(objectMapper));
         }

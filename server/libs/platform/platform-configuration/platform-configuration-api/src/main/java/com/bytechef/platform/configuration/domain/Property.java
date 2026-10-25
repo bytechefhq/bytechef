@@ -55,7 +55,7 @@ public class Property {
     private Long scopeId;
 
     @Column
-    private EncryptedMapWrapper value;
+    private EncryptedMapWrapper value = new EncryptedMapWrapper();
 
     @Column
     private @Nullable Integer environment;
