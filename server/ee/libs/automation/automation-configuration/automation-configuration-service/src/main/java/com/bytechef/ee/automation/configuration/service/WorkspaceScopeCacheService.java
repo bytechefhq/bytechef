@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.service.PermissionService.UserWorks
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @version ee
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional(readOnly = true)
 public class WorkspaceScopeCacheService {
 

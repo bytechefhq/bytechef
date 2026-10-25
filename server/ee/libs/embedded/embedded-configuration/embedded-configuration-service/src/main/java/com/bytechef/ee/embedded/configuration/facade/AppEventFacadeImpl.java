@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnEEVersion
 @Transactional(readOnly = true)
 public class AppEventFacadeImpl implements AppEventFacade {
 
