@@ -55,7 +55,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Long connectionId) {
+        Long connectionId, String workflowId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options"),
@@ -69,7 +69,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Map<String, Long> connectionIds, Map<String, ?> extensions) {
+        Map<String, Long> connectionIds, Map<String, ?> extensions, String workflowId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName,
@@ -83,7 +83,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds, String workflowId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
