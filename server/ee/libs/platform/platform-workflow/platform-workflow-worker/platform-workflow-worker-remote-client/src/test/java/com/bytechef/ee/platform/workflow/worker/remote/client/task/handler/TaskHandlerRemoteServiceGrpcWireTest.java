@@ -140,6 +140,27 @@ class TaskHandlerRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testHandleSpreadsTasksOverEveryWorkerOfferingTheComponent() throws TaskExecutionException {
+        when(discoveryClient.getInstances("worker-app")).thenReturn(
+            List.of(
+                new DefaultServiceInstance(
+                    "worker-app:1", "worker-app", "worker-1", 8080, false,
+                    Map.of("components", "[{\"name\":\"randomHelper\"}]", "grpc-port", "9090")),
+                new DefaultServiceInstance(
+                    "worker-app:2", "worker-app", "worker-2", 8080, false,
+                    Map.of("components", "[{\"name\":\"randomHelper\"}]", "grpc-port", "9090"))));
+
+        for (int index = 0; index < 4; index++) {
+            remoteTaskHandlerClient.handle(
+                "randomHelper/v1/randomFloat", taskExecution("randomHelper/v1/randomFloat", Map.of()));
+        }
+
+        assertThat(requestedTargets).containsOnly("worker-app:1", "worker-app:2");
+        assertThat(requestedTargets).containsExactlyInAnyOrder(
+            "worker-app:1", "worker-app:1", "worker-app:2", "worker-app:2");
+    }
+
+    @Test
     void testHandleWithoutAdvertisingWorkerUsesTheServiceChannel() throws TaskExecutionException {
         remoteTaskHandlerClient.handle("var/v1/set", taskExecution("var/v1/set", Map.of()));
 
