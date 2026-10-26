@@ -46,7 +46,7 @@ import {
     useAiProviderCatalogQuery,
     useResolveAiHubToolApprovalMutation,
 } from '@/shared/middleware/graphql';
-import {GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
+import {GraphQLHttpError, GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {environmentStore, useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -717,7 +717,9 @@ export const buildAiHubSubscriber = ({
             }
 
             const toolResultContent = contentToText(event.content);
-            const toolCallName = toolCallNamesById.get(event.toolCallId);
+            const toolCallName =
+                toolCallNamesById.get(event.toolCallId) ??
+                aiChatToolCallStore.getState().toolCalls[event.toolCallId]?.toolName;
 
             toolCallNamesById.delete(event.toolCallId);
 
@@ -1372,7 +1374,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
                 console.error('Failed to auto-create chat on first message:', error);
 
-                if (!(error instanceof GraphQLResponseError)) {
+                if (!(error instanceof GraphQLResponseError) && !(error instanceof GraphQLHttpError)) {
                     toast.error(`Failed to start chat: ${errorMessage}`);
                 }
 
