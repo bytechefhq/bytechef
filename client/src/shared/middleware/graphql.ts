@@ -384,6 +384,357 @@ export type AuditEventTypesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuditEventTypesQuery = { auditEventTypes: Array<string> };
 
+export type AiGatewayBudgetQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiGatewayBudgetQuery = { aiGatewayBudget: { alertThreshold: number, amount: string, createdDate: any, enabled: boolean, enforcementMode: Types.AiGatewayBudgetEnforcementMode, id: string, lastModifiedDate: any, period: Types.AiGatewayBudgetPeriod, version: number | null } | null };
+
+export type CreateAiGatewayBudgetMutationVariables = Exact<{
+  input: Types.CreateAiGatewayBudgetInput;
+}>;
+
+
+export type CreateAiGatewayBudgetMutation = { createAiGatewayBudget: { alertThreshold: number, amount: string, createdDate: any, enabled: boolean, enforcementMode: Types.AiGatewayBudgetEnforcementMode, id: string, lastModifiedDate: any, period: Types.AiGatewayBudgetPeriod, version: number | null } | null };
+
+export type UpdateAiGatewayBudgetMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateAiGatewayBudgetInput;
+}>;
+
+
+export type UpdateAiGatewayBudgetMutation = { updateAiGatewayBudget: { alertThreshold: number, amount: string, createdDate: any, enabled: boolean, enforcementMode: Types.AiGatewayBudgetEnforcementMode, id: string, lastModifiedDate: any, period: Types.AiGatewayBudgetPeriod, version: number | null } | null };
+
+export type DeleteAiGatewayBudgetMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiGatewayBudgetMutation = { deleteAiGatewayBudget: boolean | null };
+
+export type AiGatewayProjectSettingsQueryVariables = Exact<{
+  projectId: string | number;
+}>;
+
+
+export type AiGatewayProjectSettingsQuery = { aiGatewayProjectSettings: { blockedTerms: string | null, injectionDetectionEnabled: boolean | null, moderationEnabled: boolean | null, projectId: string, redactPii: boolean | null, redactSecrets: boolean | null, scanResponses: boolean | null } | null };
+
+export type UpdateAiGatewayProjectSettingsMutationVariables = Exact<{
+  input: Types.AiGatewayProjectSettingsInput;
+}>;
+
+
+export type UpdateAiGatewayProjectSettingsMutation = { updateAiGatewayProjectSettings: { blockedTerms: string | null, injectionDetectionEnabled: boolean | null, moderationEnabled: boolean | null, projectId: string, redactPii: boolean | null, redactSecrets: boolean | null, scanResponses: boolean | null } | null };
+
+export type AiGatewayProjectsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiGatewayProjectsQuery = { aiGatewayProjects: Array<{ cachingEnabled: boolean | null, cacheTtlMinutes: number | null, compressionEnabled: boolean | null, createdDate: any, description: string | null, id: string, lastModifiedDate: any, logRetentionDays: number | null, name: string, retryMaxAttempts: number | null, routingPolicyId: string | null, slug: string, timeoutSeconds: number | null, version: number | null }> };
+
+export type CreateAiGatewayProjectMutationVariables = Exact<{
+  input: Types.CreateAiGatewayProjectInput;
+}>;
+
+
+export type CreateAiGatewayProjectMutation = { createAiGatewayProject: { id: string, name: string, slug: string } | null };
+
+export type UpdateAiGatewayProjectMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateAiGatewayProjectInput;
+}>;
+
+
+export type UpdateAiGatewayProjectMutation = { updateAiGatewayProject: { id: string, name: string, slug: string } | null };
+
+export type DeleteAiGatewayProjectMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiGatewayProjectMutation = { deleteAiGatewayProject: boolean | null };
+
+export type AiGatewayProvidersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AiGatewayProvidersQuery = { aiGatewayProviders: Array<{ baseUrl: string | null, config: string | null, createdBy: string | null, createdDate: any, enabled: boolean, id: string, lastModifiedBy: string | null, lastModifiedDate: any, name: string, type: Types.AiGatewayProviderType, version: number | null } | null> | null };
+
+export type AiGatewayProviderQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type AiGatewayProviderQuery = { aiGatewayProvider: { baseUrl: string | null, config: string | null, createdBy: string | null, createdDate: any, enabled: boolean, id: string, lastModifiedBy: string | null, lastModifiedDate: any, name: string, type: Types.AiGatewayProviderType, version: number | null } | null };
+
+export type CreateAiGatewayProviderMutationVariables = Exact<{
+  input: Types.CreateAiGatewayProviderInput;
+}>;
+
+
+export type CreateAiGatewayProviderMutation = { createAiGatewayProvider: { baseUrl: string | null, config: string | null, createdBy: string | null, createdDate: any, enabled: boolean, id: string, lastModifiedBy: string | null, lastModifiedDate: any, name: string, type: Types.AiGatewayProviderType, version: number | null } | null };
+
+export type UpdateAiGatewayProviderMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateAiGatewayProviderInput;
+}>;
+
+
+export type UpdateAiGatewayProviderMutation = { updateAiGatewayProvider: { baseUrl: string | null, config: string | null, createdBy: string | null, createdDate: any, enabled: boolean, id: string, lastModifiedBy: string | null, lastModifiedDate: any, name: string, type: Types.AiGatewayProviderType, version: number | null } | null };
+
+export type DeleteAiGatewayProviderMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiGatewayProviderMutation = { deleteAiGatewayProvider: boolean | null };
+
+export type AiGatewayRateLimitsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiGatewayRateLimitsQuery = { aiGatewayRateLimits: Array<{ createdDate: any, enabled: boolean, id: string, lastModifiedDate: any, limitType: Types.AiGatewayRateLimitType, limitValue: number, name: string, projectId: string | null, propertyKey: string | null, scope: Types.AiGatewayRateLimitScope, version: number | null, windowSeconds: number }> };
+
+export type CreateAiGatewayRateLimitMutationVariables = Exact<{
+  input: Types.CreateAiGatewayRateLimitInput;
+}>;
+
+
+export type CreateAiGatewayRateLimitMutation = { createAiGatewayRateLimit: { createdDate: any, enabled: boolean, id: string, lastModifiedDate: any, limitType: Types.AiGatewayRateLimitType, limitValue: number, name: string, projectId: string | null, propertyKey: string | null, scope: Types.AiGatewayRateLimitScope, version: number | null, windowSeconds: number } | null };
+
+export type UpdateAiGatewayRateLimitMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateAiGatewayRateLimitInput;
+}>;
+
+
+export type UpdateAiGatewayRateLimitMutation = { updateAiGatewayRateLimit: { createdDate: any, enabled: boolean, id: string, lastModifiedDate: any, limitType: Types.AiGatewayRateLimitType, limitValue: number, name: string, projectId: string | null, propertyKey: string | null, scope: Types.AiGatewayRateLimitScope, version: number | null, windowSeconds: number } | null };
+
+export type DeleteAiGatewayRateLimitMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiGatewayRateLimitMutation = { deleteAiGatewayRateLimit: boolean | null };
+
+export type AiGatewayRequestLogsQueryVariables = Exact<{
+  startDate: any;
+  endDate: any;
+}>;
+
+
+export type AiGatewayRequestLogsQuery = { aiGatewayRequestLogs: Array<{ apiKeyId: string | null, cacheHit: boolean | null, cost: string | null, createdDate: any, errorMessage: string | null, id: string, inputTokens: number | null, latencyMs: number | null, outputTokens: number | null, requestId: string, requestedModel: string | null, routedModel: string | null, routedProvider: string | null, routingPolicyId: string | null, routingStrategy: string | null, status: number | null } | null> | null };
+
+export type AiGatewayRoutingPoliciesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AiGatewayRoutingPoliciesQuery = { aiGatewayRoutingPolicies: Array<{ config: string | null, createdDate: any, enabled: boolean, fallbackModel: string | null, id: string, lastModifiedDate: any, name: string, strategy: Types.AiGatewayRoutingStrategyType, version: number | null, deployments: Array<{ enabled: boolean, id: string, maxRpm: number | null, maxTpm: number | null, modelId: string, priorityOrder: number, routingPolicyId: string, weight: number } | null> | null } | null> | null };
+
+export type CreateAiGatewayRoutingPolicyMutationVariables = Exact<{
+  input: Types.CreateAiGatewayRoutingPolicyInput;
+}>;
+
+
+export type CreateAiGatewayRoutingPolicyMutation = { createAiGatewayRoutingPolicy: { config: string | null, createdDate: any, enabled: boolean, fallbackModel: string | null, id: string, lastModifiedDate: any, name: string, strategy: Types.AiGatewayRoutingStrategyType, version: number | null } | null };
+
+export type UpdateAiGatewayRoutingPolicyMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateAiGatewayRoutingPolicyInput;
+}>;
+
+
+export type UpdateAiGatewayRoutingPolicyMutation = { updateAiGatewayRoutingPolicy: { config: string | null, createdDate: any, enabled: boolean, fallbackModel: string | null, id: string, lastModifiedDate: any, name: string, strategy: Types.AiGatewayRoutingStrategyType, version: number | null } | null };
+
+export type DeleteAiGatewayRoutingPolicyMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiGatewayRoutingPolicyMutation = { deleteAiGatewayRoutingPolicy: boolean | null };
+
+export type AiGatewaySpendSummariesQueryVariables = Exact<{
+  startDate: any;
+  endDate: any;
+}>;
+
+
+export type AiGatewaySpendSummariesQuery = { aiGatewaySpendSummaries: Array<{ apiKeyId: string | null, createdDate: any, id: string, model: string | null, periodEnd: any, periodStart: any, provider: string | null, requestCount: number | null, totalCost: string | null, totalInputTokens: any, totalOutputTokens: any } | null> | null };
+
+export type AiGatewayWorkspaceSettingsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiGatewayWorkspaceSettingsQuery = { aiGatewayWorkspaceSettings: { cacheEnabled: boolean | null, cacheTtlSeconds: number | null, defaultRoutingPolicyId: string | null, logRetentionDays: number | null, retryCount: number | null, softBudgetWarningPct: number | null, timeoutMs: number | null, workspaceId: string } | null };
+
+export type UpdateAiGatewayWorkspaceSettingsMutationVariables = Exact<{
+  input: Types.AiGatewayWorkspaceSettingsInput;
+}>;
+
+
+export type UpdateAiGatewayWorkspaceSettingsMutation = { updateAiGatewayWorkspaceSettings: { cacheEnabled: boolean | null, cacheTtlSeconds: number | null, defaultRoutingPolicyId: string | null, logRetentionDays: number | null, retryCount: number | null, softBudgetWarningPct: number | null, timeoutMs: number | null, workspaceId: string } | null };
+
+export type AiModelsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AiModelsQuery = { aiModels: Array<{ alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
+
+export type AiModelsByProviderQueryVariables = Exact<{
+  providerId: string | number;
+}>;
+
+
+export type AiModelsByProviderQuery = { aiModelsByProvider: Array<{ alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
+
+export type CreateAiModelMutationVariables = Exact<{
+  input: Types.CreateAiModelInput;
+}>;
+
+
+export type CreateAiModelMutation = { createAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
+export type UpdateAiModelMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateAiModelInput;
+}>;
+
+
+export type UpdateAiModelMutation = { updateAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
+export type DeleteAiModelMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAiModelMutation = { deleteAiModel: boolean | null };
+
+export type UnpinAiModelMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type UnpinAiModelMutation = { unpinAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
+export type WorkspaceAiGatewayProvidersQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceAiGatewayProvidersQuery = { workspaceAiGatewayProviders: Array<{ baseUrl: string | null, config: string | null, createdBy: string | null, createdDate: any, enabled: boolean, id: string, lastModifiedBy: string | null, lastModifiedDate: any, name: string, type: Types.AiGatewayProviderType, version: number | null } | null> | null };
+
+export type CreateWorkspaceAiGatewayProviderMutationVariables = Exact<{
+  input: Types.CreateWorkspaceAiGatewayProviderInput;
+}>;
+
+
+export type CreateWorkspaceAiGatewayProviderMutation = { createWorkspaceAiGatewayProvider: { baseUrl: string | null, config: string | null, createdBy: string | null, createdDate: any, enabled: boolean, id: string, lastModifiedBy: string | null, lastModifiedDate: any, name: string, type: Types.AiGatewayProviderType, version: number | null } | null };
+
+export type DeleteWorkspaceAiGatewayProviderMutationVariables = Exact<{
+  workspaceId: string | number;
+  providerId: string | number;
+}>;
+
+
+export type DeleteWorkspaceAiGatewayProviderMutation = { deleteWorkspaceAiGatewayProvider: boolean | null };
+
+export type UpdateWorkspaceAiGatewayProviderMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  input: Types.UpdateAiGatewayProviderInput;
+}>;
+
+
+export type UpdateWorkspaceAiGatewayProviderMutation = { updateWorkspaceAiGatewayProvider: { baseUrl: string | null, config: string | null, createdBy: string | null, createdDate: any, enabled: boolean, id: string, lastModifiedBy: string | null, lastModifiedDate: any, name: string, type: Types.AiGatewayProviderType, version: number | null } | null };
+
+export type TestWorkspaceAiGatewayProviderConnectionMutationVariables = Exact<{
+  workspaceId: string | number;
+  providerId: string | number;
+}>;
+
+
+export type TestWorkspaceAiGatewayProviderConnectionMutation = { testWorkspaceAiGatewayProviderConnection: { errorMessage: string | null, latencyMs: number | null, ok: boolean } | null };
+
+export type WorkspaceAiGatewayRequestLogsQueryVariables = Exact<{
+  endDate: any;
+  startDate: any;
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceAiGatewayRequestLogsQuery = { workspaceAiGatewayRequestLogs: Array<{ apiKeyId: string | null, cacheHit: boolean | null, cost: string | null, createdDate: any, errorMessage: string | null, id: string, inputTokens: number | null, latencyMs: number | null, outputTokens: number | null, requestId: string, requestedModel: string | null, routedModel: string | null, routedProvider: string | null, routingPolicyId: string | null, routingStrategy: string | null, status: number | null } | null> | null };
+
+export type WorkspaceAiGatewayRoutingPoliciesQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceAiGatewayRoutingPoliciesQuery = { workspaceAiGatewayRoutingPolicies: Array<{ config: string | null, createdDate: any, enabled: boolean, fallbackModel: string | null, id: string, lastModifiedDate: any, name: string, strategy: Types.AiGatewayRoutingStrategyType, version: number | null, deployments: Array<{ enabled: boolean, id: string, maxRpm: number | null, maxTpm: number | null, modelId: string, priorityOrder: number, routingPolicyId: string, weight: number } | null> | null } | null> | null };
+
+export type CreateWorkspaceAiGatewayRoutingPolicyMutationVariables = Exact<{
+  input: Types.CreateWorkspaceAiGatewayRoutingPolicyInput;
+}>;
+
+
+export type CreateWorkspaceAiGatewayRoutingPolicyMutation = { createWorkspaceAiGatewayRoutingPolicy: { config: string | null, createdDate: any, enabled: boolean, fallbackModel: string | null, id: string, lastModifiedDate: any, name: string, strategy: Types.AiGatewayRoutingStrategyType, version: number | null } | null };
+
+export type DeleteWorkspaceAiGatewayRoutingPolicyMutationVariables = Exact<{
+  workspaceId: string | number;
+  routingPolicyId: string | number;
+}>;
+
+
+export type DeleteWorkspaceAiGatewayRoutingPolicyMutation = { deleteWorkspaceAiGatewayRoutingPolicy: boolean | null };
+
+export type UpdateWorkspaceAiGatewayRoutingPolicyMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  input: Types.UpdateAiGatewayRoutingPolicyInput;
+}>;
+
+
+export type UpdateWorkspaceAiGatewayRoutingPolicyMutation = { updateWorkspaceAiGatewayRoutingPolicy: { config: string | null, createdDate: any, enabled: boolean, fallbackModel: string | null, id: string, lastModifiedDate: any, name: string, strategy: Types.AiGatewayRoutingStrategyType, version: number | null } | null };
+
+export type WorkspaceAiModelsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceAiModelsQuery = { workspaceAiModels: Array<{ alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null> | null };
+
+export type CreateWorkspaceAiModelMutationVariables = Exact<{
+  input: Types.CreateWorkspaceAiModelInput;
+}>;
+
+
+export type CreateWorkspaceAiModelMutation = { createWorkspaceAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
+export type DeleteWorkspaceAiModelMutationVariables = Exact<{
+  workspaceId: string | number;
+  modelId: string | number;
+}>;
+
+
+export type DeleteWorkspaceAiModelMutation = { deleteWorkspaceAiModel: boolean | null };
+
+export type UnpinWorkspaceAiModelMutationVariables = Exact<{
+  workspaceId: string | number;
+  modelId: string | number;
+}>;
+
+
+export type UnpinWorkspaceAiModelMutation = { unpinWorkspaceAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
+export type UpdateWorkspaceAiModelMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  input: Types.UpdateAiModelInput;
+}>;
+
+
+export type UpdateWorkspaceAiModelMutation = { updateWorkspaceAiModel: { alias: string | null, capabilities: string | null, catalogManaged: boolean, catalogPinned: boolean, contextWindow: number | null, defaultRoutingPolicyId: string | null, createdDate: any, enabled: boolean, id: string, inputCostPerMTokens: number | null, lastModifiedDate: any, name: string, outputCostPerMTokens: number | null, providerId: string, version: number | null } | null };
+
 export type ApprovalTaskQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -3853,6 +4204,1466 @@ export const useAuditEventTypesQuery = <
       {
     queryKey: variables === undefined ? ['AuditEventTypes'] : ['AuditEventTypes', variables],
     queryFn: fetcher<AuditEventTypesQuery, AuditEventTypesQueryVariables>(AuditEventTypesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiGatewayBudgetDocument = new TypedDocumentString(`
+    query aiGatewayBudget($workspaceId: ID!) {
+  aiGatewayBudget(workspaceId: $workspaceId) {
+    alertThreshold
+    amount
+    createdDate
+    enabled
+    enforcementMode
+    id
+    lastModifiedDate
+    period
+    version
+  }
+}
+    `);
+
+export const useAiGatewayBudgetQuery = <
+      TData = AiGatewayBudgetQuery,
+      TError = unknown
+    >(
+      variables: AiGatewayBudgetQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayBudgetQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayBudgetQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayBudgetQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewayBudget', variables],
+    queryFn: fetcher<AiGatewayBudgetQuery, AiGatewayBudgetQueryVariables>(AiGatewayBudgetDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiGatewayBudgetDocument = new TypedDocumentString(`
+    mutation createAiGatewayBudget($input: CreateAiGatewayBudgetInput!) {
+  createAiGatewayBudget(input: $input) {
+    alertThreshold
+    amount
+    createdDate
+    enabled
+    enforcementMode
+    id
+    lastModifiedDate
+    period
+    version
+  }
+}
+    `);
+
+export const useCreateAiGatewayBudgetMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiGatewayBudgetMutation, TError, CreateAiGatewayBudgetMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiGatewayBudgetMutation, TError, CreateAiGatewayBudgetMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiGatewayBudget'],
+    mutationFn: (variables?: CreateAiGatewayBudgetMutationVariables) => fetcher<CreateAiGatewayBudgetMutation, CreateAiGatewayBudgetMutationVariables>(CreateAiGatewayBudgetDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiGatewayBudgetDocument = new TypedDocumentString(`
+    mutation updateAiGatewayBudget($id: ID!, $input: UpdateAiGatewayBudgetInput!) {
+  updateAiGatewayBudget(id: $id, input: $input) {
+    alertThreshold
+    amount
+    createdDate
+    enabled
+    enforcementMode
+    id
+    lastModifiedDate
+    period
+    version
+  }
+}
+    `);
+
+export const useUpdateAiGatewayBudgetMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGatewayBudgetMutation, TError, UpdateAiGatewayBudgetMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGatewayBudgetMutation, TError, UpdateAiGatewayBudgetMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGatewayBudget'],
+    mutationFn: (variables?: UpdateAiGatewayBudgetMutationVariables) => fetcher<UpdateAiGatewayBudgetMutation, UpdateAiGatewayBudgetMutationVariables>(UpdateAiGatewayBudgetDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiGatewayBudgetDocument = new TypedDocumentString(`
+    mutation deleteAiGatewayBudget($id: ID!) {
+  deleteAiGatewayBudget(id: $id)
+}
+    `);
+
+export const useDeleteAiGatewayBudgetMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiGatewayBudgetMutation, TError, DeleteAiGatewayBudgetMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiGatewayBudgetMutation, TError, DeleteAiGatewayBudgetMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiGatewayBudget'],
+    mutationFn: (variables?: DeleteAiGatewayBudgetMutationVariables) => fetcher<DeleteAiGatewayBudgetMutation, DeleteAiGatewayBudgetMutationVariables>(DeleteAiGatewayBudgetDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiGatewayProjectSettingsDocument = new TypedDocumentString(`
+    query aiGatewayProjectSettings($projectId: ID!) {
+  aiGatewayProjectSettings(projectId: $projectId) {
+    blockedTerms
+    injectionDetectionEnabled
+    moderationEnabled
+    projectId
+    redactPii
+    redactSecrets
+    scanResponses
+  }
+}
+    `);
+
+export const useAiGatewayProjectSettingsQuery = <
+      TData = AiGatewayProjectSettingsQuery,
+      TError = unknown
+    >(
+      variables: AiGatewayProjectSettingsQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayProjectSettingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayProjectSettingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayProjectSettingsQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewayProjectSettings', variables],
+    queryFn: fetcher<AiGatewayProjectSettingsQuery, AiGatewayProjectSettingsQueryVariables>(AiGatewayProjectSettingsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateAiGatewayProjectSettingsDocument = new TypedDocumentString(`
+    mutation updateAiGatewayProjectSettings($input: AiGatewayProjectSettingsInput!) {
+  updateAiGatewayProjectSettings(input: $input) {
+    blockedTerms
+    injectionDetectionEnabled
+    moderationEnabled
+    projectId
+    redactPii
+    redactSecrets
+    scanResponses
+  }
+}
+    `);
+
+export const useUpdateAiGatewayProjectSettingsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGatewayProjectSettingsMutation, TError, UpdateAiGatewayProjectSettingsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGatewayProjectSettingsMutation, TError, UpdateAiGatewayProjectSettingsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGatewayProjectSettings'],
+    mutationFn: (variables?: UpdateAiGatewayProjectSettingsMutationVariables) => fetcher<UpdateAiGatewayProjectSettingsMutation, UpdateAiGatewayProjectSettingsMutationVariables>(UpdateAiGatewayProjectSettingsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiGatewayProjectsDocument = new TypedDocumentString(`
+    query aiGatewayProjects($workspaceId: ID!) {
+  aiGatewayProjects(workspaceId: $workspaceId) {
+    cachingEnabled
+    cacheTtlMinutes
+    compressionEnabled
+    createdDate
+    description
+    id
+    lastModifiedDate
+    logRetentionDays
+    name
+    retryMaxAttempts
+    routingPolicyId
+    slug
+    timeoutSeconds
+    version
+  }
+}
+    `);
+
+export const useAiGatewayProjectsQuery = <
+      TData = AiGatewayProjectsQuery,
+      TError = unknown
+    >(
+      variables: AiGatewayProjectsQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayProjectsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayProjectsQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewayProjects', variables],
+    queryFn: fetcher<AiGatewayProjectsQuery, AiGatewayProjectsQueryVariables>(AiGatewayProjectsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiGatewayProjectDocument = new TypedDocumentString(`
+    mutation createAiGatewayProject($input: CreateAiGatewayProjectInput!) {
+  createAiGatewayProject(input: $input) {
+    id
+    name
+    slug
+  }
+}
+    `);
+
+export const useCreateAiGatewayProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiGatewayProjectMutation, TError, CreateAiGatewayProjectMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiGatewayProjectMutation, TError, CreateAiGatewayProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiGatewayProject'],
+    mutationFn: (variables?: CreateAiGatewayProjectMutationVariables) => fetcher<CreateAiGatewayProjectMutation, CreateAiGatewayProjectMutationVariables>(CreateAiGatewayProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiGatewayProjectDocument = new TypedDocumentString(`
+    mutation updateAiGatewayProject($id: ID!, $input: UpdateAiGatewayProjectInput!) {
+  updateAiGatewayProject(id: $id, input: $input) {
+    id
+    name
+    slug
+  }
+}
+    `);
+
+export const useUpdateAiGatewayProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGatewayProjectMutation, TError, UpdateAiGatewayProjectMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGatewayProjectMutation, TError, UpdateAiGatewayProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGatewayProject'],
+    mutationFn: (variables?: UpdateAiGatewayProjectMutationVariables) => fetcher<UpdateAiGatewayProjectMutation, UpdateAiGatewayProjectMutationVariables>(UpdateAiGatewayProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiGatewayProjectDocument = new TypedDocumentString(`
+    mutation deleteAiGatewayProject($id: ID!) {
+  deleteAiGatewayProject(id: $id)
+}
+    `);
+
+export const useDeleteAiGatewayProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiGatewayProjectMutation, TError, DeleteAiGatewayProjectMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiGatewayProjectMutation, TError, DeleteAiGatewayProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiGatewayProject'],
+    mutationFn: (variables?: DeleteAiGatewayProjectMutationVariables) => fetcher<DeleteAiGatewayProjectMutation, DeleteAiGatewayProjectMutationVariables>(DeleteAiGatewayProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiGatewayProvidersDocument = new TypedDocumentString(`
+    query aiGatewayProviders {
+  aiGatewayProviders {
+    baseUrl
+    config
+    createdBy
+    createdDate
+    enabled
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    type
+    version
+  }
+}
+    `);
+
+export const useAiGatewayProvidersQuery = <
+      TData = AiGatewayProvidersQuery,
+      TError = unknown
+    >(
+      variables?: AiGatewayProvidersQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayProvidersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayProvidersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayProvidersQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiGatewayProviders'] : ['aiGatewayProviders', variables],
+    queryFn: fetcher<AiGatewayProvidersQuery, AiGatewayProvidersQueryVariables>(AiGatewayProvidersDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiGatewayProviderDocument = new TypedDocumentString(`
+    query aiGatewayProvider($id: ID!) {
+  aiGatewayProvider(id: $id) {
+    baseUrl
+    config
+    createdBy
+    createdDate
+    enabled
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    type
+    version
+  }
+}
+    `);
+
+export const useAiGatewayProviderQuery = <
+      TData = AiGatewayProviderQuery,
+      TError = unknown
+    >(
+      variables: AiGatewayProviderQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayProviderQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayProviderQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayProviderQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewayProvider', variables],
+    queryFn: fetcher<AiGatewayProviderQuery, AiGatewayProviderQueryVariables>(AiGatewayProviderDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiGatewayProviderDocument = new TypedDocumentString(`
+    mutation createAiGatewayProvider($input: CreateAiGatewayProviderInput!) {
+  createAiGatewayProvider(input: $input) {
+    baseUrl
+    config
+    createdBy
+    createdDate
+    enabled
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    type
+    version
+  }
+}
+    `);
+
+export const useCreateAiGatewayProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiGatewayProviderMutation, TError, CreateAiGatewayProviderMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiGatewayProviderMutation, TError, CreateAiGatewayProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiGatewayProvider'],
+    mutationFn: (variables?: CreateAiGatewayProviderMutationVariables) => fetcher<CreateAiGatewayProviderMutation, CreateAiGatewayProviderMutationVariables>(CreateAiGatewayProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiGatewayProviderDocument = new TypedDocumentString(`
+    mutation updateAiGatewayProvider($id: ID!, $input: UpdateAiGatewayProviderInput!) {
+  updateAiGatewayProvider(id: $id, input: $input) {
+    baseUrl
+    config
+    createdBy
+    createdDate
+    enabled
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    type
+    version
+  }
+}
+    `);
+
+export const useUpdateAiGatewayProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGatewayProviderMutation, TError, UpdateAiGatewayProviderMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGatewayProviderMutation, TError, UpdateAiGatewayProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGatewayProvider'],
+    mutationFn: (variables?: UpdateAiGatewayProviderMutationVariables) => fetcher<UpdateAiGatewayProviderMutation, UpdateAiGatewayProviderMutationVariables>(UpdateAiGatewayProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiGatewayProviderDocument = new TypedDocumentString(`
+    mutation deleteAiGatewayProvider($id: ID!) {
+  deleteAiGatewayProvider(id: $id)
+}
+    `);
+
+export const useDeleteAiGatewayProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiGatewayProviderMutation, TError, DeleteAiGatewayProviderMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiGatewayProviderMutation, TError, DeleteAiGatewayProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiGatewayProvider'],
+    mutationFn: (variables?: DeleteAiGatewayProviderMutationVariables) => fetcher<DeleteAiGatewayProviderMutation, DeleteAiGatewayProviderMutationVariables>(DeleteAiGatewayProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiGatewayRateLimitsDocument = new TypedDocumentString(`
+    query aiGatewayRateLimits($workspaceId: ID!) {
+  aiGatewayRateLimits(workspaceId: $workspaceId) {
+    createdDate
+    enabled
+    id
+    lastModifiedDate
+    limitType
+    limitValue
+    name
+    projectId
+    propertyKey
+    scope
+    version
+    windowSeconds
+  }
+}
+    `);
+
+export const useAiGatewayRateLimitsQuery = <
+      TData = AiGatewayRateLimitsQuery,
+      TError = unknown
+    >(
+      variables: AiGatewayRateLimitsQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayRateLimitsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayRateLimitsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayRateLimitsQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewayRateLimits', variables],
+    queryFn: fetcher<AiGatewayRateLimitsQuery, AiGatewayRateLimitsQueryVariables>(AiGatewayRateLimitsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiGatewayRateLimitDocument = new TypedDocumentString(`
+    mutation createAiGatewayRateLimit($input: CreateAiGatewayRateLimitInput!) {
+  createAiGatewayRateLimit(input: $input) {
+    createdDate
+    enabled
+    id
+    lastModifiedDate
+    limitType
+    limitValue
+    name
+    projectId
+    propertyKey
+    scope
+    version
+    windowSeconds
+  }
+}
+    `);
+
+export const useCreateAiGatewayRateLimitMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiGatewayRateLimitMutation, TError, CreateAiGatewayRateLimitMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiGatewayRateLimitMutation, TError, CreateAiGatewayRateLimitMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiGatewayRateLimit'],
+    mutationFn: (variables?: CreateAiGatewayRateLimitMutationVariables) => fetcher<CreateAiGatewayRateLimitMutation, CreateAiGatewayRateLimitMutationVariables>(CreateAiGatewayRateLimitDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiGatewayRateLimitDocument = new TypedDocumentString(`
+    mutation updateAiGatewayRateLimit($id: ID!, $input: UpdateAiGatewayRateLimitInput!) {
+  updateAiGatewayRateLimit(id: $id, input: $input) {
+    createdDate
+    enabled
+    id
+    lastModifiedDate
+    limitType
+    limitValue
+    name
+    projectId
+    propertyKey
+    scope
+    version
+    windowSeconds
+  }
+}
+    `);
+
+export const useUpdateAiGatewayRateLimitMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGatewayRateLimitMutation, TError, UpdateAiGatewayRateLimitMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGatewayRateLimitMutation, TError, UpdateAiGatewayRateLimitMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGatewayRateLimit'],
+    mutationFn: (variables?: UpdateAiGatewayRateLimitMutationVariables) => fetcher<UpdateAiGatewayRateLimitMutation, UpdateAiGatewayRateLimitMutationVariables>(UpdateAiGatewayRateLimitDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiGatewayRateLimitDocument = new TypedDocumentString(`
+    mutation deleteAiGatewayRateLimit($id: ID!) {
+  deleteAiGatewayRateLimit(id: $id)
+}
+    `);
+
+export const useDeleteAiGatewayRateLimitMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiGatewayRateLimitMutation, TError, DeleteAiGatewayRateLimitMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiGatewayRateLimitMutation, TError, DeleteAiGatewayRateLimitMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiGatewayRateLimit'],
+    mutationFn: (variables?: DeleteAiGatewayRateLimitMutationVariables) => fetcher<DeleteAiGatewayRateLimitMutation, DeleteAiGatewayRateLimitMutationVariables>(DeleteAiGatewayRateLimitDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiGatewayRequestLogsDocument = new TypedDocumentString(`
+    query aiGatewayRequestLogs($startDate: Long!, $endDate: Long!) {
+  aiGatewayRequestLogs(startDate: $startDate, endDate: $endDate) {
+    apiKeyId
+    cacheHit
+    cost
+    createdDate
+    errorMessage
+    id
+    inputTokens
+    latencyMs
+    outputTokens
+    requestId
+    requestedModel
+    routedModel
+    routedProvider
+    routingPolicyId
+    routingStrategy
+    status
+  }
+}
+    `);
+
+export const useAiGatewayRequestLogsQuery = <
+      TData = AiGatewayRequestLogsQuery,
+      TError = unknown
+    >(
+      variables: AiGatewayRequestLogsQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayRequestLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayRequestLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayRequestLogsQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewayRequestLogs', variables],
+    queryFn: fetcher<AiGatewayRequestLogsQuery, AiGatewayRequestLogsQueryVariables>(AiGatewayRequestLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiGatewayRoutingPoliciesDocument = new TypedDocumentString(`
+    query aiGatewayRoutingPolicies {
+  aiGatewayRoutingPolicies {
+    config
+    createdDate
+    deployments {
+      enabled
+      id
+      maxRpm
+      maxTpm
+      modelId
+      priorityOrder
+      routingPolicyId
+      weight
+    }
+    enabled
+    fallbackModel
+    id
+    lastModifiedDate
+    name
+    strategy
+    version
+  }
+}
+    `);
+
+export const useAiGatewayRoutingPoliciesQuery = <
+      TData = AiGatewayRoutingPoliciesQuery,
+      TError = unknown
+    >(
+      variables?: AiGatewayRoutingPoliciesQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayRoutingPoliciesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayRoutingPoliciesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayRoutingPoliciesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiGatewayRoutingPolicies'] : ['aiGatewayRoutingPolicies', variables],
+    queryFn: fetcher<AiGatewayRoutingPoliciesQuery, AiGatewayRoutingPoliciesQueryVariables>(AiGatewayRoutingPoliciesDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiGatewayRoutingPolicyDocument = new TypedDocumentString(`
+    mutation createAiGatewayRoutingPolicy($input: CreateAiGatewayRoutingPolicyInput!) {
+  createAiGatewayRoutingPolicy(input: $input) {
+    config
+    createdDate
+    enabled
+    fallbackModel
+    id
+    lastModifiedDate
+    name
+    strategy
+    version
+  }
+}
+    `);
+
+export const useCreateAiGatewayRoutingPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiGatewayRoutingPolicyMutation, TError, CreateAiGatewayRoutingPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiGatewayRoutingPolicyMutation, TError, CreateAiGatewayRoutingPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiGatewayRoutingPolicy'],
+    mutationFn: (variables?: CreateAiGatewayRoutingPolicyMutationVariables) => fetcher<CreateAiGatewayRoutingPolicyMutation, CreateAiGatewayRoutingPolicyMutationVariables>(CreateAiGatewayRoutingPolicyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiGatewayRoutingPolicyDocument = new TypedDocumentString(`
+    mutation updateAiGatewayRoutingPolicy($id: ID!, $input: UpdateAiGatewayRoutingPolicyInput!) {
+  updateAiGatewayRoutingPolicy(id: $id, input: $input) {
+    config
+    createdDate
+    enabled
+    fallbackModel
+    id
+    lastModifiedDate
+    name
+    strategy
+    version
+  }
+}
+    `);
+
+export const useUpdateAiGatewayRoutingPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGatewayRoutingPolicyMutation, TError, UpdateAiGatewayRoutingPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGatewayRoutingPolicyMutation, TError, UpdateAiGatewayRoutingPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGatewayRoutingPolicy'],
+    mutationFn: (variables?: UpdateAiGatewayRoutingPolicyMutationVariables) => fetcher<UpdateAiGatewayRoutingPolicyMutation, UpdateAiGatewayRoutingPolicyMutationVariables>(UpdateAiGatewayRoutingPolicyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiGatewayRoutingPolicyDocument = new TypedDocumentString(`
+    mutation deleteAiGatewayRoutingPolicy($id: ID!) {
+  deleteAiGatewayRoutingPolicy(id: $id)
+}
+    `);
+
+export const useDeleteAiGatewayRoutingPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiGatewayRoutingPolicyMutation, TError, DeleteAiGatewayRoutingPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiGatewayRoutingPolicyMutation, TError, DeleteAiGatewayRoutingPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiGatewayRoutingPolicy'],
+    mutationFn: (variables?: DeleteAiGatewayRoutingPolicyMutationVariables) => fetcher<DeleteAiGatewayRoutingPolicyMutation, DeleteAiGatewayRoutingPolicyMutationVariables>(DeleteAiGatewayRoutingPolicyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiGatewaySpendSummariesDocument = new TypedDocumentString(`
+    query aiGatewaySpendSummaries($startDate: Long!, $endDate: Long!) {
+  aiGatewaySpendSummaries(startDate: $startDate, endDate: $endDate) {
+    apiKeyId
+    createdDate
+    id
+    model
+    periodEnd
+    periodStart
+    provider
+    requestCount
+    totalCost
+    totalInputTokens
+    totalOutputTokens
+  }
+}
+    `);
+
+export const useAiGatewaySpendSummariesQuery = <
+      TData = AiGatewaySpendSummariesQuery,
+      TError = unknown
+    >(
+      variables: AiGatewaySpendSummariesQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewaySpendSummariesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewaySpendSummariesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewaySpendSummariesQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewaySpendSummaries', variables],
+    queryFn: fetcher<AiGatewaySpendSummariesQuery, AiGatewaySpendSummariesQueryVariables>(AiGatewaySpendSummariesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiGatewayWorkspaceSettingsDocument = new TypedDocumentString(`
+    query aiGatewayWorkspaceSettings($workspaceId: ID!) {
+  aiGatewayWorkspaceSettings(workspaceId: $workspaceId) {
+    cacheEnabled
+    cacheTtlSeconds
+    defaultRoutingPolicyId
+    logRetentionDays
+    retryCount
+    softBudgetWarningPct
+    timeoutMs
+    workspaceId
+  }
+}
+    `);
+
+export const useAiGatewayWorkspaceSettingsQuery = <
+      TData = AiGatewayWorkspaceSettingsQuery,
+      TError = unknown
+    >(
+      variables: AiGatewayWorkspaceSettingsQueryVariables,
+      options?: Omit<UseQueryOptions<AiGatewayWorkspaceSettingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGatewayWorkspaceSettingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGatewayWorkspaceSettingsQuery, TError, TData>(
+      {
+    queryKey: ['aiGatewayWorkspaceSettings', variables],
+    queryFn: fetcher<AiGatewayWorkspaceSettingsQuery, AiGatewayWorkspaceSettingsQueryVariables>(AiGatewayWorkspaceSettingsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateAiGatewayWorkspaceSettingsDocument = new TypedDocumentString(`
+    mutation updateAiGatewayWorkspaceSettings($input: AiGatewayWorkspaceSettingsInput!) {
+  updateAiGatewayWorkspaceSettings(input: $input) {
+    cacheEnabled
+    cacheTtlSeconds
+    defaultRoutingPolicyId
+    logRetentionDays
+    retryCount
+    softBudgetWarningPct
+    timeoutMs
+    workspaceId
+  }
+}
+    `);
+
+export const useUpdateAiGatewayWorkspaceSettingsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGatewayWorkspaceSettingsMutation, TError, UpdateAiGatewayWorkspaceSettingsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGatewayWorkspaceSettingsMutation, TError, UpdateAiGatewayWorkspaceSettingsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGatewayWorkspaceSettings'],
+    mutationFn: (variables?: UpdateAiGatewayWorkspaceSettingsMutationVariables) => fetcher<UpdateAiGatewayWorkspaceSettingsMutation, UpdateAiGatewayWorkspaceSettingsMutationVariables>(UpdateAiGatewayWorkspaceSettingsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiModelsDocument = new TypedDocumentString(`
+    query aiModels {
+  aiModels {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useAiModelsQuery = <
+      TData = AiModelsQuery,
+      TError = unknown
+    >(
+      variables?: AiModelsQueryVariables,
+      options?: Omit<UseQueryOptions<AiModelsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiModelsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiModelsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiModels'] : ['aiModels', variables],
+    queryFn: fetcher<AiModelsQuery, AiModelsQueryVariables>(AiModelsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiModelsByProviderDocument = new TypedDocumentString(`
+    query aiModelsByProvider($providerId: ID!) {
+  aiModelsByProvider(providerId: $providerId) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useAiModelsByProviderQuery = <
+      TData = AiModelsByProviderQuery,
+      TError = unknown
+    >(
+      variables: AiModelsByProviderQueryVariables,
+      options?: Omit<UseQueryOptions<AiModelsByProviderQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiModelsByProviderQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiModelsByProviderQuery, TError, TData>(
+      {
+    queryKey: ['aiModelsByProvider', variables],
+    queryFn: fetcher<AiModelsByProviderQuery, AiModelsByProviderQueryVariables>(AiModelsByProviderDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAiModelDocument = new TypedDocumentString(`
+    mutation createAiModel($input: CreateAiModelInput!) {
+  createAiModel(input: $input) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useCreateAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAiModelMutation, TError, CreateAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAiModelMutation, TError, CreateAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['createAiModel'],
+    mutationFn: (variables?: CreateAiModelMutationVariables) => fetcher<CreateAiModelMutation, CreateAiModelMutationVariables>(CreateAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiModelDocument = new TypedDocumentString(`
+    mutation updateAiModel($id: ID!, $input: UpdateAiModelInput!) {
+  updateAiModel(id: $id, input: $input) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useUpdateAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiModelMutation, TError, UpdateAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiModelMutation, TError, UpdateAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiModel'],
+    mutationFn: (variables?: UpdateAiModelMutationVariables) => fetcher<UpdateAiModelMutation, UpdateAiModelMutationVariables>(UpdateAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAiModelDocument = new TypedDocumentString(`
+    mutation deleteAiModel($id: ID!) {
+  deleteAiModel(id: $id)
+}
+    `);
+
+export const useDeleteAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiModelMutation, TError, DeleteAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiModelMutation, TError, DeleteAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiModel'],
+    mutationFn: (variables?: DeleteAiModelMutationVariables) => fetcher<DeleteAiModelMutation, DeleteAiModelMutationVariables>(DeleteAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnpinAiModelDocument = new TypedDocumentString(`
+    mutation unpinAiModel($id: ID!) {
+  unpinAiModel(id: $id) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useUnpinAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnpinAiModelMutation, TError, UnpinAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<UnpinAiModelMutation, TError, UnpinAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['unpinAiModel'],
+    mutationFn: (variables?: UnpinAiModelMutationVariables) => fetcher<UnpinAiModelMutation, UnpinAiModelMutationVariables>(UnpinAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkspaceAiGatewayProvidersDocument = new TypedDocumentString(`
+    query workspaceAiGatewayProviders($workspaceId: ID!) {
+  workspaceAiGatewayProviders(workspaceId: $workspaceId) {
+    baseUrl
+    config
+    createdBy
+    createdDate
+    enabled
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    type
+    version
+  }
+}
+    `);
+
+export const useWorkspaceAiGatewayProvidersQuery = <
+      TData = WorkspaceAiGatewayProvidersQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceAiGatewayProvidersQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceAiGatewayProvidersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceAiGatewayProvidersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceAiGatewayProvidersQuery, TError, TData>(
+      {
+    queryKey: ['workspaceAiGatewayProviders', variables],
+    queryFn: fetcher<WorkspaceAiGatewayProvidersQuery, WorkspaceAiGatewayProvidersQueryVariables>(WorkspaceAiGatewayProvidersDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateWorkspaceAiGatewayProviderDocument = new TypedDocumentString(`
+    mutation createWorkspaceAiGatewayProvider($input: CreateWorkspaceAiGatewayProviderInput!) {
+  createWorkspaceAiGatewayProvider(input: $input) {
+    baseUrl
+    config
+    createdBy
+    createdDate
+    enabled
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    type
+    version
+  }
+}
+    `);
+
+export const useCreateWorkspaceAiGatewayProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWorkspaceAiGatewayProviderMutation, TError, CreateWorkspaceAiGatewayProviderMutationVariables, TContext>) => {
+    
+    return useMutation<CreateWorkspaceAiGatewayProviderMutation, TError, CreateWorkspaceAiGatewayProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['createWorkspaceAiGatewayProvider'],
+    mutationFn: (variables?: CreateWorkspaceAiGatewayProviderMutationVariables) => fetcher<CreateWorkspaceAiGatewayProviderMutation, CreateWorkspaceAiGatewayProviderMutationVariables>(CreateWorkspaceAiGatewayProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteWorkspaceAiGatewayProviderDocument = new TypedDocumentString(`
+    mutation deleteWorkspaceAiGatewayProvider($workspaceId: ID!, $providerId: ID!) {
+  deleteWorkspaceAiGatewayProvider(
+    workspaceId: $workspaceId
+    providerId: $providerId
+  )
+}
+    `);
+
+export const useDeleteWorkspaceAiGatewayProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkspaceAiGatewayProviderMutation, TError, DeleteWorkspaceAiGatewayProviderMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkspaceAiGatewayProviderMutation, TError, DeleteWorkspaceAiGatewayProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWorkspaceAiGatewayProvider'],
+    mutationFn: (variables?: DeleteWorkspaceAiGatewayProviderMutationVariables) => fetcher<DeleteWorkspaceAiGatewayProviderMutation, DeleteWorkspaceAiGatewayProviderMutationVariables>(DeleteWorkspaceAiGatewayProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceAiGatewayProviderDocument = new TypedDocumentString(`
+    mutation updateWorkspaceAiGatewayProvider($workspaceId: ID!, $id: ID!, $input: UpdateAiGatewayProviderInput!) {
+  updateWorkspaceAiGatewayProvider(
+    workspaceId: $workspaceId
+    id: $id
+    input: $input
+  ) {
+    baseUrl
+    config
+    createdBy
+    createdDate
+    enabled
+    id
+    lastModifiedBy
+    lastModifiedDate
+    name
+    type
+    version
+  }
+}
+    `);
+
+export const useUpdateWorkspaceAiGatewayProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceAiGatewayProviderMutation, TError, UpdateWorkspaceAiGatewayProviderMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceAiGatewayProviderMutation, TError, UpdateWorkspaceAiGatewayProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceAiGatewayProvider'],
+    mutationFn: (variables?: UpdateWorkspaceAiGatewayProviderMutationVariables) => fetcher<UpdateWorkspaceAiGatewayProviderMutation, UpdateWorkspaceAiGatewayProviderMutationVariables>(UpdateWorkspaceAiGatewayProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TestWorkspaceAiGatewayProviderConnectionDocument = new TypedDocumentString(`
+    mutation testWorkspaceAiGatewayProviderConnection($workspaceId: ID!, $providerId: ID!) {
+  testWorkspaceAiGatewayProviderConnection(
+    workspaceId: $workspaceId
+    providerId: $providerId
+  ) {
+    errorMessage
+    latencyMs
+    ok
+  }
+}
+    `);
+
+export const useTestWorkspaceAiGatewayProviderConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestWorkspaceAiGatewayProviderConnectionMutation, TError, TestWorkspaceAiGatewayProviderConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<TestWorkspaceAiGatewayProviderConnectionMutation, TError, TestWorkspaceAiGatewayProviderConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['testWorkspaceAiGatewayProviderConnection'],
+    mutationFn: (variables?: TestWorkspaceAiGatewayProviderConnectionMutationVariables) => fetcher<TestWorkspaceAiGatewayProviderConnectionMutation, TestWorkspaceAiGatewayProviderConnectionMutationVariables>(TestWorkspaceAiGatewayProviderConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkspaceAiGatewayRequestLogsDocument = new TypedDocumentString(`
+    query workspaceAiGatewayRequestLogs($endDate: Long!, $startDate: Long!, $workspaceId: ID!) {
+  workspaceAiGatewayRequestLogs(
+    endDate: $endDate
+    startDate: $startDate
+    workspaceId: $workspaceId
+  ) {
+    apiKeyId
+    cacheHit
+    cost
+    createdDate
+    errorMessage
+    id
+    inputTokens
+    latencyMs
+    outputTokens
+    requestId
+    requestedModel
+    routedModel
+    routedProvider
+    routingPolicyId
+    routingStrategy
+    status
+  }
+}
+    `);
+
+export const useWorkspaceAiGatewayRequestLogsQuery = <
+      TData = WorkspaceAiGatewayRequestLogsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceAiGatewayRequestLogsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceAiGatewayRequestLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceAiGatewayRequestLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceAiGatewayRequestLogsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceAiGatewayRequestLogs', variables],
+    queryFn: fetcher<WorkspaceAiGatewayRequestLogsQuery, WorkspaceAiGatewayRequestLogsQueryVariables>(WorkspaceAiGatewayRequestLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceAiGatewayRoutingPoliciesDocument = new TypedDocumentString(`
+    query workspaceAiGatewayRoutingPolicies($workspaceId: ID!) {
+  workspaceAiGatewayRoutingPolicies(workspaceId: $workspaceId) {
+    config
+    createdDate
+    deployments {
+      enabled
+      id
+      maxRpm
+      maxTpm
+      modelId
+      priorityOrder
+      routingPolicyId
+      weight
+    }
+    enabled
+    fallbackModel
+    id
+    lastModifiedDate
+    name
+    strategy
+    version
+  }
+}
+    `);
+
+export const useWorkspaceAiGatewayRoutingPoliciesQuery = <
+      TData = WorkspaceAiGatewayRoutingPoliciesQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceAiGatewayRoutingPoliciesQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceAiGatewayRoutingPoliciesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceAiGatewayRoutingPoliciesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceAiGatewayRoutingPoliciesQuery, TError, TData>(
+      {
+    queryKey: ['workspaceAiGatewayRoutingPolicies', variables],
+    queryFn: fetcher<WorkspaceAiGatewayRoutingPoliciesQuery, WorkspaceAiGatewayRoutingPoliciesQueryVariables>(WorkspaceAiGatewayRoutingPoliciesDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateWorkspaceAiGatewayRoutingPolicyDocument = new TypedDocumentString(`
+    mutation createWorkspaceAiGatewayRoutingPolicy($input: CreateWorkspaceAiGatewayRoutingPolicyInput!) {
+  createWorkspaceAiGatewayRoutingPolicy(input: $input) {
+    config
+    createdDate
+    enabled
+    fallbackModel
+    id
+    lastModifiedDate
+    name
+    strategy
+    version
+  }
+}
+    `);
+
+export const useCreateWorkspaceAiGatewayRoutingPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWorkspaceAiGatewayRoutingPolicyMutation, TError, CreateWorkspaceAiGatewayRoutingPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<CreateWorkspaceAiGatewayRoutingPolicyMutation, TError, CreateWorkspaceAiGatewayRoutingPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['createWorkspaceAiGatewayRoutingPolicy'],
+    mutationFn: (variables?: CreateWorkspaceAiGatewayRoutingPolicyMutationVariables) => fetcher<CreateWorkspaceAiGatewayRoutingPolicyMutation, CreateWorkspaceAiGatewayRoutingPolicyMutationVariables>(CreateWorkspaceAiGatewayRoutingPolicyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteWorkspaceAiGatewayRoutingPolicyDocument = new TypedDocumentString(`
+    mutation deleteWorkspaceAiGatewayRoutingPolicy($workspaceId: ID!, $routingPolicyId: ID!) {
+  deleteWorkspaceAiGatewayRoutingPolicy(
+    workspaceId: $workspaceId
+    routingPolicyId: $routingPolicyId
+  )
+}
+    `);
+
+export const useDeleteWorkspaceAiGatewayRoutingPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkspaceAiGatewayRoutingPolicyMutation, TError, DeleteWorkspaceAiGatewayRoutingPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkspaceAiGatewayRoutingPolicyMutation, TError, DeleteWorkspaceAiGatewayRoutingPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWorkspaceAiGatewayRoutingPolicy'],
+    mutationFn: (variables?: DeleteWorkspaceAiGatewayRoutingPolicyMutationVariables) => fetcher<DeleteWorkspaceAiGatewayRoutingPolicyMutation, DeleteWorkspaceAiGatewayRoutingPolicyMutationVariables>(DeleteWorkspaceAiGatewayRoutingPolicyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceAiGatewayRoutingPolicyDocument = new TypedDocumentString(`
+    mutation updateWorkspaceAiGatewayRoutingPolicy($workspaceId: ID!, $id: ID!, $input: UpdateAiGatewayRoutingPolicyInput!) {
+  updateWorkspaceAiGatewayRoutingPolicy(
+    workspaceId: $workspaceId
+    id: $id
+    input: $input
+  ) {
+    config
+    createdDate
+    enabled
+    fallbackModel
+    id
+    lastModifiedDate
+    name
+    strategy
+    version
+  }
+}
+    `);
+
+export const useUpdateWorkspaceAiGatewayRoutingPolicyMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceAiGatewayRoutingPolicyMutation, TError, UpdateWorkspaceAiGatewayRoutingPolicyMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceAiGatewayRoutingPolicyMutation, TError, UpdateWorkspaceAiGatewayRoutingPolicyMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceAiGatewayRoutingPolicy'],
+    mutationFn: (variables?: UpdateWorkspaceAiGatewayRoutingPolicyMutationVariables) => fetcher<UpdateWorkspaceAiGatewayRoutingPolicyMutation, UpdateWorkspaceAiGatewayRoutingPolicyMutationVariables>(UpdateWorkspaceAiGatewayRoutingPolicyDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkspaceAiModelsDocument = new TypedDocumentString(`
+    query workspaceAiModels($workspaceId: ID!) {
+  workspaceAiModels(workspaceId: $workspaceId) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    defaultRoutingPolicyId
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useWorkspaceAiModelsQuery = <
+      TData = WorkspaceAiModelsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceAiModelsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceAiModelsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceAiModelsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceAiModelsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceAiModels', variables],
+    queryFn: fetcher<WorkspaceAiModelsQuery, WorkspaceAiModelsQueryVariables>(WorkspaceAiModelsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateWorkspaceAiModelDocument = new TypedDocumentString(`
+    mutation createWorkspaceAiModel($input: CreateWorkspaceAiModelInput!) {
+  createWorkspaceAiModel(input: $input) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    defaultRoutingPolicyId
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useCreateWorkspaceAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWorkspaceAiModelMutation, TError, CreateWorkspaceAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<CreateWorkspaceAiModelMutation, TError, CreateWorkspaceAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['createWorkspaceAiModel'],
+    mutationFn: (variables?: CreateWorkspaceAiModelMutationVariables) => fetcher<CreateWorkspaceAiModelMutation, CreateWorkspaceAiModelMutationVariables>(CreateWorkspaceAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteWorkspaceAiModelDocument = new TypedDocumentString(`
+    mutation deleteWorkspaceAiModel($workspaceId: ID!, $modelId: ID!) {
+  deleteWorkspaceAiModel(workspaceId: $workspaceId, modelId: $modelId)
+}
+    `);
+
+export const useDeleteWorkspaceAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkspaceAiModelMutation, TError, DeleteWorkspaceAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkspaceAiModelMutation, TError, DeleteWorkspaceAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWorkspaceAiModel'],
+    mutationFn: (variables?: DeleteWorkspaceAiModelMutationVariables) => fetcher<DeleteWorkspaceAiModelMutation, DeleteWorkspaceAiModelMutationVariables>(DeleteWorkspaceAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UnpinWorkspaceAiModelDocument = new TypedDocumentString(`
+    mutation unpinWorkspaceAiModel($workspaceId: ID!, $modelId: ID!) {
+  unpinWorkspaceAiModel(workspaceId: $workspaceId, modelId: $modelId) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    defaultRoutingPolicyId
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useUnpinWorkspaceAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UnpinWorkspaceAiModelMutation, TError, UnpinWorkspaceAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<UnpinWorkspaceAiModelMutation, TError, UnpinWorkspaceAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['unpinWorkspaceAiModel'],
+    mutationFn: (variables?: UnpinWorkspaceAiModelMutationVariables) => fetcher<UnpinWorkspaceAiModelMutation, UnpinWorkspaceAiModelMutationVariables>(UnpinWorkspaceAiModelDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceAiModelDocument = new TypedDocumentString(`
+    mutation updateWorkspaceAiModel($workspaceId: ID!, $id: ID!, $input: UpdateAiModelInput!) {
+  updateWorkspaceAiModel(workspaceId: $workspaceId, id: $id, input: $input) {
+    alias
+    capabilities
+    catalogManaged
+    catalogPinned
+    contextWindow
+    defaultRoutingPolicyId
+    createdDate
+    enabled
+    id
+    inputCostPerMTokens
+    lastModifiedDate
+    name
+    outputCostPerMTokens
+    providerId
+    version
+  }
+}
+    `);
+
+export const useUpdateWorkspaceAiModelMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceAiModelMutation, TError, UpdateWorkspaceAiModelMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceAiModelMutation, TError, UpdateWorkspaceAiModelMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceAiModel'],
+    mutationFn: (variables?: UpdateWorkspaceAiModelMutationVariables) => fetcher<UpdateWorkspaceAiModelMutation, UpdateWorkspaceAiModelMutationVariables>(UpdateWorkspaceAiModelDocument, variables)(),
     ...options
   }
     )};

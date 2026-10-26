@@ -314,6 +314,222 @@ export type AiDefaultModel = {
   provider: Scalars['String']['output'];
 };
 
+export type AiGatewayBudget = {
+  __typename?: 'AiGatewayBudget';
+  alertThreshold: Scalars['Int']['output'];
+  amount: Scalars['String']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  enforcementMode: AiGatewayBudgetEnforcementMode;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  period: AiGatewayBudgetPeriod;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export enum AiGatewayBudgetEnforcementMode {
+  Hard = 'HARD',
+  Soft = 'SOFT'
+}
+
+export enum AiGatewayBudgetPeriod {
+  Daily = 'DAILY',
+  Monthly = 'MONTHLY',
+  Quarterly = 'QUARTERLY',
+  Weekly = 'WEEKLY',
+  Yearly = 'YEARLY'
+}
+
+export type AiGatewayModelDeployment = {
+  __typename?: 'AiGatewayModelDeployment';
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  maxRpm?: Maybe<Scalars['Int']['output']>;
+  maxTpm?: Maybe<Scalars['Int']['output']>;
+  modelId: Scalars['ID']['output'];
+  priorityOrder: Scalars['Int']['output'];
+  routingPolicyId: Scalars['ID']['output'];
+  weight: Scalars['Int']['output'];
+};
+
+export type AiGatewayProject = {
+  __typename?: 'AiGatewayProject';
+  cacheTtlMinutes?: Maybe<Scalars['Int']['output']>;
+  cachingEnabled?: Maybe<Scalars['Boolean']['output']>;
+  compressionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  logRetentionDays?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  retryMaxAttempts?: Maybe<Scalars['Int']['output']>;
+  routingPolicyId?: Maybe<Scalars['ID']['output']>;
+  slug: Scalars['String']['output'];
+  timeoutSeconds?: Maybe<Scalars['Int']['output']>;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type AiGatewayProjectSettings = {
+  __typename?: 'AiGatewayProjectSettings';
+  blockedTerms?: Maybe<Scalars['String']['output']>;
+  injectionDetectionEnabled?: Maybe<Scalars['Boolean']['output']>;
+  moderationEnabled?: Maybe<Scalars['Boolean']['output']>;
+  projectId: Scalars['ID']['output'];
+  redactPii?: Maybe<Scalars['Boolean']['output']>;
+  redactSecrets?: Maybe<Scalars['Boolean']['output']>;
+  scanResponses?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type AiGatewayProjectSettingsInput = {
+  blockedTerms?: InputMaybe<Scalars['String']['input']>;
+  injectionDetectionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  moderationEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  projectId: Scalars['ID']['input'];
+  redactPii?: InputMaybe<Scalars['Boolean']['input']>;
+  redactSecrets?: InputMaybe<Scalars['Boolean']['input']>;
+  scanResponses?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type AiGatewayProvider = {
+  __typename?: 'AiGatewayProvider';
+  baseUrl?: Maybe<Scalars['String']['output']>;
+  config?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  type: AiGatewayProviderType;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export enum AiGatewayProviderType {
+  Anthropic = 'ANTHROPIC',
+  AzureOpenai = 'AZURE_OPENAI',
+  Cohere = 'COHERE',
+  Deepseek = 'DEEPSEEK',
+  GoogleGemini = 'GOOGLE_GEMINI',
+  Groq = 'GROQ',
+  Mistral = 'MISTRAL',
+  Openai = 'OPENAI'
+}
+
+export type AiGatewayRateLimit = {
+  __typename?: 'AiGatewayRateLimit';
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  limitType: AiGatewayRateLimitType;
+  limitValue: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  projectId?: Maybe<Scalars['ID']['output']>;
+  propertyKey?: Maybe<Scalars['String']['output']>;
+  scope: AiGatewayRateLimitScope;
+  version?: Maybe<Scalars['Int']['output']>;
+  windowSeconds: Scalars['Int']['output'];
+};
+
+export enum AiGatewayRateLimitScope {
+  Global = 'GLOBAL',
+  PerProperty = 'PER_PROPERTY',
+  PerUser = 'PER_USER'
+}
+
+export enum AiGatewayRateLimitType {
+  Cost = 'COST',
+  Requests = 'REQUESTS',
+  Tokens = 'TOKENS'
+}
+
+export type AiGatewayRequestLog = {
+  __typename?: 'AiGatewayRequestLog';
+  apiKeyId?: Maybe<Scalars['ID']['output']>;
+  cacheHit?: Maybe<Scalars['Boolean']['output']>;
+  cost?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  inputTokens?: Maybe<Scalars['Int']['output']>;
+  latencyMs?: Maybe<Scalars['Int']['output']>;
+  outputTokens?: Maybe<Scalars['Int']['output']>;
+  requestId: Scalars['String']['output'];
+  requestedModel?: Maybe<Scalars['String']['output']>;
+  routedModel?: Maybe<Scalars['String']['output']>;
+  routedProvider?: Maybe<Scalars['String']['output']>;
+  routingPolicyId?: Maybe<Scalars['ID']['output']>;
+  routingStrategy?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['Int']['output']>;
+};
+
+export type AiGatewayRoutingPolicy = {
+  __typename?: 'AiGatewayRoutingPolicy';
+  config?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  deployments?: Maybe<Array<Maybe<AiGatewayModelDeployment>>>;
+  enabled: Scalars['Boolean']['output'];
+  fallbackModel?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  strategy: AiGatewayRoutingStrategyType;
+  tagIds?: Maybe<Array<Scalars['ID']['output']>>;
+  version?: Maybe<Scalars['Int']['output']>;
+};
+
+export enum AiGatewayRoutingStrategyType {
+  CostOptimized = 'COST_OPTIMIZED',
+  IntelligentBalanced = 'INTELLIGENT_BALANCED',
+  IntelligentCost = 'INTELLIGENT_COST',
+  IntelligentQuality = 'INTELLIGENT_QUALITY',
+  LatencyOptimized = 'LATENCY_OPTIMIZED',
+  PriorityFallback = 'PRIORITY_FALLBACK',
+  Simple = 'SIMPLE',
+  TagBased = 'TAG_BASED',
+  WeightedRandom = 'WEIGHTED_RANDOM'
+}
+
+export type AiGatewaySpendSummary = {
+  __typename?: 'AiGatewaySpendSummary';
+  apiKeyId?: Maybe<Scalars['ID']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  model?: Maybe<Scalars['String']['output']>;
+  periodEnd?: Maybe<Scalars['Long']['output']>;
+  periodStart?: Maybe<Scalars['Long']['output']>;
+  provider?: Maybe<Scalars['String']['output']>;
+  requestCount?: Maybe<Scalars['Int']['output']>;
+  totalCost?: Maybe<Scalars['String']['output']>;
+  totalInputTokens?: Maybe<Scalars['Long']['output']>;
+  totalOutputTokens?: Maybe<Scalars['Long']['output']>;
+};
+
+export type AiGatewayWorkspaceSettings = {
+  __typename?: 'AiGatewayWorkspaceSettings';
+  cacheEnabled?: Maybe<Scalars['Boolean']['output']>;
+  cacheTtlSeconds?: Maybe<Scalars['Int']['output']>;
+  defaultRoutingPolicyId?: Maybe<Scalars['ID']['output']>;
+  logRetentionDays?: Maybe<Scalars['Int']['output']>;
+  retryCount?: Maybe<Scalars['Int']['output']>;
+  softBudgetWarningPct?: Maybe<Scalars['Int']['output']>;
+  timeoutMs?: Maybe<Scalars['Int']['output']>;
+  workspaceId: Scalars['ID']['output'];
+};
+
+export type AiGatewayWorkspaceSettingsInput = {
+  cacheEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  cacheTtlSeconds?: InputMaybe<Scalars['Int']['input']>;
+  defaultRoutingPolicyId?: InputMaybe<Scalars['ID']['input']>;
+  logRetentionDays?: InputMaybe<Scalars['Int']['input']>;
+  retryCount?: InputMaybe<Scalars['Int']['input']>;
+  softBudgetWarningPct?: InputMaybe<Scalars['Int']['input']>;
+  timeoutMs?: InputMaybe<Scalars['Int']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type AiGuardrailCustomRule = {
   __typename?: 'AiGuardrailCustomRule';
   /** Comma-delimited keywords that raise a match's confidence when one sits near it. Raising only, never lowering. */
@@ -413,6 +629,25 @@ export type AiGuardrailsWorkspaceSettingsInput = {
   scanResponses?: InputMaybe<Scalars['Boolean']['input']>;
   scope?: InputMaybe<AiGuardrailsSettingsScope>;
   workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type AiModel = {
+  __typename?: 'AiModel';
+  alias?: Maybe<Scalars['String']['output']>;
+  capabilities?: Maybe<Scalars['String']['output']>;
+  catalogManaged: Scalars['Boolean']['output'];
+  catalogPinned: Scalars['Boolean']['output'];
+  contextWindow?: Maybe<Scalars['Int']['output']>;
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  defaultRoutingPolicyId?: Maybe<Scalars['ID']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  inputCostPerMTokens?: Maybe<Scalars['Float']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  outputCostPerMTokens?: Maybe<Scalars['Float']['output']>;
+  providerId: Scalars['ID']['output'];
+  version?: Maybe<Scalars['Int']['output']>;
 };
 
 export type AiProviderCatalogItem = {
@@ -1096,6 +1331,67 @@ export type CreateA2aServerInput = {
   workspaceId: Scalars['ID']['input'];
 };
 
+export type CreateAiGatewayBudgetInput = {
+  alertThreshold?: InputMaybe<Scalars['Int']['input']>;
+  amount: Scalars['String']['input'];
+  enforcementMode: AiGatewayBudgetEnforcementMode;
+  period: AiGatewayBudgetPeriod;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type CreateAiGatewayProjectInput = {
+  cacheTtlMinutes?: InputMaybe<Scalars['Int']['input']>;
+  cachingEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  compressionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  logRetentionDays?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  retryMaxAttempts?: InputMaybe<Scalars['Int']['input']>;
+  routingPolicyId?: InputMaybe<Scalars['ID']['input']>;
+  slug: Scalars['String']['input'];
+  timeoutSeconds?: InputMaybe<Scalars['Int']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type CreateAiGatewayProviderInput = {
+  apiKey: Scalars['String']['input'];
+  baseUrl?: InputMaybe<Scalars['String']['input']>;
+  config?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  type: AiGatewayProviderType;
+};
+
+export type CreateAiGatewayRateLimitInput = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  limitType: AiGatewayRateLimitType;
+  limitValue: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  propertyKey?: InputMaybe<Scalars['String']['input']>;
+  scope: AiGatewayRateLimitScope;
+  windowSeconds: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type CreateAiGatewayRoutingPolicyInput = {
+  config?: InputMaybe<Scalars['String']['input']>;
+  fallbackModel?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  strategy: AiGatewayRoutingStrategyType;
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type CreateAiModelInput = {
+  alias?: InputMaybe<Scalars['String']['input']>;
+  capabilities?: InputMaybe<Scalars['String']['input']>;
+  contextWindow?: InputMaybe<Scalars['Int']['input']>;
+  defaultRoutingPolicyId?: InputMaybe<Scalars['ID']['input']>;
+  inputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
+  name: Scalars['String']['input'];
+  outputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
+  providerId: Scalars['ID']['input'];
+};
+
 export type CreateApiConnectorInput = {
   connectorVersion: Scalars['Int']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
@@ -1131,6 +1427,35 @@ export type CreateMcpProjectInput = {
   projectVersion: Scalars['Int']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
   workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
+};
+
+export type CreateWorkspaceAiGatewayProviderInput = {
+  apiKey: Scalars['String']['input'];
+  baseUrl?: InputMaybe<Scalars['String']['input']>;
+  config?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  type: AiGatewayProviderType;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type CreateWorkspaceAiGatewayRoutingPolicyInput = {
+  config?: InputMaybe<Scalars['String']['input']>;
+  fallbackModel?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  strategy: AiGatewayRoutingStrategyType;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type CreateWorkspaceAiModelInput = {
+  alias?: InputMaybe<Scalars['String']['input']>;
+  capabilities?: InputMaybe<Scalars['String']['input']>;
+  contextWindow?: InputMaybe<Scalars['Int']['input']>;
+  defaultRoutingPolicyId?: InputMaybe<Scalars['ID']['input']>;
+  inputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
+  name: Scalars['String']['input'];
+  outputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
+  providerId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 export type CreateWorkspaceMcpServerInput = {
@@ -1920,6 +2245,11 @@ export type Mutation = {
   createAiAgentJudge: AiAgentJudge;
   createAiAgentScenarioJudge: AiAgentScenarioJudge;
   createAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
+  createAiGatewayBudget?: Maybe<AiGatewayBudget>;
+  createAiGatewayProject?: Maybe<AiGatewayProject>;
+  createAiGatewayProvider?: Maybe<AiGatewayProvider>;
+  createAiGatewayRateLimit?: Maybe<AiGatewayRateLimit>;
+  createAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
   /**
    * Creates a rule, DISABLED. Enabling is a separate mutation, deliberately: writing a rule and turning it on are
    * different decisions, and the intended route between them is observe mode — enable under BlockingMode.ALLOW, watch
@@ -1929,6 +2259,7 @@ export type Mutation = {
    * write \\d{1,20} rather than \\d+.
    */
   createAiGuardrailCustomRule: AiGuardrailCustomRule;
+  createAiModel?: Maybe<AiModel>;
   createAiSkill: AiSkill;
   createAiSkillFromInstructions: AiSkill;
   createApiConnector: ApiConnector;
@@ -1949,6 +2280,9 @@ export type Mutation = {
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpTool?: Maybe<McpTool>;
+  createWorkspaceAiGatewayProvider?: Maybe<AiGatewayProvider>;
+  createWorkspaceAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
+  createWorkspaceAiModel?: Maybe<AiModel>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteA2aProject?: Maybe<Scalars['Boolean']['output']>;
@@ -1965,7 +2299,13 @@ export type Mutation = {
    * Fails with CONFLICT when another write changes the memory while it is being deleted; reload it and retry.
    */
   deleteAiAutoMemory: Scalars['Boolean']['output'];
+  deleteAiGatewayBudget?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiGatewayProject?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiGatewayProvider?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiGatewayRateLimit?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiGatewayRoutingPolicy?: Maybe<Scalars['Boolean']['output']>;
   deleteAiGuardrailCustomRule: Scalars['Boolean']['output'];
+  deleteAiModel?: Maybe<Scalars['Boolean']['output']>;
   deleteAiSkill: Scalars['Boolean']['output'];
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
@@ -1996,6 +2336,9 @@ export type Mutation = {
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
+  deleteWorkspaceAiGatewayProvider?: Maybe<Scalars['Boolean']['output']>;
+  deleteWorkspaceAiGatewayRoutingPolicy?: Maybe<Scalars['Boolean']['output']>;
+  deleteWorkspaceAiModel?: Maybe<Scalars['Boolean']['output']>;
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   disconnectConnection: Scalars['Boolean']['output'];
@@ -2024,6 +2367,7 @@ export type Mutation = {
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
+  reconcileAiModelCatalog?: Maybe<Scalars['Boolean']['output']>;
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
@@ -2040,6 +2384,9 @@ export type Mutation = {
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
+  testWorkspaceAiGatewayProviderConnection?: Maybe<ProviderConnectionResult>;
+  unpinAiModel?: Maybe<AiModel>;
+  unpinWorkspaceAiModel?: Maybe<AiModel>;
   updateA2aProject?: Maybe<A2aProject>;
   updateA2aProjectWorkflowEnabled?: Maybe<A2aProjectWorkflow>;
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
@@ -2059,9 +2406,17 @@ export type Mutation = {
    * when the memory has changed since expectedVersion, or when another write races this one; reload it and retry.
    */
   updateAiAutoMemory: AiAutoMemory;
+  updateAiGatewayBudget?: Maybe<AiGatewayBudget>;
+  updateAiGatewayProject?: Maybe<AiGatewayProject>;
+  updateAiGatewayProjectSettings?: Maybe<AiGatewayProjectSettings>;
+  updateAiGatewayProvider?: Maybe<AiGatewayProvider>;
+  updateAiGatewayRateLimit?: Maybe<AiGatewayRateLimit>;
+  updateAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
+  updateAiGatewayWorkspaceSettings?: Maybe<AiGatewayWorkspaceSettings>;
   /** Replaces a rule's pattern. Re-validated, since the pattern is the field the gate exists for. */
   updateAiGuardrailCustomRulePattern: AiGuardrailCustomRule;
   updateAiGuardrailsWorkspaceSettings?: Maybe<AiGuardrailsWorkspaceSettings>;
+  updateAiModel?: Maybe<AiModel>;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
   updateAiSkillTags: AiSkill;
@@ -2099,6 +2454,9 @@ export type Mutation = {
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
   updateUser: AdminUser;
+  updateWorkspaceAiGatewayProvider?: Maybe<AiGatewayProvider>;
+  updateWorkspaceAiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
+  updateWorkspaceAiModel?: Maybe<AiModel>;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
   upgradeAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
@@ -2181,8 +2539,38 @@ export type MutationCreateAiAgentScenarioToolSimulationArgs = {
 };
 
 
+export type MutationCreateAiGatewayBudgetArgs = {
+  input: CreateAiGatewayBudgetInput;
+};
+
+
+export type MutationCreateAiGatewayProjectArgs = {
+  input: CreateAiGatewayProjectInput;
+};
+
+
+export type MutationCreateAiGatewayProviderArgs = {
+  input: CreateAiGatewayProviderInput;
+};
+
+
+export type MutationCreateAiGatewayRateLimitArgs = {
+  input: CreateAiGatewayRateLimitInput;
+};
+
+
+export type MutationCreateAiGatewayRoutingPolicyArgs = {
+  input: CreateAiGatewayRoutingPolicyInput;
+};
+
+
 export type MutationCreateAiGuardrailCustomRuleArgs = {
   input: AiGuardrailCustomRuleInput;
+};
+
+
+export type MutationCreateAiModelArgs = {
+  input: CreateAiModelInput;
 };
 
 
@@ -2308,6 +2696,21 @@ export type MutationCreateMcpToolArgs = {
 };
 
 
+export type MutationCreateWorkspaceAiGatewayProviderArgs = {
+  input: CreateWorkspaceAiGatewayProviderInput;
+};
+
+
+export type MutationCreateWorkspaceAiGatewayRoutingPolicyArgs = {
+  input: CreateWorkspaceAiGatewayRoutingPolicyInput;
+};
+
+
+export type MutationCreateWorkspaceAiModelArgs = {
+  input: CreateWorkspaceAiModelInput;
+};
+
+
 export type MutationCreateWorkspaceApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -2363,9 +2766,39 @@ export type MutationDeleteAiAutoMemoryArgs = {
 };
 
 
+export type MutationDeleteAiGatewayBudgetArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiGatewayProjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiGatewayProviderArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiGatewayRateLimitArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiGatewayRoutingPolicyArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteAiGuardrailCustomRuleArgs = {
   id: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiModelArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2517,6 +2950,24 @@ export type MutationDeleteSharedWorkflowArgs = {
 
 export type MutationDeleteUserArgs = {
   login: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteWorkspaceAiGatewayProviderArgs = {
+  providerId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteWorkspaceAiGatewayRoutingPolicyArgs = {
+  routingPolicyId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteWorkspaceAiModelArgs = {
+  modelId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2793,6 +3244,23 @@ export type MutationTestWorkflowNodeScriptArgs = {
 };
 
 
+export type MutationTestWorkspaceAiGatewayProviderConnectionArgs = {
+  providerId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnpinAiModelArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUnpinWorkspaceAiModelArgs = {
+  modelId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateA2aProjectArgs = {
   id: Scalars['ID']['input'];
   input: UpdateA2aProjectInput;
@@ -2868,6 +3336,46 @@ export type MutationUpdateAiAutoMemoryArgs = {
 };
 
 
+export type MutationUpdateAiGatewayBudgetArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiGatewayBudgetInput;
+};
+
+
+export type MutationUpdateAiGatewayProjectArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiGatewayProjectInput;
+};
+
+
+export type MutationUpdateAiGatewayProjectSettingsArgs = {
+  input: AiGatewayProjectSettingsInput;
+};
+
+
+export type MutationUpdateAiGatewayProviderArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiGatewayProviderInput;
+};
+
+
+export type MutationUpdateAiGatewayRateLimitArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiGatewayRateLimitInput;
+};
+
+
+export type MutationUpdateAiGatewayRoutingPolicyArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiGatewayRoutingPolicyInput;
+};
+
+
+export type MutationUpdateAiGatewayWorkspaceSettingsArgs = {
+  input: AiGatewayWorkspaceSettingsInput;
+};
+
+
 export type MutationUpdateAiGuardrailCustomRulePatternArgs = {
   id: Scalars['ID']['input'];
   pattern: Scalars['String']['input'];
@@ -2877,6 +3385,12 @@ export type MutationUpdateAiGuardrailCustomRulePatternArgs = {
 
 export type MutationUpdateAiGuardrailsWorkspaceSettingsArgs = {
   input: AiGuardrailsWorkspaceSettingsInput;
+};
+
+
+export type MutationUpdateAiModelArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiModelInput;
 };
 
 
@@ -3100,6 +3614,27 @@ export type MutationUpdateMcpToolArgs = {
 export type MutationUpdateUserArgs = {
   login: Scalars['String']['input'];
   role: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateWorkspaceAiGatewayProviderArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiGatewayProviderInput;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateWorkspaceAiGatewayRoutingPolicyArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiGatewayRoutingPolicyInput;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateWorkspaceAiModelArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAiModelInput;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3384,6 +3919,13 @@ export enum PropertyType {
   Time = 'TIME'
 }
 
+export type ProviderConnectionResult = {
+  __typename?: 'ProviderConnectionResult';
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  latencyMs?: Maybe<Scalars['Int']['output']>;
+  ok: Scalars['Boolean']['output'];
+};
+
 export type ProvisionConnectedUserProjectWorkflowInput = {
   inputs?: InputMaybe<Scalars['Map']['input']>;
   workflowUuid: Scalars['ID']['input'];
@@ -3482,6 +4024,18 @@ export type Query = {
    */
   aiAutoMemoryPrincipals: Array<AiAutoMemoryPrincipal>;
   aiDefaultModel?: Maybe<AiDefaultModel>;
+  aiGatewayBudget?: Maybe<AiGatewayBudget>;
+  aiGatewayProject?: Maybe<AiGatewayProject>;
+  aiGatewayProjectSettings?: Maybe<AiGatewayProjectSettings>;
+  aiGatewayProjects: Array<AiGatewayProject>;
+  aiGatewayProvider?: Maybe<AiGatewayProvider>;
+  aiGatewayProviders?: Maybe<Array<Maybe<AiGatewayProvider>>>;
+  aiGatewayRateLimits: Array<AiGatewayRateLimit>;
+  aiGatewayRequestLogs?: Maybe<Array<Maybe<AiGatewayRequestLog>>>;
+  aiGatewayRoutingPolicies?: Maybe<Array<Maybe<AiGatewayRoutingPolicy>>>;
+  aiGatewayRoutingPolicy?: Maybe<AiGatewayRoutingPolicy>;
+  aiGatewaySpendSummaries?: Maybe<Array<Maybe<AiGatewaySpendSummary>>>;
+  aiGatewayWorkspaceSettings?: Maybe<AiGatewayWorkspaceSettings>;
   /** A workspace's own detection rules, enabled or not, ordered by type. */
   aiGuardrailCustomRules: Array<AiGuardrailCustomRule>;
   /**
@@ -3496,6 +4050,9 @@ export type Query = {
    */
   aiGuardrailViolations: Array<AiGuardrailViolation>;
   aiGuardrailsWorkspaceSettings?: Maybe<AiGuardrailsWorkspaceSettings>;
+  aiModel?: Maybe<AiModel>;
+  aiModels?: Maybe<Array<Maybe<AiModel>>>;
+  aiModelsByProvider?: Maybe<Array<Maybe<AiModel>>>;
   aiProviderCatalog: Array<AiProviderCatalogItem>;
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
@@ -3651,6 +4208,10 @@ export type Query = {
   workflowNodeMissingRequiredProperties: Array<Scalars['String']['output']>;
   workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
+  workspaceAiGatewayProviders?: Maybe<Array<Maybe<AiGatewayProvider>>>;
+  workspaceAiGatewayRequestLogs?: Maybe<Array<Maybe<AiGatewayRequestLog>>>;
+  workspaceAiGatewayRoutingPolicies?: Maybe<Array<Maybe<AiGatewayRoutingPolicy>>>;
+  workspaceAiModels?: Maybe<Array<Maybe<AiModel>>>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceChatWorkflows: Array<ChatWorkflow>;
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
@@ -3775,6 +4336,58 @@ export type QueryAiDefaultModelArgs = {
 };
 
 
+export type QueryAiGatewayBudgetArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiGatewayProjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiGatewayProjectSettingsArgs = {
+  projectId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiGatewayProjectsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiGatewayProviderArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiGatewayRateLimitsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiGatewayRequestLogsArgs = {
+  endDate: Scalars['Long']['input'];
+  startDate: Scalars['Long']['input'];
+};
+
+
+export type QueryAiGatewayRoutingPolicyArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiGatewaySpendSummariesArgs = {
+  endDate: Scalars['Long']['input'];
+  startDate: Scalars['Long']['input'];
+};
+
+
+export type QueryAiGatewayWorkspaceSettingsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryAiGuardrailCustomRulesArgs = {
   workspaceId: Scalars['ID']['input'];
 };
@@ -3789,6 +4402,16 @@ export type QueryAiGuardrailViolationsArgs = {
 export type QueryAiGuardrailsWorkspaceSettingsArgs = {
   scope?: InputMaybe<AiGuardrailsSettingsScope>;
   workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryAiModelArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiModelsByProviderArgs = {
+  providerId: Scalars['ID']['input'];
 };
 
 
@@ -4553,6 +5176,28 @@ export type QueryWorkflowTemplateArgs = {
 };
 
 
+export type QueryWorkspaceAiGatewayProvidersArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceAiGatewayRequestLogsArgs = {
+  endDate: Scalars['Long']['input'];
+  startDate: Scalars['Long']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceAiGatewayRoutingPoliciesArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceAiModelsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
@@ -4875,6 +5520,67 @@ export type UpdateAiAutoMemoryInput = {
   principal?: InputMaybe<AiAutoMemoryPrincipalInput>;
   title?: InputMaybe<Scalars['String']['input']>;
   workspaceId: Scalars['ID']['input'];
+};
+
+export type UpdateAiGatewayBudgetInput = {
+  alertThreshold?: InputMaybe<Scalars['Int']['input']>;
+  amount?: InputMaybe<Scalars['String']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  enforcementMode?: InputMaybe<AiGatewayBudgetEnforcementMode>;
+  period?: InputMaybe<AiGatewayBudgetPeriod>;
+};
+
+export type UpdateAiGatewayProjectInput = {
+  cacheTtlMinutes?: InputMaybe<Scalars['Int']['input']>;
+  cachingEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  compressionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  logRetentionDays?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  retryMaxAttempts?: InputMaybe<Scalars['Int']['input']>;
+  routingPolicyId?: InputMaybe<Scalars['ID']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  timeoutSeconds?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateAiGatewayProviderInput = {
+  apiKey?: InputMaybe<Scalars['String']['input']>;
+  baseUrl?: InputMaybe<Scalars['String']['input']>;
+  config?: InputMaybe<Scalars['String']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  name: Scalars['String']['input'];
+  type: AiGatewayProviderType;
+};
+
+export type UpdateAiGatewayRateLimitInput = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  limitType?: InputMaybe<AiGatewayRateLimitType>;
+  limitValue?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  propertyKey?: InputMaybe<Scalars['String']['input']>;
+  scope?: InputMaybe<AiGatewayRateLimitScope>;
+  windowSeconds?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateAiGatewayRoutingPolicyInput = {
+  config?: InputMaybe<Scalars['String']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  fallbackModel?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  strategy?: InputMaybe<AiGatewayRoutingStrategyType>;
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type UpdateAiModelInput = {
+  alias?: InputMaybe<Scalars['String']['input']>;
+  capabilities?: InputMaybe<Scalars['String']['input']>;
+  contextWindow?: InputMaybe<Scalars['Int']['input']>;
+  defaultRoutingPolicyId?: InputMaybe<Scalars['ID']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  inputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  outputCostPerMTokens?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type UpdateApiConnectorInput = {
