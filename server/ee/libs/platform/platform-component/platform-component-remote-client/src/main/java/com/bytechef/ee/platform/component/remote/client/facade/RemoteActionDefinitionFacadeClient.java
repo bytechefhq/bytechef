@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ActionDefinitionFacadeRemoteServiceGrpc;
@@ -24,9 +25,11 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.google.protobuf.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -40,13 +43,19 @@ import tools.jackson.databind.ObjectMapper;
 public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacade {
 
     private final ComponentProtoMapper componentProtoMapper;
+    private final Duration executionDeadline;
     private final GrpcChannels grpcChannels;
     private final WorkerInstances workerInstances;
 
     public RemoteActionDefinitionFacadeClient(
-        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        ApplicationProperties applicationProperties, GrpcChannels grpcChannels, DiscoveryClient discoveryClient,
+        ObjectMapper objectMapper) {
+
+        ApplicationProperties.Remote remote = applicationProperties.getRemote();
+        ApplicationProperties.Remote.Grpc grpc = remote.getGrpc();
 
         this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.executionDeadline = grpc.getExecutionDeadline();
         this.grpcChannels = grpcChannels;
         this.workerInstances = new WorkerInstances(discoveryClient);
     }
@@ -223,7 +232,13 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
     }
 
     private ActionDefinitionFacadeRemoteServiceBlockingStub getStub(String componentName) {
-        return ActionDefinitionFacadeRemoteServiceGrpc.newBlockingStub(
+        ActionDefinitionFacadeRemoteServiceBlockingStub stub = ActionDefinitionFacadeRemoteServiceGrpc.newBlockingStub(
             grpcChannels.getChannel(workerInstances.getInstance(componentName)));
+
+        if (executionDeadline == null) {
+            return stub;
+        }
+
+        return stub.withDeadlineAfter(executionDeadline.toMillis(), TimeUnit.MILLISECONDS);
     }
 }
