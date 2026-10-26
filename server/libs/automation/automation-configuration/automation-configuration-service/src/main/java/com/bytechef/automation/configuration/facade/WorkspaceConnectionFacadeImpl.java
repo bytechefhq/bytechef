@@ -40,6 +40,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -107,6 +108,27 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         workspaceConnectionService.create(connectionId, workspaceId);
 
         return connectionId;
+    }
+
+    @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_REGISTERED, data = {
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "storeType", value = "#storeType"),
+        @AuditData(key = "workspaceId", value = "#workspaceId")
+    })
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public long registerExisting(
+        long workspaceId, ConnectionDTO connectionDTO, CredentialStoreType storeType, String credentialRef) {
+
+        Connection connection = connectionDTO.toConnection();
+
+        connection.setType(PlatformType.AUTOMATION);
+
+        Connection registered = connectionService.registerExisting(connection, storeType, credentialRef);
+
+        workspaceConnectionService.create(registered.getId(), workspaceId);
+
+        return registered.getId();
     }
 
     @Override

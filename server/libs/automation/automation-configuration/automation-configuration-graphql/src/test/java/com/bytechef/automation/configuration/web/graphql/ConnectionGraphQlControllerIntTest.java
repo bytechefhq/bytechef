@@ -16,9 +16,12 @@
 
 package com.bytechef.automation.configuration.web.graphql;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +30,8 @@ import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -194,5 +199,35 @@ public class ConnectionGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(workspaceConnectionFacade).updateConnectionCredentials(789L, Map.of("token", "new-token"), 3);
+    }
+
+    @Test
+    void testRegisterExistingConnectionMutation() {
+        when(workspaceConnectionFacade.registerExisting(
+            eq(1L), any(ConnectionDTO.class), eq(CredentialStoreType.HASHICORP_VAULT), anyString()))
+                .thenReturn(42L);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    registerExistingConnection(input: {
+                        componentName: "acme-api"
+                        connectionVersion: 1
+                        credentialRef: "secret/data/bytechef/connections/abc-uuid"
+                        credentialStoreType: HASHICORP_VAULT
+                        environmentId: "1"
+                        name: "vault-backed conn"
+                        workspaceId: "1"
+                    })
+                }
+                """)
+            .execute()
+            .path("registerExistingConnection")
+            .entity(Long.class)
+            .isEqualTo(42L);
+
+        verify(workspaceConnectionFacade).registerExisting(
+            eq(1L), any(ConnectionDTO.class), eq(CredentialStoreType.HASHICORP_VAULT),
+            eq("secret/data/bytechef/connections/abc-uuid"));
     }
 }

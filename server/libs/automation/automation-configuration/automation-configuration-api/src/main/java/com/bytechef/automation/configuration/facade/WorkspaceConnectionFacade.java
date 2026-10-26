@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,9 @@ import java.util.Map;
 public interface WorkspaceConnectionFacade {
 
     long create(long workspaceId, ConnectionDTO connectionDTO);
+
+    long registerExisting(
+        long workspaceId, ConnectionDTO connectionDTO, CredentialStoreType storeType, String credentialRef);
 
     void delete(long connectionId);
 

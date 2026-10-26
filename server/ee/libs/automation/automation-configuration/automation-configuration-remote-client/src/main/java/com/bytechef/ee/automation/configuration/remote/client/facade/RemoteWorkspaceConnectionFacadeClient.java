@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.configuration.remote.client.facade;
 import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,14 @@ import org.springframework.stereotype.Component;
 public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectionFacade {
 
     @Override
-    public long create(long workspaceId, com.bytechef.platform.connection.dto.ConnectionDTO connectionDTO) {
+    public long create(long workspaceId, ConnectionDTO connectionDTO) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long registerExisting(
+        long workspaceId, ConnectionDTO connectionDTO, CredentialStoreType storeType, String credentialRef) {
+
         throw new UnsupportedOperationException();
     }
 
@@ -47,12 +56,12 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
-    public com.bytechef.platform.connection.dto.ConnectionDTO getConnection(long connectionId) {
+    public ConnectionDTO getConnection(long connectionId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<com.bytechef.platform.connection.dto.ConnectionDTO> getConnections(
+    public List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long connectionEnvironment,
         Long tagId) {
 

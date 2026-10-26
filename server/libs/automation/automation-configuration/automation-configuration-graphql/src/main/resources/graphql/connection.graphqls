@@ -10,6 +10,8 @@ extend type Mutation {
     """Replace an existing connection's authorization parameters. A parameter that is not submitted is cleared.
     Succeeding means the values were stored, not that they work."""
     updateConnectionCredentials(input: UpdateConnectionCredentialsInput!): Boolean!
+    """Register an existing connection backed by an externally-provisioned credential (e.g. AWS Secrets Manager)."""
+    registerExistingConnection(input: RegisterExistingConnectionInput!): Long!
 }
 
 input UpdateConnectionCredentialsInput {
@@ -32,4 +34,14 @@ type ConnectionWorkflow {
 enum ConnectionWorkflowUsage {
     DEPLOYMENT
     EDITOR
+}
+
+input RegisterExistingConnectionInput {
+    componentName: String!
+    connectionVersion: Int!
+    credentialRef: String!
+    credentialStoreType: ConnectionCredentialStoreType!
+    environmentId: ID!
+    name: String!
+    workspaceId: ID!
 }

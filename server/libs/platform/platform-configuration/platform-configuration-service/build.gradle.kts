@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    implementation(project(":server:libs:platform:platform-credential-store:platform-credential-store-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-mail"))
@@ -22,6 +23,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
 
+    testImplementation(project(":server:libs:platform:platform-credential-store:platform-credential-store-service"))
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))

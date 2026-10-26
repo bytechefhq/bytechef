@@ -71,6 +71,7 @@ dependencies {
 
     testRuntimeOnly("org.postgresql:postgresql")
     testRuntimeOnly(project(":server:libs:platform:platform-category:platform-category-service"))
+    testRuntimeOnly(project(":server:libs:platform:platform-credential-store:platform-credential-store-service"))
     testRuntimeOnly(project(":server:libs:platform:platform-connection:platform-connection-service"))
     testRuntimeOnly(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testRuntimeOnly(project(":server:libs:platform:platform-user:platform-user-service"))

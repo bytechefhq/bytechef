@@ -20,6 +20,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,6 +59,9 @@ public interface ConnectionService {
      * Updates a connection's name, tags and parameters in one write, rejected when {@code version} is stale.
      */
     Connection update(long id, String name, List<Long> tagIds, Map<String, ?> parameters, int version);
+
+    Connection registerExisting(
+        Connection connection, CredentialStoreType storeType, String credentialRef);
 
     Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
 

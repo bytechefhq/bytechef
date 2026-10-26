@@ -43,6 +43,7 @@ dependencies {
     testImplementation("org.liquibase:liquibase-core")
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(project(":server:libs:platform:platform-credential-store:platform-credential-store-service"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service"))
     testImplementation("org.springframework:spring-webmvc")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))

@@ -40,6 +40,7 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.configuration.service.PropertyServiceImpl;
+import com.bytechef.platform.credential.store.service.DatabaseCredentialStore;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
@@ -99,7 +100,7 @@ public class EmbeddedGettingStartedIntTestConfiguration {
     @Bean
     @ConditionalOnMissingBean
     PropertyService propertyService(PropertyRepository propertyRepository) {
-        return new PropertyServiceImpl(propertyRepository);
+        return new PropertyServiceImpl(List.of(new DatabaseCredentialStore()), propertyRepository);
     }
 
     @Bean

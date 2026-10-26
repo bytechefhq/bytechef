@@ -29,6 +29,7 @@ import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.configuration.service.PropertyServiceImpl;
+import com.bytechef.platform.credential.store.service.DatabaseCredentialStore;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -169,8 +170,8 @@ class ManagementMcpServerFacadeIntTest {
     @EnableAutoConfiguration(excludeName = "org.springframework.boot.graphql.autoconfigure.GraphQlAutoConfiguration")
     @EnableConfigurationProperties(ApplicationProperties.class)
     @Import({
-        JacksonConfiguration.class, LiquibaseConfiguration.class, ManagementMcpServerFacadeImpl.class,
-        PostgreSQLContainerConfiguration.class, PropertyServiceImpl.class
+        DatabaseCredentialStore.class, JacksonConfiguration.class, LiquibaseConfiguration.class,
+        ManagementMcpServerFacadeImpl.class, PostgreSQLContainerConfiguration.class, PropertyServiceImpl.class
     })
     static class ManagementMcpServerFacadeIntTestConfiguration {
 

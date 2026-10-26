@@ -43,6 +43,14 @@ properties:
     readOnly: true
   credentialStatus:
     $ref: "./credential_status.yaml"
+  credentialStoreType:
+    description: "Backend that stores the credential payload. Defaults to DATABASE."
+    type: "string"
+    enum:
+      - "DATABASE"
+      - "AWS_SECRETS_MANAGER"
+      - "HASHICORP_VAULT"
+    default: "DATABASE"
   environmentId:
     description: "The id of an environment."
     type: "integer"

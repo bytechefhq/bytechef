@@ -25,6 +25,7 @@ import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestCo
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
+import com.bytechef.platform.credential.store.service.DatabaseCredentialStore;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
 import java.util.Optional;
@@ -109,8 +110,9 @@ class PropertyServiceIntTest {
     @Configuration
     @EnableAutoConfiguration
     @Import({
-        JacksonConfiguration.class, LiquibaseConfiguration.class, PlatformConfigurationIntTestJdbcConfiguration.class,
-        PostgreSQLContainerConfiguration.class, PropertyServiceImpl.class
+        DatabaseCredentialStore.class, JacksonConfiguration.class, LiquibaseConfiguration.class,
+        PlatformConfigurationIntTestJdbcConfiguration.class, PostgreSQLContainerConfiguration.class,
+        PropertyServiceImpl.class
     })
     static class PropertyServiceIntTestConfiguration {
 

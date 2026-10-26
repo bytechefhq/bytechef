@@ -50,6 +50,7 @@ dependencies {
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 
+    testRuntimeOnly(project(":server:libs:platform:platform-credential-store:platform-credential-store-service"))
     testRuntimeOnly(project(":server:libs:platform:platform-connection:platform-connection-service"))
     testRuntimeOnly(project(":server:libs:platform:platform-tag:platform-tag-service"))
 }
