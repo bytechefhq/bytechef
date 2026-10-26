@@ -746,6 +746,8 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispat
 include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client")
+include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-grpc")
+include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-grpc-proto")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest")
 
 include("server:ee:libs:modules:components:api-platform")
