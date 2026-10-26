@@ -2,7 +2,7 @@ import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {cleanup, render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';
-import {afterEach, vi} from 'vitest';
+import {type Mock, afterEach, vi} from 'vitest';
 
 afterEach(() => {
     cleanup();
@@ -70,6 +70,38 @@ export const resetAll = () => {
 export function mockScrollIntoView() {
     Element.prototype.scrollIntoView = vi.fn();
 }
+
+interface MutationMockOptionsI<TData, TVariables> {
+    onError?: (error: unknown, variables: TVariables) => void;
+    onSuccess?: (data: TData, variables: TVariables) => void;
+}
+
+export const stubMutation = <TData = unknown, TVariables = unknown>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mutationHookMock: Mock<(...args: any[]) => any>
+) => {
+    let latestOnError: MutationMockOptionsI<TData, TVariables>['onError'];
+    let latestOnSuccess: MutationMockOptionsI<TData, TVariables>['onSuccess'];
+
+    const mutate = vi.fn();
+
+    mutationHookMock.mockImplementation((options?: MutationMockOptionsI<TData, TVariables>) => {
+        latestOnError = options?.onError;
+        latestOnSuccess = options?.onSuccess;
+
+        return {isPending: false, mutate};
+    });
+
+    const triggerOnError = (error: unknown, variables: TVariables) => {
+        latestOnError?.(error, variables);
+    };
+
+    const triggerOnSuccess = (data: TData, variables: TVariables) => {
+        latestOnSuccess?.(data, variables);
+    };
+
+    return {mutate, triggerOnError, triggerOnSuccess};
+};
 
 export * from '@testing-library/react';
 export {default as userEvent} from '@testing-library/user-event';
