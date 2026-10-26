@@ -2,6 +2,7 @@ import useMcpServerListItemClick from '@/shared/components/mcp-server/hooks/useM
 import {
     McpServer,
     useDeleteWorkspaceMcpServerMutation,
+    useEnvironmentsQuery,
     useUpdateMcpServerMutation,
     useUpdateMcpServerTagsMutation,
 } from '@/shared/middleware/graphql';
@@ -11,6 +12,7 @@ import {useState} from 'react';
 const useMcpServerListItem = (mcpServer: McpServer) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showPromotionDialog, setShowPromotionDialog] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
 
@@ -19,6 +21,10 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const queryClient = useQueryClient();
 
     const {handleMcpServerListItemClick, toolsCollapsibleTriggerRef} = useMcpServerListItemClick();
+
+    const environmentsQuery = useEnvironmentsQuery();
+
+    const showPromoteToEnvironment = (environmentsQuery.data?.environments?.length ?? 0) >= 2;
 
     const updateMcpServerMutation = useUpdateMcpServerMutation();
     const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
@@ -82,8 +88,11 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
         mcpServerTagIds,
         setShowDeleteDialog,
         setShowEditDialog,
+        setShowPromotionDialog,
         showDeleteDialog,
         showEditDialog,
+        showPromoteToEnvironment,
+        showPromotionDialog,
         toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,
     };

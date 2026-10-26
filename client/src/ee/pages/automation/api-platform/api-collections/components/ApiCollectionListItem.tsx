@@ -7,13 +7,16 @@ import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collecti
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import ApiCollectionListItemDropDownMenu from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionListItemDropDownMenu';
 import {useApiCollectionsEnabledStore} from '@/ee/pages/automation/api-platform/api-collections/stores/useApiCollectionsEnabledStore';
+import EnvironmentPromotionDialog from '@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog';
 import {ApiCollection, Tag} from '@/ee/shared/middleware/automation/api-platform';
 import {useUpdateApiCollectionTagsMutation} from '@/ee/shared/mutations/automation/apiCollectionTags.mutations';
 import {ApiCollectionTagKeys} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
 import {useDeleteApiCollectionMutation} from '@/ee/shared/mutations/automation/apiCollections.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
+import {PromotionResourceType, useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -30,16 +33,21 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showApiEndpointDialog, setShowApiEndpointDialog] = useState(false);
     const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
+    const [showPromotionDialog, setShowPromotionDialog] = useState(false);
 
     const setApiCollectionEnabled = useApiCollectionsEnabledStore(
         ({setApiCollectionEnabled}) => setApiCollectionEnabled
     );
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const endpointsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const apiCollectionTagIds = apiCollection.tags?.map((tag) => tag.id);
 
     const {data: projectDeployment} = useGetProjectDeploymentQuery(apiCollection.projectDeploymentId!);
+
+    const environmentsQuery = useEnvironmentsQuery();
 
     const queryClient = useQueryClient();
 
@@ -116,6 +124,8 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
         () => [...new Set(apiCollection.endpoints?.map((endpoint) => endpoint.workflowUuid) || [])],
         [apiCollection.endpoints]
     );
+
+    const showPromoteToEnvironment = (environmentsQuery.data?.environments?.length ?? 0) >= 2;
 
     const handleOnProjectDeploymentDialogClose = () => {
         queryClient
@@ -224,6 +234,8 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
                             onNewEndpoint={() => setShowApiEndpointDialog(true)}
+                            onPromoteClick={() => setShowPromotionDialog(true)}
+                            showPromoteToEnvironment={showPromoteToEnvironment}
                         />
                     </div>
                 </div>
@@ -260,6 +272,20 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                     onClose={handleOnProjectDeploymentDialogClose}
                     projectDeployment={projectDeployment}
                     redirectOnSubmit={false}
+                />
+            )}
+
+            {showPromotionDialog && apiCollection.environmentId != null && (
+                <EnvironmentPromotionDialog
+                    onClose={() => setShowPromotionDialog(false)}
+                    onPromoted={() => {
+                        queryClient.invalidateQueries({queryKey: ApiCollectionKeys.apiCollections});
+                    }}
+                    resourceType={PromotionResourceType.ApiCollection}
+                    sourceEnvironmentId={apiCollection.environmentId}
+                    sourceId={String(apiCollection.id!)}
+                    sourceName={apiCollection.name}
+                    workspaceId={currentWorkspaceId!}
                 />
             )}
         </>
