@@ -1,0 +1,19 @@
+query clusterElementFields(
+    $componentName: String!
+    $componentVersion: Int!
+    $clusterElementName: String!
+    $connectionId: Long
+    $inputParameters: Map
+) {
+    clusterElementFields(
+        componentName: $componentName
+        componentVersion: $componentVersion
+        clusterElementName: $clusterElementName
+        connectionId: $connectionId
+        inputParameters: $inputParameters
+    ) {
+        name
+        label
+        type
+    }
+}
