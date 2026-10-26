@@ -59,6 +59,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl"))
+    implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
