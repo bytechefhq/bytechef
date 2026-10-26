@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +49,9 @@ class ApiGatewayLoginIntTest {
 
     static final String LOGIN = "login-test@localhost.com";
     static final String PASSWORD = "secret-password";
+    static final List<String> PUBLIC_PAGES = List.of(
+        "/automation-hub.html", "/connect.html", "/integration-marketplace.html", "/oauth.html",
+        "/workflow-builder.html");
 
     @LocalServerPort
     private int port;
@@ -147,6 +151,10 @@ class ApiGatewayLoginIntTest {
         static void properties(DynamicPropertyRegistry registry) throws IOException {
             Files.writeString(clientPath.resolve("index.html"), "<html>bytechef-client</html>");
 
+            for (String page : PUBLIC_PAGES) {
+                Files.writeString(clientPath.resolve(page.substring(1)), "<html>" + page + "</html>");
+            }
+
             registry.add("bytechef.resources.web", () -> clientPath.toUri()
                 .toString());
         }
@@ -159,6 +167,19 @@ class ApiGatewayLoginIntTest {
 
             assertThat(response.statusCode()).isEqualTo(200);
             assertThat(response.body()).contains("bytechef-client");
+        }
+
+        @Test
+        void testPublicPagesAreServed() throws IOException, InterruptedException {
+            GatewayBrowser gatewayBrowser = new GatewayBrowser(staticClientPort);
+
+            for (String page : PUBLIC_PAGES) {
+                HttpResponse<String> response = gatewayBrowser.get(page);
+
+                assertThat(response.statusCode()).as(page)
+                    .isEqualTo(200);
+                assertThat(response.body()).contains(page);
+            }
         }
 
         @Test
