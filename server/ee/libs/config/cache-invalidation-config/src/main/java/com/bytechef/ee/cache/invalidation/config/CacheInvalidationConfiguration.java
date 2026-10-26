@@ -27,7 +27,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnEEVersion
-@ConditionalOnExpression("!'${bytechef.message-broker.provider:memory}'.equalsIgnoreCase('memory')")
+@ConditionalOnExpression("!'${bytechef.message-broker.provider:memory}'.equalsIgnoreCase('memory') && " +
+    "!('${bytechef.message-broker.provider:memory}'.equalsIgnoreCase('aws') && " +
+    "!'${bytechef.message-broker.aws.control-provider:sqs}'.equalsIgnoreCase('redis'))")
 public class CacheInvalidationConfiguration {
 
     @Bean
