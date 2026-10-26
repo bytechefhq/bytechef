@@ -17,14 +17,33 @@
 package com.bytechef.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.user.remote.client.service.RemoteUserServiceClient;
+import com.bytechef.ee.platform.user.remote.grpc.UserRemoteServiceGrpcServer;
+import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
+import io.grpc.BindableService;
+import io.grpc.Server;
+import io.grpc.ServerInterceptors;
+import io.grpc.netty.NettyServerBuilder;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 /**
  * @author Ivica Cardic
@@ -35,8 +54,41 @@ import org.springframework.core.env.Environment;
 })
 public class ConfigurationApplicationIntTest {
 
+    private static final UserService GATEWAY_USER_SERVICE = mock(UserService.class);
+
+    private static Server gatewayServer;
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Autowired
     private Environment environment;
+
+    @Autowired
+    private UserService userService;
+
+    @AfterAll
+    static void afterAll() {
+        gatewayServer.shutdownNow();
+    }
+
+    @DynamicPropertySource
+    static void properties(DynamicPropertyRegistry registry) {
+        try {
+            gatewayServer = NettyServerBuilder.forPort(0)
+                .addService(
+                    ServerInterceptors.intercept(
+                        new UserRemoteServiceGrpcServer(GATEWAY_USER_SERVICE),
+                        new ServiceTokenServerInterceptor("test-service-token")))
+                .build()
+                .start();
+        } catch (IOException ioException) {
+            throw new UncheckedIOException(ioException);
+        }
+
+        registry.add(
+            "bytechef.remote.grpc.targets.api-gateway-app", () -> "localhost:" + gatewayServer.getPort());
+    }
 
     @Test
     void testContextLoads() {
@@ -47,5 +99,35 @@ public class ConfigurationApplicationIntTest {
         assertThat(environment.getProperty("spring.task.execution.thread-name-prefix"))
             .isEqualTo("configuration-app-task-");
         assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
+    }
+
+    @Test
+    void testApiKeyAndConnectedUserGrpcServicesAreServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains(
+            "bytechef.embedded.connected.user.remote.v1.ConnectedUserRemoteService",
+            "bytechef.platform.security.remote.v1.ApiKeyRemoteService");
+        assertThat(serviceNames).doesNotContain("bytechef.platform.user.remote.v1.UserRemoteService");
+    }
+
+    @Test
+    void testUserServiceCallsTheGatewayOverGrpc() {
+        User user = new User();
+
+        user.setId(1L);
+        user.setLogin("admin@localhost.com");
+
+        when(GATEWAY_USER_SERVICE.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+
+        assertThat(userService).isInstanceOf(RemoteUserServiceClient.class);
+        assertThat(userService.getUser("admin@localhost.com")
+            .getId()).isEqualTo(1L);
     }
 }

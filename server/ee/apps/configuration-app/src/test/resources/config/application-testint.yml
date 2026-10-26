@@ -9,6 +9,9 @@ openapi:
       platform: /api/platform
 
 spring:
+  grpc:
+    server:
+      port: 0
   graphql:
     schema:
       locations: classpath*:graphql/**/
@@ -21,6 +24,10 @@ bytechef:
   edition: EE
   file-storage:
     provider: JDBC
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
   webhook-delivery:
     concurrency-limit: 10
     max-pending-deliveries: 1000

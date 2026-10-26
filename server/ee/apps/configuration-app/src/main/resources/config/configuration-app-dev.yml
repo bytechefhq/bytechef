@@ -8,3 +8,8 @@ bytechef:
     url: jdbc:postgresql://localhost:5432/bytechef
     username: postgres
     password: postgres
+
+spring:
+  grpc:
+    server:
+      port: 17222
