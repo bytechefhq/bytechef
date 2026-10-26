@@ -8,13 +8,16 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceWorkflowRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceWorkflowRequest;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -26,13 +29,13 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationInstanceWorkflowServiceClient implements IntegrationInstanceWorkflowService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String PROJECT_SERVICE = "/remote/integration-instance-workflow-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteIntegrationInstanceWorkflowServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteIntegrationInstanceWorkflowServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -74,13 +77,15 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     @Override
     public IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId) {
+        IntegrationInstanceWorkflowRemoteServiceGrpc.IntegrationInstanceWorkflowRemoteServiceBlockingStub stub =
+            IntegrationInstanceWorkflowRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
 
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(PROJECT_SERVICE + "/get-integration/instance-workflow/{integrationInstanceId}/{workflowId}")
-                .build(integrationInstanceId, workflowId),
-            IntegrationInstanceWorkflow.class);
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceWorkflow(
+            stub.getIntegrationInstanceWorkflow(
+                IntegrationInstanceWorkflowRequest.newBuilder()
+                    .setIntegrationInstanceId(integrationInstanceId)
+                    .setWorkflowId(workflowId)
+                    .build()));
     }
 
     @Override

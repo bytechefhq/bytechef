@@ -14,17 +14,19 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.AutomationWorkflowProjectFacadeRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.google.protobuf.Empty;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -36,13 +38,13 @@ import org.springframework.stereotype.Component;
 public class RemoteAutomationProjectFacadeClient implements AutomationProjectFacade {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String AUTOMATION_PROJECT_FACADE = "/remote/automation-project-facade";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteAutomationProjectFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteAutomationProjectFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -131,12 +133,12 @@ public class RemoteAutomationProjectFacadeClient implements AutomationProjectFac
 
     @Override
     public List<AutomationProjectDTO> getPublishedProjects() {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(AUTOMATION_PROJECT_FACADE + "/get-published-projects")
-                .build(),
-            new ParameterizedTypeReference<>() {});
+        AutomationWorkflowProjectFacadeRemoteServiceGrpc.AutomationWorkflowProjectFacadeRemoteServiceBlockingStub stub =
+            AutomationWorkflowProjectFacadeRemoteServiceGrpc
+                .newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        return embeddedConfigurationProtoMapper.toAutomationWorkflowProjectDTOs(
+            stub.getPublishedProjects(Empty.getDefaultInstance()));
     }
 
     @Override
