@@ -1653,6 +1653,14 @@ export type CustomComponentTriggerDefinition = {
   title?: Maybe<Scalars['String']['output']>;
 };
 
+export type DataStreamCompatibleConnection = {
+  __typename?: 'DataStreamCompatibleConnection';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type DataTable = {
   __typename?: 'DataTable';
   baseName: Scalars['String']['output'];
@@ -1912,6 +1920,14 @@ export type ExternalInvocationLogType = {
   toolName?: Maybe<Scalars['String']['output']>;
   workflowName?: Maybe<Scalars['String']['output']>;
   workspaceId?: Maybe<Scalars['Long']['output']>;
+};
+
+export type Field = {
+  __typename?: 'Field';
+  label?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  /** Java class simple name of the field's type, e.g. String, Long, Instant. */
+  type?: Maybe<Scalars['String']['output']>;
 };
 
 export type FileEntry = {
@@ -4551,6 +4567,7 @@ export type Query = {
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
   clusterElementDynamicProperties: Array<Property>;
+  clusterElementFields: Array<Field>;
   clusterElementMissingRequiredProperties: Array<Scalars['String']['output']>;
   clusterElementOptions: Array<Option>;
   clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
@@ -4604,6 +4621,8 @@ export type Query = {
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
   customComponentSource: Scalars['String']['output'];
   customComponents: Array<CustomComponent>;
+  /** Workspace connections whose component exposes at least one ItemReader cluster element. */
+  dataStreamCompatibleConnections: Array<DataStreamCompatibleConnection>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
   dataTableTags: Array<Tag>;
@@ -5096,6 +5115,15 @@ export type QueryClusterElementDynamicPropertiesArgs = {
 };
 
 
+export type QueryClusterElementFieldsArgs = {
+  clusterElementName: Scalars['String']['input'];
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  connectionId?: InputMaybe<Scalars['Long']['input']>;
+  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+};
+
+
 export type QueryClusterElementMissingRequiredPropertiesArgs = {
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
@@ -5280,6 +5308,12 @@ export type QueryCustomComponentDefinitionArgs = {
 
 export type QueryCustomComponentSourceArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryDataStreamCompatibleConnectionsArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
