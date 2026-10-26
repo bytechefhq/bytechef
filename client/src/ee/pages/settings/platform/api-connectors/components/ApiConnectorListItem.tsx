@@ -12,8 +12,10 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEditDialog';
 import ApiConnectorEndpointListItem from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointListItem';
+import {API_CONNECTORS_PATH} from '@/ee/pages/settings/platform/api-connectors/pages/hooks/useImportApiConnector';
 import {ApiConnector} from '@/shared/middleware/graphql';
 import {ChevronDownIcon, EllipsisVerticalIcon} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 
 import useApiConnectorListItem from './hooks/useApiConnectorListItem';
 
@@ -32,11 +34,13 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
         showEditDialog,
     } = useApiConnectorListItem({apiConnector});
 
+    const navigate = useNavigate();
+
     return (
-        <Collapsible className="w-full rounded-md px-2 py-5 hover:bg-surface-neutral-primary-hover">
+        <Collapsible className="mb-2 w-full rounded border border-border/50 px-3 py-4 hover:bg-surface-neutral-primary-hover">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
-                    <div className="flex items-center justify-between">
+                    <div className="flex min-h-8 items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {apiConnector.description ? (
                                 <Tooltip>
@@ -64,7 +68,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                         </div>
                     </div>
 
-                    <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                    <div className="mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
                             <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-content-neutral-primary">
                                 <span className="mr-1">
@@ -80,11 +84,13 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                 </div>
 
                 <div className="flex items-center justify-end gap-x-6">
-                    <div className="flex flex-col items-end gap-y-4">
-                        <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
+                    <div className="flex flex-col items-end gap-y-2">
+                        <div className="flex min-h-8 items-center">
+                            <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
+                        </div>
 
                         <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                            <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                 {lastModifiedDate ? (
                                     <span className="text-xs">
                                         {`Modified at ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
@@ -108,14 +114,17 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => navigate(`${API_CONNECTORS_PATH}/${apiConnector.id}/edit`)}
+                            >
+                                Edit
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit YAML</DropdownMenuItem>
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem
-                                className="text-content-destructive"
-                                onClick={() => setShowDeleteDialog(true)}
-                            >
+                            <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>

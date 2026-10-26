@@ -93,7 +93,14 @@ const RequestBodyEditor = ({onChange, requestBody}: RequestBodyEditorProps) => {
             <Dialog onOpenChange={handleDialogOpen} open={isDialogOpen}>
                 <DialogContent>
                     <DialogMain>
-                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(handleSaveRequestBody)}>
+                        <form
+                            className="flex min-h-0 flex-1 flex-col"
+                            onSubmit={(event) => {
+                                event.stopPropagation();
+
+                                handleSubmit(handleSaveRequestBody)(event);
+                            }}
+                        >
                             <DialogHeader title={`${requestBody ? 'Edit' : 'Add'} Request Body`} />
 
                             <DialogBody>

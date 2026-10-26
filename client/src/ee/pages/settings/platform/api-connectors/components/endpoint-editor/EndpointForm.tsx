@@ -103,6 +103,10 @@ const EndpointForm = ({endpoint, onClose, onSave, open}: EndpointFormProps) => {
                                                                     <SelectItem value={HttpMethod.Delete}>
                                                                         DELETE
                                                                     </SelectItem>
+
+                                                                    <SelectItem value={HttpMethod.Head}>
+                                                                        HEAD
+                                                                    </SelectItem>
                                                                 </SelectContent>
                                                             </Select>
 
