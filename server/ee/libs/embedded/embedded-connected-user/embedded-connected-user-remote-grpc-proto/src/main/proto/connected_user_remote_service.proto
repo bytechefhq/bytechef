@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package bytechef.embedded.connected.user.remote.v1;
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.embedded.connected.user.remote.grpc.proto";
+
+service ConnectedUserRemoteService {
+  rpc CreateConnectedUser(CreateConnectedUserRequest) returns (CreateConnectedUserResponse);
+  rpc FetchConnectedUserByExternalId(FetchConnectedUserByExternalIdRequest) returns (FetchConnectedUserResponse);
+}
+
+message RemoteConnectedUser {
+  optional int64 id = 1;
+  optional string external_id = 2;
+  optional string email = 3;
+  optional string name = 4;
+  bool enabled = 5;
+  // Environment ordinal, as stored
+  int32 environment = 6;
+  int32 version = 7;
+  map<string, string> metadata = 8;
+  optional string created_by = 9;
+}
+
+message CreateConnectedUserRequest {
+  string external_id = 1;
+  int64 environment_id = 2;
+}
+
+message CreateConnectedUserResponse {
+  RemoteConnectedUser connected_user = 1;
+}
+
+message FetchConnectedUserByExternalIdRequest {
+  string external_id = 1;
+  int64 environment_id = 2;
+}
+
+message FetchConnectedUserResponse {
+  optional RemoteConnectedUser connected_user = 1;
+}
