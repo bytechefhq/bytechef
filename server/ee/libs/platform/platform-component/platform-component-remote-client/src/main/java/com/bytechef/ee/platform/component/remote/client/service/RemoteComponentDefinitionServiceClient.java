@@ -91,8 +91,10 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
                 uriBuilder -> toUri(
                     uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions",
                     Map.of(),
-                    getQueryParams(actionDefinitions, clusterElementDefinitions, connectionDefinitions,
-                        triggerDefinitions)),
+                    getQueryParams(
+                        actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions,
+                        include,
+                        platformType)),
                 new ParameterizedTypeReference<>() {})));
 
         return getComponentDefinitions(completableFutures);
@@ -151,7 +153,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     private static LinkedMultiValueMap<String, String> getQueryParams(
         Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
-        Boolean triggerDefinitions) {
+        Boolean triggerDefinitions, @Nullable List<String> include, @Nullable PlatformType platformType) {
 
         LinkedMultiValueMap<String, String> queryParamsMap = new LinkedMultiValueMap<>();
 
@@ -169,6 +171,14 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
         if (triggerDefinitions != null) {
             queryParamsMap.put("triggerDefinitions", List.of(triggerDefinitions.toString()));
+        }
+
+        if (include != null) {
+            queryParamsMap.put("include", include);
+        }
+
+        if (platformType != null) {
+            queryParamsMap.put("platformType", List.of(platformType.name()));
         }
 
         return queryParamsMap;
