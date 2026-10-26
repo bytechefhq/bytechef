@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package bytechef.platform.security.remote.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.security.remote.grpc.proto";
+
+service ApiKeyRemoteService {
+  rpc Exists(ExistsRequest) returns (ExistsResponse);
+  rpc FetchApiKeyBySecretKey(FetchApiKeyBySecretKeyRequest) returns (FetchApiKeyResponse);
+  rpc FetchApiKeyBySecretKeyAndEnvironment(FetchApiKeyBySecretKeyAndEnvironmentRequest) returns (FetchApiKeyResponse);
+}
+
+message RemoteApiKey {
+  optional int64 id = 1;
+  optional string name = 2;
+  optional string secret_key = 3;
+  // PlatformType ordinal, as stored
+  optional int32 type = 4;
+  // Environment ordinal, as stored
+  int32 environment = 5;
+  optional int64 user_id = 6;
+  optional google.protobuf.Timestamp last_used_date = 7;
+  optional string created_by = 8;
+}
+
+message ExistsRequest {
+  string secret_key = 1;
+  int64 environment_id = 2;
+}
+
+message ExistsResponse {
+  bool exists = 1;
+}
+
+message FetchApiKeyBySecretKeyRequest {
+  string secret_key = 1;
+}
+
+message FetchApiKeyBySecretKeyAndEnvironmentRequest {
+  string secret_key = 1;
+  int64 environment_id = 2;
+}
+
+message FetchApiKeyResponse {
+  optional RemoteApiKey api_key = 1;
+}
