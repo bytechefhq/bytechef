@@ -18,6 +18,8 @@ package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -42,5 +44,28 @@ public class ConnectionGraphQlController {
         workspaceConnectionFacade.disconnectConnection(connectionId);
 
         return true;
+    }
+
+    @MutationMapping(name = "registerExistingConnection")
+    public Long registerExistingConnection(@Argument RegisterExistingConnectionInput input) {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .componentName(input.componentName())
+            .connectionVersion(input.connectionVersion())
+            .environmentId((int) input.environmentId())
+            .name(input.name())
+            .build();
+
+        return workspaceConnectionFacade.registerExisting(
+            input.workspaceId(), connectionDTO, input.credentialStoreType(), input.credentialRef());
+    }
+
+    public record RegisterExistingConnectionInput(
+        String componentName,
+        int connectionVersion,
+        String credentialRef,
+        CredentialStoreType credentialStoreType,
+        long environmentId,
+        String name,
+        long workspaceId) {
     }
 }

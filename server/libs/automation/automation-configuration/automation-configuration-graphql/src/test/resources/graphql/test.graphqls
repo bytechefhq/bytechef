@@ -9,6 +9,15 @@ type Mutation {
     _placeholder: Boolean
 }
 
+# Scalar and enum types from platform modules not available on the test classpath
+scalar Long
+
+enum ConnectionCredentialStoreType {
+    DATABASE
+    AWS_SECRETS_MANAGER
+    HASHICORP_VAULT
+}
+
 # Minimal type stubs referenced by this module's SDL
 
 type ApiKey {

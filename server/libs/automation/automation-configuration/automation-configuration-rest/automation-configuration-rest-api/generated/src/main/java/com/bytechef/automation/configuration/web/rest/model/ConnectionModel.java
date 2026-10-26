@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.821704+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-05T07:19:48.417771+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ConnectionModel {
 
   private @Nullable Boolean active;
@@ -56,6 +56,45 @@ public class ConnectionModel {
   private @Nullable OffsetDateTime createdDate;
 
   private @Nullable CredentialStatusModel credentialStatus;
+
+  /**
+   * Backend that stores the credential payload. Defaults to DATABASE.
+   */
+  public enum CredentialStoreTypeEnum {
+    DATABASE("DATABASE"),
+    
+    AWS_SECRETS_MANAGER("AWS_SECRETS_MANAGER"),
+    
+    HASHICORP_VAULT("HASHICORP_VAULT");
+
+    private final String value;
+
+    CredentialStoreTypeEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static CredentialStoreTypeEnum fromValue(String value) {
+      for (CredentialStoreTypeEnum b : CredentialStoreTypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private CredentialStoreTypeEnum credentialStoreType = CredentialStoreTypeEnum.DATABASE;
 
   private @Nullable Long environmentId;
 
@@ -316,6 +355,27 @@ public class ConnectionModel {
     this.credentialStatus = credentialStatus;
   }
 
+  public ConnectionModel credentialStoreType(CredentialStoreTypeEnum credentialStoreType) {
+    this.credentialStoreType = credentialStoreType;
+    return this;
+  }
+
+  /**
+   * Backend that stores the credential payload. Defaults to DATABASE.
+   * @return credentialStoreType
+   */
+  
+  @Schema(name = "credentialStoreType", description = "Backend that stores the credential payload. Defaults to DATABASE.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("credentialStoreType")
+  public CredentialStoreTypeEnum getCredentialStoreType() {
+    return credentialStoreType;
+  }
+
+  @JsonProperty("credentialStoreType")
+  public void setCredentialStoreType(CredentialStoreTypeEnum credentialStoreType) {
+    this.credentialStoreType = credentialStoreType;
+  }
+
   public ConnectionModel environmentId(@Nullable Long environmentId) {
     this.environmentId = environmentId;
     return this;
@@ -540,6 +600,7 @@ public class ConnectionModel {
         Objects.equals(this.createdBy, connection.createdBy) &&
         Objects.equals(this.createdDate, connection.createdDate) &&
         Objects.equals(this.credentialStatus, connection.credentialStatus) &&
+        Objects.equals(this.credentialStoreType, connection.credentialStoreType) &&
         Objects.equals(this.environmentId, connection.environmentId) &&
         Objects.equals(this.id, connection.id) &&
         Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
@@ -553,7 +614,7 @@ public class ConnectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version, workspaceId);
+    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, credentialStoreType, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version, workspaceId);
   }
 
   @Override
@@ -570,6 +631,7 @@ public class ConnectionModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
+    sb.append("    credentialStoreType: ").append(toIndentedString(credentialStoreType)).append("\n");
     sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");

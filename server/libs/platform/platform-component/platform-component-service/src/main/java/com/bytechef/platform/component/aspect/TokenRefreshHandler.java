@@ -27,12 +27,15 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.credential.store.CredentialStore;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -56,15 +59,17 @@ public class TokenRefreshHandler {
 
     private final CacheManager cacheManager;
     private final ConnectionDefinitionService connectionDefinitionService;
+    private final List<CredentialStore> credentialStores;
     private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public TokenRefreshHandler(
         CacheManager cacheManager, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService) {
+        List<CredentialStore> credentialStores, ConnectionService connectionService) {
 
         this.cacheManager = cacheManager;
         this.connectionDefinitionService = connectionDefinitionService;
+        this.credentialStores = credentialStores;
         this.connectionService = connectionService;
     }
 
@@ -150,6 +155,27 @@ public class TokenRefreshHandler {
 
             if (log.isTraceEnabled()) {
                 log.trace("Credential refresh completed");
+            }
+
+            Connection fetchedConnection = connectionService.getConnection(componentConnection.connectionId());
+            CredentialStoreType storeType = fetchedConnection.getCredentialStoreType();
+            Optional<CredentialStore> store = credentialStores.stream()
+                .filter(curStore -> curStore.getType() == storeType)
+                .findFirst();
+
+            if (store.map(CredentialStore::isReadOnly)
+                .orElse(false)) {
+                log.warn(
+                    "Cannot refresh token for connection {} — credential store {} is read-only",
+                    componentConnection.connectionId(), storeType);
+
+                connectionService.updateConnectionCredentialStatus(
+                    componentConnection.connectionId(), Connection.CredentialStatus.INVALID);
+
+                return new ComponentConnection(
+                    componentConnection.componentName(), fetchedConnection.getConnectionVersion(),
+                    componentConnection.connectionId(), fetchedConnection.getParameters(),
+                    fetchedConnection.getAuthorizationType());
             }
 
             Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));

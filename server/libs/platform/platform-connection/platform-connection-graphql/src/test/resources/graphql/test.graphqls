@@ -1,0 +1,4 @@
+# Test-only GraphQL base operations so that 'extend type Query' from main resources can merge.
+type Query {
+    _placeholder: Boolean
+}
