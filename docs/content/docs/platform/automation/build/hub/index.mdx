@@ -91,10 +91,12 @@ Voice - the microphone button in the composer starts a spoken interaction instea
 ## How the assistant's tools are wired
 
 The AI Hub runs an **Ask** agent and a **Build** agent. Ask reads your workspace - projects, workflows, connections,
-executions - and never changes anything. Build can also create and change projects, deployments and connections, and
-it authors workflow content only through `buildWorkflow` and `importWorkflow`, the same workflow builder the Copilot and
-the management MCP server use. Tools that change your workspace can require your approval first (see **Tool
-approvals** in the AI Hub settings).
+executions - and never changes anything. Build can also create and change projects, deployments and connections, and it
+authors workflow content only through `buildWorkflow` and `importWorkflow`, the same workflow builder the Copilot and
+the management MCP server use. Build also creates and changes
+[AI Agents](/platform/automation/build/ai-agents#sample-prompts), and opens the agent it worked on in the resource
+panel. Tools that change your workspace can require your approval first (see **Tool approvals** in the AI Hub
+settings).
 
 {/* @coming-soon Connectors, custom MCP servers and the tiered tool catalog come with later AI Hub phases.
 ## Managing connectors and MCP servers
