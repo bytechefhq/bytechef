@@ -601,6 +601,8 @@ include("server:ee:libs:automation:automation-configuration:automation-configura
 include("server:ee:libs:automation:automation-configuration:automation-configuration-graphql")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-public-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-client")
+include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-grpc")
+include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-grpc-proto")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-service")

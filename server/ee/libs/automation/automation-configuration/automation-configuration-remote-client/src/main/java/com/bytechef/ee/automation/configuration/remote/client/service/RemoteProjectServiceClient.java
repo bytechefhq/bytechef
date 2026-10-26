@@ -12,15 +12,20 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectRemoteServiceGrpc;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectRemoteServiceGrpc.ProjectRemoteServiceBlockingStub;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.WorkflowIdRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.google.protobuf.Empty;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -32,13 +37,13 @@ import org.springframework.stereotype.Component;
 public class RemoteProjectServiceClient implements ProjectService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String PROJECT_SERVICE = "/remote/project-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final AutomationConfigurationProtoMapper automationConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteProjectServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteProjectServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.automationConfigurationProtoMapper = new AutomationConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -68,22 +73,13 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public Project getProjectDeploymentProject(long projectDeploymentId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(PROJECT_SERVICE + "/get-project/deployment-project/{projectDeploymentId}")
-                .build(projectDeploymentId),
-            Project.class);
+        return automationConfigurationProtoMapper.toProject(
+            getStub().getProjectDeploymentProject(toIdRequest(projectDeploymentId)));
     }
 
     @Override
     public Project getProject(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(PROJECT_SERVICE + "/get-project/{id}")
-                .build(id),
-            Project.class);
+        return automationConfigurationProtoMapper.toProject(getStub().getProject(toIdRequest(id)));
     }
 
     @Override
@@ -98,12 +94,7 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public List<Project> getProjects() {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(PROJECT_SERVICE + "/get-projects")
-                .build(),
-            new ParameterizedTypeReference<>() {});
+        return automationConfigurationProtoMapper.toProjects(getStub().getProjects(Empty.getDefaultInstance()));
     }
 
     @Override
@@ -121,12 +112,11 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public Project getWorkflowProject(String workflowId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(PROJECT_SERVICE + "/get-workflow-project/{workflowId}")
-                .build(workflowId),
-            Project.class);
+        return automationConfigurationProtoMapper.toProject(
+            getStub().getWorkflowProject(
+                WorkflowIdRequest.newBuilder()
+                    .setWorkflowId(workflowId)
+                    .build()));
     }
 
     @Override
@@ -164,4 +154,13 @@ public class RemoteProjectServiceClient implements ProjectService {
         throw new UnsupportedOperationException();
     }
 
+    private ProjectRemoteServiceBlockingStub getStub() {
+        return ProjectRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
+    }
 }

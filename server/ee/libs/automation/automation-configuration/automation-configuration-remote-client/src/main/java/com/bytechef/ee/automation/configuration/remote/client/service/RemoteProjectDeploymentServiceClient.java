@@ -9,13 +9,16 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -27,13 +30,13 @@ import org.springframework.stereotype.Component;
 public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String PROJECT_DEPLOYMENT_SERVICE = "/remote/project/deployment-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final AutomationConfigurationProtoMapper automationConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteProjectDeploymentServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteProjectDeploymentServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.automationConfigurationProtoMapper = new AutomationConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -68,12 +71,14 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
 
     @Override
     public ProjectDeployment getProjectDeployment(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(PROJECT_DEPLOYMENT_SERVICE + "/get-project/deployment/{id}")
-                .build(id),
-            ProjectDeployment.class);
+        ProjectDeploymentRemoteServiceGrpc.ProjectDeploymentRemoteServiceBlockingStub stub =
+            ProjectDeploymentRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        return automationConfigurationProtoMapper.toProjectDeployment(
+            stub.getProjectDeployment(
+                IdRequest.newBuilder()
+                    .setId(id)
+                    .build()));
     }
 
     @Override
