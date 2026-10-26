@@ -93,6 +93,7 @@ With `sqs` and more than one node, each control message reaches a single node, o
 - SSE clients connected to one node miss the events of webhook runs handled by another node.
 - WebSocket webhook clients (Twilio call status) miss updates handled by another node.
 - EE cache invalidation between nodes is off, so other nodes keep cached entries for up to 10 minutes after a change.
+- EE shared state caches (the editor's webhook test, embedded JWT public keys) stay in each node's memory, so with more than one coordinator these can fail when a request lands on another coordinator.
 
 At startup, the `AWS` provider logs a warning when `control-provider` is `sqs`.
 
