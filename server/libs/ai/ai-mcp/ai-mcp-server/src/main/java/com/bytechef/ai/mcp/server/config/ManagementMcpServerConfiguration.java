@@ -59,8 +59,8 @@ public class ManagementMcpServerConfiguration {
         """
             ByteChef management server. Two kinds of tools: ordinary tools are deterministic CRUD; call them \
             directly. Intelligent tools (buildWorkflow, importWorkflow, authorSkill, debugWorkflowExecution, \
-            configureMcpServer) run an inner AI agent and may take minutes; call them for judgment work, not \
-            for CRUD.
+            configureMcpServer, buildAiAgent) run an inner AI agent and may take minutes; call them for \
+            judgment work, not for CRUD.
             To build a workflow: createProject (if needed) → buildWorkflow with a plain-language instruction \
             and the projectId for a new workflow or the workflowId for an existing one. To import an external \
             workflow (n8n, Make, Zapier, Workato): createProject (if needed) → importWorkflow with the source \
@@ -75,6 +75,14 @@ public class ManagementMcpServerConfiguration {
             workspace. getProject also reports publication state, the last version and deployments. \
             Skills are read-only here (getAiSkills, getAiSkill, getAiSkillFilePaths, getAiSkillFileContent); \
             author or change a skill with authorSkill.
+            To build an AI Agent (a chat-first automation that runs on a model instead of a hand-built \
+            workflow): createProject (if needed) → buildAiAgent with a plain-language instruction and the \
+            projectId for a new agent or the aiAgentId for an existing one; it looks up tools and \
+            connections itself. For precise edits use the agent tools directly: listAiAgents, getAiAgent, \
+            createAiAgent, updateAiAgent, add/update/deleteAiAgentElement, add/deleteAiAgentChannel, \
+            updateAiAgentSettings, and searchAiAgentTools to find the componentName, componentVersion and \
+            actionName of a TOOL element and searchAiAgentReferences to find the referenceId of a skill or knowledge \
+            base. An agent's MODEL element needs a connectionId.
             To expose workflows over MCP: createMcpServer(name, environment, enabled?), leaving enabled unset \
             or false, since a server with any unmapped attached workflow cannot be enabled; then \
             createMcpProject(mcpServerId, projectId, projectVersion, workflowIds) to attach a published \
@@ -87,8 +95,8 @@ public class ManagementMcpServerConfiguration {
             numeric id. configureMcpServer never creates the server, attaches workflows to it, or enables it; \
             those are the flat tools above.
             Tools that work within a workspace (listProjects, createProject, searchWorkflows without a \
-            projectId, and the MCP server, deployment \
-            and knowledge-base tools) take a workspaceId, and several also take an environment (DEVELOPMENT, \
+            projectId, listAiAgents, createAiAgent, and the MCP server, \
+            deployment and knowledge-base tools) take a workspaceId, and several also take an environment (DEVELOPMENT, \
             STAGING or PRODUCTION, default DEVELOPMENT). Call listWorkspaces first to find the workspace id. \
             Tools that take a project or workflow id act on that object directly.""";
 

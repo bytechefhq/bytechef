@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -33,6 +34,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
@@ -40,11 +42,13 @@ import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.SkillsTools;
+import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -291,6 +295,87 @@ class ToolCallbackContributorConfigurationTest {
                 provider, workspaceFacade);
 
             return contributor.getToolCallbacks();
+        }
+    }
+
+    @Nested
+    class AiAgentCrudContributorTest {
+
+        private final AiAgentFacade aiAgentFacade = mock(AiAgentFacade.class);
+        private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade =
+            mock(WorkspaceKnowledgeBaseFacade.class);
+
+        @Test
+        void testContributesTheAgentBuilderTools() {
+            assertThat(getToolCallbacks())
+                .extracting(toolCallback -> toolCallback.getToolDefinition()
+                    .name())
+                .containsExactlyInAnyOrder(
+                    "listAiAgents", "getAiAgent", "searchAiAgentTools", "searchAiAgentReferences", "createAiAgent",
+                    "updateAiAgent",
+                    "addAiAgentChannel", "deleteAiAgentChannel", "addAiAgentElement", "updateAiAgentElement",
+                    "deleteAiAgentElement", "updateAiAgentSettings");
+        }
+
+        @Test
+        void testOnlyListCreateAndSearchReferencesAcceptWorkspaceId() {
+            Set<String> workspaceScopedNames = Set.of("listAiAgents", "createAiAgent", "searchAiAgentReferences");
+
+            assertThat(getToolCallbacks())
+                .allSatisfy(toolCallback -> {
+                    String inputSchema = toolCallback.getToolDefinition()
+                        .inputSchema();
+
+                    if (workspaceScopedNames.contains(toolCallback.getToolDefinition()
+                        .name())) {
+
+                        assertThat(inputSchema).contains("workspaceId");
+                    } else {
+                        assertThat(inputSchema).doesNotContain("workspaceId");
+                    }
+                });
+        }
+
+        @Test
+        void testListAiAgentsListsTheGivenWorkspace() {
+            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(7L, "Workspace")));
+
+            String result = getToolCallbacks().stream()
+                .filter(toolCallback -> "listAiAgents".equals(toolCallback.getToolDefinition()
+                    .name()))
+                .findFirst()
+                .orElseThrow()
+                .call("{\"workspaceId\": 7}");
+
+            assertThat(result).isEqualTo("[]");
+            verify(aiAgentFacade).getAgents(7L);
+        }
+
+        @Test
+        void testSearchAiAgentReferencesFindsKnowledgeBasesOfTheGivenWorkspace() {
+            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(7L, "Workspace")));
+
+            String result = getToolCallbacks().stream()
+                .filter(toolCallback -> "searchAiAgentReferences".equals(toolCallback.getToolDefinition()
+                    .name()))
+                .findFirst()
+                .orElseThrow()
+                .call("{\"kind\": \"KNOWLEDGE_BASE\", \"workspaceId\": 7}");
+
+            assertThat(result).isEqualTo("[]");
+            verify(workspaceKnowledgeBaseFacade).getWorkspaceKnowledgeBases(eq(7L), anyLong());
+        }
+
+        @SuppressWarnings("unchecked")
+        private List<ToolCallback> getToolCallbacks() {
+            ObjectProvider<AiAgentToolCallbacksFactory> provider = mock(ObjectProvider.class);
+
+            when(provider.getIfAvailable()).thenReturn(
+                new AiAgentToolCallbacksFactory(aiAgentFacade, mock(ClusterElementDefinitionService.class), null,
+                    workspaceKnowledgeBaseFacade));
+
+            return configuration.aiAgentFlatCrudMcpContributor(provider, workspaceFacade)
+                .getToolCallbacks();
         }
     }
 
