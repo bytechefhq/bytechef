@@ -1,0 +1,46 @@
+extend type Query {
+    """
+    Per-detection guardrail drill-down records for a workspace, newest first.
+
+    These records never carry the matched value: spanStart/spanLength locate a match and category names the rule
+    that fired, which is what makes a rule debuggable without building a store of the very values the guardrails
+    exist to redact.
+
+    There is deliberately no by-id read. Every read is scoped to a workspace the caller has already been authorized
+    for, so no lookup here can confirm the existence of another workspace's record.
+    """
+    aiGuardrailViolations(workspaceId: ID, limit: Int): [AiGuardrailViolation!]!
+}
+
+type AiGuardrailViolation {
+    id: ID!
+    workspaceId: ID
+    environment: Int
+    surface: String!
+
+    "The rule that fired, e.g. EMAIL_ADDRESS."
+    category: String!
+
+    kind: Int!
+
+    "Where the match sat in the scanned text. Never the text itself."
+    spanStart: Int!
+
+    spanLength: Int!
+    confidence: Float!
+
+    """
+    What was actually done. ALLOWED is a counterfactual - observe mode saw the violation and forwarded the content
+    unmodified - so it must not be read as an enforcement.
+    """
+    action: AiGuardrailViolationAction!
+
+    principal: String
+    createdDate: String
+}
+
+enum AiGuardrailViolationAction {
+    BLOCKED
+    REDACTED
+    ALLOWED
+}

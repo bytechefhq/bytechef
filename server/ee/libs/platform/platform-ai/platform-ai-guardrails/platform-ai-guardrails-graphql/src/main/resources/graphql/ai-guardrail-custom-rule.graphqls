@@ -1,0 +1,58 @@
+extend type Query {
+    "A workspace's own detection rules, enabled or not, ordered by type."
+    aiGuardrailCustomRules(workspaceId: ID!): [AiGuardrailCustomRule!]!
+}
+
+extend type Mutation {
+    """
+    Creates a rule, DISABLED. Enabling is a separate mutation, deliberately: writing a rule and turning it on are
+    different decisions, and the intended route between them is observe mode — enable under BlockingMode.ALLOW, watch
+    guardrail_allowed against real traffic, then enforce.
+
+    The pattern is validated and a rejection says which defence caught it. Every quantifier must carry an upper bound:
+    write \\d{1,20} rather than \\d+.
+    """
+    createAiGuardrailCustomRule(input: AiGuardrailCustomRuleInput!): AiGuardrailCustomRule!
+
+    "Replaces a rule's pattern. Re-validated, since the pattern is the field the gate exists for."
+    updateAiGuardrailCustomRulePattern(workspaceId: ID!, id: ID!, pattern: String!): AiGuardrailCustomRule!
+
+    setAiGuardrailCustomRuleEnabled(workspaceId: ID!, id: ID!, enabled: Boolean!): AiGuardrailCustomRule!
+
+    deleteAiGuardrailCustomRule(workspaceId: ID!, id: ID!): Boolean!
+}
+
+type AiGuardrailCustomRule {
+    id: ID!
+    workspaceId: ID!
+
+    "The span category, and the name that appears in tokens, metrics and violation records."
+    type: String!
+
+    pattern: String!
+
+    "0 is PII (reversible, tokenized); 1 is SECRET (never restored)."
+    kind: Int!
+
+    score: Float!
+
+    "Comma-delimited keywords that raise a match's confidence when one sits near it. Raising only, never lowering."
+    contextKeywords: String
+
+    contextWindow: Int
+    contextScore: Float
+    enabled: Boolean!
+    createdDate: String
+    lastModifiedDate: String
+}
+
+input AiGuardrailCustomRuleInput {
+    workspaceId: ID!
+    type: String!
+    pattern: String!
+    kind: Int!
+    score: Float!
+    contextKeywords: String
+    contextWindow: Int
+    contextScore: Float
+}

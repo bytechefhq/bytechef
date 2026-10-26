@@ -27,6 +27,19 @@ bytechef:
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
+    guardrails:
+      detection:
+        max-unwindowable-input: 262144
+        timeout: 2s
+      session:
+        retention-cron: '0 0 3 * * *'
+        retention-days: 30
+      violation:
+        daily-cap: 100000
+        enabled: false
+        queue-capacity: 1000
+        retention-cron: '0 30 2 * * *'
+        retention-days: 30
     hub:
       # Whether the AI Hub is enabled
       enabled: false

@@ -806,6 +806,7 @@ public class ApplicationProperties {
         private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
+        private Guardrails guardrails = new Guardrails();
         private Hub hub = new Hub();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
         private Mcp mcp = new Mcp();
@@ -827,6 +828,10 @@ public class ApplicationProperties {
 
         public Firecrawl getFirecrawl() {
             return firecrawl;
+        }
+
+        public Guardrails getGuardrails() {
+            return guardrails;
         }
 
         public Hub getHub() {
@@ -867,6 +872,10 @@ public class ApplicationProperties {
 
         public void setFirecrawl(Firecrawl firecrawl) {
             this.firecrawl = firecrawl;
+        }
+
+        public void setGuardrails(Guardrails guardrails) {
+            this.guardrails = guardrails;
         }
 
         public void setHub(Hub hub) {
@@ -1422,6 +1431,138 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+        }
+
+        public static class Guardrails {
+
+            private Detection detection = new Detection();
+
+            private Session session = new Session();
+
+            private Violation violation = new Violation();
+
+            public Session getSession() {
+                return session;
+            }
+
+            public void setSession(Session session) {
+                this.session = session;
+            }
+
+            public Violation getViolation() {
+                return violation;
+            }
+
+            public void setViolation(Violation violation) {
+                this.violation = violation;
+            }
+
+            public Detection getDetection() {
+                return detection;
+            }
+
+            public void setDetection(Detection detection) {
+                this.detection = detection;
+            }
+
+            public static class Detection {
+
+                private Duration timeout;
+
+                private int maxUnwindowableInput;
+
+                public Duration getTimeout() {
+                    return timeout;
+                }
+
+                public void setTimeout(Duration timeout) {
+                    this.timeout = timeout;
+                }
+
+                public int getMaxUnwindowableInput() {
+                    return maxUnwindowableInput;
+                }
+
+                public void setMaxUnwindowableInput(int maxUnwindowableInput) {
+                    this.maxUnwindowableInput = maxUnwindowableInput;
+                }
+            }
+
+            public static class Session {
+
+                private long retentionDays;
+
+                private String retentionCron;
+
+                public long getRetentionDays() {
+                    return retentionDays;
+                }
+
+                public void setRetentionDays(long retentionDays) {
+                    this.retentionDays = retentionDays;
+                }
+
+                public String getRetentionCron() {
+                    return retentionCron;
+                }
+
+                public void setRetentionCron(String retentionCron) {
+                    this.retentionCron = retentionCron;
+                }
+            }
+
+            public static class Violation {
+
+                private boolean enabled;
+
+                private int dailyCap;
+
+                private int queueCapacity;
+
+                private long retentionDays;
+
+                private String retentionCron;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public int getDailyCap() {
+                    return dailyCap;
+                }
+
+                public void setDailyCap(int dailyCap) {
+                    this.dailyCap = dailyCap;
+                }
+
+                public int getQueueCapacity() {
+                    return queueCapacity;
+                }
+
+                public void setQueueCapacity(int queueCapacity) {
+                    this.queueCapacity = queueCapacity;
+                }
+
+                public long getRetentionDays() {
+                    return retentionDays;
+                }
+
+                public void setRetentionDays(long retentionDays) {
+                    this.retentionDays = retentionDays;
+                }
+
+                public String getRetentionCron() {
+                    return retentionCron;
+                }
+
+                public void setRetentionCron(String retentionCron) {
+                    this.retentionCron = retentionCron;
+                }
             }
         }
 
