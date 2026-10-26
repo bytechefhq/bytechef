@@ -28,6 +28,7 @@ import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageImpl;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.component.log.TriggerLogFileStorageImpl;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,9 +45,11 @@ class LogFileStorageConfiguration {
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry,
         ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
 
-        if (isJdbcProvider(applicationProperties)) {
-            return new EditorLogFileStorageImpl(
-                new JdbcLogFileStorage(namedParameterJdbcOperationsProvider.getObject(), Scope.EDITOR));
+        NamedParameterJdbcOperations namedParameterJdbcOperations = getNamedParameterJdbcOperations(
+            applicationProperties, namedParameterJdbcOperationsProvider);
+
+        if (namedParameterJdbcOperations != null) {
+            return new EditorLogFileStorageImpl(new JdbcLogFileStorage(namedParameterJdbcOperations, Scope.EDITOR));
         }
 
         return new EditorLogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
@@ -57,9 +60,11 @@ class LogFileStorageConfiguration {
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry,
         ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
 
-        if (isJdbcProvider(applicationProperties)) {
-            return new TriggerLogFileStorageImpl(
-                new JdbcLogFileStorage(namedParameterJdbcOperationsProvider.getObject(), Scope.TRIGGER));
+        NamedParameterJdbcOperations namedParameterJdbcOperations = getNamedParameterJdbcOperations(
+            applicationProperties, namedParameterJdbcOperationsProvider);
+
+        if (namedParameterJdbcOperations != null) {
+            return new TriggerLogFileStorageImpl(new JdbcLogFileStorage(namedParameterJdbcOperations, Scope.TRIGGER));
         }
 
         return new TriggerLogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
@@ -70,8 +75,11 @@ class LogFileStorageConfiguration {
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry,
         ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
 
-        if (isJdbcProvider(applicationProperties)) {
-            return new JdbcLogFileStorage(namedParameterJdbcOperationsProvider.getObject(), Scope.JOB);
+        NamedParameterJdbcOperations namedParameterJdbcOperations = getNamedParameterJdbcOperations(
+            applicationProperties, namedParameterJdbcOperationsProvider);
+
+        if (namedParameterJdbcOperations != null) {
+            return new JdbcLogFileStorage(namedParameterJdbcOperations, Scope.JOB);
         }
 
         return new LogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
@@ -85,13 +93,20 @@ class LogFileStorageConfiguration {
         return fileStorageServiceRegistry.getFileStorageService(provider.name());
     }
 
+    private static @Nullable NamedParameterJdbcOperations getNamedParameterJdbcOperations(
+        ApplicationProperties applicationProperties,
+        ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
+
+        if (getProvider(applicationProperties) != Provider.JDBC) {
+            return null;
+        }
+
+        return namedParameterJdbcOperationsProvider.getIfAvailable();
+    }
+
     private static Provider getProvider(ApplicationProperties applicationProperties) {
         ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
 
         return fileStorage.getProvider();
-    }
-
-    private static boolean isJdbcProvider(ApplicationProperties applicationProperties) {
-        return getProvider(applicationProperties) == Provider.JDBC;
     }
 }
