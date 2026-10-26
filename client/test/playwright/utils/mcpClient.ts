@@ -145,22 +145,32 @@ export async function buildWorkflowAnsweringQuestions(
     mcpClient: McpClient,
     buildArguments: {request: string; workspaceId: number}
 ): Promise<McpToolCallResultI> {
-    let request = buildArguments.request;
-    let buildResult = await mcpClient.callTool('buildWorkflow', {...buildArguments, request});
+    return callIntelligentToolAnsweringQuestions(mcpClient, 'buildWorkflow', 'request', buildArguments);
+}
+
+/** Calls an intelligent tool and answers each numbered question it returns with the first option. */
+export async function callIntelligentToolAnsweringQuestions(
+    mcpClient: McpClient,
+    toolName: string,
+    instructionField: string,
+    toolArguments: Record<string, unknown>
+): Promise<McpToolCallResultI> {
+    let instruction = String(toolArguments[instructionField]);
+    let toolResult = await mcpClient.callTool(toolName, {...toolArguments, [instructionField]: instruction});
 
     for (
         let round = 0;
-        round < MAX_BUILD_WORKFLOW_QUESTIONS && toolResultText(buildResult).includes(BUILD_WORKFLOW_QUESTION_MARKER);
+        round < MAX_BUILD_WORKFLOW_QUESTIONS && toolResultText(toolResult).includes(BUILD_WORKFLOW_QUESTION_MARKER);
         round++
     ) {
-        const questionText = toolResultText(buildResult);
+        const questionText = toolResultText(toolResult);
         const question = questionText.split('\n').find((line) => line.trim().endsWith('?')) ?? 'your question';
         const firstOption = /^1\.\s+(.+)$/m.exec(questionText)?.[1] ?? 'the first option';
 
-        request = `${request} Answer to "${question.trim()}": ${firstOption.trim()}.`;
+        instruction = `${instruction} Answer to "${question.trim()}": ${firstOption.trim()}.`;
 
-        buildResult = await mcpClient.callTool('buildWorkflow', {...buildArguments, request});
+        toolResult = await mcpClient.callTool(toolName, {...toolArguments, [instructionField]: instruction});
     }
 
-    return buildResult;
+    return toolResult;
 }

@@ -527,6 +527,7 @@ export interface ProjectSummaryI {
     lastPublishedDate?: string | number | null;
     lastStatus?: string;
     name: string;
+    workspaceId?: number;
 }
 
 export async function listWorkspaceProjects(page: Page, workspaceId: number): Promise<ProjectSummaryI[]> {
@@ -549,6 +550,14 @@ export async function readProject(page: Page, projectId: number): Promise<Projec
     const response = await page.request.get(`${PROJECTS_API_PATH}/${projectId}`);
 
     return response.ok() ? ((await response.json()) as ProjectSummaryI) : undefined;
+}
+
+export async function readProjectWorkspaceId(page: Page, projectId: number): Promise<number> {
+    const project = await readProject(page, projectId);
+
+    expect(project?.workspaceId, `project ${projectId} has a workspace`).toBeDefined();
+
+    return project!.workspaceId!;
 }
 
 export async function publishProjectThroughApi(page: Page, projectId: number, description: string): Promise<void> {
