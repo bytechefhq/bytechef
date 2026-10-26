@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.platform.component.remote.grpc;
 
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -24,6 +26,13 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 @ConditionalOnClass(name = "com.bytechef.platform.component.service.ComponentDefinitionServiceImpl")
 public class ComponentGrpcServerConfiguration {
+
+    @Bean
+    ActionDefinitionFacadeRemoteServiceGrpcServer actionDefinitionFacadeRemoteServiceGrpcServer(
+        ActionDefinitionFacade actionDefinitionFacade, ComponentProtoMapper componentProtoMapper) {
+
+        return new ActionDefinitionFacadeRemoteServiceGrpcServer(actionDefinitionFacade, componentProtoMapper);
+    }
 
     @Bean
     ActionDefinitionRemoteServiceGrpcServer actionDefinitionRemoteServiceGrpcServer(
@@ -49,6 +58,13 @@ public class ComponentGrpcServerConfiguration {
         ConnectionDefinitionService connectionDefinitionService, ComponentProtoMapper componentProtoMapper) {
 
         return new ConnectionDefinitionRemoteServiceGrpcServer(connectionDefinitionService, componentProtoMapper);
+    }
+
+    @Bean
+    TriggerDefinitionFacadeRemoteServiceGrpcServer triggerDefinitionFacadeRemoteServiceGrpcServer(
+        TriggerDefinitionFacade triggerDefinitionFacade, ComponentProtoMapper componentProtoMapper) {
+
+        return new TriggerDefinitionFacadeRemoteServiceGrpcServer(triggerDefinitionFacade, componentProtoMapper);
     }
 
     @Bean

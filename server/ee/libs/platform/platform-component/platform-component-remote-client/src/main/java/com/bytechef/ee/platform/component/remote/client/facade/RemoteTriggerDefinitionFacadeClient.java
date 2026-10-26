@@ -9,8 +9,21 @@ package com.bytechef.ee.platform.component.remote.client.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
-import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
-import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
+import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionFacadeRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionFacadeRemoteServiceGrpc.TriggerDefinitionFacadeRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteDynamicPropertiesRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteDynamicWebhookRefreshRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteListenerRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteOptionsRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteOutputRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteTriggerRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookDisableRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookEnableRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookValidateRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -21,7 +34,6 @@ import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -31,14 +43,18 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient implements TriggerDefinitionFacade {
+public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFacade {
 
-    private static final String TRIGGER_DEFINITION_FACADE = "/trigger-definition-facade";
+    private final ComponentProtoMapper componentProtoMapper;
+    private final GrpcChannels grpcChannels;
+    private final WorkerInstances workerInstances;
 
     public RemoteTriggerDefinitionFacadeClient(
-        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultRestClient, discoveryClient, objectMapper);
+        this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+        this.workerInstances = new WorkerInstances(discoveryClient);
     }
 
     @Override
@@ -46,73 +62,101 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
-            new PropertiesRequest(
-                componentName, componentVersion, triggerName, propertyName, inputParameters, connectionId,
-                lookupDependsOnPaths),
-            new ParameterizedTypeReference<>() {});
+        TriggerExecuteDynamicPropertiesRequest.Builder builder = TriggerExecuteDynamicPropertiesRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setPropertyName(propertyName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return componentProtoMapper.toProperties(getStub(componentName).executeDynamicProperties(builder.build()));
     }
 
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> outputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters,
+        Long connectionId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-refresh"),
-            new DynamicWebhookRefresh(componentName, componentVersion, triggerName, outputParameters, connectionId),
-            WebhookEnableOutput.class);
+        TriggerExecuteDynamicWebhookRefreshRequest.Builder builder =
+            TriggerExecuteDynamicWebhookRefreshRequest.newBuilder()
+                .setComponentName(componentName)
+                .setComponentVersion(componentVersion)
+                .setTriggerName(triggerName)
+                .setOutputParameters(ProtoValues.toStruct(outputParameters));
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return componentProtoMapper.toWebhookEnableOutput(
+            getStub(componentName).executeDynamicWebhookRefresh(builder.build()));
     }
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Long connectionId) {
 
-        defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-listener-disable"),
-            new ListenerDisableRequest(
+        getStub(componentName).executeListenerDisable(
+            getListenerRequest(
                 componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, connectionId));
     }
 
     @Override
     public void executeListenerEnable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Long connectionId) {
 
-        defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-listener-enable"),
-            new ListenerEnableRequest(
+        getStub(componentName).executeListenerEnable(
+            getListenerRequest(
                 componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, connectionId));
     }
 
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Long connectionId) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-options"),
-            new OptionsRequest(
-                componentName, componentVersion, triggerName, propertyName, inputParameters, connectionId,
-                lookupDependsOnPaths, searchText),
-            new ParameterizedTypeReference<>() {});
+        TriggerExecuteOptionsRequest.Builder builder = TriggerExecuteOptionsRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setPropertyName(propertyName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
+
+        if (searchText != null) {
+            builder.setSearchText(searchText);
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return componentProtoMapper.toOptions(getStub(componentName).executeOptions(builder.build()));
     }
 
     @Override
     public OutputResponse executeOutput(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        Long connectionId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output"),
-            new OutputRequest(componentName, componentVersion, triggerName, inputParameters, connectionId),
-            new ParameterizedTypeReference<>() {});
+        TriggerExecuteOutputRequest.Builder builder = TriggerExecuteOutputRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters));
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return componentProtoMapper.toOutputResponse(getStub(componentName).executeOutput(builder.build()));
     }
 
     @Override
@@ -121,58 +165,119 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         Long triggerExecutionId, Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId, Long environmentId, PlatformType type, boolean editorEnvironment) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-trigger"),
-            new TriggerRequest(
-                componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
-                connectionId, jobPrincipalId, workflowUuid, triggerExecutionId, editorEnvironment, type,
-                environmentId),
-            TriggerOutput.class);
+        TriggerExecuteTriggerRequest.Builder builder = TriggerExecuteTriggerRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setEditorEnvironment(editorEnvironment);
+
+        if (jobPrincipalId != null) {
+            builder.setJobPrincipalId(jobPrincipalId);
+        }
+
+        if (workflowUuid != null) {
+            builder.setWorkflowUuid(workflowUuid);
+        }
+
+        if (triggerExecutionId != null) {
+            builder.setTriggerExecutionId(triggerExecutionId);
+        }
+
+        if (triggerState != null) {
+            builder.setTriggerState(ProtoValues.toValue(triggerState));
+        }
+
+        if (webhookRequest != null) {
+            builder.setWebhookRequest(componentProtoMapper.toProto(webhookRequest));
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        if (environmentId != null) {
+            builder.setEnvironmentId(environmentId);
+        }
+
+        if (type != null) {
+            builder.setPlatformType(type.name());
+        }
+
+        return componentProtoMapper.toTriggerOutput(getStub(componentName).executeTrigger(builder.build()));
     }
 
     @Override
     public void executeWebhookDisable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId,
-        Map<String, ?> outputParameters,
-        Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Map<String, ?> outputParameters, Long connectionId) {
 
-        defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-disable"),
-            new DynamicWebhookDisableRequest(
-                componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, outputParameters,
-                connectionId));
+        TriggerExecuteWebhookDisableRequest.Builder builder = TriggerExecuteWebhookDisableRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setOutputParameters(ProtoValues.toStruct(outputParameters));
+
+        if (workflowExecutionId != null) {
+            builder.setWorkflowExecutionId(workflowExecutionId);
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        getStub(componentName).executeWebhookDisable(builder.build());
     }
 
     @Override
     public WebhookEnableOutput executeWebhookEnable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId, String webhookUrl,
-        long environmentId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Long connectionId, String webhookUrl, long environmentId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-enable"),
-            new DynamicWebhookEnableRequest(
-                componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, connectionId,
-                webhookUrl, environmentId),
-            WebhookEnableOutput.class);
+        TriggerExecuteWebhookEnableRequest.Builder builder = TriggerExecuteWebhookEnableRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setEnvironmentId(environmentId);
+
+        if (workflowExecutionId != null) {
+            builder.setWorkflowExecutionId(workflowExecutionId);
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        if (webhookUrl != null) {
+            builder.setWebhookUrl(webhookUrl);
+        }
+
+        return componentProtoMapper.toWebhookEnableOutput(getStub(componentName).executeWebhookEnable(builder.build()));
     }
 
     @Override
     public WebhookValidateResponse executeWebhookValidate(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Long connectionId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-validate"),
-            new WebhookValidateRequest(
-                componentName, componentVersion, triggerName, inputParameters, webhookRequest,
-                connectionId),
-            WebhookValidateResponse.class);
+        TriggerExecuteWebhookValidateRequest.Builder builder = TriggerExecuteWebhookValidateRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters));
+
+        if (webhookRequest != null) {
+            builder.setWebhookRequest(componentProtoMapper.toProto(webhookRequest));
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return componentProtoMapper.toWebhookValidateResponse(
+            getStub(componentName).executeWebhookValidate(builder.build()));
     }
 
     @Override
@@ -183,54 +288,29 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         throw new UnsupportedOperationException();
     }
 
-    private record OptionsRequest(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, Long connectionId, List<String> lookupDependsOnPaths, String searchText) {
-    }
-
-    private record OutputRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Long connectionId) {
-    }
-
-    private record PropertiesRequest(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, Long connectionId, List<String> loadDependsOnPath) {
-    }
-
-    private record DynamicWebhookDisableRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, Long connectionIdd) {
-    }
-
-    private record DynamicWebhookEnableRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Long connectionId, String webhookUrl, long environmentId) {
-    }
-
-    private record DynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters,
-        Long connectionId) {
-    }
-
-    private record ListenerDisableRequest(
+    private static TriggerExecuteListenerRequest getListenerRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, Long connectionId) {
+
+        TriggerExecuteListenerRequest.Builder builder = TriggerExecuteListenerRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters));
+
+        if (workflowExecutionId != null) {
+            builder.setWorkflowExecutionId(workflowExecutionId);
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return builder.build();
     }
 
-    private record ListenerEnableRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Long connectionI) {
-    }
-
-    private record TriggerRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters, Object state,
-        WebhookRequest webhookRequest, Long connectionId, Long jobPrincipalId, String workflowUuid,
-        Long triggerExecutionId, boolean editorEnvironment, PlatformType type, Long environmentId) {
-    }
-
-    private record WebhookValidateRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, Long connectionId) {
+    private TriggerDefinitionFacadeRemoteServiceBlockingStub getStub(String componentName) {
+        return TriggerDefinitionFacadeRemoteServiceGrpc.newBlockingStub(
+            grpcChannels.getChannel(workerInstances.getInstance(componentName)));
     }
 }

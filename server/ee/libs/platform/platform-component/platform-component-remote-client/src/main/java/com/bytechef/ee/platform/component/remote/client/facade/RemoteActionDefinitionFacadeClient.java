@@ -7,18 +7,27 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
-import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
-import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
+import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionDefinitionFacadeRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionDefinitionFacadeRemoteServiceGrpc.ActionDefinitionFacadeRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionExecuteDynamicPropertiesRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionExecuteOptionsRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionExecuteOutputRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionExecutePerformRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ValueResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.google.protobuf.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -28,15 +37,18 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
-    implements ActionDefinitionFacade {
+public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacade {
 
-    private static final String ACTION_DEFINITION_FACADE = "/action-definition-facade";
+    private final ComponentProtoMapper componentProtoMapper;
+    private final GrpcChannels grpcChannels;
+    private final WorkerInstances workerInstances;
 
     public RemoteActionDefinitionFacadeClient(
-        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultRestClient, discoveryClient, objectMapper);
+        this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+        this.workerInstances = new WorkerInstances(discoveryClient);
     }
 
     @Override
@@ -44,25 +56,39 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId, Long connectionId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),
-            new PropertiesRequest(
-                componentName, componentVersion, actionName, inputParameters, connectionId, propertyName),
-            new ParameterizedTypeReference<>() {});
+        ActionExecuteDynamicPropertiesRequest.Builder builder = ActionExecuteDynamicPropertiesRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setActionName(actionName)
+            .setPropertyName(propertyName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
+
+        if (workflowId != null) {
+            builder.setWorkflowId(workflowId);
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return componentProtoMapper.toProperties(getStub(componentName).executeDynamicProperties(builder.build()));
     }
 
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Long connectionId) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options"),
-            new OptionsRequest(
-                componentName, componentVersion, actionName, propertyName, inputParameters, connectionId,
-                lookupDependsOnPaths, searchText),
-            new ParameterizedTypeReference<>() {});
+        ActionExecuteOptionsRequest.Builder builder = getExecuteOptionsRequestBuilder(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText);
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return componentProtoMapper.toOptions(getStub(componentName).executeOptions(builder.build()));
     }
 
     @Override
@@ -71,92 +97,133 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         Map<String, Long> connectionIds, Map<String, ?> extensions) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName,
-                ACTION_DEFINITION_FACADE + "/execute-options-multiple-connections"),
-            new MultipleConnectionsOptionsRequest(
-                componentName, componentVersion, actionName, propertyName, inputParameters, connectionIds,
-                lookupDependsOnPaths, searchText, extensions),
-            new ParameterizedTypeReference<>() {});
+        ActionExecuteOptionsRequest.Builder builder = getExecuteOptionsRequestBuilder(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText)
+                .setMultipleConnections(true);
+
+        if (connectionIds != null) {
+            builder.putAllConnectionIds(connectionIds);
+        }
+
+        if (extensions != null) {
+            builder.setExtensions(ProtoValues.toStruct(extensions));
+        }
+
+        return componentProtoMapper.toOptions(getStub(componentName).executeOptions(builder.build()));
     }
 
     @Override
     public OutputResponse executeOutput(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
-            new OutputRequest(componentName, componentVersion, actionName, inputParameters, connectionIds),
-            new ParameterizedTypeReference<>() {});
+        ActionExecuteOutputRequest.Builder builder = ActionExecuteOutputRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setActionName(actionName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters));
+
+        if (connectionIds != null) {
+            builder.putAllConnectionIds(connectionIds);
+        }
+
+        return componentProtoMapper.toOutputResponse(getStub(componentName).executeOutput(builder.build()));
     }
 
     @Override
     public Object executePerform(
-        String componentName, int componentVersion, String actionName, Long jobPrincipalId, Long jobPrincipalWorkflowId,
-        Long jobId, Long taskExecutionId, String workflowId, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds, Map<String, ?> extensions, Long environmentId, PlatformType type,
-        boolean editorEnvironment, Map<String, ?> continueParameters, Map<String, ?> resumeData,
-        Instant suspendExpiresAt) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
-            new PerformRequest(
-                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                taskExecutionId, workflowId, inputParameters, connectionIds, castExtensions(extensions),
-                environmentId),
-            new ParameterizedTypeReference<>() {});
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Long> castExtensions(Map<String, ?> extensions) {
-        if (extensions == null) {
-            return null;
-        }
-        try {
-            return (Map<String, Long>) (Map<?, ?>) extensions;
-        } catch (ClassCastException e) {
-            // Fallback: convert values via toString/parseLong when possible
-            return extensions.entrySet()
-                .stream()
-                .collect(
-                    java.util.stream.Collectors.toMap(Map.Entry::getKey, e2 -> {
-                        Object v = e2.getValue();
-                        if (v == null)
-                            return null;
-                        if (v instanceof Number n)
-                            return n.longValue();
-                        return Long.parseLong(v.toString());
-                    }));
-        }
-    }
-
-    private record MultipleConnectionsOptionsRequest(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIds, List<String> lookupDependsOnPaths,
-        String searchText, Map<String, ?> extensions) {
-    }
-
-    private record OptionsRequest(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, Long connectionId, List<String> lookupDependsOnPaths, String searchText) {
-    }
-
-    private record OutputRequest(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds) {
-    }
-
-    private record PerformRequest(
-        String componentName, int componentVersion, String actionName, PlatformType type, Long jobPrincipalId,
+        String componentName, int componentVersion, String actionName, Long jobPrincipalId,
         Long jobPrincipalWorkflowId, Long jobId, Long taskExecutionId, String workflowId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, Long> extensions,
-        Long environmentId) {
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, ?> extensions,
+        Long environmentId, PlatformType type, boolean editorEnvironment, Map<String, ?> continueParameters,
+        Map<String, ?> resumeData, Instant suspendExpiresAt) {
+
+        ActionExecutePerformRequest.Builder builder = ActionExecutePerformRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setActionName(actionName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setEditorEnvironment(editorEnvironment);
+
+        if (jobPrincipalId != null) {
+            builder.setJobPrincipalId(jobPrincipalId);
+        }
+
+        if (jobPrincipalWorkflowId != null) {
+            builder.setJobPrincipalWorkflowId(jobPrincipalWorkflowId);
+        }
+
+        if (jobId != null) {
+            builder.setJobId(jobId);
+        }
+
+        if (taskExecutionId != null) {
+            builder.setTaskExecutionId(taskExecutionId);
+        }
+
+        if (workflowId != null) {
+            builder.setWorkflowId(workflowId);
+        }
+
+        if (connectionIds != null) {
+            builder.putAllConnectionIds(connectionIds);
+        }
+
+        if (extensions != null) {
+            builder.setExtensions(ProtoValues.toStruct(extensions));
+        }
+
+        if (environmentId != null) {
+            builder.setEnvironmentId(environmentId);
+        }
+
+        if (type != null) {
+            builder.setPlatformType(type.name());
+        }
+
+        if (continueParameters != null) {
+            builder.setContinueParameters(ProtoValues.toStruct(continueParameters));
+        }
+
+        if (resumeData != null) {
+            builder.setResumeData(ProtoValues.toStruct(resumeData));
+        }
+
+        if (suspendExpiresAt != null) {
+            builder.setSuspendExpiresAt(
+                Timestamp.newBuilder()
+                    .setSeconds(suspendExpiresAt.getEpochSecond())
+                    .setNanos(suspendExpiresAt.getNano())
+                    .build());
+        }
+
+        ValueResponse valueResponse = getStub(componentName).executePerform(builder.build());
+
+        return ProtoValues.toObject(valueResponse.getValue());
     }
 
-    private record PropertiesRequest(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Long connectionId, String propertyName) {
+    private static ActionExecuteOptionsRequest.Builder getExecuteOptionsRequestBuilder(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText) {
+
+        ActionExecuteOptionsRequest.Builder builder = ActionExecuteOptionsRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setActionName(actionName)
+            .setPropertyName(propertyName)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
+
+        if (searchText != null) {
+            builder.setSearchText(searchText);
+        }
+
+        return builder;
+    }
+
+    private ActionDefinitionFacadeRemoteServiceBlockingStub getStub(String componentName) {
+        return ActionDefinitionFacadeRemoteServiceGrpc.newBlockingStub(
+            grpcChannels.getChannel(workerInstances.getInstance(componentName)));
     }
 }
