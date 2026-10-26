@@ -16,9 +16,5 @@ import java.math.BigDecimal;
  */
 public interface LlmCostEstimator {
 
-    /**
-     * Returns the USD cost of an LLM call given the model name and token counts. Implementations should return
-     * {@link BigDecimal#ZERO} (not throw) for unknown models so the recording path stays robust.
-     */
     BigDecimal estimateLlmCost(String model, int inputTokens, int outputTokens);
 }
