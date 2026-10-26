@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+package bytechef.platform.connection.remote.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.connection.remote.grpc.proto";
+
+service ConnectionRemoteService {
+  rpc Create(RemoteConnection) returns (RemoteConnection);
+  rpc CreateWithParameters(CreateConnectionRequest) returns (RemoteConnection);
+  rpc Delete(IdRequest) returns (google.protobuf.Empty);
+  rpc FetchConnection(IdRequest) returns (ConnectionResult);
+  rpc FindConnections(FindConnectionsRequest) returns (RemoteConnections);
+  rpc GetComponentConnections(GetComponentConnectionsRequest) returns (RemoteConnections);
+  rpc GetConnection(IdRequest) returns (RemoteConnection);
+  rpc GetConnectionsByIds(IdsRequest) returns (RemoteConnections);
+  rpc GetConnectionsByType(TypeRequest) returns (RemoteConnections);
+  rpc ReplaceParameters(ConnectionParametersRequest) returns (RemoteConnection);
+  rpc Update(UpdateConnectionRequest) returns (RemoteConnection);
+  rpc UpdateCredentialStatus(ConnectionStatusRequest) returns (RemoteConnection);
+  rpc UpdateParameters(ConnectionParametersRequest) returns (RemoteConnection);
+  rpc UpdateStatus(ConnectionStatusRequest) returns (RemoteConnection);
+  rpc UpdateTagIds(UpdateConnectionTagIdsRequest) returns (RemoteConnection);
+}
+
+service ConnectionFacadeRemoteService {
+  rpc Create(CreateConnectionDTORequest) returns (IdResponse);
+  rpc Delete(IdRequest) returns (google.protobuf.Empty);
+  rpc ExecuteConnectionRefresh(IdRequest) returns (IntResponse);
+  rpc FindConnections(FindConnectionDTOsRequest) returns (RemoteConnectionDTOs);
+  rpc GetConnection(IdRequest) returns (RemoteConnectionDTO);
+  rpc GetConnectionTags(TypeRequest) returns (RemoteTags);
+  rpc GetConnectionsByIds(ConnectionIdsTypeRequest) returns (RemoteConnectionDTOs);
+  rpc ReplaceAuthorizationParameters(ConnectionParametersRequest) returns (google.protobuf.Empty);
+  rpc ToConnectionDTOs(RemoteConnections) returns (RemoteConnectionDTOs);
+  rpc Update(UpdateConnectionDTORequest) returns (google.protobuf.Empty);
+  rpc UpdateTags(UpdateConnectionDTOTagsRequest) returns (google.protobuf.Empty);
+}
+
+message RemoteConnection {
+  optional string authorization_type = 1;
+  optional string component_name = 2;
+  optional int32 connection_version = 3;
+  optional string created_by = 4;
+  optional google.protobuf.Timestamp created_date = 5;
+  optional string credential_status = 6;
+  optional bool credentials_status_updated = 7;
+  optional int32 environment_id = 8;
+  optional int64 id = 9;
+  optional string last_modified_by = 10;
+  optional google.protobuf.Timestamp last_modified_date = 11;
+  optional string name = 12;
+  optional google.protobuf.Struct parameters = 13;
+  optional string status = 14;
+  repeated int64 tag_ids = 15;
+  optional string type = 16;
+  optional int32 version = 17;
+}
+
+message RemoteConnections {
+  repeated RemoteConnection connections = 1;
+}
+
+message RemoteTag {
+  optional string created_by = 1;
+  optional google.protobuf.Timestamp created_date = 2;
+  optional int64 id = 3;
+  optional string last_modified_by = 4;
+  optional google.protobuf.Timestamp last_modified_date = 5;
+  optional string name = 6;
+  optional bool new = 7;
+  optional int32 version = 8;
+}
+
+message RemoteTags {
+  repeated RemoteTag tags = 1;
+}
+
+message RemoteConnectionDTO {
+  optional bool active = 1;
+  optional string authorization_type = 2;
+  optional google.protobuf.Struct authorization_parameters = 3;
+  optional string base_uri = 4;
+  optional string component_name = 5;
+  optional google.protobuf.Struct connection_parameters = 6;
+  optional int32 connection_version = 7;
+  optional string created_by = 8;
+  optional google.protobuf.Timestamp created_date = 9;
+  optional string credential_status = 10;
+  optional int32 environment_id = 11;
+  optional int64 id = 12;
+  optional string last_modified_by = 13;
+  optional google.protobuf.Timestamp last_modified_date = 14;
+  optional string name = 15;
+  optional google.protobuf.Struct parameters = 16;
+  optional string status = 17;
+  repeated RemoteTag tags = 18;
+  optional int32 version = 19;
+}
+
+message RemoteConnectionDTOs {
+  repeated RemoteConnectionDTO connections = 1;
+}
+
+message ConnectionResult {
+  optional RemoteConnection connection = 1;
+}
+
+message IdRequest {
+  int64 id = 1;
+}
+
+message IdsRequest {
+  repeated int64 ids = 1;
+}
+
+message IdResponse {
+  int64 id = 1;
+}
+
+message IntResponse {
+  optional int32 value = 1;
+}
+
+message TypeRequest {
+  optional string type = 1;
+}
+
+message CreateConnectionRequest {
+  optional string authorization_type = 1;
+  string component_name = 2;
+  int32 connection_version = 3;
+  int32 environment_id = 4;
+  string name = 5;
+  google.protobuf.Struct parameters = 6;
+  optional string type = 7;
+}
+
+message FindConnectionsRequest {
+  optional string component_name = 1;
+  optional int32 connection_version = 2;
+  optional int64 tag_id = 3;
+  optional int64 environment_id = 4;
+  optional string type = 5;
+}
+
+message GetComponentConnectionsRequest {
+  string component_name = 1;
+  int32 version = 2;
+  optional string type = 3;
+}
+
+message UpdateConnectionTagIdsRequest {
+  int64 id = 1;
+  repeated int64 tag_ids = 2;
+}
+
+message UpdateConnectionRequest {
+  int64 id = 1;
+  string name = 2;
+  repeated int64 tag_ids = 3;
+  int32 version = 4;
+}
+
+message ConnectionStatusRequest {
+  int64 connection_id = 1;
+  string status = 2;
+}
+
+message ConnectionParametersRequest {
+  int64 connection_id = 1;
+  google.protobuf.Struct parameters = 2;
+}
+
+message CreateConnectionDTORequest {
+  RemoteConnectionDTO connection = 1;
+  optional string type = 2;
+}
+
+message ConnectionIdsTypeRequest {
+  bool has_connection_ids = 1;
+  repeated int64 connection_ids = 2;
+  optional string type = 3;
+}
+
+message FindConnectionDTOsRequest {
+  optional string component_name = 1;
+  optional int32 connection_version = 2;
+  bool has_connection_ids = 3;
+  repeated int64 connection_ids = 4;
+  optional int64 tag_id = 5;
+  optional int64 environment_id = 6;
+  optional string type = 7;
+}
+
+message UpdateConnectionDTOTagsRequest {
+  int64 id = 1;
+  repeated RemoteTag tags = 2;
+}
+
+message UpdateConnectionDTORequest {
+  int64 id = 1;
+  string name = 2;
+  repeated RemoteTag tags = 3;
+  int32 version = 4;
+}
