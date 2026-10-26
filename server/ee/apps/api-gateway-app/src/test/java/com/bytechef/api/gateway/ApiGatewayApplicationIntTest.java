@@ -39,7 +39,8 @@ public class ApiGatewayApplicationIntTest {
 
     @Test
     void testSharedAndAppConfigurationLoad() {
-        assertThat(environment.getProperty("spring.cloud.gateway.mvc.routes[0].id")).isEqualTo("configuration-service");
+        assertThat(environment.getProperty("spring.cloud.gateway.server.webmvc.routes[0].id"))
+            .isEqualTo("user-graphql");
         assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
     }
 

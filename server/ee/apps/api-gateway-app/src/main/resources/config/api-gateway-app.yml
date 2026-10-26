@@ -1,27 +1,36 @@
 spring:
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-      mvc:
-        routes:
-          - id: configuration-service
-            uri: lb://configuration-app
-            predicates:
-            - Path=/api/automation/**,/api/embedded/**,/api/platform/**
-          - id: connection-service
-            uri: lb://connection-app
-            predicates:
-              - Path=/api/automation/**,/api/embedded/**
-          - id: execution-service
-            uri: lb://execution-app
-            predicates:
-              - Path=/api/automation/**,/api/embedded/**
-          - id: webhook-service
-            uri: lb://webhook-app
-            predicates:
-              - Path=/webhooks/**
+      server:
+        webmvc:
+          routes:
+            - id: user-graphql
+              uri: forward:/api/user/graphql
+              predicates:
+                - Path=/graphql
+                - Header=X-ByteChef-GraphQL-Schema, user
+            - id: configuration-webhook-test
+              uri: lb://configuration-app
+              predicates:
+                - Path=/webhooks/*/test/**
+            - id: configuration-embedded-automation
+              uri: lb://configuration-app
+              predicates:
+                - Path=/api/embedded/v1/automation/**
+            - id: execution-app
+              uri: lb://execution-app
+              predicates:
+                - Path=/api/automation/internal/workflow-executions/**,/api/automation/internal/workspaces/*/workflow-executions/**,/api/automation/internal/trigger-form/**,/api/platform/internal/jobs/**,/api/platform/internal/trigger-executions/**,/api/platform/internal/approval-form/**,/api/embedded/internal/workflow-executions/**,/api/embedded/v1/*/tools/**,/api/embedded/v1/*/components/*/versions/*/actions/**
+            - id: webhook-app
+              uri: lb://webhook-app
+              predicates:
+                - Path=/webhooks/**,/approvals/**,/callback/**,/job/resume/**,/file-entries/**,/api/embedded/v1/app-events/**,/api/embedded/v1/workflows/**,/api/embedded/v1/*/app-events/**,/api/embedded/v1/*/workflows/**
+            - id: configuration-app
+              uri: lb://configuration-app
+              predicates:
+                - Path=/api/automation/**,/api/platform/**,/api/embedded/**,/graphql,/icons/**
+
+bytechef:
   mail:
     base-url: https://www.bytechef.io
     from: noreply@app.bytechef.io
