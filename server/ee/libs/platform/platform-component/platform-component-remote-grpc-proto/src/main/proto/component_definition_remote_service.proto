@@ -15,6 +15,7 @@ service ComponentDefinitionRemoteService {
   rpc GetComponentDefinition(GetComponentDefinitionRequest) returns (RemoteComponentDefinition);
   rpc GetComponentDefinitions(GetComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
   rpc GetComponentDefinitionVersions(GetComponentDefinitionVersionsRequest) returns (RemoteComponentDefinitions);
+  rpc SearchComponentDefinitions(SearchComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
 }
 
 service ActionDefinitionRemoteService {
@@ -283,6 +284,10 @@ message GetComponentDefinitionsRequest {
   optional bool connection_definitions = 3;
   optional bool trigger_definitions = 4;
   repeated string include = 5;
+}
+
+message SearchComponentDefinitionsRequest {
+  string query = 1;
 }
 
 message GetComponentDefinitionVersionsRequest {

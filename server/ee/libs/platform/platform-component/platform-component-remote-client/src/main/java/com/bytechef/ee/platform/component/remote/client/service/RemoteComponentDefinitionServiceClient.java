@@ -17,6 +17,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefiniti
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionsRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinitions;
+import com.bytechef.ee.platform.component.remote.grpc.proto.SearchComponentDefinitionsRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -148,16 +149,7 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
         List<ComponentDefinition> componentDefinitions = getMergedComponentDefinitions(
             stub -> stub.getComponentDefinitions(getComponentDefinitionsRequest));
 
-        if (platformType != null) {
-            ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
-                .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported platform type: " + platformType));
-
-            componentDefinitions = componentDefinitions.stream()
-                .filter(componentDefinitionFilter::filter)
-                .toList();
-        }
+        componentDefinitions = filterByPlatformType(componentDefinitions, platformType);
 
         if (include != null && !include.isEmpty()) {
             componentDefinitions = new ArrayList<>(componentDefinitions);
@@ -171,7 +163,14 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions(String query, PlatformType platformType) {
-        throw new UnsupportedOperationException();
+        SearchComponentDefinitionsRequest searchComponentDefinitionsRequest =
+            SearchComponentDefinitionsRequest.newBuilder()
+                .setQuery(query)
+                .build();
+
+        return filterByPlatformType(
+            getMergedComponentDefinitions(stub -> stub.searchComponentDefinitions(searchComponentDefinitionsRequest)),
+            platformType);
     }
 
     @Override
@@ -193,6 +192,23 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
     @Override
     public boolean hasComponentDefinition(String name, @Nullable Integer version) {
         throw new UnsupportedOperationException();
+    }
+
+    private List<ComponentDefinition> filterByPlatformType(
+        List<ComponentDefinition> componentDefinitions, @Nullable PlatformType platformType) {
+
+        if (platformType == null) {
+            return componentDefinitions;
+        }
+
+        ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported platform type: " + platformType));
+
+        return componentDefinitions.stream()
+            .filter(componentDefinitionFilter::filter)
+            .toList();
     }
 
     private List<ComponentDefinition> getMergedComponentDefinitions(
