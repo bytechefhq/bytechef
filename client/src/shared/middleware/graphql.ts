@@ -848,6 +848,109 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 
 export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, enforceToolAuthorization: boolean, authenticationRequired: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null, mcpTools: Array<{ id: string } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
+export type ContextStoreSourceQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ContextStoreSourceQuery = { contextStoreSource: { id: string, name: string, entityName: string, description: string | null, idField: string, storedFields: any, indexedFields: any, semanticIndexFields: any, parameters: any, sourceComponentName: string, sourceComponentVersion: number, sourceClusterElementName: string | null, connectionId: string | null, cadence: string, status: Types.ContextStoreSourceStatus, enabled: boolean, lastSyncRunAt: any, lastSyncJobExecutionId: string | null, workflowId: string | null, fullReplaceCadence: string | null, tombstoneStrategy: Types.ContextStoreTombstoneStrategy } | null };
+
+export type ContextStoreSourcesQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  filter?: Types.ContextStoreSourceFilter | null | undefined;
+}>;
+
+
+export type ContextStoreSourcesQuery = { contextStoreSources: Array<{ id: string, contextStoreId: string, name: string, entityName: string, description: string | null, idField: string, indexedFields: any, sourceComponentName: string, sourceComponentVersion: number, sourceClusterElementName: string | null, connectionId: string | null, cadence: string, status: Types.ContextStoreSourceStatus, enabled: boolean, lastSyncRunAt: any, lastSyncJobExecutionId: string | null, workflowId: string | null }> };
+
+export type ContextStoreTagsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type ContextStoreTagsQuery = { contextStoreTags: Array<{ id: string, name: string }> };
+
+export type ContextStoresQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+}>;
+
+
+export type ContextStoresQuery = { contextStores: Array<{ id: string, name: string, description: string | null, environment: string, tagIds: Array<string>, version: number, tags: Array<{ id: string, name: string }> }> };
+
+export type CreateContextStoreMutationVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  input: Types.CreateContextStoreInput;
+}>;
+
+
+export type CreateContextStoreMutation = { createContextStore: { id: string, name: string, description: string | null, environment: string, tagIds: Array<string>, version: number } };
+
+export type CreateContextStoreSourceMutationVariables = Exact<{
+  input: Types.CreateContextStoreSourceInput;
+}>;
+
+
+export type CreateContextStoreSourceMutation = { createContextStoreSource: { id: string, name: string, status: Types.ContextStoreSourceStatus, enabled: boolean, cadence: string } };
+
+export type DeleteContextStoreMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+}>;
+
+
+export type DeleteContextStoreMutation = { deleteContextStore: boolean };
+
+export type DeleteContextStoreSourceMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteContextStoreSourceMutation = { deleteContextStoreSource: boolean };
+
+export type RefreshContextStoreSourceMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RefreshContextStoreSourceMutation = { refreshContextStoreSource: string };
+
+export type SetContextStoreSourceEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type SetContextStoreSourceEnabledMutation = { setContextStoreSourceEnabled: { id: string, enabled: boolean, status: Types.ContextStoreSourceStatus } };
+
+export type UpdateContextStoreMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  input: Types.UpdateContextStoreInput;
+}>;
+
+
+export type UpdateContextStoreMutation = { updateContextStore: { id: string, name: string, description: string | null, environment: string, tagIds: Array<string>, version: number } };
+
+export type UpdateContextStoreSourceMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateContextStoreSourceInput;
+}>;
+
+
+export type UpdateContextStoreSourceMutation = { updateContextStoreSource: { id: string, name: string, cadence: string, enabled: boolean, status: Types.ContextStoreSourceStatus } };
+
+export type UpdateContextStoreTagsMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  tags: Array<Types.TagInput> | Types.TagInput;
+}>;
+
+
+export type UpdateContextStoreTagsMutation = { updateContextStoreTags: Array<{ id: string, name: string }> };
+
 export type AddDataTableColumnMutationVariables = Exact<{
   input: Types.AddColumnInput;
 }>;
@@ -5534,6 +5637,360 @@ export const useWorkspaceMcpServersQuery = <
       {
     queryKey: ['workspaceMcpServers', variables],
     queryFn: fetcher<WorkspaceMcpServersQuery, WorkspaceMcpServersQueryVariables>(WorkspaceMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const ContextStoreSourceDocument = new TypedDocumentString(`
+    query contextStoreSource($id: ID!) {
+  contextStoreSource(id: $id) {
+    id
+    name
+    entityName
+    description
+    idField
+    storedFields
+    indexedFields
+    semanticIndexFields
+    parameters
+    sourceComponentName
+    sourceComponentVersion
+    sourceClusterElementName
+    connectionId
+    cadence
+    status
+    enabled
+    lastSyncRunAt
+    lastSyncJobExecutionId
+    workflowId
+    fullReplaceCadence
+    tombstoneStrategy
+  }
+}
+    `);
+
+export const useContextStoreSourceQuery = <
+      TData = ContextStoreSourceQuery,
+      TError = unknown
+    >(
+      variables: ContextStoreSourceQueryVariables,
+      options?: Omit<UseQueryOptions<ContextStoreSourceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ContextStoreSourceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ContextStoreSourceQuery, TError, TData>(
+      {
+    queryKey: ['contextStoreSource', variables],
+    queryFn: fetcher<ContextStoreSourceQuery, ContextStoreSourceQueryVariables>(ContextStoreSourceDocument, variables),
+    ...options
+  }
+    )};
+
+export const ContextStoreSourcesDocument = new TypedDocumentString(`
+    query contextStoreSources($workspaceId: ID!, $environmentId: ID!, $filter: ContextStoreSourceFilter) {
+  contextStoreSources(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    filter: $filter
+  ) {
+    id
+    contextStoreId
+    name
+    entityName
+    description
+    idField
+    indexedFields
+    sourceComponentName
+    sourceComponentVersion
+    sourceClusterElementName
+    connectionId
+    cadence
+    status
+    enabled
+    lastSyncRunAt
+    lastSyncJobExecutionId
+    workflowId
+  }
+}
+    `);
+
+export const useContextStoreSourcesQuery = <
+      TData = ContextStoreSourcesQuery,
+      TError = unknown
+    >(
+      variables: ContextStoreSourcesQueryVariables,
+      options?: Omit<UseQueryOptions<ContextStoreSourcesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ContextStoreSourcesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ContextStoreSourcesQuery, TError, TData>(
+      {
+    queryKey: ['contextStoreSources', variables],
+    queryFn: fetcher<ContextStoreSourcesQuery, ContextStoreSourcesQueryVariables>(ContextStoreSourcesDocument, variables),
+    ...options
+  }
+    )};
+
+export const ContextStoreTagsDocument = new TypedDocumentString(`
+    query contextStoreTags($workspaceId: ID!) {
+  contextStoreTags(workspaceId: $workspaceId) {
+    id
+    name
+  }
+}
+    `);
+
+export const useContextStoreTagsQuery = <
+      TData = ContextStoreTagsQuery,
+      TError = unknown
+    >(
+      variables: ContextStoreTagsQueryVariables,
+      options?: Omit<UseQueryOptions<ContextStoreTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ContextStoreTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ContextStoreTagsQuery, TError, TData>(
+      {
+    queryKey: ['contextStoreTags', variables],
+    queryFn: fetcher<ContextStoreTagsQuery, ContextStoreTagsQueryVariables>(ContextStoreTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const ContextStoresDocument = new TypedDocumentString(`
+    query contextStores($workspaceId: ID!, $environmentId: ID!) {
+  contextStores(workspaceId: $workspaceId, environmentId: $environmentId) {
+    id
+    name
+    description
+    environment
+    tagIds
+    tags {
+      id
+      name
+    }
+    version
+  }
+}
+    `);
+
+export const useContextStoresQuery = <
+      TData = ContextStoresQuery,
+      TError = unknown
+    >(
+      variables: ContextStoresQueryVariables,
+      options?: Omit<UseQueryOptions<ContextStoresQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ContextStoresQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ContextStoresQuery, TError, TData>(
+      {
+    queryKey: ['contextStores', variables],
+    queryFn: fetcher<ContextStoresQuery, ContextStoresQueryVariables>(ContextStoresDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateContextStoreDocument = new TypedDocumentString(`
+    mutation createContextStore($workspaceId: ID!, $environmentId: ID!, $input: CreateContextStoreInput!) {
+  createContextStore(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    input: $input
+  ) {
+    id
+    name
+    description
+    environment
+    tagIds
+    version
+  }
+}
+    `);
+
+export const useCreateContextStoreMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateContextStoreMutation, TError, CreateContextStoreMutationVariables, TContext>) => {
+    
+    return useMutation<CreateContextStoreMutation, TError, CreateContextStoreMutationVariables, TContext>(
+      {
+    mutationKey: ['createContextStore'],
+    mutationFn: (variables?: CreateContextStoreMutationVariables) => fetcher<CreateContextStoreMutation, CreateContextStoreMutationVariables>(CreateContextStoreDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateContextStoreSourceDocument = new TypedDocumentString(`
+    mutation createContextStoreSource($input: CreateContextStoreSourceInput!) {
+  createContextStoreSource(input: $input) {
+    id
+    name
+    status
+    enabled
+    cadence
+  }
+}
+    `);
+
+export const useCreateContextStoreSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateContextStoreSourceMutation, TError, CreateContextStoreSourceMutationVariables, TContext>) => {
+    
+    return useMutation<CreateContextStoreSourceMutation, TError, CreateContextStoreSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['createContextStoreSource'],
+    mutationFn: (variables?: CreateContextStoreSourceMutationVariables) => fetcher<CreateContextStoreSourceMutation, CreateContextStoreSourceMutationVariables>(CreateContextStoreSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteContextStoreDocument = new TypedDocumentString(`
+    mutation deleteContextStore($workspaceId: ID!, $id: ID!) {
+  deleteContextStore(workspaceId: $workspaceId, id: $id)
+}
+    `);
+
+export const useDeleteContextStoreMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteContextStoreMutation, TError, DeleteContextStoreMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteContextStoreMutation, TError, DeleteContextStoreMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteContextStore'],
+    mutationFn: (variables?: DeleteContextStoreMutationVariables) => fetcher<DeleteContextStoreMutation, DeleteContextStoreMutationVariables>(DeleteContextStoreDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteContextStoreSourceDocument = new TypedDocumentString(`
+    mutation deleteContextStoreSource($id: ID!) {
+  deleteContextStoreSource(id: $id)
+}
+    `);
+
+export const useDeleteContextStoreSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteContextStoreSourceMutation, TError, DeleteContextStoreSourceMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteContextStoreSourceMutation, TError, DeleteContextStoreSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteContextStoreSource'],
+    mutationFn: (variables?: DeleteContextStoreSourceMutationVariables) => fetcher<DeleteContextStoreSourceMutation, DeleteContextStoreSourceMutationVariables>(DeleteContextStoreSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RefreshContextStoreSourceDocument = new TypedDocumentString(`
+    mutation refreshContextStoreSource($id: ID!) {
+  refreshContextStoreSource(id: $id)
+}
+    `);
+
+export const useRefreshContextStoreSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RefreshContextStoreSourceMutation, TError, RefreshContextStoreSourceMutationVariables, TContext>) => {
+    
+    return useMutation<RefreshContextStoreSourceMutation, TError, RefreshContextStoreSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['refreshContextStoreSource'],
+    mutationFn: (variables?: RefreshContextStoreSourceMutationVariables) => fetcher<RefreshContextStoreSourceMutation, RefreshContextStoreSourceMutationVariables>(RefreshContextStoreSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetContextStoreSourceEnabledDocument = new TypedDocumentString(`
+    mutation setContextStoreSourceEnabled($id: ID!, $enabled: Boolean!) {
+  setContextStoreSourceEnabled(id: $id, enabled: $enabled) {
+    id
+    enabled
+    status
+  }
+}
+    `);
+
+export const useSetContextStoreSourceEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetContextStoreSourceEnabledMutation, TError, SetContextStoreSourceEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<SetContextStoreSourceEnabledMutation, TError, SetContextStoreSourceEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['setContextStoreSourceEnabled'],
+    mutationFn: (variables?: SetContextStoreSourceEnabledMutationVariables) => fetcher<SetContextStoreSourceEnabledMutation, SetContextStoreSourceEnabledMutationVariables>(SetContextStoreSourceEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateContextStoreDocument = new TypedDocumentString(`
+    mutation updateContextStore($workspaceId: ID!, $id: ID!, $input: UpdateContextStoreInput!) {
+  updateContextStore(workspaceId: $workspaceId, id: $id, input: $input) {
+    id
+    name
+    description
+    environment
+    tagIds
+    version
+  }
+}
+    `);
+
+export const useUpdateContextStoreMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateContextStoreMutation, TError, UpdateContextStoreMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateContextStoreMutation, TError, UpdateContextStoreMutationVariables, TContext>(
+      {
+    mutationKey: ['updateContextStore'],
+    mutationFn: (variables?: UpdateContextStoreMutationVariables) => fetcher<UpdateContextStoreMutation, UpdateContextStoreMutationVariables>(UpdateContextStoreDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateContextStoreSourceDocument = new TypedDocumentString(`
+    mutation updateContextStoreSource($id: ID!, $input: UpdateContextStoreSourceInput!) {
+  updateContextStoreSource(id: $id, input: $input) {
+    id
+    name
+    cadence
+    enabled
+    status
+  }
+}
+    `);
+
+export const useUpdateContextStoreSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateContextStoreSourceMutation, TError, UpdateContextStoreSourceMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateContextStoreSourceMutation, TError, UpdateContextStoreSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['updateContextStoreSource'],
+    mutationFn: (variables?: UpdateContextStoreSourceMutationVariables) => fetcher<UpdateContextStoreSourceMutation, UpdateContextStoreSourceMutationVariables>(UpdateContextStoreSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateContextStoreTagsDocument = new TypedDocumentString(`
+    mutation updateContextStoreTags($workspaceId: ID!, $id: ID!, $tags: [TagInput!]!) {
+  updateContextStoreTags(workspaceId: $workspaceId, id: $id, tags: $tags) {
+    id
+    name
+  }
+}
+    `);
+
+export const useUpdateContextStoreTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateContextStoreTagsMutation, TError, UpdateContextStoreTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateContextStoreTagsMutation, TError, UpdateContextStoreTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateContextStoreTags'],
+    mutationFn: (variables?: UpdateContextStoreTagsMutationVariables) => fetcher<UpdateContextStoreTagsMutation, UpdateContextStoreTagsMutationVariables>(UpdateContextStoreTagsDocument, variables)(),
     ...options
   }
     )};
