@@ -10,9 +10,12 @@ package com.bytechef.ee.remote.grpc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -39,6 +42,38 @@ class ProtoValuesTest {
         map.put("ratio", 0.5);
 
         assertThat(ProtoValues.toMap(ProtoValues.toStruct(map))).isEqualTo(map);
+    }
+
+    @Test
+    void testMapKeyOrderIsKept() {
+        Map<String, Object> nested = new LinkedHashMap<>();
+
+        nested.put("zeta", 1);
+        nested.put("alpha", 2);
+
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        map.put("zulu", "z");
+        map.put("alpha", "a");
+        map.put("mike", nested);
+
+        Map<String, Object> roundTripMap = ProtoValues.toMap(ProtoValues.toStruct(map));
+
+        assertThat(roundTripMap.keySet()).containsExactly("zulu", "alpha", "mike");
+        Map<?, ?> roundTripNested = (Map<?, ?>) roundTripMap.get("mike");
+
+        assertThat(List.copyOf(roundTripNested.keySet())).isEqualTo(List.of("zeta", "alpha"));
+    }
+
+    @Test
+    void testNumbersBeyondDoublePrecisionTravelAsStrings() {
+        assertThat(ProtoValues.toObject(ProtoValues.toValue(9_007_199_254_740_993L))).isEqualTo("9007199254740993");
+        assertThat(ProtoValues.toObject(ProtoValues.toValue(new BigInteger("123456789012345678901234567890"))))
+            .isEqualTo("123456789012345678901234567890");
+        assertThat(ProtoValues.toObject(ProtoValues.toValue(new BigDecimal("12345678901234567890.5"))))
+            .isEqualTo("12345678901234567890.5");
+        assertThat(ProtoValues.toObject(ProtoValues.toValue(new BigDecimal("0.1")))).isEqualTo(0.1);
+        assertThat(ProtoValues.toObject(ProtoValues.toValue(9_007_199_254_740_992L))).isEqualTo(9_007_199_254_740_992L);
     }
 
     @Test

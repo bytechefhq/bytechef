@@ -12,15 +12,18 @@ import com.google.protobuf.ListValue;
 import com.google.protobuf.NullValue;
 import com.google.protobuf.Struct;
 import com.google.protobuf.Value;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Converts plain Java maps, lists and scalars to protobuf {@link Struct} and {@link Value} and back. Integral numbers
- * come back as {@link Integer} when they fit, else {@link Long}.
+ * Converts plain Java maps, lists and scalars to protobuf {@link Struct} and {@link Value} and back. Map key order is
+ * kept. Integral numbers come back as {@link Integer} when they fit, else {@link Long}; numbers a double cannot hold
+ * exactly, such as longs beyond 2^53, travel as their decimal string.
  *
  * @version ee
  *
@@ -28,11 +31,13 @@ import org.jspecify.annotations.Nullable;
  */
 public final class ProtoValues {
 
+    private static final BigInteger MAX_EXACT_INTEGER = BigInteger.TWO.pow(53);
+
     private ProtoValues() {
     }
 
     public static Map<String, Object> toMap(Struct struct) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new LinkedHashMap<>();
 
         for (Map.Entry<String, Value> entry : struct.getFieldsMap()
             .entrySet()) {
@@ -81,6 +86,11 @@ public final class ProtoValues {
         }
 
         if (object instanceof Number number) {
+            if (!isExactAsDouble(number)) {
+                return builder.setStringValue(number.toString())
+                    .build();
+            }
+
             return builder.setNumberValue(number.doubleValue())
                 .build();
         }
@@ -109,6 +119,25 @@ public final class ProtoValues {
         return toValue(ConvertUtils.convertValue(object, Object.class));
     }
 
+    private static boolean isExactAsDouble(Number number) {
+        if (number instanceof Long || number instanceof BigInteger) {
+            BigInteger bigInteger = number instanceof BigInteger curBigInteger
+                ? curBigInteger : BigInteger.valueOf(number.longValue());
+
+            return bigInteger.abs()
+                .compareTo(MAX_EXACT_INTEGER) <= 0;
+        }
+
+        if (number instanceof BigDecimal bigDecimal) {
+            double doubleValue = bigDecimal.doubleValue();
+
+            return !Double.isInfinite(doubleValue) && BigDecimal.valueOf(doubleValue)
+                .compareTo(bigDecimal) == 0;
+        }
+
+        return true;
+    }
+
     private static List<@Nullable Object> toList(ListValue listValue) {
         List<@Nullable Object> list = new ArrayList<>();
 
@@ -120,7 +149,7 @@ public final class ProtoValues {
     }
 
     private static Number toNumber(double number) {
-        if (number == Math.rint(number) && !Double.isInfinite(number) && Math.abs(number) < 0x1p53) {
+        if (number == Math.rint(number) && !Double.isInfinite(number) && Math.abs(number) <= 0x1p53) {
             long longValue = (long) number;
 
             if (longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE) {

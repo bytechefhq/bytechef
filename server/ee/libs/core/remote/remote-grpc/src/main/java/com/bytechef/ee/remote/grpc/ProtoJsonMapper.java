@@ -73,7 +73,7 @@ public class ProtoJsonMapper {
         if (jsonNode.isDouble()) {
             double number = jsonNode.doubleValue();
 
-            if (number == Math.rint(number) && Math.abs(number) < 0x1p53) {
+            if (number == Math.rint(number) && Math.abs(number) <= 0x1p53) {
                 long longValue = (long) number;
 
                 return longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE
