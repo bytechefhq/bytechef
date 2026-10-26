@@ -8,6 +8,7 @@ import {
 } from '../types/api-connector-wizard.types';
 
 const initialState = {
+    baseSpecification: undefined,
     baseUrl: undefined,
     currentStep: 0,
     discoveredEndpoints: [] as DiscoveredEndpointI[],
@@ -18,6 +19,7 @@ const initialState = {
     icon: undefined,
     isProcessing: false,
     jobId: null as string | null,
+    maxPages: 1,
     name: '',
     selectedEndpointIds: [] as string[],
     specification: undefined,
@@ -71,6 +73,10 @@ export const useApiConnectorWizardStore = create<ApiConnectorWizardStoreType>()(
                 set({selectedEndpointIds: discoveredEndpoints.map((endpoint) => endpoint.id)});
             },
 
+            setBaseSpecification: (specification?: string) => {
+                set({baseSpecification: specification});
+            },
+
             setBaseUrl: (url: string) => {
                 set({baseUrl: url});
             },
@@ -109,6 +115,10 @@ export const useApiConnectorWizardStore = create<ApiConnectorWizardStoreType>()(
 
             setJobId: (jobId: string | null) => {
                 set({jobId});
+            },
+
+            setMaxPages: (maxPages: number) => {
+                set({maxPages});
             },
 
             setName: (name: string) => {

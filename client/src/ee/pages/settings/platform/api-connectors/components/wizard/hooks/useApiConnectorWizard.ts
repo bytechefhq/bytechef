@@ -9,6 +9,7 @@ interface WizardFormDataI {
     baseUrl: string;
     documentationUrl: string;
     icon: string;
+    maxPages: number;
     name: string;
     specification: string;
     userPrompt: string;
@@ -20,8 +21,8 @@ interface UseApiConnectorWizardI {
 }
 
 export default function useApiConnectorWizard(formType: WizardFormType): UseApiConnectorWizardI {
-    const {baseUrl, documentationUrl, icon, name, specification, userPrompt} = useApiConnectorWizardStore();
-    const {setBaseUrl, setDocumentationUrl, setIcon, setName, setSpecification, setUserPrompt} =
+    const {baseUrl, documentationUrl, icon, maxPages, name, specification, userPrompt} = useApiConnectorWizardStore();
+    const {setBaseUrl, setDocumentationUrl, setIcon, setMaxPages, setName, setSpecification, setUserPrompt} =
         useApiConnectorWizardStore();
 
     const form = useForm<WizardFormDataI>({
@@ -29,6 +30,7 @@ export default function useApiConnectorWizard(formType: WizardFormType): UseApiC
             baseUrl: baseUrl || '',
             documentationUrl: documentationUrl || '',
             icon: icon || '',
+            maxPages: maxPages || 1,
             name: name || '',
             specification: specification || '',
             userPrompt: userPrompt || '',
@@ -61,11 +63,25 @@ export default function useApiConnectorWizard(formType: WizardFormType): UseApiC
                 if (values.userPrompt !== undefined) {
                     setUserPrompt(values.userPrompt);
                 }
+
+                if (values.maxPages !== undefined) {
+                    setMaxPages(values.maxPages);
+                }
             }
         });
 
         return () => subscription.unsubscribe();
-    }, [form, formType, setBaseUrl, setDocumentationUrl, setIcon, setName, setSpecification, setUserPrompt]);
+    }, [
+        form,
+        formType,
+        setBaseUrl,
+        setDocumentationUrl,
+        setIcon,
+        setMaxPages,
+        setName,
+        setSpecification,
+        setUserPrompt,
+    ]);
 
     return {control: form.control, form};
 }

@@ -14,6 +14,7 @@ export interface ApiConnectorWizardActionsI {
     removeEndpoint: (id: string) => void;
     reset: () => void;
     selectAllEndpoints: () => void;
+    setBaseSpecification: (specification?: string) => void;
     setBaseUrl: (url: string) => void;
     setCurrentStep: (step: number) => void;
     setDiscoveredEndpoints: (endpoints: DiscoveredEndpointI[]) => void;
@@ -24,6 +25,7 @@ export interface ApiConnectorWizardActionsI {
     setIcon: (icon: string) => void;
     setIsProcessing: (isProcessing: boolean) => void;
     setJobId: (jobId: string | null) => void;
+    setMaxPages: (maxPages: number) => void;
     setName: (name: string) => void;
     setSelectedEndpointIds: (ids: string[]) => void;
     setSpecification: (specification?: string) => void;
@@ -33,6 +35,7 @@ export interface ApiConnectorWizardActionsI {
 }
 
 export interface ApiConnectorWizardStateI {
+    baseSpecification?: string;
     baseUrl?: string;
     currentStep: number;
     discoveredEndpoints: DiscoveredEndpointI[];
@@ -43,6 +46,7 @@ export interface ApiConnectorWizardStateI {
     icon?: string;
     isProcessing: boolean;
     jobId: string | null;
+    maxPages: number;
     name: string;
     selectedEndpointIds: string[];
     specification?: string;
@@ -68,6 +72,7 @@ export interface ParameterDefinitionI {
     in: ParameterLocationType;
     name: string;
     required: boolean;
+    schema?: string;
     type: ParameterTypeType;
 }
 
@@ -96,8 +101,8 @@ export interface DiscoveredEndpointI {
 }
 
 export const WIZARD_STEPS: Record<WizardModeType, string[]> = {
-    ai: ['Basic Info', 'Select Endpoints', 'Review'],
-    import: ['Import File', 'Review'],
+    ai: ['Basic Info', 'Select Endpoints', 'Define Endpoints', 'Review'],
+    import: ['Import File', 'Define Endpoints', 'Review'],
     manual: ['Basic Info', 'Define Endpoints', 'Review'],
 };
 

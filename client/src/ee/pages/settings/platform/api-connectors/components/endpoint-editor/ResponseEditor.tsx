@@ -106,7 +106,14 @@ const ResponseEditor = ({onChange, responses}: ResponseEditorProps) => {
             <Dialog onOpenChange={handleDialogOpen} open={isDialogOpen}>
                 <DialogContent>
                     <DialogMain>
-                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(handleSaveResponse)}>
+                        <form
+                            className="flex min-h-0 flex-1 flex-col"
+                            onSubmit={(event) => {
+                                event.stopPropagation();
+
+                                handleSubmit(handleSaveResponse)(event);
+                            }}
+                        >
                             <DialogHeader title={`${editingResponse ? 'Edit' : 'Add'} Response`} />
 
                             <DialogBody>

@@ -85,6 +85,9 @@ const ApiConnectorImportPage = lazy(
     () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorImportPage')
 );
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
+const ApiConnectorEditPage = lazy(
+    () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorEditPage')
+);
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
@@ -378,6 +381,18 @@ const platformSettingsRoutes = {
                         </PrivateRoute>
                     ),
                     path: 'new/ai',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <ApiConnectorEditPage />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    path: ':apiConnectorId/edit',
                 },
             ],
             path: 'api-connectors',

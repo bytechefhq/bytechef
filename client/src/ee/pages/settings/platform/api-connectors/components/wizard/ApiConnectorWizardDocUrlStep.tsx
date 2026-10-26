@@ -1,4 +1,5 @@
 import {Input} from '@/components/Input/Input';
+import {Checkbox} from '@/components/ui/checkbox';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import IconField from '@/ee/pages/settings/platform/api-connectors/components/IconField';
@@ -7,6 +8,8 @@ import useApiConnectorWizard from './hooks/useApiConnectorWizard';
 
 const ApiConnectorWizardDocUrlStep = () => {
     const {control, form} = useApiConnectorWizard('docUrl');
+
+    const crawlEnabled = (form.watch('maxPages') ?? 1) > 1;
 
     return (
         <Form {...form}>
@@ -75,6 +78,42 @@ const ApiConnectorWizardDocUrlStep = () => {
                                     {...field}
                                 />
                             </FormControl>
+
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={control}
+                    name="maxPages"
+                    render={({field}) => (
+                        <FormItem>
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    checked={crawlEnabled}
+                                    id="crawl-enabled"
+                                    onCheckedChange={(checked) => field.onChange(checked === true ? 10 : 1)}
+                                />
+
+                                <FormLabel className="!mt-0" htmlFor="crawl-enabled">
+                                    Crawl linked documentation pages
+                                </FormLabel>
+                            </div>
+
+                            {crawlEnabled && (
+                                <FormControl>
+                                    <Input
+                                        max={50}
+                                        min={2}
+                                        onChange={(event) =>
+                                            field.onChange(Math.max(2, Number(event.target.value) || 2))
+                                        }
+                                        type="number"
+                                        value={field.value ?? 10}
+                                    />
+                                </FormControl>
+                            )}
 
                             <FormMessage />
                         </FormItem>

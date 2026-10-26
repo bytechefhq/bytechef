@@ -25,7 +25,7 @@ const ApiConnectorManualPage = () => {
 
             {currentStep === 1 && <ApiConnectorWizardEndpointsStep />}
 
-            {currentStep >= 2 && <ApiConnectorWizardReviewStep mode="manual" />}
+            {currentStep >= 2 && <ApiConnectorWizardReviewStep />}
         </ApiConnectorWizardLayout>
     );
 };

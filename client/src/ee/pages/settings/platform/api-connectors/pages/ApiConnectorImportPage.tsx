@@ -1,3 +1,4 @@
+import ApiConnectorWizardEndpointsStep from '../components/wizard/ApiConnectorWizardEndpointsStep';
 import ApiConnectorWizardImportStep from '../components/wizard/ApiConnectorWizardImportStep';
 import ApiConnectorWizardLayout from '../components/wizard/ApiConnectorWizardLayout';
 import ApiConnectorWizardReviewStep from '../components/wizard/ApiConnectorWizardReviewStep';
@@ -20,7 +21,11 @@ const ApiConnectorImportPage = () => {
             pageTitle="Import OpenAPI"
             steps={WIZARD_STEPS.import}
         >
-            {currentStep === 0 ? <ApiConnectorWizardImportStep /> : <ApiConnectorWizardReviewStep mode="import" />}
+            {currentStep === 0 && <ApiConnectorWizardImportStep />}
+
+            {currentStep === 1 && <ApiConnectorWizardEndpointsStep />}
+
+            {currentStep >= 2 && <ApiConnectorWizardReviewStep />}
         </ApiConnectorWizardLayout>
     );
 };
