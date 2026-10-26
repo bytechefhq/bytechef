@@ -31,10 +31,13 @@ import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Implementation of the {@link McpServerService} interface.
@@ -72,6 +75,10 @@ public class McpServerServiceImpl implements McpServerService {
     public McpServer create(McpServer mcpServer) {
         checkAuthenticationRequiredForEnforcement(mcpServer);
 
+        if (mcpServer.getUuid() == null) {
+            mcpServer.setUuid(UUID.randomUUID());
+        }
+
         return mcpServerRepository.save(mcpServer);
     }
 
@@ -90,6 +97,18 @@ public class McpServerServiceImpl implements McpServerService {
         }
 
         mcpServerRepository.delete(mcpServer);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByNameAndEnvironment(String name, Environment environment, @Nullable UUID excludeUuid) {
+        Assert.notNull(name, "'name' must not be null");
+
+        if (excludeUuid == null) {
+            return mcpServerRepository.existsByNameAndEnvironment(name, environment.ordinal());
+        }
+
+        return mcpServerRepository.existsByNameAndEnvironmentAndUuidNot(name, environment.ordinal(), excludeUuid);
     }
 
     @Override
@@ -118,6 +137,12 @@ public class McpServerServiceImpl implements McpServerService {
     @Transactional(readOnly = true)
     public Optional<McpServer> fetchMcpServer(String secretKey) {
         return mcpServerRepository.findBySecretKey(secretKey);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<McpServer> fetchMcpServer(UUID uuid, Environment environment) {
+        return mcpServerRepository.findByUuidAndEnvironment(uuid, environment.ordinal());
     }
 
     @Override

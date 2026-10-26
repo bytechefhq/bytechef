@@ -15,6 +15,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @version ee
@@ -26,7 +27,7 @@ public record ApiCollectionDTO(
     int collectionVersion, String contextPath, String createdBy, Instant createdDate, String description,
     boolean enabled, List<ApiCollectionEndpointDTO> endpoints, Environment environment, Long id, String lastModifiedBy,
     Instant lastModifiedDate, String name, Project project, long projectId, ProjectDeployment projectDeployment,
-    long projectDeploymentId, int projectVersion, List<Tag> tags, int version) {
+    long projectDeploymentId, int projectVersion, List<Tag> tags, int version, String uuid) {
 
     public ApiCollectionDTO(
         ApiCollection apiCollection, List<ApiCollectionEndpointDTO> endpoints, Project project,
@@ -38,7 +39,7 @@ public record ApiCollectionDTO(
             projectDeployment.getEnvironment(), apiCollection.getId(), apiCollection.getLastModifiedBy(),
             apiCollection.getLastModifiedDate(), apiCollection.getName(), project, projectDeployment.getProjectId(),
             projectDeployment, apiCollection.getProjectDeploymentId(), projectDeployment.getProjectVersion(), tags,
-            apiCollection.getVersion());
+            apiCollection.getVersion(), apiCollection.getUuidAsString());
     }
 
     public ApiCollection toApiCollection() {
@@ -51,6 +52,7 @@ public record ApiCollectionDTO(
         apiCollection.setName(name);
         apiCollection.setProjectDeploymentId(projectDeploymentId);
         apiCollection.setTags(tags);
+        apiCollection.setUuid(uuid == null ? null : UUID.fromString(uuid));
         apiCollection.setVersion(version);
 
         return apiCollection;

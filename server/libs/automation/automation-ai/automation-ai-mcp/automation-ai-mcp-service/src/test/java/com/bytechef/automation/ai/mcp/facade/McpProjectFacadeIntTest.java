@@ -218,6 +218,7 @@ class McpProjectFacadeIntTest {
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         projectDeployment = projectDeploymentRepository.save(projectDeployment);
     }
@@ -621,6 +622,7 @@ class McpProjectFacadeIntTest {
             unpublishedProjectDeployment.setName("unpublished-deployment");
             unpublishedProjectDeployment.setProjectId(unpublishedProject.getId());
             unpublishedProjectDeployment.setProjectVersion(1);
+            unpublishedProjectDeployment.setUuid(UUID.randomUUID());
 
             unpublishedProjectDeployment = projectDeploymentRepository.save(unpublishedProjectDeployment);
 

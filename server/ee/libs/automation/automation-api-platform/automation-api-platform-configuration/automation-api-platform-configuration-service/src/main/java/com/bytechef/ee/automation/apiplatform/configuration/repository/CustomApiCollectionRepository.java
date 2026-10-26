@@ -18,11 +18,19 @@ package com.bytechef.ee.automation.apiplatform.configuration.repository;
 
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface CustomApiCollectionRepository {
 
+    boolean existsByNameAndWorkspaceIdAndEnvironment(
+        String name, long workspaceId, int environment, @Nullable Long excludeId);
+
     List<ApiCollection> findAllApiCollections(Long workspaceId, Integer environment, Long projectId, Long tagId);
+
+    Optional<ApiCollection> findByUuidAndEnvironment(UUID uuid, int environment);
 }

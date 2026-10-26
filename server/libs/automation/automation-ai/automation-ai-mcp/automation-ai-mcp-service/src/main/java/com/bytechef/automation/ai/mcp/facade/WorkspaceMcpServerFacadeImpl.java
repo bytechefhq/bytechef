@@ -37,7 +37,9 @@ import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,6 +126,16 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
         String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
         Long workspaceId) {
 
+        return createWorkspaceMcpServer(
+            name, type, environment, enabled, authenticationRequired, null, workspaceId, null);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_CREATE')")
+    public McpServer createWorkspaceMcpServer(
+        String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
+        Boolean enforceToolAuthorization, Long workspaceId, @Nullable UUID uuid) {
+
         if (type != PlatformType.AUTOMATION) {
             throw new IllegalArgumentException("Workspace MCP servers must be automation MCP servers: " + type);
         }
@@ -136,6 +148,14 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
         if (authenticationRequired != null) {
             mcpServer.setAuthenticationRequired(authenticationRequired);
+        }
+
+        if (enforceToolAuthorization != null) {
+            mcpServer.setEnforceToolAuthorization(enforceToolAuthorization);
+        }
+
+        if (uuid != null) {
+            mcpServer.setUuid(uuid);
         }
 
         mcpServer = mcpServerService.create(mcpServer);

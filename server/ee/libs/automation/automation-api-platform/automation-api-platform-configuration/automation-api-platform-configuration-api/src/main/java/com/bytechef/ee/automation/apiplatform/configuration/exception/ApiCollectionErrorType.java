@@ -19,6 +19,8 @@ public class ApiCollectionErrorType extends AbstractErrorType {
 
     public static final ApiCollectionErrorType INVALID_WORKFLOW_TRIGGER_TYPE = new ApiCollectionErrorType(100);
     public static final ApiCollectionErrorType INVALID_CONTEXT_PATH = new ApiCollectionErrorType(101);
+    public static final ApiCollectionErrorType NAME_ALREADY_EXISTS = new ApiCollectionErrorType(102);
+    public static final ApiCollectionErrorType WORKFLOW_NOT_FOUND = new ApiCollectionErrorType(103);
 
     private ApiCollectionErrorType(int errorKey) {
         super(ApiCollection.class, errorKey);

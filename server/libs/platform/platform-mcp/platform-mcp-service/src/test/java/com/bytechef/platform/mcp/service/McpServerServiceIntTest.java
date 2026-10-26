@@ -39,6 +39,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
@@ -184,10 +185,10 @@ class McpServerServiceIntTest {
         Timestamp now = Timestamp.from(Instant.now());
 
         new JdbcTemplate(dataSource).update(
-            "INSERT INTO mcp_server (name, type, environment, enabled, secret_key, created_date, created_by, " +
-                "last_modified_date, last_modified_by, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO mcp_server (name, type, environment, enabled, secret_key, uuid, created_date, created_by, " +
+                "last_modified_date, last_modified_by, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             "auth-legacy", PlatformType.AUTOMATION.ordinal(), Environment.PRODUCTION.ordinal(), true,
-            "legacy-secret-key", now, "system", now, "system", 0);
+            "legacy-secret-key", UUID.randomUUID(), now, "system", now, "system", 0);
 
         McpServer loaded = mcpServerService.getMcpServer("legacy-secret-key");
 
@@ -233,6 +234,33 @@ class McpServerServiceIntTest {
 
         assertThatThrownBy(() -> mcpServerService.update(mcpServer))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testExistsByNameAndEnvironment() {
+        mcpServerRepository.save(new McpServer("taken", PlatformType.AUTOMATION, Environment.STAGING));
+
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, null)).isTrue();
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.PRODUCTION, null)).isFalse();
+        assertThat(mcpServerService.existsByNameAndEnvironment("free", Environment.STAGING, null)).isFalse();
+    }
+
+    @Test
+    void testExistsByNameAndEnvironmentExcludesTheGivenLineage() {
+        McpServer mcpServer = mcpServerRepository.save(
+            new McpServer("taken", PlatformType.AUTOMATION, Environment.STAGING));
+
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, mcpServer.getUuid()))
+            .isFalse();
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, UUID.randomUUID()))
+            .isTrue();
+    }
+
+    @Test
+    void testExistsByNameAndEnvironmentSpansPlatformTypes() {
+        mcpServerRepository.save(new McpServer("taken", PlatformType.EMBEDDED, Environment.STAGING));
+
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, null)).isTrue();
     }
 
     @Test
