@@ -11,8 +11,6 @@ bytechef:
     provider: JDBC
   oauth2:
     redirect-uri:
-  worker:
-    enabled: false
   workflow:
     output-storage:
       provider: JDBC
