@@ -63,6 +63,22 @@ class PlatformConfigurationProtoMapperTest {
     }
 
     @Test
+    void testWorkflowWithTriggersRoundTrip() {
+        String definition = """
+            {"label":"Sync Webhook","triggers":[{"name":"trigger_1","type":"webhook/v1/awaitWorkflowAndRespond"}],
+            "tasks":[{"name":"randomHelper_1","type":"randomHelper/v1/randomFloat"}]}
+            """;
+
+        Workflow workflow = new Workflow("workflow-1", definition, Workflow.Format.JSON);
+
+        Workflow readWorkflow = platformConfigurationProtoMapper.toWorkflow(
+            platformConfigurationProtoMapper.toProto(workflow));
+
+        assertThat(readWorkflow.getDefinition()).isEqualTo(definition);
+        assertThat(readWorkflow.getExtensions()).containsKey("triggers");
+    }
+
+    @Test
     void testComponentConnectionRoundTrip() {
         List<ComponentConnection> componentConnections = List.of(
             new ComponentConnection("airtable", 1, "airtable_1", "airtable", true),
