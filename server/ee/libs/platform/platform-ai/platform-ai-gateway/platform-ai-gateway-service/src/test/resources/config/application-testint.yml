@@ -1,0 +1,7 @@
+bytechef:
+  edition: ee
+  ai:
+    gateway:
+      enabled: true
+      rate-limiting:
+        enabled: true
