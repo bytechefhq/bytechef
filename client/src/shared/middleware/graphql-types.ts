@@ -1096,14 +1096,6 @@ export type CreateA2aServerInput = {
   workspaceId: Scalars['ID']['input'];
 };
 
-export type CreateApiConnectorInput = {
-  connectorVersion: Scalars['Int']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  title?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type CreateDataTableInput = {
   baseName: Scalars['String']['input'];
   columns: Array<ColumnInput>;
@@ -1283,21 +1275,6 @@ export type DeleteRowInput = {
   tableId: Scalars['ID']['input'];
 };
 
-export type DiscoverEndpointsInput = {
-  documentationUrl: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  userPrompt?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type DiscoveredEndpoint = {
-  __typename?: 'DiscoveredEndpoint';
-  id: Scalars['ID']['output'];
-  method: Scalars['String']['output'];
-  path: Scalars['String']['output'];
-  resource?: Maybe<Scalars['String']['output']>;
-  summary?: Maybe<Scalars['String']['output']>;
-};
-
 export type DocumentStatusUpdate = {
   __typename?: 'DocumentStatusUpdate';
   documentId: Scalars['ID']['output'];
@@ -1335,14 +1312,6 @@ export type EndpointDefinitionInput = {
   requestBody?: InputMaybe<RequestBodyDefinitionInput>;
   responses?: InputMaybe<Array<ResponseDefinitionInput>>;
   summary?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type EndpointDiscoveryResult = {
-  __typename?: 'EndpointDiscoveryResult';
-  endpoints?: Maybe<Array<DiscoveredEndpoint>>;
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  jobId: Scalars['String']['output'];
-  status: GenerationJobStatusEnum;
 };
 
 export type Environment = {
@@ -1432,16 +1401,10 @@ export type FileEntryProperty = Property & {
   type: PropertyType;
 };
 
-export type GenerateForEndpointsInput = {
-  documentationUrl: Scalars['String']['input'];
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  selectedEndpoints: Array<SelectedEndpointInput>;
-};
-
 export type GenerateFromDocumentationInput = {
   documentationUrl: Scalars['String']['input'];
   icon?: InputMaybe<Scalars['String']['input']>;
+  maxPages?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
   userPrompt?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1482,6 +1445,7 @@ export type Help = {
 export enum HttpMethod {
   Delete = 'DELETE',
   Get = 'GET',
+  Head = 'HEAD',
   Patch = 'PATCH',
   Post = 'POST',
   Put = 'PUT'
@@ -1931,7 +1895,6 @@ export type Mutation = {
   createAiGuardrailCustomRule: AiGuardrailCustomRule;
   createAiSkill: AiSkill;
   createAiSkillFromInstructions: AiSkill;
-  createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
   createAutomationWorkflowProject: Scalars['ID']['output'];
@@ -1992,6 +1955,7 @@ export type Mutation = {
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpTool?: Maybe<Scalars['Boolean']['output']>;
+  deleteOrphanedApiConnectorFiles: Scalars['Int']['output'];
   deleteRegisteredClient: Scalars['Boolean']['output'];
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
@@ -2035,8 +1999,6 @@ export type Mutation = {
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   setAiGuardrailCustomRuleEnabled: AiGuardrailCustomRule;
   startAiAgentEvalRun: AiAgentEvalRun;
-  startDiscoverEndpoints: EndpointDiscoveryResult;
-  startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
@@ -2198,11 +2160,6 @@ export type MutationCreateAiSkillFromInstructionsArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   instructions: Scalars['String']['input'];
   name: Scalars['String']['input'];
-};
-
-
-export type MutationCreateApiConnectorArgs = {
-  input: CreateApiConnectorInput;
 };
 
 
@@ -2757,16 +2714,6 @@ export type MutationStartAiAgentEvalRunArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   scenarioIds?: InputMaybe<Array<Scalars['ID']['input']>>;
-};
-
-
-export type MutationStartDiscoverEndpointsArgs = {
-  input: DiscoverEndpointsInput;
-};
-
-
-export type MutationStartGenerateForEndpointsArgs = {
-  input: GenerateForEndpointsInput;
 };
 
 
@@ -3563,7 +3510,6 @@ export type Query = {
   embeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   embeddedMcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
-  endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
   evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
@@ -4148,11 +4094,6 @@ export type QueryEmbeddedMcpToolsByComponentIdArgs = {
 };
 
 
-export type QueryEndpointDiscoveryStatusArgs = {
-  jobId: Scalars['String']['input'];
-};
-
-
 export type QueryEvaluatorFunctionDefinitionArgs = {
   name: Scalars['String']['input'];
 };
@@ -4688,11 +4629,6 @@ export type SearchResult = {
   type: SearchAssetType;
 };
 
-export type SelectedEndpointInput = {
-  method: Scalars['String']['input'];
-  path: Scalars['String']['input'];
-};
-
 export type SharedProject = {
   __typename?: 'SharedProject';
   description?: Maybe<Scalars['String']['output']>;
@@ -4882,7 +4818,9 @@ export type UpdateApiConnectorInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   icon?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  specification?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdateDataTableTagsInput = {

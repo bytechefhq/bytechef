@@ -1774,13 +1774,6 @@ export type CancelGenerationJobMutationVariables = Exact<{
 
 export type CancelGenerationJobMutation = { cancelGenerationJob: boolean };
 
-export type CreateApiConnectorMutationVariables = Exact<{
-  input: Types.CreateApiConnectorInput;
-}>;
-
-
-export type CreateApiConnectorMutation = { createApiConnector: { id: string, name: string, title: string | null, description: string | null, icon: string | null, connectorVersion: number, enabled: boolean | null, specification: string | null, definition: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, endpoints: Array<{ id: string, name: string, description: string | null, path: string | null, httpMethod: Types.HttpMethod | null }> | null } };
-
 export type DeleteApiConnectorMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -8922,47 +8915,6 @@ export const useCancelGenerationJobMutation = <
       {
     mutationKey: ['cancelGenerationJob'],
     mutationFn: (variables?: CancelGenerationJobMutationVariables) => fetcher<CancelGenerationJobMutation, CancelGenerationJobMutationVariables>(CancelGenerationJobDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const CreateApiConnectorDocument = new TypedDocumentString(`
-    mutation createApiConnector($input: CreateApiConnectorInput!) {
-  createApiConnector(input: $input) {
-    id
-    name
-    title
-    description
-    icon
-    connectorVersion
-    enabled
-    specification
-    definition
-    endpoints {
-      id
-      name
-      description
-      path
-      httpMethod
-    }
-    createdBy
-    createdDate
-    lastModifiedBy
-    lastModifiedDate
-    version
-  }
-}
-    `);
-
-export const useCreateApiConnectorMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>) => {
-    
-    return useMutation<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>(
-      {
-    mutationKey: ['createApiConnector'],
-    mutationFn: (variables?: CreateApiConnectorMutationVariables) => fetcher<CreateApiConnectorMutation, CreateApiConnectorMutationVariables>(CreateApiConnectorDocument, variables)(),
     ...options
   }
     )};
