@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.platform.user.remote.client.service.RemoteUserServiceClient;
 import com.bytechef.ee.platform.user.remote.grpc.UserRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -36,6 +37,7 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,6 +46,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * @author Ivica Cardic
@@ -138,5 +141,20 @@ public class ConfigurationApplicationIntTest {
         assertThat(userService).isInstanceOf(RemoteUserServiceClient.class);
         assertThat(userService.getUser("admin@localhost.com")
             .getId()).isEqualTo(1L);
+    }
+
+    @Nested
+    @TestPropertySource(properties = "bytechef.message-broker.provider=amqp")
+    class AmqpMessageBrokerProvider {
+
+        @Autowired
+        private MessageBroker messageBroker;
+
+        @Test
+        void testAmqpMessageBrokerIsAvailable() {
+            Class<?> messageBrokerClass = messageBroker.getClass();
+
+            assertThat(messageBrokerClass.getName()).isEqualTo("com.bytechef.message.broker.amqp.AmqpMessageBroker");
+        }
     }
 }
