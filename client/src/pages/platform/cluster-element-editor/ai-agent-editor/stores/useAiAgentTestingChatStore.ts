@@ -3,6 +3,7 @@ import {
     addToolExecutionToLastAssistantMessage as addToolExecutionHelper,
     appendToLastAssistantMessage as appendHelper,
     setLastAssistantMessageContent as setContentHelper,
+    setLastAssistantMessageError as setErrorHelper,
 } from '@/shared/util/assistant-message-utils';
 import {generateRandomId} from '@/shared/util/random-utils';
 import {ThreadMessageLike} from '@assistant-ui/react';
@@ -51,25 +52,9 @@ const useAiAgentTestingChatStore = create<AiAgentTestingChatStateI>()(
                     messages: setContentHelper(state.messages, content),
                 })),
             setLastAssistantMessageError: (errorMessage: string) =>
-                set((state) => {
-                    const updatedMessages = [...state.messages];
-                    const errorStatus = {error: errorMessage, reason: 'error' as const, type: 'incomplete' as const};
-
-                    for (let i = updatedMessages.length - 1; i >= 0; i--) {
-                        if (updatedMessages[i]?.role === 'assistant') {
-                            updatedMessages[i] = {...updatedMessages[i], status: errorStatus};
-
-                            return {messages: updatedMessages};
-                        }
-                    }
-
-                    return {
-                        messages: [
-                            ...updatedMessages,
-                            {content: '', role: 'assistant', status: errorStatus} as ThreadMessageLike,
-                        ],
-                    };
-                }),
+                set((state) => ({
+                    messages: setErrorHelper(state.messages, errorMessage),
+                })),
             resetMessages: () => set({messages: []}),
             truncateMessagesFrom: (index: number) =>
                 set((state) => ({

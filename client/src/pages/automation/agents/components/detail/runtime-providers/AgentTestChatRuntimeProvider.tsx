@@ -7,6 +7,7 @@ import {
     appendToLastAssistantMessage,
     formatAskUserQuestionMessage,
     setLastAssistantMessageContent,
+    setLastAssistantMessageError,
 } from '@/shared/util/assistant-message-utils';
 import {generateRandomId} from '@/shared/util/random-utils';
 import {extractStreamChunk} from '@/shared/util/stream-utils';
@@ -28,6 +29,23 @@ import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'reac
 export const AGENT_TEST_CHAT_TRIGGER_NODE_NAME = 'chat_1';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => message;
+
+interface AgentTestChatJobI {
+    error?: {message?: string} | null;
+    outputs?: {message?: string} | null;
+    status?: string;
+    taskExecutions?: {error?: {message?: string} | null}[] | null;
+}
+
+function getFailedJobErrorMessage(job: AgentTestChatJobI | undefined): string | undefined {
+    if (job?.status !== 'FAILED') {
+        return undefined;
+    }
+
+    const failedTaskExecution = job.taskExecutions?.find((taskExecution) => taskExecution.error?.message);
+
+    return job.error?.message || failedTaskExecution?.error?.message || 'The agent run failed.';
+}
 
 const attachmentAdapter = new CompositeAttachmentAdapter([
     new SimpleImageAttachmentAdapter(),
@@ -141,16 +159,25 @@ export function useAgentTestChatRuntime(workflowId: string): UseAgentTestChatRun
                 setIsRunning(false);
                 setStreamRequest(null);
             },
-            error: () => {
+            error: (data: unknown) => {
+                const errorMessage = typeof data === 'string' && data ? data : 'An unexpected error occurred';
+
+                setMessages((previousMessages) => setLastAssistantMessageError(previousMessages, errorMessage));
                 setIsRunning(false);
                 setStreamRequest(null);
             },
             result: (data: unknown) => {
                 try {
                     const resultData = typeof data === 'string' ? JSON.parse(data) : data;
-                    const message = (resultData as {job?: {outputs?: {message?: string}}})?.job?.outputs?.message ?? '';
+                    const job = (resultData as {job?: AgentTestChatJobI})?.job;
+                    const failedJobErrorMessage = getFailedJobErrorMessage(job);
+                    const message = job?.outputs?.message ?? '';
 
-                    if (message && message.trim().length > 0) {
+                    if (failedJobErrorMessage) {
+                        setMessages((previousMessages) =>
+                            setLastAssistantMessageError(previousMessages, failedJobErrorMessage)
+                        );
+                    } else if (message && message.trim().length > 0) {
                         setMessages((previousMessages) => setLastAssistantMessageContent(previousMessages, message));
                     }
                 } catch (error) {
@@ -178,7 +205,20 @@ export function useAgentTestChatRuntime(workflowId: string): UseAgentTestChatRun
 
             pendingResumeRef.current = null;
 
-            pending?.reject(new ResumeError(status));
+            if (pending) {
+                pending.reject(new ResumeError(status));
+
+                return;
+            }
+
+            const errorMessage =
+                status === null
+                    ? 'The connection to the agent was lost.'
+                    : `The test request failed with status ${status}.`;
+
+            setMessages((previousMessages) => setLastAssistantMessageError(previousMessages, errorMessage));
+            setIsRunning(false);
+            setStreamRequest(null);
         },
         onRequestSuccess: () => {
             const pending = pendingResumeRef.current;
