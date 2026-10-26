@@ -6,6 +6,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 const hoisted = vi.hoisted(() => ({
+    captureProjectDeploymentEnabledMock: vi.fn(),
     deleteProjectDeploymentMock: vi.fn(),
     openProjectMock: vi.fn(),
 }));
@@ -19,7 +20,14 @@ vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => (
 
 vi.mock('@/shared/mutations/automation/projectDeployments.mutations', () => ({
     useDeleteProjectDeploymentMutation: () => ({isPending: false, mutate: hoisted.deleteProjectDeploymentMock}),
-    useEnableProjectDeploymentMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnableProjectDeploymentMutation: ({
+        onSuccess,
+    }: {
+        onSuccess?: (result: void, variables: {enable: boolean; id: number}) => void;
+    }) => ({
+        isPending: false,
+        mutate: (variables: {enable: boolean; id: number}) => onSuccess?.(undefined, variables),
+    }),
 }));
 
 vi.mock('@/shared/mutations/automation/projectDeploymentTags.mutations', () => ({
@@ -27,7 +35,7 @@ vi.mock('@/shared/mutations/automation/projectDeploymentTags.mutations', () => (
 }));
 
 vi.mock('@/shared/hooks/useAnalytics', () => ({
-    useAnalytics: () => ({captureProjectDeploymentEnabled: vi.fn()}),
+    useAnalytics: () => ({captureProjectDeploymentEnabled: hoisted.captureProjectDeploymentEnabledMock}),
 }));
 
 vi.mock('@/components/ui/collapsible', () => ({
@@ -77,6 +85,7 @@ const projectDeployment: ProjectDeployment = {
 
 describe('ProjectDeploymentListItem', () => {
     beforeEach(() => {
+        hoisted.captureProjectDeploymentEnabledMock.mockReset();
         hoisted.deleteProjectDeploymentMock.mockReset();
         hoisted.openProjectMock.mockReset();
     });
@@ -128,5 +137,33 @@ describe('ProjectDeploymentListItem', () => {
 
         expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
         expect(screen.queryByText('Open Project')).not.toBeInTheDocument();
+    });
+
+    it('captures the deployment enabled event when the deployment is turned on', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <ProjectDeploymentListItem
+                projectDeployment={{
+                    ...projectDeployment,
+                    enabled: false,
+                    projectDeploymentWorkflows: [{enabled: true}],
+                }}
+            />
+        );
+
+        await user.click(screen.getByRole('switch'));
+
+        expect(hoisted.captureProjectDeploymentEnabledMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not capture the deployment enabled event when the deployment is turned off', async () => {
+        const user = userEvent.setup();
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        await user.click(screen.getByRole('switch'));
+
+        expect(hoisted.captureProjectDeploymentEnabledMock).not.toHaveBeenCalled();
     });
 });
