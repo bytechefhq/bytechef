@@ -7,3 +7,9 @@ spring:
   devtools:
     restart:
       enabled: true
+
+bytechef:
+  remote:
+    grpc:
+      plaintext: true
+      service-token: dev-service-token

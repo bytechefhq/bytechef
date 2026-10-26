@@ -627,6 +627,7 @@ include("server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"
 include("server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl")
 include("server:ee:libs:core:message:message-broker:message-broker-aws")
 include("server:ee:libs:core:remote:remote-client")
+include("server:ee:libs:core:remote:remote-grpc")
 include("server:ee:libs:core:remote:remote-rest")
 include("server:ee:libs:core:tenant:tenant-multi-service")
 include("server:ee:libs:core:tenant:tenant-remote-client")
