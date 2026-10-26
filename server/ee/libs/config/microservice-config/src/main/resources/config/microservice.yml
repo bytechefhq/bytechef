@@ -28,6 +28,9 @@ info:
       host: ${bytechef.analytics.postHog.host:}
   application:
     edition: ${bytechef.edition:}
+  billing:
+    enabled: ${billing.enabled:false}
+    customerPortalUrl: ${billing.stripe.customer-portal-url:}
   docs:
     changelogUrl: ${docs.changelog-url:}
     communitySupportUrl: ${docs.community-support-url:}
@@ -41,6 +44,8 @@ info:
   signUp:
     activationRequired: ${bytechef.sign-up.activation-required}
     enabled: ${bytechef.sign-up.enabled}
+  socialLogin:
+    enabled: ${bytechef.security.social-login.enabled:false}
   userGuiding:
     containerId: ${bytechef.userGuiding.containerId:}
     enabled: ${bytechef.userGuiding.enabled:false}
