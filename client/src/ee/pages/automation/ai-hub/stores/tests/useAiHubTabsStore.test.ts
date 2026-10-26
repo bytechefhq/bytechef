@@ -3,6 +3,8 @@ import {beforeEach, describe, expect, it} from 'vitest';
 
 import {aiHubTabsStore, getTabGenericId, useAiHubTabsStore} from '../useAiHubTabsStore';
 
+const AI_AGENT_ONE = {aiAgentId: '42', name: 'Support Agent'};
+
 const WORKFLOW_ONE = {name: 'My Workflow', projectId: 'proj-1', projectWorkflowId: 10, workflowId: 'wf-1'};
 const WORKFLOW_TWO = {name: 'Other Workflow', projectId: 'proj-1', projectWorkflowId: 11, workflowId: 'wf-2'};
 const WORKFLOW_THREE = {name: 'Third Workflow', projectId: 'proj-2', projectWorkflowId: 21, workflowId: 'wf-3'};
@@ -142,6 +144,46 @@ describe('useAiHubTabsStore', () => {
         expect(getTabGenericId(tab)).toBe('wf-1');
     });
 
+    it('opens an AI Agent tab beside a workflow tab and returns the agent id as the generic tab id', () => {
+        let aiAgentTabId = '';
+
+        act(() => {
+            aiHubTabsStore.getState().openWorkflowTab(WORKFLOW_ONE);
+
+            aiAgentTabId = aiHubTabsStore.getState().openAiAgentTab(AI_AGENT_ONE);
+        });
+
+        const {activeTabId, openTabs, rightPanelOpen} = aiHubTabsStore.getState();
+
+        const aiAgentTab = openTabs.find((openTab) => openTab.id === aiAgentTabId)!;
+
+        expect(openTabs).toHaveLength(2);
+        expect(aiAgentTab).toMatchObject({...AI_AGENT_ONE, kind: 'aiAgent'});
+        expect(getTabGenericId(aiAgentTab)).toBe('42');
+        expect(activeTabId).toBe(aiAgentTabId);
+        expect(rightPanelOpen).toBe(true);
+    });
+
+    it('focuses and renames the existing tab when the same AI Agent is opened again', () => {
+        let firstTabId = '';
+        let secondTabId = '';
+
+        act(() => {
+            firstTabId = aiHubTabsStore.getState().openAiAgentTab(AI_AGENT_ONE);
+
+            aiHubTabsStore.getState().openWorkflowTab(WORKFLOW_ONE);
+
+            secondTabId = aiHubTabsStore.getState().openAiAgentTab({...AI_AGENT_ONE, name: 'Renamed Agent'});
+        });
+
+        const {activeTabId, openTabs} = aiHubTabsStore.getState();
+
+        expect(secondTabId).toBe(firstTabId);
+        expect(openTabs).toHaveLength(2);
+        expect(activeTabId).toBe(firstTabId);
+        expect(openTabs.find((openTab) => openTab.id === firstTabId)?.name).toBe('Renamed Agent');
+    });
+
     describe('setActiveChatId home to chat hand-off', () => {
         it('inherits the open tabs and rightPanelOpen from home view when first chat is created', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
@@ -178,7 +220,7 @@ describe('useAiHubTabsStore', () => {
                 result.current.setActiveChatId(1);
             });
 
-            expect(result.current.openTabs.map((tab) => tab.workflowId)).toEqual(['wf-1', 'wf-3']);
+            expect(result.current.openTabs.map(getTabGenericId)).toEqual(['wf-1', 'wf-3']);
             expect(result.current.activeTabId).toBe(firstTabId);
             expect(result.current.rightPanelOpen).toBe(true);
         });

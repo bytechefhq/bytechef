@@ -74,7 +74,7 @@ describe('AiHubResourcePanel', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Close Invoices'}));
 
         expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
-        expect(screen.getByText('Workflows you or the assistant open appear here.')).toBeInTheDocument();
+        expect(screen.getByText('Workflows and AI Agents you or the assistant open appear here.')).toBeInTheDocument();
     });
 
     it('hides the panel from its close control', () => {
