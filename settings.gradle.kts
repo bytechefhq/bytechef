@@ -736,6 +736,8 @@ include("server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invo
 include("server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-graphql")
 include("server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-service")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client")
+include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-grpc")
+include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-grpc-proto")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-rest")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest")

@@ -7,19 +7,26 @@
 
 package com.bytechef.ee.platform.workflow.task.dispatcher.registry.remote.client.service;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatcherProtoMapper;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.ExecuteTaskDispatcherOutputRequest;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.GetTaskDispatcherDefinitionRequest;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.GetTaskDispatcherDefinitionVersionsRequest;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionRemoteServiceGrpc;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionRemoteServiceGrpc.TaskDispatcherDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Option;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.google.protobuf.Empty;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -30,13 +37,13 @@ import org.springframework.stereotype.Component;
 public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatcherDefinitionService {
 
     private static final String COORDINATOR_APP = "coordinator-app";
-    private static final String TASK_DISPATCHER_DEFINITION_SERVICE = "/remote/task-dispatcher-definition-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
+    private final TaskDispatcherProtoMapper taskDispatcherProtoMapper;
 
-    @SuppressFBWarnings("EI")
-    public RemoteTaskDispatcherDefinitionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteTaskDispatcherDefinitionServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.grpcChannels = grpcChannels;
+        this.taskDispatcherProtoMapper = new TaskDispatcherProtoMapper(objectMapper);
     }
 
     @Override
@@ -52,17 +59,15 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     }
 
     @Override
-    public OutputResponse executeOutput(
-        String name, int version, Map<String, ?> inputParameters) {
+    public OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters) {
+        ExecuteTaskDispatcherOutputRequest executeTaskDispatcherOutputRequest =
+            ExecuteTaskDispatcherOutputRequest.newBuilder()
+                .setName(name)
+                .setVersion(version)
+                .setInputParameters(ProtoValues.toStruct(inputParameters))
+                .build();
 
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(COORDINATOR_APP)
-                .path(
-                    TASK_DISPATCHER_DEFINITION_SERVICE + "/execute-output")
-                .build(),
-            new OutputRequest(name, version, inputParameters),
-            new ParameterizedTypeReference<>() {});
+        return taskDispatcherProtoMapper.toOutputResponse(getStub().executeOutput(executeTaskDispatcherOutputRequest));
     }
 
     @Override
@@ -82,33 +87,32 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
 
     @Override
     public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, @Nullable Integer version) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(COORDINATOR_APP)
-                .path(
-                    TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definition/{name}/{version}")
-                .build(name, version),
-            new ParameterizedTypeReference<>() {});
+        GetTaskDispatcherDefinitionRequest.Builder builder = GetTaskDispatcherDefinitionRequest.newBuilder()
+            .setName(name);
+
+        if (version != null) {
+            builder.setVersion(version);
+        }
+
+        return taskDispatcherProtoMapper.toTaskDispatcherDefinition(
+            getStub().getTaskDispatcherDefinition(builder.build()));
     }
 
     @Override
     public List<TaskDispatcherDefinition> getTaskDispatcherDefinitions() {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(COORDINATOR_APP)
-                .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definitions")
-                .build(),
-            new ParameterizedTypeReference<>() {});
+        return taskDispatcherProtoMapper.toTaskDispatcherDefinitions(
+            getStub().getTaskDispatcherDefinitions(Empty.getDefaultInstance()));
     }
 
     @Override
     public List<TaskDispatcherDefinition> getTaskDispatcherDefinitionVersions(String name) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(COORDINATOR_APP)
-                .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definition-versions/{name}")
-                .build(name),
-            new ParameterizedTypeReference<>() {});
+        GetTaskDispatcherDefinitionVersionsRequest getTaskDispatcherDefinitionVersionsRequest =
+            GetTaskDispatcherDefinitionVersionsRequest.newBuilder()
+                .setName(name)
+                .build();
+
+        return taskDispatcherProtoMapper.toTaskDispatcherDefinitions(
+            getStub().getTaskDispatcherDefinitionVersions(getTaskDispatcherDefinitionVersionsRequest));
     }
 
     @Override
@@ -116,6 +120,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
         throw new UnsupportedOperationException();
     }
 
-    private record OutputRequest(String name, int version, Map<String, ?> taskDispatcherParameters) {
+    private TaskDispatcherDefinitionRemoteServiceBlockingStub getStub() {
+        return TaskDispatcherDefinitionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(COORDINATOR_APP));
     }
 }
