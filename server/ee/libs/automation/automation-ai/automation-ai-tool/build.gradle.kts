@@ -24,6 +24,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-api"))
+    implementation(project(":server:ee:libs:platform:platform-context-store:platform-context-store-api"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")

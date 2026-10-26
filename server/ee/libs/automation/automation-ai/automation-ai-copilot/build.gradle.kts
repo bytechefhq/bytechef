@@ -3,6 +3,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.ai:spring-ai-model")
+    implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
@@ -22,6 +23,8 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-api"))
+    implementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-api"))
+    implementation(project(":server:ee:libs:platform:platform-context-store:platform-context-store-api"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
