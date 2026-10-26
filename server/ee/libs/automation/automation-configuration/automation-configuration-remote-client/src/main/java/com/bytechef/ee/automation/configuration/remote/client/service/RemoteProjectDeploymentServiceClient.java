@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentRemoteServiceGrpc;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
@@ -61,7 +62,15 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
 
     @Override
     public boolean isProjectDeploymentEnabled(long projectDeploymentId) {
-        throw new UnsupportedOperationException();
+        ProjectDeploymentRemoteServiceGrpc.ProjectDeploymentRemoteServiceBlockingStub stub =
+            ProjectDeploymentRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        BoolResponse boolResponse = stub.isProjectDeploymentEnabled(
+            IdRequest.newBuilder()
+                .setId(projectDeploymentId)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override

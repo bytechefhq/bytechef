@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.grpc;
 
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentRemoteServiceGrpc;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.RemoteProjectDeployment;
@@ -38,6 +39,15 @@ public class ProjectDeploymentRemoteServiceGrpcServer
     public void getProjectDeployment(IdRequest request, StreamObserver<RemoteProjectDeployment> responseObserver) {
         responseObserver.onNext(
             automationConfigurationProtoMapper.toProto(projectDeploymentService.getProjectDeployment(request.getId())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void isProjectDeploymentEnabled(IdRequest request, StreamObserver<BoolResponse> responseObserver) {
+        responseObserver.onNext(
+            BoolResponse.newBuilder()
+                .setValue(projectDeploymentService.isProjectDeploymentEnabled(request.getId()))
+                .build());
         responseObserver.onCompleted();
     }
 }

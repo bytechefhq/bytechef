@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.remote.grpc;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,5 +53,12 @@ public class AutomationConfigurationGrpcServerConfiguration {
         ProjectService projectService, AutomationConfigurationProtoMapper automationConfigurationProtoMapper) {
 
         return new ProjectRemoteServiceGrpcServer(projectService, automationConfigurationProtoMapper);
+    }
+
+    @Bean
+    ProjectWorkflowRemoteServiceGrpcServer projectWorkflowRemoteServiceGrpcServer(
+        ProjectWorkflowService projectWorkflowService) {
+
+        return new ProjectWorkflowRemoteServiceGrpcServer(projectWorkflowService);
     }
 }
