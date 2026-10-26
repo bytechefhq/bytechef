@@ -64,10 +64,20 @@ public class GrpcRemoteConfiguration {
                     "bytechef.remote.grpc.service-token must be set to serve gRPC to other microservices");
             }
 
-            if (!grpc.isPlaintext() && StringUtils.isBlank(environment.getProperty("spring.grpc.server.ssl.bundle"))) {
+            if (grpc.isPlaintext()) {
+                return;
+            }
+
+            if (StringUtils.isBlank(environment.getProperty("spring.grpc.server.ssl.bundle"))) {
                 throw new IllegalStateException(
                     "spring.grpc.server.ssl.bundle must be set to serve gRPC with TLS, or set " +
                         "bytechef.remote.grpc.plaintext=true on a trusted network");
+            }
+
+            if (!environment.getProperty("spring.grpc.server.ssl.enabled", Boolean.class, true)) {
+                throw new IllegalStateException(
+                    "spring.grpc.server.ssl.enabled=false serves gRPC without TLS; set " +
+                        "bytechef.remote.grpc.plaintext=true on a trusted network instead");
             }
         };
     }
