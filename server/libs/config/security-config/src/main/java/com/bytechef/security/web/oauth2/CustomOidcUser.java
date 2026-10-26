@@ -16,8 +16,11 @@
 
 package com.bytechef.security.web.oauth2;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,27 +30,35 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 /**
  * Custom OidcUser implementation that wraps the internal ByteChef user login. The {@link #getName()} method returns the
- * internal user's login, which is critical for remember-me compatibility. Delegates all OIDC-specific methods to the
- * wrapped OidcUser.
+ * internal user's login, which is critical for remember-me compatibility. Keeps the serializable parts of the wrapped
+ * OidcUser so the principal survives a session store that serializes it.
  *
  * @author Ivica Cardic
  */
-public class CustomOidcUser implements OidcUser {
+public class CustomOidcUser implements OidcUser, Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private final Map<String, Object> attributes;
     private final Collection<? extends GrantedAuthority> authorities;
+    private final Map<String, Object> claims;
+    private final OidcIdToken idToken;
     private final String login;
-    private final OidcUser oidcUser;
+    private final OidcUserInfo userInfo;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CustomOidcUser(String login, Collection<? extends GrantedAuthority> authorities, OidcUser oidcUser) {
-        this.login = login;
+        this.attributes = Collections.unmodifiableMap(new LinkedHashMap<>(oidcUser.getAttributes()));
         this.authorities = List.copyOf(authorities);
-        this.oidcUser = oidcUser;
+        this.claims = Collections.unmodifiableMap(new LinkedHashMap<>(oidcUser.getClaims()));
+        this.idToken = oidcUser.getIdToken();
+        this.login = login;
+        this.userInfo = oidcUser.getUserInfo();
     }
 
     @Override
     public Map<String, Object> getAttributes() {
-        return oidcUser.getAttributes();
+        return attributes;
     }
 
     @Override
@@ -57,12 +68,12 @@ public class CustomOidcUser implements OidcUser {
 
     @Override
     public Map<String, Object> getClaims() {
-        return oidcUser.getClaims();
+        return claims;
     }
 
     @Override
     public OidcIdToken getIdToken() {
-        return oidcUser.getIdToken();
+        return idToken;
     }
 
     @Override
@@ -72,6 +83,6 @@ public class CustomOidcUser implements OidcUser {
 
     @Override
     public OidcUserInfo getUserInfo() {
-        return oidcUser.getUserInfo();
+        return userInfo;
     }
 }
