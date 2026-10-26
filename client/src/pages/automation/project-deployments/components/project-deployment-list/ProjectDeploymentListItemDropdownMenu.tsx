@@ -6,13 +6,23 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, SquareArrowOutUpRightIcon, Trash2Icon} from 'lucide-react';
+import EEVersion from '@/shared/edition/EEVersion';
+import {
+    ArrowUpRightIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    RefreshCcwIcon,
+    SquareArrowOutUpRightIcon,
+    Trash2Icon,
+} from 'lucide-react';
 
 interface ProjectDeploymentListItemDropdownMenuProps {
     onChangeProjectVersionClick: () => void;
     onDeleteClick: () => void;
     onEditClick: () => void;
     onOpenProjectClick?: () => void;
+    onPromoteClick?: () => void;
+    showPromoteToEnvironment?: boolean;
 }
 
 const ProjectDeploymentListItemDropdownMenu = ({
@@ -20,6 +30,8 @@ const ProjectDeploymentListItemDropdownMenu = ({
     onDeleteClick,
     onEditClick,
     onOpenProjectClick,
+    onPromoteClick,
+    showPromoteToEnvironment = false,
 }: ProjectDeploymentListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -43,6 +55,16 @@ const ProjectDeploymentListItemDropdownMenu = ({
                     label="Change Project Version"
                     onClick={onChangeProjectVersionClick}
                 />
+
+                {showPromoteToEnvironment && onPromoteClick && (
+                    <EEVersion hidden={true}>
+                        <DropdownMenuItem
+                            icon={<ArrowUpRightIcon />}
+                            label="Promote to environment…"
+                            onClick={onPromoteClick}
+                        />
+                    </EEVersion>
+                )}
 
                 <DropdownMenuSeparator />
 

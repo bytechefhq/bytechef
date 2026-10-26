@@ -11,6 +11,7 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useDeleteWorkspaceMcpServerMutation: () => ({mutate: vi.fn()}),
+    useEnvironmentsQuery: () => ({data: {environments: []}}),
     useUpdateMcpServerMutation: () => ({mutate: vi.fn()}),
     useUpdateMcpServerTagsMutation: ({onSuccess}: {onSuccess: () => void}) => {
         hoisted.updateTagsOnSuccess = onSuccess;

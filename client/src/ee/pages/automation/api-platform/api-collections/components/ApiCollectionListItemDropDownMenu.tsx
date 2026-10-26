@@ -15,6 +15,8 @@ interface ApiCollectionListItemDropdownMenuProps {
     onDeleteClick: () => void;
     onEditClick: () => void;
     onNewEndpoint: () => void;
+    onPromoteClick: () => void;
+    showPromoteToEnvironment: boolean;
 }
 
 const ApiCollectionListItemDropDownMenu = ({
@@ -23,6 +25,8 @@ const ApiCollectionListItemDropDownMenu = ({
     onDeleteClick,
     onEditClick,
     onNewEndpoint,
+    onPromoteClick,
+    showPromoteToEnvironment,
 }: ApiCollectionListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -38,6 +42,12 @@ const ApiCollectionListItemDropDownMenu = ({
                 <DropdownMenuItem className="dropdown-menu-item" onClick={onChangeProjectVersionClick}>
                     <RefreshCcwIcon /> Change Project Version
                 </DropdownMenuItem>
+
+                {showPromoteToEnvironment && (
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onPromoteClick}>
+                        Promote to environment…
+                    </DropdownMenuItem>
+                )}
 
                 <DropdownMenuItem className="dropdown-menu-item" onClick={onNewEndpoint}>
                     <PlusIcon /> New Endpoint
