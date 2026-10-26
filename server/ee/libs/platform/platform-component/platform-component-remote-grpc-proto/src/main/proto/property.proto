@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package bytechef.platform.component.remote.v1;
+
+import "google/protobuf/struct.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.component.remote.grpc.proto";
+
+// A property of a component or task dispatcher definition: the fields shared by every property type plus the union of
+// the type-specific ones. Java enum values travel as their constant names.
+message RemoteProperty {
+  optional string name = 1;
+  optional string type = 2;
+  optional string description = 3;
+  optional bool required = 4;
+  optional bool hidden = 5;
+  optional bool advanced_option = 6;
+  optional bool expression_enabled = 7;
+  optional string display_condition = 8;
+  optional google.protobuf.Struct metadata = 9;
+  optional string resource_type = 10;
+  optional string control_type = 11;
+  optional google.protobuf.Value default_value = 12;
+  optional google.protobuf.Value example_value = 13;
+  optional string label = 14;
+  optional string placeholder = 15;
+  repeated RemoteOption options = 16;
+  optional RemoteOptionsDataSource options_data_source = 17;
+  optional bool options_loaded_dynamically = 18;
+  optional string header = 19;
+  optional RemotePropertiesDataSource properties_data_source = 20;
+  repeated RemoteProperty items = 21;
+  repeated RemoteProperty properties = 22;
+  repeated RemoteProperty additional_properties = 23;
+  optional bool multiple_values = 24;
+  optional int64 max_items = 25;
+  optional int64 min_items = 26;
+  optional int32 max_length = 27;
+  optional int32 min_length = 28;
+  optional string regex = 29;
+  optional string language_id = 30;
+  optional double max_value = 31;
+  optional double min_value = 32;
+  optional int32 number_precision = 33;
+  optional int32 max_number_precision = 34;
+  optional int32 min_number_precision = 35;
+}
+
+message RemoteOption {
+  optional string label = 1;
+  optional string description = 2;
+  optional google.protobuf.Value value = 3;
+}
+
+message RemoteOptionsDataSource {
+  repeated string options_lookup_depends_on = 1;
+}
+
+message RemotePropertiesDataSource {
+  repeated string properties_lookup_depends_on = 1;
+}
+
+message RemoteProperties {
+  repeated RemoteProperty properties = 1;
+}
+
+message RemoteOptions {
+  repeated RemoteOption options = 1;
+}
