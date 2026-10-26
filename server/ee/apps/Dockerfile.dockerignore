@@ -1,0 +1,3 @@
+**
+!server/ee/apps/*/build/libs/*.jar
+!client/dist
