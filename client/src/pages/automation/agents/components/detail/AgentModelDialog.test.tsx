@@ -78,7 +78,7 @@ const {CATALOG_RESULT, DEFINITION_BY_COMPONENT, NO_DEFINITION, PROVIDERS_RESULT}
     NO_DEFINITION: {data: undefined},
     PROVIDERS_RESULT: {
         data: [
-            {componentName: 'anthropic', componentVersion: 1, name: 'model', title: 'Antropic Model'},
+            {componentName: 'anthropic', componentVersion: 1, name: 'model', title: 'Anthropic Model'},
             {componentName: 'ollama', componentVersion: 1, name: 'model', title: 'Ollama Model'},
             {componentName: 'openAi', componentVersion: 1, name: 'model', title: 'OpenAI Model'},
         ],
@@ -204,7 +204,7 @@ describe('AgentModelDialog', () => {
         expect(screen.getByTestId('target')).toHaveTextContent('openAi');
 
         await user.click(screen.getByRole('combobox', {name: /provider/i}));
-        await user.click(await screen.findByText('Antropic'));
+        await user.click(await screen.findByText('Anthropic'));
 
         expect(screen.getByTestId('target')).toHaveTextContent('none');
     });
