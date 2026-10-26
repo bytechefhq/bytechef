@@ -10,8 +10,17 @@ package com.bytechef.ee.platform.component.remote.client.service;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
-import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
+import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentVersionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ExecuteWorkflowNodeDescriptionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetTriggerDefinitionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteTriggerDefinitions;
+import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionRemoteServiceGrpc.TriggerDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -25,7 +34,6 @@ import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -35,14 +43,18 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient implements TriggerDefinitionService {
+public class RemoteTriggerDefinitionServiceClient implements TriggerDefinitionService {
 
-    private static final String TRIGGER_DEFINITION_SERVICE = "/trigger-definition-service";
+    private final ComponentProtoMapper componentProtoMapper;
+    private final GrpcChannels grpcChannels;
+    private final WorkerInstances workerInstances;
 
     public RemoteTriggerDefinitionServiceClient(
-        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultRestClient, discoveryClient, objectMapper);
+        this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+        this.workerInstances = new WorkerInstances(discoveryClient);
     }
 
     @Override
@@ -128,15 +140,20 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
 
     @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
 
-        return defaultRestClient.post(
-            uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_SERVICE + "/execute-workflow-node-description"),
-            new WorkflowNodeDescriptionRequest(
-                componentName, componentVersion, triggerName, inputParameters),
-            String.class);
+        ExecuteWorkflowNodeDescriptionRequest executeWorkflowNodeDescriptionRequest =
+            ExecuteWorkflowNodeDescriptionRequest.newBuilder()
+                .setComponentName(componentName)
+                .setComponentVersion(componentVersion)
+                .setTriggerName(triggerName)
+                .setInputParameters(ProtoValues.toStruct(inputParameters))
+                .build();
+
+        StringResponse stringResponse = getStub(componentName).executeWorkflowNodeDescription(
+            executeWorkflowNodeDescriptionRequest);
+
+        return stringResponse.hasValue() ? stringResponse.getValue() : null;
     }
 
     @Override
@@ -147,39 +164,33 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public TriggerDefinition getTriggerDefinition(
-        String componentName, int componentVersion, String triggerName) {
-
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, componentName,
-                TRIGGER_DEFINITION_SERVICE + "/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
-                componentName, componentVersion, triggerName),
-            TriggerDefinition.class);
+    public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
+        return componentProtoMapper.toTriggerDefinition(
+            getStub(componentName).getTriggerDefinition(
+                getTriggerDefinitionRequest(componentName, componentVersion, triggerName)));
     }
 
     @Override
     public List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, componentName,
-                TRIGGER_DEFINITION_SERVICE + "/get-trigger-definitions/{componentName}/{componentVersion}",
-                componentName,
-                componentVersion),
-            new ParameterizedTypeReference<>() {});
+        ComponentVersionRequest componentVersionRequest = ComponentVersionRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .build();
+
+        RemoteTriggerDefinitions remoteTriggerDefinitions = getStub(componentName).getTriggerDefinitions(
+            componentVersionRequest);
+
+        return remoteTriggerDefinitions.getTriggerDefinitionsList()
+            .stream()
+            .map(componentProtoMapper::toTriggerDefinition)
+            .toList();
     }
 
     @Override
-    public WebhookTriggerFlags getWebhookTriggerFlags(
-        String componentName, int componentVersion, String triggerName) {
-
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, componentName,
-                TRIGGER_DEFINITION_SERVICE + "/get-webhook-trigger-flags/{componentName}/{componentVersion}" +
-                    "/{triggerName}",
-                componentName, componentVersion, triggerName),
-            WebhookTriggerFlags.class);
+    public WebhookTriggerFlags getWebhookTriggerFlags(String componentName, int componentVersion, String triggerName) {
+        return componentProtoMapper.toWebhookTriggerFlags(
+            getStub(componentName).getWebhookTriggerFlags(
+                getTriggerDefinitionRequest(componentName, componentVersion, triggerName)));
     }
 
     @Override
@@ -216,7 +227,18 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
         throw new UnsupportedOperationException();
     }
 
-    private record WorkflowNodeDescriptionRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
+    private TriggerDefinitionRemoteServiceBlockingStub getStub(String componentName) {
+        return TriggerDefinitionRemoteServiceGrpc.newBlockingStub(
+            grpcChannels.getChannel(workerInstances.getInstance(componentName)));
+    }
+
+    private static GetTriggerDefinitionRequest getTriggerDefinitionRequest(
+        String componentName, int componentVersion, String triggerName) {
+
+        return GetTriggerDefinitionRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .build();
     }
 }

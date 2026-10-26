@@ -7,25 +7,33 @@
 
 package com.bytechef.ee.platform.component.remote.client.service;
 
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
-import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
+import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc.ComponentDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionVersionsRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionsRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinitions;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -34,15 +42,21 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
-    implements ComponentDefinitionService {
+public class RemoteComponentDefinitionServiceClient implements ComponentDefinitionService {
 
-    private static final String COMPONENT_DEFINITION_SERVICE = "/component-definition-service";
+    private final ComponentProtoMapper componentProtoMapper;
+    private final List<ComponentDefinitionFilter> componentDefinitionFilters;
+    private final GrpcChannels grpcChannels;
+    private final WorkerInstances workerInstances;
 
     public RemoteComponentDefinitionServiceClient(
-        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper,
+        List<ComponentDefinitionFilter> componentDefinitionFilters) {
 
-        super(defaultRestClient, discoveryClient, objectMapper);
+        this.componentDefinitionFilters = List.copyOf(componentDefinitionFilters);
+        this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+        this.workerInstances = new WorkerInstances(discoveryClient);
     }
 
     @Override
@@ -61,23 +75,23 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, name, COMPONENT_DEFINITION_SERVICE + "/get-component-definition/{name}/{version}", name,
-                checkVersion(version)),
-            ComponentDefinition.class);
+        GetComponentDefinitionRequest.Builder builder = GetComponentDefinitionRequest.newBuilder()
+            .setName(name);
+
+        if (version != null) {
+            builder.setVersion(version);
+        }
+
+        RemoteComponentDefinition remoteComponentDefinition = getStub(workerInstances.getInstance(name))
+            .getComponentDefinition(builder.build());
+
+        return componentProtoMapper.toComponentDefinition(remoteComponentDefinition);
     }
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions() {
-        List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
-            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
-                uriBuilder -> toUri(
-                    uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions"),
-                new ParameterizedTypeReference<>() {})));
-
-        return getComponentDefinitions(completableFutures);
+        return getMergedComponentDefinitions(
+            stub -> stub.getComponentDefinitions(GetComponentDefinitionsRequest.getDefaultInstance()));
     }
 
     @Override
@@ -85,20 +99,52 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
         Boolean triggerDefinitions, List<String> include, PlatformType platformType) {
 
-        List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
-            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
-                uriBuilder -> toUri(
-                    uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions",
-                    Map.of(),
-                    getQueryParams(
-                        actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions,
-                        include,
-                        platformType)),
-                new ParameterizedTypeReference<>() {})));
+        GetComponentDefinitionsRequest.Builder builder = GetComponentDefinitionsRequest.newBuilder();
 
-        return getComponentDefinitions(completableFutures);
+        if (actionDefinitions != null) {
+            builder.setActionDefinitions(actionDefinitions);
+        }
 
+        if (clusterElementDefinitions != null) {
+            builder.setClusterElementDefinitions(clusterElementDefinitions);
+        }
+
+        if (connectionDefinitions != null) {
+            builder.setConnectionDefinitions(connectionDefinitions);
+        }
+
+        if (triggerDefinitions != null) {
+            builder.setTriggerDefinitions(triggerDefinitions);
+        }
+
+        if (include != null) {
+            builder.addAllInclude(include);
+        }
+
+        GetComponentDefinitionsRequest getComponentDefinitionsRequest = builder.build();
+
+        List<ComponentDefinition> componentDefinitions = getMergedComponentDefinitions(
+            stub -> stub.getComponentDefinitions(getComponentDefinitionsRequest));
+
+        if (platformType != null) {
+            ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
+                .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported platform type: " + platformType));
+
+            componentDefinitions = componentDefinitions.stream()
+                .filter(componentDefinitionFilter::filter)
+                .toList();
+        }
+
+        if (include != null && !include.isEmpty()) {
+            componentDefinitions = new ArrayList<>(componentDefinitions);
+
+            componentDefinitions.sort(Comparator.comparing(componentDefinition -> include.indexOf(
+                componentDefinition.getName())));
+        }
+
+        return componentDefinitions;
     }
 
     @Override
@@ -108,15 +154,13 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
-        List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
-            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
-                uriBuilder -> toUri(
-                    uriBuilder, serviceInstance,
-                    COMPONENT_DEFINITION_SERVICE + "/get-component-definition-versions/{name}", name),
-                new ParameterizedTypeReference<>() {})));
+        GetComponentDefinitionVersionsRequest getComponentDefinitionVersionsRequest =
+            GetComponentDefinitionVersionsRequest.newBuilder()
+                .setName(name)
+                .build();
 
-        return getComponentDefinitions(completableFutures);
+        return getMergedComponentDefinitions(
+            stub -> stub.getComponentDefinitionVersions(getComponentDefinitionVersionsRequest));
     }
 
     @Override
@@ -129,58 +173,33 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         throw new UnsupportedOperationException();
     }
 
-    private static int checkVersion(Integer version) {
-        if (version == null) {
-            version = 1;
+    private List<ComponentDefinition> getMergedComponentDefinitions(
+        Function<ComponentDefinitionRemoteServiceBlockingStub, RemoteComponentDefinitions> call) {
+
+        Map<String, ComponentDefinition> componentDefinitionMap = new LinkedHashMap<>();
+
+        for (ServiceInstance serviceInstance : workerInstances.getInstances()) {
+            RemoteComponentDefinitions remoteComponentDefinitions = call.apply(getStub(serviceInstance));
+
+            for (RemoteComponentDefinition remoteComponentDefinition : remoteComponentDefinitions
+                .getComponentDefinitionsList()) {
+
+                componentDefinitionMap.putIfAbsent(
+                    remoteComponentDefinition.getName() + ":" + remoteComponentDefinition.getVersion(),
+                    componentProtoMapper.toComponentDefinition(remoteComponentDefinition));
+            }
         }
 
-        return version;
+        List<ComponentDefinition> componentDefinitions = new ArrayList<>(componentDefinitionMap.values());
+
+        componentDefinitions.sort(
+            Comparator.comparing(ComponentDefinition::getName)
+                .thenComparing(ComponentDefinition::getVersion));
+
+        return componentDefinitions;
     }
 
-    private static List<ComponentDefinition> getComponentDefinitions(
-        List<CompletableFuture<List<ComponentDefinition>>> completableFutures) {
-
-        CompletableFuture
-            .allOf(completableFutures.toArray(new CompletableFuture[0]))
-            .join();
-
-        return completableFutures
-            .stream()
-            .map(CompletableFuture::join)
-            .flatMap(CollectionUtils::stream)
-            .collect(Collectors.toList());
-    }
-
-    private static LinkedMultiValueMap<String, String> getQueryParams(
-        Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
-        Boolean triggerDefinitions, @Nullable List<String> include, @Nullable PlatformType platformType) {
-
-        LinkedMultiValueMap<String, String> queryParamsMap = new LinkedMultiValueMap<>();
-
-        if (actionDefinitions != null) {
-            queryParamsMap.put("actionDefinitions", List.of(actionDefinitions.toString()));
-        }
-
-        if (clusterElementDefinitions != null) {
-            queryParamsMap.put("clusterElementDefinitions", List.of(clusterElementDefinitions.toString()));
-        }
-
-        if (connectionDefinitions != null) {
-            queryParamsMap.put("connectionDefinitions", List.of(connectionDefinitions.toString()));
-        }
-
-        if (triggerDefinitions != null) {
-            queryParamsMap.put("triggerDefinitions", List.of(triggerDefinitions.toString()));
-        }
-
-        if (include != null) {
-            queryParamsMap.put("include", include);
-        }
-
-        if (platformType != null) {
-            queryParamsMap.put("platformType", List.of(platformType.name()));
-        }
-
-        return queryParamsMap;
+    private ComponentDefinitionRemoteServiceBlockingStub getStub(ServiceInstance serviceInstance) {
+        return ComponentDefinitionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(serviceInstance));
     }
 }

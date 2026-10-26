@@ -44,7 +44,7 @@ public class WorkerDiscoveryUtils {
             }
         }
 
-        throw new IllegalArgumentException("None od worker instances contains component: %s".formatted(componentName));
+        throw new IllegalArgumentException("No worker instance offers component %s".formatted(componentName));
     }
 
     public static Set<ServiceInstance> filterServiceInstances(List<ServiceInstance> serviceInstances) {
