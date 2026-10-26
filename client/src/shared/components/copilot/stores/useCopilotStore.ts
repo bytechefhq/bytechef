@@ -21,6 +21,7 @@ export enum Source {
     SKILLS = 'SKILLS',
     WORKFLOW_CODE_EDITOR = 'WORKFLOW_CODE_EDITOR',
     MCP_SERVER = 'MCP_SERVER',
+    CONTEXT_STORE = 'CONTEXT_STORE',
 }
 
 export type ContextType = {

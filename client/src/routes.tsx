@@ -56,6 +56,8 @@ const AutomationWorkflowExecutions = lazy(() =>
 const DataTables = lazy(() => import('@/pages/automation/datatables/DataTables'));
 const DataTable = lazy(() => import('@/pages/automation/datatable/DataTable'));
 const Home = lazy(() => import('@/pages/home/Home'));
+const ContextStoreSources = lazy(() => import('@/pages/automation/context-store/ContextStoreSources'));
+const ContextStores = lazy(() => import('@/pages/automation/context-store/ContextStores'));
 const KnowledgeBase = lazy(() => import('@/pages/automation/knowledge-base/KnowledgeBase'));
 const KnowledgeBases = lazy(() => import('@/pages/automation/knowledge-bases/KnowledgeBases'));
 const McpServer = lazy(() => import('@/pages/settings/platform/mcp-server/McpServer'));
@@ -854,6 +856,30 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'knowledge-bases/:id',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <ContextStores />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'context-stores',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <ContextStoreSources />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'context-stores/:id',
                                 },
                                 {
                                     children: [
