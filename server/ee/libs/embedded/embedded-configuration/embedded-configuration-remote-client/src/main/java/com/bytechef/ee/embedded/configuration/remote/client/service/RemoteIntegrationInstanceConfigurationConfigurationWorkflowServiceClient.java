@@ -9,14 +9,20 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
+import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConfigurationWorkflowRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationWorkflowConnectionResult;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationWorkflowRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationWorkflowRemoteServiceGrpc.IntegrationInstanceConfigurationWorkflowRemoteServiceBlockingStub;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.core.ParameterizedTypeReference;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -29,15 +35,13 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     implements IntegrationInstanceConfigurationWorkflowService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_SERVICE =
-        "/remote/integration-instance-configuration-workflow-service";
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceClient(
-        LoadBalancedRestClient loadBalancedRestClient) {
-
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceClient(GrpcChannels grpcChannels,
+        ObjectMapper objectMapper) {
+        this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -64,18 +68,17 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
         fetchIntegrationInstanceConfigurationWorkflowConnection(
             long integrationInstanceConfigurationId, String workflowId, String workflowNodeName,
             String workflowConnectionKey) {
+        IntegrationInstanceConfigurationWorkflowConnectionResult integrationInstanceConfigurationWorkflowConnectionResult =
+            getStub().fetchIntegrationInstanceConfigurationWorkflowConnection(
+                toRequest(integrationInstanceConfigurationId, workflowId, workflowNodeName, workflowConnectionKey));
 
-        return Optional.ofNullable(
-            loadBalancedRestClient.get(
-                uriBuilder -> uriBuilder
-                    .host(CONFIGURATION_APP)
-                    .path(
-                        INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_SERVICE +
-                            "/fetch-integration-instance-configuration-workflow-connection" +
-                            "/{integrationInstanceConfigurationId}/{workflowId}/{workflowNodeName}" +
-                            "/{workflowConnectionKey}")
-                    .build(integrationInstanceConfigurationId, workflowId, workflowNodeName, workflowConnectionKey),
-                IntegrationInstanceConfigurationWorkflowConnection.class));
+        if (!integrationInstanceConfigurationWorkflowConnectionResult.hasConnection()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+            embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflowConnection(
+                integrationInstanceConfigurationWorkflowConnectionResult.getConnection()));
     }
 
     @Override
@@ -86,48 +89,27 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     @Override
     public IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId) {
-
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(
-                    INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_SERVICE +
-                        "/get-integration-instance-configuration-workflow/{integrationInstanceConfigurationId}" +
-                        "/{workflowId}")
-                .build(integrationInstanceConfigurationId, workflowId),
-            IntegrationInstanceConfigurationWorkflow.class);
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflow(
+            getStub().getIntegrationInstanceConfigurationWorkflow(
+                toRequest(integrationInstanceConfigurationId, workflowId, null, null)));
     }
 
     @Override
     public IntegrationInstanceConfigurationWorkflowConnection getIntegrationInstanceConfigurationWorkflowConnection(
         long integrationInstanceConfigurationId, String workflowId, String operationName,
         String key) {
-
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(
-                    INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_SERVICE +
-                        "/get-integration-instance-configuration-workflow-connection/" +
-                        "{integrationInstanceConfigurationId}/{workflowId}/{operationName}/{key}")
-                .build(integrationInstanceConfigurationId, workflowId, operationName, key),
-            IntegrationInstanceConfigurationWorkflowConnection.class);
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflowConnection(
+            getStub().getIntegrationInstanceConfigurationWorkflowConnection(
+                toRequest(integrationInstanceConfigurationId, workflowId, operationName, key)));
     }
 
     @Override
     public List<IntegrationInstanceConfigurationWorkflowConnection>
         getIntegrationInstanceConfigurationWorkflowConnections(
             Long integrationInstanceConfigurationId, String workflowId, String operationName) {
-
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(
-                    INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_SERVICE +
-                        "/get-integration-instance-configuration-workflow-connection/" +
-                        "{integrationInstanceConfigurationId}/{workflowId}/{operationName}")
-                .build(integrationInstanceConfigurationId, workflowId, operationName),
-            new ParameterizedTypeReference<>() {});
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflowConnections(
+            getStub().getIntegrationInstanceConfigurationWorkflowConnections(
+                toRequest(integrationInstanceConfigurationId, workflowId, operationName, null)));
     }
 
     @Override
@@ -146,12 +128,11 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
 
     @Override
     public boolean isConnectionUsed(long connectionId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_SERVICE + "/is-connection-used/{connectionId}")
-                .build(connectionId),
-            Boolean.class);
+        return getStub().isConnectionUsed(
+            IdRequest.newBuilder()
+                .setId(connectionId)
+                .build())
+            .getValue();
     }
 
     @Override
@@ -176,5 +157,32 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     @Override
     public void updateEnabled(Long id, boolean enable) {
         throw new UnsupportedOperationException();
+    }
+
+    private IntegrationInstanceConfigurationWorkflowRemoteServiceBlockingStub getStub() {
+        return IntegrationInstanceConfigurationWorkflowRemoteServiceGrpc.newBlockingStub(
+            grpcChannels.getChannel(CONFIGURATION_APP));
+    }
+
+    private static ConfigurationWorkflowRequest toRequest(
+        @Nullable Long integrationInstanceConfigurationId, String workflowId, @Nullable String workflowNodeName,
+        @Nullable String workflowConnectionKey) {
+
+        ConfigurationWorkflowRequest.Builder builder = ConfigurationWorkflowRequest.newBuilder()
+            .setWorkflowId(workflowId);
+
+        if (integrationInstanceConfigurationId != null) {
+            builder.setIntegrationInstanceConfigurationId(integrationInstanceConfigurationId);
+        }
+
+        if (workflowNodeName != null) {
+            builder.setWorkflowNodeName(workflowNodeName);
+        }
+
+        if (workflowConnectionKey != null) {
+            builder.setWorkflowConnectionKey(workflowConnectionKey);
+        }
+
+        return builder.build();
     }
 }

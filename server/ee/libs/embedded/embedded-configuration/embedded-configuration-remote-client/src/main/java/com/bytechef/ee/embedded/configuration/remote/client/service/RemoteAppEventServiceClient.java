@@ -8,12 +8,15 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
+import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.AppEventRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -25,13 +28,13 @@ import org.springframework.stereotype.Component;
 public class RemoteAppEventServiceClient implements AppEventService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String PROJECT_SERVICE = "/remote/app-event-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteAppEventServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteAppEventServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -46,12 +49,7 @@ public class RemoteAppEventServiceClient implements AppEventService {
 
     @Override
     public AppEvent getAppEvent(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(PROJECT_SERVICE + "/get-app-event/{id}")
-                .build(id),
-            AppEvent.class);
+        return embeddedConfigurationProtoMapper.toAppEvent(getStub().getAppEvent(toIdRequest(id)));
     }
 
     @Override
@@ -62,5 +60,15 @@ public class RemoteAppEventServiceClient implements AppEventService {
     @Override
     public AppEvent update(AppEvent appEvent) {
         throw new UnsupportedOperationException();
+    }
+
+    private AppEventRemoteServiceGrpc.AppEventRemoteServiceBlockingStub getStub() {
+        return AppEventRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 }

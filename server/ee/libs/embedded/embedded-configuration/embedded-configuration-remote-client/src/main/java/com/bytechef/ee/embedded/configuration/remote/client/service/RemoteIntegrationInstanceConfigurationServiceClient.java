@@ -8,13 +8,16 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -26,14 +29,13 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationInstanceConfigurationServiceClient implements IntegrationInstanceConfigurationService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String INTEGRATION_INSTANCE_CONFIGURATION_SERVICE =
-        "/remote/integration-instance-configuration-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteIntegrationInstanceConfigurationServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteIntegrationInstanceConfigurationServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -59,12 +61,8 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
 
     @Override
     public IntegrationInstanceConfiguration getIntegrationInstanceConfiguration(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(INTEGRATION_INSTANCE_CONFIGURATION_SERVICE + "/get-integration-instance-configuration/{id}")
-                .build(id),
-            IntegrationInstanceConfiguration.class);
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfiguration(
+            getStub().getIntegrationInstanceConfiguration(toIdRequest(id)));
     }
 
     @Override
@@ -113,5 +111,17 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
     @Override
     public void updateEnabled(long id, boolean enabled) {
         throw new UnsupportedOperationException();
+    }
+
+    private IntegrationInstanceConfigurationRemoteServiceGrpc.IntegrationInstanceConfigurationRemoteServiceBlockingStub
+        getStub() {
+        return IntegrationInstanceConfigurationRemoteServiceGrpc
+            .newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 }

@@ -646,6 +646,8 @@ include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-g
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-public-rest")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client")
+include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-grpc")
+include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-grpc-proto")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-rest")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-api")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl")

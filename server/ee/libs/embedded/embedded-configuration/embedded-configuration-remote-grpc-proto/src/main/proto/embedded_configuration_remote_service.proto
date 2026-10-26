@@ -1,0 +1,234 @@
+syntax = "proto3";
+
+package bytechef.embedded.configuration.remote.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.embedded.configuration.remote.grpc.proto";
+
+service IntegrationRemoteService {
+  rpc GetIntegration(IdRequest) returns (RemoteIntegration);
+  rpc GetIntegrationInstanceIntegration(IdRequest) returns (RemoteIntegration);
+  rpc GetIntegrations(google.protobuf.Empty) returns (RemoteIntegrations);
+  rpc GetWorkflowIntegration(WorkflowIdRequest) returns (RemoteIntegration);
+}
+
+service IntegrationInstanceConfigurationRemoteService {
+  rpc GetIntegrationInstanceConfiguration(IdRequest) returns (RemoteIntegrationInstanceConfiguration);
+}
+
+service IntegrationInstanceConfigurationWorkflowRemoteService {
+  rpc FetchIntegrationInstanceConfigurationWorkflowConnection(ConfigurationWorkflowRequest)
+      returns (IntegrationInstanceConfigurationWorkflowConnectionResult);
+  rpc GetIntegrationInstanceConfigurationWorkflow(ConfigurationWorkflowRequest)
+      returns (RemoteIntegrationInstanceConfigurationWorkflow);
+  rpc GetIntegrationInstanceConfigurationWorkflowConnection(ConfigurationWorkflowRequest)
+      returns (RemoteIntegrationInstanceConfigurationWorkflowConnection);
+  rpc GetIntegrationInstanceConfigurationWorkflowConnections(ConfigurationWorkflowRequest)
+      returns (RemoteIntegrationInstanceConfigurationWorkflowConnections);
+  rpc IsConnectionUsed(IdRequest) returns (BoolResponse);
+}
+
+service IntegrationInstanceWorkflowRemoteService {
+  rpc GetIntegrationInstanceWorkflow(IntegrationInstanceWorkflowRequest) returns (RemoteIntegrationInstanceWorkflow);
+}
+
+service AppEventRemoteService {
+  rpc GetAppEvent(IdRequest) returns (RemoteAppEvent);
+}
+
+service ConnectedUserProjectDeploymentResolverRemoteService {
+  rpc GetProjectDeploymentIds(IdRequest) returns (IdsResponse);
+}
+
+service AutomationWorkflowProjectFacadeRemoteService {
+  rpc GetPublishedProjects(google.protobuf.Empty) returns (RemoteAutomationWorkflowProjects);
+}
+
+service ConnectedUserProjectFacadeRemoteService {
+  rpc CopyWorkflowTemplate(CopyWorkflowTemplateRequest) returns (StringResponse);
+}
+
+message IdRequest {
+  int64 id = 1;
+}
+
+message WorkflowIdRequest {
+  string workflow_id = 1;
+}
+
+message IntegrationInstanceWorkflowRequest {
+  int64 integration_instance_id = 1;
+  string workflow_id = 2;
+}
+
+message ConfigurationWorkflowRequest {
+  optional int64 integration_instance_configuration_id = 1;
+  string workflow_id = 2;
+  optional string workflow_node_name = 3;
+  optional string workflow_connection_key = 4;
+}
+
+message CopyWorkflowTemplateRequest {
+  string external_user_id = 1;
+  string workflow_uuid = 2;
+  string environment = 3;
+}
+
+message BoolResponse {
+  bool value = 1;
+}
+
+message IdsResponse {
+  repeated int64 ids = 1;
+}
+
+message StringResponse {
+  string value = 1;
+}
+
+message RemoteIntegration {
+  optional int64 category_id = 1;
+  optional string component_name = 2;
+  optional int32 component_version = 3;
+  optional string created_by = 4;
+  optional google.protobuf.Timestamp created_date = 5;
+  optional string description = 6;
+  optional int64 id = 7;
+  repeated RemoteIntegrationVersion integration_versions = 8;
+  optional string last_modified_by = 9;
+  optional google.protobuf.Timestamp last_modified_date = 10;
+  optional bool multiple_instances = 11;
+  optional string name = 12;
+  optional string permission_expression = 13;
+  repeated int64 tag_ids = 14;
+  optional int32 version = 15;
+}
+
+message RemoteIntegrations {
+  repeated RemoteIntegration integrations = 1;
+}
+
+message RemoteIntegrationVersion {
+  optional string description = 1;
+  optional google.protobuf.Timestamp published_date = 2;
+  optional string status = 3;
+  optional int32 version = 4;
+}
+
+message RemoteIntegrationInstanceConfiguration {
+  optional string authorization_type = 1;
+  optional bytes connection_parameters = 2;
+  optional string created_by = 3;
+  optional google.protobuf.Timestamp created_date = 4;
+  optional string description = 5;
+  optional bool enabled = 6;
+  optional string environment = 7;
+  optional int64 id = 8;
+  optional int64 integration_id = 9;
+  optional int32 integration_version = 10;
+  optional string last_modified_by = 11;
+  optional google.protobuf.Timestamp last_modified_date = 12;
+  optional string name = 13;
+  repeated int64 tag_ids = 14;
+  optional int32 version = 15;
+}
+
+message RemoteIntegrationInstanceConfigurationWorkflow {
+  repeated RemoteIntegrationInstanceConfigurationWorkflowConnection connections = 1;
+  optional string created_by = 2;
+  optional google.protobuf.Timestamp created_date = 3;
+  optional bool enabled = 4;
+  optional int64 id = 5;
+  optional bytes inputs = 6;
+  optional int64 integration_instance_configuration_id = 7;
+  optional string last_modified_by = 8;
+  optional google.protobuf.Timestamp last_modified_date = 9;
+  optional int32 version = 10;
+  optional string workflow_id = 11;
+}
+
+message RemoteIntegrationInstanceConfigurationWorkflowConnection {
+  optional int64 connection_id = 1;
+  optional string workflow_connection_key = 2;
+  optional string workflow_node_name = 3;
+}
+
+message RemoteIntegrationInstanceConfigurationWorkflowConnections {
+  repeated RemoteIntegrationInstanceConfigurationWorkflowConnection connections = 1;
+}
+
+message IntegrationInstanceConfigurationWorkflowConnectionResult {
+  optional RemoteIntegrationInstanceConfigurationWorkflowConnection connection = 1;
+}
+
+message RemoteIntegrationInstanceWorkflow {
+  optional string created_by = 1;
+  optional google.protobuf.Timestamp created_date = 2;
+  optional bool enabled = 3;
+  optional int64 id = 4;
+  optional bytes inputs = 5;
+  optional int64 integration_instance_configuration_workflow_id = 6;
+  optional int64 integration_instance_id = 7;
+  optional string last_modified_by = 8;
+  optional google.protobuf.Timestamp last_modified_date = 9;
+  optional int32 version = 10;
+}
+
+message RemoteAppEvent {
+  optional string created_by = 1;
+  optional google.protobuf.Timestamp created_date = 2;
+  optional int64 id = 3;
+  optional string last_modified_by = 4;
+  optional google.protobuf.Timestamp last_modified_date = 5;
+  optional string name = 6;
+  optional string schema = 7;
+  optional int32 version = 8;
+}
+
+message RemoteAutomationWorkflowProject {
+  optional bool automation_hub_visible = 1;
+  optional int64 category_id = 2;
+  optional string description = 3;
+  optional int64 id = 4;
+  optional int32 last_published_version = 5;
+  optional string name = 6;
+  optional string permission_expression = 7;
+  optional bool published = 8;
+  repeated int64 tag_ids = 9;
+  optional int32 version = 10;
+  repeated RemoteWorkflowTemplate workflow_templates = 11;
+}
+
+message RemoteAutomationWorkflowProjects {
+  repeated RemoteAutomationWorkflowProject projects = 1;
+}
+
+message RemoteWorkflowTemplate {
+  repeated RemoteWorkflowTemplateComponent components = 1;
+  optional string description = 2;
+  repeated RemoteWorkflowTemplateInput inputs = 3;
+  optional string label = 4;
+  optional string last_modified_date = 5;
+  optional string permission_expression = 6;
+  repeated RemoteWorkflowTemplateComponent triggers = 7;
+  optional string workflow_id = 8;
+  optional string workflow_uuid = 9;
+}
+
+message RemoteWorkflowTemplateComponent {
+  optional bool connection_required = 1;
+  optional string icon = 2;
+  optional int64 integration_id = 3;
+  optional string name = 4;
+  optional string title = 5;
+}
+
+message RemoteWorkflowTemplateInput {
+  optional string label = 1;
+  optional string name = 2;
+  optional bool required = 3;
+  optional string type = 4;
+}
