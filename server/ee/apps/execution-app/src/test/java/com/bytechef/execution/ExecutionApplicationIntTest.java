@@ -68,6 +68,31 @@ public class ExecutionApplicationIntTest {
     }
 
     @Test
+    void testExecutionGrpcServicesAreServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains(
+            "bytechef.atlas.execution.remote.v1.ContextRemoteService",
+            "bytechef.atlas.execution.remote.v1.CounterRemoteService",
+            "bytechef.atlas.execution.remote.v1.JobFacadeRemoteService",
+            "bytechef.atlas.execution.remote.v1.JobRemoteService",
+            "bytechef.atlas.execution.remote.v1.TaskExecutionRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.ConnectionLifecycleFacadeRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.JobResumeFacadeRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.PrincipalJobFacadeRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.PrincipalJobRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.TriggerExecutionRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.TriggerLifecycleFacadeRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.TriggerStateRemoteService");
+    }
+
+    @Test
     void testToolInvocationLogRetentionJobPurgesTheExecutionDatabase() {
         ToolInvocationLogRetentionJob toolInvocationLogRetentionJob =
             toolInvocationLogRetentionJobProvider.getIfAvailable();

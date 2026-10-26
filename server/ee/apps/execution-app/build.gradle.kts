@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
 
+    implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-grpc"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
@@ -61,7 +62,6 @@ dependencies {
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl"))
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
-    implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
@@ -76,7 +76,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-service"))
-    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client"))
 
     runtimeOnly("org.postgresql:postgresql")
