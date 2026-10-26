@@ -18,7 +18,6 @@ package com.bytechef.config;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -3089,11 +3088,6 @@ public class ApplicationProperties {
         private boolean enabled = true;
 
         /**
-         * How long a starting CE coordinator waits for the single coordinator lock held by a previous coordinator
-         */
-        private Duration lockWait;
-
-        /**
          * Task coordination configuration
          */
         private Task task = new Task();
@@ -3107,10 +3101,6 @@ public class ApplicationProperties {
             return enabled;
         }
 
-        public Duration getLockWait() {
-            return lockWait;
-        }
-
         public Task getTask() {
             return task;
         }
@@ -3121,10 +3111,6 @@ public class ApplicationProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }
-
-        public void setLockWait(Duration lockWait) {
-            this.lockWait = lockWait;
         }
 
         public void setTask(Task task) {
