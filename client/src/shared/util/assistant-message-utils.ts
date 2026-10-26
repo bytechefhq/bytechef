@@ -175,6 +175,25 @@ export function setLastAssistantMessageContent(messages: ThreadMessageLike[], co
 }
 
 /**
+ * Marks the last assistant message as failed with the error message.
+ * If no assistant message exists, creates an empty one that carries the error.
+ */
+export function setLastAssistantMessageError(messages: ThreadMessageLike[], errorMessage: string): ThreadMessageLike[] {
+    const updatedMessages = [...messages];
+    const errorStatus = {error: errorMessage, reason: 'error' as const, type: 'incomplete' as const};
+
+    for (let i = updatedMessages.length - 1; i >= 0; i--) {
+        if (updatedMessages[i]?.role === 'assistant') {
+            updatedMessages[i] = {...updatedMessages[i], status: errorStatus};
+
+            return updatedMessages;
+        }
+    }
+
+    return [...updatedMessages, {content: '', role: 'assistant', status: errorStatus} as ThreadMessageLike];
+}
+
+/**
  * Formats an ask_user_question event as a readable assistant message with the questions and options.
  */
 export function formatAskUserQuestionMessage(event: AskUserQuestionEventI): string {
