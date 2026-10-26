@@ -47,6 +47,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -253,6 +254,34 @@ class PersistentTokenRememberMeServicesTest {
         persistentTokenRememberMeServices.loginFail(request, new MockHttpServletResponse());
 
         verify(persistentTokenService, never()).delete(anyString());
+    }
+
+    @Test
+    void testNotRegisteredWhenLoginDisabled() {
+        new ApplicationContextRunner()
+            .withPropertyValues("bytechef.security.login.enabled=false")
+            .withUserConfiguration(PersistentTokenRememberMeServices.class)
+            .run(context -> assertThat(context)
+                .hasNotFailed()
+                .doesNotHaveBean(PersistentTokenRememberMeServices.class));
+    }
+
+    @Test
+    void testRegisteredWhenLoginEnabled() {
+        new ApplicationContextRunner()
+            .withPropertyValues("bytechef.security.login.enabled=true")
+            .withBean(RememberMeKey.class, () -> {
+                RememberMeKey rememberMeKey = mock(RememberMeKey.class);
+
+                when(rememberMeKey.getKey()).thenReturn("remember-me-test-key");
+
+                return rememberMeKey;
+            })
+            .withBean(UserDetailsService.class, () -> mock(UserDetailsService.class))
+            .withBean(PersistentTokenService.class, () -> persistentTokenService)
+            .withBean(TenantService.class, () -> tenantService)
+            .withUserConfiguration(PersistentTokenRememberMeServices.class)
+            .run(context -> assertThat(context).hasSingleBean(PersistentTokenRememberMeServices.class));
     }
 
     private void mockStoredToken() {

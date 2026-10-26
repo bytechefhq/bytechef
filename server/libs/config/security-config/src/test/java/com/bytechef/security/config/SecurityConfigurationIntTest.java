@@ -17,10 +17,15 @@
 package com.bytechef.security.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -75,6 +80,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -316,6 +322,7 @@ class SecurityConfigurationIntTest {
             SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class,
             RememberMeAutoLogin.RememberMeAutoLoginConfiguration.class
         })
+    @TestPropertySource(properties = "bytechef.security.login.enabled=true")
     class RememberMeAutoLogin {
 
         private static final String COOKIE_TENANT_ID = "000003";
@@ -607,6 +614,122 @@ class SecurityConfigurationIntTest {
                 .map(AuthenticationSuccessEvent::getAuthentication)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("No AuthenticationSuccessEvent was published"));
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @AutoConfigureMockMvc
+    @EnableConfigurationProperties(ApplicationProperties.class)
+    @SpringBootTest(
+        classes = {
+            SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class, LoginConfiguration.class
+        })
+    @TestPropertySource(properties = "bytechef.security.login.enabled=false")
+    class LoginDisabled {
+
+        @MockitoBean(name = "corsConfigurationSource")
+        private CorsConfigurationSource corsConfigurationSource;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockitoBean
+        private PasswordEncoder passwordEncoder;
+
+        @Test
+        void testContextStartsWithoutUserServices() {
+        }
+
+        @Test
+        void testLoginEndpointIsNotServed() throws Exception {
+            mockMvc.perform(post("/api/authentication")
+                .param("username", "admin")
+                .param("password", "admin")
+                .with(csrf()))
+                .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void testRememberMeCookieIsIgnored() throws Exception {
+            mockMvc.perform(get("/api/ping").cookie(new Cookie("remember-me", "abc")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().doesNotExist("Set-Cookie"));
+        }
+
+        @Test
+        void testSessionAuthenticationIsHonored() throws Exception {
+            mockMvc.perform(get("/api/ping").with(user("admin")))
+                .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @AutoConfigureMockMvc
+    @EnableConfigurationProperties(ApplicationProperties.class)
+    @SpringBootTest(
+        classes = {
+            SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class, LoginConfiguration.class
+        })
+    @TestPropertySource(properties = "bytechef.security.login.enabled=true")
+    class LoginEnabled {
+
+        @MockitoBean
+        private AuthenticationFailureHandler authenticationFailureHandler;
+
+        @MockitoBean
+        private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+        @MockitoBean(name = "corsConfigurationSource")
+        private CorsConfigurationSource corsConfigurationSource;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockitoBean
+        private PasswordEncoder passwordEncoder;
+
+        @MockitoBean
+        private RememberMeServices rememberMeServices;
+
+        @Test
+        void testLoginEndpointIsServed() throws Exception {
+            mockMvc.perform(post("/api/authentication")
+                .param("username", "admin")
+                .param("password", "admin")
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+            verify(authenticationFailureHandler).onAuthenticationFailure(any(), any(), any());
+        }
+    }
+
+    @TestConfiguration
+    static class LoginConfiguration {
+
+        @Bean
+        List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors() {
+            return List.of();
+        }
+
+        @Bean
+        List<SecurityConfigurerContributor> securityConfigurerContributors() {
+            return List.of();
+        }
+
+        @Bean
+        List<SpaWebFilterContributor> spaWebFilterContributors() {
+            return List.of();
+        }
+
+        @RestController
+        static class PingController {
+
+            @GetMapping("/api/ping")
+            String ping() {
+                return "pong";
+            }
         }
     }
 }

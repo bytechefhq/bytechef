@@ -4634,6 +4634,11 @@ public class ApplicationProperties {
         private String contentSecurityPolicy;
 
         /**
+         * Interactive login (form, remember-me, social and SSO) configuration
+         */
+        private Login login = new Login();
+
+        /**
          * Remember-me authentication configuration
          */
         private RememberMe rememberMe = new RememberMe();
@@ -4662,12 +4667,20 @@ public class ApplicationProperties {
             return contentSecurityPolicy;
         }
 
+        public Login getLogin() {
+            return login;
+        }
+
         public RememberMe getRememberMe() {
             return rememberMe;
         }
 
         public void setContentSecurityPolicy(String contentSecurityPolicy) {
             this.contentSecurityPolicy = contentSecurityPolicy;
+        }
+
+        public void setLogin(Login login) {
+            this.login = login;
         }
 
         public void setRememberMe(RememberMe rememberMe) {
@@ -4704,6 +4717,25 @@ public class ApplicationProperties {
 
         public void setTwoFactorAuthentication(TwoFactorAuthentication twoFactorAuthentication) {
             this.twoFactorAuthentication = twoFactorAuthentication;
+        }
+
+        /**
+         * Interactive login configuration. Apps that only read a session written by another app turn it off.
+         */
+        public static class Login {
+
+            /**
+             * Whether this app serves form login, remember-me, social and SSO login
+             */
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
         }
 
         /**

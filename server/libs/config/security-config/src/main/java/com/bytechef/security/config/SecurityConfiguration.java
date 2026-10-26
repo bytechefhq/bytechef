@@ -95,6 +95,7 @@ public class SecurityConfiguration {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final boolean loginEnabled;
     private final CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
     private final List<OAuth2LoginCustomizer> oAuth2LoginCustomizers;
     private final PasswordEncoder passwordEncoder;
@@ -106,21 +107,36 @@ public class SecurityConfiguration {
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public SecurityConfiguration(
-        ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
-        AuthenticationSuccessHandler authenticationSuccessHandler,
+        ApplicationProperties applicationProperties,
+        ObjectProvider<AuthenticationFailureHandler> authenticationFailureHandlerProvider,
+        ObjectProvider<AuthenticationSuccessHandler> authenticationSuccessHandlerProvider,
         ObjectProvider<List<OAuth2LoginCustomizer>> oAuth2LoginCustomizersProvider, PasswordEncoder passwordEncoder,
-        RememberMeKey rememberMeKey, RememberMeServices rememberMeServices,
+        RememberMeKey rememberMeKey, ObjectProvider<RememberMeServices> rememberMeServicesProvider,
         ObjectProvider<List<Saml2LoginCustomizer>> saml2LoginCustomizersProvider,
         ObjectProvider<TwoFactorVerificationFilter> twoFactorVerificationFilterProvider) {
 
-        this.authenticationFailureHandler = authenticationFailureHandler;
-        this.authenticationSuccessHandler = authenticationSuccessHandler;
-        this.oAuth2LoginCustomizers = oAuth2LoginCustomizersProvider.getIfAvailable(List::of);
+        this.security = applicationProperties.getSecurity();
+
+        Security.Login login = security.getLogin();
+
+        this.loginEnabled = login.isEnabled();
+
+        if (loginEnabled) {
+            this.authenticationFailureHandler = authenticationFailureHandlerProvider.getObject();
+            this.authenticationSuccessHandler = authenticationSuccessHandlerProvider.getObject();
+            this.oAuth2LoginCustomizers = oAuth2LoginCustomizersProvider.getIfAvailable(List::of);
+            this.rememberMeServices = rememberMeServicesProvider.getObject();
+            this.saml2LoginCustomizers = saml2LoginCustomizersProvider.getIfAvailable(List::of);
+        } else {
+            this.authenticationFailureHandler = null;
+            this.authenticationSuccessHandler = null;
+            this.oAuth2LoginCustomizers = List.of();
+            this.rememberMeServices = null;
+            this.saml2LoginCustomizers = List.of();
+        }
+
         this.passwordEncoder = passwordEncoder;
         this.rememberMeKey = rememberMeKey;
-        this.rememberMeServices = rememberMeServices;
-        this.saml2LoginCustomizers = saml2LoginCustomizersProvider.getIfAvailable(List::of);
-        this.security = applicationProperties.getSecurity();
         this.twoFactorVerificationFilterProvider = twoFactorVerificationFilterProvider;
     }
 
@@ -271,14 +287,29 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.matcher("/graphql"))
                     .authenticated();
             })
+            .exceptionHandling(exceptionHanding -> exceptionHanding
+                .defaultAuthenticationEntryPointFor(
+                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                    new OrRequestMatcher(mvc.matcher("/api/**"), mvc.matcher("/graphql"))));
+
+        if (loginEnabled) {
+            applyLogin(http);
+        }
+
+        for (SecurityConfigurerContributor securityConfigurerContributor : securityConfigurerContributors) {
+
+            http.with(securityConfigurerContributor.getSecurityConfigurerAdapter(), withDefaults());
+        }
+
+        return http.build();
+    }
+
+    private void applyLogin(HttpSecurity http) throws Exception {
+        http
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")
                 .key(rememberMeKey.getKey()))
-            .exceptionHandling(exceptionHanding -> exceptionHanding
-                .defaultAuthenticationEntryPointFor(
-                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                    new OrRequestMatcher(mvc.matcher("/api/**"), mvc.matcher("/graphql"))))
             .formLogin(formLogin -> formLogin
                 .loginPage("/")
                 .loginProcessingUrl("/api/authentication")
@@ -297,13 +328,6 @@ public class SecurityConfiguration {
         for (Saml2LoginCustomizer saml2LoginCustomizer : saml2LoginCustomizers) {
             saml2LoginCustomizer.customize(http);
         }
-
-        for (SecurityConfigurerContributor securityConfigurerContributor : securityConfigurerContributors) {
-
-            http.with(securityConfigurerContributor.getSecurityConfigurerAdapter(), withDefaults());
-        }
-
-        return http.build();
     }
 
     /**
