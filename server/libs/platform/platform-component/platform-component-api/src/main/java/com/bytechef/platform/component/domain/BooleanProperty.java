@@ -18,6 +18,7 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Property;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +30,7 @@ public class BooleanProperty extends ValueProperty<Boolean> {
 
     private List<Option> options;
 
+    @JsonCreator
     private BooleanProperty() {
     }
 

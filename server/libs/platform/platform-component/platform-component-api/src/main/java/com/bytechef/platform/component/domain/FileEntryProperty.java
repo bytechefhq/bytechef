@@ -18,6 +18,7 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Property;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class FileEntryProperty extends ValueProperty<Map<String, ?>> {
 
     private List<? extends ValueProperty<?>> properties;
 
+    @JsonCreator
     private FileEntryProperty() {
     }
 

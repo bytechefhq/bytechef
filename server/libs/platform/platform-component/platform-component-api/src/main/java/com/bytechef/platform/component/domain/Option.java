@@ -17,12 +17,14 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.platform.domain.BaseOption;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  * @author Ivica Cardic
  */
 public class Option extends BaseOption {
 
+    @JsonCreator
     private Option() {
     }
 
