@@ -21,7 +21,6 @@ message HandleTaskResponse {
   optional google.protobuf.Value output = 1;
 }
 
-// A task execution; its workflow task is the free-form task map of the workflow definition.
 message RemoteTaskExecution {
   optional google.protobuf.Timestamp end_date = 1;
   optional RemoteExecutionError error = 2;
@@ -43,6 +42,10 @@ message RemoteTaskExecution {
   optional string status = 19;
   optional int32 task_number = 20;
   optional google.protobuf.Struct workflow_task = 21;
+  optional string created_by = 22;
+  optional google.protobuf.Timestamp created_date = 23;
+  optional string last_modified_by = 24;
+  optional google.protobuf.Timestamp last_modified_date = 25;
 }
 
 message RemoteExecutionError {
