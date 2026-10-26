@@ -45,6 +45,18 @@ class GrpcRemoteConfigurationTest {
     }
 
     @Test
+    void testSslDisabledWithBundleFails() {
+        applicationContextRunner
+            .withUserConfiguration(EchoServiceConfiguration.class)
+            .withPropertyValues(
+                "bytechef.remote.grpc.plaintext=false", "bytechef.remote.grpc.service-token=secret",
+                "spring.grpc.server.ssl.bundle=grpc", "spring.grpc.server.ssl.enabled=false")
+            .run(context -> assertThat(context).hasFailed()
+                .getFailure()
+                .hasStackTraceContaining("spring.grpc.server.ssl.enabled"));
+    }
+
+    @Test
     void testPlaintextTrueWithTokenStarts() {
         applicationContextRunner
             .withUserConfiguration(EchoServiceConfiguration.class)
