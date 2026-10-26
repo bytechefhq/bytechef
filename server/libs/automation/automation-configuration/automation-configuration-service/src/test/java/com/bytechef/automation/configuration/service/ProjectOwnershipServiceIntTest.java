@@ -727,8 +727,8 @@ public class ProjectOwnershipServiceIntTest {
                     Object[] arguments = event.getArgumentArray();
 
                     assertThat(arguments).hasSize(2);
-                    assertThat(arguments[0]).asInstanceOf(InstanceOfAssertFactories.LIST)
-                        .isEmpty();
+                    assertThat(arguments[0]).asInstanceOf(InstanceOfAssertFactories.list(ProjectOwner.class))
+                        .containsExactly(ProjectOwner.CONTEXT_STORE);
                     assertThat(arguments[1]).asInstanceOf(InstanceOfAssertFactories.list(ProjectDeploymentOwner.class))
                         .containsExactlyInAnyOrder(
                             ProjectDeploymentOwner.API_COLLECTION, ProjectDeploymentOwner.A2A_SERVER);
