@@ -169,7 +169,7 @@ class TaskHandlerRemoteServiceGrpcWireTest {
         assertThatThrownBy(() -> remoteTaskHandlerClient.handle(
             "failing/v1/fail", taskExecution("failing/v1/fail", Map.of())))
                 .isInstanceOf(TaskExecutionException.class)
-                .hasMessageContaining("Bad input");
+                .hasMessage("Bad input");
     }
 
     private static TaskExecution taskExecution(String type, Map<String, ?> parameters) {
