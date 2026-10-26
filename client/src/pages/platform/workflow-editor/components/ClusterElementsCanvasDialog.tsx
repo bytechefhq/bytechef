@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Dialog, DialogClose, DialogContent, DialogTitle} from '@/components/Dialog';
 import AiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/AiAgentEditor';
-import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
 import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
 import useAiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAiAgentEvals';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
@@ -29,6 +28,10 @@ import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+const AiAgentTestingPanel = lazy(
+    () =>
+        import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
+);
 const DataPillPanel = lazy(() => import('./datapills/DataPillPanel'));
 
 interface ClusterElementsCanvasDialogProps {
@@ -264,11 +267,13 @@ const ClusterElementsCanvasDialog = ({
                                     copilotPanelOpen && workflowNodeDetailsPanelOpen && 'right-[915px]'
                                 )}
                             >
-                                <AiAgentTestingPanel
-                                    contentClassName="rounded-none"
-                                    headerClassName="px-4 pt-4"
-                                    onClose={handleCloseTestingPanel}
-                                />
+                                <Suspense fallback={null}>
+                                    <AiAgentTestingPanel
+                                        contentClassName="rounded-none"
+                                        headerClassName="px-4 pt-4"
+                                        onClose={handleCloseTestingPanel}
+                                    />
+                                </Suspense>
                             </div>
                         )}
 
