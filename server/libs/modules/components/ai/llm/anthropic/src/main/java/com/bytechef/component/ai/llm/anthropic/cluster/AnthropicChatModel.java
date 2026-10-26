@@ -35,14 +35,14 @@ import org.springframework.ai.chat.model.ChatModel;
 /**
  * @author Monika Kušter
  */
-public class AntropicChatModel {
+public class AnthropicChatModel {
 
     public static final ClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ModelFunction>clusterElement("model")
-            .title("Antropic Model")
-            .description("Antropic model.")
+            .title("Anthropic Model")
+            .description("Anthropic model.")
             .type(ModelFunction.MODEL)
-            .object(() -> AntropicChatModel::apply)
+            .object(() -> AnthropicChatModel::apply)
             .properties(
                 CHAT_MODEL_PROPERTY,
                 MAX_TOKENS_PROPERTY,
