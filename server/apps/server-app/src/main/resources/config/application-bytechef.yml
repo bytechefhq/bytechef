@@ -152,6 +152,9 @@ bytechef:
   component:
     custom-component:
       java-enabled: true
+  context-store:
+    # Whether the Context Store is enabled (default: false)
+    enabled: false
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true
