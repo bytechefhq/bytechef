@@ -12,9 +12,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.protobuf.DescriptorProtos.DescriptorProto;
 import com.google.protobuf.DescriptorProtos.FieldDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
+import com.google.protobuf.DescriptorProtos.MessageOptions;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Int64Value;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -37,7 +39,8 @@ class ProtoJsonMapperTest {
 
         Holder holder = new Holder(
             "parent", Map.of("id", 9_007_199_254_740_993L, "ratio", 5.0),
-            List.of(new Holder("child", Map.of("nested", Map.of("count", 5)), List.of())));
+            List.of(new Holder("child", Map.of("nested", Map.of("count", 5)), List.of(), Map.of(), List.of())),
+            Map.of(), List.of());
 
         DynamicMessage dynamicMessage = protoJsonMapper.toProto(holder, DynamicMessage.newBuilder(descriptor));
 
@@ -51,9 +54,30 @@ class ProtoJsonMapperTest {
     }
 
     @Test
+    void testMapAndRepeatedBytesCarryJackson() throws Descriptors.DescriptorValidationException {
+        List<Object> items = new ArrayList<>();
+
+        items.add(9_007_199_254_740_993L);
+        items.add(null);
+        items.add(Map.of("ratio", 5.0));
+
+        Holder holder = new Holder(
+            "parent", null, List.of(), Map.of("big", 9_007_199_254_740_993L, "nested", Map.of("count", 5)), items);
+
+        DynamicMessage dynamicMessage = protoJsonMapper.toProto(holder, DynamicMessage.newBuilder(holderDescriptor()));
+
+        Holder readHolder = protoJsonMapper.toObject(dynamicMessage, Holder.class);
+
+        assertThat(readHolder.extras()).isEqualTo(holder.extras());
+        assertThat(readHolder.extras()
+            .get("big")).isInstanceOf(Long.class);
+        assertThat(readHolder.items()).isEqualTo(items);
+    }
+
+    @Test
     void testUnsetBytesFieldReadsAsNull() throws Descriptors.DescriptorValidationException {
         DynamicMessage dynamicMessage = protoJsonMapper.toProto(
-            new Holder("parent", null, List.of()), DynamicMessage.newBuilder(holderDescriptor()));
+            new Holder("parent", null, List.of(), Map.of(), List.of()), DynamicMessage.newBuilder(holderDescriptor()));
 
         assertThat(protoJsonMapper.toObject(dynamicMessage, Holder.class)
             .payload()).isNull();
@@ -78,6 +102,25 @@ class ProtoJsonMapperTest {
                     .toBuilder()
                     .setTypeName(".test.Holder")
                     .build())
+            .addField(
+                field("extras", 4, FieldDescriptorProto.Type.TYPE_MESSAGE, FieldDescriptorProto.Label.LABEL_REPEATED)
+                    .toBuilder()
+                    .setTypeName(".test.Holder.ExtrasEntry")
+                    .build())
+            .addField(
+                field("items", 5, FieldDescriptorProto.Type.TYPE_BYTES, FieldDescriptorProto.Label.LABEL_REPEATED))
+            .addNestedType(
+                DescriptorProto.newBuilder()
+                    .setName("ExtrasEntry")
+                    .addField(
+                        field("key", 1, FieldDescriptorProto.Type.TYPE_STRING,
+                            FieldDescriptorProto.Label.LABEL_OPTIONAL))
+                    .addField(
+                        field("value", 2, FieldDescriptorProto.Type.TYPE_BYTES,
+                            FieldDescriptorProto.Label.LABEL_OPTIONAL))
+                    .setOptions(
+                        MessageOptions.newBuilder()
+                            .setMapEntry(true)))
             .build();
 
         FileDescriptorProto fileDescriptorProto = FileDescriptorProto.newBuilder()
@@ -104,6 +147,8 @@ class ProtoJsonMapperTest {
             .build();
     }
 
-    record Holder(String name, Map<String, Object> payload, List<Holder> children) {
+    record Holder(
+        String name, Map<String, Object> payload, List<Holder> children, Map<String, Object> extras,
+        List<Object> items) {
     }
 }
