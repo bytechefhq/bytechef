@@ -11,10 +11,16 @@ option java_multiple_files = true;
 option java_package = "com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto";
 
 service TaskDispatcherDefinitionRemoteService {
+  rpc ExecuteDynamicProperties(ExecuteTaskDispatcherDynamicPropertiesRequest) returns (bytechef.platform.component.remote.v1.RemoteProperties);
+  rpc ExecuteOptions(ExecuteTaskDispatcherOptionsRequest) returns (bytechef.platform.component.remote.v1.RemoteOptions);
   rpc ExecuteOutput(ExecuteTaskDispatcherOutputRequest) returns (bytechef.platform.component.remote.v1.OutputResponseResult);
+  rpc ExecuteVariableProperties(ExecuteTaskDispatcherOutputRequest) returns (bytechef.platform.component.remote.v1.OutputResponseResult);
+  rpc ExecuteWorkflowNodeDescription(ExecuteTaskDispatcherOutputRequest) returns (bytechef.platform.component.remote.v1.StringResponse);
+  rpc FetchTaskDispatcherDefinition(GetTaskDispatcherDefinitionRequest) returns (TaskDispatcherDefinitionResult);
   rpc GetTaskDispatcherDefinition(GetTaskDispatcherDefinitionRequest) returns (RemoteTaskDispatcherDefinition);
   rpc GetTaskDispatcherDefinitions(google.protobuf.Empty) returns (RemoteTaskDispatcherDefinitions);
   rpc GetTaskDispatcherDefinitionVersions(GetTaskDispatcherDefinitionVersionsRequest) returns (RemoteTaskDispatcherDefinitions);
+  rpc IsDynamicOutputDefined(IsDynamicOutputDefinedRequest) returns (bytechef.platform.component.remote.v1.BoolResponse);
 }
 
 message RemoteTaskDispatcherDefinition {
@@ -51,4 +57,27 @@ message ExecuteTaskDispatcherOutputRequest {
   string name = 1;
   int32 version = 2;
   google.protobuf.Struct input_parameters = 3;
+}
+
+message TaskDispatcherDefinitionResult {
+  optional RemoteTaskDispatcherDefinition task_dispatcher_definition = 1;
+}
+
+message ExecuteTaskDispatcherDynamicPropertiesRequest {
+  string name = 1;
+  int32 version = 2;
+  string property_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+}
+
+message ExecuteTaskDispatcherOptionsRequest {
+  string name = 1;
+  int32 version = 2;
+  string property_name = 3;
+  optional string search = 4;
+}
+
+message IsDynamicOutputDefinedRequest {
+  string name = 1;
+  int32 version = 2;
 }

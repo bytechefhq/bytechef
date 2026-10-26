@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.workflow.task.dispatcher.registry.remote.client.service;
 
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.option;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,8 @@ import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatc
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatcherProtoMapper;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Option;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcherDefinitionFactory;
@@ -26,6 +29,7 @@ import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -119,6 +123,65 @@ class TaskDispatcherDefinitionRemoteServiceGrpcWireTest {
         assertThat(remoteTaskDispatcherDefinitionServiceClient.executeOutput("loop", 1, inputParameters))
             .usingRecursiveComparison()
             .isEqualTo(outputResponse);
+    }
+
+    @Test
+    void testFetchTaskDispatcherDefinition() {
+        TaskDispatcherDefinition loopTaskDispatcherDefinition = loop();
+
+        when(taskDispatcherDefinitionService.fetchTaskDispatcherDefinition("loop", 1))
+            .thenReturn(Optional.of(loopTaskDispatcherDefinition));
+        when(taskDispatcherDefinitionService.fetchTaskDispatcherDefinition("missing", null))
+            .thenReturn(Optional.empty());
+
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.fetchTaskDispatcherDefinition("loop", 1))
+            .get()
+            .usingRecursiveComparison()
+            .isEqualTo(loopTaskDispatcherDefinition);
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.fetchTaskDispatcherDefinition("missing", null))
+            .isEmpty();
+    }
+
+    @Test
+    void testTaskDispatcherQueries() {
+        Map<String, Object> inputParameters = Map.of("items", List.of(1, 2));
+        OutputResponse outputResponse = new OutputResponse(
+            loop().getProperties()
+                .getFirst(),
+            Map.of("item", 1), null);
+
+        when(taskDispatcherDefinitionService.isDynamicOutputDefined("loop", 1)).thenReturn(true);
+        when(taskDispatcherDefinitionService.executeWorkflowNodeDescription("loop", 1, inputParameters))
+            .thenReturn("Loop over 2 items");
+        when(taskDispatcherDefinitionService.executeVariableProperties("loop", 1, inputParameters))
+            .thenReturn(outputResponse);
+
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.isDynamicOutputDefined("loop", 1)).isTrue();
+        assertThat(
+            remoteTaskDispatcherDefinitionServiceClient.executeWorkflowNodeDescription("loop", 1, inputParameters))
+                .isEqualTo("Loop over 2 items");
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.executeVariableProperties("loop", 1, inputParameters))
+            .usingRecursiveComparison()
+            .isEqualTo(outputResponse);
+    }
+
+    @Test
+    void testExecuteDynamicPropertiesAndOptions() {
+        Map<String, Object> inputParameters = Map.of("items", List.of(1, 2));
+        List<Property> properties = List.copyOf(loop().getProperties());
+        List<Option> options = List.of(new Option(option("Yes", true)), new Option(option("No", false)));
+
+        when(taskDispatcherDefinitionService.executeDynamicProperties("loop", 1, "items", inputParameters))
+            .thenReturn(properties);
+        when(taskDispatcherDefinitionService.executeOptions("loop", 1, "items", "y")).thenReturn(options);
+
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.executeDynamicProperties(
+            "loop", 1, "items", inputParameters))
+                .usingRecursiveComparison()
+                .isEqualTo(properties);
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.executeOptions("loop", 1, "items", "y"))
+            .usingRecursiveComparison()
+            .isEqualTo(options);
     }
 
     private static TaskDispatcherDefinition condition() {

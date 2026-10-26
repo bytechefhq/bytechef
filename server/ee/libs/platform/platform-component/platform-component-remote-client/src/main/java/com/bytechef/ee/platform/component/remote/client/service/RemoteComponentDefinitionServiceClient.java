@@ -15,6 +15,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionR
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionVersionsRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionsRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionComponentDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinitions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.SearchComponentDefinitionsRequest;
@@ -186,7 +187,15 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
 
     @Override
     public ComponentDefinition getConnectionComponentDefinition(String name, int connectionVersion) {
-        throw new UnsupportedOperationException();
+        GetConnectionComponentDefinitionRequest getConnectionComponentDefinitionRequest =
+            GetConnectionComponentDefinitionRequest.newBuilder()
+                .setName(name)
+                .setConnectionVersion(connectionVersion)
+                .build();
+
+        return componentProtoMapper.toComponentDefinition(
+            getStub(workerInstances.getInstance(name)).getConnectionComponentDefinition(
+                getConnectionComponentDefinitionRequest));
     }
 
     @Override
