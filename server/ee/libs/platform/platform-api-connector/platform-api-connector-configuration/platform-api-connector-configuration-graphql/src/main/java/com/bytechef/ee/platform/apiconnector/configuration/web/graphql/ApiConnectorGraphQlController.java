@@ -65,8 +65,8 @@ public class ApiConnectorGraphQlController {
     }
 
     @QueryMapping
-    public ApiConnector apiConnector(@Argument long id) {
-        return apiConnectorService.getApiConnector(id);
+    public ApiConnectorDTO apiConnector(@Argument long id) {
+        return apiConnectorFacade.getApiConnector(id);
     }
 
     @QueryMapping
@@ -82,23 +82,15 @@ public class ApiConnectorGraphQlController {
     }
 
     @MutationMapping
-    public ApiConnector createApiConnector(@Argument CreateApiConnectorInput input) {
-        ApiConnector apiConnector = new ApiConnector();
+    public boolean deleteApiConnector(@Argument long id) {
+        apiConnectorFacade.deleteApiConnector(id);
 
-        apiConnector.setName(input.name());
-        apiConnector.setTitle(input.title());
-        apiConnector.setDescription(input.description());
-        apiConnector.setIcon(input.icon());
-        apiConnector.setConnectorVersion(input.connectorVersion());
-
-        return apiConnectorService.create(apiConnector);
+        return true;
     }
 
     @MutationMapping
-    public boolean deleteApiConnector(@Argument long id) {
-        apiConnectorService.delete(id);
-
-        return true;
+    public int deleteOrphanedApiConnectorFiles() {
+        return apiConnectorFacade.deleteOrphanedFiles();
     }
 
     @MutationMapping
@@ -110,6 +102,11 @@ public class ApiConnectorGraphQlController {
 
     @MutationMapping
     public ApiConnector updateApiConnector(@Argument long id, @Argument UpdateApiConnectorInput input) {
+        if (input.specification() != null) {
+            return apiConnectorFacade.updateApiConnector(
+                id, input.name(), input.icon(), input.specification(), input.version());
+        }
+
         ApiConnector apiConnector = apiConnectorService.getApiConnector(id);
 
         if (input.name() != null) {
@@ -138,7 +135,7 @@ public class ApiConnectorGraphQlController {
 
     @MutationMapping
     public ApiConnector importOpenApiSpecification(@Argument ImportOpenApiSpecificationInput input) {
-        return apiConnectorFacade.importOpenApiSpecification(input.name(), input.specification());
+        return apiConnectorFacade.importOpenApiSpecification(input.name(), input.icon(), input.specification());
     }
 
     @MutationMapping
@@ -152,7 +149,7 @@ public class ApiConnectorGraphQlController {
 
     @MutationMapping
     public ApiConnector generateFromDocumentation(@Argument GenerateFromDocumentationInput input) {
-        return apiConnectorFacade.generateFromDocumentation(input.name(), input.documentationUrl());
+        return apiConnectorFacade.generateFromDocumentation(input.name(), input.documentationUrl(), input.icon());
     }
 
     @MutationMapping
@@ -236,13 +233,9 @@ public class ApiConnectorGraphQlController {
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateApiConnectorInput(
-        String name, String title, String description, String icon, int connectorVersion) {
-    }
-
-    @SuppressFBWarnings("EI")
     public record UpdateApiConnectorInput(
-        String name, String title, String description, String icon, Integer connectorVersion) {
+        String name, String title, String description, String icon, Integer connectorVersion, String specification,
+        Integer version) {
     }
 
     @SuppressFBWarnings("EI")
