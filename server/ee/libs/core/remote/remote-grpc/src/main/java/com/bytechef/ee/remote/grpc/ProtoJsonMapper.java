@@ -12,13 +12,16 @@ import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.math.BigInteger;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.IntNode;
 import tools.jackson.databind.node.LongNode;
 import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 /**
  * Moves objects between Java and proto messages through JSON: the proto schema fixes the wire contract and rejects any
@@ -31,6 +34,7 @@ import tools.jackson.databind.node.ObjectNode;
  */
 public class ProtoJsonMapper {
 
+    private static final BigInteger MAX_EXACT_INTEGER = BigInteger.TWO.pow(53);
     private static final JsonFormat.Parser PARSER = JsonFormat.parser();
     private static final JsonFormat.Printer PRINTER = JsonFormat.printer()
         .alwaysPrintFieldsWithNoPresence();
@@ -46,7 +50,7 @@ public class ProtoJsonMapper {
         try {
             JsonNode jsonNode = objectMapper.readTree(PRINTER.print(messageOrBuilder));
 
-            return objectMapper.treeToValue(toIntegralNumbers(jsonNode), valueType);
+            return objectMapper.treeToValue(transformNumbers(jsonNode, ProtoJsonMapper::toIntegralNumber), valueType);
         } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
             throw new IllegalStateException(
                 "Unable to read %s from its proto message".formatted(valueType.getSimpleName()),
@@ -57,7 +61,10 @@ public class ProtoJsonMapper {
     @SuppressWarnings("unchecked")
     public <M extends Message> M toProto(Object value, Message.Builder builder) {
         try {
-            PARSER.merge(objectMapper.writeValueAsString(value), builder);
+            JsonNode jsonNode = objectMapper.valueToTree(value);
+
+            PARSER.merge(
+                objectMapper.writeValueAsString(transformNumbers(jsonNode, ProtoJsonMapper::toExactNumber)), builder);
         } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
             throw new IllegalStateException(
                 "Unable to write %s to its proto message".formatted(
@@ -69,7 +76,18 @@ public class ProtoJsonMapper {
         return (M) builder.build();
     }
 
-    private static JsonNode toIntegralNumbers(JsonNode jsonNode) {
+    private static JsonNode toExactNumber(JsonNode jsonNode) {
+        if (jsonNode.isIntegralNumber() && jsonNode.bigIntegerValue()
+            .abs()
+            .compareTo(MAX_EXACT_INTEGER) > 0) {
+
+            return StringNode.valueOf(jsonNode.asString());
+        }
+
+        return jsonNode;
+    }
+
+    private static JsonNode toIntegralNumber(JsonNode jsonNode) {
         if (jsonNode.isDouble()) {
             double number = jsonNode.doubleValue();
 
@@ -79,17 +97,23 @@ public class ProtoJsonMapper {
                 return longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE
                     ? IntNode.valueOf((int) longValue) : LongNode.valueOf(longValue);
             }
+        }
 
-            return jsonNode;
+        return jsonNode;
+    }
+
+    private static JsonNode transformNumbers(JsonNode jsonNode, UnaryOperator<JsonNode> numberTransformer) {
+        if (jsonNode.isNumber()) {
+            return numberTransformer.apply(jsonNode);
         }
 
         if (jsonNode instanceof ObjectNode objectNode) {
             for (Map.Entry<String, JsonNode> entry : objectNode.properties()) {
-                entry.setValue(toIntegralNumbers(entry.getValue()));
+                entry.setValue(transformNumbers(entry.getValue(), numberTransformer));
             }
         } else if (jsonNode instanceof ArrayNode arrayNode) {
             for (int index = 0; index < arrayNode.size(); index++) {
-                arrayNode.set(index, toIntegralNumbers(arrayNode.get(index)));
+                arrayNode.set(index, transformNumbers(arrayNode.get(index), numberTransformer));
             }
         }
 
