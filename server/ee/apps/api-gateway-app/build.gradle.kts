@@ -11,6 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -32,9 +33,11 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
     implementation(project(":server:libs:core:encryption:encryption-property"))
+    implementation(project(":server:libs:core:graphql:graphql-impl"))
     implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-graphql"))
     implementation(project(":server:libs:platform:platform-user:platform-user-rest"))
     implementation(project(":server:libs:platform:platform-user:platform-user-service"))
 
@@ -46,6 +49,7 @@ dependencies {
     implementation(project(":server:ee:libs:config:tenant-multi-security-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
+    implementation(project(":server:ee:libs:platform:platform-user:platform-user-graphql"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-service"))
 
     runtimeOnly("org.postgresql:postgresql")
