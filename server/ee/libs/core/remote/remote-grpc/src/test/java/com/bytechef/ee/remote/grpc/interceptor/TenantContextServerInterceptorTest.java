@@ -33,6 +33,9 @@ class TenantContextServerInterceptorTest {
                 "000002", () -> EchoService.echoTenant(inProcessGrpc.channel()));
 
             assertThat(tenantId).isEqualTo("000002");
+            assertThat(inProcessGrpc.serverExecutorService()
+                .submit(TenantContext::getCurrentTenantId)
+                .get()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
         }
     }
 
