@@ -176,8 +176,10 @@ class AiHubToolApprovalRuleFacadeTest {
     @Test
     void testGetDefaultToolNamesListsOnlyTheRegisteredGatedTools() {
         assertThat(facade.getDefaultToolNames()).containsExactly(
-            "createProjectDeployment", "deleteProject", "deleteProjectDeployment", "deleteWorkflow", "promoteWorkflow",
-            "publishProject", "rollbackProjectDeployment", "toggleProjectDeployment", "updateProjectDeployment");
+            "createProjectDeployment", "deleteAiAgentChannel", "deleteAiAgentElement", "deleteProject",
+            "deleteProjectDeployment", "deleteWorkflow", "promoteWorkflow", "publishProject",
+            "rollbackProjectDeployment",
+            "toggleProjectDeployment", "updateProjectDeployment");
     }
 
     @Test

@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -46,8 +47,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.springframework.graphql:spring-graphql")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
     testImplementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:ee:libs:ai:ai-hub:ai-hub-rest")) {
         exclude(module = "ai-hub-service")

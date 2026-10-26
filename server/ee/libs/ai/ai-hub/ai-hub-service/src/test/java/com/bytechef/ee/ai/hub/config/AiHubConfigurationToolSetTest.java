@@ -42,10 +42,11 @@ class AiHubConfigurationToolSetTest {
                 "listProjects", "getWorkflow", "listProjectDeployments", "listConnectionsForComponent",
                 "askUserQuestion", "openWorkflowTab", "openWorkflowChatTab", "listWorkflowExecutions",
                 "getWorkflowExecution", "getAction", "getTrigger", "getClusterElement", "checkWorkflow",
-                "searchDocs")
+                "searchDocs", "listAiAgents", "getAiAgent", "openAiAgentTab")
             .doesNotContain(
                 "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-                "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
+                "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition",
+                "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel");
     }
 
     @Test
@@ -57,7 +58,8 @@ class AiHubConfigurationToolSetTest {
             .contains(
                 "createProject", "createProjectWorkflow", "deleteWorkflow", "createProjectDeployment",
                 "promoteWorkflow", "selectConnection", "createConnection", "buildWorkflow", "importWorkflow",
-                "openWorkflowTab", "openWorkflowChatTab", "listChatWorkflows", "createWorkflowChat")
+                "openWorkflowTab", "openWorkflowChatTab", "listChatWorkflows", "createWorkflowChat", "createAiAgent",
+                "updateAiAgent", "addAiAgentChannel", "addAiAgentElement", "updateAiAgentSettings", "openAiAgentTab")
             .doesNotContain("updateWorkflow");
     }
 
