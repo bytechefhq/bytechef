@@ -32,3 +32,5 @@ spring:
 bytechef:
   session:
     store: redis
+  worker:
+    enabled: false
