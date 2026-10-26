@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -23,6 +24,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RemoteClusterElementDefinitionFacadeClient implements ClusterElementDefinitionFacade {
+
+    @Override
+    public List<Field> executeFields(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId) {
+
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public List<Property> executeDynamicProperties(

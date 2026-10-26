@@ -21,6 +21,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.domain.OutputResponse;
@@ -43,6 +44,13 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
         @Nullable ComponentConnection componentConnection,
         ClusterElementResolverFunction clusterElementResolver);
+
+    /**
+     * Returns the fields of a cluster element implementing {@code FieldsProvider}, or an empty list otherwise.
+     */
+    List<Field> executeFields(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection);
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,

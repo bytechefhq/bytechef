@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.facade;
 
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.domain.OutputResponse;
@@ -37,6 +38,13 @@ public interface ClusterElementDefinitionFacade {
         Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
         @Nullable Long connectionId, Map<String, Long> clusterElementConnectionIds,
         Map<String, Map<String, ?>> clusterElementInputParameters);
+
+    /**
+     * Returns the fields of a cluster element implementing {@code FieldsProvider}, or an empty list otherwise.
+     */
+    List<Field> executeFields(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId);
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,

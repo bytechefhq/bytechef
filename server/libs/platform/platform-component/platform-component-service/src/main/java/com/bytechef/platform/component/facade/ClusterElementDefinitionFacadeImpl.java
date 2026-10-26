@@ -23,6 +23,7 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ClusterElementContextAware.ClusterElementFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -91,6 +92,17 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
         return clusterElementDefinitionService.executeDynamicProperties(
             componentName, componentVersion, clusterElementName, propertyName, inputParameters,
             lookupDependsOnPaths, componentConnection, clusterElementResolver);
+    }
+
+    @Override
+    public List<Field> executeFields(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId) {
+
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
+
+        return clusterElementDefinitionService.executeFields(
+            componentName, componentVersion, clusterElementName, inputParameters, componentConnection);
     }
 
     @Override

@@ -1,3 +1,15 @@
+extend type Query {
+    """Workspace connections whose component exposes at least one ItemReader cluster element."""
+    dataStreamCompatibleConnections(workspaceId: ID!, environmentId: ID!): [DataStreamCompatibleConnection!]!
+}
+
+type DataStreamCompatibleConnection {
+    id: ID!
+    name: String!
+    componentName: String!
+    componentVersion: Int!
+}
+
 extend type Mutation {
     disconnectConnection(connectionId: ID!): Boolean!
 }
