@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261026000003" author="Ivica Cardic">
+        <createTable tableName="ai_gateway_provider">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="api_key" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_url" type="VARCHAR(512)"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config" type="TEXT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="ai_gateway_budget">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="amount" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enforcement_mode" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alert_threshold" type="INT" defaultValueNumeric="80">
+                <constraints nullable="false"/>
+            </column>
+            <column name="week_starts_on" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="ai_gateway_routing_policy">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="strategy" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fallback_model" type="VARCHAR(256)"/>
+            <column name="config" type="TEXT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="ai_gateway_model_deployment">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="routing_policy_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ai_gateway_model_deployment_routing_policy"
+                             references="ai_gateway_routing_policy(id)"/>
+            </column>
+            <column name="model_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_rpm" type="INT"/>
+            <column name="max_tpm" type="INT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="ai_gateway_spend_summary">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="api_key_id" type="BIGINT"/>
+            <column name="project_id" type="BIGINT"/>
+            <column name="model" type="VARCHAR(256)"/>
+            <column name="provider" type="VARCHAR(64)"/>
+            <column name="period_start" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_end" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="request_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_input_tokens" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_output_tokens" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_cost" type="DECIMAL(12,6)" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="VARCHAR(3)" defaultValue="USD">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="ai_gateway_project">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="routing_policy_id" type="BIGINT">
+                <constraints foreignKeyName="fk_ai_gateway_project_routing_policy"
+                             references="ai_gateway_routing_policy(id)"/>
+            </column>
+            <column name="compression_enabled" type="BOOLEAN"/>
+            <column name="retry_max_attempts" type="INT"/>
+            <column name="timeout_seconds" type="INT"/>
+            <column name="caching_enabled" type="BOOLEAN"/>
+            <column name="cache_ttl_minutes" type="INT"/>
+            <column name="log_retention_days" type="INT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="ai_gateway_routing_policy_tag">
+            <column name="ai_gateway_routing_policy_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ai_gateway_routing_policy_tag_routing_policy"
+                             references="ai_gateway_routing_policy(id)"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_ai_gateway_routing_policy_tag_tag"
+                             references="tag(id)"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="ai_gateway_routing_policy_tag" columnNames="ai_gateway_routing_policy_id,tag_id"/>
+
+        <createTable tableName="ai_gateway_rate_limit">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scope" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="property_key" type="VARCHAR(256)"/>
+            <column name="limit_type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="limit_value" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="window_seconds" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_ai_model_provider" baseTableName="ai_model"
+                                 baseColumnNames="provider_id" referencedTableName="ai_gateway_provider"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_ai_gateway_model_deployment_model"
+                                 baseTableName="ai_gateway_model_deployment" baseColumnNames="model_id"
+                                 referencedTableName="ai_model" referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
