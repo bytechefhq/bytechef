@@ -1,0 +1,3 @@
+mutation deleteContextStore($workspaceId: ID!, $id: ID!) {
+    deleteContextStore(workspaceId: $workspaceId, id: $id)
+}

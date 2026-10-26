@@ -1,0 +1,21 @@
+query contextStoreSources($workspaceId: ID!, $environmentId: ID!, $filter: ContextStoreSourceFilter) {
+    contextStoreSources(workspaceId: $workspaceId, environmentId: $environmentId, filter: $filter) {
+        id
+        contextStoreId
+        name
+        entityName
+        description
+        idField
+        indexedFields
+        sourceComponentName
+        sourceComponentVersion
+        sourceClusterElementName
+        connectionId
+        cadence
+        status
+        enabled
+        lastSyncRunAt
+        lastSyncJobExecutionId
+        workflowId
+    }
+}

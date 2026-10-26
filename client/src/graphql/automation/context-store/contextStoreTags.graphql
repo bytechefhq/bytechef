@@ -1,0 +1,6 @@
+query contextStoreTags($workspaceId: ID!) {
+    contextStoreTags(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}
