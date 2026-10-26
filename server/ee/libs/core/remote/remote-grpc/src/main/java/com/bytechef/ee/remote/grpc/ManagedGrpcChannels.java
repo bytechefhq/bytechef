@@ -9,11 +9,13 @@ package com.bytechef.ee.remote.grpc;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.remote.grpc.discovery.DiscoveryClientNameResolverProvider;
+import com.bytechef.ee.remote.grpc.interceptor.DeadlineClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextClientInterceptor;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
 
+    private final Duration deadline;
     private final Map<String, ManagedChannel> managedChannels = new ConcurrentHashMap<>();
     private final boolean plaintext;
     private final String serviceToken;
@@ -40,6 +43,7 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
 
         Map<String, String> configuredTargets = grpc.getTargets();
 
+        this.deadline = grpc.getDeadline();
         this.plaintext = grpc.isPlaintext();
         this.serviceToken = grpc.getServiceToken();
         this.targets = configuredTargets == null ? Map.of() : Map.copyOf(configuredTargets);
@@ -72,6 +76,10 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forTarget(getTarget(serviceId))
             .defaultLoadBalancingPolicy("round_robin")
             .intercept(new TenantContextClientInterceptor(), new ServiceTokenClientInterceptor(serviceToken));
+
+        if (deadline != null) {
+            managedChannelBuilder.intercept(new DeadlineClientInterceptor(deadline));
+        }
 
         if (plaintext) {
             managedChannelBuilder.usePlaintext();
