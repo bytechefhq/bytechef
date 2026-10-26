@@ -12,6 +12,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionR
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionVersionsRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionsRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionComponentDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinitions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.SearchComponentDefinitionsRequest;
@@ -97,6 +98,17 @@ public class ComponentDefinitionRemoteServiceGrpcServer
 
         responseObserver.onNext(
             toRemoteComponentDefinitions(componentDefinitionService.getComponentDefinitionVersions(request.getName())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getConnectionComponentDefinition(
+        GetConnectionComponentDefinitionRequest request, StreamObserver<RemoteComponentDefinition> responseObserver) {
+
+        responseObserver.onNext(
+            componentProtoMapper.toProto(
+                componentDefinitionService.getConnectionComponentDefinition(
+                    request.getName(), request.getConnectionVersion())));
         responseObserver.onCompleted();
     }
 
