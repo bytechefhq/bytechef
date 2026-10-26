@@ -51,6 +51,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {

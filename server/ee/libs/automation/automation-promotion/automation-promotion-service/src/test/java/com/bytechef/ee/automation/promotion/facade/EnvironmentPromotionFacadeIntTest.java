@@ -103,6 +103,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 @SpringBootTest(
     classes = EnvironmentPromotionIntTestConfiguration.class, properties = "bytechef.webhook-url=/webhooks/{id}")
 @Import(PostgreSQLContainerConfiguration.class)
