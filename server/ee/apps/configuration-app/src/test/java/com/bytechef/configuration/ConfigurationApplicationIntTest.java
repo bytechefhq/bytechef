@@ -143,6 +143,33 @@ public class ConfigurationApplicationIntTest {
     }
 
     @Test
+    void testConfigurationGrpcServicesAreServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains(
+            "bytechef.automation.configuration.remote.v1.ProjectRemoteService",
+            "bytechef.automation.configuration.remote.v1.ProjectDeploymentRemoteService",
+            "bytechef.automation.configuration.remote.v1.ProjectDeploymentWorkflowRemoteService",
+            "bytechef.embedded.configuration.remote.v1.AppEventRemoteService",
+            "bytechef.embedded.configuration.remote.v1.AutomationWorkflowProjectFacadeRemoteService",
+            "bytechef.embedded.configuration.remote.v1.ConnectedUserProjectDeploymentResolverRemoteService",
+            "bytechef.embedded.configuration.remote.v1.ConnectedUserProjectFacadeRemoteService",
+            "bytechef.embedded.configuration.remote.v1.IntegrationInstanceConfigurationRemoteService",
+            "bytechef.embedded.configuration.remote.v1.IntegrationInstanceConfigurationWorkflowRemoteService",
+            "bytechef.embedded.configuration.remote.v1.IntegrationInstanceWorkflowRemoteService",
+            "bytechef.embedded.configuration.remote.v1.IntegrationRemoteService",
+            "bytechef.platform.configuration.remote.v1.ComponentConnectionFacadeRemoteService",
+            "bytechef.platform.configuration.remote.v1.WorkflowRemoteService",
+            "bytechef.platform.configuration.remote.v1.WorkflowTestConfigurationRemoteService");
+    }
+
+    @Test
     void testUserServiceCallsTheGatewayOverGrpc() {
         User user = new User();
 
