@@ -72,6 +72,16 @@ public class ApiGatewayApplicationIntTest {
     }
 
     @Test
+    void testApplicationInfoHasEveryKeyTheClientReads() {
+        assertThat(environment.getProperty("info.ai.copilot.enabled")).isEqualTo("false");
+        assertThat(environment.getProperty("info.ai.knowledgeBase.enabled")).isEqualTo("false");
+        assertThat(environment.getProperty("info.billing.enabled")).isEqualTo("false");
+        assertThat(environment.getProperty("info.signUp.activationRequired")).isEqualTo("false");
+        assertThat(environment.getProperty("info.signUp.enabled")).isEqualTo("true");
+        assertThat(environment.getProperty("info.socialLogin.enabled")).isEqualTo("false");
+    }
+
+    @Test
     void testRedisDiscoveryClientIsRegistered() {
         assertThat(applicationContext.getBeansOfType(RedisDiscoveryClient.class)).hasSize(1);
     }
