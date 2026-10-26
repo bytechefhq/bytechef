@@ -29,7 +29,6 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
-import com.bytechef.platform.coordinator.lock.SingleCoordinatorLock;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -38,6 +37,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.scheduler.SingleCoordinatorCheck;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;
@@ -195,7 +195,7 @@ class ServerApplicationIntTest {
         void testContextLoadsInCommunityEdition() {
             assertThat(communityEditionApplicationContext.getBeanNamesForType(WorkspaceScopeCacheService.class))
                 .isEmpty();
-            assertThat(communityEditionApplicationContext.getBeanNamesForType(SingleCoordinatorLock.class))
+            assertThat(communityEditionApplicationContext.getBeanNamesForType(SingleCoordinatorCheck.class))
                 .isNotEmpty();
         }
     }
