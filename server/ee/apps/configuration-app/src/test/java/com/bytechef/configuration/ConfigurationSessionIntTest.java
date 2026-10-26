@@ -9,10 +9,12 @@ package com.bytechef.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -60,6 +63,22 @@ class ConfigurationSessionIntTest {
             .cookie(new Cookie("SESSION", EncodingUtils.base64EncodeToString(sessionId))))
             .andExpect(result -> assertThat(result.getResponse()
                 .getStatus()).isNotEqualTo(401));
+    }
+
+    @Test
+    void testWebhookTestTriggerReachesItsController() throws Exception {
+        MockHttpServletResponse response;
+
+        try {
+            response = mockMvc.perform(post("/webhooks/abc/test/environments/1"))
+                .andReturn()
+                .getResponse();
+        } catch (ServletException servletException) {
+            return;
+        }
+
+        assertThat(response.getForwardedUrl()).isNull();
+        assertThat(response.getStatus()).isNotIn(401, 403);
     }
 
     private static <S extends Session> String saveSession(SessionRepository<S> sessionRepository) {
