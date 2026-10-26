@@ -1,6 +1,5 @@
 import AiAgentHeader from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/AiAgentHeader';
 import {AiAgentConfigurationPanel} from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/AiAgentConfigurationPanel';
-import AiAgentTestingPanel from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel';
 import useAiAgentEditor from '@/pages/platform/cluster-element-editor/ai-agent-editor/hooks/useAiAgentEditor';
 import AiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals';
 import useAiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-evals/hooks/useAiAgentEvals';
@@ -13,6 +12,10 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Suspense, lazy} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+const AiAgentTestingPanel = lazy(
+    () =>
+        import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
+);
 const DataPillPanel = lazy(() => import('@/pages/platform/workflow-editor/components/datapills/DataPillPanel'));
 
 interface AiAgentEditorProps {
@@ -81,7 +84,9 @@ export default function AiAgentEditor({
 
                 <div className="relative mb-4 min-h-0">
                     <div className="size-full overflow-hidden">
-                        <AiAgentTestingPanel />
+                        <Suspense fallback={null}>
+                            <AiAgentTestingPanel />
+                        </Suspense>
                     </div>
 
                     {showNodeDetailsPanel && previousComponentDefinitions && workflowNodeOutputs && (
