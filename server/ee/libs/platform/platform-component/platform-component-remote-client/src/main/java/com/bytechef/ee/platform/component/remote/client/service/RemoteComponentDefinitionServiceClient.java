@@ -26,14 +26,18 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
+import io.grpc.StatusRuntimeException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
@@ -46,6 +50,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Component
 public class RemoteComponentDefinitionServiceClient implements ComponentDefinitionService {
+
+    private static final Logger log = LoggerFactory.getLogger(RemoteComponentDefinitionServiceClient.class);
 
     private final ComponentProtoMapper componentProtoMapper;
     private final List<ComponentDefinitionFilter> componentDefinitionFilters;
@@ -224,17 +230,40 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
         Function<ComponentDefinitionRemoteServiceBlockingStub, RemoteComponentDefinitions> call) {
 
         Map<String, ComponentDefinition> componentDefinitionMap = new LinkedHashMap<>();
+        Set<ServiceInstance> serviceInstances = workerInstances.getInstances();
+        StatusRuntimeException lastStatusRuntimeException = null;
+        int failedInstanceCount = 0;
 
-        for (ServiceInstance serviceInstance : workerInstances.getInstances()) {
-            RemoteComponentDefinitions remoteComponentDefinitions = call.apply(getStub(serviceInstance));
+        for (ServiceInstance serviceInstance : serviceInstances) {
+            RemoteComponentDefinitions remoteComponentDefinitions;
+
+            try {
+                remoteComponentDefinitions = call.apply(getStub(serviceInstance));
+            } catch (StatusRuntimeException statusRuntimeException) {
+                log.warn(
+                    "Skipping worker instance {} while listing component definitions: {}",
+                    serviceInstance.getInstanceId(), statusRuntimeException.getStatus());
+
+                lastStatusRuntimeException = statusRuntimeException;
+                failedInstanceCount++;
+
+                continue;
+            }
 
             for (RemoteComponentDefinition remoteComponentDefinition : remoteComponentDefinitions
                 .getComponentDefinitionsList()) {
 
-                componentDefinitionMap.putIfAbsent(
-                    remoteComponentDefinition.getName() + ":" + remoteComponentDefinition.getVersion(),
-                    componentProtoMapper.toComponentDefinition(remoteComponentDefinition));
+                String key = remoteComponentDefinition.getName() + ":" + remoteComponentDefinition.getVersion();
+
+                if (!componentDefinitionMap.containsKey(key)) {
+                    componentDefinitionMap.put(
+                        key, componentProtoMapper.toComponentDefinition(remoteComponentDefinition));
+                }
             }
+        }
+
+        if (lastStatusRuntimeException != null && failedInstanceCount == serviceInstances.size()) {
+            throw lastStatusRuntimeException;
         }
 
         List<ComponentDefinition> componentDefinitions = new ArrayList<>(componentDefinitionMap.values());
