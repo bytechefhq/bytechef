@@ -44,7 +44,7 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
 
         Map<String, Object> settings = notification.getSettings();
 
-        mailService.sendEmail(
+        mailService.sendEmailOrThrow(
             (String) settings.get("email"), emailNotificationHandler.getSubject(notificationHandlerContext),
             emailNotificationHandler.getContent(notificationHandlerContext), false, emailNotificationHandler.isHtml());
     }

@@ -34,6 +34,7 @@ import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Matija Petanjek
@@ -76,11 +77,11 @@ public class PlatformCoordinatorConfiguration {
 
     @Bean
     NotificationJobStatusApplicationEventListener jobStatusApplicationEventListener(
-        Optional<JobExecutionCounter> jobExecutionCounter) {
+        Optional<JobExecutionCounter> jobExecutionCounter, TaskExecutor taskExecutor) {
 
         return new NotificationJobStatusApplicationEventListener(
             jobExecutionCounter.orElse(null), jobService, notificationHandlerRegistry, notificationSenderRegistry,
-            notificationService);
+            notificationService, taskExecutor);
     }
 
     @Bean
