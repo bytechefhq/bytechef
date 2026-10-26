@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentWorkflowConnectionResult;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentWorkflowRemoteServiceGrpc;
@@ -87,6 +88,7 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     @Override
     public Optional<ProjectDeploymentWorkflowConnection> fetchProjectDeploymentWorkflowConnection(
         long projectDeploymentId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
+
         ProjectDeploymentWorkflowConnectionResult projectDeploymentWorkflowConnectionResult =
             getStub().fetchProjectDeploymentWorkflowConnection(
                 toRequest(projectDeploymentId, workflowId).toBuilder()
@@ -111,6 +113,7 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     @Override
     public List<ProjectDeploymentWorkflowConnection> getProjectDeploymentWorkflowConnections(
         long projectDeploymentId, String workflowId, String workflowNodeName) {
+
         return automationConfigurationProtoMapper.toProjectDeploymentWorkflowConnections(
             getStub().getProjectDeploymentWorkflowConnections(
                 toRequest(projectDeploymentId, workflowId).toBuilder()
@@ -135,11 +138,12 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
 
     @Override
     public boolean isConnectionUsed(long connectionId) {
-        return getStub().isConnectionUsed(
+        BoolResponse boolResponse = getStub().isConnectionUsed(
             IdRequest.newBuilder()
                 .setId(connectionId)
-                .build())
-            .getValue();
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
