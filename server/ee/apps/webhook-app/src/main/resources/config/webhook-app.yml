@@ -2,3 +2,7 @@ spring:
   task:
     execution:
       thread-name-prefix: webhook-app-task-
+
+bytechef:
+  session:
+    store: redis

@@ -12,6 +12,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation(project(":server:libs:config:app-config"))
@@ -22,6 +23,7 @@ dependencies {
     implementation(project(":server:libs:config:jackson-config"))
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:messages-config"))
+    implementation(project(":server:libs:config:security-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
@@ -46,6 +48,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
+    implementation(project(":server:ee:libs:config:session-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
@@ -60,5 +63,9 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client"))
 
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.session:spring-session-core")
+    testImplementation(project(":server:libs:core:commons:commons-util"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

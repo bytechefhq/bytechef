@@ -23,3 +23,7 @@ spring:
   task:
     execution:
       thread-name-prefix: configuration-app-task-
+
+bytechef:
+  session:
+    store: redis
