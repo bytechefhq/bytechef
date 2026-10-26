@@ -7,26 +7,33 @@
 
 package com.bytechef.ee.platform.component.remote.client.service;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Authorization.RefreshTokenResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
-import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
+import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc.ConnectionDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationTypeRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
+import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.google.protobuf.Empty;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -36,15 +43,18 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClient
-    implements ConnectionDefinitionService {
+public class RemoteConnectionDefinitionServiceClient implements ConnectionDefinitionService {
 
-    private static final String CONNECTION_DEFINITION_SERVICE = "/connection-definition-service";
+    private final ComponentProtoMapper componentProtoMapper;
+    private final GrpcChannels grpcChannels;
+    private final WorkerInstances workerInstances;
 
     public RemoteConnectionDefinitionServiceClient(
-        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultRestClient, discoveryClient, objectMapper);
+        this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+        this.workerInstances = new WorkerInstances(discoveryClient);
     }
 
     @Override
@@ -124,13 +134,18 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     public AuthorizationType getAuthorizationType(
         String componentName, int connectionVersion, AuthorizationType authorizationType) {
 
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, componentName,
-                CONNECTION_DEFINITION_SERVICE + "/get-authorization-type/{componentName}/{connectionVersion}" +
-                    "/{authorizationType}",
-                componentName, connectionVersion, authorizationType),
-            AuthorizationType.class);
+        GetAuthorizationTypeRequest.Builder builder = GetAuthorizationTypeRequest.newBuilder()
+            .setComponentName(componentName)
+            .setConnectionVersion(connectionVersion);
+
+        if (authorizationType != null) {
+            builder.setAuthorizationType(authorizationType.name());
+        }
+
+        StringResponse stringResponse = getStub(workerInstances.getInstance(componentName))
+            .getAuthorizationType(builder.build());
+
+        return stringResponse.hasValue() ? AuthorizationType.valueOf(stringResponse.getValue()) : null;
     }
 
     @Override
@@ -142,48 +157,60 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public ConnectionDefinition getConnectionDefinition(String componentName, Integer componentVersion) {
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, componentName,
-                CONNECTION_DEFINITION_SERVICE + "/get-connection-definition/{componentName}/{componentVersion}",
-                componentName, componentVersion),
-            ConnectionDefinition.class);
+        RemoteConnectionDefinition remoteConnectionDefinition = getStub(workerInstances.getInstance(componentName))
+            .getConnectionDefinition(getConnectionDefinitionRequest(componentName, componentVersion));
+
+        return componentProtoMapper.toConnectionDefinition(remoteConnectionDefinition);
     }
 
     @Override
-    public List<ConnectionDefinition> getConnectionDefinitions(
-        String componentName, Integer componentVersion) {
+    public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
+        RemoteConnectionDefinitions remoteConnectionDefinitions = getStub(workerInstances.getInstance(componentName))
+            .getComponentConnectionDefinitions(getConnectionDefinitionRequest(componentName, componentVersion));
 
-        List<CompletableFuture<List<ConnectionDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
-            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
-                uriBuilder -> toUri(
-                    uriBuilder, serviceInstance,
-                    CONNECTION_DEFINITION_SERVICE + "/get-connection-definitions/{componentName}/{componentVersion}",
-                    componentName, componentVersion),
-                new ParameterizedTypeReference<>() {})));
-
-        CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]))
-            .join();
-
-        return completableFutures.stream()
-            .map(CompletableFuture::join)
-            .flatMap(CollectionUtils::stream)
-            .collect(Collectors.toList());
+        return toConnectionDefinitions(remoteConnectionDefinitions);
     }
 
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions() {
-        List<CompletableFuture<ConnectionDefinition>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
-            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
-                uriBuilder -> toUri(
-                    uriBuilder, serviceInstance, CONNECTION_DEFINITION_SERVICE + "/get-connection-definitions"),
-                ConnectionDefinition.class)));
+        Map<String, ConnectionDefinition> connectionDefinitionMap = new LinkedHashMap<>();
 
-        CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]))
-            .join();
+        for (ServiceInstance serviceInstance : workerInstances.getInstances()) {
+            for (ConnectionDefinition connectionDefinition : toConnectionDefinitions(
+                getStub(serviceInstance).getConnectionDefinitions(Empty.getDefaultInstance()))) {
 
-        return CollectionUtils.map(completableFutures, CompletableFuture::join);
+                connectionDefinitionMap.putIfAbsent(
+                    connectionDefinition.getComponentName() + ":" + connectionDefinition.getVersion(),
+                    connectionDefinition);
+            }
+        }
+
+        return new ArrayList<>(connectionDefinitionMap.values());
+    }
+
+    private static GetConnectionDefinitionRequest getConnectionDefinitionRequest(
+        String componentName, Integer componentVersion) {
+
+        GetConnectionDefinitionRequest.Builder builder = GetConnectionDefinitionRequest.newBuilder()
+            .setComponentName(componentName);
+
+        if (componentVersion != null) {
+            builder.setComponentVersion(componentVersion);
+        }
+
+        return builder.build();
+    }
+
+    private ConnectionDefinitionRemoteServiceBlockingStub getStub(ServiceInstance serviceInstance) {
+        return ConnectionDefinitionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(serviceInstance));
+    }
+
+    private List<ConnectionDefinition> toConnectionDefinitions(
+        RemoteConnectionDefinitions remoteConnectionDefinitions) {
+
+        return remoteConnectionDefinitions.getConnectionDefinitionsList()
+            .stream()
+            .map(componentProtoMapper::toConnectionDefinition)
+            .toList();
     }
 }
