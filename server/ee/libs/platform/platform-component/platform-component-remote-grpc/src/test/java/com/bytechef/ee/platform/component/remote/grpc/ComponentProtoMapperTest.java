@@ -7,12 +7,17 @@
 
 package com.bytechef.ee.platform.component.remote.grpc;
 
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.AiAgentComponentHandler;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
@@ -65,6 +70,36 @@ class ComponentProtoMapperTest {
                 .withEqualsForFieldsMatchingRegexes(this::jsonEquals, FREE_FORM_FIELDS)
                 .isEqualTo(componentDefinition);
         }
+    }
+
+    @Test
+    void testDynamicDataSourcesRoundTrip() {
+        ComponentDefinition componentDefinition = new ComponentDefinition(
+            component("dynamic")
+                .title("Dynamic")
+                .description("Dynamic component")
+                .actions(
+                    action("get")
+                        .title("Get")
+                        .description("Gets a record")
+                        .properties(
+                            string("status")
+                                .options(
+                                    (ActionDefinition.OptionsFunction<String>) (
+                                        inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
+                                        context) -> List.of())
+                                .optionsLookupDependsOn("name"),
+                            dynamicProperties("fields")
+                                .properties(
+                                    (ActionDefinition.PropertiesFunction) (
+                                        inputParameters, connectionParameters, lookupDependsOnPaths,
+                                        context) -> List.of())
+                                .propertiesLookupDependsOn("name"))));
+
+        assertThat(componentProtoMapper.toComponentDefinition(componentProtoMapper.toProto(componentDefinition)))
+            .usingRecursiveComparison()
+            .withEqualsForFieldsMatchingRegexes(this::jsonEquals, FREE_FORM_FIELDS)
+            .isEqualTo(componentDefinition);
     }
 
     @Test

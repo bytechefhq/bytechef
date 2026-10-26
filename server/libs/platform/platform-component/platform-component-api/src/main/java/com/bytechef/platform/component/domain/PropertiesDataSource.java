@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +27,12 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public final class PropertiesDataSource {
 
-    private final List<String> propertiesLookupDependsOn;
+    private List<String> propertiesLookupDependsOn;
+
+    @JsonCreator
+    private PropertiesDataSource() {
+        this.propertiesLookupDependsOn = List.of();
+    }
 
     public PropertiesDataSource(com.bytechef.component.definition.PropertiesDataSource<?> propertiesDataSource) {
         this.propertiesLookupDependsOn = propertiesDataSource.getPropertiesLookupDependsOn();

@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +28,12 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class OptionsDataSource {
 
-    private final List<String> optionsLookupDependsOn;
+    private List<String> optionsLookupDependsOn;
+
+    @JsonCreator
+    private OptionsDataSource() {
+        this.optionsLookupDependsOn = List.of();
+    }
 
     public OptionsDataSource(com.bytechef.component.definition.OptionsDataSource optionsDataSource) {
         this.optionsLookupDependsOn = OptionalUtils.orElse(optionsDataSource.getOptionsLookupDependsOn(), List.of());

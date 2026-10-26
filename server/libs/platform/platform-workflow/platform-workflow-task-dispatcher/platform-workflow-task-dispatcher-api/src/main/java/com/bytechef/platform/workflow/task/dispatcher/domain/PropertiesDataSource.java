@@ -26,7 +26,7 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class PropertiesDataSource {
 
-    private final List<String> propertiesLookupDependsOn;
+    private List<String> propertiesLookupDependsOn;
 
     public PropertiesDataSource() {
         this.propertiesLookupDependsOn = List.of();
