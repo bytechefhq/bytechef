@@ -20,9 +20,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * A gRPC service for tests: one method answers with the tenant bound while it runs, the other never answers.
+ * A gRPC service for tests: methods answer with the tenant or user bound while they run, one never answers.
  *
  * @version ee
  */
@@ -31,6 +35,13 @@ public final class EchoService implements BindableService {
     public static final MethodDescriptor<String, String> ECHO_TENANT = MethodDescriptor.<String, String>newBuilder()
         .setType(MethodDescriptor.MethodType.UNARY)
         .setFullMethodName(MethodDescriptor.generateFullMethodName("test.Echo", "EchoTenant"))
+        .setRequestMarshaller(new StringMarshaller())
+        .setResponseMarshaller(new StringMarshaller())
+        .build();
+
+    public static final MethodDescriptor<String, String> ECHO_USER = MethodDescriptor.<String, String>newBuilder()
+        .setType(MethodDescriptor.MethodType.UNARY)
+        .setFullMethodName(MethodDescriptor.generateFullMethodName("test.Echo", "EchoUser"))
         .setRequestMarshaller(new StringMarshaller())
         .setResponseMarshaller(new StringMarshaller())
         .build();
@@ -53,6 +64,10 @@ public final class EchoService implements BindableService {
         return ClientCalls.blockingUnaryCall(channel, ECHO_TENANT, CallOptions.DEFAULT, "");
     }
 
+    public static String echoUser(Channel channel) {
+        return ClientCalls.blockingUnaryCall(channel, ECHO_USER, CallOptions.DEFAULT, "");
+    }
+
     public static String large(Channel channel, int length) {
         return ClientCalls.blockingUnaryCall(channel, LARGE, CallOptions.DEFAULT, String.valueOf(length));
     }
@@ -68,12 +83,29 @@ public final class EchoService implements BindableService {
                 responseObserver.onNext(TenantContext.getCurrentTenantId());
                 responseObserver.onCompleted();
             }))
+            .addMethod(ECHO_USER, ServerCalls.asyncUnaryCall((request, responseObserver) -> {
+                responseObserver.onNext(describeUser(SecurityContextHolder.getContext()
+                    .getAuthentication()));
+                responseObserver.onCompleted();
+            }))
             .addMethod(LARGE, ServerCalls.asyncUnaryCall((request, responseObserver) -> {
                 responseObserver.onNext("x".repeat(Integer.parseInt(request)));
                 responseObserver.onCompleted();
             }))
             .addMethod(NEVER_ANSWER, ServerCalls.asyncUnaryCall((request, responseObserver) -> {}))
             .build();
+    }
+
+    public static String describeUser(Authentication authentication) {
+        if (authentication == null) {
+            return "";
+        }
+
+        return authentication.getName() + "|" + authentication.isAuthenticated() + "|" + authentication.getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .sorted()
+            .collect(Collectors.joining(","));
     }
 
     private static final class StringMarshaller implements MethodDescriptor.Marshaller<String> {

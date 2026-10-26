@@ -13,6 +13,7 @@ import com.bytechef.ee.remote.grpc.discovery.DiscoveryClientNameResolverProvider
 import com.bytechef.ee.remote.grpc.interceptor.DeadlineClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextClientInterceptor;
+import com.bytechef.ee.remote.grpc.interceptor.UserContextClientInterceptor;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -117,7 +118,9 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
     private ManagedChannel createManagedChannel(String target, @Nullable String authority) {
         ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
-            .intercept(new TenantContextClientInterceptor(), new ServiceTokenClientInterceptor(serviceToken));
+            .intercept(
+                new TenantContextClientInterceptor(), new UserContextClientInterceptor(),
+                new ServiceTokenClientInterceptor(serviceToken));
 
         if (deadline != null) {
             managedChannelBuilder.intercept(new DeadlineClientInterceptor(deadline));

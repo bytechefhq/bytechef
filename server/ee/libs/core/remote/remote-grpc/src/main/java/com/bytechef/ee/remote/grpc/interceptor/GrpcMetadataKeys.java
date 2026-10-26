@@ -22,6 +22,12 @@ public final class GrpcMetadataKeys {
     public static final Metadata.Key<String> TENANT_ID =
         Metadata.Key.of("x-bytechef-tenant-id", Metadata.ASCII_STRING_MARSHALLER);
 
+    public static final Metadata.Key<String> USER_AUTHORITIES =
+        Metadata.Key.of("x-bytechef-user-authorities", Metadata.ASCII_STRING_MARSHALLER);
+
+    public static final Metadata.Key<String> USER_LOGIN =
+        Metadata.Key.of("x-bytechef-user-login", Metadata.ASCII_STRING_MARSHALLER);
+
     private GrpcMetadataKeys() {
     }
 }

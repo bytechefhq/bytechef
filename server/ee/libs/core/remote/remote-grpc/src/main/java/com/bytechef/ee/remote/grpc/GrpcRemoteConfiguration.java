@@ -11,6 +11,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.remote.grpc.discovery.DiscoveryClientNameResolverProvider;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
+import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
 import io.grpc.BindableService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -101,5 +102,11 @@ public class GrpcRemoteConfiguration {
     @GlobalServerInterceptor
     TenantContextServerInterceptor tenantContextServerInterceptor() {
         return new TenantContextServerInterceptor();
+    }
+
+    @Bean
+    @GlobalServerInterceptor
+    UserContextServerInterceptor userContextServerInterceptor() {
+        return new UserContextServerInterceptor();
     }
 }
