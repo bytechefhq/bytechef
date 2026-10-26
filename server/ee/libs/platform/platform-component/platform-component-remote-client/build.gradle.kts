@@ -6,4 +6,6 @@ dependencies {
 
     implementation(project(":server:ee:libs:core:remote:remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-util"))
+
+    testImplementation(project(":server:libs:test:test-support"))
 }
