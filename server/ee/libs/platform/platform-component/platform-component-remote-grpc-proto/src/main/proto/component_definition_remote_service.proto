@@ -3,7 +3,6 @@ syntax = "proto3";
 package bytechef.platform.component.remote.v1;
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "property.proto";
 
@@ -62,11 +61,11 @@ service TriggerDefinitionFacadeRemoteService {
 }
 
 message RemoteComponentDefinition {
-  optional google.protobuf.Struct action_cluster_element_types = 1;
+  optional bytes action_cluster_element_types = 1;
   repeated RemoteActionDefinition actions = 2;
   optional int32 actions_count = 3;
   optional bool cluster_element = 4;
-  optional google.protobuf.Struct cluster_element_cluster_element_types = 5;
+  optional bytes cluster_element_cluster_element_types = 5;
   repeated RemoteClusterElementType cluster_element_types = 6;
   repeated RemoteClusterElementDefinition cluster_elements = 7;
   map<string, int32> cluster_element_counts = 8 [json_name = "clusterElementsCount"];
@@ -195,7 +194,7 @@ message RemoteAuthorization {
   repeated string detect_on = 2;
   optional string name = 3;
   repeated RemoteProperty properties = 4;
-  repeated google.protobuf.Value refresh_on = 5;
+  bytes refresh_on = 5;
   optional string title = 6;
   optional string type = 7;
 }
@@ -218,8 +217,8 @@ message RemotePropertyGroup {
 
 message RemoteOutputResponse {
   optional RemoteProperty output_schema = 1;
-  optional google.protobuf.Value sample_output = 2;
-  optional google.protobuf.Value placeholder = 3;
+  optional bytes sample_output = 2;
+  optional bytes placeholder = 3;
 }
 
 message RemoteWebhookTriggerFlags {
@@ -230,34 +229,34 @@ message RemoteWebhookTriggerFlags {
 }
 
 message RemoteTriggerOutput {
-  optional google.protobuf.Value value = 1;
-  optional google.protobuf.Value state = 2;
+  optional bytes value = 1;
+  optional bytes state = 2;
   bool batch = 3;
 }
 
 message RemoteWebhookEnableOutput {
-  optional google.protobuf.Struct parameters = 1;
+  optional bytes parameters = 1;
   optional google.protobuf.Timestamp webhook_expiration_date = 2;
 }
 
 message RemoteWebhookRequest {
-  optional google.protobuf.Struct headers = 1;
-  optional google.protobuf.Struct parameters = 2;
+  optional bytes headers = 1;
+  optional bytes parameters = 2;
   optional RemoteWebhookBody body = 3;
   optional string method = 4;
   bool validated = 5;
 }
 
 message RemoteWebhookBody {
-  optional google.protobuf.Value content = 1;
+  optional bytes content = 1;
   optional string content_type = 2;
   optional string mime_type = 3;
   optional string raw_content = 4;
 }
 
 message RemoteWebhookValidateResponse {
-  optional google.protobuf.Value body = 1;
-  optional google.protobuf.Struct headers = 2;
+  optional bytes body = 1;
+  optional bytes headers = 2;
   int32 status = 3;
 }
 
@@ -278,7 +277,7 @@ message StringResponse {
 }
 
 message ValueResponse {
-  optional google.protobuf.Value value = 1;
+  optional bytes value = 1;
 }
 
 message GetComponentDefinitionRequest {
@@ -322,7 +321,7 @@ message ActionExecuteWorkflowNodeDescriptionRequest {
   string component_name = 1;
   int32 component_version = 2;
   string action_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
 }
 
 message GetTriggerDefinitionRequest {
@@ -335,7 +334,7 @@ message ExecuteWorkflowNodeDescriptionRequest {
   string component_name = 1;
   int32 component_version = 2;
   string trigger_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
 }
 
 message GetAuthorizationTypeRequest {
@@ -354,7 +353,7 @@ message ActionExecuteDynamicPropertiesRequest {
   int32 component_version = 2;
   string action_name = 3;
   string property_name = 4;
-  google.protobuf.Struct input_parameters = 5;
+  bytes input_parameters = 5;
   repeated string lookup_depends_on_paths = 6;
   optional string workflow_id = 7;
   optional int64 connection_id = 8;
@@ -365,12 +364,12 @@ message ActionExecuteOptionsRequest {
   int32 component_version = 2;
   string action_name = 3;
   string property_name = 4;
-  google.protobuf.Struct input_parameters = 5;
+  bytes input_parameters = 5;
   repeated string lookup_depends_on_paths = 6;
   optional string search_text = 7;
   optional int64 connection_id = 8;
   map<string, int64> connection_ids = 9;
-  optional google.protobuf.Struct extensions = 10;
+  optional bytes extensions = 10;
   bool multiple_connections = 11;
 }
 
@@ -378,7 +377,7 @@ message ActionExecuteOutputRequest {
   string component_name = 1;
   int32 component_version = 2;
   string action_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
   map<string, int64> connection_ids = 5;
 }
 
@@ -391,14 +390,14 @@ message ActionExecutePerformRequest {
   optional int64 job_id = 6;
   optional int64 task_execution_id = 7;
   optional string workflow_id = 8;
-  google.protobuf.Struct input_parameters = 9;
+  bytes input_parameters = 9;
   map<string, int64> connection_ids = 10;
-  optional google.protobuf.Struct extensions = 11;
+  optional bytes extensions = 11;
   optional int64 environment_id = 12;
   optional string platform_type = 13;
   bool editor_environment = 14;
-  optional google.protobuf.Struct continue_parameters = 15;
-  optional google.protobuf.Struct resume_data = 16;
+  optional bytes continue_parameters = 15;
+  optional bytes resume_data = 16;
   optional google.protobuf.Timestamp suspend_expires_at = 17;
 }
 
@@ -407,7 +406,7 @@ message TriggerExecuteDynamicPropertiesRequest {
   int32 component_version = 2;
   string trigger_name = 3;
   string property_name = 4;
-  google.protobuf.Struct input_parameters = 5;
+  bytes input_parameters = 5;
   repeated string lookup_depends_on_paths = 6;
   optional int64 connection_id = 7;
 }
@@ -416,7 +415,7 @@ message TriggerExecuteDynamicWebhookRefreshRequest {
   string component_name = 1;
   int32 component_version = 2;
   string trigger_name = 3;
-  google.protobuf.Struct output_parameters = 4;
+  bytes output_parameters = 4;
   optional int64 connection_id = 5;
 }
 
@@ -424,7 +423,7 @@ message TriggerExecuteListenerRequest {
   string component_name = 1;
   int32 component_version = 2;
   string trigger_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
   optional string workflow_execution_id = 5;
   optional int64 connection_id = 6;
 }
@@ -434,7 +433,7 @@ message TriggerExecuteOptionsRequest {
   int32 component_version = 2;
   string trigger_name = 3;
   string property_name = 4;
-  google.protobuf.Struct input_parameters = 5;
+  bytes input_parameters = 5;
   repeated string lookup_depends_on_paths = 6;
   optional string search_text = 7;
   optional int64 connection_id = 8;
@@ -444,7 +443,7 @@ message TriggerExecuteOutputRequest {
   string component_name = 1;
   int32 component_version = 2;
   string trigger_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
   optional int64 connection_id = 5;
 }
 
@@ -455,8 +454,8 @@ message TriggerExecuteTriggerRequest {
   optional int64 job_principal_id = 4;
   optional string workflow_uuid = 5;
   optional int64 trigger_execution_id = 6;
-  google.protobuf.Struct input_parameters = 7;
-  optional google.protobuf.Value trigger_state = 8;
+  bytes input_parameters = 7;
+  optional bytes trigger_state = 8;
   optional RemoteWebhookRequest webhook_request = 9;
   optional int64 connection_id = 10;
   optional int64 environment_id = 11;
@@ -468,9 +467,9 @@ message TriggerExecuteWebhookDisableRequest {
   string component_name = 1;
   int32 component_version = 2;
   string trigger_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
   optional string workflow_execution_id = 5;
-  google.protobuf.Struct output_parameters = 6;
+  bytes output_parameters = 6;
   optional int64 connection_id = 7;
 }
 
@@ -478,7 +477,7 @@ message TriggerExecuteWebhookEnableRequest {
   string component_name = 1;
   int32 component_version = 2;
   string trigger_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
   optional string workflow_execution_id = 5;
   optional int64 connection_id = 6;
   optional string webhook_url = 7;
@@ -489,7 +488,7 @@ message TriggerExecuteWebhookValidateRequest {
   string component_name = 1;
   int32 component_version = 2;
   string trigger_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
   optional RemoteWebhookRequest webhook_request = 5;
   optional int64 connection_id = 6;
 }

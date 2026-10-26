@@ -130,6 +130,25 @@ class ConnectionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testConnectionParametersKeepNumberTypes() {
+        Map<String, Object> parameters = Map.of("big", 9_007_199_254_740_993L, "port", 5432, "ratio", 5.0);
+
+        Connection connection = connection(7L);
+
+        connection.setParameters(parameters);
+
+        when(connectionService.getConnection(7L)).thenReturn(connection);
+
+        Map<String, ?> readParameters = remoteConnectionServiceClient.getConnection(7L)
+            .getParameters();
+
+        assertThat(readParameters).isEqualTo(parameters);
+        assertThat(readParameters.get("big")).isInstanceOf(Long.class);
+        assertThat(readParameters.get("port")).isInstanceOf(Integer.class);
+        assertThat(readParameters.get("ratio")).isInstanceOf(Double.class);
+    }
+
+    @Test
     void testServiceListCalls() {
         List<Connection> connections = List.of(connection(7L), connection(8L));
 

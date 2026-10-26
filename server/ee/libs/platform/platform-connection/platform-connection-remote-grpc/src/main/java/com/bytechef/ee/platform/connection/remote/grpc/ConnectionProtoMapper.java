@@ -13,11 +13,15 @@ import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteConnectionDTO
 import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteConnections;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteTag;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteTags;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
+import com.google.protobuf.ByteString;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -29,10 +33,24 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class ConnectionProtoMapper {
 
+    private final JsonBytes jsonBytes;
     private final ProtoJsonMapper protoJsonMapper;
 
     public ConnectionProtoMapper(ObjectMapper objectMapper) {
+        this.jsonBytes = new JsonBytes(objectMapper);
         this.protoJsonMapper = new ProtoJsonMapper(objectMapper);
+    }
+
+    public ByteString toBytes(@Nullable Object value) {
+        return jsonBytes.write(value);
+    }
+
+    public @Nullable Map<String, Object> toMap(ByteString bytes) {
+        return jsonBytes.readMap(bytes);
+    }
+
+    public @Nullable Object toObject(ByteString bytes) {
+        return jsonBytes.read(bytes);
     }
 
     public Connection toConnection(RemoteConnection remoteConnection) {

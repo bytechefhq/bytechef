@@ -64,6 +64,10 @@ class TaskHandlerRemoteServiceGrpcWireTest {
             throw new TaskExecutionException("Bad input");
         }
 
+        if ("bigNumber/v1/get".equals(type)) {
+            return Map.of("id", 9_007_199_254_740_993L);
+        }
+
         return Map.of("type", type, "value", 0.5);
     };
 
@@ -168,21 +172,24 @@ class TaskHandlerRemoteServiceGrpcWireTest {
     }
 
     @Test
-    void testHandleKeepsIntegerAndLargeNumberInputs() throws TaskExecutionException {
+    void testHandleKeepsNumberTypes() throws TaskExecutionException {
         Map<String, Object> parameters = new LinkedHashMap<>();
 
         parameters.put("count", 5);
         parameters.put("id", 9_007_199_254_740_993L);
+        parameters.put("ratio", 5.0);
 
-        remoteTaskHandlerClient.handle("randomHelper/v1/randomFloat",
-            taskExecution("randomHelper/v1/randomFloat", parameters));
+        Object output = remoteTaskHandlerClient.handle(
+            "bigNumber/v1/get", taskExecution("bigNumber/v1/get", parameters));
 
         TaskExecution taskExecution = receivedTaskExecution.get();
         WorkflowTask workflowTask = taskExecution.getWorkflowTask();
         Map<String, ?> receivedParameters = workflowTask.getParameters();
 
         assertThat(receivedParameters.get("count")).isEqualTo(5);
-        assertThat(receivedParameters.get("id")).isEqualTo("9007199254740993");
+        assertThat(receivedParameters.get("id")).isEqualTo(9_007_199_254_740_993L);
+        assertThat(receivedParameters.get("ratio")).isEqualTo(5.0);
+        assertThat(output).isEqualTo(Map.of("id", 9_007_199_254_740_993L));
     }
 
     @Test

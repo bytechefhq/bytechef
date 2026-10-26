@@ -22,7 +22,6 @@ import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteTags;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.TypeRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionDTORequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionDTOTagsRequest;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
@@ -130,7 +129,7 @@ public class ConnectionFacadeRemoteServiceGrpcServer
         ConnectionParametersRequest request, StreamObserver<Empty> responseObserver) {
 
         connectionFacade.replaceAuthorizationParameters(
-            request.getConnectionId(), ProtoValues.toMap(request.getParameters()));
+            request.getConnectionId(), connectionProtoMapper.toMap(request.getParameters()));
 
         replyEmpty(responseObserver);
     }

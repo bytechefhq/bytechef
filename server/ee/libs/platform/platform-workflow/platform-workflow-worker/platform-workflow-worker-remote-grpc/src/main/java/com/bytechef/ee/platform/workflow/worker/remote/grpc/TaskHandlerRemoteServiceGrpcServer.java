@@ -14,7 +14,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.HandleTaskRequest;
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.HandleTaskResponse;
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.TaskHandlerRemoteServiceGrpc;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -58,7 +57,7 @@ public class TaskHandlerRemoteServiceGrpcServer extends TaskHandlerRemoteService
         HandleTaskResponse.Builder builder = HandleTaskResponse.newBuilder();
 
         if (output != null) {
-            builder.setOutput(ProtoValues.toValue(output));
+            builder.setOutput(taskExecutionProtoMapper.toBytes(output));
         }
 
         responseObserver.onNext(builder.build());

@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package bytechef.platform.workflow.worker.remote.v1;
 
-import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
@@ -18,7 +17,7 @@ message HandleTaskRequest {
 }
 
 message HandleTaskResponse {
-  optional google.protobuf.Value output = 1;
+  optional bytes output = 1;
 }
 
 message RemoteTaskExecution {
@@ -29,7 +28,7 @@ message RemoteTaskExecution {
   optional int64 id = 5;
   optional int64 job_id = 6;
   optional int32 max_retries = 7;
-  optional google.protobuf.Struct metadata = 8;
+  optional bytes metadata = 8;
   optional bool new = 9;
   optional RemoteFileEntry output = 10;
   optional int64 parent_id = 11;
@@ -41,7 +40,7 @@ message RemoteTaskExecution {
   optional google.protobuf.Timestamp start_date = 18;
   optional string status = 19;
   optional int32 task_number = 20;
-  optional google.protobuf.Struct workflow_task = 21;
+  optional bytes workflow_task = 21;
   optional string created_by = 22;
   optional google.protobuf.Timestamp created_date = 23;
   optional string last_modified_by = 24;

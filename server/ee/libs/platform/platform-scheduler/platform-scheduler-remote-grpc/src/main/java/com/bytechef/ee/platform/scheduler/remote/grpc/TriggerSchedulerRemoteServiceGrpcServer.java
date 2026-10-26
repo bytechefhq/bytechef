@@ -13,12 +13,13 @@ import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ScheduleOneTimeTaskR
 import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ScheduleScheduleTriggerRequest;
 import com.bytechef.ee.platform.scheduler.remote.grpc.proto.TriggerSchedulerRemoteServiceGrpc;
 import com.bytechef.ee.platform.scheduler.remote.grpc.proto.WorkflowExecutionIdRequest;
-import com.bytechef.ee.remote.grpc.ProtoValues;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -29,10 +30,12 @@ public class TriggerSchedulerRemoteServiceGrpcServer
     extends TriggerSchedulerRemoteServiceGrpc.TriggerSchedulerRemoteServiceImplBase {
 
     private final TriggerScheduler triggerScheduler;
+    private final JsonBytes jsonBytes;
 
     @SuppressFBWarnings("EI")
-    public TriggerSchedulerRemoteServiceGrpcServer(TriggerScheduler triggerScheduler) {
+    public TriggerSchedulerRemoteServiceGrpcServer(TriggerScheduler triggerScheduler, ObjectMapper objectMapper) {
         this.triggerScheduler = triggerScheduler;
+        this.jsonBytes = new JsonBytes(objectMapper);
     }
 
     @Override
@@ -83,7 +86,7 @@ public class TriggerSchedulerRemoteServiceGrpcServer
     public void scheduleOneTimeTask(ScheduleOneTimeTaskRequest request, StreamObserver<Empty> responseObserver) {
         triggerScheduler.scheduleOneTimeTask(
             SchedulerProtoTimestamps.toInstant(request.getExecuteAt()),
-            request.hasOutput() ? ProtoValues.toMap(request.getOutput()) : null, request.getJobId());
+            request.hasOutput() ? jsonBytes.readMap(request.getOutput()) : null, request.getJobId());
 
         replyEmpty(responseObserver);
     }
@@ -101,7 +104,7 @@ public class TriggerSchedulerRemoteServiceGrpcServer
 
         triggerScheduler.scheduleScheduleTrigger(
             request.getPattern(), request.hasZoneId() ? request.getZoneId() : null,
-            request.hasOutput() ? ProtoValues.toMap(request.getOutput()) : null,
+            request.hasOutput() ? jsonBytes.readMap(request.getOutput()) : null,
             WorkflowExecutionId.parse(request.getWorkflowExecutionId()));
 
         replyEmpty(responseObserver);

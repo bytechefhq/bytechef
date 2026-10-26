@@ -16,12 +16,13 @@ import com.bytechef.ee.platform.scheduler.remote.grpc.proto.TriggerSchedulerRemo
 import com.bytechef.ee.platform.scheduler.remote.grpc.proto.TriggerSchedulerRemoteServiceGrpc.TriggerSchedulerRemoteServiceBlockingStub;
 import com.bytechef.ee.platform.scheduler.remote.grpc.proto.WorkflowExecutionIdRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.time.Instant;
 import java.util.Map;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -34,9 +35,11 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     private static final String SCHEDULER_APP = "scheduler-app";
 
     private final GrpcChannels grpcChannels;
+    private final JsonBytes jsonBytes;
 
-    public RemoteTriggerSchedulerClient(GrpcChannels grpcChannels) {
+    public RemoteTriggerSchedulerClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
         this.grpcChannels = grpcChannels;
+        this.jsonBytes = new JsonBytes(objectMapper);
     }
 
     @Override
@@ -102,7 +105,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
         }
 
         if (output != null) {
-            builder.setOutput(ProtoValues.toStruct(output));
+            builder.setOutput(jsonBytes.write(output));
         }
 
         getStub().scheduleScheduleTrigger(builder.build());
@@ -115,7 +118,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
             .setJobId(jobId);
 
         if (output != null) {
-            builder.setOutput(ProtoValues.toStruct(output));
+            builder.setOutput(jsonBytes.write(output));
         }
 
         getStub().scheduleOneTimeTask(builder.build());

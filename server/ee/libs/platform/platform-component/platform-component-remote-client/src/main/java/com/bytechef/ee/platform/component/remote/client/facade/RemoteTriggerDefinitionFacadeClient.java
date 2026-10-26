@@ -25,7 +25,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhoo
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookEnableRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookValidateRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -78,7 +77,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
             .setPropertyName(propertyName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
             .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
 
         if (connectionId != null) {
@@ -98,7 +97,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
                 .setComponentName(componentName)
                 .setComponentVersion(componentVersion)
                 .setTriggerName(triggerName)
-                .setOutputParameters(ProtoValues.toStruct(outputParameters));
+                .setOutputParameters(componentProtoMapper.toBytes(outputParameters));
 
         if (connectionId != null) {
             builder.setConnectionId(connectionId);
@@ -139,7 +138,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
             .setPropertyName(propertyName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
             .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
 
         if (searchText != null) {
@@ -162,7 +161,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters));
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
 
         if (connectionId != null) {
             builder.setConnectionId(connectionId);
@@ -181,7 +180,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
             .setEditorEnvironment(editorEnvironment);
 
         if (jobPrincipalId != null) {
@@ -197,7 +196,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
         }
 
         if (triggerState != null) {
-            builder.setTriggerState(ProtoValues.toValue(triggerState));
+            builder.setTriggerState(componentProtoMapper.toBytes(triggerState));
         }
 
         if (webhookRequest != null) {
@@ -228,8 +227,8 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
-            .setOutputParameters(ProtoValues.toStruct(outputParameters));
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
+            .setOutputParameters(componentProtoMapper.toBytes(outputParameters));
 
         if (workflowExecutionId != null) {
             builder.setWorkflowExecutionId(workflowExecutionId);
@@ -251,7 +250,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
             .setEnvironmentId(environmentId);
 
         if (workflowExecutionId != null) {
@@ -285,7 +284,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters));
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
 
         if (webhookRequest != null) {
             builder.setWebhookRequest(componentProtoMapper.toProto(webhookRequest));
@@ -307,7 +306,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
         throw new UnsupportedOperationException();
     }
 
-    private static TriggerExecuteListenerRequest getListenerRequest(
+    private TriggerExecuteListenerRequest getListenerRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, Long connectionId) {
 
@@ -315,7 +314,7 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setTriggerName(triggerName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters));
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
 
         if (workflowExecutionId != null) {
             builder.setWorkflowExecutionId(workflowExecutionId);

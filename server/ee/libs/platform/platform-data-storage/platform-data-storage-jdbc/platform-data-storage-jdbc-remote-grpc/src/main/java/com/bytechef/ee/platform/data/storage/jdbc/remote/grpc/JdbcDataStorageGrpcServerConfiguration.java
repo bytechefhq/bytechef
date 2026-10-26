@@ -12,6 +12,7 @@ import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -25,8 +26,8 @@ public class JdbcDataStorageGrpcServerConfiguration {
 
     @Bean
     JdbcDataStorageRemoteServiceGrpcServer jdbcDataStorageRemoteServiceGrpcServer(
-        JdbcDataStorageService jdbcDataStorageService) {
+        JdbcDataStorageService jdbcDataStorageService, ObjectMapper objectMapper) {
 
-        return new JdbcDataStorageRemoteServiceGrpcServer(jdbcDataStorageService);
+        return new JdbcDataStorageRemoteServiceGrpcServer(jdbcDataStorageService, objectMapper);
     }
 }
