@@ -1,0 +1,465 @@
+syntax = "proto3";
+
+package bytechef.platform.component.remote.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "property.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.component.remote.grpc.proto";
+
+service ComponentDefinitionRemoteService {
+  rpc GetComponentDefinition(GetComponentDefinitionRequest) returns (RemoteComponentDefinition);
+  rpc GetComponentDefinitions(GetComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
+  rpc GetComponentDefinitionVersions(GetComponentDefinitionVersionsRequest) returns (RemoteComponentDefinitions);
+}
+
+service ActionDefinitionRemoteService {
+  rpc GetActionDefinition(GetActionDefinitionRequest) returns (RemoteActionDefinition);
+  rpc GetActionDefinitions(ComponentVersionRequest) returns (RemoteActionDefinitions);
+}
+
+service TriggerDefinitionRemoteService {
+  rpc ExecuteWorkflowNodeDescription(ExecuteWorkflowNodeDescriptionRequest) returns (StringResponse);
+  rpc GetTriggerDefinition(GetTriggerDefinitionRequest) returns (RemoteTriggerDefinition);
+  rpc GetTriggerDefinitions(ComponentVersionRequest) returns (RemoteTriggerDefinitions);
+  rpc GetWebhookTriggerFlags(GetTriggerDefinitionRequest) returns (RemoteWebhookTriggerFlags);
+}
+
+service ConnectionDefinitionRemoteService {
+  rpc GetAuthorizationType(GetAuthorizationTypeRequest) returns (StringResponse);
+  rpc GetComponentConnectionDefinitions(GetConnectionDefinitionRequest) returns (RemoteConnectionDefinitions);
+  rpc GetConnectionDefinition(GetConnectionDefinitionRequest) returns (RemoteConnectionDefinition);
+  rpc GetConnectionDefinitions(google.protobuf.Empty) returns (RemoteConnectionDefinitions);
+}
+
+service ActionDefinitionFacadeRemoteService {
+  rpc ExecuteDynamicProperties(ActionExecuteDynamicPropertiesRequest) returns (RemoteProperties);
+  rpc ExecuteOptions(ActionExecuteOptionsRequest) returns (RemoteOptions);
+  rpc ExecuteOutput(ActionExecuteOutputRequest) returns (OutputResponseResult);
+  rpc ExecutePerform(ActionExecutePerformRequest) returns (ValueResponse);
+}
+
+service TriggerDefinitionFacadeRemoteService {
+  rpc ExecuteDynamicProperties(TriggerExecuteDynamicPropertiesRequest) returns (RemoteProperties);
+  rpc ExecuteDynamicWebhookRefresh(TriggerExecuteDynamicWebhookRefreshRequest) returns (WebhookEnableOutputResult);
+  rpc ExecuteListenerDisable(TriggerExecuteListenerRequest) returns (google.protobuf.Empty);
+  rpc ExecuteListenerEnable(TriggerExecuteListenerRequest) returns (google.protobuf.Empty);
+  rpc ExecuteOptions(TriggerExecuteOptionsRequest) returns (RemoteOptions);
+  rpc ExecuteOutput(TriggerExecuteOutputRequest) returns (OutputResponseResult);
+  rpc ExecuteTrigger(TriggerExecuteTriggerRequest) returns (RemoteTriggerOutput);
+  rpc ExecuteWebhookDisable(TriggerExecuteWebhookDisableRequest) returns (google.protobuf.Empty);
+  rpc ExecuteWebhookEnable(TriggerExecuteWebhookEnableRequest) returns (WebhookEnableOutputResult);
+  rpc ExecuteWebhookValidate(TriggerExecuteWebhookValidateRequest) returns (RemoteWebhookValidateResponse);
+}
+
+message RemoteComponentDefinition {
+  optional google.protobuf.Struct action_cluster_element_types = 1;
+  repeated RemoteActionDefinition actions = 2;
+  optional int32 actions_count = 3;
+  optional bool cluster_element = 4;
+  optional google.protobuf.Struct cluster_element_cluster_element_types = 5;
+  repeated RemoteClusterElementType cluster_element_types = 6;
+  repeated RemoteClusterElementDefinition cluster_elements = 7;
+  map<string, int32> cluster_element_counts = 8 [json_name = "clusterElementsCount"];
+  optional bool cluster_root = 9;
+  repeated RemoteComponentCategory component_categories = 10;
+  optional RemoteConnectionDefinition connection = 11;
+  optional bool connection_required = 12;
+  optional string description = 13;
+  optional string icon = 14;
+  repeated RemotePropertyGroup inputs = 15;
+  optional string name = 16;
+  optional RemoteResources resources = 17;
+  repeated string tags = 18;
+  optional string title = 19;
+  repeated RemoteTriggerDefinition triggers = 20;
+  optional int32 triggers_count = 21;
+  optional string unified_api_category = 22;
+  optional int32 version = 23;
+}
+
+message RemoteComponentDefinitions {
+  repeated RemoteComponentDefinition component_definitions = 1;
+}
+
+message RemoteActionDefinition {
+  optional bool batch = 1;
+  optional string component_name = 2;
+  optional int32 component_version = 3;
+  optional string description = 4;
+  optional RemoteHelp help = 5;
+  optional string name = 6;
+  optional bool output_defined = 7;
+  optional bool output_file_entry = 8;
+  optional bool output_function_defined = 9;
+  optional RemoteOutputResponse output_response = 10;
+  optional bool output_schema_defined = 11;
+  repeated RemoteProperty properties = 12;
+  optional bool resume_perform_function_defined = 13;
+  optional bool single_connection = 14;
+  optional bool sse_stream_response = 15;
+  optional string title = 16;
+  optional bool workflow_node_description_defined = 17;
+}
+
+message RemoteActionDefinitions {
+  repeated RemoteActionDefinition action_definitions = 1;
+}
+
+message RemoteTriggerDefinition {
+  optional bool batch = 1;
+  optional string component_name = 2;
+  optional int32 component_version = 3;
+  optional string description = 4;
+  optional RemoteHelp help = 5;
+  optional string name = 6;
+  optional bool output_defined = 7;
+  optional bool output_file_entry = 8;
+  optional bool output_function_defined = 9;
+  optional RemoteOutputResponse output_response = 10;
+  optional bool output_schema_defined = 11;
+  repeated RemoteProperty properties = 12;
+  optional string title = 13;
+  optional string type = 14;
+  optional bool webhook_raw_body = 15;
+  optional bool workflow_node_description_defined = 16;
+  optional bool workflow_sync_execution = 17;
+  optional bool workflow_sync_on_enable_validation = 18;
+  optional bool workflow_sync_validation = 19;
+}
+
+message RemoteTriggerDefinitions {
+  repeated RemoteTriggerDefinition trigger_definitions = 1;
+}
+
+message RemoteClusterElementDefinition {
+  optional string component_name = 1;
+  optional int32 component_version = 2;
+  optional string description = 3;
+  optional RemoteHelp help = 4;
+  optional string icon = 5;
+  optional string name = 6;
+  optional bool output_defined = 7;
+  optional bool output_function_defined = 8;
+  optional RemoteOutputResponse output_response = 9;
+  optional bool output_schema_defined = 10;
+  repeated RemoteProperty properties = 11;
+  optional bool testable = 12;
+  optional string title = 13;
+  optional RemoteClusterElementType type = 14;
+}
+
+message RemoteClusterElementType {
+  optional string key = 1;
+  optional string label = 2;
+  optional bool multiple_elements = 3;
+  optional string name = 4;
+  optional bool required = 5;
+}
+
+message RemoteComponentCategory {
+  optional string label = 1;
+  optional string name = 2;
+}
+
+message RemoteConnectionDefinition {
+  optional bool authorization_required = 1;
+  repeated RemoteAuthorization authorizations = 2;
+  optional string component_description = 3;
+  optional string component_name = 4;
+  optional string component_title = 5;
+  optional RemoteHelp help = 6;
+  repeated RemoteProperty properties = 7;
+  optional int32 version = 8;
+}
+
+message RemoteConnectionDefinitions {
+  repeated RemoteConnectionDefinition connection_definitions = 1;
+}
+
+message RemoteAuthorization {
+  optional string description = 1;
+  repeated string detect_on = 2;
+  optional string name = 3;
+  repeated RemoteProperty properties = 4;
+  repeated google.protobuf.Value refresh_on = 5;
+  optional string title = 6;
+  optional string type = 7;
+}
+
+message RemoteHelp {
+  optional string body = 1;
+  optional string learn_more_url = 2;
+}
+
+message RemoteResources {
+  map<string, string> additional_urls = 1;
+  optional string documentation_url = 2;
+}
+
+message RemotePropertyGroup {
+  optional string label = 1;
+  optional string name = 2;
+  repeated RemoteProperty properties = 3;
+}
+
+message RemoteOutputResponse {
+  optional RemoteProperty output_schema = 1;
+  optional google.protobuf.Value sample_output = 2;
+  optional google.protobuf.Value placeholder = 3;
+}
+
+message RemoteWebhookTriggerFlags {
+  bool webhook_raw_body = 1;
+  bool workflow_sync_execution = 2;
+  bool workflow_sync_validation = 3;
+  bool workflow_sync_on_enable_validation = 4;
+}
+
+message RemoteTriggerOutput {
+  optional google.protobuf.Value value = 1;
+  optional google.protobuf.Value state = 2;
+  bool batch = 3;
+}
+
+message RemoteWebhookEnableOutput {
+  optional google.protobuf.Struct parameters = 1;
+  optional google.protobuf.Timestamp webhook_expiration_date = 2;
+}
+
+message RemoteWebhookRequest {
+  optional google.protobuf.Struct headers = 1;
+  optional google.protobuf.Struct parameters = 2;
+  optional RemoteWebhookBody body = 3;
+  optional string method = 4;
+  bool validated = 5;
+}
+
+message RemoteWebhookBody {
+  optional google.protobuf.Value content = 1;
+  optional string content_type = 2;
+  optional string mime_type = 3;
+  optional string raw_content = 4;
+}
+
+message RemoteWebhookValidateResponse {
+  optional google.protobuf.Value body = 1;
+  optional google.protobuf.Struct headers = 2;
+  int32 status = 3;
+}
+
+message OutputResponseResult {
+  optional RemoteOutputResponse output_response = 1;
+}
+
+message WebhookEnableOutputResult {
+  optional RemoteWebhookEnableOutput webhook_enable_output = 1;
+}
+
+message StringResponse {
+  optional string value = 1;
+}
+
+message ValueResponse {
+  optional google.protobuf.Value value = 1;
+}
+
+message GetComponentDefinitionRequest {
+  string name = 1;
+  optional int32 version = 2;
+}
+
+message GetComponentDefinitionsRequest {
+  optional bool action_definitions = 1;
+  optional bool cluster_element_definitions = 2;
+  optional bool connection_definitions = 3;
+  optional bool trigger_definitions = 4;
+  repeated string include = 5;
+}
+
+message GetComponentDefinitionVersionsRequest {
+  string name = 1;
+}
+
+message ComponentVersionRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+}
+
+message GetActionDefinitionRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string action_name = 3;
+}
+
+message GetTriggerDefinitionRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+}
+
+message ExecuteWorkflowNodeDescriptionRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+}
+
+message GetAuthorizationTypeRequest {
+  string component_name = 1;
+  int32 connection_version = 2;
+  optional string authorization_type = 3;
+}
+
+message GetConnectionDefinitionRequest {
+  string component_name = 1;
+  optional int32 component_version = 2;
+}
+
+message ActionExecuteDynamicPropertiesRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string action_name = 3;
+  string property_name = 4;
+  google.protobuf.Struct input_parameters = 5;
+  repeated string lookup_depends_on_paths = 6;
+  optional string workflow_id = 7;
+  optional int64 connection_id = 8;
+}
+
+message ActionExecuteOptionsRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string action_name = 3;
+  string property_name = 4;
+  google.protobuf.Struct input_parameters = 5;
+  repeated string lookup_depends_on_paths = 6;
+  optional string search_text = 7;
+  optional int64 connection_id = 8;
+  map<string, int64> connection_ids = 9;
+  optional google.protobuf.Struct extensions = 10;
+  bool multiple_connections = 11;
+}
+
+message ActionExecuteOutputRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string action_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+  map<string, int64> connection_ids = 5;
+}
+
+message ActionExecutePerformRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string action_name = 3;
+  optional int64 job_principal_id = 4;
+  optional int64 job_principal_workflow_id = 5;
+  optional int64 job_id = 6;
+  optional int64 task_execution_id = 7;
+  optional string workflow_id = 8;
+  google.protobuf.Struct input_parameters = 9;
+  map<string, int64> connection_ids = 10;
+  optional google.protobuf.Struct extensions = 11;
+  optional int64 environment_id = 12;
+  optional string platform_type = 13;
+  bool editor_environment = 14;
+  optional google.protobuf.Struct continue_parameters = 15;
+  optional google.protobuf.Struct resume_data = 16;
+  optional google.protobuf.Timestamp suspend_expires_at = 17;
+}
+
+message TriggerExecuteDynamicPropertiesRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  string property_name = 4;
+  google.protobuf.Struct input_parameters = 5;
+  repeated string lookup_depends_on_paths = 6;
+  optional int64 connection_id = 7;
+}
+
+message TriggerExecuteDynamicWebhookRefreshRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  google.protobuf.Struct output_parameters = 4;
+  optional int64 connection_id = 5;
+}
+
+message TriggerExecuteListenerRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+  optional string workflow_execution_id = 5;
+  optional int64 connection_id = 6;
+}
+
+message TriggerExecuteOptionsRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  string property_name = 4;
+  google.protobuf.Struct input_parameters = 5;
+  repeated string lookup_depends_on_paths = 6;
+  optional string search_text = 7;
+  optional int64 connection_id = 8;
+}
+
+message TriggerExecuteOutputRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+  optional int64 connection_id = 5;
+}
+
+message TriggerExecuteTriggerRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  optional int64 job_principal_id = 4;
+  optional string workflow_uuid = 5;
+  optional int64 trigger_execution_id = 6;
+  google.protobuf.Struct input_parameters = 7;
+  optional google.protobuf.Value trigger_state = 8;
+  optional RemoteWebhookRequest webhook_request = 9;
+  optional int64 connection_id = 10;
+  optional int64 environment_id = 11;
+  optional string platform_type = 12;
+  bool editor_environment = 13;
+}
+
+message TriggerExecuteWebhookDisableRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+  optional string workflow_execution_id = 5;
+  google.protobuf.Struct output_parameters = 6;
+  optional int64 connection_id = 7;
+}
+
+message TriggerExecuteWebhookEnableRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+  optional string workflow_execution_id = 5;
+  optional int64 connection_id = 6;
+  optional string webhook_url = 7;
+  int64 environment_id = 8;
+}
+
+message TriggerExecuteWebhookValidateRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string trigger_name = 3;
+  google.protobuf.Struct input_parameters = 4;
+  optional RemoteWebhookRequest webhook_request = 5;
+  optional int64 connection_id = 6;
+}
