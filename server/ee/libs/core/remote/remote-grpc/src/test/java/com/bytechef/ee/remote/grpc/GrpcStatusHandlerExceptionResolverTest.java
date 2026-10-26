@@ -29,24 +29,24 @@ class GrpcStatusHandlerExceptionResolverTest {
         new GrpcStatusHandlerExceptionResolver(JSON_MAPPER);
 
     @Test
-    void testPermissionDeniedBecomesForbidden() throws Exception {
+    void testPermissionDeniedKeepsItsReasonLikeALocalDenial() throws Exception {
         MockHttpServletResponse mockHttpServletResponse = resolve(
             Status.PERMISSION_DENIED
                 .withDescription("Only the connection creator or an admin can modify connection 7"));
 
         JsonNode problemDetail = JSON_MAPPER.readTree(mockHttpServletResponse.getContentAsString());
 
-        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(403);
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(500);
         assertThat(mockHttpServletResponse.getContentType()).isEqualTo("application/problem+json");
         assertThat(problemDetail.get("detail")
             .asString()).isEqualTo("Only the connection creator or an admin can modify connection 7");
         assertThat(problemDetail.get("status")
-            .asInt()).isEqualTo(403);
+            .asInt()).isEqualTo(500);
     }
 
     @Test
     void testStatusesMapToHttp() throws Exception {
-        assertThat(resolve(Status.UNAUTHENTICATED).getStatus()).isEqualTo(401);
+        assertThat(resolve(Status.UNAUTHENTICATED).getStatus()).isEqualTo(500);
         assertThat(resolve(Status.NOT_FOUND).getStatus()).isEqualTo(404);
         assertThat(resolve(Status.INVALID_ARGUMENT).getStatus()).isEqualTo(400);
         assertThat(resolve(Status.INTERNAL.withDescription("IllegalStateException: boom")).getStatus())

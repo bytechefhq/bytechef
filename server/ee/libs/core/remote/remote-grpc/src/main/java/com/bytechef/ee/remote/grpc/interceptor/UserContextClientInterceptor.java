@@ -14,8 +14,9 @@ import io.grpc.ClientInterceptor;
 import io.grpc.ForwardingClientCall;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
-import java.util.stream.Collectors;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import java.nio.charset.StandardCharsets;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -23,7 +24,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Sends the login and authorities of the caller's authenticated user with every outgoing call.
+ * Sends the login and authorities of the caller's interactively authenticated platform user with every outgoing call;
+ * API-key and connected-user principals are not carried.
  *
  * @version ee
  */
@@ -44,13 +46,16 @@ public class UserContextClientInterceptor implements ClientInterceptor {
             @Override
             public void start(Listener<RespT> responseListener, Metadata metadata) {
                 if (login != null) {
-                    metadata.put(GrpcMetadataKeys.USER_LOGIN, login);
-                    metadata.put(
-                        GrpcMetadataKeys.USER_AUTHORITIES,
-                        authentication.getAuthorities()
-                            .stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .collect(Collectors.joining(",")));
+                    metadata.put(GrpcMetadataKeys.USER_LOGIN, login.getBytes(StandardCharsets.UTF_8));
+
+                    for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
+                        String authority = grantedAuthority.getAuthority();
+
+                        if (authority != null) {
+                            metadata.put(
+                                GrpcMetadataKeys.USER_AUTHORITY, authority.getBytes(StandardCharsets.UTF_8));
+                        }
+                    }
                 }
 
                 super.start(responseListener, metadata);
@@ -59,8 +64,8 @@ public class UserContextClientInterceptor implements ClientInterceptor {
     }
 
     private static String getLogin(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated() ||
-            authentication instanceof AnonymousAuthenticationToken) {
+        if (!(authentication instanceof UsernamePasswordAuthenticationToken ||
+            authentication instanceof RememberMeAuthenticationToken) || !authentication.isAuthenticated()) {
 
             return null;
         }
