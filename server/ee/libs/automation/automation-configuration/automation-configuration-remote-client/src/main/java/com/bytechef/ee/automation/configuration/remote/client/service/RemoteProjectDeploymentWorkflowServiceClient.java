@@ -10,13 +10,18 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentWorkflowConnectionResult;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentWorkflowRemoteServiceGrpc;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentWorkflowRemoteServiceGrpc.ProjectDeploymentWorkflowRemoteServiceBlockingStub;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentWorkflowRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -28,12 +33,12 @@ import org.springframework.stereotype.Component;
 public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDeploymentWorkflowService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String PROJECT_DEPLOYMENT_WORKFLOW_SERVICE = "/remote/project/deployment-workflow-service";
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final AutomationConfigurationProtoMapper automationConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteProjectDeploymentWorkflowServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteProjectDeploymentWorkflowServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.automationConfigurationProtoMapper = new AutomationConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -75,30 +80,27 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
 
     @Override
     public ProjectDeploymentWorkflow getProjectDeploymentWorkflow(long projectDeploymentId, String workflowId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(
-                    PROJECT_DEPLOYMENT_WORKFLOW_SERVICE +
-                        "/get-project/deployment-workflow/{projectDeploymentId}/{workflowId}")
-                .build(projectDeploymentId, workflowId),
-            ProjectDeploymentWorkflow.class);
+        return automationConfigurationProtoMapper.toProjectDeploymentWorkflow(
+            getStub().getProjectDeploymentWorkflow(toRequest(projectDeploymentId, workflowId)));
     }
 
     @Override
     public Optional<ProjectDeploymentWorkflowConnection> fetchProjectDeploymentWorkflowConnection(
-        long projectDeploymentOd, String workflowId, String workflowNodeName, String workflowConnectionKey) {
+        long projectDeploymentId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
+        ProjectDeploymentWorkflowConnectionResult projectDeploymentWorkflowConnectionResult =
+            getStub().fetchProjectDeploymentWorkflowConnection(
+                toRequest(projectDeploymentId, workflowId).toBuilder()
+                    .setWorkflowNodeName(workflowNodeName)
+                    .setWorkflowConnectionKey(workflowConnectionKey)
+                    .build());
 
-        return Optional.ofNullable(
-            loadBalancedRestClient.get(
-                uriBuilder -> uriBuilder
-                    .host(CONFIGURATION_APP)
-                    .path(
-                        PROJECT_DEPLOYMENT_WORKFLOW_SERVICE +
-                            "/fetch-project/deployment-workflow-connection/{projectDeploymentId}/{workflowId}/" +
-                            "{workflowNodeName}/{workflowConnectionKey}")
-                    .build(projectDeploymentOd, workflowId, workflowNodeName, workflowConnectionKey),
-                ProjectDeploymentWorkflowConnection.class));
+        if (!projectDeploymentWorkflowConnectionResult.hasConnection()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+            automationConfigurationProtoMapper.toProjectDeploymentWorkflowConnection(
+                projectDeploymentWorkflowConnectionResult.getConnection()));
     }
 
     @Override
@@ -109,16 +111,11 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     @Override
     public List<ProjectDeploymentWorkflowConnection> getProjectDeploymentWorkflowConnections(
         long projectDeploymentId, String workflowId, String workflowNodeName) {
-
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(
-                    PROJECT_DEPLOYMENT_WORKFLOW_SERVICE +
-                        "/get-project/deployment-workflow-connection/{projectDeploymentId}/{workflowId}/" +
-                        "{workflowNodeName}")
-                .build(projectDeploymentId, workflowId, workflowNodeName),
-            new ParameterizedTypeReference<>() {});
+        return automationConfigurationProtoMapper.toProjectDeploymentWorkflowConnections(
+            getStub().getProjectDeploymentWorkflowConnections(
+                toRequest(projectDeploymentId, workflowId).toBuilder()
+                    .setWorkflowNodeName(workflowNodeName)
+                    .build()));
     }
 
     @Override
@@ -138,14 +135,11 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
 
     @Override
     public boolean isConnectionUsed(long connectionId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(
-                    PROJECT_DEPLOYMENT_WORKFLOW_SERVICE +
-                        "/is-connection-used/{connectionId}")
-                .build(connectionId),
-            Boolean.class);
+        return getStub().isConnectionUsed(
+            IdRequest.newBuilder()
+                .setId(connectionId)
+                .build())
+            .getValue();
     }
 
     @Override
@@ -166,5 +160,16 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     @Override
     public void updateEnabled(Long id, boolean enable) {
         throw new UnsupportedOperationException();
+    }
+
+    private ProjectDeploymentWorkflowRemoteServiceBlockingStub getStub() {
+        return ProjectDeploymentWorkflowRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+    }
+
+    private static ProjectDeploymentWorkflowRequest toRequest(long projectDeploymentId, String workflowId) {
+        return ProjectDeploymentWorkflowRequest.newBuilder()
+            .setProjectDeploymentId(projectDeploymentId)
+            .setWorkflowId(workflowId)
+            .build();
     }
 }
