@@ -14,6 +14,7 @@ dependencies {
     api("com.google.protobuf:protobuf-java")
     api("com.google.protobuf:protobuf-java-util")
     api("org.springframework.cloud:spring-cloud-commons")
+    api("tools.jackson.core:jackson-databind")
 
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
