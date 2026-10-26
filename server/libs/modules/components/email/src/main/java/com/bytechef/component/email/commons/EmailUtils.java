@@ -38,7 +38,7 @@ public class EmailUtils {
         props.setProperty("mail.store.protocol", protocol.name());
         props.setProperty("mail.debug", "true");
 
-        switch (connectionParameters.getRequiredString(CRYPTOGRAPHIC_PROTOCOL)) {
+        switch (connectionParameters.getString(CRYPTOGRAPHIC_PROTOCOL, "")) {
             case TLS -> props.put(String.format("mail.%s.starttls.enable", protocol), "true");
             case SSL -> {
                 props.put(String.format("mail.%s.ssl.enable", protocol), "true");
