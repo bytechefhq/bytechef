@@ -7,18 +7,20 @@
 
 package com.bytechef.ee.platform.data.storage.db.remote.client.service;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageKeyRequest;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageScopeRequest;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DeleteScopeDataRequest;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.FetchDataStorageValueResponse;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc.JdbcDataStorageRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutDataStorageValueRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.jdbc.domain.DataEntryVersion;
-import com.bytechef.platform.data.storage.jdbc.domain.VersionedValue;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
-import org.springframework.core.ParameterizedTypeReference;
 
 /**
  * @version ee
@@ -28,122 +30,107 @@ import org.springframework.core.ParameterizedTypeReference;
 public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageService {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String DATA_STORAGE_SERVICE = "/remote/jdbc-data-storage-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteJdbcDataStorageServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteJdbcDataStorageServiceClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public void delete(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
-        loadBalancedRestClient.delete(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(DATA_STORAGE_SERVICE
-                    + "/delete/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}")
-                .build(componentName, scope, scopeId, key, environmentId, type));
+
+        getStub().delete(toDataStorageKeyRequest(componentName, scope, scopeId, key, environmentId, type));
     }
 
     @Override
-    public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
-        loadBalancedRestClient.delete(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(DATA_STORAGE_SERVICE + "/delete-scope-data/{scope}/{scopeId}/{type}")
-                .build(scope, scopeId, type));
+    public void deleteScopeData(DataStorageScope scope, String scopeId) {
+        DeleteScopeDataRequest deleteScopeDataRequest = DeleteScopeDataRequest.newBuilder()
+            .setScope(scope.name())
+            .setScopeId(scopeId)
+            .build();
+
+        getStub().deleteScopeData(deleteScopeDataRequest);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
 
-        return fetchValue(componentName, scope, scopeId, key, environmentId, type);
+        FetchDataStorageValueResponse fetchDataStorageValueResponse = getStub().fetch(
+            toDataStorageKeyRequest(componentName, scope, scopeId, key, environmentId, type));
+
+        if (!fetchDataStorageValueResponse.hasValue()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable((T) ProtoValues.toObject(fetchDataStorageValueResponse.getValue()));
     }
 
     @Override
     public <T> T get(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
-        Optional<T> valueOptional = fetchValue(componentName, scope, scopeId, key, environmentId, type);
 
-        return valueOptional.orElseThrow();
+        Optional<T> value = fetch(componentName, scope, scopeId, key, environmentId, type);
+
+        return value.orElseThrow(() -> new IllegalArgumentException("No data storage value for key " + key));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
         String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
-        throw new UnsupportedOperationException();
+
+        DataStorageScopeRequest.Builder builder = DataStorageScopeRequest.newBuilder()
+            .setComponentName(componentName)
+            .setScope(scope.name())
+            .setScopeId(scopeId)
+            .setEnvironmentId(environmentId);
+
+        if (type != null) {
+            builder.setType(type.name());
+        }
+
+        return (Map<String, T>) ProtoValues.toMap(getStub().getAll(builder.build()));
     }
 
     @Override
-    public void
-        put(
-            String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
-            PlatformType type,
-            Object value) {
-        loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(DATA_STORAGE_SERVICE
-                    + "/save/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}")
-                .build(componentName, scope, scopeId, key, environmentId, type),
-            value);
+    public void put(
+        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
+        PlatformType type, Object value) {
+
+        PutDataStorageValueRequest putDataStorageValueRequest = PutDataStorageValueRequest.newBuilder()
+            .setKey(toDataStorageKeyRequest(componentName, scope, scopeId, key, environmentId, type))
+            .setValue(ProtoValues.toValue(value))
+            .build();
+
+        getStub().put(putDataStorageValueRequest);
     }
 
-    @Override
-    public <T> Optional<VersionedValue<T>> fetchVersioned(
+    private JdbcDataStorageRemoteServiceBlockingStub getStub() {
+        return JdbcDataStorageRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private static DataStorageKeyRequest toDataStorageKeyRequest(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type) {
 
-        return Optional.ofNullable(loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(DATA_STORAGE_SERVICE
-                    + "/fetch-versioned/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}")
-                .build(componentName, scope, scopeId, key, environmentId, type),
-            new ParameterizedTypeReference<VersionedValue<T>>() {}));
-    }
+        DataStorageKeyRequest.Builder builder = DataStorageKeyRequest.newBuilder()
+            .setComponentName(componentName)
+            .setScope(scope.name())
+            .setScopeId(scopeId)
+            .setKey(key)
+            .setEnvironmentId(environmentId);
 
-    @Override
-    public boolean putIfVersion(
-        String componentName, DataStorageScope scope, String scopeId, String key, long environmentId, PlatformType type,
-        Object value, @Nullable DataEntryVersion expectedVersion) {
+        if (type != null) {
+            builder.setType(type.name());
+        }
 
-        Boolean result = loadBalancedRestClient.put(
-            uriBuilder -> {
-                uriBuilder
-                    .host(EXECUTION_APP)
-                    .path(DATA_STORAGE_SERVICE
-                        + "/put-if-version/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}");
-
-                if (expectedVersion != null) {
-                    uriBuilder.queryParam("expectedId", expectedVersion.id());
-                    uriBuilder.queryParam("expectedVersion", expectedVersion.version());
-                }
-
-                return uriBuilder.build(componentName, scope, scopeId, key, environmentId, type);
-            },
-            Collections.singletonMap("value", value), Boolean.class);
-
-        return Boolean.TRUE.equals(result);
-    }
-
-    private <T> Optional<T>
-        fetchValue(
-            String componentName, DataStorageScope scope, String scopeId, String key, long environment,
-            PlatformType type) {
-        return Optional.ofNullable(loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(DATA_STORAGE_SERVICE
-                    + "/fetch-value/{componentName}/{scope}/{scopeId}/{key}/{environment}/{type}")
-                .build(componentName, scope, scopeId, key, environment, type),
-            new ParameterizedTypeReference<>() {}));
+        return builder.build();
     }
 }

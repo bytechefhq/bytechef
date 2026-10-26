@@ -1,20 +1,23 @@
 server:
   port: 9999
 
+spring:
+  cloud:
+    aws:
+      s3:
+        enabled: false
+  grpc:
+    server:
+      port: 0
+  liquibase:
+    contexts: execution
+
 openapi:
   openAPIDefinition:
     base-path:
       automation: /api/automation
       embedded: /api/embedded
       platform: /api/platform
-
-spring:
-  cloud:
-    aws:
-      s3:
-        enabled: false
-  liquibase:
-    contexts: execution
 
 bytechef:
   data-storage:
@@ -26,6 +29,10 @@ bytechef:
     provider: JDBC
   message-broker:
     provider: MEMORY
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
   workflow:
     output-storage:
       provider: JDBC

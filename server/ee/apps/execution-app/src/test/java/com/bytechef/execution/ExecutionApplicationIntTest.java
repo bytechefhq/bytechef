@@ -13,10 +13,13 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
+import io.grpc.BindableService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
@@ -30,6 +33,9 @@ import org.springframework.core.env.Environment;
     PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
 })
 public class ExecutionApplicationIntTest {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private Environment environment;
@@ -46,6 +52,19 @@ public class ExecutionApplicationIntTest {
         assertThat(environment.getProperty("spring.task.execution.thread-name-prefix"))
             .isEqualTo("execution-app-task-");
         assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
+    }
+
+    @Test
+    void testDataStorageGrpcServiceIsServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains("bytechef.platform.data.storage.remote.v1.JdbcDataStorageRemoteService");
     }
 
     @Test
