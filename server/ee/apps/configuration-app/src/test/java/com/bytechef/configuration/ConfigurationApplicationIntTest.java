@@ -167,6 +167,9 @@ public class ConfigurationApplicationIntTest {
             "bytechef.platform.configuration.remote.v1.ComponentConnectionFacadeRemoteService",
             "bytechef.platform.configuration.remote.v1.WorkflowRemoteService",
             "bytechef.platform.configuration.remote.v1.WorkflowTestConfigurationRemoteService");
+        assertThat(serviceNames).doesNotContain(
+            "bytechef.atlas.execution.remote.v1.JobRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.TriggerExecutionRemoteService");
     }
 
     @Test
