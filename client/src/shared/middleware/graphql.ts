@@ -506,6 +506,14 @@ export type CreateMcpServerMutationVariables = Exact<{
 
 export type CreateMcpServerMutation = { createWorkspaceMcpServer: { id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean } | null };
 
+export type DataStreamCompatibleConnectionsQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+}>;
+
+
+export type DataStreamCompatibleConnectionsQuery = { dataStreamCompatibleConnections: Array<{ id: string, name: string, componentName: string, componentVersion: number }> };
+
 export type DeleteA2aProjectMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -2059,6 +2067,17 @@ export type ClusterElementDefinitionQuery = { clusterElementDefinition: { compon
       | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
       | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, timeDefaultValue: string | null }
     > } };
+
+export type ClusterElementFieldsQueryVariables = Exact<{
+  componentName: string;
+  componentVersion: number;
+  clusterElementName: string;
+  connectionId?: any;
+  inputParameters?: any;
+}>;
+
+
+export type ClusterElementFieldsQuery = { clusterElementFields: Array<{ name: string, label: string | null, type: string | null }> };
 
 export type ClusterElementMissingRequiredPropertiesQueryVariables = Exact<{
   workflowId: string;
@@ -4403,6 +4422,36 @@ export const useCreateMcpServerMutation = <
       {
     mutationKey: ['createMcpServer'],
     mutationFn: (variables?: CreateMcpServerMutationVariables) => fetcher<CreateMcpServerMutation, CreateMcpServerMutationVariables>(CreateMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DataStreamCompatibleConnectionsDocument = new TypedDocumentString(`
+    query dataStreamCompatibleConnections($workspaceId: ID!, $environmentId: ID!) {
+  dataStreamCompatibleConnections(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+  ) {
+    id
+    name
+    componentName
+    componentVersion
+  }
+}
+    `);
+
+export const useDataStreamCompatibleConnectionsQuery = <
+      TData = DataStreamCompatibleConnectionsQuery,
+      TError = unknown
+    >(
+      variables: DataStreamCompatibleConnectionsQueryVariables,
+      options?: Omit<UseQueryOptions<DataStreamCompatibleConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataStreamCompatibleConnectionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataStreamCompatibleConnectionsQuery, TError, TData>(
+      {
+    queryKey: ['dataStreamCompatibleConnections', variables],
+    queryFn: fetcher<DataStreamCompatibleConnectionsQuery, DataStreamCompatibleConnectionsQueryVariables>(DataStreamCompatibleConnectionsDocument, variables),
     ...options
   }
     )};
@@ -10222,6 +10271,38 @@ export const useClusterElementDefinitionQuery = <
       {
     queryKey: ['clusterElementDefinition', variables],
     queryFn: fetcher<ClusterElementDefinitionQuery, ClusterElementDefinitionQueryVariables>(ClusterElementDefinitionDocument, variables),
+    ...options
+  }
+    )};
+
+export const ClusterElementFieldsDocument = new TypedDocumentString(`
+    query clusterElementFields($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $connectionId: Long, $inputParameters: Map) {
+  clusterElementFields(
+    componentName: $componentName
+    componentVersion: $componentVersion
+    clusterElementName: $clusterElementName
+    connectionId: $connectionId
+    inputParameters: $inputParameters
+  ) {
+    name
+    label
+    type
+  }
+}
+    `);
+
+export const useClusterElementFieldsQuery = <
+      TData = ClusterElementFieldsQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementFieldsQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementFieldsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementFieldsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementFieldsQuery, TError, TData>(
+      {
+    queryKey: ['clusterElementFields', variables],
+    queryFn: fetcher<ClusterElementFieldsQuery, ClusterElementFieldsQueryVariables>(ClusterElementFieldsDocument, variables),
     ...options
   }
     )};
