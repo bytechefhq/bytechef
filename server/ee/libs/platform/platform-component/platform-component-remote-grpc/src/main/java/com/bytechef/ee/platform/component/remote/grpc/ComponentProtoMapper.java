@@ -9,11 +9,14 @@ package com.bytechef.ee.platform.component.remote.grpc;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.ee.platform.component.remote.grpc.proto.OutputResponseResult;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOption;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOptions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOutputResponse;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteProperties;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteProperty;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteTriggerDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteTriggerOutput;
@@ -21,6 +24,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookEnableO
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookTriggerFlags;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookValidateResponse;
+import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookEnableOutputResult;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
@@ -38,7 +42,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
+import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
@@ -67,6 +73,70 @@ public class ComponentProtoMapper {
         this.objectMapper = objectMapper.rebuild()
             .addMixIn(BaseProperty.class, ComponentBasePropertyMixIn.class)
             .build();
+    }
+
+    public List<Option> toOptions(RemoteOptions remoteOptions) {
+        return remoteOptions.getOptionsList()
+            .stream()
+            .map(this::toOption)
+            .toList();
+    }
+
+    public @Nullable OutputResponse toOutputResponse(OutputResponseResult outputResponseResult) {
+        return outputResponseResult.hasOutputResponse() ? toOutputResponse(outputResponseResult.getOutputResponse())
+            : null;
+    }
+
+    public OutputResponseResult toOutputResponseResult(@Nullable OutputResponse outputResponse) {
+        OutputResponseResult.Builder builder = OutputResponseResult.newBuilder();
+
+        if (outputResponse != null) {
+            builder.setOutputResponse(toProto(outputResponse));
+        }
+
+        return builder.build();
+    }
+
+    public List<Property> toProperties(RemoteProperties remoteProperties) {
+        return remoteProperties.getPropertiesList()
+            .stream()
+            .map(this::toProperty)
+            .toList();
+    }
+
+    public RemoteOptions toRemoteOptions(List<Option> options) {
+        RemoteOptions.Builder builder = RemoteOptions.newBuilder();
+
+        for (Option option : options) {
+            builder.addOptions(toProto(option));
+        }
+
+        return builder.build();
+    }
+
+    public RemoteProperties toRemoteProperties(List<? extends Property> properties) {
+        RemoteProperties.Builder builder = RemoteProperties.newBuilder();
+
+        for (Property property : properties) {
+            builder.addProperties(toProto(property));
+        }
+
+        return builder.build();
+    }
+
+    public @Nullable WebhookEnableOutput toWebhookEnableOutput(WebhookEnableOutputResult webhookEnableOutputResult) {
+        return webhookEnableOutputResult.hasWebhookEnableOutput()
+            ? toWebhookEnableOutput(webhookEnableOutputResult.getWebhookEnableOutput()) : null;
+    }
+
+    public WebhookEnableOutputResult toWebhookEnableOutputResult(@Nullable WebhookEnableOutput webhookEnableOutput) {
+        WebhookEnableOutputResult.Builder builder = WebhookEnableOutputResult.newBuilder();
+
+        if (webhookEnableOutput != null) {
+            builder.setWebhookEnableOutput(toProto(webhookEnableOutput));
+        }
+
+        return builder.build();
     }
 
     public ActionDefinition toActionDefinition(RemoteActionDefinition remoteActionDefinition) {

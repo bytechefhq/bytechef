@@ -7,16 +7,12 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
-import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
-import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -24,14 +20,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
-    implements ComponentDefinitionFacade {
-
-    public RemoteComponentDefinitionFacadeClient(
-        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
-
-        super(defaultRestClient, discoveryClient, objectMapper);
-    }
+public class RemoteComponentDefinitionFacadeClient implements ComponentDefinitionFacade {
 
     @Override
     public List<Option> executeWorkflowInputOptions(
