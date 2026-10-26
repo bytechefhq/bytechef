@@ -12,6 +12,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentVersionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ExecuteWorkflowNodeDescriptionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetTriggerDefinitionRequest;
@@ -194,8 +195,11 @@ public class RemoteTriggerDefinitionServiceClient implements TriggerDefinitionSe
     }
 
     @Override
-    public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
-        throw new UnsupportedOperationException();
+    public boolean isDynamicOutputDefined(String componentName, int componentVersion, String triggerName) {
+        BoolResponse boolResponse = getStub(componentName).isDynamicOutputDefined(
+            getTriggerDefinitionRequest(componentName, componentVersion, triggerName));
+
+        return boolResponse.getValue();
     }
 
     @Override

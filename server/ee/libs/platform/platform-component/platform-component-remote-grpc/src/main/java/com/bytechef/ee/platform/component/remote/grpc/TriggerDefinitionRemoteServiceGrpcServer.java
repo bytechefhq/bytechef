@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.grpc;
 
+import com.bytechef.ee.platform.component.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentVersionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ExecuteWorkflowNodeDescriptionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetTriggerDefinitionRequest;
@@ -91,6 +92,19 @@ public class TriggerDefinitionRemoteServiceGrpcServer
             componentProtoMapper.toProto(
                 triggerDefinitionService.getWebhookTriggerFlags(
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void isDynamicOutputDefined(
+        GetTriggerDefinitionRequest request, StreamObserver<BoolResponse> responseObserver) {
+
+        responseObserver.onNext(
+            BoolResponse.newBuilder()
+                .setValue(
+                    triggerDefinitionService.isDynamicOutputDefined(
+                        request.getComponentName(), request.getComponentVersion(), request.getTriggerName()))
+                .build());
         responseObserver.onCompleted();
     }
 }

@@ -13,10 +13,14 @@ import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ActionDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ActionDefinitionRemoteServiceGrpc.ActionDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionExecuteWorkflowNodeDescriptionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentVersionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetActionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinitions;
+import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -123,7 +127,18 @@ public class RemoteActionDefinitionServiceClient implements ActionDefinitionServ
     public String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters) {
 
-        throw new UnsupportedOperationException();
+        ActionExecuteWorkflowNodeDescriptionRequest actionExecuteWorkflowNodeDescriptionRequest =
+            ActionExecuteWorkflowNodeDescriptionRequest.newBuilder()
+                .setComponentName(componentName)
+                .setComponentVersion(componentVersion)
+                .setActionName(actionName)
+                .setInputParameters(ProtoValues.toStruct(inputParameters))
+                .build();
+
+        StringResponse stringResponse = getStub(componentName).executeWorkflowNodeDescription(
+            actionExecuteWorkflowNodeDescriptionRequest);
+
+        return stringResponse.hasValue() ? stringResponse.getValue() : null;
     }
 
     @Override
@@ -163,7 +178,15 @@ public class RemoteActionDefinitionServiceClient implements ActionDefinitionServ
 
     @Override
     public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
-        throw new UnsupportedOperationException();
+        GetActionDefinitionRequest getActionDefinitionRequest = GetActionDefinitionRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setActionName(actionName)
+            .build();
+
+        BoolResponse boolResponse = getStub(componentName).isDynamicOutputDefined(getActionDefinitionRequest);
+
+        return boolResponse.getValue();
     }
 
     @Override
