@@ -40,6 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.DataAccessException;
@@ -83,6 +84,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
+@ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
 public class PersistentTokenRememberMeServices extends AbstractRememberMeServices implements ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);

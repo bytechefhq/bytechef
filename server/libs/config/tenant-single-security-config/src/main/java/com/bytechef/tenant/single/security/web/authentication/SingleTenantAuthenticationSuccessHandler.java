@@ -22,6 +22,7 @@ import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnSingleTenant
+@ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
 public class SingleTenantAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider;
