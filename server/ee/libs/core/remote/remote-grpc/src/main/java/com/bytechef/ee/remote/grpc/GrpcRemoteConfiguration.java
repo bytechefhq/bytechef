@@ -83,6 +83,11 @@ public class GrpcRemoteConfiguration {
     }
 
     @Bean
+    GrpcRemoteExceptionHandler grpcRemoteExceptionHandler() {
+        return new GrpcRemoteExceptionHandler();
+    }
+
+    @Bean
     @GlobalServerInterceptor
     ServiceTokenServerInterceptor serviceTokenServerInterceptor(ApplicationProperties applicationProperties) {
         ApplicationProperties.Remote remote = applicationProperties.getRemote();

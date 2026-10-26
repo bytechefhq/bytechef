@@ -20,6 +20,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Component;
 import org.springframework.util.unit.DataSize;
@@ -75,7 +76,7 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         checkServiceToken();
 
         return managedChannels.computeIfAbsent(
-            serviceId, curServiceId -> createManagedChannel(getTarget(curServiceId)));
+            serviceId, curServiceId -> createManagedChannel(getTarget(curServiceId), null));
     }
 
     @Override
@@ -83,7 +84,8 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         checkServiceToken();
 
         return instanceManagedChannels.computeIfAbsent(
-            serviceInstance.getInstanceId(), instanceId -> createManagedChannel(getInstanceTarget(serviceInstance)));
+            serviceInstance.getInstanceId(),
+            instanceId -> createManagedChannel(getInstanceTarget(serviceInstance), serviceInstance.getServiceId()));
     }
 
     public String getTarget(String serviceId) {
@@ -112,13 +114,17 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         }
     }
 
-    private ManagedChannel createManagedChannel(String target) {
+    private ManagedChannel createManagedChannel(String target, @Nullable String authority) {
         ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
             .intercept(new TenantContextClientInterceptor(), new ServiceTokenClientInterceptor(serviceToken));
 
         if (deadline != null) {
             managedChannelBuilder.intercept(new DeadlineClientInterceptor(deadline));
+        }
+
+        if (authority != null) {
+            managedChannelBuilder.overrideAuthority(authority);
         }
 
         if (maxInboundMessageSize != null) {
