@@ -22,8 +22,10 @@ import io.grpc.Channel;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -45,6 +47,7 @@ public class RemoteTaskHandlerClient {
     private final DiscoveryClient discoveryClient;
     private final Duration executionDeadline;
     private final GrpcChannels grpcChannels;
+    private final AtomicInteger nextInstanceIndex = new AtomicInteger();
     private final TaskExecutionProtoMapper taskExecutionProtoMapper;
 
     public RemoteTaskHandlerClient(
@@ -83,11 +86,24 @@ public class RemoteTaskHandlerClient {
     }
 
     private Channel getChannel(String type) {
-        Optional<ServiceInstance> serviceInstance = WorkerDiscoveryUtils.fetchServiceInstance(
-            discoveryClient.getInstances(WORKER_APP), StringUtils.substringBefore(type, "/"));
+        String componentName = StringUtils.substringBefore(type, "/");
 
-        return serviceInstance.map(grpcChannels::getChannel)
-            .orElseGet(() -> grpcChannels.getChannel(WORKER_APP));
+        List<ServiceInstance> serviceInstances = discoveryClient.getInstances(WORKER_APP)
+            .stream()
+            .filter(serviceInstance -> {
+                Optional<ServiceInstance> offeringServiceInstance = WorkerDiscoveryUtils.fetchServiceInstance(
+                    List.of(serviceInstance), componentName);
+
+                return offeringServiceInstance.isPresent();
+            })
+            .toList();
+
+        if (serviceInstances.isEmpty()) {
+            return grpcChannels.getChannel(WORKER_APP);
+        }
+
+        return grpcChannels.getChannel(
+            serviceInstances.get(Math.floorMod(nextInstanceIndex.getAndIncrement(), serviceInstances.size())));
     }
 
     private TaskHandlerRemoteServiceBlockingStub getStub(String type) {
