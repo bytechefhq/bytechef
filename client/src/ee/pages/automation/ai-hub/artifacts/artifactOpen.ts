@@ -67,10 +67,11 @@ export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
 }
 
 /**
- * Only a referenced workflow is user-attached and removable; the created and updated rows are the agent's history.
+ * Only a referenced workflow or AI Agent is user-attached and removable; the created and updated rows are the agent's
+ * history.
  */
 export function isArtifactRemovable(artifact: AiHubChatArtifactI): boolean {
-    return artifact.kind === 'WORKFLOW_REFERENCED';
+    return artifact.kind === 'WORKFLOW_REFERENCED' || artifact.kind === 'AI_AGENT_REFERENCED';
 }
 
 export function isArtifactClickable(artifact: AiHubChatArtifactI): boolean {
