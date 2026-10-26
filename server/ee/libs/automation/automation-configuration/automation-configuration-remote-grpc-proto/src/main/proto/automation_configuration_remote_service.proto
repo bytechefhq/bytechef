@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package bytechef.automation.configuration.remote.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.automation.configuration.remote.grpc.proto";
+
+service ProjectRemoteService {
+  rpc GetProject(IdRequest) returns (RemoteProject);
+  rpc GetProjectDeploymentProject(IdRequest) returns (RemoteProject);
+  rpc GetProjects(google.protobuf.Empty) returns (RemoteProjects);
+  rpc GetWorkflowProject(WorkflowIdRequest) returns (RemoteProject);
+}
+
+service ProjectDeploymentRemoteService {
+  rpc GetProjectDeployment(IdRequest) returns (RemoteProjectDeployment);
+}
+
+service ProjectDeploymentWorkflowRemoteService {
+  rpc FetchProjectDeploymentWorkflowConnection(ProjectDeploymentWorkflowRequest)
+      returns (ProjectDeploymentWorkflowConnectionResult);
+  rpc GetProjectDeploymentWorkflow(ProjectDeploymentWorkflowRequest) returns (RemoteProjectDeploymentWorkflow);
+  rpc GetProjectDeploymentWorkflowConnections(ProjectDeploymentWorkflowRequest)
+      returns (RemoteProjectDeploymentWorkflowConnections);
+  rpc IsConnectionUsed(IdRequest) returns (BoolResponse);
+}
+
+message IdRequest {
+  int64 id = 1;
+}
+
+message WorkflowIdRequest {
+  string workflow_id = 1;
+}
+
+message ProjectDeploymentWorkflowRequest {
+  int64 project_deployment_id = 1;
+  string workflow_id = 2;
+  optional string workflow_node_name = 3;
+  optional string workflow_connection_key = 4;
+}
+
+message BoolResponse {
+  bool value = 1;
+}
+
+message RemoteProject {
+  optional int64 category_id = 1;
+  optional string created_by = 2;
+  optional google.protobuf.Timestamp created_date = 3;
+  optional string description = 4;
+  optional int64 id = 5;
+  optional string last_modified_by = 6;
+  optional google.protobuf.Timestamp last_modified_date = 7;
+  optional string name = 8;
+  repeated RemoteProjectVersion project_versions = 9;
+  repeated int64 tag_ids = 10;
+  optional string uuid = 11;
+  optional int32 version = 12;
+  optional int64 workspace_id = 13;
+}
+
+message RemoteProjects {
+  repeated RemoteProject projects = 1;
+}
+
+message RemoteProjectVersion {
+  optional string description = 1;
+  optional google.protobuf.Timestamp published_date = 2;
+  optional string status = 3;
+  optional int32 version = 4;
+}
+
+message RemoteProjectDeployment {
+  optional string created_by = 1;
+  optional google.protobuf.Timestamp created_date = 2;
+  optional string description = 3;
+  optional bool enabled = 4;
+  optional string environment = 5;
+  optional int64 id = 6;
+  optional string last_modified_by = 7;
+  optional google.protobuf.Timestamp last_modified_date = 8;
+  optional string name = 9;
+  optional int64 project_id = 10;
+  optional int32 project_version = 11;
+  repeated int64 tag_ids = 12;
+  optional int32 version = 13;
+}
+
+message RemoteProjectDeploymentWorkflow {
+  repeated RemoteProjectDeploymentWorkflowConnection connections = 1;
+  optional string created_by = 2;
+  optional google.protobuf.Timestamp created_date = 3;
+  optional bool enabled = 4;
+  optional int64 id = 5;
+  optional bytes inputs = 6;
+  optional string last_modified_by = 7;
+  optional google.protobuf.Timestamp last_modified_date = 8;
+  optional int64 project_deployment_id = 9;
+  optional int32 version = 10;
+  optional string workflow_id = 11;
+}
+
+message RemoteProjectDeploymentWorkflowConnection {
+  optional int64 connection_id = 1;
+  optional string workflow_connection_key = 2;
+  optional string workflow_node_name = 3;
+}
+
+message RemoteProjectDeploymentWorkflowConnections {
+  repeated RemoteProjectDeploymentWorkflowConnection connections = 1;
+}
+
+message ProjectDeploymentWorkflowConnectionResult {
+  optional RemoteProjectDeploymentWorkflowConnection connection = 1;
+}
