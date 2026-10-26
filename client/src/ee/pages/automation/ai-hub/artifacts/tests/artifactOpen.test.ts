@@ -88,14 +88,14 @@ describe('artifactOpen', () => {
         expect(isArtifactClickable(buildArtifact({kind: 'FILE_CREATED'}))).toBe(false);
     });
 
-    it('is clickable but not removable for AI_AGENT_REFERENCED', () => {
+    it('is clickable and removable for AI_AGENT_REFERENCED', () => {
         const aiAgentArtifact = buildArtifact({artifactId: '42', kind: 'AI_AGENT_REFERENCED', metadataJson: null});
 
         expect(isArtifactClickable(aiAgentArtifact)).toBe(true);
-        expect(isArtifactRemovable(aiAgentArtifact)).toBe(false);
+        expect(isArtifactRemovable(aiAgentArtifact)).toBe(true);
     });
 
-    it('is removable only for WORKFLOW_REFERENCED', () => {
+    it('is removable for WORKFLOW_REFERENCED but not for the created and updated workflow kinds', () => {
         expect(isArtifactRemovable(buildArtifact({kind: 'WORKFLOW_REFERENCED'}))).toBe(true);
         expect(isArtifactRemovable(buildArtifact({kind: 'WORKFLOW_CREATED'}))).toBe(false);
         expect(isArtifactRemovable(buildArtifact({kind: 'WORKFLOW_UPDATED'}))).toBe(false);

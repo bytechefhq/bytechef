@@ -24,6 +24,10 @@ vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
     useGetProjectWorkflowsQuery: vi.fn(),
 }));
 
+vi.mock('@/shared/middleware/graphql', () => ({
+    useAiAgentsQuery: vi.fn(),
+}));
+
 vi.mock('use-debounce', () => ({
     useDebouncedCallback: (fn: (value: string) => void) => fn,
 }));
@@ -31,8 +35,16 @@ vi.mock('use-debounce', () => ({
 const {useGetWorkspaceProjectsQuery} = await import('@/shared/queries/automation/projects.queries');
 const {useGetProjectWorkflowsQuery} = await import('@/shared/queries/automation/projectWorkflows.queries');
 
+const {useAiAgentsQuery} = await import('@/shared/middleware/graphql');
+
+const mockUseAiAgentsQuery = vi.mocked(useAiAgentsQuery);
 const mockUseGetWorkspaceProjectsQuery = vi.mocked(useGetWorkspaceProjectsQuery);
 const mockUseGetProjectWorkflowsQuery = vi.mocked(useGetProjectWorkflowsQuery);
+
+const AI_AGENTS = [
+    {id: '42', title: 'Support Agent'},
+    {id: '43', title: 'Sales Agent'},
+];
 
 const PROJECTS = [
     {id: 10, name: 'Alpha Project', projectWorkflowIds: [101], workspaceId: 1},
@@ -49,6 +61,7 @@ const WORKFLOWS_BY_PROJECT: Record<number, Array<{id: string; label: string; pro
 };
 
 const setupMocks = () => {
+    mockUseAiAgentsQuery.mockReturnValue(mockQuerySuccess({aiAgents: AI_AGENTS}) as never);
     mockUseGetWorkspaceProjectsQuery.mockReturnValue(mockQuerySuccess(PROJECTS) as never);
     mockUseGetProjectWorkflowsQuery.mockImplementation(
         (projectId: number) => mockQuerySuccess(WORKFLOWS_BY_PROJECT[projectId]) as never
@@ -87,13 +100,15 @@ describe('ResourcePickerMenu', () => {
         setupMocks();
     });
 
-    it('shows only the Workflows entry in the root menu', async () => {
+    it('shows the Workflows and AI Agents entries in the root menu', async () => {
         await renderMenu();
         await openMenu();
 
         await waitFor(() => {
             expect(screen.getByText('Workflows')).toBeInTheDocument();
         });
+
+        expect(screen.getByText('AI Agents')).toBeInTheDocument();
 
         expect(screen.queryByText('Files')).not.toBeInTheDocument();
         expect(screen.queryByText('Data Tables')).not.toBeInTheDocument();
@@ -103,6 +118,42 @@ describe('ResourcePickerMenu', () => {
         await renderMenu();
 
         expect(mockUseGetWorkspaceProjectsQuery).toHaveBeenLastCalledWith({id: 1}, false);
+    });
+
+    it('does not fetch AI Agents while the picker is closed, and fetches them once open', async () => {
+        await renderMenu();
+
+        expect(mockUseAiAgentsQuery).toHaveBeenLastCalledWith({workspaceId: '1'}, {enabled: false});
+
+        await openMenu();
+
+        expect(mockUseAiAgentsQuery).toHaveBeenLastCalledWith({workspaceId: '1'}, {enabled: true});
+    });
+
+    describe('AI Agents', () => {
+        it('fires onSelect with kind=aiAgent after picking an agent from the AI Agents list', async () => {
+            const {onSelect} = await renderMenu();
+
+            await openMenu();
+
+            await userEvent.click(screen.getByText('AI Agents'));
+            await userEvent.click(await screen.findByText('Sales Agent'));
+
+            expect(onSelect).toHaveBeenCalledWith({id: '43', kind: 'aiAgent', name: 'Sales Agent'});
+        });
+
+        it('lists matching agents when searching from the root menu', async () => {
+            await renderMenu();
+            await openMenu();
+
+            await userEvent.type(screen.getByPlaceholderText('Search resources…'), 'support');
+
+            await waitFor(() => {
+                expect(screen.getByText('Support Agent')).toBeInTheDocument();
+            });
+
+            expect(screen.queryByText('Sales Agent')).not.toBeInTheDocument();
+        });
     });
 
     it('fetches the projects of the given workspace once open', async () => {

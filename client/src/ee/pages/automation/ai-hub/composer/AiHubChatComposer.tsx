@@ -26,10 +26,12 @@ import {ArrowUpIcon, SquareIcon, XIcon} from 'lucide-react';
 import {KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
 
 const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
+    aiAgent: 'AI Agent',
     workflow: 'Workflow',
 };
 
 const KIND_BADGE_CLASSES: Record<ReferencedResourceKindType, string> = {
+    aiAgent: 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300',
     workflow: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
 };
 
