@@ -19,6 +19,7 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +38,7 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
     private OptionsDataSource optionsDataSource;
     private Boolean optionsLoadedDynamically;
 
+    @JsonCreator
     private StringProperty() {
     }
 

@@ -19,6 +19,7 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -39,6 +40,7 @@ public final class Authorization {
     private String title;
     private AuthorizationType type;
 
+    @JsonCreator
     private Authorization() {
     }
 

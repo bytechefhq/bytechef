@@ -18,6 +18,7 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,7 @@ public class ArrayProperty extends ValueProperty<List<?>> implements OptionsData
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
 
+    @JsonCreator
     private ArrayProperty() {
     }
 

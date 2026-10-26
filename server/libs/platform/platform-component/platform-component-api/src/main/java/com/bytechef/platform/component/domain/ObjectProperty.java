@@ -18,6 +18,7 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class ObjectProperty extends ValueProperty<Map<String, ?>> implements Opt
     private OptionsDataSource optionsDataSource;
     private List<? extends Property> properties;
 
+    @JsonCreator
     private ObjectProperty() {
     }
 

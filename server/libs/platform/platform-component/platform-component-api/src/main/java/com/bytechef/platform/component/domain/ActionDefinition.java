@@ -24,6 +24,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerfo
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +55,7 @@ public final class ActionDefinition {
     private String title;
     private boolean workflowNodeDescriptionDefined;
 
+    @JsonCreator
     private ActionDefinition() {
     }
 

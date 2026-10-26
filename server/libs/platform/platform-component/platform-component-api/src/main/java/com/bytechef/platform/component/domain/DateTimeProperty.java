@@ -19,6 +19,7 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,7 @@ public class DateTimeProperty extends ValueProperty<LocalDateTime> implements Op
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
 
+    @JsonCreator
     private DateTimeProperty() {
     }
 

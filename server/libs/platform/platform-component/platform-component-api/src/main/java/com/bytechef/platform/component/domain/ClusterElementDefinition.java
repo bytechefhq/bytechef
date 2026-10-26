@@ -24,6 +24,7 @@ import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsTo
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +51,7 @@ public final class ClusterElementDefinition {
     private String title;
     private ClusterElementType type;
 
+    @JsonCreator
     private ClusterElementDefinition() {
     }
 
