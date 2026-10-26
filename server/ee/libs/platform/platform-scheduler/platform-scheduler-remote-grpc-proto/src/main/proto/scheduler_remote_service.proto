@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package bytechef.platform.scheduler.remote.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.scheduler.remote.grpc.proto";
+
+service TriggerSchedulerRemoteService {
+  rpc CancelDynamicWebhookTriggerRefresh(WorkflowExecutionIdRequest) returns (google.protobuf.Empty);
+  rpc CancelOneTimeTask(JobIdRequest) returns (google.protobuf.Empty);
+  rpc CancelPollingTrigger(WorkflowExecutionIdRequest) returns (google.protobuf.Empty);
+  rpc CancelScheduleTrigger(WorkflowExecutionIdRequest) returns (google.protobuf.Empty);
+  rpc ScheduleDynamicWebhookTriggerRefresh(ScheduleDynamicWebhookTriggerRefreshRequest) returns (google.protobuf.Empty);
+  rpc ScheduleOneTimeTask(ScheduleOneTimeTaskRequest) returns (google.protobuf.Empty);
+  rpc SchedulePollingTrigger(WorkflowExecutionIdRequest) returns (google.protobuf.Empty);
+  rpc ScheduleScheduleTrigger(ScheduleScheduleTriggerRequest) returns (google.protobuf.Empty);
+}
+
+service ConnectionRefreshSchedulerRemoteService {
+  rpc CancelConnectionRefresh(ConnectionRefreshRequest) returns (google.protobuf.Empty);
+  rpc ScheduleConnectionRefresh(ConnectionRefreshRequest) returns (google.protobuf.Empty);
+}
+
+message WorkflowExecutionIdRequest {
+  string workflow_execution_id = 1;
+}
+
+message JobIdRequest {
+  int64 job_id = 1;
+}
+
+message ScheduleDynamicWebhookTriggerRefreshRequest {
+  optional google.protobuf.Timestamp webhook_expiration_date = 1;
+  string component_name = 2;
+  int32 component_version = 3;
+  string workflow_execution_id = 4;
+  optional int64 connection_id = 5;
+}
+
+message ScheduleOneTimeTaskRequest {
+  google.protobuf.Timestamp execute_at = 1;
+  optional google.protobuf.Struct output = 2;
+  int64 job_id = 3;
+}
+
+message ScheduleScheduleTriggerRequest {
+  string pattern = 1;
+  optional string zone_id = 2;
+  optional google.protobuf.Struct output = 3;
+  string workflow_execution_id = 4;
+}
+
+message ConnectionRefreshRequest {
+  optional int64 connection_id = 1;
+  optional google.protobuf.Timestamp token_expiration_time = 2;
+  optional string tenant_id = 3;
+}

@@ -7,9 +7,12 @@
 
 package com.bytechef.ee.platform.scheduler.remote.client;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.scheduler.remote.grpc.SchedulerProtoTimestamps;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ConnectionRefreshRequest;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ConnectionRefreshSchedulerRemoteServiceGrpc;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ConnectionRefreshSchedulerRemoteServiceGrpc.ConnectionRefreshSchedulerRemoteServiceBlockingStub;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import org.springframework.stereotype.Component;
 
@@ -21,36 +24,45 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteConnectionRefreshSchedulerClient implements ConnectionRefreshScheduler {
 
-    private static final String CONNECTION_REFRESH_SCHEDULER = "/remote/connection-refresh-scheduler";
     private static final String SCHEDULER_APP = "scheduler-app";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteConnectionRefreshSchedulerClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteConnectionRefreshSchedulerClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public void cancelConnectionRefresh(Long connectionId, String tenantId) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(CONNECTION_REFRESH_SCHEDULER + "/cancel-connection-refresh")
-                .build(),
-            new ScheduleConnectionRefreshRequest(connectionId, Instant.now(), tenantId));
+        getStub().cancelConnectionRefresh(toConnectionRefreshRequest(connectionId, null, tenantId));
     }
 
     @Override
     public void scheduleConnectionRefresh(Long connectionId, Instant tokenExpirationTime, String tenantId) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(CONNECTION_REFRESH_SCHEDULER + "/schedule-connection-refresh")
-                .build(),
-            new ScheduleConnectionRefreshRequest(connectionId, tokenExpirationTime, tenantId));
+        getStub().scheduleConnectionRefresh(toConnectionRefreshRequest(connectionId, tokenExpirationTime, tenantId));
     }
 
-    private record ScheduleConnectionRefreshRequest(Long connectionId, Instant expiry, String tenantId) {
+    private ConnectionRefreshSchedulerRemoteServiceBlockingStub getStub() {
+        return ConnectionRefreshSchedulerRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(SCHEDULER_APP));
+    }
+
+    private static ConnectionRefreshRequest toConnectionRefreshRequest(
+        Long connectionId, Instant tokenExpirationTime, String tenantId) {
+
+        ConnectionRefreshRequest.Builder builder = ConnectionRefreshRequest.newBuilder();
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        if (tokenExpirationTime != null) {
+            builder.setTokenExpirationTime(SchedulerProtoTimestamps.toTimestamp(tokenExpirationTime));
+        }
+
+        if (tenantId != null) {
+            builder.setTenantId(tenantId);
+        }
+
+        return builder.build();
     }
 }

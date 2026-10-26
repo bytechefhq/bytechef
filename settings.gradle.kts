@@ -728,6 +728,8 @@ include("server:ee:libs:platform:platform-notification:platform-notification-rem
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-aws")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-impl")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client")
+include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-grpc")
+include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-grpc-proto")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-rest")
 include("server:ee:libs:platform:platform-security:platform-security-remote-client")
 include("server:ee:libs:platform:platform-security:platform-security-remote-grpc")
