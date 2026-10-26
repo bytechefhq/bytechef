@@ -165,17 +165,14 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean clusterElementDefinitions, Boolean connectionDefinitions,
-        Boolean triggerDefinitions, @Nullable List<String> include, PlatformType platformType) {
+        Boolean triggerDefinitions, @Nullable List<String> include, @Nullable PlatformType platformType) {
 
-        ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
-            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
+        Predicate<ComponentDefinition> platformFilter = getPlatformFilter(platformType);
 
         List<ComponentDefinition> components = filterLatestVersions(
             getComponentDefinitions()
                 .stream()
-                .filter(componentDefinitionFilter::filter)
+                .filter(platformFilter)
                 .filter(
                     filter(
                         actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions,
@@ -193,18 +190,15 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public List<ComponentDefinition> getComponentDefinitions(String query, PlatformType platformType) {
+    public List<ComponentDefinition> getComponentDefinitions(String query, @Nullable PlatformType platformType) {
         String lowerCaseQuery = query.toLowerCase();
 
-        ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
-            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
+        Predicate<ComponentDefinition> platformFilter = getPlatformFilter(platformType);
 
         return filterLatestVersions(
             getComponentDefinitions()
                 .stream()
-                .filter(componentDefinitionFilter::filter)
+                .filter(platformFilter)
                 .filter(componentDefinition -> hasMatchingComponent(componentDefinition, lowerCaseQuery) ||
                     hasMatchingAction(componentDefinition.getActions(), lowerCaseQuery) ||
                     hasMatchingTrigger(componentDefinition.getTriggers(), lowerCaseQuery))
@@ -279,6 +273,19 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             return include == null && actionDefinitions == null && clusterElementDefinitions == null &&
                 connectionDefinitions == null && triggerDefinitions == null;
         };
+    }
+
+    private Predicate<ComponentDefinition> getPlatformFilter(@Nullable PlatformType platformType) {
+        if (platformType == null) {
+            return componentDefinition -> true;
+        }
+
+        ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(platformType))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
+
+        return componentDefinitionFilter::filter;
     }
 
     private static List<ComponentDefinition> filterLatestVersions(List<ComponentDefinition> componentDefinitions) {

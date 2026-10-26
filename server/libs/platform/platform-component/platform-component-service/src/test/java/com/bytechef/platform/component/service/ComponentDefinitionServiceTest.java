@@ -86,6 +86,23 @@ public class ComponentDefinitionServiceTest {
     }
 
     @Test
+    public void testGetComponentDefinitionsWithoutPlatformTypeSkipsPlatformFilter() {
+        ComponentDefinitionService componentDefinitionService = createComponentDefinitionService(
+            new RejectTestForAutomationComponentDefinitionFilter());
+
+        Assertions.assertThat(componentDefinitionService.getComponentDefinitions(true, null, null, null, null, null))
+            .extracting(ComponentDefinition::getName)
+            .contains("test");
+        Assertions.assertThat(componentDefinitionService.getComponentDefinitions("test", null))
+            .extracting(ComponentDefinition::getName)
+            .contains("test");
+        Assertions.assertThat(
+            componentDefinitionService.getComponentDefinitions(true, null, null, null, null, PlatformType.AUTOMATION))
+            .extracting(ComponentDefinition::getName)
+            .doesNotContain("test");
+    }
+
+    @Test
     public void testGetComponentDefinitionVersionsReturnsAllVersionsInAscendingOrder() {
         ComponentDefinitionService componentDefinitionService = createComponentDefinitionService();
 
@@ -98,6 +115,12 @@ public class ComponentDefinitionServiceTest {
     }
 
     private static ComponentDefinitionService createComponentDefinitionService() {
+        return createComponentDefinitionService(new AllComponentDefinitionFilter());
+    }
+
+    private static ComponentDefinitionService createComponentDefinitionService(
+        ComponentDefinitionFilter componentDefinitionFilter) {
+
         ApplicationProperties applicationProperties = new ApplicationProperties();
         ApplicationProperties.Component component = new ApplicationProperties.Component();
 
@@ -108,7 +131,7 @@ public class ComponentDefinitionServiceTest {
             applicationProperties, List.of(TEST_COMPONENT_V2_HANDLER, TEST_COMPONENT_V1_HANDLER), List::of, List.of());
 
         return new ComponentDefinitionServiceImpl(
-            List.of(new AllComponentDefinitionFilter()), componentDefinitionRegistry,
+            List.of(componentDefinitionFilter), componentDefinitionRegistry,
             Mockito.mock(ContextFactory.class));
     }
 
@@ -122,6 +145,19 @@ public class ComponentDefinitionServiceTest {
         @Override
         public boolean supports(PlatformType type) {
             return true;
+        }
+    }
+
+    private static class RejectTestForAutomationComponentDefinitionFilter implements ComponentDefinitionFilter {
+
+        @Override
+        public boolean filter(ComponentDefinition componentDefinition) {
+            return !"test".equals(componentDefinition.getName());
+        }
+
+        @Override
+        public boolean supports(PlatformType type) {
+            return PlatformType.AUTOMATION.equals(type);
         }
     }
 }
