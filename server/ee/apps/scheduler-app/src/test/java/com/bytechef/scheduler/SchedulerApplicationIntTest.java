@@ -9,12 +9,15 @@ package com.bytechef.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * @version ee
@@ -39,5 +42,20 @@ public class SchedulerApplicationIntTest {
         assertThat(environment.getProperty("spring.task.execution.thread-name-prefix"))
             .isEqualTo("scheduler-app-task-");
         assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
+    }
+
+    @Nested
+    @TestPropertySource(properties = "bytechef.message-broker.provider=amqp")
+    class AmqpMessageBrokerProvider {
+
+        @Autowired
+        private MessageBroker messageBroker;
+
+        @Test
+        void testAmqpMessageBrokerIsAvailable() {
+            Class<?> messageBrokerClass = messageBroker.getClass();
+
+            assertThat(messageBrokerClass.getName()).isEqualTo("com.bytechef.message.broker.amqp.AmqpMessageBroker");
+        }
     }
 }
