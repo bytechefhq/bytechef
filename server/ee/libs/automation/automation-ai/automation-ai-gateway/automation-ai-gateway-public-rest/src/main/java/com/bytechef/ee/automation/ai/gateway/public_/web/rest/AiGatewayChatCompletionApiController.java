@@ -1,0 +1,367 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.ai.gateway.public_.web.rest;
+
+import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayFacade;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChatCompletionRequestModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChatCompletionResponseModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChatMessageModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ChoiceModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ContentBlockImageUrlModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolCallFunctionModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolCallModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.ToolFunctionModel;
+import com.bytechef.ee.automation.ai.gateway.public_.web.rest.model.UsageModel;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatMessage;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatRole;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlock;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlockType;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayTool;
+import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayToolChoice;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@RestController
+@ConditionalOnEEVersion
+@ConditionalOnProperty(prefix = "bytechef.ai.gateway", name = "enabled", havingValue = "true")
+@RequestMapping("/api/ai-gateway/v1")
+@SuppressFBWarnings("EI")
+class AiGatewayChatCompletionApiController implements ChatCompletionApi {
+
+    private final AiGatewayFacade aiGatewayFacade;
+
+    AiGatewayChatCompletionApiController(AiGatewayFacade aiGatewayFacade) {
+        this.aiGatewayFacade = aiGatewayFacade;
+    }
+
+    @Override
+    @PostMapping(
+        value = PATH_CHAT_COMPLETIONS, consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ChatCompletionResponseModel> chatCompletions(
+        ChatCompletionRequestModel chatCompletionRequestModel) {
+        AiGatewayChatCompletionRequest request = toDomainRequest(chatCompletionRequestModel);
+
+        if (Boolean.TRUE.equals(chatCompletionRequestModel.getStream())) {
+            throw new IllegalArgumentException(
+                "Streaming requests must use Accept: text/event-stream header");
+        }
+
+        AiGatewayChatCompletionResponse domainResponse = aiGatewayFacade.chatCompletion(request);
+
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+
+        applyGatewayMetadataHeaders(builder, domainResponse);
+
+        return builder.body(toResponseModel(domainResponse));
+    }
+
+    private static void applyGatewayMetadataHeaders(
+        ResponseEntity.BodyBuilder builder, AiGatewayChatCompletionResponse domainResponse) {
+        AiGatewayChatCompletionResponse.GatewayMetadata metadata = domainResponse.gatewayMetadata();
+
+        if (metadata == null) {
+            return;
+        }
+
+        if (metadata.provider() != null) {
+            builder.header("x-gateway-provider", metadata.provider());
+        }
+
+        if (metadata.model() != null) {
+            builder.header("x-gateway-model", metadata.model());
+        }
+
+        if (metadata.latencyMs() != null) {
+            builder.header("x-gateway-latency-ms", String.valueOf(metadata.latencyMs()));
+        }
+
+        if (metadata.cacheHit() != null) {
+            builder.header("x-gateway-cache-hit", String.valueOf(metadata.cacheHit()));
+        }
+
+        if (metadata.routingPolicy() != null) {
+            builder.header("x-gateway-routing-policy", metadata.routingPolicy());
+        }
+
+        if (metadata.requestId() != null) {
+            builder.header("x-gateway-request-id", metadata.requestId());
+        }
+
+        if (metadata.budgetWarningRemainingUsd() != null) {
+            builder.header(
+                "x-gateway-budget-warning",
+                metadata.budgetWarningRemainingUsd()
+                    .toPlainString());
+        }
+    }
+
+    @PostMapping(value = PATH_CHAT_COMPLETIONS, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    Flux<ServerSentEvent<Object>> chatCompletionsStream(
+        @RequestBody ChatCompletionRequestModel chatCompletionRequestModel) {
+        return Flux.defer(() -> {
+            AiGatewayChatCompletionRequest request = toDomainRequest(chatCompletionRequestModel);
+
+            return aiGatewayFacade.chatCompletionStream(request)
+                .<ServerSentEvent<Object>>map(domainResponse -> ServerSentEvent.<Object>builder()
+                    .data(toResponseModel(domainResponse))
+                    .build());
+        })
+            .onErrorResume(exception -> Flux.just(ServerSentEvent.<Object>builder()
+                .event("error")
+                .data(new StreamErrorChunkModel(
+                    resolveErrorType(exception),
+                    exception.getMessage() != null ? exception.getMessage() : "Streaming failed"))
+                .build()));
+    }
+
+    private static String resolveErrorType(Throwable exception) {
+        if (exception instanceof com.bytechef.ee.platform.ai.gateway.domain.BudgetExceededException) {
+            return "budget_exceeded";
+        }
+
+        return exception.getClass()
+            .getSimpleName();
+    }
+
+    public record StreamErrorChunkModel(String type, String message) {
+    }
+
+    private AiGatewayChatCompletionRequest toDomainRequest(ChatCompletionRequestModel model) {
+        if (model.getModel() == null || model.getModel()
+            .isBlank()) {
+            throw new IllegalArgumentException("'model' field is required");
+        }
+
+        if (model.getMessages() == null || model.getMessages()
+            .isEmpty()) {
+            throw new IllegalArgumentException("'messages' field is required and must not be empty");
+        }
+
+        List<AiGatewayChatMessage> messages = model.getMessages()
+            .stream()
+            .map(this::toDomainMessage)
+            .toList();
+
+        List<AiGatewayTool> tools = model.getTools() == null
+            ? null
+            : model.getTools()
+                .stream()
+                .map(toolModel -> {
+                    ToolFunctionModel toolFunctionModel = toolModel.getFunction();
+
+                    return new AiGatewayTool(
+                        toolModel.getType(),
+                        toolFunctionModel == null
+                            ? null
+                            : new AiGatewayTool.AiGatewayToolFunction(
+                                toolFunctionModel.getName(), toolFunctionModel.getDescription(),
+                                toParametersMap(toolFunctionModel.getParameters())));
+                })
+                .toList();
+
+        Map<String, String> tags = model.getTags() == null
+            ? null
+            : model.getTags()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> String.valueOf(entry.getValue())));
+
+        return new AiGatewayChatCompletionRequest(
+            model.getModel(), messages, model.getTemperature(), model.getMaxTokens(),
+            model.getTopP(), Boolean.TRUE.equals(model.getStream()), model.getRoutingPolicy(),
+            model.getCache(), toToolChoice(model.getToolChoice()), tools, tags);
+    }
+
+    private AiGatewayChatMessage toDomainMessage(ChatMessageModel messageModel) {
+        List<AiGatewayChatMessage.ToolCall> toolCalls = messageModel.getToolCalls() == null
+            ? null
+            : messageModel.getToolCalls()
+                .stream()
+                .map(this::toDomainToolCall)
+                .toList();
+
+        List<AiGatewayContentBlock> contentBlocks = null;
+
+        if (messageModel.getContentBlocks() != null) {
+            contentBlocks = messageModel.getContentBlocks()
+                .stream()
+                .map(blockModel -> {
+                    ContentBlockImageUrlModel imageUrlModel = blockModel.getImageUrl();
+
+                    AiGatewayContentBlock.ImageUrl imageUrl = imageUrlModel == null
+                        ? null
+                        : new AiGatewayContentBlock.ImageUrl(imageUrlModel.getUrl(), imageUrlModel.getDetail());
+
+                    return new AiGatewayContentBlock(
+                        AiGatewayContentBlockType.fromValue(blockModel.getType()),
+                        blockModel.getText(), imageUrl, null);
+                })
+                .toList();
+        }
+
+        return new AiGatewayChatMessage(
+            AiGatewayChatRole.fromValue(messageModel.getRole()), messageModel.getContent(), contentBlocks,
+            toolCalls, messageModel.getToolCallId());
+    }
+
+    private AiGatewayChatMessage.ToolCall toDomainToolCall(ToolCallModel toolCallModel) {
+        ToolCallFunctionModel toolCallFunctionModel = toolCallModel.getFunction();
+
+        return new AiGatewayChatMessage.ToolCall(
+            toolCallModel.getId(), toolCallModel.getType(),
+            toolCallFunctionModel == null
+                ? null
+                : new AiGatewayChatMessage.ToolCallFunction(
+                    toolCallFunctionModel.getName(), toolCallFunctionModel.getArguments()));
+    }
+
+    private ChatCompletionResponseModel toResponseModel(AiGatewayChatCompletionResponse domainResponse) {
+        ChatCompletionResponseModel responseModel = new ChatCompletionResponseModel();
+
+        responseModel.setId(domainResponse.id());
+        responseModel.setObject(domainResponse.object());
+        responseModel.setCreated(domainResponse.created());
+        responseModel.setModel(domainResponse.model());
+
+        if (domainResponse.choices() != null) {
+            List<ChoiceModel> choiceModels = domainResponse.choices()
+                .stream()
+                .map(choice -> {
+                    ChoiceModel choiceModel = new ChoiceModel();
+
+                    choiceModel.setIndex(choice.index());
+                    choiceModel.setFinishReason(choice.finishReason());
+
+                    if (choice.message() != null) {
+                        ChatMessageModel messageModel = new ChatMessageModel();
+
+                        messageModel.setRole(choice.message()
+                            .role()
+                            .getValue());
+                        messageModel.setContent(choice.message()
+                            .content());
+
+                        if (choice.message()
+                            .toolCalls() != null) {
+                            List<ToolCallModel> toolCallModels = choice.message()
+                                .toolCalls()
+                                .stream()
+                                .map(this::toToolCallModel)
+                                .toList();
+
+                            messageModel.setToolCalls(toolCallModels);
+                        }
+
+                        choiceModel.setMessage(messageModel);
+                    }
+
+                    return choiceModel;
+                })
+                .toList();
+
+            responseModel.setChoices(choiceModels);
+        }
+
+        if (domainResponse.usage() != null) {
+            UsageModel usageModel = new UsageModel();
+
+            usageModel.setPromptTokens((long) domainResponse.usage()
+                .promptTokens());
+            usageModel.setCompletionTokens((long) domainResponse.usage()
+                .completionTokens());
+            usageModel.setTotalTokens((long) domainResponse.usage()
+                .totalTokens());
+
+            responseModel.setUsage(usageModel);
+        }
+
+        return responseModel;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> toParametersMap(Object parameters) {
+        if (parameters instanceof Map<?, ?> map) {
+            return (Map<String, Object>) map;
+        }
+
+        if (parameters != null) {
+            throw new IllegalArgumentException(
+                "Expected tool function parameters to be a Map, got: " + parameters.getClass()
+                    .getSimpleName());
+        }
+
+        return null;
+    }
+
+    private AiGatewayToolChoice toToolChoice(Object toolChoice) {
+        switch (toolChoice) {
+            case null -> {
+                return null;
+            }
+            case String stringValue -> {
+                return AiGatewayToolChoice.ofString(stringValue);
+            }
+            case Map<?, ?> map -> {
+                Object toolRefObj = map.get("function");
+
+                if (toolRefObj instanceof Map<?, ?> toolRefMap) {
+                    Object name = toolRefMap.get("name");
+
+                    String toolName = name != null ? name.toString() : null;
+
+                    return AiGatewayToolChoice.ofTool(toolName);
+                }
+            }
+            default -> {
+            }
+        }
+
+        throw new IllegalArgumentException(
+            "Invalid tool_choice value: expected string or object with 'function' key");
+    }
+
+    private ToolCallModel toToolCallModel(AiGatewayChatMessage.ToolCall toolCall) {
+        ToolCallModel toolCallModel = new ToolCallModel();
+
+        toolCallModel.setId(toolCall.id());
+        toolCallModel.setType(toolCall.type());
+
+        if (toolCall.function() != null) {
+            ToolCallFunctionModel functionModel = new ToolCallFunctionModel();
+
+            functionModel.setName(toolCall.function()
+                .name());
+            functionModel.setArguments(toolCall.function()
+                .arguments());
+
+            toolCallModel.setFunction(functionModel);
+        }
+
+        return toolCallModel;
+    }
+}
