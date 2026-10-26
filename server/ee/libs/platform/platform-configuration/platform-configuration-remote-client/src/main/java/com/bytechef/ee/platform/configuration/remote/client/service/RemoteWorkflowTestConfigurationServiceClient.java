@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.configuration.remote.client.service;
 
 import com.bytechef.ee.platform.configuration.remote.grpc.PlatformConfigurationProtoMapper;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.InputsResponse;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowTestConfigurationInputsRequest;
@@ -92,11 +93,12 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
 
     @Override
     public boolean isConnectionUsed(long connectionId) {
-        return getStub().isConnectionUsed(
+        BoolResponse boolResponse = getStub().isConnectionUsed(
             IdRequest.newBuilder()
                 .setId(connectionId)
-                .build())
-            .getValue();
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
