@@ -28,6 +28,7 @@ import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.ConnectionDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
@@ -40,6 +41,7 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -52,6 +54,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -161,6 +164,40 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
             .extracting(ComponentDefinition::getName, ComponentDefinition::getVersion)
             .containsExactly(
                 org.assertj.core.groups.Tuple.tuple("keep", 1), org.assertj.core.groups.Tuple.tuple("keep", 2));
+    }
+
+    @Test
+    void testListSkipsAnUnreachableWorker() {
+        ManagedChannel unreachableManagedChannel = InProcessChannelBuilder.forName("unreachable-worker")
+            .directExecutor()
+            .build();
+
+        GrpcChannels grpcChannels = new GrpcChannels() {
+
+            @Override
+            public Channel getChannel(String serviceId) {
+                return managedChannel;
+            }
+
+            @Override
+            public Channel getChannel(ServiceInstance serviceInstance) {
+                return "worker-app:2".equals(serviceInstance.getInstanceId()) ? unreachableManagedChannel
+                    : managedChannel;
+            }
+        };
+
+        RemoteComponentDefinitionServiceClient oneWorkerDownRemoteComponentDefinitionServiceClient =
+            new RemoteComponentDefinitionServiceClient(grpcChannels, discoveryClient, jsonMapper, List.of());
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(componentDefinition("keep", 1)));
+
+        try {
+            assertThat(oneWorkerDownRemoteComponentDefinitionServiceClient.getComponentDefinitions())
+                .extracting(ComponentDefinition::getName)
+                .containsExactly("keep");
+        } finally {
+            unreachableManagedChannel.shutdownNow();
+        }
     }
 
     @Test
