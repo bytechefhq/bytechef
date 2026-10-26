@@ -34,6 +34,7 @@ include("server:apps:server-app")
 
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-api")
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-graphql")
+include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-public-rest")
 include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-service")
 include("server:libs:ai:ai-api")
 include("server:libs:ai:ai-copilot:ai-copilot-api")
