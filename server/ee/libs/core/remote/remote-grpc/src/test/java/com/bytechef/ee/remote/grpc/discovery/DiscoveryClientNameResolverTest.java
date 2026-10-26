@@ -9,6 +9,7 @@ package com.bytechef.ee.remote.grpc.discovery;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,8 +17,11 @@ import io.grpc.EquivalentAddressGroup;
 import io.grpc.NameResolver;
 import io.grpc.Status;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.cloud.client.DefaultServiceInstance;
@@ -57,7 +61,7 @@ class DiscoveryClientNameResolverTest {
         when(discoveryClient.getInstances("api-gateway-app")).thenReturn(
             List.of(instance("localhost", 8080, Map.of())));
 
-        new DiscoveryClientNameResolver("api-gateway-app", discoveryClient).start(listener);
+        new DiscoveryClientNameResolver("api-gateway-app", discoveryClient, null, null).start(listener);
 
         ArgumentCaptor<Status> statusArgumentCaptor = ArgumentCaptor.forClass(Status.class);
 
@@ -67,8 +71,37 @@ class DiscoveryClientNameResolverTest {
             .getCode()).isEqualTo(Status.Code.UNAVAILABLE);
     }
 
+    @Test
+    void testInstancesAddedLaterAreResolvedWithoutAFailure() {
+        when(discoveryClient.getInstances("api-gateway-app")).thenReturn(
+            List.of(instance("localhost", 8080, Map.of(DiscoveryClientNameResolver.GRPC_PORT_METADATA_KEY, "9090"))),
+            List.of(
+                instance("localhost", 8080, Map.of(DiscoveryClientNameResolver.GRPC_PORT_METADATA_KEY, "9090")),
+                instance("localhost", 8081, Map.of(DiscoveryClientNameResolver.GRPC_PORT_METADATA_KEY, "9091"))));
+
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+        DiscoveryClientNameResolver discoveryClientNameResolver = new DiscoveryClientNameResolver(
+            "api-gateway-app", discoveryClient, scheduledExecutorService, Duration.ofMillis(50));
+
+        try {
+            discoveryClientNameResolver.start(listener);
+
+            ArgumentCaptor<NameResolver.ResolutionResult> resolutionResultArgumentCaptor =
+                ArgumentCaptor.forClass(NameResolver.ResolutionResult.class);
+
+            verify(listener, timeout(2000).atLeast(2)).onResult(resolutionResultArgumentCaptor.capture());
+
+            assertThat(resolutionResultArgumentCaptor.getValue()
+                .getAddresses()).hasSize(2);
+        } finally {
+            discoveryClientNameResolver.shutdown();
+            scheduledExecutorService.shutdownNow();
+        }
+    }
+
     private List<Object> resolve() {
-        new DiscoveryClientNameResolver("api-gateway-app", discoveryClient).start(listener);
+        new DiscoveryClientNameResolver("api-gateway-app", discoveryClient, null, null).start(listener);
 
         ArgumentCaptor<NameResolver.ResolutionResult> resolutionResultArgumentCaptor =
             ArgumentCaptor.forClass(NameResolver.ResolutionResult.class);
