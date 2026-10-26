@@ -86,6 +86,15 @@ these messages over a different transport, chosen with `bytechef.message-broker.
 | `sqs` (default) | Control messages go through SQS and reach only one node. Fine for a single node. |
 | `redis` | Control messages go over Redis pub/sub (for example Amazon ElastiCache), so every node receives them. Required when you run more than one node. Set the connection with `BYTECHEF_REDIS_*`. |
 
+With `sqs` and more than one node, each control message reaches a single node, often not the one that needs it:
+
+- Cancelling a task or a job does not stop a task running on another worker.
+- Cancelling a trigger execution does not stop it on another node.
+- SSE clients connected to one node miss the events of webhook runs handled by another node.
+- WebSocket webhook clients (Twilio call status) miss updates handled by another node.
+
+At startup, the `AWS` provider logs a warning when `control-provider` is `sqs`.
+
 ## Switching providers
 
 1. Drain in-flight tasks on the old broker.
