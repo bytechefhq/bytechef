@@ -7,6 +7,7 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -49,6 +50,7 @@ dependencies {
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:config:scheduler-lock-config"))
     implementation(project(":server:libs:config:logback-config"))
+    implementation(project(":server:libs:config:security-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
@@ -68,6 +70,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-notification:platform-notification-rest"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:libs:platform:platform-security:platform-security-graphql"))
     implementation(project(":server:libs:platform:platform-security:platform-security-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
@@ -86,6 +89,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-task:automation-task-remote-rest"))
     implementation(project(":server:ee:libs:config:microservice-config"))
+    implementation(project(":server:ee:libs:config:session-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
@@ -103,6 +107,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-service"))
     implementation(project(":server:ee:libs:embedded:embedded-swagger"))
@@ -115,6 +120,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
@@ -123,5 +129,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
 
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.session:spring-session-core")
+    testImplementation(project(":server:libs:core:commons:commons-util"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

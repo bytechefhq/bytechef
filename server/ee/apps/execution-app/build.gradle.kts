@@ -8,6 +8,7 @@ springBoot {
 dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -36,6 +37,7 @@ dependencies {
     implementation(project(":server:libs:config:jdbc-config"))
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:liquibase-config"))
+    implementation(project(":server:libs:config:security-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
@@ -51,6 +53,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
+    implementation(project(":server:ee:libs:config:session-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:cloud:cloud-aws"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
@@ -76,5 +79,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
 
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.session:spring-session-core")
+    testImplementation(project(":server:libs:core:commons:commons-util"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
