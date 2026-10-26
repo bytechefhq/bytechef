@@ -687,6 +687,8 @@ include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-
 include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-graphql")
 include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-opennlp")
 include("server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service")
+include("server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-api")
+include("server:ee:libs:platform:platform-ai:platform-ai-llm-usage:platform-ai-llm-usage-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client")
 include("server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client")
 include("server:ee:libs:platform:platform-ai:platform-ai-workspace")
