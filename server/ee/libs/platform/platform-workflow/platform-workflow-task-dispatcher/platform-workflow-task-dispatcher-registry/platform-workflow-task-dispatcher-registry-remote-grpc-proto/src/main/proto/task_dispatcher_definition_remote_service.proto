@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package bytechef.platform.workflow.task.dispatcher.remote.v1;
+
+import "component_definition_remote_service.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "property.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto";
+
+service TaskDispatcherDefinitionRemoteService {
+  rpc ExecuteOutput(ExecuteTaskDispatcherOutputRequest) returns (bytechef.platform.component.remote.v1.OutputResponseResult);
+  rpc GetTaskDispatcherDefinition(GetTaskDispatcherDefinitionRequest) returns (RemoteTaskDispatcherDefinition);
+  rpc GetTaskDispatcherDefinitions(google.protobuf.Empty) returns (RemoteTaskDispatcherDefinitions);
+  rpc GetTaskDispatcherDefinitionVersions(GetTaskDispatcherDefinitionVersionsRequest) returns (RemoteTaskDispatcherDefinitions);
+}
+
+message RemoteTaskDispatcherDefinition {
+  optional string description = 1;
+  optional bytechef.platform.component.remote.v1.RemoteHelp help = 2;
+  optional string icon = 3;
+  optional string name = 4;
+  optional bool output_defined = 5;
+  optional bool output_function_defined = 6;
+  optional bytechef.platform.component.remote.v1.RemoteOutputResponse output_response = 7;
+  optional bool output_schema_defined = 8;
+  repeated bytechef.platform.component.remote.v1.RemoteProperty properties = 9;
+  optional bytechef.platform.component.remote.v1.RemoteResources resources = 10;
+  repeated bytechef.platform.component.remote.v1.RemoteProperty task_properties = 11;
+  optional string title = 12;
+  optional bool variable_properties_defined = 13;
+  optional int32 version = 14;
+}
+
+message RemoteTaskDispatcherDefinitions {
+  repeated RemoteTaskDispatcherDefinition task_dispatcher_definitions = 1;
+}
+
+message GetTaskDispatcherDefinitionRequest {
+  string name = 1;
+  optional int32 version = 2;
+}
+
+message GetTaskDispatcherDefinitionVersionsRequest {
+  string name = 1;
+}
+
+message ExecuteTaskDispatcherOutputRequest {
+  string name = 1;
+  int32 version = 2;
+  google.protobuf.Struct input_parameters = 3;
+}
