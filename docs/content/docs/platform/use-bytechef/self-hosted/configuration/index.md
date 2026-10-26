@@ -59,10 +59,18 @@ re-encryption pass.
 
 There is **one instance-wide encryption key**, chosen with `BYTECHEF_ENCRYPTION_PROVIDER`:
 
-- **`FILESYSTEM`** (default) - ByteChef generates an AES key on first start and writes it to the
-  local filesystem. This is fine for a single, persistent node, but it is **not** suitable for
-  containers with ephemeral disks or for multi-instance deployments, because each replica would
-  generate its own key and could not decrypt data written by the others.
+- **`FILESYSTEM`** (default) - ByteChef generates an AES key on first start and writes it to
+  `~/.bytechef/key`, resolved against the home directory of the user the server runs as. In the
+  official Docker image that is `/root/.bytechef/key`. On later starts the existing file is read
+  back. This is fine for a single, persistent node, but it is **not** suitable for containers with
+  ephemeral disks or for multi-instance deployments, because each replica would generate its own key
+  and could not decrypt data written by the others.
+
+  When you run the image under this provider, bind-mount the directory to the host
+  (`-v ~/.bytechef:/root/.bytechef`, as the shipped `docker-compose.yml` does). Without the mount
+  the key lives in the container's writable layer and is lost when the container is deleted or
+  re-created, taking every stored connection credential with it. See
+  [Local Docker](/platform/use-bytechef/self-hosted/installation/local-docker).
 - **`PROPERTY`** - you supply the key yourself via `BYTECHEF_ENCRYPTION_PROPERTY_KEY`. Use this for
   Kubernetes and any multi-replica setup so every instance shares one stable key. Store the key in a
   secret manager, never in source control.

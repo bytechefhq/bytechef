@@ -300,8 +300,8 @@ does not support.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_ENCRYPTION_PROVIDER` | Encryption provider (FILESYSTEM, PROPERTY) | `FILESYSTEM` |
-| `BYTECHEF_ENCRYPTION_PROPERTY_KEY` | Encryption key (sensitive) | - |
+| `BYTECHEF_ENCRYPTION_PROVIDER` | Encryption provider (FILESYSTEM, PROPERTY). `FILESYSTEM` generates a key on first start and keeps it in `~/.bytechef/key` (`/root/.bytechef/key` in the Docker image). In a container, bind-mount `~/.bytechef` to the host, or the key is lost when the container is re-created and stored credentials can no longer be decrypted. Use `PROPERTY` for multiple replicas or ephemeral disks. | `FILESYSTEM` |
+| `BYTECHEF_ENCRYPTION_PROPERTY_KEY` | Encryption key (sensitive). Required when `BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY`; use the same stable value on every instance. | - |
 
 ## Feature Flags
 
