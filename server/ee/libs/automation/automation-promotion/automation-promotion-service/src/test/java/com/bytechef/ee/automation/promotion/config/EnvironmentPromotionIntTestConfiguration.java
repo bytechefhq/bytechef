@@ -63,6 +63,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import tools.jackson.databind.ObjectMapper;
 
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
 @ComponentScan(
     basePackages = {
         "com.bytechef.automation.ai.mcp", "com.bytechef.automation.configuration",
