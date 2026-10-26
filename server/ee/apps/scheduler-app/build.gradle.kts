@@ -37,12 +37,13 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-impl"))
-    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
 
+    testImplementation("io.grpc:grpc-api")
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

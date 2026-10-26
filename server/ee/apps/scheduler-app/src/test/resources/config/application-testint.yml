@@ -1,7 +1,16 @@
 server:
   port: 9999
 
+spring:
+  grpc:
+    server:
+      port: 0
+
 bytechef:
   edition: EE
   message-broker:
     provider: MEMORY
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
