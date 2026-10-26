@@ -8,18 +8,11 @@ spring:
   profiles:
     active: #spring.profiles.active#
   mail:
-    host: http://127.0.0.1
-    port: 8080
-    username: noreply@app.bytechef.io
-    password: your-password
     properties:
       mail:
         smtp:
-          auth: true
           # Milliseconds; JavaMail waits forever by default and a test send runs on the request thread
           connectiontimeout: 10000
-          starttls:
-            enable: true
           timeout: 30000
           writetimeout: 30000
         smtps:

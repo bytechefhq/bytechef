@@ -20,6 +20,11 @@ spring:
       poolName: Hikari
   liquibase:
     contexts: configuration
+  mail:
+    host: ${bytechef.mail.host:localhost}
+    port: ${bytechef.mail.port:25}
+    username: ${bytechef.mail.username:}
+    password: ${bytechef.mail.password:}
   task:
     execution:
       thread-name-prefix: configuration-app-task-

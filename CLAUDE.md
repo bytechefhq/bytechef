@@ -426,7 +426,7 @@ Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-appro
 - **Client**: 3000 (development server)
 - **PostgreSQL**: 5432
 - **Redis**: 6379
-- **Mailhog**: 1025
+- **Mailpit**: 1025 (SMTP), 8025 (UI)
 
 ## Common Development Workflows
 

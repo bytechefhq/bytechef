@@ -48,7 +48,10 @@ import org.springframework.test.context.DynamicPropertySource;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = ConfigurationApplication.class)
+@SpringBootTest(
+    classes = ConfigurationApplication.class, properties = {
+        "bytechef.mail.host=mailpit", "bytechef.mail.port=1025"
+    })
 @Import({
     PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
 })
@@ -99,6 +102,12 @@ public class ConfigurationApplicationIntTest {
         assertThat(environment.getProperty("spring.task.execution.thread-name-prefix"))
             .isEqualTo("configuration-app-task-");
         assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
+    }
+
+    @Test
+    void testMailUsesBytechefMailSettings() {
+        assertThat(environment.getProperty("spring.mail.host")).isEqualTo("mailpit");
+        assertThat(environment.getProperty("spring.mail.port")).isEqualTo("1025");
     }
 
     @Test
