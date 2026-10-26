@@ -15,6 +15,7 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
@@ -22,6 +23,7 @@ import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -48,6 +50,7 @@ import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenAiAgentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
@@ -154,6 +157,8 @@ public class AiHubConfiguration {
         ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
         ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
+        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
@@ -168,6 +173,8 @@ public class AiHubConfiguration {
             searchDocsToolCallbacks(embeddingProviderStatusProviderProvider, copilotPgVectorStoreProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(aiAgentFlatCrudToolCallbacks(aiAgentToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
@@ -182,6 +189,8 @@ public class AiHubConfiguration {
         ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
         ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
+        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
@@ -199,6 +208,8 @@ public class AiHubConfiguration {
             searchDocsToolCallbacks(embeddingProviderStatusProviderProvider, copilotPgVectorStoreProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(aiAgentFlatCrudToolCallbacks(aiAgentToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
@@ -457,6 +468,34 @@ public class AiHubConfiguration {
         return writable
             ? deploymentToolCallbacksFactory.writeToolCallbacks()
             : deploymentToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> aiAgentFlatCrudToolCallbacks(
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider, boolean writable) {
+
+        AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory = aiAgentToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (aiAgentToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? aiAgentToolCallbacksFactory.writeToolCallbacks()
+            : aiAgentToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> openAiAgentTabToolCallbacks(
+        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
+        @Nullable AiHubChatArtifactRecorder aiHubChatArtifactRecorder) {
+
+        AiAgentFacade aiAgentFacade = aiAgentFacadeProvider.getIfAvailable();
+
+        if (aiAgentFacade == null) {
+            return List.of();
+        }
+
+        return List.of(new OpenAiAgentTabToolCallback(aiAgentFacade, aiHubChatArtifactRecorder));
     }
 
     private static void requireBuildWorkflow(List<ToolCallback> toolCallbacks) {
