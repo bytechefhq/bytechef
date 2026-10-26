@@ -82,6 +82,11 @@ public class ApiGatewayApplicationIntTest {
     }
 
     @Test
+    void testGrpcServerAcceptsConfiguredInboundMessageSize() {
+        assertThat(environment.getProperty("spring.grpc.server.inbound.message.max-size")).isEqualTo("64MB");
+    }
+
+    @Test
     void testRedisDiscoveryClientIsRegistered() {
         assertThat(applicationContext.getBeansOfType(RedisDiscoveryClient.class)).hasSize(1);
     }

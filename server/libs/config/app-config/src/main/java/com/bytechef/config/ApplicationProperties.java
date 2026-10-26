@@ -5030,6 +5030,12 @@ public class ApplicationProperties {
             private Duration deadline;
 
             /**
+             * Largest message a microservice accepts from another one, such as a list of component definitions with
+             * their icons
+             */
+            private DataSize maxInboundMessageSize;
+
+            /**
              * Send calls without TLS. Only for a trusted network, such as a Docker Compose network
              */
             private boolean plaintext;
@@ -5049,6 +5055,10 @@ public class ApplicationProperties {
                 return deadline;
             }
 
+            public DataSize getMaxInboundMessageSize() {
+                return maxInboundMessageSize;
+            }
+
             public String getServiceToken() {
                 return serviceToken;
             }
@@ -5063,6 +5073,10 @@ public class ApplicationProperties {
 
             public void setDeadline(Duration deadline) {
                 this.deadline = deadline;
+            }
+
+            public void setMaxInboundMessageSize(DataSize maxInboundMessageSize) {
+                this.maxInboundMessageSize = maxInboundMessageSize;
             }
 
             public void setPlaintext(boolean plaintext) {
