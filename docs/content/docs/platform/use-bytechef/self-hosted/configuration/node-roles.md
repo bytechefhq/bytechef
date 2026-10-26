@@ -102,7 +102,7 @@ By default, login state lives in the memory of the coordinator that served the l
 
 With `REDIS` or `JDBC`, any coordinator serves any request, so the load balancer needs no sticky sessions (no `ip_hash`), and a coordinator failure does not log users out. Remember-me tokens and CSRF tokens do not depend on the session store, but every node still needs the same `BYTECHEF_SECURITY_REMEMBER_ME_KEY`.
 
-A CE node started with `REDIS` or `JDBC` does not fail. It logs at INFO `bytechef.session.store=<value> requires ByteChef Enterprise Edition; using memory sessions` and keeps memory sessions, so one configuration works in both editions.
+A CE node started with `REDIS` or `JDBC` does not fail and keeps memory sessions, so one configuration works in both editions.
 
 Workers and webhook nodes do not use sessions, so they keep the session store disabled even when `BYTECHEF_SESSION_STORE` is set. Only nodes with the coordinator role open the Redis connection or use the JDBC tables.
 
