@@ -7,6 +7,10 @@ const WORKFLOW_ARTIFACT_KINDS: ReadonlySet<AiHubArtifactKindType> = new Set([
     'WORKFLOW_UPDATED',
 ]);
 
+export function isAiAgentArtifactKind(kind: AiHubArtifactKindType): boolean {
+    return kind === 'AI_AGENT_REFERENCED';
+}
+
 export function isWorkflowArtifactKind(kind: AiHubArtifactKindType): boolean {
     return WORKFLOW_ARTIFACT_KINDS.has(kind);
 }
@@ -31,6 +35,12 @@ export function parseArtifactMetadata(metadataJson: string | null): Record<strin
 }
 
 export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
+    if (isAiAgentArtifactKind(artifact.kind)) {
+        aiHubTabsStore.getState().openAiAgentTab({aiAgentId: artifact.artifactId, name: artifact.artifactName});
+
+        return;
+    }
+
     if (!isWorkflowArtifactKind(artifact.kind)) {
         return;
     }
@@ -56,6 +66,10 @@ export function isArtifactRemovable(artifact: AiHubChatArtifactI): boolean {
 }
 
 export function isArtifactClickable(artifact: AiHubChatArtifactI): boolean {
+    if (isAiAgentArtifactKind(artifact.kind)) {
+        return true;
+    }
+
     if (!isWorkflowArtifactKind(artifact.kind)) {
         return false;
     }
