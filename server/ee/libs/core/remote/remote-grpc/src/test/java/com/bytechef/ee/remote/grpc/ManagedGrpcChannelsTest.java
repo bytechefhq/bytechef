@@ -79,8 +79,16 @@ class ManagedGrpcChannelsTest {
 
             assertThat(managedGrpcChannels.getChannel(first)).isSameAs(managedGrpcChannels.getChannel(first));
             assertThat(managedGrpcChannels.getChannel(first)).isNotSameAs(managedGrpcChannels.getChannel(second));
-            assertThat(managedGrpcChannels.getChannel(second)
-                .authority()).isEqualTo("localhost:19092");
+        }
+    }
+
+    @Test
+    void testInstanceChannelAuthenticatesAsServiceId() {
+        try (ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(
+            applicationProperties("token", Map.of()))) {
+
+            assertThat(managedGrpcChannels.getChannel(serviceInstance("worker-app:1", 19091))
+                .authority()).isEqualTo("worker-app");
         }
     }
 
