@@ -26,6 +26,8 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.platform.component.log.JdbcLogFileStorage;
+import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
@@ -145,6 +147,22 @@ class ServerApplicationIntTest {
         void testContextLoadsInCommunityEdition() {
             assertThat(communityEditionApplicationContext.getBeanNamesForType(WorkspaceScopeCacheService.class))
                 .isEmpty();
+        }
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+        "bytechef.file-storage.provider=jdbc", "spring.quartz.scheduler-name=jdbcFileStorageScheduler"
+    })
+    class JdbcFileStorageIntTest {
+
+        @Autowired
+        private ApplicationContext jdbcFileStorageApplicationContext;
+
+        @Test
+        void testStoresComponentLogsInTheDatabase() {
+            assertThat(jdbcFileStorageApplicationContext.getBean(LogFileStorage.class))
+                .isInstanceOf(JdbcLogFileStorage.class);
         }
     }
 

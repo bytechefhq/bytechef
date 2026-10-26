@@ -28,11 +28,11 @@ import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageImpl;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.component.log.TriggerLogFileStorageImpl;
+import com.bytechef.platform.component.log.repository.ComponentLogEntryRepository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 /**
  * @author Ivica Cardic
@@ -43,13 +43,13 @@ class LogFileStorageConfiguration {
     @Bean
     EditorLogFileStorage editorLogFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry,
-        ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
+        ObjectProvider<ComponentLogEntryRepository> componentLogEntryRepositoryProvider) {
 
-        NamedParameterJdbcOperations namedParameterJdbcOperations = getNamedParameterJdbcOperations(
-            applicationProperties, namedParameterJdbcOperationsProvider);
+        ComponentLogEntryRepository componentLogEntryRepository = getComponentLogEntryRepository(
+            applicationProperties, componentLogEntryRepositoryProvider);
 
-        if (namedParameterJdbcOperations != null) {
-            return new EditorLogFileStorageImpl(new JdbcLogFileStorage(namedParameterJdbcOperations, Scope.EDITOR));
+        if (componentLogEntryRepository != null) {
+            return new EditorLogFileStorageImpl(new JdbcLogFileStorage(componentLogEntryRepository, Scope.EDITOR));
         }
 
         return new EditorLogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
@@ -58,13 +58,13 @@ class LogFileStorageConfiguration {
     @Bean
     TriggerLogFileStorage triggerLogFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry,
-        ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
+        ObjectProvider<ComponentLogEntryRepository> componentLogEntryRepositoryProvider) {
 
-        NamedParameterJdbcOperations namedParameterJdbcOperations = getNamedParameterJdbcOperations(
-            applicationProperties, namedParameterJdbcOperationsProvider);
+        ComponentLogEntryRepository componentLogEntryRepository = getComponentLogEntryRepository(
+            applicationProperties, componentLogEntryRepositoryProvider);
 
-        if (namedParameterJdbcOperations != null) {
-            return new TriggerLogFileStorageImpl(new JdbcLogFileStorage(namedParameterJdbcOperations, Scope.TRIGGER));
+        if (componentLogEntryRepository != null) {
+            return new TriggerLogFileStorageImpl(new JdbcLogFileStorage(componentLogEntryRepository, Scope.TRIGGER));
         }
 
         return new TriggerLogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
@@ -73,13 +73,13 @@ class LogFileStorageConfiguration {
     @Bean
     LogFileStorage logFileStorage(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry,
-        ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
+        ObjectProvider<ComponentLogEntryRepository> componentLogEntryRepositoryProvider) {
 
-        NamedParameterJdbcOperations namedParameterJdbcOperations = getNamedParameterJdbcOperations(
-            applicationProperties, namedParameterJdbcOperationsProvider);
+        ComponentLogEntryRepository componentLogEntryRepository = getComponentLogEntryRepository(
+            applicationProperties, componentLogEntryRepositoryProvider);
 
-        if (namedParameterJdbcOperations != null) {
-            return new JdbcLogFileStorage(namedParameterJdbcOperations, Scope.JOB);
+        if (componentLogEntryRepository != null) {
+            return new JdbcLogFileStorage(componentLogEntryRepository, Scope.JOB);
         }
 
         return new LogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
@@ -93,15 +93,15 @@ class LogFileStorageConfiguration {
         return fileStorageServiceRegistry.getFileStorageService(provider.name());
     }
 
-    private static @Nullable NamedParameterJdbcOperations getNamedParameterJdbcOperations(
+    private static @Nullable ComponentLogEntryRepository getComponentLogEntryRepository(
         ApplicationProperties applicationProperties,
-        ObjectProvider<NamedParameterJdbcOperations> namedParameterJdbcOperationsProvider) {
+        ObjectProvider<ComponentLogEntryRepository> componentLogEntryRepositoryProvider) {
 
         if (getProvider(applicationProperties) != Provider.JDBC) {
             return null;
         }
 
-        return namedParameterJdbcOperationsProvider.getIfAvailable();
+        return componentLogEntryRepositoryProvider.getIfAvailable();
     }
 
     private static Provider getProvider(ApplicationProperties applicationProperties) {

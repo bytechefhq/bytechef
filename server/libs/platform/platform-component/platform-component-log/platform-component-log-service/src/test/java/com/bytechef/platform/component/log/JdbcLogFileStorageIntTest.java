@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.tenant.multi.sql.MultiTenantDataSource;
 import com.bytechef.platform.component.log.JdbcLogFileStorage.Scope;
 import com.bytechef.platform.component.log.domain.LogEntry;
+import com.bytechef.platform.component.log.repository.ComponentLogEntryRepository;
 import com.bytechef.tenant.TenantContext;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -37,8 +38,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -56,6 +65,8 @@ class JdbcLogFileStorageIntTest {
     private static final PostgreSQLContainer<?> postgreSql = new PostgreSQLContainer<>("postgres:16-alpine");
 
     private static HikariDataSource hikariDataSource;
+    private static AnnotationConfigApplicationContext multiTenantApplicationContext;
+    private static AnnotationConfigApplicationContext singleTenantApplicationContext;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -78,17 +89,24 @@ class JdbcLogFileStorageIntTest {
         }
 
         execute("CREATE SCHEMA " + getSchema("unmigrated"));
+
+        singleTenantApplicationContext = createApplicationContext(hikariDataSource);
+        multiTenantApplicationContext = createApplicationContext(new MultiTenantDataSource(hikariDataSource));
     }
 
     @AfterAll
     static void afterAll() {
+        multiTenantApplicationContext.close();
+        singleTenantApplicationContext.close();
+
         hikariDataSource.close();
     }
 
     @Nested
     class SingleTenant {
 
-        private final JdbcLogFileStorage jobLogFileStorage = createLogFileStorage(hikariDataSource, Scope.JOB);
+        private final JdbcLogFileStorage jobLogFileStorage =
+            createLogFileStorage(singleTenantApplicationContext, Scope.JOB);
 
         @AfterEach
         void afterEach() throws Exception {
@@ -143,7 +161,8 @@ class JdbcLogFileStorageIntTest {
 
         @Test
         void testScopesDoNotSeeEachOther() {
-            JdbcLogFileStorage editorLogFileStorage = createLogFileStorage(hikariDataSource, Scope.EDITOR);
+            JdbcLogFileStorage editorLogFileStorage =
+                createLogFileStorage(singleTenantApplicationContext, Scope.EDITOR);
 
             jobLogFileStorage.storeLogEntry(1L, 7L, createLogEntry(LogEntry.Level.INFO, "job", 7L));
             editorLogFileStorage.storeLogEntry(1L, 7L, createLogEntry(LogEntry.Level.INFO, "editor", 7L));
@@ -169,7 +188,7 @@ class JdbcLogFileStorageIntTest {
     class MultiTenant {
 
         private final JdbcLogFileStorage jobLogFileStorage =
-            createLogFileStorage(new MultiTenantDataSource(hikariDataSource), Scope.JOB);
+            createLogFileStorage(multiTenantApplicationContext, Scope.JOB);
 
         @Test
         void testTenantsDoNotSeeEachOthersLogs() {
@@ -191,8 +210,23 @@ class JdbcLogFileStorageIntTest {
         }
     }
 
-    private static JdbcLogFileStorage createLogFileStorage(DataSource dataSource, Scope scope) {
-        return new JdbcLogFileStorage(new NamedParameterJdbcTemplate(dataSource), scope);
+    private static AnnotationConfigApplicationContext createApplicationContext(DataSource dataSource) {
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+
+        applicationContext.registerBean(
+            NamedParameterJdbcOperations.class, () -> new NamedParameterJdbcTemplate(dataSource));
+        applicationContext.registerBean(
+            "transactionManager", PlatformTransactionManager.class,
+            () -> new DataSourceTransactionManager(dataSource));
+        applicationContext.register(JdbcRepositoryTestConfiguration.class);
+
+        applicationContext.refresh();
+
+        return applicationContext;
+    }
+
+    private static JdbcLogFileStorage createLogFileStorage(ApplicationContext applicationContext, Scope scope) {
+        return new JdbcLogFileStorage(applicationContext.getBean(ComponentLogEntryRepository.class), scope);
     }
 
     private static LogEntry createLogEntry(LogEntry.Level level, String message, long taskExecutionId) {
@@ -234,5 +268,10 @@ class JdbcLogFileStorageIntTest {
         Instant now = Instant.now();
 
         return now.truncatedTo(ChronoUnit.MILLIS);
+    }
+
+    @Configuration
+    @EnableJdbcRepositories(basePackages = "com.bytechef.platform.component.log.repository")
+    static class JdbcRepositoryTestConfiguration extends AbstractJdbcConfiguration {
     }
 }
