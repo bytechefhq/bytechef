@@ -114,7 +114,7 @@ public class WebhookRequestUtils {
         return uriComponentsBuilder.build();
     }
 
-    static String getFilename(String mimeTypeString) {
+    private static String getFilename(String mimeTypeString) {
         MimeType mimeType = org.springframework.util.MimeTypeUtils.parseMimeType(mimeTypeString);
 
         String subtype = mimeType.getSubtype();
