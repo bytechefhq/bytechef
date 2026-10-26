@@ -18,17 +18,20 @@ package com.bytechef.platform.scheduler;
 
 import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.CONNECTION_ID;
 import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
+import static org.awaitility.Awaitility.await;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzJdbcTestConfiguration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -49,6 +52,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
@@ -70,6 +74,9 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 public class QuartzIntTest {
 
     @Autowired
+    private DataSource dataSource;
+
+    @Autowired
     private Scheduler scheduler;
 
     @Autowired
@@ -78,7 +85,17 @@ public class QuartzIntTest {
     @AfterEach
     public void tearDown() throws Exception {
         if (!scheduler.isShutdown()) {
+            scheduler.standby();
+
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+
+            await()
+                .atMost(Duration.ofSeconds(10))
+                .until(() -> Objects.equals(
+                    jdbcTemplate.queryForObject("SELECT COUNT(*) FROM QRTZ_FIRED_TRIGGERS", Integer.class), 0));
+
             scheduler.clear();
+            scheduler.start();
         }
     }
 
