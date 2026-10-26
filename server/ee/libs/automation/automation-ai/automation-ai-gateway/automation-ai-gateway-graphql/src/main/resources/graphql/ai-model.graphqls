@@ -1,0 +1,53 @@
+extend type Query {
+    aiModel(id: ID!): AiModel
+    aiModels: [AiModel]
+    aiModelsByProvider(providerId: ID!): [AiModel]
+}
+
+extend type Mutation {
+    createAiModel(input: CreateAiModelInput!): AiModel
+    deleteAiModel(id: ID!): Boolean
+    reconcileAiModelCatalog: Boolean
+    unpinAiModel(id: ID!): AiModel
+    updateAiModel(id: ID!, input: UpdateAiModelInput!): AiModel
+}
+
+type AiModel {
+    alias: String
+    capabilities: String
+    catalogManaged: Boolean!
+    catalogPinned: Boolean!
+    contextWindow: Int
+    createdDate: Long
+    defaultRoutingPolicyId: ID
+    enabled: Boolean!
+    id: ID!
+    inputCostPerMTokens: Float
+    lastModifiedDate: Long
+    name: String!
+    outputCostPerMTokens: Float
+    providerId: ID!
+    version: Int
+}
+
+input CreateAiModelInput {
+    alias: String
+    capabilities: String
+    contextWindow: Int
+    defaultRoutingPolicyId: ID
+    inputCostPerMTokens: Float
+    name: String!
+    outputCostPerMTokens: Float
+    providerId: ID!
+}
+
+input UpdateAiModelInput {
+    alias: String
+    capabilities: String
+    contextWindow: Int
+    defaultRoutingPolicyId: ID
+    enabled: Boolean
+    inputCostPerMTokens: Float
+    name: String
+    outputCostPerMTokens: Float
+}

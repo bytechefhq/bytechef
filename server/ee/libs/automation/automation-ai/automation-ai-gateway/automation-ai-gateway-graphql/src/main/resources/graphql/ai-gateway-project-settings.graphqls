@@ -1,0 +1,27 @@
+extend type Query {
+    aiGatewayProjectSettings(projectId: ID!): AiGatewayProjectSettings
+}
+
+extend type Mutation {
+    updateAiGatewayProjectSettings(input: AiGatewayProjectSettingsInput!): AiGatewayProjectSettings
+}
+
+type AiGatewayProjectSettings {
+    blockedTerms: String
+    injectionDetectionEnabled: Boolean
+    moderationEnabled: Boolean
+    projectId: ID!
+    redactPii: Boolean
+    redactSecrets: Boolean
+    scanResponses: Boolean
+}
+
+input AiGatewayProjectSettingsInput {
+    blockedTerms: String
+    injectionDetectionEnabled: Boolean
+    moderationEnabled: Boolean
+    projectId: ID!
+    redactPii: Boolean
+    redactSecrets: Boolean
+    scanResponses: Boolean
+}
