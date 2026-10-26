@@ -1,0 +1,214 @@
+# ByteChef EE microservices.
+#
+# Required variables:
+#   POSTGRES_PASSWORD, RABBITMQ_PASSWORD,
+#   BYTECHEF_ENCRYPTION_KEY (openssl rand -base64 16),
+#   BYTECHEF_SECURITY_REMEMBER_ME_KEY (openssl rand -base64 32),
+#   BYTECHEF_REMOTE_GRPC_SERVICE_TOKEN (openssl rand -hex 32)
+#
+# Build the jars and the client before building the images from source:
+#   ./gradlew :server:ee:apps:api-gateway-app:bootJar :server:ee:apps:configuration-app:bootJar \
+#     :server:ee:apps:connection-app:bootJar :server:ee:apps:coordinator-app:bootJar \
+#     :server:ee:apps:execution-app:bootJar :server:ee:apps:migration-app:bootJar \
+#     :server:ee:apps:scheduler-app:bootJar :server:ee:apps:webhook-app:bootJar :server:ee:apps:worker-app:bootJar
+#   (cd client && npm run build)
+#   docker compose -f docker-compose.microservices.yml up -d --build --wait
+
+x-bytechef-environment: &bytechef-environment
+  BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+  BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
+  BYTECHEF_DATASOURCE_USERNAME: postgres
+  BYTECHEF_EDITION: ee
+  BYTECHEF_ENCRYPTION_PROPERTY_KEY: ${BYTECHEF_ENCRYPTION_KEY:?Set BYTECHEF_ENCRYPTION_KEY, e.g. openssl rand -base64 16}
+  BYTECHEF_ENCRYPTION_PROVIDER: property
+  BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR: /opt/bytechef/data/file-storage
+  BYTECHEF_FILE_STORAGE_PROVIDER: filesystem
+  BYTECHEF_MAIL_HOST: mailpit
+  BYTECHEF_MAIL_PORT: 1025
+  BYTECHEF_MESSAGE_BROKER_PROVIDER: ${BYTECHEF_MESSAGE_BROKER_PROVIDER:-amqp}
+  BYTECHEF_PUBLIC_URL: ${BYTECHEF_PUBLIC_URL:-http://localhost:8080}
+  BYTECHEF_REMOTE_GRPC_PLAINTEXT: "true"
+  BYTECHEF_REMOTE_GRPC_SERVICE_TOKEN: ${BYTECHEF_REMOTE_GRPC_SERVICE_TOKEN:?Set BYTECHEF_REMOTE_GRPC_SERVICE_TOKEN}
+  BYTECHEF_SECURITY_REMEMBER_ME_KEY: ${BYTECHEF_SECURITY_REMEMBER_ME_KEY:?Set BYTECHEF_SECURITY_REMEMBER_ME_KEY}
+  BYTECHEF_SESSION_STORE: redis
+  BYTECHEF_TENANT_MODE: ${BYTECHEF_TENANT_MODE:-single}
+  JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75
+  SERVER_PORT: 8080
+  SPRING_DATA_REDIS_HOST: redis
+  SPRING_DATA_REDIS_PORT: 6379
+  SPRING_LIQUIBASE_ENABLED: "false"
+  SPRING_PROFILES_ACTIVE: prod
+  SPRING_RABBITMQ_HOST: rabbitmq
+  SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+  SPRING_RABBITMQ_PORT: 5672
+  SPRING_RABBITMQ_USERNAME: bytechef
+
+x-bytechef-app: &bytechef-app
+  restart: unless-stopped
+  depends_on: &bytechef-app-depends-on
+    migrate:
+      condition: service_completed_successfully
+    postgres:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  environment:
+    <<: *bytechef-environment
+  healthcheck:
+    test: [ "CMD", "curl", "-fs", "http://localhost:8080/actuator/health/readiness" ]
+    interval: 10s
+    timeout: 5s
+    retries: 30
+    start_period: 60s
+  mem_limit: 2g
+  volumes:
+    - file-storage:/opt/bytechef/data/file-storage
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bytechef
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_USER: bytechef
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  redis:
+    image: redis:8-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+
+  migrate:
+    image: ${BYTECHEF_MIGRATION_APP_IMAGE:-docker.bytechef.io/bytechef/migration-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: migration-app
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *bytechef-environment
+      SPRING_LIQUIBASE_ENABLED: "true"
+
+  api-gateway-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_API_GATEWAY_APP_IMAGE:-docker.bytechef.io/bytechef/api-gateway-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: gateway
+      args:
+        APP_NAME: api-gateway-app
+    depends_on:
+      <<: *bytechef-app-depends-on
+      configuration-app:
+        condition: service_healthy
+      execution-app:
+        condition: service_healthy
+    ports:
+      - "${BYTECHEF_PORT:-8080}:8080"
+
+  configuration-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_CONFIGURATION_APP_IMAGE:-docker.bytechef.io/bytechef/configuration-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: configuration-app
+
+  connection-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_CONNECTION_APP_IMAGE:-docker.bytechef.io/bytechef/connection-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: connection-app
+
+  coordinator-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_COORDINATOR_APP_IMAGE:-docker.bytechef.io/bytechef/coordinator-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: coordinator-app
+
+  execution-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_EXECUTION_APP_IMAGE:-docker.bytechef.io/bytechef/execution-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: execution-app
+
+  scheduler-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_SCHEDULER_APP_IMAGE:-docker.bytechef.io/bytechef/scheduler-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: scheduler-app
+
+  webhook-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_WEBHOOK_APP_IMAGE:-docker.bytechef.io/bytechef/webhook-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: webhook-app
+
+  worker-app:
+    <<: *bytechef-app
+    image: ${BYTECHEF_WORKER_APP_IMAGE:-docker.bytechef.io/bytechef/worker-app:latest}
+    build:
+      context: .
+      dockerfile: server/ee/apps/Dockerfile
+      target: app
+      args:
+        APP_NAME: worker-app
+
+volumes:
+  file-storage:
+  postgres:
