@@ -57,7 +57,8 @@ class AiHubConfigurationToolSetTest {
 
         assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotContain(
             "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
+            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition",
+            "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel");
     }
 
     @Test
