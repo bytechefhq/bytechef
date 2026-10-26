@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public class FileEntryProperty extends ValueProperty<Map<String, ?>> {
 
-    private final List<? extends ValueProperty<?>> properties;
+    private List<? extends ValueProperty<?>> properties;
 
     private FileEntryProperty() {
         this.properties = List.of();
