@@ -25,8 +25,9 @@ import org.springframework.web.servlet.ModelAndView;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Answers a REST request that failed in a remote call with the HTTP status matching the remote gRPC status and the
- * remote description as the problem detail.
+ * Answers a REST request that failed in a remote call with the remote description as the problem detail: an invalid
+ * argument becomes 400 and a missing resource 404, while everything else, a remote denial included, becomes 500 just as
+ * the same failure does in the monolith.
  *
  * @version ee
  */
@@ -78,8 +79,6 @@ public class GrpcStatusHandlerExceptionResolver implements HandlerExceptionResol
         return switch (code) {
             case INVALID_ARGUMENT -> HttpStatus.BAD_REQUEST;
             case NOT_FOUND -> HttpStatus.NOT_FOUND;
-            case PERMISSION_DENIED -> HttpStatus.FORBIDDEN;
-            case UNAUTHENTICATED -> HttpStatus.UNAUTHORIZED;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
     }
