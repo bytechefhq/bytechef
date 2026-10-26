@@ -112,6 +112,12 @@ public class CopilotApiController {
             } else {
                 agentId = "cluster_element_ask";
             }
+        } else if (agentId.equals("context_store")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "context_store_build";
+            } else {
+                agentId = "context_store_ask";
+            }
         } else if (agentId.equals("converter")) {
             agentId = "converter_build";
         } else if (agentId.equals("mcp_server")) {

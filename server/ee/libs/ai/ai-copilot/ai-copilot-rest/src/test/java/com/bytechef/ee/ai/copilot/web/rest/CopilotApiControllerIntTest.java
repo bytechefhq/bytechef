@@ -86,6 +86,34 @@ class CopilotApiControllerIntTest {
         assertThat(localAgent.getAgentId()).isEqualTo("mcp_server_build");
     }
 
+    @Test
+    @WithMockUser
+    void testContextStoreSourceRunsTheAgentMatchingTheMode() throws Exception {
+        assertThat(runContextStoreAgent("ASK")).isEqualTo("context_store_ask");
+        assertThat(runContextStoreAgent("BUILD")).isEqualTo("context_store_build");
+    }
+
+    private String runContextStoreAgent(String mode) throws Exception {
+        Mockito.clearInvocations(agUiService);
+
+        mockMvc
+            .perform(
+                post("/internal/ai/chat/context_store")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":{\"mode\":\"" + mode + "\"}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<LocalAgent> localAgentCaptor = ArgumentCaptor.forClass(LocalAgent.class);
+
+        verify(agUiService).runAgent(localAgentCaptor.capture(), any(AgUiParameters.class));
+
+        LocalAgent localAgent = localAgentCaptor.getValue();
+
+        return localAgent.getAgentId();
+    }
+
     @Configuration
     @Import(CopilotApiController.class)
     static class CopilotApiControllerTestConfiguration {
@@ -101,6 +129,16 @@ class CopilotApiControllerIntTest {
         @Bean
         AgUiService agUiService() {
             return mock(AgUiService.class);
+        }
+
+        @Bean
+        LocalAgent contextStoreAskAgent() {
+            return localAgent("context_store_ask");
+        }
+
+        @Bean
+        LocalAgent contextStoreBuildAgent() {
+            return localAgent("context_store_build");
         }
 
         @Bean
