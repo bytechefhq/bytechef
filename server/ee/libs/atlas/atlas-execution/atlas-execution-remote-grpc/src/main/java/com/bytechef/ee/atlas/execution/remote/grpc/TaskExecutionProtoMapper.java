@@ -5,10 +5,10 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.worker.remote.grpc;
+package com.bytechef.ee.atlas.execution.remote.grpc;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.RemoteTaskExecution;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteTaskExecution;
 import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -17,7 +17,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.workflow.worker.remote.grpc.TaskExecutionProtoMapper;
+import com.bytechef.ee.atlas.execution.remote.grpc.TaskExecutionProtoMapper;
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.TaskHandlerRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
