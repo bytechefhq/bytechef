@@ -8,8 +8,11 @@
 package com.bytechef.ee.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.CounterRemoteServiceGrpc;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.Int64Response;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.SetCounterRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,42 +23,42 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteCounterServiceClient implements CounterService {
 
-    private static final String COUNTER_SERVICE = "/remote/counter-service";
     private static final String EXECUTION_APP = "execution-app";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteCounterServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteCounterServiceClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public void delete(long id) {
-        loadBalancedRestClient.delete(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(COUNTER_SERVICE + "/delete/{id}")
-                .build(id));
+        getStub().delete(toIdRequest(id));
     }
 
     @Override
     public long decrement(long id) {
-        return loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(COUNTER_SERVICE + "/decrement/{id}")
-                .build(id),
-            null, Long.class);
+        Int64Response int64Response = getStub().decrement(toIdRequest(id));
+
+        return int64Response.getValue();
     }
 
     @Override
     public void set(long id, long value) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(COUNTER_SERVICE + "/set/{id}/{value}")
-                .build(id, value),
-            null);
+        getStub().set(
+            SetCounterRequest.newBuilder()
+                .setId(id)
+                .setValue(value)
+                .build());
+    }
+
+    private CounterRemoteServiceGrpc.CounterRemoteServiceBlockingStub getStub() {
+        return CounterRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 }

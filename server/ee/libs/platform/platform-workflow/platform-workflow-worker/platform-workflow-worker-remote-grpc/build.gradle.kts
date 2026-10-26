@@ -1,5 +1,6 @@
 dependencies {
     api(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-grpc-proto"))
+    api(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-grpc"))
     api(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     api(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
 

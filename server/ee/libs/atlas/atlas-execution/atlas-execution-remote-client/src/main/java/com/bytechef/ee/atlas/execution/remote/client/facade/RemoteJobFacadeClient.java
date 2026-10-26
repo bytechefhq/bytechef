@@ -9,12 +9,15 @@ package com.bytechef.ee.atlas.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobFacadeRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import java.util.Map;
 import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -24,21 +27,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteJobFacadeClient implements JobFacade {
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private static final String EXECUTION_APP = "execution-app";
 
-    @SuppressFBWarnings("EI")
-    public RemoteJobFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    private final AtlasExecutionProtoMapper atlasExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
+
+    public RemoteJobFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.atlasExecutionProtoMapper = new AtlasExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public long createJob(JobParametersDTO jobParametersDTO) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host("execution-app")
-                .path("/remote/job-facade/create-async-job")
-                .build(),
-            jobParametersDTO, Long.class);
+        IdResponse idResponse = getStub().createJob(atlasExecutionProtoMapper.toProto(jobParametersDTO));
+
+        return idResponse.getId();
     }
 
     @Override
@@ -72,12 +75,7 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void resumeClaimedJob(long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host("execution-app")
-                .path("/remote/job-facade/resume-claimed-job")
-                .build(),
-            new ResumeClaimedJobRequest(id, taskExecutionId, data));
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -85,8 +83,7 @@ public class RemoteJobFacadeClient implements JobFacade {
         throw new UnsupportedOperationException();
     }
 
-    @SuppressFBWarnings("EI")
-    public record ResumeClaimedJobRequest(
-        long id, @Nullable Long taskExecutionId, @Nullable Map<String, ?> data) {
+    private JobFacadeRemoteServiceGrpc.JobFacadeRemoteServiceBlockingStub getStub() {
+        return JobFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
     }
 }

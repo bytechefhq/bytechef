@@ -9,13 +9,16 @@ package com.bytechef.ee.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.ContextKeyRequest;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.ContextRemoteServiceGrpc;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.PushContextRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.file.storage.domain.FileEntry;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
-import org.springframework.core.ParameterizedTypeReference;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -26,13 +29,13 @@ import org.springframework.stereotype.Component;
 public class RemoteContextServiceClient implements ContextService {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String INTERNAL_CONTEXT_SERVICE = "/remote/context-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final AtlasExecutionProtoMapper atlasExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteContextServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteContextServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.atlasExecutionProtoMapper = new AtlasExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -47,41 +50,48 @@ public class RemoteContextServiceClient implements ContextService {
 
     @Override
     public FileEntry peek(long stackId, Classname classname) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(INTERNAL_CONTEXT_SERVICE + "/peek/{stackId}/{classname}")
-                .build(stackId, classname),
-            FileEntry.class);
+        return atlasExecutionProtoMapper.toFileEntry(getStub().peek(toContextKeyRequest(stackId, null, classname)));
     }
 
     @Override
     public FileEntry peek(long stackId, int subStackId, Classname classname) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(INTERNAL_CONTEXT_SERVICE + "/peek/{stackId}/{subStackId}/{classname}")
-                .build(stackId, subStackId, classname),
-            FileEntry.class);
+        return atlasExecutionProtoMapper
+            .toFileEntry(getStub().peek(toContextKeyRequest(stackId, subStackId, classname)));
     }
 
     @Override
     public void push(long stackId, Classname classname, FileEntry value) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(INTERNAL_CONTEXT_SERVICE + "/push/{stackId}/{classname}")
-                .build(stackId, classname),
-            value, FileEntry.class);
+        push(toContextKeyRequest(stackId, null, classname), value);
     }
 
     @Override
     public void push(long stackId, int subStackId, Classname classname, FileEntry value) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(INTERNAL_CONTEXT_SERVICE + "/push/{stackId}/{subStackId}/{classname}")
-                .build(stackId, classname),
-            value, new ParameterizedTypeReference<Map<String, Object>>() {});
+        push(toContextKeyRequest(stackId, subStackId, classname), value);
+    }
+
+    private ContextRemoteServiceGrpc.ContextRemoteServiceBlockingStub getStub() {
+        return ContextRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private void push(ContextKeyRequest contextKeyRequest, FileEntry value) {
+        getStub().push(
+            PushContextRequest.newBuilder()
+                .setKey(contextKeyRequest)
+                .setValue(atlasExecutionProtoMapper.toProto(value))
+                .build());
+    }
+
+    private static ContextKeyRequest toContextKeyRequest(
+        long stackId, @Nullable Integer subStackId, Classname classname) {
+
+        ContextKeyRequest.Builder builder = ContextKeyRequest.newBuilder()
+            .setClassname(classname.name())
+            .setStackId(stackId);
+
+        if (subStackId != null) {
+            builder.setSubStackId(subStackId);
+        }
+
+        return builder.build();
     }
 }

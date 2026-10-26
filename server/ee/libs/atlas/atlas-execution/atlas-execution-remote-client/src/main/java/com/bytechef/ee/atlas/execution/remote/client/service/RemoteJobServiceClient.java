@@ -11,14 +11,19 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobRemoteServiceGrpc;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobResult;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.WorkflowIdRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.LongConsumer;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -29,22 +34,17 @@ import org.springframework.stereotype.Component;
 public class RemoteJobServiceClient implements JobService {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String JOB_SERVICE = "/remote/job-service";
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final AtlasExecutionProtoMapper atlasExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteJobServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteJobServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.atlasExecutionProtoMapper = new AtlasExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/create")
-                .build(),
-            new JobCreateRequest(jobParametersDTO, workflow), Job.class);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -69,13 +69,16 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Optional<Job> fetchLastWorkflowJob(String workflowId) {
-        return Optional.ofNullable(
-            loadBalancedRestClient.get(
-                uriBuilder -> uriBuilder
-                    .host(EXECUTION_APP)
-                    .path(JOB_SERVICE + "/fetch-last-workflow-job/{workflowId}")
-                    .build(workflowId),
-                Job.class));
+        JobResult jobResult = getStub().fetchLastWorkflowJob(
+            WorkflowIdRequest.newBuilder()
+                .setWorkflowId(workflowId)
+                .build());
+
+        if (!jobResult.hasJob()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(atlasExecutionProtoMapper.toJob(jobResult.getJob()));
     }
 
     @Override
@@ -122,12 +125,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job getJob(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/get-job/{id}")
-                .build(id),
-            Job.class);
+        return atlasExecutionProtoMapper.toJob(getStub().getJob(toIdRequest(id)));
     }
 
     @Override
@@ -137,22 +135,12 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job getTaskExecutionJob(long taskExecutionId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/get-task-execution-job/{taskExecutionId}")
-                .build(taskExecutionId),
-            Job.class);
+        return atlasExecutionProtoMapper.toJob(getStub().getTaskExecutionJob(toIdRequest(taskExecutionId)));
     }
 
     @Override
     public Job resumeToStatusStarted(long id) {
-        return loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/resume-to-status-started/{id}")
-                .build(id),
-            null, Job.class);
+        return atlasExecutionProtoMapper.toJob(getStub().resumeToStatusStarted(toIdRequest(id)));
     }
 
     @Override
@@ -169,34 +157,26 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job setStatusToStarted(long id) {
-        return loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/set-status-to-started/{id}")
-                .build(id),
-            null, Job.class);
+        return atlasExecutionProtoMapper.toJob(getStub().setStatusToStarted(toIdRequest(id)));
     }
 
     @Override
     public Job setStatusToStopped(long id) {
-        return loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/set-status-to-stopped/{id}")
-                .build(id),
-            null, Job.class);
+        return atlasExecutionProtoMapper.toJob(getStub().setStatusToStopped(toIdRequest(id)));
     }
 
     @Override
     public Job update(Job job) {
-        return loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_SERVICE + "/update")
-                .build(),
-            job, Job.class);
+        return atlasExecutionProtoMapper.toJob(getStub().update(atlasExecutionProtoMapper.toProto(job)));
     }
 
-    private record JobCreateRequest(JobParametersDTO jobParameters, Workflow workflow) {
+    private JobRemoteServiceGrpc.JobRemoteServiceBlockingStub getStub() {
+        return JobRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 }

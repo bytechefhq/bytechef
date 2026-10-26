@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.workflow.worker.remote.grpc;
+package com.bytechef.ee.atlas.execution.remote.grpc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
