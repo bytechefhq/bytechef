@@ -9,8 +9,14 @@ package com.bytechef.ee.platform.component.remote.client.service;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
-import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
+import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionDefinitionRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ActionDefinitionRemoteServiceGrpc.ActionDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentVersionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetActionDefinitionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinitions;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -23,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -33,14 +38,18 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient implements ActionDefinitionService {
+public class RemoteActionDefinitionServiceClient implements ActionDefinitionService {
 
-    private static final String ACTION_DEFINITION_SERVICE = "/action-definition-service";
+    private final ComponentProtoMapper componentProtoMapper;
+    private final GrpcChannels grpcChannels;
+    private final WorkerInstances workerInstances;
 
     public RemoteActionDefinitionServiceClient(
-        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultRestClient, discoveryClient, objectMapper);
+        this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+        this.workerInstances = new WorkerInstances(discoveryClient);
     }
 
     @Override
@@ -118,25 +127,31 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public ActionDefinition getActionDefinition(
-        String componentName, int componentVersion, String actionName) {
+    public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
+        GetActionDefinitionRequest getActionDefinitionRequest = GetActionDefinitionRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setActionName(actionName)
+            .build();
 
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, componentName,
-                ACTION_DEFINITION_SERVICE + "/get-action-definition/{componentName}/{componentVersion}/{actionName}",
-                componentName, componentVersion, actionName),
-            ActionDefinition.class);
+        return componentProtoMapper.toActionDefinition(
+            getStub(componentName).getActionDefinition(getActionDefinitionRequest));
     }
 
     @Override
     public List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
-        return defaultRestClient.get(
-            uriBuilder -> toUri(
-                uriBuilder, componentName,
-                ACTION_DEFINITION_SERVICE + "/get-action-definitions/{componentName}/{componentVersion}",
-                componentName, componentVersion),
-            new ParameterizedTypeReference<>() {});
+        ComponentVersionRequest componentVersionRequest = ComponentVersionRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .build();
+
+        RemoteActionDefinitions remoteActionDefinitions = getStub(componentName).getActionDefinitions(
+            componentVersionRequest);
+
+        return remoteActionDefinitions.getActionDefinitionsList()
+            .stream()
+            .map(componentProtoMapper::toActionDefinition)
+            .toList();
     }
 
     @Override
@@ -156,5 +171,10 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
         String componentName, int componentVersion, String actionName, String propertyName) {
 
         throw new UnsupportedOperationException();
+    }
+
+    private ActionDefinitionRemoteServiceBlockingStub getStub(String componentName) {
+        return ActionDefinitionRemoteServiceGrpc.newBlockingStub(
+            grpcChannels.getChannel(workerInstances.getInstance(componentName)));
     }
 }
