@@ -16,22 +16,30 @@ import {useShallow} from 'zustand/react/shallow';
 const AiHubResourcePanel = () => {
     const activeTabRef = useRef<HTMLDivElement | null>(null);
 
-    const {activeTabId, closeTab, openTabs, openWorkflowTab, setActiveTab, setRightPanelOpen} = useAiHubTabsStore(
-        useShallow((state) => ({
-            activeTabId: state.activeTabId,
-            closeTab: state.closeTab,
-            openTabs: state.openTabs,
-            openWorkflowTab: state.openWorkflowTab,
-            setActiveTab: state.setActiveTab,
-            setRightPanelOpen: state.setRightPanelOpen,
-        }))
-    );
+    const {activeTabId, closeTab, openAiAgentTab, openTabs, openWorkflowTab, setActiveTab, setRightPanelOpen} =
+        useAiHubTabsStore(
+            useShallow((state) => ({
+                activeTabId: state.activeTabId,
+                closeTab: state.closeTab,
+                openAiAgentTab: state.openAiAgentTab,
+                openTabs: state.openTabs,
+                openWorkflowTab: state.openWorkflowTab,
+                setActiveTab: state.setActiveTab,
+                setRightPanelOpen: state.setRightPanelOpen,
+            }))
+        );
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const activeTab = openTabs.find((tab) => tab.id === activeTabId);
 
     const handleResourceSelect = (selection: ResourcePickerSelectionI) => {
+        if (selection.kind === 'aiAgent') {
+            openAiAgentTab({aiAgentId: selection.id, name: selection.name});
+
+            return;
+        }
+
         if (selection.projectId == null || selection.projectWorkflowId == null) {
             return;
         }

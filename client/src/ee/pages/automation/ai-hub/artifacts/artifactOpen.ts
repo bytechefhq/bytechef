@@ -62,7 +62,7 @@ export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
 }
 
 export function isArtifactRemovable(artifact: AiHubChatArtifactI): boolean {
-    return artifact.kind === 'WORKFLOW_REFERENCED';
+    return artifact.kind === 'WORKFLOW_REFERENCED' || artifact.kind === 'AI_AGENT_REFERENCED';
 }
 
 export function isArtifactClickable(artifact: AiHubChatArtifactI): boolean {
