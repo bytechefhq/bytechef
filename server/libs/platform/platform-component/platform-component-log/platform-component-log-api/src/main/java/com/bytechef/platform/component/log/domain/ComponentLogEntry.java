@@ -24,9 +24,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * A row of the {@code component_log_entry} table, which keeps component logs for the {@code jdbc} file storage
- * provider.
- *
  * @author Ivica Cardic
  */
 @Table("component_log_entry")

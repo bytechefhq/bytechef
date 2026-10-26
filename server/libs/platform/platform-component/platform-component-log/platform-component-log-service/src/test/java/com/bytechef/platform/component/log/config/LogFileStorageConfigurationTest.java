@@ -41,12 +41,9 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
  */
 class LogFileStorageConfigurationTest {
 
-    @TempDir
-    private Path baseDirectory;
-
     @Test
-    void testUsesTheLogTableWithTheJdbcProvider() {
-        contextRunner(Provider.JDBC)
+    void testUsesTheLogTableWithTheJdbcProvider(@TempDir Path baseDirectory) {
+        contextRunner(Provider.JDBC, baseDirectory)
             .run(context -> {
                 assertThat(context.getBean(LogFileStorage.class)).isInstanceOf(JdbcLogFileStorage.class);
                 assertThat(context.getBean(EditorLogFileStorage.class)).isNotNull();
@@ -55,8 +52,8 @@ class LogFileStorageConfigurationTest {
     }
 
     @Test
-    void testUsesFilesWithTheFilesystemProvider() {
-        contextRunner(Provider.FILESYSTEM)
+    void testUsesFilesWithTheFilesystemProvider(@TempDir Path baseDirectory) {
+        contextRunner(Provider.FILESYSTEM, baseDirectory)
             .run(context -> assertThat(context.getBean(LogFileStorage.class))
                 .isInstanceOf(LogFileStorageImpl.class));
     }
@@ -79,7 +76,7 @@ class LogFileStorageConfigurationTest {
             });
     }
 
-    private ApplicationContextRunner contextRunner(Provider provider) {
+    private static ApplicationContextRunner contextRunner(Provider provider, Path baseDirectory) {
         ApplicationProperties applicationProperties = createApplicationProperties(provider);
 
         return new ApplicationContextRunner()
