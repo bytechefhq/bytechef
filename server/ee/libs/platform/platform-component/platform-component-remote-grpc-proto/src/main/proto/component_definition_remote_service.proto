@@ -36,6 +36,7 @@ service TriggerDefinitionRemoteService {
 service ConnectionDefinitionRemoteService {
   rpc GetAuthorizationType(GetAuthorizationTypeRequest) returns (StringResponse);
   rpc GetComponentConnectionDefinitions(GetConnectionDefinitionRequest) returns (RemoteConnectionDefinitions);
+  rpc GetConnectionConnectionDefinition(GetConnectionConnectionDefinitionRequest) returns (RemoteConnectionDefinition);
   rpc GetConnectionDefinition(GetConnectionDefinitionRequest) returns (RemoteConnectionDefinition);
   rpc GetConnectionDefinitions(google.protobuf.Empty) returns (RemoteConnectionDefinitions);
 }
@@ -341,6 +342,11 @@ message GetAuthorizationTypeRequest {
   string component_name = 1;
   int32 connection_version = 2;
   optional string authorization_type = 3;
+}
+
+message GetConnectionConnectionDefinitionRequest {
+  string component_name = 1;
+  int32 connection_version = 2;
 }
 
 message GetConnectionDefinitionRequest {

@@ -17,6 +17,7 @@ import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc.ConnectionDefinitionRemoteServiceBlockingStub;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationTypeRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
@@ -152,7 +153,14 @@ public class RemoteConnectionDefinitionServiceClient implements ConnectionDefini
     public ConnectionDefinition getConnectionConnectionDefinition(
         String componentName, int connectionVersion) {
 
-        throw new UnsupportedOperationException();
+        RemoteConnectionDefinition remoteConnectionDefinition = getStub(workerInstances.getInstance(componentName))
+            .getConnectionConnectionDefinition(
+                GetConnectionConnectionDefinitionRequest.newBuilder()
+                    .setComponentName(componentName)
+                    .setConnectionVersion(connectionVersion)
+                    .build());
+
+        return componentProtoMapper.toConnectionDefinition(remoteConnectionDefinition);
     }
 
     @Override

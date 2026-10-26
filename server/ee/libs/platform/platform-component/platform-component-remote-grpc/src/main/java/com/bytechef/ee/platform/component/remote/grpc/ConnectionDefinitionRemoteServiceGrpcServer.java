@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.component.remote.grpc;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationTypeRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
@@ -64,6 +65,18 @@ public class ConnectionDefinitionRemoteServiceGrpcServer
             toRemoteConnectionDefinitions(
                 connectionDefinitionService.getConnectionDefinitions(
                     request.getComponentName(), request.hasComponentVersion() ? request.getComponentVersion() : null)));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getConnectionConnectionDefinition(
+        GetConnectionConnectionDefinitionRequest request,
+        StreamObserver<RemoteConnectionDefinition> responseObserver) {
+
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
+            request.getComponentName(), request.getConnectionVersion());
+
+        responseObserver.onNext(componentProtoMapper.toProto(connectionDefinition));
         responseObserver.onCompleted();
     }
 
