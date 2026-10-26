@@ -627,6 +627,7 @@ include("server:ee:libs:automation:automation-configuration:automation-configura
 include("server:ee:libs:automation:automation-data-table:automation-data-table-public-rest")
 include("server:ee:libs:automation:automation-data-table:automation-data-table-remote-client")
 include("server:ee:libs:automation:automation-promotion:automation-promotion-api")
+include("server:ee:libs:automation:automation-promotion:automation-promotion-graphql")
 include("server:ee:libs:automation:automation-promotion:automation-promotion-service")
 include("server:ee:libs:automation:automation-task:automation-task-remote-client")
 include("server:ee:libs:automation:automation-task:automation-task-remote-rest")
