@@ -48,8 +48,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.Validate;
@@ -542,5 +544,35 @@ public class TaskWorkerTest {
         Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
 
         fixedThreadPool.shutdownNow();
+    }
+
+    @Test
+    public void testCancelBeforeTheTaskStartsReleasesTheCaller() throws Exception {
+        List<Runnable> queuedRunnables = new CopyOnWriteArrayList<>();
+
+        TaskWorker worker = new TaskWorker(
+            null, EVALUATOR, event -> {}, queuedRunnables::add, task -> taskExecution -> null, taskFileStorage,
+            List.of());
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+
+        taskExecution.setId(4444L);
+        taskExecution.setJobId(5555L);
+
+        Future<?> onTaskExecutionEventFuture = EXECUTOR_SERVICE.submit(
+            () -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution)));
+
+        waitForCondition(() -> MapUtils.size(worker.getTaskExecutions()) == 1, 5000);
+
+        Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
+
+        worker.onCancelControlTaskEvent(new CancelControlTaskEvent(new CancelControlTask(5555L, 4444L)));
+
+        onTaskExecutionEventFuture.get(5, TimeUnit.SECONDS);
+
+        Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
+        Assertions.assertEquals(1, queuedRunnables.size());
     }
 }
