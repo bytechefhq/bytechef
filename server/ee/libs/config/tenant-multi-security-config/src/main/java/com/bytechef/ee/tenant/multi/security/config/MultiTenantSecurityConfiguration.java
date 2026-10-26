@@ -17,6 +17,7 @@ import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -32,11 +33,13 @@ import org.springframework.security.web.authentication.RememberMeServices;
 public class MultiTenantSecurityConfiguration {
 
     @Bean
+    @ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
     MultiTenantAuthenticationFailureHandler multiTenantAuthenticationFailureHandler() {
         return new MultiTenantAuthenticationFailureHandler();
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
     MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler(
         RememberMeServices rememberMeServices, TenantService tenantService,
         ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider) {
@@ -51,6 +54,7 @@ public class MultiTenantSecurityConfiguration {
     }
 
     @Bean("userDetailsService")
+    @ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
     MultiTenantUserDetailsService multiTenantUserDetailsService(
         AuthorityService authorityService, TenantService tenantService) {
 

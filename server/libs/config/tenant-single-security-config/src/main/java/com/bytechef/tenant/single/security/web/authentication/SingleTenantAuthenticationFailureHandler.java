@@ -19,6 +19,7 @@ package com.bytechef.tenant.single.security.web.authentication;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnSingleTenant
+@ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
 public class SingleTenantAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Override

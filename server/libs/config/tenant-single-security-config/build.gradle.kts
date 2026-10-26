@@ -3,6 +3,7 @@ dependencies {
 
     implementation(libs.commons.validator)
     implementation("org.springframework:spring-tx")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:config:security-config"))
