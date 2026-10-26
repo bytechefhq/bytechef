@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 
 /**
- * Stores log entries as rows of the {@code component_log_entry} table, for the {@code jdbc} file storage provider.
- *
  * @author Ivica Cardic
  */
 public class JdbcLogFileStorage implements LogFileStorage {
@@ -90,10 +88,6 @@ public class JdbcLogFileStorage implements LogFileStorage {
             .toList();
     }
 
-    /**
-     * Separates the logs of production runs, editor test runs and trigger executions, whose ids come from different
-     * sequences.
-     */
     public enum Scope {
         JOB,
         EDITOR,
