@@ -22,6 +22,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.PlatformType;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
@@ -127,6 +128,13 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
      */
     @Nullable
     Long getTaskExecutionId();
+
+    /**
+     * Retrieves the parent job's metadata map.
+     *
+     * @return the job metadata, or an empty map when the job or its metadata is not available
+     */
+    Map<String, Object> getJobMetadata();
 
     /**
      * Retrieves the platform type for the current context.

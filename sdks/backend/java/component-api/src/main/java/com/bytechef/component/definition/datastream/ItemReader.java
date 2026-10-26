@@ -26,5 +26,19 @@ public interface ItemReader extends ItemStream, FieldsProvider {
 
     ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
 
+    /**
+     * {@link ExecutionContext} key holding the previous successful run's start instant as epoch milliseconds.
+     */
+    String SINCE_KEY = "datastream.since";
+
+    /**
+     * Whether this reader filters upstream by the {@link #SINCE_KEY} timestamp.
+     *
+     * @return {@code true} if this reader honors {@link #SINCE_KEY}
+     */
+    default boolean supportsIncremental() {
+        return false;
+    }
+
     Map<String, Object> read() throws Exception;
 }

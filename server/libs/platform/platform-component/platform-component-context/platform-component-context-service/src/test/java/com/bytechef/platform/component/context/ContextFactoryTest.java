@@ -78,7 +78,8 @@ class ContextFactoryTest {
         contextFactory = new ContextFactoryImpl(
             mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class), mock(DataStorage.class),
             editorLogFileStorage, mock(EditorTempFileStorage.class), mock(ApplicationEventPublisher.class),
-            approvalTokensProvider, logFileStorage, mock(TempFileStorage.class), mock(Tracer.class),
+            mock(ObjectProvider.class), approvalTokensProvider, logFileStorage, mock(TempFileStorage.class),
+            mock(Tracer.class),
             triggerLogFileStorage);
     }
 
@@ -146,8 +147,8 @@ class ContextFactoryTest {
         ContextFactory mintingContextFactory = new ContextFactoryImpl(
             mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class), mock(DataStorage.class),
             editorLogFileStorage, mock(EditorTempFileStorage.class), mock(ApplicationEventPublisher.class),
-            approvalTokensProvider, logFileStorage, mock(TempFileStorage.class), mock(Tracer.class),
-            triggerLogFileStorage);
+            mock(ObjectProvider.class), approvalTokensProvider, logFileStorage, mock(TempFileStorage.class),
+            mock(Tracer.class), triggerLogFileStorage);
 
         ActionContext actionContext = mintingContextFactory.createActionContext(
             "approval", 1, "requestApproval", null, null, 1L, 10L, "workflowId", null, null, PlatformType.AUTOMATION,
@@ -181,7 +182,8 @@ class ContextFactoryTest {
             ContextFactory signingContextFactory = new ContextFactoryImpl(
                 mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class),
                 mock(DataStorage.class), editorLogFileStorage, mock(EditorTempFileStorage.class),
-                mock(ApplicationEventPublisher.class), approvalTokensProvider, logFileStorage,
+                mock(ApplicationEventPublisher.class), mock(ObjectProvider.class), approvalTokensProvider,
+                logFileStorage,
                 mock(TempFileStorage.class), mock(Tracer.class), triggerLogFileStorage);
 
             ActionContext actionContext = signingContextFactory.createActionContext(

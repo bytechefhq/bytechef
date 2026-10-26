@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.context;
 
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
@@ -54,6 +55,7 @@ public class ContextFactoryImpl implements ContextFactory {
     private final EditorLogFileStorage editorLogFileStorage;
     private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
+    private final ObjectProvider<JobService> jobServiceProvider;
     private final LogFileStorage logFileStorage;
     private final TempFileStorage tempFileStorage;
     private final TriggerLogFileStorage triggerLogFileStorage;
@@ -64,8 +66,9 @@ public class ContextFactoryImpl implements ContextFactory {
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
         DataStorage dataStorage, EditorLogFileStorage editorLogFileStorage, EditorTempFileStorage editorTempFileStorage,
-        ApplicationEventPublisher eventPublisher, ObjectProvider<ApprovalTokens> approvalTokensProvider,
-        LogFileStorage logFileStorage, TempFileStorage tempFileStorage, Tracer tracer,
+        ApplicationEventPublisher eventPublisher, ObjectProvider<JobService> jobServiceProvider,
+        ObjectProvider<ApprovalTokens> approvalTokensProvider, LogFileStorage logFileStorage,
+        TempFileStorage tempFileStorage, Tracer tracer,
         TriggerLogFileStorage triggerLogFileStorage) {
 
         this.applicationContext = applicationContext;
@@ -75,6 +78,7 @@ public class ContextFactoryImpl implements ContextFactory {
         this.editorLogFileStorage = editorLogFileStorage;
         this.editorTempFileStorage = editorTempFileStorage;
         this.eventPublisher = eventPublisher;
+        this.jobServiceProvider = jobServiceProvider;
         this.logFileStorage = logFileStorage;
         this.tempFileStorage = tempFileStorage;
         this.tracer = tracer;
@@ -99,6 +103,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .jobId(jobId)
             .jobPrincipalId(jobPrincipalId)
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+            .jobService(jobServiceProvider.getIfAvailable())
             .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
             .publicUrl(publicUrl)
             .taskExecutionId(taskExecutionId != null ? taskExecutionId : 0)

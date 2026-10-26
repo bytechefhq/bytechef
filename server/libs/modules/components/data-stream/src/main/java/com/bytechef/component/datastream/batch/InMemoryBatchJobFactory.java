@@ -19,9 +19,10 @@ package com.bytechef.component.datastream.batch;
 import com.bytechef.component.datastream.item.ItemStreamProcessorDelegate;
 import com.bytechef.component.datastream.item.ItemStreamReaderDelegate;
 import com.bytechef.component.datastream.item.ItemStreamWriterDelegate;
-import com.bytechef.component.datastream.listener.DataStreamJobExecutionListener;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.JobExecution;
@@ -29,6 +30,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.core.job.parameters.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
+import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.ResourcelessJobRepository;
 import org.springframework.batch.core.step.Step;
@@ -49,15 +51,16 @@ public class InMemoryBatchJobFactory {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ContextFactory contextFactory;
-    private final DataStreamJobExecutionListener jobExecutionListener;
+    private final List<JobExecutionListener> jobExecutionListeners;
 
+    @SuppressFBWarnings("EI2")
     public InMemoryBatchJobFactory(
         ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory,
-        DataStreamJobExecutionListener jobExecutionListener) {
+        List<JobExecutionListener> jobExecutionListeners) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.contextFactory = contextFactory;
-        this.jobExecutionListener = jobExecutionListener;
+        this.jobExecutionListeners = jobExecutionListeners;
     }
 
     /**
@@ -79,8 +82,13 @@ public class InMemoryBatchJobFactory {
             .writer(new ItemStreamWriterDelegate(clusterElementDefinitionService, contextFactory))
             .build();
 
-        Job job = new JobBuilder("inMemoryDataStreamJob", jobRepository)
-            .listener(jobExecutionListener)
+        JobBuilder jobBuilder = new JobBuilder("inMemoryDataStreamJob", jobRepository);
+
+        for (JobExecutionListener jobExecutionListener : jobExecutionListeners) {
+            jobBuilder = jobBuilder.listener(jobExecutionListener);
+        }
+
+        Job job = jobBuilder
             .incrementer(new RunIdIncrementer())
             .start(step)
             .build();

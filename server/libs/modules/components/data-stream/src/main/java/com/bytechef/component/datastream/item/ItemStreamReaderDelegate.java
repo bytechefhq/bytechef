@@ -16,6 +16,7 @@
 
 package com.bytechef.component.datastream.item;
 
+import static com.bytechef.component.definition.datastream.ItemReader.SINCE_KEY;
 import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
 
 import com.bytechef.component.definition.datastream.ItemReader;
@@ -23,6 +24,8 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.tenant.TenantContext;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
+import org.springframework.batch.core.job.parameters.JobParameter;
 import org.springframework.batch.core.step.StepExecution;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
 import org.springframework.batch.infrastructure.item.ItemStreamException;
@@ -36,6 +39,7 @@ public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private ItemReader itemReader;
+    private @Nullable Long since;
 
     public ItemStreamReaderDelegate(
         ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
@@ -52,6 +56,10 @@ public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
+        if (since != null) {
+            executionContext.putLong(SINCE_KEY, since);
+        }
+
         ItemStreamExecutionContext itemStreamExecutionContext = new ItemStreamExecutionContext(executionContext);
 
         TenantContext.runWithTenantId(
@@ -76,5 +84,14 @@ public class ItemStreamReaderDelegate extends AbstractItemStreamDelegate
     protected void doBeforeStep(final StepExecution stepExecution) {
         itemReader = clusterElementDefinitionService.getClusterElement(
             componentName, componentVersion, clusterElementName);
+
+        JobParameter<?> sinceParameter = stepExecution.getJobParameters()
+            .getParameter(SINCE_KEY);
+
+        if (sinceParameter != null && sinceParameter.value() instanceof Long longValue) {
+            this.since = longValue;
+        } else {
+            this.since = null;
+        }
     }
 }
