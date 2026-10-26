@@ -168,6 +168,42 @@ const AiGuardrails = () => {
 
                         <div className="flex items-center justify-between gap-4 rounded-md border p-4">
                             <div className="flex flex-col gap-1">
+                                <Label htmlFor="moderation-enabled">Model-based moderation</Label>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Reject unsafe prompts across AI Gateway requests and canvas AI Agent runs. Requires
+                                    the AI Gateway and a moderation model configured via the
+                                    bytechef.ai.gateway.guardrails.moderation-model property.
+                                </p>
+                            </div>
+
+                            <Switch
+                                checked={form.moderationEnabled}
+                                id="moderation-enabled"
+                                onCheckedChange={(checked) => setForm({...form, moderationEnabled: checked})}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-4 rounded-md border p-4">
+                            <div className="flex flex-col gap-1">
+                                <Label htmlFor="injection-detection-enabled">Prompt-injection detection</Label>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Reject jailbreak and instruction-override attempts. Requires the AI Gateway and an
+                                    injection model configured via the bytechef.ai.gateway.guardrails.injection-model
+                                    property.
+                                </p>
+                            </div>
+
+                            <Switch
+                                checked={form.injectionDetectionEnabled}
+                                id="injection-detection-enabled"
+                                onCheckedChange={(checked) => setForm({...form, injectionDetectionEnabled: checked})}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-4 rounded-md border p-4">
+                            <div className="flex flex-col gap-1">
                                 <Label htmlFor="restore-into-workflow-output">Restore PII in workflow output</Label>
 
                                 <p className="text-xs text-muted-foreground">
