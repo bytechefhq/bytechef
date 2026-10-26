@@ -19,6 +19,7 @@ package com.bytechef.ai.copilot.agent;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.AccessDeniedException;
@@ -69,8 +70,9 @@ final class CopilotRunFailures {
 
         Class<? extends Throwable> throwableClass = throwable.getClass();
 
-        String className = throwableClass.getSimpleName()
-            .toLowerCase(Locale.ROOT);
+        String simpleName = throwableClass.getSimpleName();
+
+        String className = simpleName.toLowerCase(Locale.ROOT);
         String message = throwable.getMessage() == null ? "" : throwable.getMessage();
 
         String lowerCaseMessage = message.toLowerCase(Locale.ROOT);
@@ -85,30 +87,33 @@ final class CopilotRunFailures {
             return OUT_OF_CREDITS;
         }
 
+        Matcher rateLimitStatusMatcher = RATE_LIMIT_STATUS.matcher(message);
+
         if (className.contains("ratelimit") || lowerCaseMessage.contains("rate limit")
-            || lowerCaseMessage.contains("rate_limit") || RATE_LIMIT_STATUS.matcher(message)
-                .find()) {
+            || lowerCaseMessage.contains("rate_limit") || rateLimitStatusMatcher.find()) {
 
             return RATE_LIMITED;
         }
 
+        Matcher overloadedStatusMatcher = OVERLOADED_STATUS.matcher(message);
+
         if (className.contains("overloaded") || lowerCaseMessage.contains("overloaded")
-            || OVERLOADED_STATUS.matcher(message)
-                .find()) {
+            || overloadedStatusMatcher.find()) {
 
             return OVERLOADED;
         }
 
-        if (MISSING_API_KEY.matcher(message)
-            .find()) {
+        Matcher missingApiKeyMatcher = MISSING_API_KEY.matcher(message);
 
+        if (missingApiKeyMatcher.find()) {
             return null;
         }
 
+        Matcher unauthorizedStatusMatcher = UNAUTHORIZED_STATUS.matcher(message);
+
         if (className.contains("unauthorized") || className.contains("authentication")
             || lowerCaseMessage.contains("api key") || lowerCaseMessage.contains("api_key")
-            || lowerCaseMessage.contains("x-api-key") || UNAUTHORIZED_STATUS.matcher(message)
-                .find()) {
+            || lowerCaseMessage.contains("x-api-key") || unauthorizedStatusMatcher.find()) {
 
             return API_KEY_REJECTED;
         }
