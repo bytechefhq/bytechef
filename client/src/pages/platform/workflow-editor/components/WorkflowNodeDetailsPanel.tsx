@@ -144,6 +144,8 @@ const WorkflowNodeDetailsPanel = ({
     const documentationUrl =
         currentActionDefinition?.help?.learnMoreUrl ?? currentTriggerDefinition?.help?.learnMoreUrl;
 
+    const nodeLabel = currentNode?.label || currentWorkflowNode?.title;
+
     return (
         <div
             className={twMerge(
@@ -172,23 +174,23 @@ const WorkflowNodeDetailsPanel = ({
 
                                 <div className="flex min-w-0 flex-1 flex-col items-start">
                                     <div className="flex max-w-full min-w-0 items-center gap-2">
-                                        {(currentNode?.label?.length ?? 0) > 32 ? (
+                                        {(nodeLabel?.length ?? 0) > 32 ? (
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <span className="min-w-0 flex-1 truncate text-lg font-semibold">
-                                                        {currentNode?.label}
+                                                        {nodeLabel}
                                                     </span>
                                                 </TooltipTrigger>
 
                                                 <TooltipPortal>
                                                     <TooltipContent className="max-w-md break-all" side="bottom">
-                                                        {currentNode?.label}
+                                                        {nodeLabel}
                                                     </TooltipContent>
                                                 </TooltipPortal>
                                             </Tooltip>
                                         ) : (
                                             <span className="min-w-0 flex-1 truncate text-lg font-semibold">
-                                                {currentNode?.label}
+                                                {nodeLabel}
                                             </span>
                                         )}
 
