@@ -21,7 +21,7 @@ import tools.jackson.databind.ObjectMapper;
  * @version ee
  */
 @Configuration
-@ConditionalOnClass(name = "com.bytechef.atlas.execution.service.JobServiceImpl")
+@ConditionalOnClass(name = "com.bytechef.atlas.execution.repository.jdbc.JdbcJobRepository")
 public class AtlasExecutionGrpcServerConfiguration {
 
     @Bean
