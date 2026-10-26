@@ -7,11 +7,15 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.ConnectionLifecycleFacadeRemoteServiceGrpc;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.ConnectionRefreshRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -21,46 +25,48 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteConnectionLifecycleFacadeClient implements ConnectionLifecycleFacade {
 
-    private static final String CONNECTION_LIFECYCLE_FACADE = "/remote/connection-lifecycle-facade";
     private static final String EXECUTION_APP = "execution-app";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteConnectionLifecycleFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteConnectionLifecycleFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.platformWorkflowExecutionProtoMapper = new PlatformWorkflowExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public void scheduleConnectionRefresh(
         Long connectionId, Map<String, ?> parameters, String tenantId) {
 
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(CONNECTION_LIFECYCLE_FACADE + "/schedule-connection-refresh")
-                .build(),
-            new ScheduleConnectionRefreshRequest(connectionId, parameters, tenantId));
+        getStub().scheduleConnectionRefresh(toConnectionRefreshRequest(connectionId, parameters, tenantId));
     }
 
     @Override
     public void deleteScheduledConnectionRefresh(
         Long connectionId, String tenantId) {
 
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(CONNECTION_LIFECYCLE_FACADE + "/delete-scheduled-connection-refresh")
-                .build(),
-            new DeleteScheduledConnectionRefreshRequest(connectionId, tenantId));
+        getStub().deleteScheduledConnectionRefresh(toConnectionRefreshRequest(connectionId, null, tenantId));
     }
 
-    @SuppressFBWarnings("EI")
-    private record ScheduleConnectionRefreshRequest(
-        Long connectionId, Map<String, ?> parameters, String tenantId) {
+    private ConnectionLifecycleFacadeRemoteServiceGrpc.ConnectionLifecycleFacadeRemoteServiceBlockingStub getStub() {
+        return ConnectionLifecycleFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
     }
 
-    private record DeleteScheduledConnectionRefreshRequest(
-        Long connectionId, String tenantId) {
+    private ConnectionRefreshRequest toConnectionRefreshRequest(
+        @Nullable Long connectionId, @Nullable Map<String, ?> parameters, @Nullable String tenantId) {
+
+        ConnectionRefreshRequest.Builder builder = ConnectionRefreshRequest.newBuilder()
+            .setParameters(platformWorkflowExecutionProtoMapper.toBytes(parameters));
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        if (tenantId != null) {
+            builder.setTenantId(tenantId);
+        }
+
+        return builder.build();
     }
 }
