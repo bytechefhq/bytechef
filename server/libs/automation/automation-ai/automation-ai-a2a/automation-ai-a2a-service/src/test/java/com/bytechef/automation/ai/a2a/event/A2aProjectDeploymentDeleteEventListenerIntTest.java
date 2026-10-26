@@ -183,6 +183,7 @@ class A2aProjectDeploymentDeleteEventListenerIntTest {
         projectDeployment.setName("other-deployment");
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         ProjectDeployment otherProjectDeployment = projectDeploymentRepository.save(projectDeployment);
 

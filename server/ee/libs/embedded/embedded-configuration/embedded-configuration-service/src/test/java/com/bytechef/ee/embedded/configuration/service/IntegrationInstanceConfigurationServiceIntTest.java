@@ -301,9 +301,9 @@ class IntegrationInstanceConfigurationServiceIntTest {
                 .sql(
                     """
                         INSERT INTO mcp_server
-                            (name, type, environment, enabled, secret_key, created_date, created_by,
+                            (name, type, environment, enabled, secret_key, uuid, created_date, created_by,
                              last_modified_date, last_modified_by, version)
-                        VALUES ('mcp-server', 1, 2, true, 'secret', now(), 'test', now(), 'test', 0)
+                        VALUES ('mcp-server', 1, 2, true, 'secret', gen_random_uuid(), now(), 'test', now(), 'test', 0)
                         RETURNING id
                         """)
                 .query(Long.class)

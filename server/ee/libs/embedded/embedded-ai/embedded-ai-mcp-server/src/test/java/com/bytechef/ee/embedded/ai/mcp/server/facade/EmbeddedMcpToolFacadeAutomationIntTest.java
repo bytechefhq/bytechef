@@ -687,8 +687,8 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
         long projectDeploymentId = insert(
             """
                 INSERT INTO project_deployment (project_id, project_version, name, enabled, environment,
-                    created_date, created_by, last_modified_date, last_modified_by, version)
-                VALUES (?, 1, 'deployment', true, ?, now(), 'system', now(), 'system', 0)
+                    created_date, created_by, last_modified_date, last_modified_by, version, uuid)
+                VALUES (?, 1, 'deployment', true, ?, now(), 'system', now(), 'system', 0, gen_random_uuid())
                 RETURNING id
                 """,
             projectId, Environment.PRODUCTION.ordinal());

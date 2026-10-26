@@ -1073,6 +1073,7 @@ class A2aProjectFacadeIntTest {
             projectDeployment.setName(name);
             projectDeployment.setProjectId(project.getId());
             projectDeployment.setProjectVersion(projectVersion);
+            projectDeployment.setUuid(UUID.randomUUID());
 
             return projectDeployment;
         }
