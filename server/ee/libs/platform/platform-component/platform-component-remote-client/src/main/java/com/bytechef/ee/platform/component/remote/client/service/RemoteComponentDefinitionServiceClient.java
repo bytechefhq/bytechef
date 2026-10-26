@@ -11,6 +11,7 @@ import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc.ComponentDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionResult;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionVersionsRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionsRequest;
@@ -70,7 +71,28 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
 
     @Override
     public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
-        throw new UnsupportedOperationException();
+        Optional<ServiceInstance> serviceInstance = workerInstances.fetchInstance(name);
+
+        if (serviceInstance.isEmpty()) {
+            return Optional.empty();
+        }
+
+        GetComponentDefinitionRequest.Builder builder = GetComponentDefinitionRequest.newBuilder()
+            .setName(name);
+
+        if (version != null) {
+            builder.setVersion(version);
+        }
+
+        ComponentDefinitionResult componentDefinitionResult = getStub(serviceInstance.get())
+            .fetchComponentDefinition(builder.build());
+
+        if (!componentDefinitionResult.hasComponentDefinition()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+            componentProtoMapper.toComponentDefinition(componentDefinitionResult.getComponentDefinition()));
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +30,7 @@ import tools.jackson.core.type.TypeReference;
  */
 public class WorkerDiscoveryUtils {
 
-    public static ServiceInstance filterServiceInstance(
+    public static Optional<ServiceInstance> fetchServiceInstance(
         List<ServiceInstance> serviceInstances, String componentName) {
 
         for (ServiceInstance serviceInstance : serviceInstances) {
@@ -39,12 +40,21 @@ public class WorkerDiscoveryUtils {
 
             for (String curComponentName : componentNames) {
                 if (curComponentName.equalsIgnoreCase(componentName)) {
-                    return serviceInstance;
+                    return Optional.of(serviceInstance);
                 }
             }
         }
 
-        throw new IllegalArgumentException("No worker instance offers component %s".formatted(componentName));
+        return Optional.empty();
+    }
+
+    public static ServiceInstance filterServiceInstance(
+        List<ServiceInstance> serviceInstances, String componentName) {
+
+        Optional<ServiceInstance> serviceInstance = fetchServiceInstance(serviceInstances, componentName);
+
+        return serviceInstance.orElseThrow(
+            () -> new IllegalArgumentException("No worker instance offers component %s".formatted(componentName)));
     }
 
     public static Set<ServiceInstance> filterServiceInstances(List<ServiceInstance> serviceInstances) {

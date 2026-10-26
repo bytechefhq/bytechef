@@ -11,6 +11,7 @@ option java_multiple_files = true;
 option java_package = "com.bytechef.ee.platform.component.remote.grpc.proto";
 
 service ComponentDefinitionRemoteService {
+  rpc FetchComponentDefinition(GetComponentDefinitionRequest) returns (ComponentDefinitionResult);
   rpc GetComponentDefinition(GetComponentDefinitionRequest) returns (RemoteComponentDefinition);
   rpc GetComponentDefinitions(GetComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
   rpc GetComponentDefinitionVersions(GetComponentDefinitionVersionsRequest) returns (RemoteComponentDefinitions);
@@ -79,6 +80,10 @@ message RemoteComponentDefinition {
   optional int32 triggers_count = 21;
   optional string unified_api_category = 22;
   optional int32 version = 23;
+}
+
+message ComponentDefinitionResult {
+  optional RemoteComponentDefinition component_definition = 1;
 }
 
 message RemoteComponentDefinitions {
