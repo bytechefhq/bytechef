@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
     EmbeddingModel.class, VectorStore.class
 })
 @ConditionalOnProperty(prefix = "bytechef.context-store", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.vectorstore.pgvector", name = "url")
 @SuppressFBWarnings("EI2")
 class ContextStoreSemanticSearchServiceImpl implements ContextStoreSemanticSearchService {
 

@@ -35,6 +35,7 @@ import tools.jackson.databind.ObjectMapper;
 @ConditionalOnBean(EmbeddingModel.class)
 @ConditionalOnSingleTenant
 @ConditionalOnProperty(prefix = "bytechef.context-store", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.vectorstore.pgvector", name = "url")
 class ContextStorePgVectorConfiguration {
 
     @Bean

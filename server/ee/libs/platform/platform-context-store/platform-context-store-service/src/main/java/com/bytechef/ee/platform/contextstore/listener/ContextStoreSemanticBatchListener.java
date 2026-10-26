@@ -45,6 +45,7 @@ import org.springframework.stereotype.Component;
     EmbeddingModel.class, VectorStore.class
 })
 @ConditionalOnProperty(prefix = "bytechef.context-store", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.vectorstore.pgvector", name = "url")
 public class ContextStoreSemanticBatchListener implements JobExecutionListener {
 
     private static final Logger log = LoggerFactory.getLogger(ContextStoreSemanticBatchListener.class);
