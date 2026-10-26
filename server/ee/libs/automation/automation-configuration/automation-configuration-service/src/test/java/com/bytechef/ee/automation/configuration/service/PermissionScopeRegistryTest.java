@@ -15,6 +15,7 @@ import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.AiGatewayPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
@@ -104,6 +105,18 @@ class PermissionScopeRegistryTest {
             .isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    void testAiGatewayEditRequiresAdmin() {
+        PermissionScopeRegistry registry = new PermissionScopeRegistry(
+            List.of(new AiGatewayPermissionScopeProvider()));
+
+        Set<String> viewerScopes = registry.getScopeNames(WorkspaceRole.VIEWER);
+        Set<String> adminScopes = registry.getScopeNames(WorkspaceRole.ADMIN);
+
+        assertThat(viewerScopes).doesNotContain("AI_GATEWAY_EDIT");
+        assertThat(adminScopes).contains("AI_GATEWAY_EDIT");
+    }
+
     private static Set<String> union(Set<String> first, Set<String> second) {
         return Stream.concat(first.stream(), second.stream())
             .collect(Collectors.toUnmodifiableSet());
@@ -134,8 +147,8 @@ class PermissionScopeRegistryTest {
 
         private final PermissionScopeRegistry shippedPermissionScopeRegistry = new PermissionScopeRegistry(
             List.<PermissionScopeProvider>of(
-                new A2aPermissionScopeProvider(), new ApiKeyPermissionScopeProvider(),
-                new DeploymentPermissionScopeProvider(),
+                new A2aPermissionScopeProvider(), new AiGatewayPermissionScopeProvider(),
+                new ApiKeyPermissionScopeProvider(), new DeploymentPermissionScopeProvider(),
                 new McpPermissionScopeProvider(),
                 new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
 
