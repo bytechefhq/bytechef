@@ -1600,7 +1600,7 @@
   } ],
   "clusterElements": [ {
     "name": "model",
-    "description": "Antropic model.",
+    "description": "Anthropic model.",
     "element": { },
     "help": null,
     "outputDefinition": null,
@@ -1887,7 +1887,7 @@
       "required": false,
       "type": "STRING"
     } ],
-    "title": "Antropic Model",
+    "title": "Anthropic Model",
     "type": {
       "name": "MODEL",
       "key": "model",
