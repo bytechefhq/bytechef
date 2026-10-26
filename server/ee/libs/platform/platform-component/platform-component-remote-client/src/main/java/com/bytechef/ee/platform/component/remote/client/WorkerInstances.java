@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.remote.client;
 
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -27,6 +28,10 @@ public class WorkerInstances {
 
     public WorkerInstances(DiscoveryClient discoveryClient) {
         this.discoveryClient = discoveryClient;
+    }
+
+    public Optional<ServiceInstance> fetchInstance(String componentName) {
+        return WorkerDiscoveryUtils.fetchServiceInstance(discoveryClient.getInstances(WORKER_APP), componentName);
     }
 
     public ServiceInstance getInstance(String componentName) {

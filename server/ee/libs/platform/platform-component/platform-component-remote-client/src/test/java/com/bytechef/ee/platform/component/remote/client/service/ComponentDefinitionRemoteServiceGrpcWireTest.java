@@ -46,6 +46,7 @@ import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -178,6 +179,22 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         assertThat(remoteComponentDefinitionServiceClient.getComponentDefinition("keep", null))
             .usingRecursiveComparison()
             .isEqualTo(componentDefinition);
+    }
+
+    @Test
+    void testFetchComponentDefinition() {
+        ComponentDefinition componentDefinition = componentDefinition("keep", 2);
+
+        when(componentDefinitionService.fetchComponentDefinition("keep", 2))
+            .thenReturn(Optional.of(componentDefinition));
+        when(componentDefinitionService.fetchComponentDefinition("drop", null)).thenReturn(Optional.empty());
+
+        assertThat(remoteComponentDefinitionServiceClient.fetchComponentDefinition("keep", 2))
+            .get()
+            .usingRecursiveComparison()
+            .isEqualTo(componentDefinition);
+        assertThat(remoteComponentDefinitionServiceClient.fetchComponentDefinition("drop", null)).isEmpty();
+        assertThat(remoteComponentDefinitionServiceClient.fetchComponentDefinition("missing", null)).isEmpty();
     }
 
     @Test
