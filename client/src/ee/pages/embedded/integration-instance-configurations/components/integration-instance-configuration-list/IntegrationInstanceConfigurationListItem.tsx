@@ -72,8 +72,10 @@ const IntegrationInstanceConfigurationListItem = ({
     });
 
     const enableIntegrationInstanceConfigurationMutation = useEnableIntegrationInstanceConfigurationMutation({
-        onSuccess: () => {
-            captureIntegrationInstanceConfigurationEnabled();
+        onSuccess: (_, variables) => {
+            if (variables.enable) {
+                captureIntegrationInstanceConfigurationEnabled();
+            }
 
             queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,

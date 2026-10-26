@@ -5,14 +5,27 @@ import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+const hoisted = vi.hoisted(() => ({
+    captureIntegrationInstanceConfigurationEnabledMock: vi.fn(),
+}));
+
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
     useDeleteIntegrationInstanceConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
-    useEnableIntegrationInstanceConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnableIntegrationInstanceConfigurationMutation: ({
+        onSuccess,
+    }: {
+        onSuccess?: (result: void, variables: {enable: boolean; id: number}) => void;
+    }) => ({
+        isPending: false,
+        mutate: (variables: {enable: boolean; id: number}) => onSuccess?.(undefined, variables),
+    }),
     useUpdateIntegrationInstanceConfigurationTagsMutation: () => ({mutate: vi.fn()}),
 }));
 
 vi.mock('@/shared/hooks/useAnalytics', () => ({
-    useAnalytics: () => ({captureIntegrationInstanceConfigurationEnabled: vi.fn()}),
+    useAnalytics: () => ({
+        captureIntegrationInstanceConfigurationEnabled: hoisted.captureIntegrationInstanceConfigurationEnabledMock,
+    }),
 }));
 
 vi.mock(
@@ -31,12 +44,12 @@ const integrationInstanceConfiguration = {
     tags: [],
 } as unknown as IntegrationInstanceConfiguration;
 
-const renderItem = () =>
+const renderItem = (overrides: Partial<IntegrationInstanceConfiguration> = {}) =>
     render(
         <TooltipProvider>
             <Collapsible>
                 <IntegrationInstanceConfigurationListItem
-                    integrationInstanceConfiguration={integrationInstanceConfiguration}
+                    integrationInstanceConfiguration={{...integrationInstanceConfiguration, ...overrides}}
                 />
             </Collapsible>
         </TooltipProvider>
@@ -92,5 +105,32 @@ describe('IntegrationInstanceConfigurationListItem row click', () => {
         await userEvent.click(screen.getByRole('menu'));
 
         expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
+    });
+});
+
+describe('IntegrationInstanceConfigurationListItem enable analytics', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('should capture the enabled event when the configuration is turned on', async () => {
+        renderItem({enabled: false});
+
+        await userEvent.click(screen.getByRole('switch'));
+
+        expect(hoisted.captureIntegrationInstanceConfigurationEnabledMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not capture the enabled event when the configuration is turned off', async () => {
+        renderItem();
+
+        await userEvent.click(screen.getByRole('switch'));
+
+        expect(hoisted.captureIntegrationInstanceConfigurationEnabledMock).not.toHaveBeenCalled();
     });
 });
