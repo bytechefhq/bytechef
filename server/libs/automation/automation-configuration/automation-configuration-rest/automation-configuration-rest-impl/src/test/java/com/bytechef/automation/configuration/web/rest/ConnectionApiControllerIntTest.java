@@ -19,9 +19,12 @@ package com.bytechef.automation.configuration.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.rest.mapper.WorkspaceConnectionMapper;
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
@@ -31,6 +34,8 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
+import com.bytechef.platform.credential.store.exception.ReadOnlyCredentialStoreException;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +69,9 @@ public class ConnectionApiControllerIntTest {
 
     @MockitoBean
     private ConnectionService connectionService;
+
+    @Autowired
+    private WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @Autowired
     private WorkspaceConnectionMapper workspaceConnectionMapper;
@@ -289,6 +297,81 @@ public class ConnectionApiControllerIntTest {
         Long capturedTagId = tagIterator.next();
 
         Assertions.assertEquals(2, capturedTagId);
+    }
+
+    @Test
+    public void testRegisterExistingConnectionHappyPath() {
+        when(workspaceConnectionFacade.registerExisting(
+            eq(1L), any(ConnectionDTO.class), eq(CredentialStoreType.AWS_SECRETS_MANAGER),
+            eq("bytechef/connections/abc-uuid")))
+                .thenReturn(42L);
+
+        try {
+            this.webTestClient
+                .post()
+                .uri("/internal/connections/register-existing")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                    {
+                      "componentName": "acme-api",
+                      "connectionVersion": 1,
+                      "credentialStoreType": "AWS_SECRETS_MANAGER",
+                      "credentialRef": "bytechef/connections/abc-uuid",
+                      "environmentId": 1,
+                      "name": "my prod connection",
+                      "workspaceId": 1
+                    }
+                    """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Long.class)
+                .isEqualTo(42L);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        ArgumentCaptor<ConnectionDTO> connectionDTOCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
+
+        verify(workspaceConnectionFacade).registerExisting(
+            eq(1L), connectionDTOCaptor.capture(),
+            eq(CredentialStoreType.AWS_SECRETS_MANAGER),
+            eq("bytechef/connections/abc-uuid"));
+
+        assertThat(connectionDTOCaptor.getValue())
+            .hasFieldOrPropertyWithValue("componentName", "acme-api")
+            .hasFieldOrPropertyWithValue("connectionVersion", 1)
+            .hasFieldOrPropertyWithValue("name", "my prod connection");
+    }
+
+    @Test
+    public void testRegisterExistingConnectionRejectsReadOnlyStore() {
+        when(workspaceConnectionFacade.registerExisting(
+            anyLong(), any(ConnectionDTO.class), any(CredentialStoreType.class), anyString()))
+                .thenThrow(new ReadOnlyCredentialStoreException(CredentialStoreType.HASHICORP_VAULT));
+
+        try {
+            this.webTestClient
+                .post()
+                .uri("/internal/connections/register-existing")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                    {
+                      "componentName": "acme-api",
+                      "connectionVersion": 1,
+                      "credentialStoreType": "HASHICORP_VAULT",
+                      "credentialRef": "secret/foo",
+                      "environmentId": 1,
+                      "name": "vault conn",
+                      "workspaceId": 1
+                    }
+                    """)
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 
     private static ConnectionDTO getConnection() {

@@ -170,6 +170,13 @@ bytechef:
         trigger-listener-events: 1
         trigger-poll-events: 1
         trigger-webhook-events: 1
+  credential-store:
+    cache:
+      ttl: 5m
+    hashicorp-vault:
+      # Vault authentication method (approle | token) default: token
+      authentication: token
+      kv-mount: secret
   data-storage:
     # Data storage provider (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
     provider: JDBC

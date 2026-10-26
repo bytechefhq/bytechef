@@ -52,7 +52,8 @@ import tools.jackson.databind.ObjectMapper;
 
 @ComponentScan(
     basePackages = {
-        "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection"
+        "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection",
+        "com.bytechef.platform.credential.store"
     })
 @EnableAutoConfiguration
 @EnableCaching

@@ -26,6 +26,7 @@ spring-boot = "4.1.1"
 spring-cloud-aws = "4.2.0"
 spring-cloud-dependencies = "2025.1.3"
 spring-shell = "4.0.3"
+spring-vault = "4.1.0"
 springaicommunity-agent-utils = "0.13.0"
 springaicommunity-mcp-security = "0.1.14"
 springaicommunity-spring-ai-session = "0.10.0"
@@ -80,6 +81,7 @@ org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spri
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
+org-springframework-vault-spring-vault-core = { module = "org.springframework.vault:spring-vault-core", version.ref = "spring-vault" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.13.0"
 

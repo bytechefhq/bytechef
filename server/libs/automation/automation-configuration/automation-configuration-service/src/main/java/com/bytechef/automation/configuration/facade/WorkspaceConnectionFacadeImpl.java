@@ -24,9 +24,12 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,6 +47,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     private final ConnectionFacade connectionFacade;
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
+    private final ConnectionService connectionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
@@ -51,12 +55,13 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
+        this.connectionService = connectionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
@@ -69,6 +74,22 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         workspaceConnectionService.create(connectionId, workspaceId);
 
         return connectionId;
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public long registerExisting(
+        long workspaceId, ConnectionDTO connectionDTO, CredentialStoreType storeType, String credentialRef) {
+
+        Connection connection = connectionDTO.toConnection();
+
+        connection.setType(PlatformType.AUTOMATION);
+
+        Connection registered = connectionService.registerExisting(connection, storeType, credentialRef);
+
+        workspaceConnectionService.create(registered.getId(), workspaceId);
+
+        return registered.getId();
     }
 
     @Override

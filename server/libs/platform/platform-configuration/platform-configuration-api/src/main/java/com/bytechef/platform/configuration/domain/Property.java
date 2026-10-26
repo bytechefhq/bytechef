@@ -18,6 +18,8 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.credential.store.CredentialSecret;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
@@ -36,7 +38,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("property")
-public class Property {
+public class Property implements CredentialSecret {
 
     public enum Scope {
         PLATFORM, AUTOMATION, EMBEDDED, WORKSPACE, PROJECT, INTEGRATION
@@ -44,6 +46,12 @@ public class Property {
 
     @Id
     private Long id;
+
+    @Column("credential_ref")
+    private @Nullable String credentialRef;
+
+    @Column("credential_store_type")
+    private int credentialStoreType;
 
     @Column
     private String key;
@@ -87,6 +95,7 @@ public class Property {
         if (this == o) {
             return true;
         }
+
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
@@ -107,12 +116,27 @@ public class Property {
         return map.get(key);
     }
 
+    @Override
+    public @Nullable String getCredentialRef() {
+        return credentialRef;
+    }
+
+    @Override
+    public CredentialStoreType getCredentialStoreType() {
+        return CredentialStoreType.values()[credentialStoreType];
+    }
+
     public Long getId() {
         return id;
     }
 
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public Map<String, ?> getPayload() {
+        return getValue();
     }
 
     public Scope getScope() {
@@ -155,12 +179,27 @@ public class Property {
         return version;
     }
 
+    @Override
+    public void setCredentialRef(@Nullable String credentialRef) {
+        this.credentialRef = credentialRef;
+    }
+
+    @Override
+    public void setCredentialStoreType(CredentialStoreType credentialStoreType) {
+        this.credentialStoreType = credentialStoreType.ordinal();
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    @Override
+    public void setPayload(Map<String, ?> payload) {
+        setValue(payload);
     }
 
     public void setScope(Scope scope) {
@@ -213,6 +252,8 @@ public class Property {
             ", scope=" + scope +
             ", scopeId=" + scopeId +
             ", environment=" + environment +
+            ", credentialStoreType=" + credentialStoreType +
+            ", credentialRef='" + credentialRef + '\'' +
             ", value=" + value +
             ", enabled=" + enabled +
             ", createdBy='" + createdBy + '\'' +

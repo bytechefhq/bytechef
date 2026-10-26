@@ -35,6 +35,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testImplementation(project(":server:libs:platform:platform-credential-store:platform-credential-store-service"))
     testImplementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     testImplementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))

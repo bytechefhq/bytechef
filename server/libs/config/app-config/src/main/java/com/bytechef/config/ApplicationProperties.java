@@ -90,6 +90,11 @@ public class ApplicationProperties {
     private Component component = new Component();
 
     /**
+     * Credential-store configuration
+     */
+    private CredentialStore credentialStore = new CredentialStore();
+
+    /**
      * Workflow coordinator configuration
      */
     private Coordinator coordinator = new Coordinator();
@@ -283,6 +288,10 @@ public class ApplicationProperties {
         return component;
     }
 
+    public CredentialStore getCredentialStore() {
+        return credentialStore;
+    }
+
     public Coordinator getCoordinator() {
         return coordinator;
     }
@@ -449,6 +458,10 @@ public class ApplicationProperties {
 
     public void setComponent(Component component) {
         this.component = component;
+    }
+
+    public void setCredentialStore(CredentialStore credentialStore) {
+        this.credentialStore = credentialStore;
     }
 
     public void setCoordinator(Coordinator coordinator) {
@@ -3489,6 +3502,190 @@ public class ApplicationProperties {
 
             public void setExclude(List<String> exclude) {
                 this.exclude = exclude;
+            }
+        }
+    }
+
+    /**
+     * Credential-store configuration for external secret backends.
+     */
+    public static class CredentialStore {
+
+        private AwsSecretsManager awsSecretsManager = new AwsSecretsManager();
+        private Cache cache = new Cache();
+        private External external = new External();
+        private HashiCorpVault hashicorpVault = new HashiCorpVault();
+        private String pathTemplate;
+
+        public AwsSecretsManager getAwsSecretsManager() {
+            return awsSecretsManager;
+        }
+
+        public void setAwsSecretsManager(AwsSecretsManager awsSecretsManager) {
+            this.awsSecretsManager = awsSecretsManager;
+        }
+
+        public Cache getCache() {
+            return cache;
+        }
+
+        public void setCache(Cache cache) {
+            this.cache = cache;
+        }
+
+        public External getExternal() {
+            return external;
+        }
+
+        public void setExternal(External external) {
+            this.external = external;
+        }
+
+        public HashiCorpVault getHashicorpVault() {
+            return hashicorpVault;
+        }
+
+        public void setHashicorpVault(HashiCorpVault hashicorpVault) {
+            this.hashicorpVault = hashicorpVault;
+        }
+
+        public String getPathTemplate() {
+            return pathTemplate;
+        }
+
+        public void setPathTemplate(String pathTemplate) {
+            this.pathTemplate = pathTemplate;
+        }
+
+        public static class AwsSecretsManager {
+
+            /** When true, refuses write operations (operator IAM policy enforcement). */
+            private boolean readOnly;
+
+            public boolean isReadOnly() {
+                return readOnly;
+            }
+
+            public void setReadOnly(boolean readOnly) {
+                this.readOnly = readOnly;
+            }
+        }
+
+        public static class Cache {
+
+            /** Per-adapter read-path cache TTL. */
+            private Duration ttl;
+
+            public Duration getTtl() {
+                return ttl;
+            }
+
+            public void setTtl(Duration ttl) {
+                this.ttl = ttl;
+            }
+        }
+
+        public static class External {
+
+            /** Active external store provider. Unset = database only. */
+            private String provider;
+
+            public String getProvider() {
+                return provider;
+            }
+
+            public void setProvider(String provider) {
+                this.provider = provider;
+            }
+        }
+
+        public static class HashiCorpVault {
+
+            /** When true, refuses write operations. */
+            private boolean readOnly;
+
+            /** Vault HTTP endpoint, e.g. "http://vault:8200". */
+            private String uri;
+
+            /** Authentication method: "token" or "approle". */
+            private String authentication;
+
+            /** Bearer token when authentication=token. */
+            private String token;
+
+            private AppRole approle = new AppRole();
+
+            /** KV v2 mount path. */
+            private String kvMount;
+
+            public boolean isReadOnly() {
+                return readOnly;
+            }
+
+            public void setReadOnly(boolean readOnly) {
+                this.readOnly = readOnly;
+            }
+
+            public String getUri() {
+                return uri;
+            }
+
+            public void setUri(String uri) {
+                this.uri = uri;
+            }
+
+            public String getAuthentication() {
+                return authentication;
+            }
+
+            public void setAuthentication(String authentication) {
+                this.authentication = authentication;
+            }
+
+            public String getToken() {
+                return token;
+            }
+
+            public void setToken(String token) {
+                this.token = token;
+            }
+
+            public AppRole getApprole() {
+                return approle;
+            }
+
+            public void setApprole(AppRole approle) {
+                this.approle = approle;
+            }
+
+            public String getKvMount() {
+                return kvMount;
+            }
+
+            public void setKvMount(String kvMount) {
+                this.kvMount = kvMount;
+            }
+
+            public static class AppRole {
+
+                private String roleId;
+                private String secretId;
+
+                public String getRoleId() {
+                    return roleId;
+                }
+
+                public void setRoleId(String roleId) {
+                    this.roleId = roleId;
+                }
+
+                public String getSecretId() {
+                    return secretId;
+                }
+
+                public void setSecretId(String secretId) {
+                    this.secretId = secretId;
+                }
             }
         }
     }
