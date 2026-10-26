@@ -706,6 +706,8 @@ include("server:ee:libs:platform:platform-configuration:platform-configuration-r
 include("server:ee:libs:platform:platform-configuration:platform-configuration-rest")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-service")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-client")
+include("server:ee:libs:platform:platform-connection:platform-connection-remote-grpc")
+include("server:ee:libs:platform:platform-connection:platform-connection-remote-grpc-proto")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-rest")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service")
