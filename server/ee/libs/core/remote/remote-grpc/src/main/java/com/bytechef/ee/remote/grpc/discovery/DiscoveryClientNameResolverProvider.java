@@ -11,6 +11,7 @@ import io.grpc.NameResolver;
 import io.grpc.NameResolverProvider;
 import io.grpc.NameResolverRegistry;
 import java.net.URI;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -24,6 +25,8 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 public final class DiscoveryClientNameResolverProvider extends NameResolverProvider {
 
     public static final String SCHEME = "discovery";
+
+    private static final Duration REFRESH_INTERVAL = Duration.ofSeconds(30);
 
     private static final DiscoveryClientNameResolverProvider INSTANCE = new DiscoveryClientNameResolverProvider();
 
@@ -56,7 +59,9 @@ public final class DiscoveryClientNameResolverProvider extends NameResolverProvi
 
         String path = targetUri.getPath();
 
-        return new DiscoveryClientNameResolver(path.startsWith("/") ? path.substring(1) : path, discoveryClient);
+        return new DiscoveryClientNameResolver(
+            path.startsWith("/") ? path.substring(1) : path, discoveryClient, args.getScheduledExecutorService(),
+            REFRESH_INTERVAL);
     }
 
     @Override
