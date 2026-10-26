@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.action;
 
 import static com.bytechef.component.ai.agent.constant.AiAgentConstants.AI_AGENT;
+import static com.bytechef.component.ai.agent.constant.AiAgentConstants.MAX_TOOL_CALLS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
@@ -279,7 +280,7 @@ public abstract class AbstractAiAgentChatAction {
                 .advisors(
                     getAdvisors(
                         clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId,
-                        resumedTurn, toolBoundaryMetrics))
+                        resumedTurn, toolBoundaryMetrics, inputParameters.getInteger(MAX_TOOL_CALLS)))
                 .advisors(getConversationAdvisor(conversationId))
                 .advisors(new TextGenerationFirstAdvisor())
                 .messages(messages)
@@ -881,13 +882,14 @@ public abstract class AbstractAiAgentChatAction {
 
         return getAdvisors(
             clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId, false,
-            null);
+            null, null);
     }
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
         ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult,
-        @Nullable String conversationId, boolean resumedTurn, @Nullable SensitiveDataMetrics toolBoundaryMetrics) {
+        @Nullable String conversationId, boolean resumedTurn, @Nullable SensitiveDataMetrics toolBoundaryMetrics,
+        @Nullable Integer maxToolCalls) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -945,7 +947,7 @@ public abstract class AbstractAiAgentChatAction {
             .orElse(false);
 
         ToolCallingManager agentToolCallingManager = agentToolCallingManagers.getToolCallingManager(
-            toolBoundaryMetrics);
+            toolBoundaryMetrics, maxToolCalls);
 
         if (context instanceof ActionContextAware actionContextAware) {
             agentToolCallingManager = new SuspendableToolCallingManager(agentToolCallingManager, actionContextAware);
