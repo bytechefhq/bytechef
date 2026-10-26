@@ -182,6 +182,16 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testSearchComponentDefinitionsAppliesCallerPlatformFilter() {
+        when(componentDefinitionService.getComponentDefinitions("ke", null))
+            .thenReturn(List.of(componentDefinition("keep", 1), componentDefinition("drop", 1)));
+
+        assertThat(remoteComponentDefinitionServiceClient.getComponentDefinitions("ke", PlatformType.AUTOMATION))
+            .extracting(ComponentDefinition::getName)
+            .containsExactly("keep");
+    }
+
+    @Test
     void testFetchComponentDefinition() {
         ComponentDefinition componentDefinition = componentDefinition("keep", 2);
 
