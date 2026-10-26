@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package bytechef.platform.configuration.remote.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.configuration.remote.grpc.proto";
+
+service WorkflowRemoteService {
+  rpc FetchWorkflow(WorkflowIdRequest) returns (WorkflowResult);
+  rpc GetWorkflow(WorkflowIdRequest) returns (RemoteWorkflow);
+  rpc GetWorkflows(WorkflowIdsRequest) returns (RemoteWorkflows);
+}
+
+service WorkflowTestConfigurationRemoteService {
+  rpc GetWorkflowTestConfigurationInputs(WorkflowTestConfigurationInputsRequest) returns (InputsResponse);
+  rpc IsConnectionUsed(IdRequest) returns (BoolResponse);
+}
+
+service ComponentConnectionFacadeRemoteService {
+  rpc GetWorkflowTaskComponentConnections(WorkflowNodeRequest) returns (RemoteComponentConnections);
+  rpc GetWorkflowTriggerComponentConnections(WorkflowNodeRequest) returns (RemoteComponentConnections);
+}
+
+message IdRequest {
+  int64 id = 1;
+}
+
+message BoolResponse {
+  bool value = 1;
+}
+
+message WorkflowIdRequest {
+  string id = 1;
+}
+
+message WorkflowIdsRequest {
+  repeated string ids = 1;
+}
+
+message WorkflowTestConfigurationInputsRequest {
+  string workflow_id = 1;
+  int64 environment_id = 2;
+}
+
+message InputsResponse {
+  optional bytes inputs = 1;
+}
+
+message WorkflowNodeRequest {
+  bytes node = 1;
+}
+
+message RemoteWorkflow {
+  string definition = 1;
+  string format = 2;
+  optional string id = 3;
+  optional google.protobuf.Timestamp last_modified_date = 4;
+  bytes metadata = 5;
+  optional string source_type = 6;
+  int32 version = 7;
+}
+
+message RemoteWorkflows {
+  repeated RemoteWorkflow workflows = 1;
+}
+
+message WorkflowResult {
+  optional RemoteWorkflow workflow = 1;
+}
+
+message RemoteComponentConnection {
+  string component_name = 1;
+  int32 component_version = 2;
+  string key = 3;
+  bool required = 4;
+  string workflow_node_name = 5;
+}
+
+message RemoteComponentConnections {
+  repeated RemoteComponentConnection connections = 1;
+}

@@ -7,16 +7,21 @@
 
 package com.bytechef.ee.platform.configuration.remote.client.service;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.configuration.remote.grpc.PlatformConfigurationProtoMapper;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.InputsResponse;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowTestConfigurationInputsRequest;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowTestConfigurationRemoteServiceGrpc;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowTestConfigurationRemoteServiceGrpc.WorkflowTestConfigurationRemoteServiceBlockingStub;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -27,13 +32,13 @@ import org.springframework.stereotype.Component;
 public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTestConfigurationService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String WORKFLOW_SERVICE = "/remote/workflow-test-configuration-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
+    private final PlatformConfigurationProtoMapper platformConfigurationProtoMapper;
 
-    @SuppressFBWarnings("EI")
-    public RemoteWorkflowTestConfigurationServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteWorkflowTestConfigurationServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.grpcChannels = grpcChannels;
+        this.platformConfigurationProtoMapper = new PlatformConfigurationProtoMapper(objectMapper);
     }
 
     @Override
@@ -87,12 +92,11 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
 
     @Override
     public boolean isConnectionUsed(long connectionId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(WORKFLOW_SERVICE + "/is-connection-used/{connectionId}")
-                .build(connectionId),
-            new ParameterizedTypeReference<>() {});
+        return getStub().isConnectionUsed(
+            IdRequest.newBuilder()
+                .setId(connectionId)
+                .build())
+            .getValue();
     }
 
     @Override
@@ -104,7 +108,17 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
 
     @Override
     public Map<String, ?> getWorkflowTestConfigurationInputs(String workflowId, long environmentId) {
-        return null;
+        InputsResponse inputsResponse = getStub().getWorkflowTestConfigurationInputs(
+            WorkflowTestConfigurationInputsRequest.newBuilder()
+                .setEnvironmentId(environmentId)
+                .setWorkflowId(workflowId)
+                .build());
+
+        if (!inputsResponse.hasInputs()) {
+            return null;
+        }
+
+        return platformConfigurationProtoMapper.toMap(inputsResponse.getInputs());
     }
 
     @Override
@@ -130,5 +144,9 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     @Override
     public void updateWorkflowId(String oldWorkflowId, String newWorkflowId) {
         throw new UnsupportedOperationException();
+    }
+
+    private WorkflowTestConfigurationRemoteServiceBlockingStub getStub() {
+        return WorkflowTestConfigurationRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
     }
 }

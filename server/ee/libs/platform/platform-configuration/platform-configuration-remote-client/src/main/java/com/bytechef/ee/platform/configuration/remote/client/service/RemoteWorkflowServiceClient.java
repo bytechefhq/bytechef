@@ -9,12 +9,17 @@ package com.bytechef.ee.platform.configuration.remote.client.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ee.platform.configuration.remote.grpc.PlatformConfigurationProtoMapper;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowIdRequest;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowIdsRequest;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowRemoteServiceGrpc;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowRemoteServiceGrpc.WorkflowRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowResult;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -25,13 +30,13 @@ import org.springframework.stereotype.Component;
 public class RemoteWorkflowServiceClient implements WorkflowService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String WORKFLOW_SERVICE = "/remote/workflow-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
+    private final PlatformConfigurationProtoMapper platformConfigurationProtoMapper;
 
-    @SuppressFBWarnings("EI")
-    public RemoteWorkflowServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteWorkflowServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.grpcChannels = grpcChannels;
+        this.platformConfigurationProtoMapper = new PlatformConfigurationProtoMapper(objectMapper);
     }
 
     @Override
@@ -58,7 +63,13 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
 
     @Override
     public Optional<Workflow> fetchWorkflow(String id) {
-        return Optional.empty();
+        WorkflowResult workflowResult = getStub().fetchWorkflow(toWorkflowIdRequest(id));
+
+        if (!workflowResult.hasWorkflow()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(platformConfigurationProtoMapper.toWorkflow(workflowResult.getWorkflow()));
     }
 
     @Override
@@ -68,22 +79,16 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
 
     @Override
     public Workflow getWorkflow(String id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(WORKFLOW_SERVICE + "/get-workflow/{id}")
-                .build(id),
-            Workflow.class);
+        return platformConfigurationProtoMapper.toWorkflow(getStub().getWorkflow(toWorkflowIdRequest(id)));
     }
 
     @Override
     public List<Workflow> getWorkflows(List<String> workflowIds) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(WORKFLOW_SERVICE + "/get-workflows-by-ids/" + String.join(",", workflowIds))
-                .build(),
-            new ParameterizedTypeReference<>() {});
+        return platformConfigurationProtoMapper.toWorkflows(
+            getStub().getWorkflows(
+                WorkflowIdsRequest.newBuilder()
+                    .addAllIds(workflowIds)
+                    .build()));
     }
 
     @Override
@@ -94,5 +99,15 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     @Override
     public Workflow update(String id, String definition, int version) {
         throw new UnsupportedOperationException();
+    }
+
+    private WorkflowRemoteServiceBlockingStub getStub() {
+        return WorkflowRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+    }
+
+    private static WorkflowIdRequest toWorkflowIdRequest(String id) {
+        return WorkflowIdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 }

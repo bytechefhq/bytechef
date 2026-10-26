@@ -706,6 +706,8 @@ include("server:ee:libs:platform:platform-component:platform-component-remote-gr
 include("server:ee:libs:platform:platform-component:platform-component-remote-grpc-proto")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-api")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-client")
+include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-grpc")
+include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-grpc-proto")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-rest")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-rest")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-service")
