@@ -7,8 +7,8 @@ comingSoon: true
 
 These are the prompts ByteChef's own end-to-end tests send to the [AI Copilot](/platform/automation/build/ai-copilot),
 the [AI Hub](/platform/automation/build/hub) and the management MCP server, run against a real model. Each one shows
-something the assistants can do today. Copy a prompt, adapt the names and channels to your workspace, and compare the
-result with what the example says it builds.
+something the assistants can do today, from workflows to [AI Agents](#building-ai-agents). Copy a prompt, adapt the
+names and channels to your workspace, and compare the result with what the example says it builds.
 
 ## The same instruction, three ways in
 
@@ -141,6 +141,128 @@ workflow; it never adds a second one.
 | Schedule at 8:00 → Gmail search | `Change the schedule to run at 7:30 instead of 8:00, and only find emails that have a PDF attachment.` | Moves the schedule and narrows the search; adds nothing else |
 | Webhook → logger → Slack | `Remove the logging step; keep posting the signup to Slack.` | Removes the logger; keeps the rest |
 | Data Stream: CSV reader → JSON writer | `Add a processor to the data stream that converts every contact name to upper case.` | Adds a processor between the reader and the writer |
+
+## Building AI Agents
+
+[AI Agents](/platform/automation/build/ai-agents) are chat-first automations that run on a model instead of a
+hand-built workflow. The AI Hub, the AI Copilot and the management MCP server build them the same way you would on the
+agent page: instructions, one model with its connection, tools, memory, sub-agents, knowledge bases, skills, approvals
+and channels such as Slack or a schedule.
+
+| Where you type it | How to phrase it |
+| --- | --- |
+| **AI Hub**, Build mode, new agent | `Create a new project "Support" with this AI agent. <instruction>` |
+| **AI Hub**, Build mode, existing agent | `In the project "Support", update the AI agent "Support Triage". <instruction>` |
+| **AI Copilot**, Build mode, opened with **Ask Copilot** on the agent page | `Set up this agent. <instruction>` for a new agent, or just `<instruction>` to change it - the open agent is the one it changes |
+| **Management MCP**, `buildAiAgent` tool | `instruction` set to `<instruction>`, plus `projectId` for a new agent or `aiAgentId` to change one |
+
+An agent needs a model with a connection before it can run, so the assistant asks you to pick a connection to the
+model's provider, or to create one. When the agent is ready, try it in the agent page's **Test** panel, then publish
+its project.
+
+### Support triage
+
+```text
+An AI agent called "Support Triage" that reads customer support emails and classifies each one as Billing, Technical
+or General, with a High, Medium or Low priority and a one-sentence reason. It uses an Anthropic Claude model.
+```
+
+Writes instructions that name the three categories and the priorities, and adds an Anthropic model bound to one of
+your Anthropic connections.
+
+### A weekday digest on a schedule
+
+```text
+An AI agent called "Standup Digest" that uses an Anthropic Claude model and runs every weekday at 9:00 UTC with the
+prompt "Write a short, upbeat standup note that reminds the team of today's date".
+```
+
+Adds a schedule channel with the cron expression `0 9 ? * MON-FRI` in UTC and the prompt the agent receives on each
+run.
+
+### Tools and memory
+
+```text
+An AI agent called "Ops Helper" that uses an Anthropic Claude model, remembers the conversation, can tell the current
+date and can do arithmetic.
+```
+
+Looks up the matching tools and adds chat memory, a current-date tool and the math tools (addition, subtraction
+and so on).
+
+### A Slack tool behind human approval
+
+```text
+An AI agent called "Ops Announcer" that uses an Anthropic Claude model and can post messages to the #ops Slack
+channel, but a human must approve every post in the chat before it is sent.
+```
+
+Adds a Slack tool bound to your Slack connection, marks it as needing approval and adds the approval gate. Every post
+waits for an **Approve** in the chat.
+
+### A lead agent with a sub-agent
+
+```text
+Two AI agents that both use an Anthropic Claude model: "Fact Checker" checks a single claim and answers True, False or
+Unclear with a one-sentence reason, and "Research Lead" answers research questions and calls Fact Checker as a
+sub-agent to verify each claim before it replies.
+```
+
+Creates both agents in the same project and adds Fact Checker to Research Lead as a sub-agent. From the Copilot on
+Research Lead's page, ask for the second agent explicitly: `Set up this agent. This agent is "Research Lead": ...
+Create that sub-agent as a new agent called "Fact Checker", ...`.
+
+### A Slack helpdesk
+
+```text
+An AI agent called "Slack Helpdesk" that uses an Anthropic Claude model and answers the questions people send it in
+Slack.
+```
+
+Adds a Slack channel bound to your Slack connection, so the agent answers where people ask.
+
+### Answers from a knowledge base
+
+```text
+An AI agent called "HR Answers" that uses an Anthropic Claude model and answers employee questions from our "Employee
+Handbook" knowledge base.
+```
+
+Finds the knowledge base by name and adds it, so the agent searches the handbook before it answers.
+
+### Writing with a skill
+
+```text
+An AI agent called "Brand Writer" that uses an Anthropic Claude model and writes product announcements with our "Brand
+Voice" skill.
+```
+
+Finds the skill by name and adds it to the agent.
+
+### Searching the web
+
+```text
+An AI agent called "Market Scout" that uses an Anthropic Claude model and searches the web with the model's own web
+search to summarize news about our competitors.
+```
+
+Turns on web search with the model provider's own search, which needs no extra connection.
+
+### Changing an existing agent
+
+For an agent "Order Helper" that already has a model and short instructions:
+
+```text
+Keep its model, limit its replies to two sentences, and give it a tool that tells the current date.
+```
+
+Rewrites the instructions, adds a current-date tool and leaves the model as it was.
+
+### Questions about an agent
+
+In Ask mode, from the agent page's Copilot or with the agent referenced in the AI Hub composer (type `@` and pick it
+under **AI Agents**), questions such as `Explain what this agent does and which tools it uses.` or `Suggest
+improvements to this agent's instructions.` are answered without changing the agent.
 
 ## Questions, pickers and connections
 
