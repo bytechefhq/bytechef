@@ -1385,6 +1385,86 @@ export type ConnectionSearchResult = SearchResult & {
   type: SearchAssetType;
 };
 
+/** Parent Context Store entity. Env-stamped at creation; sources hang off this via contextStoreId. */
+export type ContextStore = {
+  __typename?: 'ContextStore';
+  description?: Maybe<Scalars['String']['output']>;
+  environment: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  tagIds: Array<Scalars['ID']['output']>;
+  /**
+   * Full Tag objects (id + name) resolved from the store's tagIds. Use {@code tags} when rendering the
+   * TagList picker; use {@code tagIds} when you just need the ID list (e.g. for filter set membership).
+   */
+  tags: Array<Tag>;
+  version: Scalars['Int']['output'];
+};
+
+/**
+ * A Context Store source binds a workspace, a source component (with its ItemReader cluster element and
+ * optional connection), and a record-shape definition to a periodic sync cadence. Source is 1:1 with its
+ * record shape — {@code entityName}, {@code idField}, {@code indexedFields}, etc. live directly on the source
+ * row.
+ */
+export type ContextStoreSource = {
+  __typename?: 'ContextStoreSource';
+  cadence: Scalars['String']['output'];
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  /**
+   * FK to the parent ContextStore. Environment is inherited via this relationship — there is no
+   * environment column on the source itself.
+   */
+  contextStoreId: Scalars['ID']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  /**
+   * Stable wire identifier for the source's records (independent of the display {@code name}). Used by
+   * the destination component handler and ClickHouse table naming.
+   */
+  entityName: Scalars['String']['output'];
+  /**
+   * Phase 17b: optional rare full-replace cadence paired with the regular incremental cadence.
+   * Null = single-trigger MVP behavior.
+   */
+  fullReplaceCadence?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  idField: Scalars['String']['output'];
+  indexedFields: Scalars['Map']['output'];
+  lastSyncJobExecutionId?: Maybe<Scalars['ID']['output']>;
+  lastSyncRunAt?: Maybe<Scalars['Long']['output']>;
+  name: Scalars['String']['output'];
+  parameters?: Maybe<Scalars['Map']['output']>;
+  semanticIndexFields?: Maybe<Scalars['Map']['output']>;
+  sourceClusterElementName?: Maybe<Scalars['String']['output']>;
+  sourceComponentName: Scalars['String']['output'];
+  sourceComponentVersion: Scalars['Int']['output'];
+  status: ContextStoreSourceStatus;
+  storedFields?: Maybe<Scalars['Map']['output']>;
+  /** Phase 17b: tombstone-derivation strategy. */
+  tombstoneStrategy: ContextStoreTombstoneStrategy;
+  workflowId?: Maybe<Scalars['ID']['output']>;
+  workspaceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ContextStoreSourceFilter = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export enum ContextStoreSourceStatus {
+  BuildingPreview = 'BUILDING_PREVIEW',
+  Disabled = 'DISABLED',
+  Failed = 'FAILED',
+  Preview = 'PREVIEW',
+  Ready = 'READY'
+}
+
+export enum ContextStoreTombstoneStrategy {
+  None = 'NONE',
+  PeriodicFullReplace = 'PERIODIC_FULL_REPLACE',
+  UpstreamChangeFeed = 'UPSTREAM_CHANGE_FEED'
+}
+
 export enum ControlType {
   ArrayBuilder = 'ARRAY_BUILDER',
   CodeEditor = 'CODE_EDITOR',
@@ -1437,6 +1517,51 @@ export type CreateApiConnectorInput = {
   icon?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateContextStoreInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type CreateContextStoreSourceInput = {
+  cadence: Scalars['String']['input'];
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  /**
+   * Parent Context Store ID. Required — sources must hang off an existing ContextStore in the
+   * same workspace. Defense in depth: the facade verifies the store belongs to workspaceId.
+   */
+  contextStoreId: Scalars['ID']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * Stable wire identifier for the source's records. Used by the destination component handler and
+   * ClickHouse table naming; independent of the display {@code name} (which can be renamed without
+   * invalidating already-synced records).
+   */
+  entityName: Scalars['String']['input'];
+  environmentId?: InputMaybe<Scalars['ID']['input']>;
+  /**
+   * Phase 17b: optional rare full-replace cadence paired with the regular incremental cadence
+   * (e.g., '@daily' alongside an '@hourly' cadence). Null = single-trigger MVP.
+   */
+  fullReplaceCadence?: InputMaybe<Scalars['String']['input']>;
+  idField: Scalars['String']['input'];
+  indexedFields: Scalars['Map']['input'];
+  name: Scalars['String']['input'];
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+  semanticIndexFields?: InputMaybe<Scalars['Map']['input']>;
+  /**
+   * Optional. When omitted, the server picks the first ItemReader cluster element on the
+   * source component. Supply a name only when the component defines more than one ItemReader.
+   */
+  sourceClusterElementName?: InputMaybe<Scalars['String']['input']>;
+  sourceComponentName: Scalars['String']['input'];
+  sourceComponentVersion: Scalars['Int']['input'];
+  storedFields?: InputMaybe<Scalars['Map']['input']>;
+  /** Phase 17b: tombstone-derivation strategy. Defaults to PERIODIC_FULL_REPLACE when omitted. */
+  tombstoneStrategy?: InputMaybe<ContextStoreTombstoneStrategy>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 export type CreateDataTableInput = {
@@ -2370,6 +2495,8 @@ export type Mutation = {
   createAutomationWorkflowProjectConfiguration: Scalars['ID']['output'];
   createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   createCodeWorkflow: Scalars['ID']['output'];
+  createContextStore: ContextStore;
+  createContextStoreSource: ContextStoreSource;
   createCustomComponent: CustomComponent;
   createDataTable: Scalars['Boolean']['output'];
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -2434,6 +2561,8 @@ export type Mutation = {
   deleteComponentRule: Scalars['Boolean']['output'];
   deleteConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
+  deleteContextStore: Scalars['Boolean']['output'];
+  deleteContextStoreSource: Scalars['Boolean']['output'];
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
@@ -2504,6 +2633,7 @@ export type Mutation = {
    * references an artifact in a chat.
    */
   recordReferencedAiHubChatArtifact: AiHubChatArtifact;
+  refreshContextStoreSource: Scalars['ID']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
@@ -2522,6 +2652,7 @@ export type Mutation = {
    */
   saveComponentRule: ComponentRule;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  setContextStoreSourceEnabled: ContextStoreSource;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
@@ -2585,6 +2716,14 @@ export type Mutation = {
    * every rule and enforces none. Admin-only.
    */
   updateComponentRuleSettings: ComponentRuleSettings;
+  updateContextStore: ContextStore;
+  updateContextStoreSource: ContextStoreSource;
+  /**
+   * Replace the tag list on a Context Store. Existing tags whose name matches an entry in {@code tags} are
+   * re-used; names not yet in the tag table are created on the fly via TagService.save. Returns the updated tags
+   * so the client can refresh its remainingTags cache.
+   */
+  updateContextStoreTags: Array<Tag>;
   updateCustomComponentSource: CustomComponent;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
@@ -2831,6 +2970,18 @@ export type MutationCreateCodeWorkflowArgs = {
 };
 
 
+export type MutationCreateContextStoreArgs = {
+  environmentId: Scalars['ID']['input'];
+  input: CreateContextStoreInput;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateContextStoreSourceArgs = {
+  input: CreateContextStoreSourceInput;
+};
+
+
 export type MutationCreateCustomComponentArgs = {
   language: CustomComponentLanguage;
   name: Scalars['String']['input'];
@@ -3059,6 +3210,17 @@ export type MutationDeleteConnectedUserMcpServerArgs = {
 
 
 export type MutationDeleteConnectedUserProjectWorkflowArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteContextStoreArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteContextStoreSourceArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -3386,6 +3548,11 @@ export type MutationRecordReferencedAiHubChatArtifactArgs = {
 };
 
 
+export type MutationRefreshContextStoreSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveDataTableColumnArgs = {
   input: RemoveColumnInput;
 };
@@ -3473,6 +3640,12 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSetContextStoreSourceEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3745,6 +3918,26 @@ export type MutationUpdateComponentRuleSettingsArgs = {
   approvalExpiresInHours: Scalars['Int']['input'];
   observeMode: Scalars['Boolean']['input'];
   workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpdateContextStoreArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateContextStoreInput;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateContextStoreSourceArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateContextStoreSourceInput;
+};
+
+
+export type MutationUpdateContextStoreTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags: Array<TagInput>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -4387,6 +4580,26 @@ export type Query = {
   connectionComponentDefinition: ComponentDefinition;
   connectionDefinition: ConnectionDefinition;
   connectionDefinitions: Array<ConnectionDefinition>;
+  contextStore?: Maybe<ContextStore>;
+  /**
+   * Resolve a (workspace, name, environment) triple to a Context Store id. Building block for env-aware
+   * workflows that target a store by stable name across DEVELOPMENT / STAGING / PRODUCTION instead of a
+   * hardcoded id. Returns null when no store matches in the given environment.
+   */
+  contextStoreIdByName?: Maybe<Scalars['ID']['output']>;
+  contextStoreSource?: Maybe<ContextStoreSource>;
+  contextStoreSources: Array<ContextStoreSource>;
+  /**
+   * All tags used across Context Stores in this workspace. Drives the TagList autocomplete (remainingTags)
+   * on the management page.
+   */
+  contextStoreTags: Array<Tag>;
+  /**
+   * Returns the parent Context Stores in the workspace, filtered by environment. Each Context Store is
+   * env-stamped at creation; sources, records, and ClickHouse projection tables hang off context_store_id and
+   * inherit env transitively.
+   */
+  contextStores: Array<ContextStore>;
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
   customComponentSource: Scalars['String']['output'];
@@ -5017,6 +5230,41 @@ export type QueryConnectionDefinitionArgs = {
 export type QueryConnectionDefinitionsArgs = {
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryContextStoreArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryContextStoreIdByNameArgs = {
+  environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryContextStoreSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryContextStoreSourcesArgs = {
+  environmentId: Scalars['ID']['input'];
+  filter?: InputMaybe<ContextStoreSourceFilter>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryContextStoreTagsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryContextStoresArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -5867,6 +6115,26 @@ export type UpdateAssetFileInput = {
 export type UpdateAssetFileTagsInput = {
   id: Scalars['ID']['input'];
   tags: Array<TagInput>;
+};
+
+export type UpdateContextStoreInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  version: Scalars['Int']['input'];
+};
+
+export type UpdateContextStoreSourceInput = {
+  cadence?: InputMaybe<Scalars['String']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  /**
+   * Phase 17b: optional full-replace cadence update. Null leaves the current value unchanged.
+   * Empty string \"\" clears it (drops back to single-trigger). Any other value replaces it.
+   */
+  fullReplaceCadence?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Phase 17b: optional tombstone strategy update. Null leaves the current value unchanged. */
+  tombstoneStrategy?: InputMaybe<ContextStoreTombstoneStrategy>;
 };
 
 export type UpdateDataTableTagsInput = {
