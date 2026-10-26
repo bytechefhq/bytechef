@@ -25,6 +25,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookRequest
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookTriggerFlags;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookValidateResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookEnableOutputResult;
+import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
@@ -38,24 +39,15 @@ import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
-import com.google.protobuf.util.JsonFormat;
 import java.util.List;
-import java.util.Map;
 import org.jspecify.annotations.Nullable;
-import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.IntNode;
-import tools.jackson.databind.node.LongNode;
-import tools.jackson.databind.node.ObjectNode;
 
 /**
- * Maps component definitions and component execution results to their proto messages and back. Both directions go
- * through JSON: the proto schema fixes the wire contract and rejects any domain field it does not declare, while the
- * domain objects are read back the way Jackson builds them.
+ * Maps component definitions and component execution results to their proto messages and back through
+ * {@link ProtoJsonMapper}, reading the abstract {@link BaseProperty} as a component {@link Property}.
  *
  * @version ee
  *
@@ -63,16 +55,13 @@ import tools.jackson.databind.node.ObjectNode;
  */
 public class ComponentProtoMapper {
 
-    private static final JsonFormat.Parser PARSER = JsonFormat.parser();
-    private static final JsonFormat.Printer PRINTER = JsonFormat.printer()
-        .alwaysPrintFieldsWithNoPresence();
-
-    private final ObjectMapper objectMapper;
+    private final ProtoJsonMapper protoJsonMapper;
 
     public ComponentProtoMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper.rebuild()
-            .addMixIn(BaseProperty.class, ComponentBasePropertyMixIn.class)
-            .build();
+        this.protoJsonMapper = new ProtoJsonMapper(
+            objectMapper.rebuild()
+                .addMixIn(BaseProperty.class, ComponentBasePropertyMixIn.class)
+                .build());
     }
 
     public List<Option> toOptions(RemoteOptions remoteOptions) {
@@ -238,57 +227,11 @@ public class ComponentProtoMapper {
     }
 
     private <T> T toDomain(MessageOrBuilder messageOrBuilder, Class<T> valueType) {
-        try {
-            JsonNode jsonNode = objectMapper.readTree(PRINTER.print(messageOrBuilder));
-
-            return objectMapper.treeToValue(toIntegralNumbers(jsonNode), valueType);
-        } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
-            throw new IllegalStateException(
-                "Unable to read %s from its proto message".formatted(valueType.getSimpleName()),
-                invalidProtocolBufferException);
-        }
+        return protoJsonMapper.toObject(messageOrBuilder, valueType);
     }
 
-    private static JsonNode toIntegralNumbers(JsonNode jsonNode) {
-        if (jsonNode.isDouble()) {
-            double number = jsonNode.doubleValue();
-
-            if (number == Math.rint(number) && Math.abs(number) < 0x1p53) {
-                long longValue = (long) number;
-
-                return longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE
-                    ? IntNode.valueOf((int) longValue) : LongNode.valueOf(longValue);
-            }
-
-            return jsonNode;
-        }
-
-        if (jsonNode instanceof ObjectNode objectNode) {
-            for (Map.Entry<String, JsonNode> entry : objectNode.properties()) {
-                entry.setValue(toIntegralNumbers(entry.getValue()));
-            }
-        } else if (jsonNode instanceof ArrayNode arrayNode) {
-            for (int index = 0; index < arrayNode.size(); index++) {
-                arrayNode.set(index, toIntegralNumbers(arrayNode.get(index)));
-            }
-        }
-
-        return jsonNode;
-    }
-
-    @SuppressWarnings("unchecked")
     private <M extends Message> M toProto(Object value, Message.Builder builder) {
-        try {
-            PARSER.merge(objectMapper.writeValueAsString(value), builder);
-        } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
-            throw new IllegalStateException(
-                "Unable to write %s to its proto message".formatted(
-                    value.getClass()
-                        .getSimpleName()),
-                invalidProtocolBufferException);
-        }
-
-        return (M) builder.build();
+        return protoJsonMapper.toProto(value, builder);
     }
 
     @JsonTypeInfo(
