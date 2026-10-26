@@ -69,8 +69,11 @@ const ProjectDeploymentListItem = ({
     });
 
     const enableProjectDeploymentMutation = useEnableProjectDeploymentMutation({
-        onSuccess: () => {
-            captureProjectDeploymentEnabled();
+        onSuccess: (_, variables) => {
+            if (variables.enable) {
+                captureProjectDeploymentEnabled();
+            }
+
             queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
         },
     });
