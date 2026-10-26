@@ -15,6 +15,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:ee:libs:config:tenant-multi-data-config"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     testImplementation(project(":server:libs:test:test-support"))
 

@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.JdbcLogFileStorage;
@@ -60,11 +61,26 @@ class LogFileStorageConfigurationTest {
                 .isInstanceOf(LogFileStorageImpl.class));
     }
 
-    private ApplicationContextRunner contextRunner(Provider provider) {
-        ApplicationProperties applicationProperties = new ApplicationProperties();
-        ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
+    @Test
+    void testUsesTheJdbcFileStorageServiceWithTheJdbcProviderWithoutADatabase() {
+        ApplicationProperties applicationProperties = createApplicationProperties(Provider.JDBC);
 
-        fileStorage.setProvider(provider);
+        new ApplicationContextRunner()
+            .withUserConfiguration(LogFileStorageConfiguration.class)
+            .withBean(ApplicationProperties.class, () -> applicationProperties)
+            .withBean(
+                FileStorageServiceRegistry.class,
+                () -> new FileStorageServiceRegistry(List.of(new Base64FileStorageService())))
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+                assertThat(context.getBean(LogFileStorage.class)).isInstanceOf(LogFileStorageImpl.class);
+                assertThat(context.getBean(EditorLogFileStorage.class)).isNotNull();
+                assertThat(context.getBean(TriggerLogFileStorage.class)).isNotNull();
+            });
+    }
+
+    private ApplicationContextRunner contextRunner(Provider provider) {
+        ApplicationProperties applicationProperties = createApplicationProperties(provider);
 
         return new ApplicationContextRunner()
             .withUserConfiguration(LogFileStorageConfiguration.class)
@@ -74,5 +90,14 @@ class LogFileStorageConfigurationTest {
                 () -> new FileStorageServiceRegistry(
                     List.of(new FilesystemFileStorageService(baseDirectory.toString()))))
             .withBean(NamedParameterJdbcOperations.class, () -> mock(NamedParameterJdbcOperations.class));
+    }
+
+    private static ApplicationProperties createApplicationProperties(Provider provider) {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+        ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
+
+        fileStorage.setProvider(provider);
+
+        return applicationProperties;
     }
 }
