@@ -18,9 +18,26 @@ import java.util.List;
  */
 public interface ApiConnectorFacade {
 
-    ApiConnector generateFromDocumentation(String componentName, String documentationUrl);
+    void deleteApiConnector(long id);
+
+    /**
+     * Deletes stored specification and definition files that no API connector references.
+     *
+     * @return the number of deleted files
+     */
+    int deleteOrphanedFiles();
+
+    ApiConnector generateFromDocumentation(String componentName, String documentationUrl, String icon);
+
+    ApiConnectorDTO getApiConnector(long id);
 
     List<ApiConnectorDTO> getApiConnectors();
 
-    ApiConnector importOpenApiSpecification(String componentName, String specification);
+    ApiConnector importOpenApiSpecification(String componentName, String icon, String specification);
+
+    /**
+     * Updates an existing API connector from a new specification and regenerates its definition. A non-null
+     * {@code version} must match the stored version.
+     */
+    ApiConnector updateApiConnector(long id, String componentName, String icon, String specification, Integer version);
 }

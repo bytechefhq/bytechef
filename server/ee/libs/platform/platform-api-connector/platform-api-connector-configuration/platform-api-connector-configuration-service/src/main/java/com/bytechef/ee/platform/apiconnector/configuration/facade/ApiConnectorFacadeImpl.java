@@ -17,13 +17,16 @@ import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiComp
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.IOException;
@@ -34,10 +37,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +60,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ConditionalOnEEVersion
 public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiConnectorFacadeImpl.class);
 
     private final ApiConnectorAiService apiConnectorAiService;
     private final ApiConnectorFileStorage apiConnectorFileStorage;
@@ -67,7 +79,19 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     }
 
     @Override
-    public ApiConnector generateFromDocumentation(String name, String documentationUrl) {
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void deleteApiConnector(long id) {
+        ApiConnector apiConnector = apiConnectorService.getApiConnector(id);
+
+        apiConnectorService.delete(id);
+
+        deleteFileEntry(apiConnector.getDefinition(), apiConnectorFileStorage::deleteApiConnectorDefinition);
+        deleteFileEntry(apiConnector.getSpecification(), apiConnectorFileStorage::deleteApiConnectorSpecification);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnector generateFromDocumentation(String name, String documentationUrl, String icon) {
         if (apiConnectorAiService == null) {
             throw new ConfigurationException(
                 "AI service is not configured. Please configure bytechef.ai.copilot settings.",
@@ -76,13 +100,83 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
         String specification = apiConnectorAiService.generateOpenApiSpecification(documentationUrl);
 
-        return importOpenApiSpecification(name, specification);
+        return importOpenApiSpecification(name, icon, specification);
     }
 
     @Override
-    public ApiConnector importOpenApiSpecification(String name, String specification) {
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnector importOpenApiSpecification(String name, String icon, String specification) {
         name = convertComponentName(name);
 
+        GeneratedDefinition generatedDefinition = generateDefinition(name, specification);
+
+        ApiConnector apiConnector = apiConnectorService.fetchApiConnector(name, 1)
+            .orElse(null);
+        boolean isNew = false;
+
+        if (apiConnector == null) {
+            apiConnector = new ApiConnector();
+            isNew = true;
+        }
+
+        FileEntry oldDefinition = apiConnector.getDefinition();
+        FileEntry oldSpecification = apiConnector.getSpecification();
+
+        applyGeneratedDefinition(apiConnector, name, icon, specification, generatedDefinition);
+
+        if (isNew) {
+            return apiConnectorService.create(apiConnector);
+        }
+
+        ApiConnector updatedApiConnector = apiConnectorService.update(apiConnector);
+
+        deleteReplacedFileEntry(oldDefinition, updatedApiConnector.getDefinition(),
+            apiConnectorFileStorage::deleteApiConnectorDefinition);
+        deleteReplacedFileEntry(oldSpecification, updatedApiConnector.getSpecification(),
+            apiConnectorFileStorage::deleteApiConnectorSpecification);
+
+        return updatedApiConnector;
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnector updateApiConnector(long id, String name, String icon, String specification, Integer version) {
+        ApiConnector curApiConnector = apiConnectorService.getApiConnector(id);
+
+        if (version != null && curApiConnector.getVersion() != version) {
+            throw new ConfigurationException(
+                "The API connector was modified by someone else; reload it and reapply the changes",
+                ApiConnectorErrorType.API_CONNECTOR_VERSION_CONFLICT);
+        }
+
+        String componentName = name == null ? curApiConnector.getName() : convertComponentName(name);
+
+        apiConnectorService.fetchApiConnector(componentName, 1)
+            .filter(existingApiConnector -> !Objects.equals(existingApiConnector.getId(), id))
+            .ifPresent(existingApiConnector -> {
+                throw new ConfigurationException(
+                    "An API connector named '%s' already exists".formatted(componentName),
+                    ApiConnectorErrorType.API_CONNECTOR_NAME_ALREADY_EXISTS);
+            });
+
+        GeneratedDefinition generatedDefinition = generateDefinition(componentName, specification);
+
+        FileEntry oldDefinition = curApiConnector.getDefinition();
+        FileEntry oldSpecification = curApiConnector.getSpecification();
+
+        applyGeneratedDefinition(curApiConnector, componentName, icon, specification, generatedDefinition);
+
+        ApiConnector updatedApiConnector = apiConnectorService.update(curApiConnector);
+
+        deleteReplacedFileEntry(oldDefinition, updatedApiConnector.getDefinition(),
+            apiConnectorFileStorage::deleteApiConnectorDefinition);
+        deleteReplacedFileEntry(oldSpecification, updatedApiConnector.getSpecification(),
+            apiConnectorFileStorage::deleteApiConnectorSpecification);
+
+        return updatedApiConnector;
+    }
+
+    private GeneratedDefinition generateDefinition(String name, String specification) {
         Path openApiSpecificationPath;
 
         try {
@@ -99,37 +193,98 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
         OpenAPI openAPI = parseOpenAPIFile(openApiSpecificationPath.toString());
 
-        String definition;
-
         try {
-            definition = OpenApiComponentDefinitionFactory.createComponentDefinitionJson(name, openAPI);
+            return new GeneratedDefinition(
+                openAPI, OpenApiComponentDefinitionFactory.createComponentDefinitionJson(name, openAPI));
         } catch (RuntimeException e) {
             throw new ConfigurationException(e.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
         }
+    }
 
-        ApiConnector apiConnector = apiConnectorService.fetchApiConnector(name, 1)
-            .orElse(null);
-        boolean isNew = false;
+    private void applyGeneratedDefinition(
+        ApiConnector apiConnector, String name, String icon, String specification,
+        GeneratedDefinition generatedDefinition) {
 
-        if (apiConnector == null) {
-            apiConnector = new ApiConnector();
-            isNew = true;
-        }
+        OpenAPI openAPI = generatedDefinition.openAPI();
 
         apiConnector.setName(name);
         apiConnector.setConnectorVersion(1);
-
-        apiConnector.setDefinition(apiConnectorFileStorage.storeApiConnectorDefinition("definition.json", definition));
+        apiConnector.setDefinition(
+            apiConnectorFileStorage.storeApiConnectorDefinition("definition.json", generatedDefinition.definition()));
         apiConnector.setDescription(getDescription(openAPI.getInfo()));
         apiConnector.setSpecification(
             apiConnectorFileStorage.storeApiConnectorSpecification("specification.yaml", specification));
         apiConnector.setTitle(getTitle(name, openAPI.getInfo()));
 
-        if (isNew) {
-            return apiConnectorService.create(apiConnector);
-        } else {
-            return apiConnectorService.update(apiConnector);
+        if (icon != null) {
+            apiConnector.setIcon(icon);
         }
+    }
+
+    private record GeneratedDefinition(OpenAPI openAPI, String definition) {
+    }
+
+    private void deleteReplacedFileEntry(FileEntry oldFileEntry, FileEntry newFileEntry, Consumer<FileEntry> delete) {
+        if (oldFileEntry == null || Objects.equals(oldFileEntry.getUrl(), newFileEntry.getUrl())) {
+            return;
+        }
+
+        deleteFileEntry(oldFileEntry, delete);
+    }
+
+    private void deleteFileEntry(FileEntry fileEntry, Consumer<FileEntry> delete) {
+        if (fileEntry == null) {
+            return;
+        }
+
+        try {
+            delete.accept(fileEntry);
+        } catch (RuntimeException exception) {
+            log.warn("Failed to delete API connector file {}", fileEntry.getName(), exception);
+        }
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public int deleteOrphanedFiles() {
+        Set<String> referencedUrls = new HashSet<>();
+
+        for (ApiConnector apiConnector : apiConnectorService.getApiConnectors()) {
+            if (apiConnector.getDefinition() != null) {
+                referencedUrls.add(apiConnector.getDefinition()
+                    .getUrl());
+            }
+
+            if (apiConnector.getSpecification() != null) {
+                referencedUrls.add(apiConnector.getSpecification()
+                    .getUrl());
+            }
+        }
+
+        int deletedFiles = 0;
+
+        for (FileEntry fileEntry : apiConnectorFileStorage.getApiConnectorDefinitionFileEntries()) {
+            if (!referencedUrls.contains(fileEntry.getUrl())) {
+                deleteFileEntry(fileEntry, apiConnectorFileStorage::deleteApiConnectorDefinition);
+
+                deletedFiles++;
+            }
+        }
+
+        for (FileEntry fileEntry : apiConnectorFileStorage.getApiConnectorSpecificationFileEntries()) {
+            if (!referencedUrls.contains(fileEntry.getUrl())) {
+                deleteFileEntry(fileEntry, apiConnectorFileStorage::deleteApiConnectorSpecification);
+
+                deletedFiles++;
+            }
+        }
+
+        return deletedFiles;
+    }
+
+    @Override
+    public ApiConnectorDTO getApiConnector(long id) {
+        return toApiConnectorDTO(apiConnectorService.getApiConnector(id));
     }
 
     @Override
@@ -143,9 +298,30 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     private ApiConnectorDTO toApiConnectorDTO(ApiConnector apiConnector) {
         String specification = apiConnectorFileStorage.readApiConnectorSpecification(apiConnector.getSpecification());
 
-        OpenAPI openAPI = parseOpenAPIContent(specification);
+        return new ApiConnectorDTO(
+            apiConnector, apiConnectorFileStorage.readApiConnectorDefinition(apiConnector.getDefinition()),
+            specification, getEndpoints(apiConnector, specification));
+    }
 
-        List<ApiConnectorEndpoint> endpoints = openAPI.getPaths()
+    private List<ApiConnectorEndpoint> getEndpoints(ApiConnector apiConnector, String specification) {
+        OpenAPI openAPI;
+
+        try {
+            openAPI = parseOpenAPIContent(specification);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to parse the stored specification of API connector {}", apiConnector.getName(), exception);
+
+            return List.of();
+        }
+
+        Paths paths = openAPI.getPaths();
+
+        if (paths == null) {
+            return List.of();
+        }
+
+        return paths
             .entrySet()
             .stream()
             .flatMap(entry -> {
@@ -172,6 +348,17 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
                         path, operation.getOperationId(), operation.getDescription(), HttpMethod.GET);
 
                     endpoint.setId(generateEndpointId(path, HttpMethod.GET));
+
+                    curEndpoints.add(endpoint);
+                }
+
+                if (pathItem.getHead() != null) {
+                    Operation operation = pathItem.getHead();
+
+                    ApiConnectorEndpoint endpoint = new ApiConnectorEndpoint(
+                        path, operation.getOperationId(), operation.getDescription(), HttpMethod.HEAD);
+
+                    endpoint.setId(generateEndpointId(path, HttpMethod.HEAD));
 
                     curEndpoints.add(endpoint);
                 }
@@ -212,10 +399,6 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
                 return CollectionUtils.stream(curEndpoints);
             })
             .toList();
-
-        return new ApiConnectorDTO(
-            apiConnector, apiConnectorFileStorage.readApiConnectorDefinition(apiConnector.getDefinition()),
-            specification, endpoints);
     }
 
     private static long generateEndpointId(String path, HttpMethod httpMethod) {
@@ -238,7 +421,7 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         }
     }
 
-    private static String convertComponentName(String componentName) {
+    static String convertComponentName(String componentName) {
         componentName = StringUtils.trim(componentName);
 
         componentName = componentName.toLowerCase();
@@ -247,7 +430,20 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
         componentName = StringUtils.replaceChars(componentName, " ", "");
 
+        validateComponentName(componentName);
+
         return componentName;
+    }
+
+    private static void validateComponentName(String componentName) {
+        if (StringUtils.isBlank(componentName) || !componentName.matches("[a-z0-9.]+") ||
+            componentName.contains("..") || StringUtils.startsWith(componentName, ".") ||
+            StringUtils.endsWith(componentName, ".")) {
+
+            throw new ConfigurationException(
+                "Invalid API connector name; only letters, digits, and dots are allowed",
+                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
     }
 
     private String getDescription(Info info) {
@@ -288,10 +484,12 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
         OpenAPI openAPI = result.getOpenAPI();
 
-        List<String> messages = result.getMessages();
+        if (openAPI == null) {
+            List<String> messages = result.getMessages();
 
-        if (messages != null && !messages.isEmpty()) {
-            throw new IllegalArgumentException(String.join("\n", messages));
+            throw new IllegalArgumentException(
+                messages == null || messages.isEmpty() ? "Invalid OpenAPI specification"
+                    : String.join("\n", messages));
         }
 
         return openAPI;
