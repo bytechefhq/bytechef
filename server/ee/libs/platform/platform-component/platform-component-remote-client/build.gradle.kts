@@ -6,7 +6,6 @@ dependencies {
 
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-grpc"))
-    implementation(project(":server:ee:libs:core:remote:remote-client"))
     implementation(project(":server:ee:libs:core:discovery:discovery-util"))
 
     testImplementation("io.grpc:grpc-inprocess")
