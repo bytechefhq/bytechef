@@ -16,11 +16,16 @@
 
 package com.bytechef.platform.workflow.coordinator.trigger.completion;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.coordinator.trigger.jobparameter.JobMetadataKeys;
+import com.bytechef.platform.workflow.coordinator.trigger.jobparameter.TriggerJobParameterContributor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -30,6 +35,8 @@ import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,23 +51,30 @@ public class TriggerCompletionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(TriggerCompletionHandler.class);
 
+    private static final String TRIGGER_EXTENSION_JOB_PARAMETERS = "jobParameters";
+
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobFacade principalJobFacade;
+    private final List<TriggerJobParameterContributor> triggerJobParameterContributors;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
     private final TriggerStateFacade triggerStateFacade;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public TriggerCompletionHandler(
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
+        List<TriggerJobParameterContributor> triggerJobParameterContributors,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
-        TriggerStateFacade triggerStateFacade) {
+        TriggerStateFacade triggerStateFacade, WorkflowService workflowService) {
 
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobFacade = principalJobFacade;
+        this.triggerJobParameterContributors = triggerJobParameterContributors;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.triggerStateFacade = triggerStateFacade;
+        this.workflowService = workflowService;
     }
 
     @SuppressWarnings("unchecked")
@@ -88,7 +102,8 @@ public class TriggerCompletionHandler {
 
         Map<String, Object> inputMap = (Map<String, Object>) getInputMap(workflowExecutionId);
         String workflowId = getWorkflowId(workflowExecutionId);
-        Map<String, ?> metadataMap = getMetadataMap(workflowExecutionId);
+        Map<String, ?> metadataMap = enrichMetadataWithJobParameters(
+            getMetadataMap(workflowExecutionId), workflowId, triggerExecution.getName(), workflowExecutionId);
 
         Object output = triggerExecution.getOutput() == null
             ? null
@@ -162,5 +177,72 @@ public class TriggerCompletionHandler {
             workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getMetadataMap(workflowExecutionId.getJobPrincipalId());
+    }
+
+    private Map<String, ?> enrichMetadataWithJobParameters(
+        Map<String, ?> metadataMap, String workflowId, String triggerName, WorkflowExecutionId workflowExecutionId) {
+
+        Workflow workflow;
+
+        try {
+            workflow = workflowService.getWorkflow(workflowId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to load workflow {} for trigger {} jobParameter enrichment: {}",
+                workflowId, triggerName, exception.getMessage());
+
+            return metadataMap;
+        }
+
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(triggerName, workflow);
+
+        Map<String, Object> jobParameters = assembleJobParameters(
+            workflowTrigger, workflow.getMetadata(), workflowExecutionId, triggerJobParameterContributors);
+
+        if (jobParameters.isEmpty()) {
+            return metadataMap;
+        }
+
+        Map<String, Object> enrichedMetadataMap = new LinkedHashMap<>(metadataMap);
+
+        enrichedMetadataMap.put(JobMetadataKeys.JOB_PARAMETERS, jobParameters);
+
+        return enrichedMetadataMap;
+    }
+
+    static Map<String, Object> assembleJobParameters(
+        WorkflowTrigger workflowTrigger, Map<String, Object> workflowMetadata,
+        WorkflowExecutionId workflowExecutionId, List<TriggerJobParameterContributor> contributors) {
+
+        Map<String, Object> jobParameters = new LinkedHashMap<>();
+
+        if (workflowTrigger != null) {
+            Map<?, ?> triggerJobParameters = workflowTrigger.getExtension(
+                TRIGGER_EXTENSION_JOB_PARAMETERS, Map.class, Map.of());
+
+            triggerJobParameters.forEach((key, value) -> jobParameters.put(String.valueOf(key), value));
+        }
+
+        for (TriggerJobParameterContributor contributor : contributors) {
+            Map<String, ?> contribution;
+
+            try {
+                contribution = contributor.contribute(workflowMetadata, workflowExecutionId);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "TriggerJobParameterContributor {} threw while contributing: {}",
+                    contributor.getClass()
+                        .getSimpleName(),
+                    exception.getMessage());
+
+                continue;
+            }
+
+            if (contribution != null && !contribution.isEmpty()) {
+                jobParameters.putAll(contribution);
+            }
+        }
+
+        return jobParameters;
     }
 }

@@ -89,12 +89,20 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
+        Map<String, ?> jobParameterOverrides = extractJobParameterOverrides(actionContextAware.getJobMetadata());
+
         JobParameters jobParameters = new JobParameters(
             new HashSet<>() {
                 {
                     ClusterElement clusterElement = clusterElementMap.getClusterElement(DESTINATION);
 
                     Map<String, Object> value = getValue(clusterElement, connectionParameters);
+
+                    Object datastreamModeOverride = jobParameterOverrides.get("datastream.mode");
+
+                    if (datastreamModeOverride != null) {
+                        value.put("mode", String.valueOf(datastreamModeOverride));
+                    }
 
                     add(new JobParameter<>(DESTINATION.name(), value, Map.class));
 
@@ -136,6 +144,25 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                             new JobParameter<>(
                                 MODE_TYPE, String.valueOf(actionContextAware.getPlatformType()), String.class));
                     }
+
+                    for (Map.Entry<String, ?> entry : jobParameterOverrides.entrySet()) {
+                        String overrideKey = entry.getKey();
+                        Object overrideValue = entry.getValue();
+
+                        if (overrideValue == null || "datastream.mode".equals(overrideKey)) {
+                            continue;
+                        }
+
+                        if (overrideValue instanceof Long longValue) {
+                            add(new JobParameter<>(overrideKey, longValue, Long.class));
+                        } else if (overrideValue instanceof Number numberValue) {
+                            add(new JobParameter<>(overrideKey, numberValue.longValue(), Long.class));
+                        } else if (overrideValue instanceof Boolean booleanValue) {
+                            add(new JobParameter<>(overrideKey, booleanValue, Boolean.class));
+                        } else {
+                            add(new JobParameter<>(overrideKey, String.valueOf(overrideValue), String.class));
+                        }
+                    }
                 }
             });
 
@@ -162,6 +189,17 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
             "endTime", Objects.requireNonNull(jobExecution.getEndTime()),
             "status", jobExecution.getStatus(),
             "startTime", Objects.requireNonNull(jobExecution.getStartTime()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, ?> extractJobParameterOverrides(Map<String, Object> jobMetadata) {
+        Object value = jobMetadata.get("__jobParameters");
+
+        if (value instanceof Map<?, ?>) {
+            return (Map<String, ?>) value;
+        }
+
+        return Map.of();
     }
 
     private static @NonNull Map<String, Object> getValue(

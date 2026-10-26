@@ -21,10 +21,10 @@ import com.bytechef.component.datastream.converter.StringToMapConverter;
 import com.bytechef.component.datastream.item.ItemStreamProcessorDelegate;
 import com.bytechef.component.datastream.item.ItemStreamReaderDelegate;
 import com.bytechef.component.datastream.item.ItemStreamWriterDelegate;
-import com.bytechef.component.datastream.listener.DataStreamJobExecutionListener;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -32,6 +32,7 @@ import org.springframework.batch.core.configuration.support.JdbcDefaultBatchConf
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.parameters.RunIdIncrementer;
+import org.springframework.batch.core.listener.JobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -66,9 +67,14 @@ public class DataStreamConfiguration extends JdbcDefaultBatchConfiguration {
     }
 
     @Bean
-    Job dataStreamJob(JobRepository jobRepository, Step step1, DataStreamJobExecutionListener listener) {
-        return new JobBuilder("dataStreamJob", jobRepository)
-            .listener(listener)
+    Job dataStreamJob(JobRepository jobRepository, Step step1, List<JobExecutionListener> jobExecutionListeners) {
+        JobBuilder jobBuilder = new JobBuilder("dataStreamJob", jobRepository);
+
+        for (JobExecutionListener jobExecutionListener : jobExecutionListeners) {
+            jobBuilder = jobBuilder.listener(jobExecutionListener);
+        }
+
+        return jobBuilder
             .incrementer(new RunIdIncrementer())
             .start(step1)
             .build();

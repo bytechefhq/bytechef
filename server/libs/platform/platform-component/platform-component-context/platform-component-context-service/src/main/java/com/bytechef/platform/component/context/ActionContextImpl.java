@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ClusterElementContext;
@@ -38,6 +39,7 @@ import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -47,6 +49,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -54,6 +58,8 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Ivica Cardic
  */
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
+
+    private static final Logger log = LoggerFactory.getLogger(ActionContextImpl.class);
 
     private final String actionName;
     private @Nullable Approval approval;
@@ -68,6 +74,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable Long jobPrincipalId;
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
+    private @Nullable Map<String, Object> jobMetadata;
+    private final @Nullable JobService jobService;
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
     private volatile @Nullable String jobResumeId;
     private volatile @Nullable Suspend suspend;
@@ -117,6 +125,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.jobPrincipalId = builder.jobPrincipalId;
         this.jobPrincipalWorkflowId = builder.jobPrincipalWorkflowId;
         this.jobId = builder.jobId;
+        this.jobService = builder.jobService;
         this.publicUrl = builder.publicUrl;
         this.suspendTarget = builder.suspendTarget;
         this.type = builder.type;
@@ -147,6 +156,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
                 .jobId(jobId)
                 .jobPrincipalId(jobPrincipalId)
                 .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+                .jobService(jobService)
                 .logFileStorageWriter(logFileStorageWriter)
                 .publicUrl(publicUrl)
                 .taskExecutionId(taskExecutionId)
@@ -180,6 +190,18 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .orElse(innerToken);
     }
 
+    private static Map<String, Object> toObjectMap(@Nullable Map<String, ?> source) {
+        if (source == null || source.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, Object> copy = new HashMap<>(source.size());
+
+        source.forEach(copy::put);
+
+        return Collections.unmodifiableMap(copy);
+    }
+
     static final class Builder {
 
         private final String actionName;
@@ -196,6 +218,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable Long jobId;
         private @Nullable Long jobPrincipalId;
         private @Nullable Long jobPrincipalWorkflowId;
+        private @Nullable JobService jobService;
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
         private @Nullable ActionContextAware suspendTarget;
@@ -249,6 +272,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         Builder jobPrincipalId(@Nullable Long jobPrincipalId) {
             this.jobPrincipalId = jobPrincipalId;
+
+            return this;
+        }
+
+        Builder jobService(@Nullable JobService jobService) {
+            this.jobService = jobService;
 
             return this;
         }
@@ -459,6 +488,32 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Nullable
     public Long getJobId() {
         return jobId;
+    }
+
+    @Override
+    @SuppressFBWarnings("EI_EXPOSE_REP")
+    public Map<String, Object> getJobMetadata() {
+        if (jobMetadata != null) {
+            return jobMetadata;
+        }
+
+        if (jobId == null || jobService == null) {
+            jobMetadata = Map.of();
+
+            return jobMetadata;
+        }
+
+        try {
+            jobMetadata = jobService.fetchJob(jobId)
+                .map(job -> toObjectMap(job.getMetadata()))
+                .orElseGet(Map::of);
+        } catch (RuntimeException exception) {
+            log.warn("Failed to load job {} metadata: {}", jobId, exception.getMessage());
+
+            jobMetadata = Map.of();
+        }
+
+        return jobMetadata;
     }
 
     @Override
