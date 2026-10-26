@@ -4,7 +4,7 @@
 
 **Goal:** One `docker compose up` starts the EE microservice deployment, and the milestone 1 flow works end to end through the gateway.
 
-**Architecture:** One shared Dockerfile builds an image per app from its boot jar (the gateway's image also carries the built React client). `docker-compose.microservices.yml`, modeled on `docker-compose.cluster.yml`, starts Postgres, Redis, RabbitMQ, Mailpit, a one-shot `migrate` service and the eight apps, configured only through environment variables, with only the gateway (and the Mailpit UI) published. A live run of the milestone 1 flow then finds the stub calls that matter; each is implemented over gRPC with a failing test first. The public distributed-installation page is rewritten for this layout.
+**Architecture:** One shared Dockerfile builds an image per app from its boot jar (the gateway's image also carries the built React client). `docker-compose.microservices.yml`, modeled on `docker-compose.cluster.yml`, starts Postgres, Redis, RabbitMQ, Mailpit, a one-shot `migrate` service (the light `migration-app`) and the eight apps, configured only through environment variables, with only the gateway (and the Mailpit UI) published. A live run of the milestone 1 flow then finds the stub calls that matter; each is implemented over gRPC with a failing test first. The public distributed-installation page is rewritten for this layout.
 
 **Tech Stack:** Docker / Docker Compose v2, GraalVM community 25 base image, Spring Boot 4.1.1, Gradle, React client build (`npm run build`), Playwright (or Chrome DevTools) MCP for the browser run.
 
@@ -24,17 +24,17 @@
 
 ## Decided here (Claude's calls, open to override)
 
-- **`migrate` runs the monolith image's `liquibase` command**, exactly as `docker-compose.cluster.yml` does, and every app gets `SPRING_LIQUIBASE_ENABLED=false`. Reason: the apps' own contexts (`user`, `configuration`, `execution`, `connection`, `scheduler`) skip 28 changesets that carry only the `mono` context, so a schema built by the apps alone would miss tables; the monolith's migration runs every changelog once, before anything starts. This is the only place the monolith image appears; runtime services are the microservice images (decision 6).
+- **`migrate` runs a light `migration-app` image** (user's call: no monolith image in this deployment), and every other app gets `SPRING_LIQUIBASE_ENABLED=false`. Reason for one migration step: the apps' own contexts (`user`, `configuration`, `execution`, `connection`, `scheduler`) skip 28 changesets that carry only the `mono` context, so a schema built by the apps alone would miss tables. `migration-app` is a non-web Spring Boot app holding only the datasource, Liquibase, every module's changelog files (copied at build time, no module code) and the multi-tenant changelog loader; it runs every changelog once with the `mono` context and exits. Not the plain `liquibase/liquibase` CLI image: in multi-tenant mode `MultiTenantLiquibaseChangelogLoader` reads the tenant ids from the database and migrates each tenant schema in Java, which the CLI cannot do without a shell loop over `psql`.
 - **Images are built by Compose** from `build:` sections (shared Dockerfile, `APP_NAME` build argument, `gateway` target adds the client), after `./gradlew bootJar` for the apps and `npm run build` in `client/`. No separate build script.
 - **Compose file name:** `docker-compose.microservices.yml` at the repository root, next to `docker-compose.cluster.yml`.
 
 ## Review Focus
 
-1. A browser session written by the gateway at login is honored by configuration-app's `/graphql` and execution-app's REST calls (the shared Redis session across containers). Pinned in Task 4 checklist items 1 and 4.
-2. Discovery registers each container's own address and gRPC port; the gateway's `lb://` routes and the gRPC `discovery:///` targets reach the right container. Pinned in Task 3 (`docker compose up --wait` all healthy) and Task 4 item 1.
-3. Webhook URLs shown in the editor point at the gateway's public URL, not an internal container address. Pinned in Task 4 item 5.
-4. A scheduled trigger fires exactly once per tick with one scheduler and one coordinator. Pinned in Task 4 item 6.
-5. Restarting one service (configuration-app) keeps the user logged in and the gateway routes to the new container. Pinned in Task 4 item 8.
+1. A browser session written by the gateway at login is honored by configuration-app's `/graphql` and execution-app's REST calls (the shared Redis session across containers). Pinned in Task 5 checklist items 1 and 4.
+2. Discovery registers each container's own address and gRPC port; the gateway's `lb://` routes and the gRPC `discovery:///` targets reach the right container. Pinned in Task 4 (`docker compose up --wait` all healthy) and Task 5 item 1.
+3. Webhook URLs shown in the editor point at the gateway's public URL, not an internal container address. Pinned in Task 5 item 5.
+4. A scheduled trigger fires exactly once per tick with one scheduler and one coordinator. Pinned in Task 5 item 6.
+5. Restarting one service (configuration-app) keeps the user logged in and the gateway routes to the new container. Pinned in Task 5 item 8.
 
 ---
 
@@ -71,7 +71,49 @@ git commit -m "Take configuration-app mail settings from bytechef.mail like the 
 
 ---
 
-### Task 2: One image per app
+### Task 2: A light migration app
+
+**Files:**
+- Create: `server/ee/apps/migration-app/build.gradle.kts` (group `com.bytechef.migration`, main class `com.bytechef.migration.MigrationApplication`; dependencies only `spring-boot-starter-jdbc`, `liquibase-core`, `postgresql` runtime, `:server:libs:config:liquibase-config`, `:server:libs:config:logback-config`, `:server:ee:libs:config:tenant-multi-data-config` and what it needs to start in multi mode; `processResources` also copies `src/main/resources/config/liquibase/**` from every other project's directory (`rootProject.subprojects`, main resources only, never test resources) with `duplicatesStrategy = DuplicatesStrategy.FAIL` so two modules shipping the same changelog path break the build)
+- Modify: `settings.gradle.kts` (`include("server:ee:apps:migration-app")` in the EE apps block, alphabetical)
+- Create: `server/ee/apps/migration-app/src/main/java/com/bytechef/migration/MigrationApplication.java` (`SpringApplication` with web type `NONE`; `main` exits with `SpringApplication.exit(context)` once the context is up, so the container stops with code 0 after `SpringLiquibase` ran during startup, and non-zero when a changeset fails)
+- Create: `server/ee/apps/migration-app/src/main/resources/config/application.yml` (`spring.application.name: migration-app`, `spring.main.web-application-type: none`, `spring.liquibase.enabled: true`, `spring.liquibase.contexts: mono` and `parameters.billing.enabled: ${billing.enabled:false}` as in `server-app`'s `application.yml`, `bytechef.edition: ee`, tenant mode from `bytechef.tenant.mode`)
+- Test: `server/ee/apps/migration-app/src/test/java/com/bytechef/migration/MigrationApplicationIntTest.java`, `src/test/resources/config/application-testint.yml`
+
+**Interfaces:**
+- Produces: boot jar `server/ee/apps/migration-app/build/libs/migration-app.jar`, built into an image by Task 3's `app` target with `APP_NAME=migration-app`; Task 4's `migrate` service runs it.
+
+- [ ] **Step 1: Write the failing test**
+
+`MigrationApplicationIntTest` (Postgres Testcontainer, `testint` profile): after the context starts, `databasechangelog` has rows from at least three different modules' changelog paths (`filename` like `%platform/user/%`, `%atlas/execution/%`, `%automation/configuration/%`), and the table created by one `mono`-only changeset exists (find one with `git grep -l 'context="mono"' -- '*/config/liquibase/changelog/*'`). `testNoWebServer`: the context has no `WebServerApplicationContext`.
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Run: `./gradlew :server:ee:apps:migration-app:testIntegration`
+Expected: FAIL (project does not exist).
+
+- [ ] **Step 3: Implement** the files above.
+
+- [ ] **Step 4: Run the tests and the check**
+
+Run: `./gradlew :server:ee:apps:migration-app:check :server:ee:apps:migration-app:testIntegration`
+Expected: PASS.
+
+- [ ] **Step 5: Prove it matches the monolith's migration**
+
+Run: against two empty Postgres databases, `java -jar server/apps/server-app/build/libs/server-app.jar --spring.profiles.active=liquibase` on one and `java -jar server/ee/apps/migration-app/build/libs/migration-app.jar` on the other (same datasource settings otherwise), then `select id, author, filename from databasechangelog order by 1,2,3` on both and `diff` the outputs.
+Expected: no difference. Also `ls -la` both jars: `migration-app.jar` is a small fraction of `server-app.jar` (record the sizes in the ledger).
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add settings.gradle.kts server/ee/apps/migration-app
+git commit -m "Add a light migration app that runs every changelog once and exits"
+```
+
+---
+
+### Task 3: One image per app
 
 **Files:**
 - Create: `server/ee/apps/Dockerfile` (two targets: `app` copies `server/ee/apps/${APP_NAME}/build/libs/${APP_NAME}.jar` into `/opt/bytechef/app/app.jar` on `ghcr.io/graalvm/graalvm-community:25.0.2`, with `/opt/bytechef/app/tmp` and `/opt/bytechef/data/file-storage`, entrypoint `java -Dfile.encoding=UTF-8 -Duser.timezone=GMT -Djava.io.tmpdir=/opt/bytechef/app/tmp -jar app/app.jar` like `runtime-job-app`'s; `gateway` extends `app` and copies `client/dist` into `/opt/bytechef/client/` exactly as the root `Dockerfile` lists the files)
@@ -79,11 +121,11 @@ git commit -m "Take configuration-app mail settings from bytechef.mail like the 
 - Create: `.dockerignore` entries if the build context would otherwise include `node_modules` or `.gradle` (check the existing root `.dockerignore` first)
 
 **Interfaces:**
-- Produces: build context = repository root; targets `app` and `gateway`; build argument `APP_NAME`. Task 3 consumes these in `build:` sections.
+- Produces: build context = repository root; targets `app` and `gateway`; build argument `APP_NAME`. Task 4 consumes these in `build:` sections.
 
 - [ ] **Step 1: Build the jars and the client**
 
-Run: `./gradlew :server:ee:apps:api-gateway-app:bootJar :server:ee:apps:configuration-app:bootJar && (cd client && npm run build)`
+Run: `./gradlew :server:ee:apps:api-gateway-app:bootJar :server:ee:apps:configuration-app:bootJar :server:ee:apps:migration-app:bootJar && (cd client && npm run build)`
 Expected: `server/ee/apps/api-gateway-app/build/libs/api-gateway-app.jar` and `client/dist/index.html` exist (fix the jar name first if it differs).
 
 - [ ] **Step 2: Verify the images do not exist yet / the build fails without the Dockerfile**
@@ -107,13 +149,13 @@ git commit -m "Build one image per microservice from a shared Dockerfile"
 
 ---
 
-### Task 3: The Compose file
+### Task 4: The Compose file
 
 **Files:**
 - Create: `docker-compose.microservices.yml`
 
 **Interfaces:**
-- Consumes: Task 2 targets.
+- Consumes: Task 3 targets; Task 2 jar.
 - Produces: services `postgres`, `redis`, `rabbitmq`, `mailpit`, `migrate`, `api-gateway-app`, `configuration-app`, `connection-app`, `execution-app`, `webhook-app`, `coordinator-app`, `worker-app`, `scheduler-app`.
 
 Content requirements:
@@ -121,9 +163,9 @@ Content requirements:
 - Anchor `x-bytechef-app` with `restart: unless-stopped`, `depends_on` migrate (`service_completed_successfully`), postgres, redis, rabbitmq (`service_healthy`), healthcheck `curl -fs http://localhost:8080/actuator/health/readiness` (as the cluster file), file-storage volume.
 - Each app: `image: ${BYTECHEF_<APP>_IMAGE:-docker.bytechef.io/bytechef/<app>:latest}`, `build:` (context `.`, dockerfile `server/ee/apps/Dockerfile`, target `app` or `gateway`, `args: {APP_NAME: <app>}`), `environment: *bytechef-environment` plus `SPRING_APPLICATION_NAME` only if the app's name differs from the service name (it does not; keep service names equal to `spring.application.name`).
 - `api-gateway-app` publishes `${BYTECHEF_PORT:-8080}:8080` and `depends_on` configuration-app and execution-app healthy; no other app publishes ports.
-- `migrate`: `image: ${BYTECHEF_IMAGE:-docker.bytechef.io/bytechef/bytechef:latest}`, `command: ["liquibase"]`, the environment anchor with `SPRING_LIQUIBASE_ENABLED: "true"` and `BYTECHEF_UPGRADE_ENABLED: "true"`, `restart: "no"`, depends on postgres healthy.
+- `migrate`: `image: ${BYTECHEF_MIGRATION_APP_IMAGE:-docker.bytechef.io/bytechef/migration-app:latest}`, `build:` (target `app`, `APP_NAME: migration-app`), the environment anchor with `SPRING_LIQUIBASE_ENABLED: "true"`, `restart: "no"`, no healthcheck (it exits), depends on postgres healthy. No monolith image anywhere in the file (`grep -c "bytechef/bytechef:" docker-compose.microservices.yml` prints 0).
 - `mailpit`: `axllent/mailpit`, publishes `${MAILPIT_UI_PORT:-8025}:8025`.
-- Volumes `postgres`, `file-storage`. A header comment lists the required variables and the build commands from Task 2 Step 1.
+- Volumes `postgres`, `file-storage`. A header comment lists the required variables and the build commands from Task 3 Step 1.
 
 - [ ] **Step 1: Verify the missing-secret failure**
 
@@ -150,11 +192,11 @@ git commit -m "Add the Docker Compose file for the EE microservices"
 
 ---
 
-### Task 4: Live milestone 1 run
+### Task 5: Live milestone 1 run
 
 **Files:** whatever the run shows is missing. Stub calls the flow hits are implemented over gRPC following plan 3's pattern (proto in the owning `*-remote-grpc-proto`, server in `*-remote-grpc` gated `@ConditionalOnClass` on the implementation, client method in `*-remote-client` with `get*` = fetch + the local exception), each with a wire test written and watched to fail first. A REST client that already works stays REST (plan 3b ports it).
 
-Checklist, all through `http://localhost:8080` in a browser driven by Playwright (or Chrome DevTools) MCP, with the Compose stack from Task 3:
+Checklist, all through `http://localhost:8080` in a browser driven by Playwright (or Chrome DevTools) MCP, with the Compose stack from Task 4:
 1. Sign up a new user (no activation mail needed) and log in; the home page loads its GraphQL data (configuration-app reads the gateway's session).
 2. Create a project and a workflow; add a component task.
 3. Create a connection for a component that needs one (any API-key component; a fake key is fine as long as the connection saves).
@@ -178,7 +220,7 @@ Expected: PASS.
 
 ---
 
-### Task 5: Documentation
+### Task 6: Documentation
 
 **Files:**
 - Modify: `docs/content/docs/platform/use-bytechef/self-hosted/installation/distributed.mdx`
