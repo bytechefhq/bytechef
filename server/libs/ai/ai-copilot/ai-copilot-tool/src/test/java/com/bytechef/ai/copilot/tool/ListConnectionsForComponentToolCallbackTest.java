@@ -111,8 +111,11 @@ class ListConnectionsForComponentToolCallbackTest {
             .asLong()).isEqualTo(42L);
         assertThat(node.get("connections")
             .get(0)
-            .get("active")
+            .get("inUse")
             .asBoolean()).isTrue();
+        assertThat(node.get("connections")
+            .get(0)
+            .has("active")).isFalse();
     }
 
     @Test
