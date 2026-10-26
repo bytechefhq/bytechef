@@ -80,6 +80,30 @@ class CacheInvalidationConfigurationTest {
     }
 
     @Test
+    void testWrapsCacheManagerWithAwsBrokerAndRedisControlProvider() {
+        contextRunner(
+            "bytechef.edition=ee", "bytechef.message-broker.provider=aws",
+            "bytechef.message-broker.aws.control-provider=redis")
+                .run(context -> assertThat(context.getBean(CacheManager.class))
+                    .isInstanceOf(ClusterInvalidatingCacheManager.class));
+    }
+
+    @Test
+    void testLeavesCacheManagerWithAwsBrokerAndSqsControlProvider() {
+        contextRunner(
+            "bytechef.edition=ee", "bytechef.message-broker.provider=aws",
+            "bytechef.message-broker.aws.control-provider=sqs")
+                .run(context -> assertThat(context.getBean(CacheManager.class))
+                    .isInstanceOf(CaffeineCacheManager.class));
+    }
+
+    @Test
+    void testLeavesCacheManagerWithAwsBrokerWhenControlProviderIsUnset() {
+        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=aws")
+            .run(context -> assertThat(context.getBean(CacheManager.class)).isInstanceOf(CaffeineCacheManager.class));
+    }
+
+    @Test
     void testLeavesCacheManagerWhenBrokerIsUnset() {
         contextRunner("bytechef.edition=ee")
             .run(context -> assertThat(context.getBean(CacheManager.class))

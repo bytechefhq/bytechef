@@ -110,7 +110,7 @@ Workers and webhook nodes do not use sessions, so they keep the session store di
 
 Caffeine is the only cache provider, so every node keeps its own caches. In EE, evictions are broadcast to every other node over the message broker as a control message, and no setting is needed; webhook nodes take part like coordinators. CE runs one coordinator and does not broadcast evictions, so a CE webhook node without the coordinator role does not cache workflow definitions and always reads the current version from the database.
 
-The broadcast needs a broker whose control routes reach every node: `AMQP`, `REDIS`, or `AWS` with `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=redis`. Kafka and JMS deliver a control message to one node only, and the in-memory broker has a single node, so with those brokers there is no cluster-wide invalidation.
+The broadcast needs a broker whose control routes reach every node: `AMQP`, `REDIS`, `KAFKA` (a consumer group per node), `JMS` (a topic), or `AWS` with `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=redis`. With `AWS` and the default `sqs` control provider, a control message reaches one node only, so cache invalidation stays off and every node keeps its caches for up to 10 minutes. The in-memory broker has a single node and needs no invalidation.
 
 ## Known limitations
 

@@ -83,7 +83,7 @@ these messages over a different transport, chosen with `bytechef.message-broker.
 
 | Value | Behaviour |
 |---|---|
-| `sqs` (default) | Control messages go through SQS and reach only one node. Fine for a single node. |
+| `sqs` (default) | Control messages go through SQS and reach only one node. Fine for a single node. EE cache invalidation between nodes is off. |
 | `redis` | Control messages go over Redis pub/sub (for example Amazon ElastiCache), so every node receives them. Required when you run more than one node. Set the connection with `BYTECHEF_REDIS_*`. |
 
 With `sqs` and more than one node, each control message reaches a single node, often not the one that needs it:
