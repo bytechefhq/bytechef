@@ -9,6 +9,8 @@ package com.bytechef.connection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import io.grpc.BindableService;
 import java.util.List;
@@ -58,5 +60,14 @@ public class ConnectionApplicationIntTest {
         assertThat(serviceNames).contains(
             "bytechef.platform.connection.remote.v1.ConnectionRemoteService",
             "bytechef.platform.connection.remote.v1.ConnectionFacadeRemoteService");
+    }
+
+    @Test
+    void testJobPrincipalAccessorsResolveForEveryPlatformType() {
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry = applicationContext.getBean(
+            JobPrincipalAccessorRegistry.class);
+
+        assertThat(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.AUTOMATION)).isNotNull();
+        assertThat(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.EMBEDDED)).isNotNull();
     }
 }
