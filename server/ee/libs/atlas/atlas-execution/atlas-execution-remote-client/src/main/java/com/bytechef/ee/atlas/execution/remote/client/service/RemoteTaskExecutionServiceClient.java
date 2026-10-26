@@ -9,14 +9,17 @@ package com.bytechef.ee.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.BoolResponse;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.TaskExecutionRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -27,47 +30,33 @@ import org.springframework.stereotype.Component;
 public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String TASK_EXECUTION_SERVICE = "/remote/task-execution-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final AtlasExecutionProtoMapper atlasExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteTaskExecutionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteTaskExecutionServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.atlasExecutionProtoMapper = new AtlasExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public boolean cancelIfUnfinished(long id) {
-        Boolean cancelled = loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/cancel-if-unfinished/{id}")
-                .build(id),
-            null, Boolean.class);
+        BoolResponse boolResponse = getStub().cancelIfUnfinished(toIdRequest(id));
 
-        return Boolean.TRUE.equals(cancelled);
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean completeIfNotCancelled(long id) {
-        Boolean completed = loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/complete-if-not-cancelled/{id}")
-                .build(id),
-            null, Boolean.class);
+        BoolResponse boolResponse = getStub().completeIfNotCancelled(toIdRequest(id));
 
-        return Boolean.TRUE.equals(completed);
+        return boolResponse.getValue();
     }
 
     @Override
     public TaskExecution create(TaskExecution taskExecution) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/create")
-                .build(),
-            taskExecution, TaskExecution.class);
+        return atlasExecutionProtoMapper
+            .toTaskExecution(getStub().create(atlasExecutionProtoMapper.toProto(taskExecution)));
     }
 
     @Override
@@ -97,42 +86,22 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public List<TaskExecution> getJobTaskExecutions(long jobId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/get-job-task-executions/{jobId}")
-                .build(jobId),
-            new ParameterizedTypeReference<>() {});
+        return atlasExecutionProtoMapper.toTaskExecutions(getStub().getJobTaskExecutions(toIdRequest(jobId)));
     }
 
     @Override
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/get-parent-task-executions/{parentId}")
-                .build(parentId),
-            new ParameterizedTypeReference<>() {});
+        return atlasExecutionProtoMapper.toTaskExecutions(getStub().getParentTaskExecutions(toIdRequest(parentId)));
     }
 
     @Override
     public TaskExecution getTaskExecution(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/get-task-execution/{id}")
-                .build(id),
-            TaskExecution.class);
+        return atlasExecutionProtoMapper.toTaskExecution(getStub().getTaskExecution(toIdRequest(id)));
     }
 
     @Override
     public TaskExecution getTaskExecutionForUpdate(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/get-task-execution-for-update/{id}")
-                .build(id),
-            TaskExecution.class);
+        return atlasExecutionProtoMapper.toTaskExecution(getStub().getTaskExecutionForUpdate(toIdRequest(id)));
     }
 
     @Override
@@ -226,12 +195,18 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public TaskExecution update(TaskExecution taskExecution) {
-        return loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TASK_EXECUTION_SERVICE + "/update")
-                .build(),
-            taskExecution, TaskExecution.class);
+        return atlasExecutionProtoMapper
+            .toTaskExecution(getStub().update(atlasExecutionProtoMapper.toProto(taskExecution)));
+    }
+
+    private TaskExecutionRemoteServiceGrpc.TaskExecutionRemoteServiceBlockingStub getStub() {
+        return TaskExecutionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 
     @Override

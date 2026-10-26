@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.workflow.worker.remote.grpc;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
+import com.bytechef.ee.atlas.execution.remote.grpc.TaskExecutionProtoMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

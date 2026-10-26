@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package bytechef.platform.workflow.worker.remote.v1;
 
-import "google/protobuf/timestamp.proto";
+import "atlas_execution_remote_service.proto";
 
 option java_multiple_files = true;
 option java_package = "com.bytechef.ee.platform.workflow.worker.remote.grpc.proto";
@@ -13,48 +13,9 @@ service TaskHandlerRemoteService {
 
 message HandleTaskRequest {
   string type = 1;
-  RemoteTaskExecution task_execution = 2;
+  bytechef.atlas.execution.remote.v1.RemoteTaskExecution task_execution = 2;
 }
 
 message HandleTaskResponse {
   optional bytes output = 1;
-}
-
-message RemoteTaskExecution {
-  optional google.protobuf.Timestamp end_date = 1;
-  optional RemoteExecutionError error = 2;
-  optional int64 execution_time = 3;
-  optional bool handled = 4;
-  optional int64 id = 5;
-  optional int64 job_id = 6;
-  optional int32 max_retries = 7;
-  optional bytes metadata = 8;
-  optional bool new = 9;
-  optional RemoteFileEntry output = 10;
-  optional int64 parent_id = 11;
-  optional int32 priority = 12;
-  optional int32 progress = 13;
-  optional int32 retry_attempts = 14;
-  optional string retry_delay = 15;
-  optional int32 retry_delay_factor = 16;
-  optional google.protobuf.Timestamp start_date = 18;
-  optional string status = 19;
-  optional int32 task_number = 20;
-  optional bytes workflow_task = 21;
-  optional string created_by = 22;
-  optional google.protobuf.Timestamp created_date = 23;
-  optional string last_modified_by = 24;
-  optional google.protobuf.Timestamp last_modified_date = 25;
-}
-
-message RemoteExecutionError {
-  optional string message = 1;
-  repeated string stack_trace = 2;
-}
-
-message RemoteFileEntry {
-  optional string extension = 1;
-  optional string mime_type = 2;
-  optional string name = 3;
-  optional string url = 4;
 }
