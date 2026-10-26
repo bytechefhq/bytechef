@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConfigurationWorkflowRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationWorkflowConnectionResult;
@@ -40,6 +41,7 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
 
     public RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceClient(GrpcChannels grpcChannels,
         ObjectMapper objectMapper) {
+
         this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
         this.grpcChannels = grpcChannels;
     }
@@ -68,6 +70,7 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
         fetchIntegrationInstanceConfigurationWorkflowConnection(
             long integrationInstanceConfigurationId, String workflowId, String workflowNodeName,
             String workflowConnectionKey) {
+
         IntegrationInstanceConfigurationWorkflowConnectionResult integrationInstanceConfigurationWorkflowConnectionResult =
             getStub().fetchIntegrationInstanceConfigurationWorkflowConnection(
                 toRequest(integrationInstanceConfigurationId, workflowId, workflowNodeName, workflowConnectionKey));
@@ -89,6 +92,7 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     @Override
     public IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId) {
+
         return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflow(
             getStub().getIntegrationInstanceConfigurationWorkflow(
                 toRequest(integrationInstanceConfigurationId, workflowId, null, null)));
@@ -98,6 +102,7 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     public IntegrationInstanceConfigurationWorkflowConnection getIntegrationInstanceConfigurationWorkflowConnection(
         long integrationInstanceConfigurationId, String workflowId, String operationName,
         String key) {
+
         return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflowConnection(
             getStub().getIntegrationInstanceConfigurationWorkflowConnection(
                 toRequest(integrationInstanceConfigurationId, workflowId, operationName, key)));
@@ -107,6 +112,7 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     public List<IntegrationInstanceConfigurationWorkflowConnection>
         getIntegrationInstanceConfigurationWorkflowConnections(
             Long integrationInstanceConfigurationId, String workflowId, String operationName) {
+
         return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflowConnections(
             getStub().getIntegrationInstanceConfigurationWorkflowConnections(
                 toRequest(integrationInstanceConfigurationId, workflowId, operationName, null)));
@@ -128,11 +134,12 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
 
     @Override
     public boolean isConnectionUsed(long connectionId) {
-        return getStub().isConnectionUsed(
+        BoolResponse boolResponse = getStub().isConnectionUsed(
             IdRequest.newBuilder()
                 .setId(connectionId)
-                .build())
-            .getValue();
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
