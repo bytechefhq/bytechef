@@ -1,0 +1,301 @@
+import AlertDialog from '@/components/AlertDialog';
+import Button from '@/components/Button/Button';
+import EmptyList from '@/components/EmptyList';
+import PageLoader from '@/components/PageLoader';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {
+    useDeleteWorkspaceAiModelMutation,
+    useUnpinWorkspaceAiModelMutation,
+    useWorkspaceAiGatewayProvidersQuery,
+    useWorkspaceAiModelsQuery,
+} from '@/shared/middleware/graphql';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useQueryClient} from '@tanstack/react-query';
+import {BoxesIcon, PencilIcon, PlusIcon, RotateCcwIcon, TrashIcon} from 'lucide-react';
+import {useCallback, useMemo, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
+
+import {AiGatewayModelType} from '../../types';
+import AiGatewayModelDialog from './AiGatewayModelDialog';
+
+const getCatalogBadge = (model: AiGatewayModelType): {className: string; label: string} => {
+    if (model.catalogPinned) {
+        return {
+            className: 'bg-surface-warning-secondary text-content-warning-primary',
+            label: 'Overridden',
+        };
+    }
+
+    if (model.catalogManaged) {
+        return {
+            className: 'bg-surface-success-secondary text-content-success-primary',
+            label: 'Catalog',
+        };
+    }
+
+    return {
+        className: 'bg-surface-neutral-secondary text-content-neutral-primary',
+        label: 'Unmanaged',
+    };
+};
+
+const AiGatewayModels = () => {
+    const [deletingModelId, setDeletingModelId] = useState<string | undefined>(undefined);
+    const [editingModel, setEditingModel] = useState<AiGatewayModelType | undefined>(undefined);
+    const [showDialog, setShowDialog] = useState(false);
+    const [unpinningModelId, setUnpinningModelId] = useState<string | undefined>(undefined);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const isAdmin = useAuthenticationStore(
+        (state) => state.authenticated && (state.account?.authorities?.includes('ROLE_ADMIN') ?? false)
+    );
+
+    const queryClient = useQueryClient();
+
+    const {data: modelsData, isLoading: modelsIsLoading} = useWorkspaceAiModelsQuery({
+        workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
+    });
+    const {data: providersData, isLoading: providersIsLoading} = useWorkspaceAiGatewayProvidersQuery({
+        workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
+    });
+
+    const deleteModelMutation = useDeleteWorkspaceAiModelMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['workspaceAiModels']});
+
+            setDeletingModelId(undefined);
+        },
+    });
+    const unpinModelMutation = useUnpinWorkspaceAiModelMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['workspaceAiModels']});
+
+            setUnpinningModelId(undefined);
+        },
+    });
+
+    const providerNameMap = useMemo(() => {
+        const providerMap = new Map<string, string>();
+
+        for (const provider of providersData?.workspaceAiGatewayProviders ?? []) {
+            if (provider) {
+                providerMap.set(provider.id, provider.name);
+            }
+        }
+
+        return providerMap;
+    }, [providersData]);
+
+    const models = modelsData?.workspaceAiModels ?? [];
+
+    const handleConfirmDelete = useCallback(() => {
+        if (deletingModelId) {
+            deleteModelMutation.mutate({
+                modelId: deletingModelId,
+                workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
+            });
+        }
+    }, [currentWorkspaceId, deleteModelMutation, deletingModelId]);
+
+    const handleConfirmUnpin = useCallback(() => {
+        if (unpinningModelId) {
+            unpinModelMutation.mutate({
+                modelId: unpinningModelId,
+                workspaceId: currentWorkspaceId != null ? String(currentWorkspaceId) : '',
+            });
+        }
+    }, [currentWorkspaceId, unpinModelMutation, unpinningModelId]);
+
+    const handleEditModel = useCallback((model: AiGatewayModelType) => {
+        setEditingModel(model);
+        setShowDialog(true);
+    }, []);
+
+    const handleCloseDialog = useCallback(() => {
+        setShowDialog(false);
+        setEditingModel(undefined);
+    }, []);
+
+    if (modelsIsLoading || providersIsLoading) {
+        return <PageLoader loading={true} />;
+    }
+
+    return (
+        <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
+            {models.length === 0 ? (
+                <EmptyList
+                    button={isAdmin ? <Button label="Add Model" onClick={() => setShowDialog(true)} /> : undefined}
+                    icon={<BoxesIcon className="size-12 text-muted-foreground" />}
+                    message={
+                        isAdmin
+                            ? 'Register models from your configured providers.'
+                            : 'No models are registered yet. An administrator can add them.'
+                    }
+                    title="No Models Registered"
+                />
+            ) : (
+                <>
+                    {isAdmin && (
+                        <div className="mb-4 flex items-center justify-end py-4">
+                            <Button
+                                icon={<PlusIcon className="size-4" />}
+                                label="Add Model"
+                                onClick={() => setShowDialog(true)}
+                            />
+                        </div>
+                    )}
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead>
+                                <tr className="border-b text-muted-foreground">
+                                    <th className="pb-2 font-medium">Name</th>
+
+                                    <th className="pb-2 font-medium">Provider</th>
+
+                                    <th className="pb-2 font-medium">Alias</th>
+
+                                    <th className="pb-2 font-medium">Context Window</th>
+
+                                    <th className="pb-2 font-medium">Input Cost ($/M tokens)</th>
+
+                                    <th className="pb-2 font-medium">Output Cost ($/M tokens)</th>
+
+                                    <th className="pb-2 font-medium">Enabled</th>
+
+                                    <th className="pb-2 font-medium">Source</th>
+
+                                    <th className="pb-2 font-medium">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {models.map((model) => {
+                                    if (!model) {
+                                        return null;
+                                    }
+
+                                    const catalogBadge = getCatalogBadge(model);
+
+                                    return (
+                                        <tr className="border-b" key={model.id}>
+                                            <td className="py-3 font-medium">{model.name}</td>
+
+                                            <td className="py-3">
+                                                {providerNameMap.get(model.providerId) || model.providerId}
+                                            </td>
+
+                                            <td className="py-3 text-muted-foreground">{model.alias || '-'}</td>
+
+                                            <td className="py-3">
+                                                {model.contextWindow
+                                                    ? `${(model.contextWindow / 1000).toFixed(0)}k`
+                                                    : '-'}
+                                            </td>
+
+                                            <td className="py-3">
+                                                {model.inputCostPerMTokens != null
+                                                    ? `$${model.inputCostPerMTokens.toFixed(2)}`
+                                                    : '-'}
+                                            </td>
+
+                                            <td className="py-3">
+                                                {model.outputCostPerMTokens != null
+                                                    ? `$${model.outputCostPerMTokens.toFixed(2)}`
+                                                    : '-'}
+                                            </td>
+
+                                            <td className="py-3">
+                                                <span
+                                                    className={twMerge(
+                                                        'rounded-full px-2 py-0.5 text-xs font-medium',
+                                                        model.enabled
+                                                            ? 'bg-surface-success-secondary text-content-success-primary'
+                                                            : 'bg-surface-neutral-secondary text-content-neutral-primary'
+                                                    )}
+                                                >
+                                                    {model.enabled ? 'Active' : 'Disabled'}
+                                                </span>
+                                            </td>
+
+                                            <td className="py-3">
+                                                <span
+                                                    className={twMerge(
+                                                        'rounded-full px-2 py-0.5 text-xs font-medium',
+                                                        catalogBadge.className
+                                                    )}
+                                                >
+                                                    {catalogBadge.label}
+                                                </span>
+                                            </td>
+
+                                            <td className="py-3">
+                                                {isAdmin ? (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            className="text-muted-foreground hover:text-foreground"
+                                                            onClick={() => handleEditModel(model)}
+                                                        >
+                                                            <PencilIcon className="size-4" />
+                                                        </button>
+
+                                                        {model.catalogPinned && (
+                                                            <button
+                                                                className="text-muted-foreground hover:text-foreground"
+                                                                onClick={() => setUnpinningModelId(model.id)}
+                                                                title="Reset to catalog"
+                                                            >
+                                                                <RotateCcwIcon className="size-4" />
+                                                            </button>
+                                                        )}
+
+                                                        <button
+                                                            className="text-destructive hover:text-destructive/80"
+                                                            onClick={() => setDeletingModelId(model.id)}
+                                                        >
+                                                            <TrashIcon className="size-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
+            )}
+
+            <AlertDialog
+                description="This action cannot be undone. This will permanently delete the model."
+                onCancel={() => setDeletingModelId(undefined)}
+                onConfirm={handleConfirmDelete}
+                open={!!deletingModelId}
+            />
+
+            <AlertDialog
+                confirmButtonVariant="default"
+                confirmLabel="Reset to Catalog"
+                description="This clears your override. On the next catalog reconcile, the context window, cost rates, and capabilities you set here will be replaced by the catalog's values. This cannot be undone."
+                isPending={unpinModelMutation.isPending}
+                onCancel={() => setUnpinningModelId(undefined)}
+                onConfirm={handleConfirmUnpin}
+                open={!!unpinningModelId}
+                title="Reset this model to catalog pricing?"
+            />
+
+            {showDialog && currentWorkspaceId != null && (
+                <AiGatewayModelDialog
+                    model={editingModel}
+                    onClose={handleCloseDialog}
+                    workspaceId={String(currentWorkspaceId)}
+                />
+            )}
+        </div>
+    );
+};
+
+export default AiGatewayModels;

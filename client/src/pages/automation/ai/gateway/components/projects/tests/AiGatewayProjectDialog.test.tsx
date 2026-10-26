@@ -1,0 +1,251 @@
+import {fireEvent, render, screen, waitFor} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+import AiGatewayProjectDialog from '../AiGatewayProjectDialog';
+
+import type {AiGatewayProjectType} from '../../../types';
+
+const {
+    createProjectMutateMock,
+    guardrailsSettingsQueryData,
+    updateProjectMutateAsyncMock,
+    updateProjectSettingsMutateAsyncMock,
+} = vi.hoisted(() => ({
+    createProjectMutateMock: vi.fn(),
+    guardrailsSettingsQueryData: {
+        aiGatewayProjectSettings: {
+            blockedTerms: '',
+            injectionDetectionEnabled: false,
+            moderationEnabled: false,
+            projectId: '1',
+            redactPii: false,
+            redactSecrets: false,
+            scanResponses: false,
+        },
+    },
+    updateProjectMutateAsyncMock: vi.fn(),
+    updateProjectSettingsMutateAsyncMock: vi.fn(),
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useAiGatewayProjectSettingsQuery: () => ({data: guardrailsSettingsQueryData}),
+    useCreateAiGatewayProjectMutation: () => ({isPending: false, mutate: createProjectMutateMock}),
+    useUpdateAiGatewayProjectMutation: () => ({isPending: false, mutateAsync: updateProjectMutateAsyncMock}),
+    useUpdateAiGatewayProjectSettingsMutation: () => ({
+        isPending: false,
+        mutateAsync: updateProjectSettingsMutateAsyncMock,
+    }),
+}));
+
+vi.mock('sonner', () => ({
+    toast: {
+        error: vi.fn(),
+        success: vi.fn(),
+    },
+}));
+
+const {toast} = await import('sonner');
+
+const project: AiGatewayProjectType = {
+    cacheTtlMinutes: null,
+    cachingEnabled: false,
+    compressionEnabled: false,
+    createdDate: '2024-01-01T00:00:00Z',
+    description: null,
+    id: '1',
+    lastModifiedDate: '2024-01-01T00:00:00Z',
+    logRetentionDays: null,
+    name: 'My Project',
+    retryMaxAttempts: null,
+    routingPolicyId: null,
+    slug: 'my-project',
+    timeoutSeconds: null,
+    version: 1,
+};
+
+const renderDialog = (onClose = vi.fn()) => {
+    render(<AiGatewayProjectDialog onClose={onClose} workspaceId="1" />);
+
+    return onClose;
+};
+
+const renderDialogInEditMode = (onClose = vi.fn()) => {
+    render(<AiGatewayProjectDialog onClose={onClose} project={project} workspaceId="1" />);
+
+    return onClose;
+};
+
+const makeGuardrailsDirty = () => {
+    fireEvent.click(screen.getByLabelText('Redact PII (emails, SSNs, cards, phones, IPs)'));
+};
+
+const clickSave = () => {
+    fireEvent.click(screen.getByRole('button', {name: 'Save'}));
+};
+
+beforeEach(() => {
+    vi.mocked(toast.error).mockClear();
+    vi.mocked(toast.success).mockClear();
+
+    createProjectMutateMock.mockClear();
+
+    updateProjectMutateAsyncMock.mockReset();
+    updateProjectMutateAsyncMock.mockResolvedValue({});
+
+    updateProjectSettingsMutateAsyncMock.mockReset();
+    updateProjectSettingsMutateAsyncMock.mockResolvedValue({});
+});
+
+describe('AiGatewayProjectDialog', () => {
+    it('renders with the dialog role', () => {
+        renderDialog();
+
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('names the dialog by its title', () => {
+        renderDialog();
+
+        expect(screen.getByRole('dialog', {name: 'Add Project'})).toBeInTheDocument();
+    });
+
+    it('closes on Escape', () => {
+        const onClose = renderDialog();
+
+        fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Escape'});
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('associates every label with its control', () => {
+        renderDialog();
+
+        expect(screen.getByLabelText('Name')).toBeInTheDocument();
+        expect(screen.getByLabelText('Slug')).toBeInTheDocument();
+        expect(screen.getByLabelText('Description (optional)')).toBeInTheDocument();
+        expect(screen.getByLabelText('Routing Policy ID (optional)')).toBeInTheDocument();
+        expect(screen.getByLabelText('Compression Enabled')).toBeInTheDocument();
+        expect(screen.getByLabelText('Retry Max Attempts (optional)')).toBeInTheDocument();
+        expect(screen.getByLabelText('Timeout Seconds (optional)')).toBeInTheDocument();
+        expect(screen.getByLabelText('Caching Enabled')).toBeInTheDocument();
+        expect(screen.getByLabelText('Cache TTL Minutes (optional)')).toBeInTheDocument();
+        expect(screen.getByLabelText('Log Retention Days (optional)')).toBeInTheDocument();
+    });
+});
+
+describe('AiGatewayProjectDialog dismissal after the guardrails Save button was removed', () => {
+    it('closes on Escape when the guardrails section is untouched', () => {
+        const onClose = renderDialogInEditMode();
+
+        fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Escape'});
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('also closes on Escape while the guardrails section has unsaved edits', () => {
+        const onClose = renderDialogInEditMode();
+
+        makeGuardrailsDirty();
+
+        fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Escape'});
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('closes on Cancel while the guardrails section has unsaved edits', () => {
+        const onClose = renderDialogInEditMode();
+
+        makeGuardrailsDirty();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('AiGatewayProjectDialog footer Save persists both resources', () => {
+    it('sends the project update and the guardrail settings, project first, when Save is clicked', async () => {
+        const callOrder: string[] = [];
+
+        updateProjectMutateAsyncMock.mockImplementation(async () => {
+            callOrder.push('project');
+
+            return {};
+        });
+
+        updateProjectSettingsMutateAsyncMock.mockImplementation(async () => {
+            callOrder.push('guardrails');
+
+            return {};
+        });
+
+        const onClose = renderDialogInEditMode();
+
+        fireEvent.change(screen.getByLabelText('Name'), {target: {value: 'Renamed Project'}});
+
+        makeGuardrailsDirty();
+
+        clickSave();
+
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+        expect(updateProjectMutateAsyncMock).toHaveBeenCalledWith({
+            id: '1',
+            input: expect.objectContaining({name: 'Renamed Project'}),
+        });
+
+        expect(updateProjectSettingsMutateAsyncMock).toHaveBeenCalledWith({
+            input: expect.objectContaining({projectId: '1', redactPii: true}),
+        });
+
+        expect(callOrder).toEqual(['project', 'guardrails']);
+    });
+
+    it('does not call the guardrails mutation when the guardrails section has no changes', async () => {
+        const onClose = renderDialogInEditMode();
+
+        fireEvent.change(screen.getByLabelText('Name'), {target: {value: 'Renamed Project'}});
+
+        clickSave();
+
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+        expect(updateProjectMutateAsyncMock).toHaveBeenCalled();
+        expect(updateProjectSettingsMutateAsyncMock).not.toHaveBeenCalled();
+    });
+});
+
+describe('AiGatewayProjectDialog partial-failure handling', () => {
+    it('saves the project, keeps the dialog open, and reports a partial failure when the guardrails save fails', async () => {
+        updateProjectSettingsMutateAsyncMock.mockRejectedValueOnce(new Error('guardrails endpoint down'));
+
+        const onClose = renderDialogInEditMode();
+
+        makeGuardrailsDirty();
+
+        clickSave();
+
+        await waitFor(() => expect(updateProjectSettingsMutateAsyncMock).toHaveBeenCalled());
+
+        expect(updateProjectMutateAsyncMock).toHaveBeenCalled();
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('guardrail'));
+    });
+
+    it('does not attempt the guardrails save when the project update itself fails', async () => {
+        updateProjectMutateAsyncMock.mockRejectedValueOnce(new Error('project endpoint down'));
+
+        const onClose = renderDialogInEditMode();
+
+        makeGuardrailsDirty();
+
+        clickSave();
+
+        await waitFor(() => expect(updateProjectMutateAsyncMock).toHaveBeenCalled());
+
+        expect(updateProjectSettingsMutateAsyncMock).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+});

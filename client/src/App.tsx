@@ -30,6 +30,7 @@ import {
     MessagesSquareIcon,
     NetworkIcon,
     RadioTowerIcon,
+    RouterIcon,
     ServerIcon,
     Settings2Icon,
     SlidersHorizontalIcon,
@@ -116,6 +117,7 @@ const automationNavigation: NavigationType[] = [
         name: 'Knowledge Base',
     },
     {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
+    {href: '/automation/ai/gateway', icon: RouterIcon, name: 'AI Gateway'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
@@ -233,6 +235,10 @@ function App() {
 
         if (navItem.href === '/automation/executions/tool-invocations') {
             return edition === EditionType.EE;
+        }
+
+        if (navItem.href === '/automation/ai/gateway') {
+            return edition === EditionType.EE && ai.gateway.enabled;
         }
 
         return true;
