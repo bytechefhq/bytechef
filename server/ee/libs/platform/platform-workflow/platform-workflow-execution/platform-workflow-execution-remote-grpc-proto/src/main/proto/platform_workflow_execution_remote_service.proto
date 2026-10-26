@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+package bytechef.platform.workflow.execution.remote.v1;
+
+import "atlas_execution_remote_service.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.workflow.execution.remote.grpc.proto";
+
+service TriggerLifecycleFacadeRemoteService {
+  rpc ExecuteTriggerDisable(TriggerLifecycleRequest) returns (google.protobuf.Empty);
+  rpc ExecuteTriggerEnable(TriggerLifecycleRequest) returns (google.protobuf.Empty);
+}
+
+service ConnectionLifecycleFacadeRemoteService {
+  rpc DeleteScheduledConnectionRefresh(ConnectionRefreshRequest) returns (google.protobuf.Empty);
+  rpc ScheduleConnectionRefresh(ConnectionRefreshRequest) returns (google.protobuf.Empty);
+}
+
+service JobResumeFacadeRemoteService {
+  rpc ResumeExpiredJob(ResumeJobRequest) returns (ResumeJobResponse);
+  rpc ResumeJob(ResumeJobRequest) returns (ResumeJobResponse);
+}
+
+service PrincipalJobFacadeRemoteService {
+  rpc CreateChildJob(CreateChildJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
+  rpc CreateJob(CreatePrincipalJobRequest) returns (bytechef.atlas.execution.remote.v1.IdResponse);
+  rpc CreateSyncJob(CreatePrincipalJobRequest) returns (bytechef.atlas.execution.remote.v1.RemoteJob);
+}
+
+service PrincipalJobRemoteService {
+  rpc FetchJobPrincipalId(JobTypeRequest) returns (OptionalIdResponse);
+  rpc FetchLastJobId(PrincipalTypeRequest) returns (OptionalIdResponse);
+  rpc FetchLastWorkflowJobId(PrincipalTypeRequest) returns (OptionalIdResponse);
+}
+
+service TriggerExecutionRemoteService {
+  rpc Create(RemoteTriggerExecution) returns (RemoteTriggerExecution);
+  rpc GetTriggerExecution(bytechef.atlas.execution.remote.v1.IdRequest) returns (RemoteTriggerExecution);
+  rpc Update(RemoteTriggerExecution) returns (RemoteTriggerExecution);
+}
+
+service TriggerStateRemoteService {
+  rpc Delete(WorkflowExecutionIdRequest) returns (google.protobuf.Empty);
+  rpc FetchValue(WorkflowExecutionIdRequest) returns (TriggerStateValue);
+  rpc Save(SaveTriggerStateRequest) returns (google.protobuf.Empty);
+}
+
+message RemoteWorkflowNodeType {
+  string name = 1;
+  int32 version = 2;
+  optional string operation = 3;
+}
+
+message TriggerLifecycleRequest {
+  string workflow_id = 1;
+  string workflow_execution_id = 2;
+  RemoteWorkflowNodeType trigger_workflow_node_type = 3;
+  bytes trigger_parameters = 4;
+  optional int64 connection_id = 5;
+  optional string webhook_url = 6;
+  int64 environment_id = 7;
+}
+
+message ConnectionRefreshRequest {
+  optional int64 connection_id = 1;
+  bytes parameters = 2;
+  optional string tenant_id = 3;
+}
+
+message ResumeJobRequest {
+  string id = 1;
+  bytes data = 2;
+}
+
+message ResumeJobResponse {
+  string outcome = 1;
+}
+
+message CreateChildJobRequest {
+  int64 parent_job_id = 1;
+  bytechef.atlas.execution.remote.v1.RemoteJobParameters job_parameters = 2;
+  string platform_type = 3;
+}
+
+message CreatePrincipalJobRequest {
+  bytechef.atlas.execution.remote.v1.RemoteJobParameters job_parameters = 1;
+  int64 job_principal_id = 2;
+  string platform_type = 3;
+}
+
+message JobTypeRequest {
+  int64 job_id = 1;
+  string platform_type = 2;
+}
+
+message PrincipalTypeRequest {
+  int64 principal_id = 1;
+  string platform_type = 2;
+  repeated string workflow_ids = 3;
+}
+
+message OptionalIdResponse {
+  optional int64 id = 1;
+}
+
+message WorkflowExecutionIdRequest {
+  string workflow_execution_id = 1;
+}
+
+message TriggerStateValue {
+  optional bytes value = 1;
+}
+
+message SaveTriggerStateRequest {
+  string workflow_execution_id = 1;
+  bytes value = 2;
+}
+
+message RemoteTriggerExecution {
+  optional bool batch = 1;
+  optional string created_by = 2;
+  optional google.protobuf.Timestamp created_date = 3;
+  optional google.protobuf.Timestamp end_date = 4;
+  optional bytechef.atlas.execution.remote.v1.RemoteExecutionError error = 5;
+  optional int64 execution_time = 6;
+  optional int64 id = 7;
+  repeated int64 job_ids = 8;
+  optional string last_modified_by = 9;
+  optional google.protobuf.Timestamp last_modified_date = 10;
+  optional int32 max_retries = 11;
+  optional bytes metadata = 12;
+  optional bytechef.atlas.execution.remote.v1.RemoteFileEntry output = 13;
+  optional int32 priority = 14;
+  optional int32 retry_attempts = 15;
+  optional string retry_delay = 16;
+  optional int32 retry_delay_factor = 17;
+  optional google.protobuf.Timestamp start_date = 18;
+  optional bytes state = 19;
+  optional string status = 20;
+  optional string workflow_execution_id = 21;
+  optional bytes workflow_trigger = 22;
+}
