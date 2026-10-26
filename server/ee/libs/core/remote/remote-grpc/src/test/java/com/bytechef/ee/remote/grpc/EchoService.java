@@ -22,7 +22,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * A one-method gRPC service for tests: it answers with the tenant bound while it runs.
+ * A gRPC service for tests: one method answers with the tenant bound while it runs, the other never answers.
  *
  * @version ee
  */
@@ -35,8 +35,19 @@ public final class EchoService implements BindableService {
         .setResponseMarshaller(new StringMarshaller())
         .build();
 
+    public static final MethodDescriptor<String, String> NEVER_ANSWER = MethodDescriptor.<String, String>newBuilder()
+        .setType(MethodDescriptor.MethodType.UNARY)
+        .setFullMethodName(MethodDescriptor.generateFullMethodName("test.Echo", "NeverAnswer"))
+        .setRequestMarshaller(new StringMarshaller())
+        .setResponseMarshaller(new StringMarshaller())
+        .build();
+
     public static String echoTenant(Channel channel) {
         return ClientCalls.blockingUnaryCall(channel, ECHO_TENANT, CallOptions.DEFAULT, "");
+    }
+
+    public static String neverAnswer(Channel channel) {
+        return ClientCalls.blockingUnaryCall(channel, NEVER_ANSWER, CallOptions.DEFAULT, "");
     }
 
     @Override
@@ -46,6 +57,7 @@ public final class EchoService implements BindableService {
                 responseObserver.onNext(TenantContext.getCurrentTenantId());
                 responseObserver.onCompleted();
             }))
+            .addMethod(NEVER_ANSWER, ServerCalls.asyncUnaryCall((request, responseObserver) -> {}))
             .build();
     }
 

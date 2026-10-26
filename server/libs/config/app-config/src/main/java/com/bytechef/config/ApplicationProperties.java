@@ -5123,6 +5123,11 @@ public class ApplicationProperties {
         public static class Grpc {
 
             /**
+             * Longest a call to another microservice may take unless it sets its own deadline
+             */
+            private Duration deadline;
+
+            /**
              * Send calls without TLS. Only for a trusted network, such as a Docker Compose network
              */
             private boolean plaintext;
@@ -5138,6 +5143,10 @@ public class ApplicationProperties {
              */
             private Map<String, String> targets;
 
+            public Duration getDeadline() {
+                return deadline;
+            }
+
             public String getServiceToken() {
                 return serviceToken;
             }
@@ -5148,6 +5157,10 @@ public class ApplicationProperties {
 
             public boolean isPlaintext() {
                 return plaintext;
+            }
+
+            public void setDeadline(Duration deadline) {
+                this.deadline = deadline;
             }
 
             public void setPlaintext(boolean plaintext) {
