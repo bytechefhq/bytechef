@@ -208,6 +208,17 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testGetConnectionComponentDefinition() {
+        ComponentDefinition componentDefinition = componentDefinition("keep", 1);
+
+        when(componentDefinitionService.getConnectionComponentDefinition("keep", 1)).thenReturn(componentDefinition);
+
+        assertThat(remoteComponentDefinitionServiceClient.getConnectionComponentDefinition("keep", 1))
+            .usingRecursiveComparison()
+            .isEqualTo(componentDefinition);
+    }
+
+    @Test
     void testGetComponentDefinitionVersions() {
         when(componentDefinitionService.getComponentDefinitionVersions("keep"))
             .thenReturn(List.of(componentDefinition("keep", 1), componentDefinition("keep", 2)));

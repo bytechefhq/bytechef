@@ -7,12 +7,18 @@
 
 package com.bytechef.ee.platform.workflow.task.dispatcher.registry.remote.client.service;
 
+import com.bytechef.ee.platform.component.remote.grpc.proto.BoolResponse;
+import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatcherProtoMapper;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.ExecuteTaskDispatcherDynamicPropertiesRequest;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.ExecuteTaskDispatcherOptionsRequest;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.ExecuteTaskDispatcherOutputRequest;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.GetTaskDispatcherDefinitionRequest;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.GetTaskDispatcherDefinitionVersionsRequest;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.IsDynamicOutputDefinedRequest;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionRemoteServiceGrpc.TaskDispatcherDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionResult;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.domain.OutputResponse;
@@ -50,39 +56,71 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     public List<Property> executeDynamicProperties(
         String name, int version, String propertyName, Map<String, ?> inputParameters) {
 
-        throw new UnsupportedOperationException();
+        ExecuteTaskDispatcherDynamicPropertiesRequest executeTaskDispatcherDynamicPropertiesRequest =
+            ExecuteTaskDispatcherDynamicPropertiesRequest.newBuilder()
+                .setName(name)
+                .setVersion(version)
+                .setPropertyName(propertyName)
+                .setInputParameters(ProtoValues.toStruct(inputParameters))
+                .build();
+
+        return taskDispatcherProtoMapper.toProperties(
+            getStub().executeDynamicProperties(executeTaskDispatcherDynamicPropertiesRequest));
     }
 
     @Override
     public List<Option> executeOptions(String name, int version, String propertyName, String search) {
-        throw new UnsupportedOperationException();
+        ExecuteTaskDispatcherOptionsRequest.Builder builder = ExecuteTaskDispatcherOptionsRequest.newBuilder()
+            .setName(name)
+            .setVersion(version)
+            .setPropertyName(propertyName);
+
+        if (search != null) {
+            builder.setSearch(search);
+        }
+
+        return taskDispatcherProtoMapper.toOptions(getStub().executeOptions(builder.build()));
     }
 
     @Override
     public OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters) {
-        ExecuteTaskDispatcherOutputRequest executeTaskDispatcherOutputRequest =
-            ExecuteTaskDispatcherOutputRequest.newBuilder()
-                .setName(name)
-                .setVersion(version)
-                .setInputParameters(ProtoValues.toStruct(inputParameters))
-                .build();
-
-        return taskDispatcherProtoMapper.toOutputResponse(getStub().executeOutput(executeTaskDispatcherOutputRequest));
+        return taskDispatcherProtoMapper.toOutputResponse(
+            getStub().executeOutput(getExecuteTaskDispatcherOutputRequest(name, version, inputParameters)));
     }
 
     @Override
     public OutputResponse executeVariableProperties(String name, int version, Map<String, ?> inputParameters) {
-        throw new UnsupportedOperationException();
+        return taskDispatcherProtoMapper.toOutputResponse(
+            getStub().executeVariableProperties(getExecuteTaskDispatcherOutputRequest(name, version, inputParameters)));
     }
 
     @Override
     public String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters) {
-        throw new UnsupportedOperationException();
+        StringResponse stringResponse = getStub().executeWorkflowNodeDescription(
+            getExecuteTaskDispatcherOutputRequest(name, version, inputParameters));
+
+        return stringResponse.hasValue() ? stringResponse.getValue() : null;
     }
 
     @Override
     public Optional<TaskDispatcherDefinition> fetchTaskDispatcherDefinition(String name, @Nullable Integer version) {
-        throw new UnsupportedOperationException();
+        GetTaskDispatcherDefinitionRequest.Builder builder = GetTaskDispatcherDefinitionRequest.newBuilder()
+            .setName(name);
+
+        if (version != null) {
+            builder.setVersion(version);
+        }
+
+        TaskDispatcherDefinitionResult taskDispatcherDefinitionResult = getStub().fetchTaskDispatcherDefinition(
+            builder.build());
+
+        if (!taskDispatcherDefinitionResult.hasTaskDispatcherDefinition()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+            taskDispatcherProtoMapper.toTaskDispatcherDefinition(
+                taskDispatcherDefinitionResult.getTaskDispatcherDefinition()));
     }
 
     @Override
@@ -117,7 +155,24 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
 
     @Override
     public boolean isDynamicOutputDefined(String componentName, int componentVersion) {
-        throw new UnsupportedOperationException();
+        IsDynamicOutputDefinedRequest isDynamicOutputDefinedRequest = IsDynamicOutputDefinedRequest.newBuilder()
+            .setName(componentName)
+            .setVersion(componentVersion)
+            .build();
+
+        BoolResponse boolResponse = getStub().isDynamicOutputDefined(isDynamicOutputDefinedRequest);
+
+        return boolResponse.getValue();
+    }
+
+    private static ExecuteTaskDispatcherOutputRequest getExecuteTaskDispatcherOutputRequest(
+        String name, int version, Map<String, ?> inputParameters) {
+
+        return ExecuteTaskDispatcherOutputRequest.newBuilder()
+            .setName(name)
+            .setVersion(version)
+            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .build();
     }
 
     private TaskDispatcherDefinitionRemoteServiceBlockingStub getStub() {
