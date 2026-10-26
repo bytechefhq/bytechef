@@ -4,7 +4,6 @@ package bytechef.platform.workflow.task.dispatcher.remote.v1;
 
 import "component_definition_remote_service.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/struct.proto";
 import "property.proto";
 
 option java_multiple_files = true;
@@ -56,7 +55,7 @@ message GetTaskDispatcherDefinitionVersionsRequest {
 message ExecuteTaskDispatcherOutputRequest {
   string name = 1;
   int32 version = 2;
-  google.protobuf.Struct input_parameters = 3;
+  bytes input_parameters = 3;
 }
 
 message TaskDispatcherDefinitionResult {
@@ -67,7 +66,7 @@ message ExecuteTaskDispatcherDynamicPropertiesRequest {
   string name = 1;
   int32 version = 2;
   string property_name = 3;
-  google.protobuf.Struct input_parameters = 4;
+  bytes input_parameters = 4;
 }
 
 message ExecuteTaskDispatcherOptionsRequest {

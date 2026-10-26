@@ -13,14 +13,16 @@ import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DeleteScopeD
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.FetchDataStorageValueResponse;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc.JdbcDataStorageRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JsonValue;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutDataStorageValueRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import java.util.Map;
 import java.util.Optional;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -32,9 +34,11 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
     private static final String EXECUTION_APP = "execution-app";
 
     private final GrpcChannels grpcChannels;
+    private final JsonBytes jsonBytes;
 
-    public RemoteJdbcDataStorageServiceClient(GrpcChannels grpcChannels) {
+    public RemoteJdbcDataStorageServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
         this.grpcChannels = grpcChannels;
+        this.jsonBytes = new JsonBytes(objectMapper);
     }
 
     @Override
@@ -68,7 +72,7 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
             return Optional.empty();
         }
 
-        return Optional.ofNullable((T) ProtoValues.toObject(fetchDataStorageValueResponse.getValue()));
+        return Optional.ofNullable((T) jsonBytes.read(fetchDataStorageValueResponse.getValue()));
     }
 
     @Override
@@ -96,7 +100,9 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
             builder.setType(type.name());
         }
 
-        return (Map<String, T>) ProtoValues.toMap(getStub().getAll(builder.build()));
+        JsonValue jsonValue = getStub().getAll(builder.build());
+
+        return (Map<String, T>) jsonBytes.readMap(jsonValue.getValue());
     }
 
     @Override
@@ -106,7 +112,7 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
 
         PutDataStorageValueRequest putDataStorageValueRequest = PutDataStorageValueRequest.newBuilder()
             .setKey(toDataStorageKeyRequest(componentName, scope, scopeId, key, environmentId, type))
-            .setValue(ProtoValues.toValue(value))
+            .setValue(jsonBytes.write(value))
             .build();
 
         getStub().put(putDataStorageValueRequest);

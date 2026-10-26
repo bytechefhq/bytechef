@@ -20,7 +20,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.GetActionDefinitionR
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinitions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -132,7 +131,7 @@ public class RemoteActionDefinitionServiceClient implements ActionDefinitionServ
                 .setComponentName(componentName)
                 .setComponentVersion(componentVersion)
                 .setActionName(actionName)
-                .setInputParameters(ProtoValues.toStruct(inputParameters))
+                .setInputParameters(componentProtoMapper.toBytes(inputParameters))
                 .build();
 
         StringResponse stringResponse = getStub(componentName).executeWorkflowNodeDescription(

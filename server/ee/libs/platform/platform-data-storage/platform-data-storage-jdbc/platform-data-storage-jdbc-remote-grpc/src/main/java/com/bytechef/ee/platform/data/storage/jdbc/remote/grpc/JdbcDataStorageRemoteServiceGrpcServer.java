@@ -12,17 +12,18 @@ import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DataStorageS
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.DeleteScopeDataRequest;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.FetchDataStorageValueResponse;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JdbcDataStorageRemoteServiceGrpc;
+import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.JsonValue;
 import com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto.PutDataStorageValueRequest;
-import com.bytechef.ee.remote.grpc.ProtoValues;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import com.google.protobuf.Empty;
-import com.google.protobuf.Struct;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
 import java.util.Map;
 import java.util.Optional;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -33,10 +34,13 @@ public class JdbcDataStorageRemoteServiceGrpcServer
     extends JdbcDataStorageRemoteServiceGrpc.JdbcDataStorageRemoteServiceImplBase {
 
     private final JdbcDataStorageService jdbcDataStorageService;
+    private final JsonBytes jsonBytes;
 
     @SuppressFBWarnings("EI")
-    public JdbcDataStorageRemoteServiceGrpcServer(JdbcDataStorageService jdbcDataStorageService) {
+    public JdbcDataStorageRemoteServiceGrpcServer(JdbcDataStorageService jdbcDataStorageService,
+        ObjectMapper objectMapper) {
         this.jdbcDataStorageService = jdbcDataStorageService;
+        this.jsonBytes = new JsonBytes(objectMapper);
     }
 
     @Override
@@ -65,19 +69,22 @@ public class JdbcDataStorageRemoteServiceGrpcServer
 
         FetchDataStorageValueResponse.Builder builder = FetchDataStorageValueResponse.newBuilder();
 
-        value.ifPresent(curValue -> builder.setValue(ProtoValues.toValue(curValue)));
+        value.ifPresent(curValue -> builder.setValue(jsonBytes.write(curValue)));
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
 
     @Override
-    public void getAll(DataStorageScopeRequest request, StreamObserver<Struct> responseObserver) {
+    public void getAll(DataStorageScopeRequest request, StreamObserver<JsonValue> responseObserver) {
         Map<String, Object> values = jdbcDataStorageService.getAll(
             request.getComponentName(), DataStorageScope.valueOf(request.getScope()), request.getScopeId(),
             request.getEnvironmentId(), toPlatformType(request.hasType(), request.getType()));
 
-        responseObserver.onNext(ProtoValues.toStruct(values));
+        responseObserver.onNext(
+            JsonValue.newBuilder()
+                .setValue(jsonBytes.write(values))
+                .build());
         responseObserver.onCompleted();
     }
 
@@ -88,7 +95,7 @@ public class JdbcDataStorageRemoteServiceGrpcServer
         jdbcDataStorageService.put(
             key.getComponentName(), DataStorageScope.valueOf(key.getScope()), key.getScopeId(), key.getKey(),
             key.getEnvironmentId(), toPlatformType(key.hasType(), key.getType()),
-            ProtoValues.toObject(request.getValue()));
+            jsonBytes.read(request.getValue()));
 
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();

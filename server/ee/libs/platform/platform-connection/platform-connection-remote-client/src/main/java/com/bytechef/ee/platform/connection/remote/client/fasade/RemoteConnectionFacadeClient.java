@@ -20,7 +20,6 @@ import com.bytechef.ee.platform.connection.remote.grpc.proto.TypeRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionDTORequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionDTOTagsRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -175,7 +174,7 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     public void replaceAuthorizationParameters(long id, Map<String, ?> parameters) {
         ConnectionParametersRequest connectionParametersRequest = ConnectionParametersRequest.newBuilder()
             .setConnectionId(id)
-            .setParameters(ProtoValues.toStruct(parameters))
+            .setParameters(connectionProtoMapper.toBytes(parameters))
             .build();
 
         getStub().replaceAuthorizationParameters(connectionParametersRequest);

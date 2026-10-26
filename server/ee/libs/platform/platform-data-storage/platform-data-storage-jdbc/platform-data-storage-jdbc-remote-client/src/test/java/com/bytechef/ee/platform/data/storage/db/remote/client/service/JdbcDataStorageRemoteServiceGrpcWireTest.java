@@ -30,6 +30,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -38,6 +39,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
 class JdbcDataStorageRemoteServiceGrpcWireTest {
+
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .build();
 
     private static final Map<String, Object> VALUE = Map.of("cursor", "abc", "page", 2, "ids", List.of(1, 2));
 
@@ -53,7 +57,7 @@ class JdbcDataStorageRemoteServiceGrpcWireTest {
 
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
-            .addService(new JdbcDataStorageRemoteServiceGrpcServer(jdbcDataStorageService))
+            .addService(new JdbcDataStorageRemoteServiceGrpcServer(jdbcDataStorageService, JSON_MAPPER))
             .build()
             .start();
         managedChannel = InProcessChannelBuilder.forName(name)
@@ -61,13 +65,40 @@ class JdbcDataStorageRemoteServiceGrpcWireTest {
             .build();
 
         remoteJdbcDataStorageServiceClient = new RemoteJdbcDataStorageServiceClient(
-            new FixedGrpcChannels(managedChannel));
+            new FixedGrpcChannels(managedChannel), JSON_MAPPER);
     }
 
     @AfterEach
     void afterEach() {
         managedChannel.shutdownNow();
         server.shutdownNow();
+    }
+
+    @Test
+    void testDataStorageKeepsNumberTypes() {
+        remoteJdbcDataStorageServiceClient.put(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", "id", 2L, PlatformType.AUTOMATION,
+            9_007_199_254_740_993L);
+
+        verify(jdbcDataStorageService).put(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", "id", 2L, PlatformType.AUTOMATION,
+            9_007_199_254_740_993L);
+
+        when(jdbcDataStorageService.fetch(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", "id", 2L, PlatformType.AUTOMATION))
+                .thenReturn(Optional.of(9_007_199_254_740_993L));
+        when(jdbcDataStorageService.fetch(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", "ratio", 2L, PlatformType.AUTOMATION))
+                .thenReturn(Optional.of(5.0));
+
+        assertThat(remoteJdbcDataStorageServiceClient.<Object>fetch(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", "id", 2L, PlatformType.AUTOMATION))
+                .containsInstanceOf(Long.class)
+                .contains(9_007_199_254_740_993L);
+        assertThat(remoteJdbcDataStorageServiceClient.<Object>fetch(
+            "github", DataStorageScope.WORKFLOW, "workflow-1", "ratio", 2L, PlatformType.AUTOMATION))
+                .containsInstanceOf(Double.class)
+                .contains(5.0);
     }
 
     @Test

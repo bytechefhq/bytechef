@@ -3,7 +3,6 @@ syntax = "proto3";
 package bytechef.platform.scheduler.remote.v1;
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
@@ -43,14 +42,14 @@ message ScheduleDynamicWebhookTriggerRefreshRequest {
 
 message ScheduleOneTimeTaskRequest {
   google.protobuf.Timestamp execute_at = 1;
-  optional google.protobuf.Struct output = 2;
+  optional bytes output = 2;
   int64 job_id = 3;
 }
 
 message ScheduleScheduleTriggerRequest {
   string pattern = 1;
   optional string zone_id = 2;
-  optional google.protobuf.Struct output = 3;
+  optional bytes output = 3;
   string workflow_execution_id = 4;
 }
 

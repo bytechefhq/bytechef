@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -46,8 +47,8 @@ public class RemoteJdbcDataStorageClientConfiguration {
     }
 
     @Bean
-    JdbcDataStorageService jdbcDataStorageService(GrpcChannels grpcChannels) {
-        return new RemoteJdbcDataStorageServiceClient(grpcChannels);
+    JdbcDataStorageService jdbcDataStorageService(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        return new RemoteJdbcDataStorageServiceClient(grpcChannels, objectMapper);
     }
 
     private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorage {

@@ -16,7 +16,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteTriggerDefinit
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookTriggerFlags;
 import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionRemoteServiceGrpc;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import io.grpc.stub.StreamObserver;
@@ -45,7 +44,7 @@ public class TriggerDefinitionRemoteServiceGrpcServer
 
         String workflowNodeDescription = triggerDefinitionService.executeWorkflowNodeDescription(
             request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-            ProtoValues.toMap(request.getInputParameters()));
+            componentProtoMapper.toMap(request.getInputParameters()));
 
         StringResponse.Builder builder = StringResponse.newBuilder();
 

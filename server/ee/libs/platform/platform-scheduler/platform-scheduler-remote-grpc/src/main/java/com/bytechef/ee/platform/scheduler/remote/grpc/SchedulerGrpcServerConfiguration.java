@@ -12,6 +12,7 @@ import com.bytechef.platform.scheduler.TriggerScheduler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -31,8 +32,8 @@ public class SchedulerGrpcServerConfiguration {
 
     @Bean
     TriggerSchedulerRemoteServiceGrpcServer triggerSchedulerRemoteServiceGrpcServer(
-        TriggerScheduler triggerScheduler) {
+        TriggerScheduler triggerScheduler, ObjectMapper objectMapper) {
 
-        return new TriggerSchedulerRemoteServiceGrpcServer(triggerScheduler);
+        return new TriggerSchedulerRemoteServiceGrpcServer(triggerScheduler, objectMapper);
     }
 }

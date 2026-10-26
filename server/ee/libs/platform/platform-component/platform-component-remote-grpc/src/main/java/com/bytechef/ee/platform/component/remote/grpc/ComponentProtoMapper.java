@@ -25,6 +25,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookRequest
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookTriggerFlags;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookValidateResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookEnableOutputResult;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -39,9 +40,11 @@ import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
@@ -55,13 +58,27 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class ComponentProtoMapper {
 
+    private final JsonBytes jsonBytes;
     private final ProtoJsonMapper protoJsonMapper;
 
     public ComponentProtoMapper(ObjectMapper objectMapper) {
+        this.jsonBytes = new JsonBytes(objectMapper);
         this.protoJsonMapper = new ProtoJsonMapper(
             objectMapper.rebuild()
                 .addMixIn(BaseProperty.class, ComponentBasePropertyMixIn.class)
                 .build());
+    }
+
+    public ByteString toBytes(@Nullable Object value) {
+        return jsonBytes.write(value);
+    }
+
+    public @Nullable Map<String, Object> toMap(ByteString bytes) {
+        return jsonBytes.readMap(bytes);
+    }
+
+    public @Nullable Object toObject(ByteString bytes) {
+        return jsonBytes.read(bytes);
     }
 
     public List<Option> toOptions(RemoteOptions remoteOptions) {

@@ -15,6 +15,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteProperties;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteProperty;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.RemoteTaskDispatcherDefinition;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.RemoteTaskDispatcherDefinitions;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -23,7 +24,9 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.protobuf.ByteString;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
@@ -37,13 +40,27 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class TaskDispatcherProtoMapper {
 
+    private final JsonBytes jsonBytes;
     private final ProtoJsonMapper protoJsonMapper;
 
     public TaskDispatcherProtoMapper(ObjectMapper objectMapper) {
+        this.jsonBytes = new JsonBytes(objectMapper);
         this.protoJsonMapper = new ProtoJsonMapper(
             objectMapper.rebuild()
                 .addMixIn(BaseProperty.class, TaskDispatcherBasePropertyMixIn.class)
                 .build());
+    }
+
+    public ByteString toBytes(@Nullable Object value) {
+        return jsonBytes.write(value);
+    }
+
+    public @Nullable Map<String, Object> toMap(ByteString bytes) {
+        return jsonBytes.readMap(bytes);
+    }
+
+    public @Nullable Object toObject(ByteString bytes) {
+        return jsonBytes.read(bytes);
     }
 
     public List<Option> toOptions(RemoteOptions remoteOptions) {

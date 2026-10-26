@@ -23,7 +23,6 @@ import com.bytechef.ee.platform.connection.remote.grpc.proto.TypeRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionTagIdsRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -68,7 +67,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
             .setConnectionVersion(connectionVersion)
             .setEnvironmentId(environmentId)
             .setName(name)
-            .setParameters(ProtoValues.toStruct(parameters));
+            .setParameters(connectionProtoMapper.toBytes(parameters));
 
         if (authorizationType != null) {
             builder.setAuthorizationType(authorizationType.name());
@@ -219,12 +218,12 @@ public class RemoteConnectionServiceClient implements ConnectionService {
         return ConnectionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONNECTION_APP));
     }
 
-    private static ConnectionParametersRequest toConnectionParametersRequest(
+    private ConnectionParametersRequest toConnectionParametersRequest(
         long connectionId, Map<String, ?> parameters) {
 
         return ConnectionParametersRequest.newBuilder()
             .setConnectionId(connectionId)
-            .setParameters(ProtoValues.toStruct(parameters))
+            .setParameters(connectionProtoMapper.toBytes(parameters))
             .build();
     }
 

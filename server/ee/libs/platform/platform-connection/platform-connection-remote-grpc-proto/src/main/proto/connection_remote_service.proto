@@ -3,7 +3,6 @@ syntax = "proto3";
 package bytechef.platform.connection.remote.v1;
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
@@ -54,7 +53,7 @@ message RemoteConnection {
   optional string last_modified_by = 10;
   optional google.protobuf.Timestamp last_modified_date = 11;
   optional string name = 12;
-  optional google.protobuf.Struct parameters = 13;
+  optional bytes parameters = 13;
   optional string status = 14;
   repeated int64 tag_ids = 15;
   optional string type = 16;
@@ -83,10 +82,10 @@ message RemoteTags {
 message RemoteConnectionDTO {
   optional bool active = 1;
   optional string authorization_type = 2;
-  optional google.protobuf.Struct authorization_parameters = 3;
+  optional bytes authorization_parameters = 3;
   optional string base_uri = 4;
   optional string component_name = 5;
-  optional google.protobuf.Struct connection_parameters = 6;
+  optional bytes connection_parameters = 6;
   optional int32 connection_version = 7;
   optional string created_by = 8;
   optional google.protobuf.Timestamp created_date = 9;
@@ -96,7 +95,7 @@ message RemoteConnectionDTO {
   optional string last_modified_by = 13;
   optional google.protobuf.Timestamp last_modified_date = 14;
   optional string name = 15;
-  optional google.protobuf.Struct parameters = 16;
+  optional bytes parameters = 16;
   optional string status = 17;
   repeated RemoteTag tags = 18;
   optional int32 version = 19;
@@ -136,7 +135,7 @@ message CreateConnectionRequest {
   int32 connection_version = 3;
   int32 environment_id = 4;
   string name = 5;
-  google.protobuf.Struct parameters = 6;
+  bytes parameters = 6;
   optional string type = 7;
 }
 
@@ -173,7 +172,7 @@ message ConnectionStatusRequest {
 
 message ConnectionParametersRequest {
   int64 connection_id = 1;
-  google.protobuf.Struct parameters = 2;
+  bytes parameters = 2;
 }
 
 message CreateConnectionDTORequest {
