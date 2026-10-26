@@ -1,67 +1,25 @@
-# Distributed ByteChef behind an nginx load balancer. One file covers every topology; switch with variables, never by
-# editing it.
-#
-#   export POSTGRES_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16)
-#   export BYTECHEF_SECURITY_REMEMBER_ME_KEY=...
-#
-#   # CE: 1 coordinator (also serving webhooks), 3 workers, RabbitMQ, single tenant
-#   docker compose -f docker-compose.cluster.yml up -d
-#
-#   # CE with 2 separate webhook nodes (the coordinator stays the fallback for webhook traffic)
-#   BYTECHEF_WEBHOOKS=2 docker compose -f docker-compose.cluster.yml up -d
-#
-#   # EE high availability: 2 coordinators
-#   BYTECHEF_EDITION=ee BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
-#
-#   # Webhooks only on webhook nodes. There is no fallback: with every webhook node down, webhooks fail (the
-#   # coordinator answers 404).
-#   BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
-#
-# - More than one coordinator requires BYTECHEF_EDITION=ee. With BYTECHEF_EDITION=ce and BYTECHEF_COORDINATORS>1, the
-#   second coordinator keeps restarting with the edition message, and the load balancer never starts because it waits
-#   for every coordinator to be healthy.
-# - The editor's webhook test (/webhooks/{id}/test/) is served by coordinators only, so nginx routes it to them.
-# - Production high availability needs managed or clustered PostgreSQL, RabbitMQ or Redis, and a load balancer. In this
-#   file they are single containers.
-# - RabbitMQ (amqp) or Redis carries messages between the nodes; BYTECHEF_MESSAGE_BROKER_PROVIDER selects it.
-# - Quartz runs in clustered mode on the shared PostgreSQL job store, so every trigger fires on exactly one node.
-# - Encryption key and remember-me key are the same on every node, and file storage is a volume all nodes mount, so
-#   any node can read what another node wrote. In production, mount shared storage (NFS, EFS) or use the aws provider.
-# - BYTECHEF_TENANT_MODE=multi starts the cluster in multi-tenant mode (requires BYTECHEF_EDITION=ee).
-#
-# Set BYTECHEF_IMAGE to use a locally built image. BYTECHEF_PORT and RABBITMQ_MANAGEMENT_PORT change the published
-# ports.
-#
-# Every node must get the same BYTECHEF_ENCRYPTION_KEY and BYTECHEF_SECURITY_REMEMBER_ME_KEY: a connection encrypted on
-# one node has to be readable on all of them.
-
 x-bytechef-environment: &bytechef-environment
   BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
   BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
   BYTECHEF_DATASOURCE_USERNAME: postgres
-  # ce | ee. More than one coordinator requires ee.
   BYTECHEF_EDITION: ${BYTECHEF_EDITION:-ce}
   BYTECHEF_ENCRYPTION_PROPERTY_KEY: ${BYTECHEF_ENCRYPTION_KEY:?Set BYTECHEF_ENCRYPTION_KEY, e.g. openssl rand -base64 16}
   BYTECHEF_ENCRYPTION_PROVIDER: property
   BYTECHEF_FEATURE_FLAGS: ${BYTECHEF_FEATURE_FLAGS:-}
   BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR: /opt/bytechef/data/file-storage
   BYTECHEF_FILE_STORAGE_PROVIDER: filesystem
-  # amqp (RabbitMQ) | redis
   BYTECHEF_MESSAGE_BROKER_PROVIDER: ${BYTECHEF_MESSAGE_BROKER_PROVIDER:-amqp}
   BYTECHEF_PUBLIC_URL: ${BYTECHEF_PUBLIC_URL:-http://localhost:8080}
   BYTECHEF_RABBITMQ_HOST: rabbitmq
-  BYTECHEF_RABBITMQ_PASSWORD: guest
+  BYTECHEF_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
   BYTECHEF_RABBITMQ_PORT: 5672
-  BYTECHEF_RABBITMQ_USERNAME: guest
+  BYTECHEF_RABBITMQ_USERNAME: bytechef
   BYTECHEF_REDIS_HOST: redis
   BYTECHEF_REDIS_PORT: 6379
-  # Harmless with one coordinator, required with more.
   BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED: "true"
   BYTECHEF_SECURITY_REMEMBER_ME_KEY: ${BYTECHEF_SECURITY_REMEMBER_ME_KEY:?Set BYTECHEF_SECURITY_REMEMBER_ME_KEY}
   BYTECHEF_SESSION_STORE: ${BYTECHEF_SESSION_STORE:-redis}
-  # single | multi (multi requires ee)
   BYTECHEF_TENANT_MODE: ${BYTECHEF_TENANT_MODE:-single}
-  # Liquibase runs once in the migrate service; every node starts after it completes.
   BYTECHEF_UPGRADE_ENABLED: "false"
   JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75
 
@@ -104,13 +62,15 @@ services:
 
   rabbitmq:
     image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_USER: bytechef
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 5s
       timeout: 10s
       retries: 20
     ports:
-      # Management UI (guest / guest)
       - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
 
   redis:
@@ -159,7 +119,6 @@ services:
   webhook:
     <<: *bytechef-node
     deploy:
-      # Separate webhook nodes are optional: with 0, the coordinators serve webhooks.
       replicas: ${BYTECHEF_WEBHOOKS:-0}
     environment:
       <<: *bytechef-environment

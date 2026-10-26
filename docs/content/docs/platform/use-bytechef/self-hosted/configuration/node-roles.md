@@ -130,11 +130,14 @@ This avoids concurrent migration attempts when many nodes start together.
 [`docker-compose.cluster.yml`](https://github.com/bytechefhq/bytechef/blob/master/docker-compose.cluster.yml) covers every topology on this page through variables: coordinator, worker and webhook replicas behind nginx, RabbitMQ or Redis, PostgreSQL, and a `migrate` service that runs Liquibase once. The `migrate` service waits for PostgreSQL, RabbitMQ and Redis, and every node starts after it completes.
 
 ```bash
-export POSTGRES_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16)
+export POSTGRES_PASSWORD=... RABBITMQ_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16)
 export BYTECHEF_SECURITY_REMEMBER_ME_KEY=...
 
 # CE: 1 coordinator (also serving webhooks), 3 workers
 docker compose -f docker-compose.cluster.yml up -d
+
+# CE with 2 separate webhook nodes, the coordinator stays the fallback for webhook traffic
+BYTECHEF_WEBHOOKS=2 docker compose -f docker-compose.cluster.yml up -d
 
 # EE high availability: 2 coordinators
 BYTECHEF_EDITION=ee BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
@@ -142,5 +145,23 @@ BYTECHEF_EDITION=ee BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.clu
 # Webhooks only on 2 webhook nodes, no coordinator fallback
 BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
 ```
+
+`POSTGRES_PASSWORD`, `RABBITMQ_PASSWORD`, `BYTECHEF_ENCRYPTION_KEY` and `BYTECHEF_SECURITY_REMEMBER_ME_KEY` have no defaults, and every node gets the same values. The other variables and their defaults:
+
+| Variable | Default | Values |
+| -------- | ------- | ------ |
+| `BYTECHEF_EDITION` | `ce` | `ce`, `ee` |
+| `BYTECHEF_COORDINATORS` | `1` | more than 1 requires `ee` |
+| `BYTECHEF_WORKERS` | `3` | |
+| `BYTECHEF_WEBHOOKS` | `0` | with 0, the coordinators serve webhooks |
+| `BYTECHEF_COORDINATOR_WEBHOOKS` | `true` | with `false` and every webhook node down, webhooks fail |
+| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | `amqp` | `amqp` (RabbitMQ), `redis` |
+| `BYTECHEF_SESSION_STORE` | `redis` | `redis`, `jdbc` (`ee` only) |
+| `BYTECHEF_TENANT_MODE` | `single` | `single`, `multi` (`ee` only) |
+| `BYTECHEF_IMAGE` | `docker.bytechef.io/bytechef/bytechef:latest` | a locally built image |
+| `BYTECHEF_PORT` | `8080` | published port of the load balancer |
+| `RABBITMQ_MANAGEMENT_PORT` | `15672` | published port of the RabbitMQ management UI (user `bytechef`, password `RABBITMQ_PASSWORD`) |
+
+With `BYTECHEF_EDITION=ce` and more than one coordinator, the second coordinator keeps restarting with the edition message, and the load balancer never starts because it waits for every coordinator to be healthy. The file storage is a volume all nodes mount; in production, mount shared storage (NFS, EFS) or use the `aws` provider.
 
 The file sets `BYTECHEF_SESSION_STORE=redis` on every node. In EE with the `redis` session store, the Redis connection opens at startup, so the nodes fail to start when Redis is unreachable. PostgreSQL, the message broker and the load balancer are single containers in this file; for production, use managed or clustered services.
