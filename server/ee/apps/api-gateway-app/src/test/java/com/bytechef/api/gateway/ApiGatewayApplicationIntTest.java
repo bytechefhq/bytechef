@@ -10,6 +10,7 @@ package com.bytechef.api.gateway;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ee.discovery.redis.client.RedisDiscoveryClient;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @version ee
@@ -24,7 +26,10 @@ import org.springframework.core.env.Environment;
  * @author Ivica Cardic
  */
 @SpringBootTest
-@Import(RedisContainerConfiguration.class)
+@ActiveProfiles("testint")
+@Import({
+    PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
+})
 public class ApiGatewayApplicationIntTest {
 
     @Autowired

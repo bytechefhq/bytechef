@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -120,7 +121,7 @@ class GatewayRouteTableTest {
             List<String> args = new ArrayList<>(predicate.getArgs()
                 .values());
 
-            switch (predicate.getName()) {
+            switch (Objects.requireNonNull(predicate.getName())) {
                 case "Path" -> pathMatched = args.stream()
                     .map(pattern -> PathPatternParser.defaultInstance.parse(pattern.trim()))
                     .anyMatch(pathPattern -> pathPattern.matches(PathContainer.parsePath(path)));
