@@ -1,0 +1,64 @@
+extend type Query {
+    aiGatewayRoutingPolicy(id: ID!): AiGatewayRoutingPolicy
+    aiGatewayRoutingPolicies: [AiGatewayRoutingPolicy]
+}
+
+extend type Mutation {
+    createAiGatewayRoutingPolicy(input: CreateAiGatewayRoutingPolicyInput!): AiGatewayRoutingPolicy
+    deleteAiGatewayRoutingPolicy(id: ID!): Boolean
+    updateAiGatewayRoutingPolicy(id: ID!, input: UpdateAiGatewayRoutingPolicyInput!): AiGatewayRoutingPolicy
+}
+
+type AiGatewayRoutingPolicy {
+    id: ID!
+    name: String!
+    strategy: AiGatewayRoutingStrategyType!
+    fallbackModel: String
+    config: String
+    enabled: Boolean!
+    deployments: [AiGatewayModelDeployment]
+    tagIds: [ID!]
+    createdDate: Long
+    lastModifiedDate: Long
+    version: Int
+}
+
+type AiGatewayModelDeployment {
+    id: ID!
+    routingPolicyId: ID!
+    modelId: ID!
+    weight: Int!
+    priorityOrder: Int!
+    maxRpm: Int
+    maxTpm: Int
+    enabled: Boolean!
+}
+
+enum AiGatewayRoutingStrategyType {
+    COST_OPTIMIZED
+    INTELLIGENT_BALANCED
+    INTELLIGENT_COST
+    INTELLIGENT_QUALITY
+    LATENCY_OPTIMIZED
+    PRIORITY_FALLBACK
+    SIMPLE
+    TAG_BASED
+    WEIGHTED_RANDOM
+}
+
+input CreateAiGatewayRoutingPolicyInput {
+    name: String!
+    strategy: AiGatewayRoutingStrategyType!
+    fallbackModel: String
+    config: String
+    tagIds: [ID!]
+}
+
+input UpdateAiGatewayRoutingPolicyInput {
+    name: String
+    strategy: AiGatewayRoutingStrategyType
+    fallbackModel: String
+    config: String
+    enabled: Boolean
+    tagIds: [ID!]
+}

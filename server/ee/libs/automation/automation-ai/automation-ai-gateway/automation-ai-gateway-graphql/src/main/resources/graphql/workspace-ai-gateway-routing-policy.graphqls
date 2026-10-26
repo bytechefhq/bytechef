@@ -1,0 +1,17 @@
+extend type Query {
+    workspaceAiGatewayRoutingPolicies(workspaceId: ID!): [AiGatewayRoutingPolicy]
+}
+
+extend type Mutation {
+    createWorkspaceAiGatewayRoutingPolicy(input: CreateWorkspaceAiGatewayRoutingPolicyInput!): AiGatewayRoutingPolicy
+    deleteWorkspaceAiGatewayRoutingPolicy(workspaceId: ID!, routingPolicyId: ID!): Boolean
+    updateWorkspaceAiGatewayRoutingPolicy(workspaceId: ID!, id: ID!, input: UpdateAiGatewayRoutingPolicyInput!): AiGatewayRoutingPolicy
+}
+
+input CreateWorkspaceAiGatewayRoutingPolicyInput {
+    config: String
+    fallbackModel: String
+    name: String!
+    strategy: AiGatewayRoutingStrategyType!
+    workspaceId: ID!
+}
