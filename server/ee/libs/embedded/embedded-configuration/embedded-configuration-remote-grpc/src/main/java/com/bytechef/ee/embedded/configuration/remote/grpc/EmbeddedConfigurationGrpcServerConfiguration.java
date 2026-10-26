@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploym
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
@@ -99,5 +100,12 @@ public class EmbeddedConfigurationGrpcServerConfiguration {
         IntegrationService integrationService, EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper) {
 
         return new IntegrationRemoteServiceGrpcServer(integrationService, embeddedConfigurationProtoMapper);
+    }
+
+    @Bean
+    ConnectedUserProjectRemoteServiceGrpcServer connectedUserProjectRemoteServiceGrpcServer(
+        ConnectedUserProjectService connectedUserProjectService) {
+
+        return new ConnectedUserProjectRemoteServiceGrpcServer(connectedUserProjectService);
     }
 }

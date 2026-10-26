@@ -7,14 +7,17 @@
 
 package com.bytechef.ee.atlas.execution.remote.grpc;
 
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteTaskExecution;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteTaskExecutions;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.TaskExecutionRemoteServiceGrpc;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.TaskExecutionResult;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -92,6 +95,19 @@ public class TaskExecutionRemoteServiceGrpcServer
     public void update(RemoteTaskExecution request, StreamObserver<RemoteTaskExecution> responseObserver) {
         responseObserver.onNext(atlasExecutionProtoMapper
             .toProto(taskExecutionService.update(atlasExecutionProtoMapper.toTaskExecution(request))));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void fetchLastJobTaskExecution(IdRequest request, StreamObserver<TaskExecutionResult> responseObserver) {
+        Optional<TaskExecution> taskExecution = taskExecutionService.fetchLastJobTaskExecution(request.getId());
+
+        TaskExecutionResult.Builder builder = TaskExecutionResult.newBuilder();
+
+        taskExecution.ifPresent(
+            curTaskExecution -> builder.setTaskExecution(atlasExecutionProtoMapper.toProto(curTaskExecution)));
+
+        responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
 }

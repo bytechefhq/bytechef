@@ -26,6 +26,7 @@ service TaskExecutionRemoteService {
   rpc CancelIfUnfinished(IdRequest) returns (BoolResponse);
   rpc CompleteIfNotCancelled(IdRequest) returns (BoolResponse);
   rpc Create(RemoteTaskExecution) returns (RemoteTaskExecution);
+  rpc FetchLastJobTaskExecution(IdRequest) returns (TaskExecutionResult);
   rpc GetJobTaskExecutions(IdRequest) returns (RemoteTaskExecutions);
   rpc GetParentTaskExecutions(IdRequest) returns (RemoteTaskExecutions);
   rpc GetTaskExecution(IdRequest) returns (RemoteTaskExecution);
@@ -127,6 +128,10 @@ message RemoteWebhookRetry {
   optional int32 max_attempts = 2;
   optional int32 max_interval = 3;
   optional int32 multiplier = 4;
+}
+
+message TaskExecutionResult {
+  optional RemoteTaskExecution task_execution = 1;
 }
 
 message RemoteTaskExecutions {

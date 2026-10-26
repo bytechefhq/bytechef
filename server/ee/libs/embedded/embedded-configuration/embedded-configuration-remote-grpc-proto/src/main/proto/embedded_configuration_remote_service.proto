@@ -47,6 +47,10 @@ service AutomationWorkflowProjectFacadeRemoteService {
   rpc GetPublishedProjects(google.protobuf.Empty) returns (RemoteAutomationWorkflowProjects);
 }
 
+service ConnectedUserProjectRemoteService {
+  rpc ContainsProjectDeployment(IdRequest) returns (BoolResponse);
+}
+
 service ConnectedUserProjectFacadeRemoteService {
   rpc CopyWorkflowTemplate(CopyWorkflowTemplateRequest) returns (StringResponse);
 }

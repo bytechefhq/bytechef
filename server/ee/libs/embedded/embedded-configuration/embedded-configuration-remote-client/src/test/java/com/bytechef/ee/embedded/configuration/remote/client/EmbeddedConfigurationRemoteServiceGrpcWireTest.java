@@ -26,6 +26,7 @@ import com.bytechef.ee.embedded.configuration.remote.client.facade.RemoteAutomat
 import com.bytechef.ee.embedded.configuration.remote.client.facade.RemoteConnectedUserProjectFacadeClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteAppEventServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteConnectedUserProjectDeploymentResolverClient;
+import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteConnectedUserProjectServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceConfigurationServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceWorkflowServiceClient;
@@ -34,12 +35,14 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.AppEventRemoteServiceG
 import com.bytechef.ee.embedded.configuration.remote.grpc.AutomationWorkflowProjectFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectDeploymentResolverRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectFacadeRemoteServiceGrpcServer;
+import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceConfigurationRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceConfigurationWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
@@ -79,6 +82,7 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     private final ConnectedUserProjectDeploymentResolver connectedUserProjectDeploymentResolver =
         mock(ConnectedUserProjectDeploymentResolver.class);
     private final ConnectedUserProjectFacade connectedUserProjectFacade = mock(ConnectedUserProjectFacade.class);
+    private final ConnectedUserProjectService connectedUserProjectService = mock(ConnectedUserProjectService.class);
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService =
         mock(IntegrationInstanceConfigurationService.class);
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService =
@@ -107,6 +111,7 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
                 automationWorkflowProjectFacade, embeddedConfigurationProtoMapper),
             new ConnectedUserProjectDeploymentResolverRemoteServiceGrpcServer(connectedUserProjectDeploymentResolver),
             new ConnectedUserProjectFacadeRemoteServiceGrpcServer(connectedUserProjectFacade),
+            new ConnectedUserProjectRemoteServiceGrpcServer(connectedUserProjectService),
             new IntegrationInstanceConfigurationRemoteServiceGrpcServer(
                 integrationInstanceConfigurationService, embeddedConfigurationProtoMapper),
             new IntegrationInstanceConfigurationWorkflowRemoteServiceGrpcServer(
@@ -321,6 +326,18 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
 
         assertThat(remoteConnectedUserProjectFacadeClient.copyWorkflowTemplate(
             "user-1", "uuid-1", Environment.PRODUCTION)).isEqualTo("workflow-2");
+    }
+
+    @Test
+    void testContainsProjectDeployment() {
+        when(connectedUserProjectService.containsProjectDeployment(1051L)).thenReturn(false);
+        when(connectedUserProjectService.containsProjectDeployment(1052L)).thenReturn(true);
+
+        RemoteConnectedUserProjectServiceClient remoteConnectedUserProjectServiceClient =
+            new RemoteConnectedUserProjectServiceClient(fixedGrpcChannels);
+
+        assertThat(remoteConnectedUserProjectServiceClient.containsProjectDeployment(1051L)).isFalse();
+        assertThat(remoteConnectedUserProjectServiceClient.containsProjectDeployment(1052L)).isTrue();
     }
 
     private static IntegrationInstanceConfigurationWorkflowConnection connection(long connectionId) {
