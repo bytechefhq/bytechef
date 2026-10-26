@@ -948,6 +948,8 @@ const CARD_CHROME_BUTTON_NAMES = new Set([
     'Submit all',
 ]);
 
+const SUBMITTING_BUTTON_NAME = 'Submitting…';
+
 const MAX_CARD_ROUNDS = 5;
 
 const CONNECTIONS_LOADING_TEXT = /^Loading .+ connections\.\.\.$/;
@@ -982,6 +984,10 @@ export async function answerInteractiveCards(
         const lastMessage = readLastMessage();
 
         await expect(lastMessage.getByText(CONNECTIONS_LOADING_TEXT)).toHaveCount(0);
+
+        await expect(lastMessage.getByRole('button', {name: SUBMITTING_BUTTON_NAME})).toHaveCount(0, {
+            timeout: 60000,
+        });
 
         const cardText = await lastMessage.innerText();
         const picker = lastMessage.getByRole('combobox');
