@@ -2,6 +2,9 @@ import AlertDialog from '@/components/AlertDialog';
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import TagList from '@/shared/components/TagList';
+import ConnectionCredentialStoreBadge, {
+    isExternalCredentialStore,
+} from '@/shared/components/connection/ConnectionCredentialStoreBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
 import ConnectionWorkflowList, {type ConnectionWorkflowI} from '@/shared/components/connection/ConnectionWorkflowList';
@@ -190,6 +193,11 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     return (
         <ConnectionListItemLayout
             active={connection.active}
+            badges={
+                isExternalCredentialStore(connection.credentialStoreType) && (
+                    <ConnectionCredentialStoreBadge credentialStoreType={connection.credentialStoreType} />
+                )
+            }
             createdDate={connection.createdDate}
             credentialStatus={connection.credentialStatus}
             expandLabel="Workflows"

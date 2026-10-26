@@ -12,6 +12,9 @@ import {
 } from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
 import TagList from '@/shared/components/TagList';
+import ConnectionCredentialStoreBadge, {
+    isExternalCredentialStore,
+} from '@/shared/components/connection/ConnectionCredentialStoreBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
 import ConnectionWorkflowList, {type ConnectionWorkflowI} from '@/shared/components/connection/ConnectionWorkflowList';
@@ -121,21 +124,27 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
             active={connection.active}
             badges={
                 badges ??
-                (connection.shared && (
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Badge
-                                className="uppercase"
-                                label="Shared"
-                                styleType="secondary-outline"
-                                weight="semibold"
-                            />
-                        </TooltipTrigger>
+                ((connection.shared || isExternalCredentialStore(connection.credentialStoreType)) && (
+                    <>
+                        {connection.shared && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge
+                                        className="uppercase"
+                                        label="Shared"
+                                        styleType="secondary-outline"
+                                        weight="semibold"
+                                    />
+                                </TooltipTrigger>
 
-                        <TooltipContent>
-                            Every connected user in this environment can use this connection
-                        </TooltipContent>
-                    </Tooltip>
+                                <TooltipContent>
+                                    Every connected user in this environment can use this connection
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
+
+                        <ConnectionCredentialStoreBadge credentialStoreType={connection.credentialStoreType} />
+                    </>
                 ))
             }
             createdDate={connection.createdDate}

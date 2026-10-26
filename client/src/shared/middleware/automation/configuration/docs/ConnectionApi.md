@@ -8,6 +8,7 @@ All URIs are relative to */api/automation/internal*
 | [**deleteConnection**](ConnectionApi.md#deleteconnection) | **DELETE** /connections/{id} | Delete a connection |
 | [**getConnection**](ConnectionApi.md#getconnection) | **GET** /connections/{id} | Get a connection by id |
 | [**getWorkspaceConnections**](ConnectionApi.md#getworkspaceconnections) | **GET** /workspaces/{id}/connections | Get all workspace connections |
+| [**registerExistingConnection**](ConnectionApi.md#registerexistingconnectionoperation) | **POST** /connections/register-existing | Register a connection backed by an externally-provisioned credential |
 | [**updateConnection**](ConnectionApi.md#updateconnectionoperation) | **PATCH** /connections/{id} | Update an existing connection |
 
 
@@ -288,6 +289,74 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The list of connections. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## registerExistingConnection
+
+> number registerExistingConnection(registerExistingConnectionRequest)
+
+Register a connection backed by an externally-provisioned credential
+
+Register a connection backed by an externally-provisioned credential.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectionApi,
+} from '';
+import type { RegisterExistingConnectionOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectionApi();
+
+  const body = {
+    // RegisterExistingConnectionRequest
+    registerExistingConnectionRequest: ...,
+  } satisfies RegisterExistingConnectionOperationRequest;
+
+  try {
+    const data = await api.registerExistingConnection(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **registerExistingConnectionRequest** | [RegisterExistingConnectionRequest](RegisterExistingConnectionRequest.md) |  | |
+
+### Return type
+
+**number**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The connection id. |  -  |
+| **400** | Read-only store rejected the write, or secret not found at credentialRef. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

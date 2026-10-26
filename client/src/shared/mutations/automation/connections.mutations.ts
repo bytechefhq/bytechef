@@ -1,7 +1,9 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Connection, ConnectionApi} from '@/shared/middleware/automation/configuration';
 import {
+    ConnectionCredentialStoreType,
     useDisconnectConnectionMutation as useDisconnectConnectionGraphQL,
+    useRegisterExistingConnectionMutation as useRegisterExistingConnectionGraphQL,
     useUpdateConnectionCredentialsMutation as useUpdateConnectionCredentialsGraphQL,
 } from '@/shared/middleware/graphql';
 import {useMutation} from '@tanstack/react-query';
@@ -22,6 +24,40 @@ export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMuta
                     workspaceId: currentWorkspaceId,
                 },
             });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+};
+
+interface RegisterExistingConnectionMutationInputI {
+    componentName: string;
+    connectionVersion: number;
+    credentialRef: string;
+    credentialStoreType: ConnectionCredentialStoreType;
+    environmentId: string;
+    name: string;
+}
+
+interface RegisterExistingConnectionMutationProps {
+    onError?: (error: Error) => void;
+    onSuccess?: (connectionId: number) => void;
+}
+
+export const useRegisterExistingConnectionMutation = (mutationProps?: RegisterExistingConnectionMutationProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const graphqlMutation = useRegisterExistingConnectionGraphQL();
+
+    return useMutation<number, Error, RegisterExistingConnectionMutationInputI>({
+        mutationFn: async (input) => {
+            const result = await graphqlMutation.mutateAsync({
+                input: {
+                    ...input,
+                    workspaceId: String(currentWorkspaceId!),
+                },
+            });
+
+            return result.registerExistingConnection;
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
