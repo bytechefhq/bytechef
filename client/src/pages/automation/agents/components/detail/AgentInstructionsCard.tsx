@@ -3,18 +3,27 @@ import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAg
 import MarkdownEditor from '@/shared/components/markdown-editor/MarkdownEditor';
 import {useUpdateAiAgentMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useRef, useState} from 'react';
+import {useState} from 'react';
 import {toast} from 'sonner';
 
 interface AgentInstructionsCardProps {
     agentId: string;
+    externalChangeRevision: number;
     instructions: string | null;
 }
 
-const AgentInstructionsCard = ({agentId, instructions}: AgentInstructionsCardProps) => {
+const AgentInstructionsCard = ({agentId, externalChangeRevision, instructions}: AgentInstructionsCardProps) => {
+    const [dirty, setDirty] = useState(false);
+    const [syncedRevision, setSyncedRevision] = useState(externalChangeRevision);
     const [value, setValue] = useState(instructions ?? '');
 
-    const dirtyRef = useRef(false);
+    if (syncedRevision !== externalChangeRevision) {
+        setSyncedRevision(externalChangeRevision);
+
+        if (!dirty) {
+            setValue(instructions ?? '');
+        }
+    }
 
     const queryClient = useQueryClient();
 
@@ -26,18 +35,17 @@ const AgentInstructionsCard = ({agentId, instructions}: AgentInstructionsCardPro
     });
 
     const handleBlur = (markdown: string) => {
-        if (!dirtyRef.current) {
+        if (!dirty) {
             return;
         }
 
-        dirtyRef.current = false;
+        setDirty(false);
 
         updateAgentMutation.mutate({input: {id: agentId, instructions: markdown}});
     };
 
     const handleChange = (markdown: string) => {
-        dirtyRef.current = true;
-
+        setDirty(true);
         setValue(markdown);
     };
 
