@@ -81,6 +81,8 @@ class AuditDataContractTest {
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
+    private static final String NO_AUDIT_EVENT = "no audit event is defined for this change yet";
+    private static final String NOT_A_WRITE = "persists nothing: a preview, check, validation, export or test run";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -92,6 +94,28 @@ class AuditDataContractTest {
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
+        Map.entry("AiGatewayBudgetFacadeImpl.createInWorkspace", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayBudgetFacadeImpl.delete", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayBudgetFacadeImpl.update", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayProjectFacadeImpl.createInWorkspace", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayProjectFacadeImpl.delete", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayProjectFacadeImpl.update", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayProjectSettingsFacadeImpl.upsert", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayProviderFacadeImpl.create", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayProviderFacadeImpl.delete", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayProviderFacadeImpl.update", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayRateLimitFacadeImpl.createInWorkspace", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayRateLimitFacadeImpl.delete", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayRateLimitFacadeImpl.update", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayRoutingPolicyFacadeImpl.create", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayRoutingPolicyFacadeImpl.delete", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayRoutingPolicyFacadeImpl.update", NO_AUDIT_EVENT),
+        Map.entry("AiGatewayWorkspaceSettingsFacadeImpl.upsert", NO_AUDIT_EVENT),
+        Map.entry("AiModelFacadeImpl.create", NO_AUDIT_EVENT),
+        Map.entry("AiModelFacadeImpl.delete", NO_AUDIT_EVENT),
+        Map.entry("AiModelFacadeImpl.reconcileCatalog", NO_AUDIT_EVENT),
+        Map.entry("AiModelFacadeImpl.unpin", NO_AUDIT_EVENT),
+        Map.entry("AiModelFacadeImpl.update", NO_AUDIT_EVENT),
         Map.entry("AutomationWorkflowProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationWorkflowProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
@@ -138,6 +162,17 @@ class AuditDataContractTest {
         Map.entry("McpServerFacadeImpl.updateMcpTool", DELEGATES),
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
+        Map.entry("WorkspaceAiGatewayProviderFacadeImpl.createWorkspaceProvider", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiGatewayProviderFacadeImpl.deleteWorkspaceProvider", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiGatewayProviderFacadeImpl.testWorkspaceProviderConnection", NOT_A_WRITE),
+        Map.entry("WorkspaceAiGatewayProviderFacadeImpl.updateWorkspaceProvider", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiGatewayRoutingPolicyFacadeImpl.createWorkspaceRoutingPolicy", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiGatewayRoutingPolicyFacadeImpl.deleteWorkspaceRoutingPolicy", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiGatewayRoutingPolicyFacadeImpl.updateWorkspaceRoutingPolicy", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiModelFacadeImpl.createWorkspaceModel", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiModelFacadeImpl.deleteWorkspaceModel", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiModelFacadeImpl.unpinWorkspaceModel", NO_AUDIT_EVENT),
+        Map.entry("WorkspaceAiModelFacadeImpl.updateWorkspaceModel", NO_AUDIT_EVENT),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
