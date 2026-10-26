@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":server:ee:libs:config:microservice-config"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-impl"))

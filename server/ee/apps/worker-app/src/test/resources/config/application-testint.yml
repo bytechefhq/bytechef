@@ -1,6 +1,11 @@
 server:
   port: 9999
 
+spring:
+  grpc:
+    server:
+      port: 0
+
 bytechef:
   discovery-service:
     provider: REDIS
@@ -19,6 +24,10 @@ bytechef:
       max-concurrent-executions: 16
       max-cpu-time: 5m
       max-heap-memory: 512MB
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
   workflow:
     execution:
       agent:

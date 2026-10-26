@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
