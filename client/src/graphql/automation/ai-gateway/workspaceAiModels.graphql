@@ -1,0 +1,83 @@
+query workspaceAiModels($workspaceId: ID!) {
+    workspaceAiModels(workspaceId: $workspaceId) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        defaultRoutingPolicyId
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation createWorkspaceAiModel($input: CreateWorkspaceAiModelInput!) {
+    createWorkspaceAiModel(input: $input) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        defaultRoutingPolicyId
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation deleteWorkspaceAiModel($workspaceId: ID!, $modelId: ID!) {
+    deleteWorkspaceAiModel(workspaceId: $workspaceId, modelId: $modelId)
+}
+
+mutation unpinWorkspaceAiModel($workspaceId: ID!, $modelId: ID!) {
+    unpinWorkspaceAiModel(workspaceId: $workspaceId, modelId: $modelId) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        defaultRoutingPolicyId
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation updateWorkspaceAiModel($workspaceId: ID!, $id: ID!, $input: UpdateAiModelInput!) {
+    updateWorkspaceAiModel(workspaceId: $workspaceId, id: $id, input: $input) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        defaultRoutingPolicyId
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}

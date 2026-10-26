@@ -1,0 +1,28 @@
+query workspaceAiGatewayRequestLogs(
+    $endDate: Long!
+    $startDate: Long!
+    $workspaceId: ID!
+) {
+    workspaceAiGatewayRequestLogs(
+        endDate: $endDate
+        startDate: $startDate
+        workspaceId: $workspaceId
+    ) {
+        apiKeyId
+        cacheHit
+        cost
+        createdDate
+        errorMessage
+        id
+        inputTokens
+        latencyMs
+        outputTokens
+        requestId
+        requestedModel
+        routedModel
+        routedProvider
+        routingPolicyId
+        routingStrategy
+        status
+    }
+}
