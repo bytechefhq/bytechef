@@ -3,9 +3,18 @@ bytechef:
     provider: filesystem
   mail:
     host: localhost
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
   security:
     remember-me:
       key: rememberMe
 
 server:
   port: 9999
+
+spring:
+  grpc:
+    server:
+      port: 0
