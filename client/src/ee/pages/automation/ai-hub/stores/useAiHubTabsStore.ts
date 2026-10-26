@@ -2,6 +2,13 @@ import {getRandomId} from '@/shared/util/random-utils';
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
+export interface AiHubAiAgentTabI {
+    aiAgentId: string;
+    id: string;
+    kind: 'aiAgent';
+    name: string;
+}
+
 export interface AiHubWorkflowTabI {
     id: string;
     kind: 'workflow';
@@ -11,7 +18,12 @@ export interface AiHubWorkflowTabI {
     workflowId: string;
 }
 
-export type AiHubTabType = AiHubWorkflowTabI;
+export type AiHubTabType = AiHubAiAgentTabI | AiHubWorkflowTabI;
+
+export interface OpenAiAgentTabArgsI {
+    aiAgentId: string;
+    name: string;
+}
 
 export interface OpenWorkflowTabArgsI {
     name: string;
@@ -37,6 +49,8 @@ interface AiHubTabsStateI {
     /** Whether the Chats sidebar is hidden. Page-level and transient: never persisted, untouched by chat switches. */
     chatsSidebarCollapsed: boolean;
     closeTab: (tabId: string) => void;
+    /** Opens an AI Agent tab, or focuses and renames the existing tab of the same agent. */
+    openAiAgentTab: (aiAgent: OpenAiAgentTabArgsI) => string;
     openTabs: AiHubTabType[];
     /**
      * Opens a workflow tab, or focuses the existing one. A workflow tab is project-scoped: opening another workflow of
@@ -56,7 +70,7 @@ interface AiHubTabsStateI {
 /**
  * The id a tab carries for its underlying resource, independent of the tab's own (random) id.
  */
-export const getTabGenericId = (tab: AiHubTabType): string => tab.workflowId;
+export const getTabGenericId = (tab: AiHubTabType): string => (tab.kind === 'aiAgent' ? tab.aiAgentId : tab.workflowId);
 
 export const attachTab = (open: () => string): {ownsTab: boolean; tabId: string} => {
     const openTabCountBefore = aiHubTabsStore.getState().openTabs.length;
@@ -103,12 +117,52 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                             openTabs,
                         };
                     }),
+                openAiAgentTab: ({aiAgentId, name}) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const existing = state.openTabs.find(
+                            (tab) => tab.kind === 'aiAgent' && tab.aiAgentId === aiAgentId
+                        );
+
+                        if (existing) {
+                            tabIdToReturn = existing.id;
+
+                            return {
+                                ...state,
+                                activeTabId: existing.id,
+                                openTabs: state.openTabs.map((tab) => (tab.id === existing.id ? {...tab, name} : tab)),
+                                rightPanelOpen: true,
+                            };
+                        }
+
+                        const newTab: AiHubAiAgentTabI = {
+                            aiAgentId,
+                            id: getRandomId(),
+                            kind: 'aiAgent',
+                            name,
+                        };
+
+                        tabIdToReturn = newTab.id;
+
+                        return {
+                            ...state,
+                            activeTabId: newTab.id,
+                            openTabs: [...state.openTabs, newTab],
+                            rightPanelOpen: true,
+                        };
+                    });
+
+                    return tabIdToReturn;
+                },
                 openTabs: [],
                 openWorkflowTab: ({name, projectId, projectWorkflowId, workflowId}) => {
                     let tabIdToReturn = '';
 
                     set((state) => {
-                        const existing = state.openTabs.find((tab) => tab.projectId === projectId);
+                        const existing = state.openTabs.find(
+                            (tab) => tab.kind === 'workflow' && tab.projectId === projectId
+                        );
 
                         if (existing) {
                             tabIdToReturn = existing.id;
@@ -117,13 +171,15 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                                 ...state,
                                 activeTabId: existing.id,
                                 openTabs: state.openTabs.map((tab) =>
-                                    tab.id === existing.id ? {...tab, name, projectWorkflowId, workflowId} : tab
+                                    tab.id === existing.id && tab.kind === 'workflow'
+                                        ? {...tab, name, projectWorkflowId, workflowId}
+                                        : tab
                                 ),
                                 rightPanelOpen: true,
                             };
                         }
 
-                        const newTab: AiHubTabType = {
+                        const newTab: AiHubWorkflowTabI = {
                             id: getRandomId(),
                             kind: 'workflow',
                             name,

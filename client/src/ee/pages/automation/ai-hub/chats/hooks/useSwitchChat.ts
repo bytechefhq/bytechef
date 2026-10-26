@@ -1,4 +1,8 @@
-import {isWorkflowArtifactKind, parseArtifactMetadata} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
+import {
+    isAiAgentArtifactKind,
+    isWorkflowArtifactKind,
+    parseArtifactMetadata,
+} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {ARTIFACT_OPEN_TOOL_NAMES} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
@@ -423,11 +427,16 @@ function applyToolApprovalStatuses(
 }
 
 /**
- * Maps a durable workflow artifact back to the `openWorkflowTab` tool call that rendered its link card in the
- * transcript. The created / updated rows carry the same project metadata as a referenced one, and the agent almost
- * always opened the workflow it built, so all three get a card. Other kinds return null.
+ * Maps a durable workflow or AI Agent artifact back to the `openWorkflowTab` / `openAiAgentTab` tool call that
+ * rendered its link card in the transcript. The workflow created / updated rows carry the same project metadata as a
+ * referenced one, and the agent almost always opened the workflow it built, so all three get a card. Other kinds return
+ * null.
  */
 function artifactToOpenToolCall(artifact: AiHubChatArtifactI): OpenToolCallI | null {
+    if (isAiAgentArtifactKind(artifact.kind)) {
+        return {args: {aiAgentId: artifact.artifactId, name: artifact.artifactName}, toolName: 'openAiAgentTab'};
+    }
+
     if (!isWorkflowArtifactKind(artifact.kind)) {
         return null;
     }
