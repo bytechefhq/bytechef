@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
 public class SocialOidcUserService extends OidcUserService {
 
     private final AuthorityService authorityService;

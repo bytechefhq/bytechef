@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnSingleTenant
 @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
 public class SingleTenantOAuth2LoginCustomizer implements OAuth2LoginCustomizer {
 
     private final CustomOAuth2UserService customOAuth2UserService;

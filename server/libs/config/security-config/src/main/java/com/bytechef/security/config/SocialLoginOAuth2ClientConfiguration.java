@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.security.social-login", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.security.login", name = "enabled", havingValue = "true")
 class SocialLoginOAuth2ClientConfiguration {
 
     @Bean
