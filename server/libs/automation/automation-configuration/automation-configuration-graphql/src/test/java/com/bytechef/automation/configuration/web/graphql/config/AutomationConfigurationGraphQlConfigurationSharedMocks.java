@@ -23,6 +23,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.service.TagService;
 import java.lang.annotation.ElementType;
@@ -37,7 +38,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    CategoryService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class,
+    CategoryService.class, ComponentDefinitionService.class, ProjectFacade.class, ProjectService.class,
+    ProjectWorkflowFacade.class,
     ProjectWorkflowService.class, TagService.class, WorkflowService.class, WorkflowFacade.class,
     WorkspaceConnectionFacade.class
 })

@@ -11,6 +11,13 @@ extend type Query {
         lookupDependsOnPaths: [String!]
         mcpComponentId: ID!
     ): [Property!]!
+    clusterElementFields(
+        componentName: String!
+        componentVersion: Int!
+        clusterElementName: String!
+        connectionId: Long
+        inputParameters: Map
+    ): [Field!]!
     clusterElementOptions(
         componentName: String!
         componentVersion: Int!
@@ -21,6 +28,13 @@ extend type Query {
         lookupDependsOnPaths: [String!]
         mcpComponentId: ID!
     ): [Option!]!
+}
+
+type Field {
+    name: String!
+    label: String
+    """Java class simple name of the field's type, e.g. String, Long, Instant."""
+    type: String
 }
 
 type ClusterElementDefinition {
