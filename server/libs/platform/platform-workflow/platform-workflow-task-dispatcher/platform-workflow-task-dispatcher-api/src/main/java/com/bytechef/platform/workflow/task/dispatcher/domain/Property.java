@@ -34,11 +34,13 @@ import java.util.Objects;
     @JsonSubTypes.Type(value = DateProperty.class, name = "DATE"),
     @JsonSubTypes.Type(value = DateTimeProperty.class, name = "DATE_TIME"),
     @JsonSubTypes.Type(value = DynamicPropertiesProperty.class, name = "DYNAMIC_PROPERTIES"),
+    @JsonSubTypes.Type(value = FileEntryProperty.class, name = "FILE_ENTRY"),
     @JsonSubTypes.Type(value = IntegerProperty.class, name = "INTEGER"),
     @JsonSubTypes.Type(value = NumberProperty.class, name = "NUMBER"),
     @JsonSubTypes.Type(value = NullProperty.class, name = "NULL"),
     @JsonSubTypes.Type(value = ObjectProperty.class, name = "OBJECT"),
     @JsonSubTypes.Type(value = StringProperty.class, name = "STRING"),
+    @JsonSubTypes.Type(value = TaskProperty.class, name = "TASK"),
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
