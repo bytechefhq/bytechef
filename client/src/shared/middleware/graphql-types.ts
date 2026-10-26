@@ -1268,6 +1268,32 @@ export enum EnvironmentEnum {
   Staging = 'STAGING'
 }
 
+/**
+ * A dry-run preview of promoting one resource from its source environment to a target environment, returned before
+ * the caller commits to `promoteToEnvironment`.
+ */
+export type EnvironmentPromotionPreview = {
+  __typename?: 'EnvironmentPromotionPreview';
+  connections: Array<PromotionConnectionMapping>;
+  existingTargetId?: Maybe<Scalars['ID']['output']>;
+  existingTargetName?: Maybe<Scalars['String']['output']>;
+  projects: Array<PromotionProjectPreview>;
+  resourceType: PromotionResourceType;
+  sourceEnvironmentId: Scalars['ID']['output'];
+  sourceId: Scalars['ID']['output'];
+  targetEnvironmentId: Scalars['ID']['output'];
+  warnings: Array<Scalars['String']['output']>;
+};
+
+/** The outcome of promoting one resource to a target environment. */
+export type EnvironmentPromotionResult = {
+  __typename?: 'EnvironmentPromotionResult';
+  created: Scalars['Boolean']['output'];
+  targetId: Scalars['ID']['output'];
+  targetUrl?: Maybe<Scalars['String']['output']>;
+  unresolvedConnectionIds: Array<Scalars['ID']['output']>;
+};
+
 export enum EvaluatorFunctionCategory {
   Collection = 'COLLECTION',
   DateTime = 'DATE_TIME',
@@ -1922,6 +1948,8 @@ export type Mutation = {
   insertDataTableRow: DataTableRow;
   inviteUser: Scalars['Boolean']['output'];
   moveAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
+  /** Promote a resource into another environment: creates the counterpart on first promotion, syncs it afterwards. */
+  promoteToEnvironment: EnvironmentPromotionResult;
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
@@ -2548,6 +2576,11 @@ export type MutationMoveAutomationWorkflowProjectConfigurationConnectedUsersArgs
   connectedUserIds: Array<Scalars['ID']['input']>;
   sourceId: Scalars['ID']['input'];
   targetId: Scalars['ID']['input'];
+};
+
+
+export type MutationPromoteToEnvironmentArgs = {
+  input: PromoteToEnvironmentInput;
 };
 
 
@@ -3226,6 +3259,53 @@ export type ProjectWorkflow = {
   workflowId: Scalars['String']['output'];
 };
 
+/** Input for promoting a resource into another environment. */
+export type PromoteToEnvironmentInput = {
+  connectionMappings: Array<PromotionConnectionMappingInput>;
+  resourceType: PromotionResourceType;
+  sourceId: Scalars['ID']['input'];
+  targetEnvironmentId: Scalars['ID']['input'];
+};
+
+/**
+ * A connection referenced by the source resource being promoted, together with a suggestion for which connection in
+ * the target environment it should be rewired to.
+ */
+export type PromotionConnectionMapping = {
+  __typename?: 'PromotionConnectionMapping';
+  componentName: Scalars['String']['output'];
+  connectionVersion: Scalars['Int']['output'];
+  sourceConnectionId: Scalars['ID']['output'];
+  sourceConnectionName: Scalars['String']['output'];
+  suggestedTargetConnectionId?: Maybe<Scalars['ID']['output']>;
+  usedBy: Array<Scalars['String']['output']>;
+};
+
+/** An explicit source-connection-to-target-connection mapping supplied by the caller for `promoteToEnvironment`. */
+export type PromotionConnectionMappingInput = {
+  sourceConnectionId: Scalars['ID']['input'];
+  targetConnectionId: Scalars['ID']['input'];
+};
+
+/**
+ * A project referenced by the source resource being promoted, together with the version already present in the
+ * target environment, if any.
+ */
+export type PromotionProjectPreview = {
+  __typename?: 'PromotionProjectPreview';
+  projectId: Scalars['ID']['output'];
+  projectName: Scalars['String']['output'];
+  sourceProjectVersion: Scalars['Int']['output'];
+  targetProjectVersion?: Maybe<Scalars['Int']['output']>;
+};
+
+/** The kinds of environment-scoped automation resources that can be promoted from one environment to another. */
+export enum PromotionResourceType {
+  ApiCollection = 'API_COLLECTION',
+  McpServer = 'MCP_SERVER',
+  ProjectDeployment = 'PROJECT_DEPLOYMENT'
+}
+
 export type PropertiesDataSource = {
   __typename?: 'PropertiesDataSource';
   propertiesLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
@@ -3425,6 +3505,11 @@ export type Query = {
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   embeddedMcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
+  /**
+   * Preview what promoting a resource into another environment will do (create vs. update, version moves,
+   * suggested connection re-bindings, warnings).
+   */
+  environmentPromotionPreview: EnvironmentPromotionPreview;
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
   evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
@@ -3994,6 +4079,13 @@ export type QueryEmbeddedMcpToolsByComponentIdArgs = {
 
 export type QueryEndpointDiscoveryStatusArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type QueryEnvironmentPromotionPreviewArgs = {
+  resourceType: PromotionResourceType;
+  sourceId: Scalars['ID']['input'];
+  targetEnvironmentId: Scalars['ID']['input'];
 };
 
 

@@ -1105,6 +1105,22 @@ export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
 
 export type UpdateKnowledgeBaseTagsMutation = { updateKnowledgeBaseTags: boolean };
 
+export type EnvironmentPromotionPreviewQueryVariables = Exact<{
+  resourceType: Types.PromotionResourceType;
+  sourceId: string | number;
+  targetEnvironmentId: string | number;
+}>;
+
+
+export type EnvironmentPromotionPreviewQuery = { environmentPromotionPreview: { existingTargetId: string | null, existingTargetName: string | null, resourceType: Types.PromotionResourceType, sourceEnvironmentId: string, sourceId: string, targetEnvironmentId: string, warnings: Array<string>, connections: Array<{ componentName: string, connectionVersion: number, sourceConnectionId: string, sourceConnectionName: string, suggestedTargetConnectionId: string | null, usedBy: Array<string> }>, projects: Array<{ projectId: string, projectName: string, sourceProjectVersion: number, targetProjectVersion: number | null }> } };
+
+export type PromoteToEnvironmentMutationVariables = Exact<{
+  input: Types.PromoteToEnvironmentInput;
+}>;
+
+
+export type PromoteToEnvironmentMutation = { promoteToEnvironment: { created: boolean, targetId: string, targetUrl: string | null, unresolvedConnectionIds: Array<string> } };
+
 export type AutomationSearchQueryVariables = Exact<{
   query: string;
   limit?: number | null | undefined;
@@ -6402,6 +6418,78 @@ export const useUpdateKnowledgeBaseTagsMutation = <
       {
     mutationKey: ['updateKnowledgeBaseTags'],
     mutationFn: (variables?: UpdateKnowledgeBaseTagsMutationVariables) => fetcher<UpdateKnowledgeBaseTagsMutation, UpdateKnowledgeBaseTagsMutationVariables>(UpdateKnowledgeBaseTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnvironmentPromotionPreviewDocument = new TypedDocumentString(`
+    query environmentPromotionPreview($resourceType: PromotionResourceType!, $sourceId: ID!, $targetEnvironmentId: ID!) {
+  environmentPromotionPreview(
+    resourceType: $resourceType
+    sourceId: $sourceId
+    targetEnvironmentId: $targetEnvironmentId
+  ) {
+    connections {
+      componentName
+      connectionVersion
+      sourceConnectionId
+      sourceConnectionName
+      suggestedTargetConnectionId
+      usedBy
+    }
+    existingTargetId
+    existingTargetName
+    projects {
+      projectId
+      projectName
+      sourceProjectVersion
+      targetProjectVersion
+    }
+    resourceType
+    sourceEnvironmentId
+    sourceId
+    targetEnvironmentId
+    warnings
+  }
+}
+    `);
+
+export const useEnvironmentPromotionPreviewQuery = <
+      TData = EnvironmentPromotionPreviewQuery,
+      TError = unknown
+    >(
+      variables: EnvironmentPromotionPreviewQueryVariables,
+      options?: Omit<UseQueryOptions<EnvironmentPromotionPreviewQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EnvironmentPromotionPreviewQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EnvironmentPromotionPreviewQuery, TError, TData>(
+      {
+    queryKey: ['environmentPromotionPreview', variables],
+    queryFn: fetcher<EnvironmentPromotionPreviewQuery, EnvironmentPromotionPreviewQueryVariables>(EnvironmentPromotionPreviewDocument, variables),
+    ...options
+  }
+    )};
+
+export const PromoteToEnvironmentDocument = new TypedDocumentString(`
+    mutation promoteToEnvironment($input: PromoteToEnvironmentInput!) {
+  promoteToEnvironment(input: $input) {
+    created
+    targetId
+    targetUrl
+    unresolvedConnectionIds
+  }
+}
+    `);
+
+export const usePromoteToEnvironmentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<PromoteToEnvironmentMutation, TError, PromoteToEnvironmentMutationVariables, TContext>) => {
+    
+    return useMutation<PromoteToEnvironmentMutation, TError, PromoteToEnvironmentMutationVariables, TContext>(
+      {
+    mutationKey: ['promoteToEnvironment'],
+    mutationFn: (variables?: PromoteToEnvironmentMutationVariables) => fetcher<PromoteToEnvironmentMutation, PromoteToEnvironmentMutationVariables>(PromoteToEnvironmentDocument, variables)(),
     ...options
   }
     )};
