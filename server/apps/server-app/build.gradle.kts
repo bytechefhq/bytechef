@@ -410,6 +410,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-api"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    testImplementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-api"))
     testImplementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
