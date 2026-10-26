@@ -806,6 +806,7 @@ public class ApplicationProperties {
         private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
+        private Gateway gateway = new Gateway();
         private Guardrails guardrails = new Guardrails();
         private Hub hub = new Hub();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
@@ -828,6 +829,10 @@ public class ApplicationProperties {
 
         public Firecrawl getFirecrawl() {
             return firecrawl;
+        }
+
+        public Gateway getGateway() {
+            return gateway;
         }
 
         public Guardrails getGuardrails() {
@@ -872,6 +877,10 @@ public class ApplicationProperties {
 
         public void setFirecrawl(Firecrawl firecrawl) {
             this.firecrawl = firecrawl;
+        }
+
+        public void setGateway(Gateway gateway) {
+            this.gateway = gateway;
         }
 
         public void setGuardrails(Guardrails guardrails) {
@@ -1431,6 +1440,153 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+        }
+
+        public static class Gateway {
+
+            private boolean enabled;
+            private Guardrails guardrails = new Guardrails();
+            private String promptComplexityScorer;
+            private RateLimiting rateLimiting = new RateLimiting();
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public Guardrails getGuardrails() {
+                return guardrails;
+            }
+
+            public void setGuardrails(Guardrails guardrails) {
+                this.guardrails = guardrails;
+            }
+
+            public String getPromptComplexityScorer() {
+                return promptComplexityScorer;
+            }
+
+            public void setPromptComplexityScorer(String promptComplexityScorer) {
+                this.promptComplexityScorer = promptComplexityScorer;
+            }
+
+            public RateLimiting getRateLimiting() {
+                return rateLimiting;
+            }
+
+            public void setRateLimiting(RateLimiting rateLimiting) {
+                this.rateLimiting = rateLimiting;
+            }
+
+            public static class Guardrails {
+
+                private String blockedTerms;
+                private String injectionModel;
+                private boolean injectionDetectionEnabled;
+                private boolean moderationEnabled;
+                private String moderationModel;
+                private boolean piiRedactionEnabled;
+                private boolean responseScanEnabled;
+                private boolean responseScanStreamingEnabled;
+                private boolean secretRedactionEnabled;
+
+                public String getBlockedTerms() {
+                    return blockedTerms;
+                }
+
+                public void setBlockedTerms(String blockedTerms) {
+                    this.blockedTerms = blockedTerms;
+                }
+
+                public String getInjectionModel() {
+                    return injectionModel;
+                }
+
+                public void setInjectionModel(String injectionModel) {
+                    this.injectionModel = injectionModel;
+                }
+
+                public boolean isInjectionDetectionEnabled() {
+                    return injectionDetectionEnabled;
+                }
+
+                public void setInjectionDetectionEnabled(boolean injectionDetectionEnabled) {
+                    this.injectionDetectionEnabled = injectionDetectionEnabled;
+                }
+
+                public boolean isModerationEnabled() {
+                    return moderationEnabled;
+                }
+
+                public void setModerationEnabled(boolean moderationEnabled) {
+                    this.moderationEnabled = moderationEnabled;
+                }
+
+                public String getModerationModel() {
+                    return moderationModel;
+                }
+
+                public void setModerationModel(String moderationModel) {
+                    this.moderationModel = moderationModel;
+                }
+
+                public boolean isPiiRedactionEnabled() {
+                    return piiRedactionEnabled;
+                }
+
+                public void setPiiRedactionEnabled(boolean piiRedactionEnabled) {
+                    this.piiRedactionEnabled = piiRedactionEnabled;
+                }
+
+                public boolean isResponseScanEnabled() {
+                    return responseScanEnabled;
+                }
+
+                public void setResponseScanEnabled(boolean responseScanEnabled) {
+                    this.responseScanEnabled = responseScanEnabled;
+                }
+
+                public boolean isResponseScanStreamingEnabled() {
+                    return responseScanStreamingEnabled;
+                }
+
+                public void setResponseScanStreamingEnabled(boolean responseScanStreamingEnabled) {
+                    this.responseScanStreamingEnabled = responseScanStreamingEnabled;
+                }
+
+                public boolean isSecretRedactionEnabled() {
+                    return secretRedactionEnabled;
+                }
+
+                public void setSecretRedactionEnabled(boolean secretRedactionEnabled) {
+                    this.secretRedactionEnabled = secretRedactionEnabled;
+                }
+            }
+
+            public static class RateLimiting {
+
+                private boolean enabled;
+                private String provider;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public String getProvider() {
+                    return provider;
+                }
+
+                public void setProvider(String provider) {
+                    this.provider = provider;
+                }
             }
         }
 
