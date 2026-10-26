@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.data.storage.jdbc.remote.grpc;
 
+import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnClass(name = "com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageServiceImpl")
+@ConditionalOnDataStorageProviderJdbc
 public class JdbcDataStorageGrpcServerConfiguration {
 
     @Bean
