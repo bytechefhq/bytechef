@@ -16,6 +16,8 @@
 
 package com.bytechef.security.web.oauth2;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  *
  * @author Ivica Cardic
  */
-public class CustomOAuth2User implements OAuth2User {
+public class CustomOAuth2User implements OAuth2User, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final Map<String, Object> attributes;
     private final Collection<? extends GrantedAuthority> authorities;
