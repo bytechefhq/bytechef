@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.mcp.web.graphql.config;
+package com.bytechef.graphql.config;
 
 import graphql.language.ArrayValue;
 import graphql.language.BooleanValue;
