@@ -17,7 +17,7 @@ import {
     useAiHubRunStateStore,
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
-import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {useCancelAiHubRunMutation} from '@/shared/middleware/graphql';
@@ -97,7 +97,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
 
         const attachedTab = tabsState.openTabs.find((tab) => tab.id === removedResource.tabId);
 
-        if (attachedTab?.workflowId === removedResource.id) {
+        if (attachedTab && getTabGenericId(attachedTab) === removedResource.id) {
             tabsState.closeTab(attachedTab.id);
         }
     };
