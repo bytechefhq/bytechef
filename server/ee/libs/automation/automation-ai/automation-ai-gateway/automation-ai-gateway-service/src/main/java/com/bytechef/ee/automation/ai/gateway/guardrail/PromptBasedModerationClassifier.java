@@ -1,0 +1,89 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.ai.gateway.guardrail;
+
+import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
+import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
+import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
+import com.bytechef.ee.platform.ai.guardrails.classifier.AiGuardrailModerationClassifier;
+import com.bytechef.ee.platform.ai.model.catalog.domain.AiModel;
+import com.bytechef.ee.platform.ai.model.catalog.service.AiModelService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Locale;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.stereotype.Component;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Component
+@ConditionalOnEEVersion
+@ConditionalOnExpression("${bytechef.ai.gateway.enabled:false} and '${bytechef.ai.gateway.guardrails.moderation-model:}' != ''")
+public class PromptBasedModerationClassifier implements AiGuardrailModerationClassifier {
+
+    private static final String CLASSIFIER_INSTRUCTION =
+        "You are a strict content-safety classifier. Reply with exactly one word — SAFE or UNSAFE — indicating " +
+            "whether the following content contains hate, harassment, sexual content involving minors, credible " +
+            "violent threats, or self-harm instructions. Content:\n\n";
+
+    private static final Logger log = LoggerFactory.getLogger(PromptBasedModerationClassifier.class);
+
+    private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
+    private final AiModelService aiModelService;
+    private final AiGatewayProviderService aiGatewayProviderService;
+    private final String moderationModel;
+
+    @SuppressFBWarnings("EI")
+    public PromptBasedModerationClassifier(
+        AiGatewayChatModelFactory aiGatewayChatModelFactory, AiModelService aiModelService,
+        AiGatewayProviderService aiGatewayProviderService,
+        @Value("${bytechef.ai.gateway.guardrails.moderation-model:}") String moderationModel) {
+        this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
+        this.aiModelService = aiModelService;
+        this.aiGatewayProviderService = aiGatewayProviderService;
+        this.moderationModel = moderationModel;
+    }
+
+    @Override
+    public boolean isFlagged(String content) {
+        if (content == null || content.isBlank() || moderationModel.isBlank()) {
+            return false;
+        }
+
+        try {
+            Optional<AiModel> modelOptional = aiModelService.findByModelIdentifier(moderationModel);
+
+            if (modelOptional.isEmpty()) {
+                return false;
+            }
+
+            AiModel model = modelOptional.get();
+
+            AiGatewayProvider provider = aiGatewayProviderService.getProvider(model.getProviderId());
+
+            ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
+
+            String verdict = chatModel.call(CLASSIFIER_INSTRUCTION + content);
+
+            return verdict != null && verdict.toUpperCase(Locale.ROOT)
+                .contains("UNSAFE");
+        } catch (Exception exception) {
+            log.warn("Moderation classification failed; failing open (not blocked): {}", exception.getMessage());
+
+            return false;
+        }
+    }
+}

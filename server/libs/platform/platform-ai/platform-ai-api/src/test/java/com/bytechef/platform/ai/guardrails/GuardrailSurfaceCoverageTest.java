@@ -49,7 +49,8 @@ class GuardrailSurfaceCoverageTest {
     private static final String DIRECT_MODEL_CALL_HINT = ".call(";
 
     private static final Set<String> EXEMPT_DIRECT_MODEL_CALLERS = Set.of(
-        "AiGatewayFacadeImpl", "ApiConnectorAiServiceImpl");
+        "AiGatewayFacadeImpl", "ApiConnectorAiServiceImpl", "PromptBasedInjectionClassifier",
+        "PromptBasedModerationClassifier");
 
     @Test
     @Timeout(value = 5, unit = TimeUnit.MINUTES)
