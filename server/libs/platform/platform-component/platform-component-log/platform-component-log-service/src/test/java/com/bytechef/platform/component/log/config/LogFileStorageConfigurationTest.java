@@ -29,12 +29,12 @@ import com.bytechef.platform.component.log.JdbcLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageImpl;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
+import com.bytechef.platform.component.log.repository.ComponentLogEntryRepository;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 /**
  * @author Ivica Cardic
@@ -89,7 +89,7 @@ class LogFileStorageConfigurationTest {
                 FileStorageServiceRegistry.class,
                 () -> new FileStorageServiceRegistry(
                     List.of(new FilesystemFileStorageService(baseDirectory.toString()))))
-            .withBean(NamedParameterJdbcOperations.class, () -> mock(NamedParameterJdbcOperations.class));
+            .withBean(ComponentLogEntryRepository.class, () -> mock(ComponentLogEntryRepository.class));
     }
 
     private static ApplicationProperties createApplicationProperties(Provider provider) {
