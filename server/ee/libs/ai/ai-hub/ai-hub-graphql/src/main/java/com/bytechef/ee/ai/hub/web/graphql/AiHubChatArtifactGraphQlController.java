@@ -31,8 +31,9 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * GraphQL surface for AI Hub chat artifacts: the {@code recordReferencedAiHubChatArtifact} and
- * {@code deleteAiHubChatArtifact} mutations used by the composer to attach and detach a referenced workflow, plus the
- * field resolvers for {@code AiHubChatArtifact}. The per-chat listing lives on {@link AiHubChatGraphQlController}.
+ * {@code deleteAiHubChatArtifact} mutations used by the composer to attach and detach a referenced workflow or AI
+ * Agent, plus the field resolvers for {@code AiHubChatArtifact}. The per-chat listing lives on
+ * {@link AiHubChatGraphQlController}.
  *
  * <p>
  * Every operation requires the workspace VIEWER role. "Artifact does not exist" and "artifact exists in another

@@ -56,9 +56,9 @@ public interface AiHubChatArtifactService {
         @Nullable Map<String, Object> metadata);
 
     /**
-     * Removes a previously-recorded {@code WORKFLOW_REFERENCED} artifact. Idempotent: returns silently when the row is
-     * already gone. Verifies the parent chat is viewable by the requester in {@code requesterWorkspaceId}, same
-     * authorization shape as {@link #recordReference}.
+     * Removes a previously-recorded {@code WORKFLOW_REFERENCED} or {@code AI_AGENT_REFERENCED} artifact. Idempotent:
+     * returns silently when the row is already gone. Verifies the parent chat is viewable by the requester in
+     * {@code requesterWorkspaceId}, same authorization shape as {@link #recordReference}.
      *
      * <p>
      * Throws {@link com.bytechef.ee.ai.hub.exception.NotFoundException} when the chat is not viewable and
