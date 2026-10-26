@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: migration-app
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${bytechef.datasource.url}
+    username: ${bytechef.datasource.username}
+    password: ${bytechef.datasource.password}
+  liquibase:
+    contexts: mono, ${spring.profiles.active:prod}
+    enabled: true
+    parameters:
+      billing.enabled: ${billing.enabled:false}
+  main:
+    web-application-type: none
+
+bytechef:
+  edition: ee
+  tenant:
+    mode: single
