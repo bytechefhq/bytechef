@@ -1,0 +1,49 @@
+extend type Query {
+    aiGuardrailsWorkspaceSettings(workspaceId: ID, scope: AiGuardrailsSettingsScope): AiGuardrailsWorkspaceSettings
+}
+
+extend type Mutation {
+    updateAiGuardrailsWorkspaceSettings(input: AiGuardrailsWorkspaceSettingsInput!): AiGuardrailsWorkspaceSettings
+}
+
+type AiGuardrailsWorkspaceSettings {
+    scope: AiGuardrailsSettingsScope
+    workspaceId: ID
+    redactPii: Boolean
+    redactSecrets: Boolean
+    blockedTerms: String
+    moderationEnabled: Boolean
+    injectionDetectionEnabled: Boolean
+    scanResponses: Boolean
+    blockingMode: AiGuardrailsBlockingMode
+    minConfidence: Float
+    redactMcpResults: Boolean
+    restoreIntoWorkflowOutput: Boolean
+}
+
+enum AiGuardrailsBlockingMode {
+    BLOCK
+    REDACT_AND_CONTINUE
+    ALLOW
+}
+
+enum AiGuardrailsSettingsScope {
+    PLATFORM
+    WORKSPACE
+    EMBEDDED
+}
+
+input AiGuardrailsWorkspaceSettingsInput {
+    scope: AiGuardrailsSettingsScope
+    workspaceId: ID
+    redactPii: Boolean
+    redactSecrets: Boolean
+    blockedTerms: String
+    moderationEnabled: Boolean
+    injectionDetectionEnabled: Boolean
+    scanResponses: Boolean
+    blockingMode: AiGuardrailsBlockingMode
+    minConfidence: Float
+    redactMcpResults: Boolean
+    restoreIntoWorkflowOutput: Boolean
+}
