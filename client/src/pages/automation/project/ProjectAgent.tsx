@@ -5,11 +5,14 @@ import ProjectBreadcrumb from '@/pages/automation/project/components/project-hea
 import ProjectItemSelect from '@/pages/automation/project/components/project-header/components/ProjectItemSelect';
 import ProjectsLeftSidebar from '@/pages/automation/project/components/projects-sidebar/ProjectsLeftSidebar';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import useOpenCopilot from '@/shared/components/copilot/hooks/useOpenCopilot';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import useElementWidth from '@/shared/hooks/useElementWidth';
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {useAiAgentQuery} from '@/shared/middleware/graphql';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useRef, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -37,7 +40,10 @@ const ProjectAgent = () => {
         }))
     );
 
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+
     const contentRowWidth = useElementWidth(contentRowRef);
+    const openCopilot = useOpenCopilot();
 
     const hasRoomForTestPanel = contentRowWidth === 0 || contentRowWidth >= TEST_PANEL_HIDE_THRESHOLD;
 
@@ -118,6 +124,16 @@ const ProjectAgent = () => {
                                     />
                                 )}
                             </div>
+                        }
+                        onAskCopilot={
+                            copilotEnabled
+                                ? () =>
+                                      openCopilot({
+                                          mode: MODE.ASK,
+                                          parameters: {aiAgentId: agent.id},
+                                          source: Source.AI_AGENT,
+                                      })
+                                : undefined
                         }
                         onToggleTestPanel={handleToggleTestPanel}
                         project={project}

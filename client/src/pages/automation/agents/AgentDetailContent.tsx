@@ -9,8 +9,13 @@ import AgentSettingsCard from '@/pages/automation/agents/components/detail/Agent
 import AgentSkillsCard from '@/pages/automation/agents/components/detail/AgentSkillsCard';
 import AgentSubAgentsCard from '@/pages/automation/agents/components/detail/AgentSubAgentsCard';
 import AgentToolsCard from '@/pages/automation/agents/components/detail/AgentToolsCard';
+import {useAgentExternalChangeStore} from '@/pages/automation/agents/stores/useAgentExternalChangeStore';
+import refreshAgentAfterExternalChange from '@/pages/automation/agents/utils/refreshAgentAfterExternalChange';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useAiAgentQuery} from '@/shared/middleware/graphql';
-import {useMemo} from 'react';
+import {useQueryClient} from '@tanstack/react-query';
+import {Fragment, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export interface AgentDetailContentPropsI {
@@ -19,13 +24,24 @@ export interface AgentDetailContentPropsI {
 }
 
 const AgentDetailContent = ({agentId, className}: AgentDetailContentPropsI) => {
+    const externalChangeRevision = useAgentExternalChangeStore((state) => state.revision);
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
     const {data, error: agentError, isLoading: agentIsLoading} = useAiAgentQuery({id: agentId}, {enabled: !!agentId});
+
+    const queryClient = useQueryClient();
 
     const agent = data?.aiAgent;
 
     const channels = useMemo(() => (agent?.channels ?? []).filter((channel) => channel != null), [agent?.channels]);
 
     const elements = useMemo(() => (agent?.elements ?? []).filter((element) => element != null), [agent?.elements]);
+
+    useEffect(() => {
+        return registerPostTurn(Source.AI_AGENT, () => {
+            void refreshAgentAfterExternalChange(queryClient);
+        });
+    }, [queryClient, registerPostTurn]);
 
     return (
         <PageLoader errors={[agentError]} loading={agentIsLoading}>
@@ -42,21 +58,27 @@ const AgentDetailContent = ({agentId, className}: AgentDetailContentPropsI) => {
                     </TabsList>
 
                     <TabsContent className="flex flex-col gap-6" value="agent">
-                        <AgentInstructionsCard agentId={agent.id} instructions={agent.instructions ?? null} />
+                        <AgentInstructionsCard
+                            agentId={agent.id}
+                            externalChangeRevision={externalChangeRevision}
+                            instructions={agent.instructions ?? null}
+                        />
 
-                        <AgentModelCard agentId={agent.id} elements={elements} />
+                        <Fragment key={externalChangeRevision}>
+                            <AgentModelCard agentId={agent.id} elements={elements} />
 
-                        <AgentChannelsCard agentId={agent.id} channels={channels} />
+                            <AgentChannelsCard agentId={agent.id} channels={channels} />
 
-                        <AgentToolsCard agentId={agent.id} elements={elements} />
+                            <AgentToolsCard agentId={agent.id} elements={elements} />
 
-                        <AgentSkillsCard agentId={agent.id} elements={elements} />
+                            <AgentSkillsCard agentId={agent.id} elements={elements} />
 
-                        <AgentKnowledgeBaseCard agentId={agent.id} elements={elements} />
+                            <AgentKnowledgeBaseCard agentId={agent.id} elements={elements} />
 
-                        <AgentSubAgentsCard agentId={agent.id} elements={elements} />
+                            <AgentSubAgentsCard agentId={agent.id} elements={elements} />
 
-                        <AgentScheduleCard agentId={agent.id} channels={channels} />
+                            <AgentScheduleCard agentId={agent.id} channels={channels} />
+                        </Fragment>
                     </TabsContent>
 
                     <TabsContent value="settings">
@@ -64,6 +86,7 @@ const AgentDetailContent = ({agentId, className}: AgentDetailContentPropsI) => {
                             agentId={agent.id}
                             channels={channels}
                             elements={elements}
+                            key={externalChangeRevision}
                             settings={agent.settings}
                         />
                     </TabsContent>
