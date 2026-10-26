@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.data.storage.db.remote.client.config;
 
 import com.bytechef.ee.platform.data.storage.db.remote.client.service.RemoteJdbcDataStorageServiceClient;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
@@ -46,8 +46,8 @@ public class RemoteJdbcDataStorageClientConfiguration {
     }
 
     @Bean
-    JdbcDataStorageService jdbcDataStorageService(LoadBalancedRestClient loadBalancedRestClient) {
-        return new RemoteJdbcDataStorageServiceClient(loadBalancedRestClient);
+    JdbcDataStorageService jdbcDataStorageService(GrpcChannels grpcChannels) {
+        return new RemoteJdbcDataStorageServiceClient(grpcChannels);
     }
 
     private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorage {
