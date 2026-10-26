@@ -7,8 +7,17 @@
 
 package com.bytechef.ee.platform.user.remote.client.service;
 
+import com.bytechef.ee.platform.user.remote.grpc.UserProtoMapper;
+import com.bytechef.ee.platform.user.remote.grpc.proto.FetchUserByEmailRequest;
+import com.bytechef.ee.platform.user.remote.grpc.proto.FetchUserByIdRequest;
+import com.bytechef.ee.platform.user.remote.grpc.proto.FetchUserByLoginRequest;
+import com.bytechef.ee.platform.user.remote.grpc.proto.FetchUserResponse;
+import com.bytechef.ee.platform.user.remote.grpc.proto.UserRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -22,6 +31,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RemoteUserServiceClient implements UserService {
+
+    private static final String SERVICE_ID = "api-gateway-app";
+
+    private final GrpcChannels grpcChannels;
+
+    public RemoteUserServiceClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
+    }
 
     @Override
     public Optional<User> activateInvitation(String key, String newPassword) {
@@ -75,12 +92,18 @@ public class RemoteUserServiceClient implements UserService {
 
     @Override
     public Optional<User> fetchCurrentUser() {
-        throw new UnsupportedOperationException();
+        Optional<String> login = SecurityUtils.fetchCurrentUserLogin();
+
+        return login.flatMap(this::fetchUserByLogin);
     }
 
     @Override
     public Optional<User> fetchUser(long id) {
-        throw new UnsupportedOperationException();
+        return toUser(
+            getStub().fetchUserById(
+                FetchUserByIdRequest.newBuilder()
+                    .setId(id)
+                    .build()));
     }
 
     @Override
@@ -90,12 +113,20 @@ public class RemoteUserServiceClient implements UserService {
 
     @Override
     public Optional<User> fetchUserByEmail(String email) {
-        throw new UnsupportedOperationException();
+        return toUser(
+            getStub().fetchUserByEmail(
+                FetchUserByEmailRequest.newBuilder()
+                    .setEmail(email)
+                    .build()));
     }
 
     @Override
     public Optional<User> fetchUserByLogin(String login) {
-        throw new UnsupportedOperationException();
+        return toUser(
+            getStub().fetchUserByLogin(
+                FetchUserByLoginRequest.newBuilder()
+                    .setLogin(login)
+                    .build()));
     }
 
     @Override
@@ -105,17 +136,23 @@ public class RemoteUserServiceClient implements UserService {
 
     @Override
     public User getCurrentUser() {
-        throw new UnsupportedOperationException();
+        Optional<User> user = fetchCurrentUser();
+
+        return user.orElseThrow(UserNotFoundException::new);
     }
 
     @Override
     public User getUser(long id) {
-        throw new UnsupportedOperationException();
+        Optional<User> user = fetchUser(id);
+
+        return user.orElseThrow(UserNotFoundException::new);
     }
 
     @Override
     public User getUser(String login) {
-        throw new UnsupportedOperationException();
+        Optional<User> user = fetchUserByLogin(login);
+
+        return user.orElseThrow(UserNotFoundException::new);
     }
 
     @Override
@@ -174,5 +211,17 @@ public class RemoteUserServiceClient implements UserService {
     @Override
     public boolean verifyTotpCode(String login, String code) {
         throw new UnsupportedOperationException();
+    }
+
+    private UserRemoteServiceGrpc.UserRemoteServiceBlockingStub getStub() {
+        return UserRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(SERVICE_ID));
+    }
+
+    private static Optional<User> toUser(FetchUserResponse fetchUserResponse) {
+        if (!fetchUserResponse.hasUser()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(UserProtoMapper.toUser(fetchUserResponse.getUser()));
     }
 }
