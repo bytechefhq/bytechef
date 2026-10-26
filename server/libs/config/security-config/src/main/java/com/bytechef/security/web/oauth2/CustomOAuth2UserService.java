@@ -49,7 +49,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnExpression("${bytechef.security.social-login.enabled} or ${bytechef.security.sso.enabled}")
+@ConditionalOnExpression("${bytechef.security.login.enabled} and (${bytechef.security.social-login.enabled} or ${bytechef.security.sso.enabled})")
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private static final String GITHUB_EMAILS_URL = "https://api.github.com/user/emails";
