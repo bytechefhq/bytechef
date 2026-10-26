@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.security.config;
+package com.bytechef.platform.workflow.execution.web.security.config;
 
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import java.util.List;

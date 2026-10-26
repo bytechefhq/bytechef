@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * @version ee
@@ -60,6 +62,27 @@ class ExecutionSessionIntTest {
             .cookie(new Cookie("SESSION", EncodingUtils.base64EncodeToString(sessionId))))
             .andExpect(result -> assertThat(result.getResponse()
                 .getStatus()).isNotEqualTo(401));
+    }
+
+    @Test
+    void testPublicFormsAreOpen() throws Exception {
+        for (String path : List.of(
+            "/api/automation/internal/trigger-form/abc", "/api/platform/internal/approval-form/abc")) {
+
+            assertThat(anonymousStatus(get(path))).as(path)
+                .isNotIn(401, 403);
+        }
+    }
+
+    private int anonymousStatus(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+        try {
+            return mockMvc.perform(requestBuilder)
+                .andReturn()
+                .getResponse()
+                .getStatus();
+        } catch (ServletException servletException) {
+            return 500;
+        }
     }
 
     private static <S extends Session> String saveSession(SessionRepository<S> sessionRepository) {
