@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.component.remote.grpc;
 
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionResult;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionVersionsRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionsRequest;
@@ -17,6 +18,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -34,6 +36,23 @@ public class ComponentDefinitionRemoteServiceGrpcServer
 
         this.componentDefinitionService = componentDefinitionService;
         this.componentProtoMapper = componentProtoMapper;
+    }
+
+    @Override
+    public void fetchComponentDefinition(
+        GetComponentDefinitionRequest request, StreamObserver<ComponentDefinitionResult> responseObserver) {
+
+        Optional<ComponentDefinition> componentDefinition = componentDefinitionService.fetchComponentDefinition(
+            request.getName(), request.hasVersion() ? request.getVersion() : null);
+
+        ComponentDefinitionResult.Builder builder = ComponentDefinitionResult.newBuilder();
+
+        componentDefinition.ifPresent(
+            curComponentDefinition -> builder
+                .setComponentDefinition(componentProtoMapper.toProto(curComponentDefinition)));
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
