@@ -1,4 +1,18 @@
 spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${bytechef.datasource.url}
+    username: ${bytechef.datasource.username}
+    password: ${bytechef.datasource.password}
+    hikari:
+      poolName: Hikari
+  liquibase:
+    contexts: user
+  mail:
+    host: ${bytechef.mail.host:localhost}
+    port: ${bytechef.mail.port:25}
+    username: ${bytechef.mail.username:}
+    password: ${bytechef.mail.password:}
   cloud:
     gateway:
       server:
@@ -34,6 +48,13 @@ bytechef:
   mail:
     base-url: https://www.bytechef.io
     from: noreply@app.bytechef.io
+  resources:
+    web: file:///opt/bytechef/client/
+  security:
+    login:
+      enabled: true
+  session:
+    store: redis
 
 server:
   servlet:
