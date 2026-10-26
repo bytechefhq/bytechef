@@ -310,6 +310,8 @@ bytechef:
   public-url: http://127.0.0.1:5173
   remote:
     grpc:
+      # Longest a call to another microservice may take
+      deadline: 10s
       # Send calls between microservices without TLS; only on a trusted network such as a Docker Compose network
       plaintext: false
       # Shared secret every call between microservices carries; a microservice serving gRPC refuses to start without it
