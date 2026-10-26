@@ -8,13 +8,16 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserIdsResponse;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserProjectDeploymentResolverRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,14 +30,11 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserProjectDeploymentResolverClient implements ConnectedUserProjectDeploymentResolver {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String CONNECTED_USER_PROJECT_DEPLOYMENT_RESOLVER =
-        "/remote/connected-user-project-deployment-resolver";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteConnectedUserProjectDeploymentResolverClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteConnectedUserProjectDeploymentResolverClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -43,25 +43,29 @@ public class RemoteConnectedUserProjectDeploymentResolverClient implements Conne
             return Map.of();
         }
 
-        Map<Long, Long> connectedUserIds = loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(CONNECTED_USER_PROJECT_DEPLOYMENT_RESOLVER + "/get-connected-user-ids")
-                .build(),
-            List.copyOf(projectDeploymentIds), new ParameterizedTypeReference<>() {});
+        ConnectedUserProjectDeploymentResolverRemoteServiceGrpc.ConnectedUserProjectDeploymentResolverRemoteServiceBlockingStub stub =
+            ConnectedUserProjectDeploymentResolverRemoteServiceGrpc.newBlockingStub(
+                grpcChannels.getChannel(CONFIGURATION_APP));
 
-        return connectedUserIds == null ? Map.of() : connectedUserIds;
+        ConnectedUserIdsResponse connectedUserIdsResponse = stub.getConnectedUserIds(
+            IdsRequest.newBuilder()
+                .addAllIds(projectDeploymentIds)
+                .build());
+
+        return connectedUserIdsResponse.getConnectedUserIdsMap();
     }
 
     @Override
     public List<Long> getProjectDeploymentIds(long connectedUserId) {
-        List<Long> projectDeploymentIds = loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(CONNECTED_USER_PROJECT_DEPLOYMENT_RESOLVER + "/get-project-deployment-ids/{connectedUserId}")
-                .build(connectedUserId),
-            new ParameterizedTypeReference<>() {});
+        ConnectedUserProjectDeploymentResolverRemoteServiceGrpc.ConnectedUserProjectDeploymentResolverRemoteServiceBlockingStub stub =
+            ConnectedUserProjectDeploymentResolverRemoteServiceGrpc.newBlockingStub(
+                grpcChannels.getChannel(CONFIGURATION_APP));
 
-        return projectDeploymentIds == null ? List.of() : projectDeploymentIds;
+        IdsResponse idsResponse = stub.getProjectDeploymentIds(
+            IdRequest.newBuilder()
+                .setId(connectedUserId)
+                .build());
+
+        return idsResponse.getIdsList();
     }
 }

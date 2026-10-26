@@ -11,10 +11,12 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserProjectFacadeRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.CopyWorkflowTemplateRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.StringResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -30,26 +32,26 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserProjectFacadeClient implements ConnectedUserProjectFacade {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String CONNECTED_USER_PROJECT_FACADE = "/remote/connected-user-project-facade";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteConnectedUserProjectFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteConnectedUserProjectFacadeClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(CONNECTED_USER_PROJECT_FACADE + "/copy-workflow-template")
-                .queryParam("externalUserId", externalUserId)
-                .queryParam("workflowUuid", workflowUuid)
-                .queryParam("environment", environment)
-                .build(),
-            null, String.class);
+        ConnectedUserProjectFacadeRemoteServiceGrpc.ConnectedUserProjectFacadeRemoteServiceBlockingStub stub =
+            ConnectedUserProjectFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        StringResponse stringResponse = stub.copyWorkflowTemplate(
+            CopyWorkflowTemplateRequest.newBuilder()
+                .setEnvironment(environment.name())
+                .setExternalUserId(externalUserId)
+                .setWorkflowUuid(workflowUuid)
+                .build());
+
+        return stringResponse.getValue();
     }
 
     @Override
