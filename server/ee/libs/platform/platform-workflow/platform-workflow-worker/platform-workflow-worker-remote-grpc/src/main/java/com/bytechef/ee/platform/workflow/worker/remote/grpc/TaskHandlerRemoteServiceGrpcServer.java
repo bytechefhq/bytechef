@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.HandleTaskResp
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.TaskHandlerRemoteServiceGrpc;
 import com.bytechef.ee.remote.grpc.ProtoValues;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 /**
@@ -46,7 +47,12 @@ public class TaskHandlerRemoteServiceGrpcServer extends TaskHandlerRemoteService
         try {
             output = taskHandler.handle(taskExecution);
         } catch (TaskExecutionException taskExecutionException) {
-            throw new IllegalStateException(taskExecutionException.getMessage(), taskExecutionException);
+            responseObserver.onError(
+                Status.INTERNAL.withDescription(taskExecutionException.getMessage())
+                    .withCause(taskExecutionException)
+                    .asRuntimeException());
+
+            return;
         }
 
         HandleTaskResponse.Builder builder = HandleTaskResponse.newBuilder();
