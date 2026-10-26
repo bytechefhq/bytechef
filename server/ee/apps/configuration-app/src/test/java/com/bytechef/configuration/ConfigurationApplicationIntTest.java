@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.ee.platform.user.remote.client.service.RemoteUserServiceClient;
 import com.bytechef.ee.platform.user.remote.grpc.UserRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
@@ -44,6 +45,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
@@ -111,6 +113,14 @@ public class ConfigurationApplicationIntTest {
     void testMailUsesBytechefMailSettings() {
         assertThat(environment.getProperty("spring.mail.host")).isEqualTo("mailpit");
         assertThat(environment.getProperty("spring.mail.port")).isEqualTo("1025");
+    }
+
+    @Test
+    void testJdbcConvertsEncryptedMaps() {
+        JdbcCustomConversions jdbcCustomConversions = applicationContext.getBean(JdbcCustomConversions.class);
+
+        assertThat(jdbcCustomConversions.hasCustomWriteTarget(EncryptedMapWrapper.class)).isTrue();
+        assertThat(jdbcCustomConversions.hasCustomReadTarget(String.class, EncryptedMapWrapper.class)).isTrue();
     }
 
     @Test
