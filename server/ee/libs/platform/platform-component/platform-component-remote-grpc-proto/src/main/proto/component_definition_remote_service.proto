@@ -19,8 +19,10 @@ service ComponentDefinitionRemoteService {
 }
 
 service ActionDefinitionRemoteService {
+  rpc ExecuteWorkflowNodeDescription(ActionExecuteWorkflowNodeDescriptionRequest) returns (StringResponse);
   rpc GetActionDefinition(GetActionDefinitionRequest) returns (RemoteActionDefinition);
   rpc GetActionDefinitions(ComponentVersionRequest) returns (RemoteActionDefinitions);
+  rpc IsDynamicOutputDefined(GetActionDefinitionRequest) returns (BoolResponse);
 }
 
 service TriggerDefinitionRemoteService {
@@ -28,6 +30,7 @@ service TriggerDefinitionRemoteService {
   rpc GetTriggerDefinition(GetTriggerDefinitionRequest) returns (RemoteTriggerDefinition);
   rpc GetTriggerDefinitions(ComponentVersionRequest) returns (RemoteTriggerDefinitions);
   rpc GetWebhookTriggerFlags(GetTriggerDefinitionRequest) returns (RemoteWebhookTriggerFlags);
+  rpc IsDynamicOutputDefined(GetTriggerDefinitionRequest) returns (BoolResponse);
 }
 
 service ConnectionDefinitionRemoteService {
@@ -265,6 +268,10 @@ message WebhookEnableOutputResult {
   optional RemoteWebhookEnableOutput webhook_enable_output = 1;
 }
 
+message BoolResponse {
+  bool value = 1;
+}
+
 message StringResponse {
   optional string value = 1;
 }
@@ -303,6 +310,13 @@ message GetActionDefinitionRequest {
   string component_name = 1;
   int32 component_version = 2;
   string action_name = 3;
+}
+
+message ActionExecuteWorkflowNodeDescriptionRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string action_name = 3;
+  google.protobuf.Struct input_parameters = 4;
 }
 
 message GetTriggerDefinitionRequest {

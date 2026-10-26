@@ -235,6 +235,27 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testActionDefinitionQueries() {
+        Map<String, Object> inputParameters = Map.of("count", 5);
+
+        when(actionDefinitionService.isDynamicOutputDefined("keep", 1, "get")).thenReturn(true);
+        when(actionDefinitionService.executeWorkflowNodeDescription("keep", 1, "get", inputParameters))
+            .thenReturn("Get 5");
+
+        assertThat(remoteActionDefinitionServiceClient.isDynamicOutputDefined("keep", 1, "get")).isTrue();
+        assertThat(
+            remoteActionDefinitionServiceClient.executeWorkflowNodeDescription("keep", 1, "get", inputParameters))
+                .isEqualTo("Get 5");
+    }
+
+    @Test
+    void testTriggerIsDynamicOutputDefined() {
+        when(triggerDefinitionService.isDynamicOutputDefined("keep", 1, "new")).thenReturn(true);
+
+        assertThat(remoteTriggerDefinitionServiceClient.isDynamicOutputDefined("keep", 1, "new")).isTrue();
+    }
+
+    @Test
     void testTriggerDefinitionCalls() {
         ComponentDefinition componentDefinition = componentDefinition("keep", 1);
         TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
