@@ -7,13 +7,17 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.SaveTriggerStateRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.TriggerStateRemoteServiceGrpc;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.TriggerStateValue;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.WorkflowExecutionIdRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -24,38 +28,47 @@ import org.springframework.stereotype.Component;
 public class RemoteTriggerStateFacadeClient implements TriggerStateFacade {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String TRIGGER_STATE_FACADE = "/remote/trigger-state-facade";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteTriggerStateFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteTriggerStateFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.platformWorkflowExecutionProtoMapper = new PlatformWorkflowExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public void delete(WorkflowExecutionId workflowExecutionId) {
-        throw new UnsupportedOperationException();
+        getStub().delete(toWorkflowExecutionIdRequest(workflowExecutionId));
     }
 
     @Override
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
-        return Optional.ofNullable(
-            loadBalancedRestClient.get(
-                uriBuilder -> uriBuilder
-                    .host(EXECUTION_APP)
-                    .path(TRIGGER_STATE_FACADE + "/fetch-value/{workflowExecutionId}")
-                    .build(workflowExecutionId),
-                new ParameterizedTypeReference<T>() {}));
+        TriggerStateValue triggerStateValue = getStub().fetchValue(toWorkflowExecutionIdRequest(workflowExecutionId));
+
+        if (!triggerStateValue.hasValue()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable((T) platformWorkflowExecutionProtoMapper.toObject(triggerStateValue.getValue()));
     }
 
     @Override
     public void save(WorkflowExecutionId workflowExecutionId, Object value) {
-        loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TRIGGER_STATE_FACADE + "/save/{workflowExecutionId}")
-                .build(workflowExecutionId),
-            value);
+        getStub().save(
+            SaveTriggerStateRequest.newBuilder()
+                .setValue(platformWorkflowExecutionProtoMapper.toBytes(value))
+                .setWorkflowExecutionId(workflowExecutionId.toString())
+                .build());
+    }
+
+    private TriggerStateRemoteServiceGrpc.TriggerStateRemoteServiceBlockingStub getStub() {
+        return TriggerStateRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private static WorkflowExecutionIdRequest toWorkflowExecutionIdRequest(WorkflowExecutionId workflowExecutionId) {
+        return WorkflowExecutionIdRequest.newBuilder()
+            .setWorkflowExecutionId(workflowExecutionId.toString())
+            .build();
     }
 }

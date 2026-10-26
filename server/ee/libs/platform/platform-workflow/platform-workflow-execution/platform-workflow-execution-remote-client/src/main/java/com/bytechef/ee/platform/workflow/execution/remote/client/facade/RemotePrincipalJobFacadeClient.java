@@ -9,11 +9,20 @@ package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreateChildJobRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.CreatePrincipalJobRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.PrincipalJobFacadeRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -23,56 +32,55 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
 
-    private static final String PRINCIPAL_JOB_FACADE = "/remote/principal-job-facade";
     private static final String EXECUTION_APP = "execution-app";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper;
+    private final @Nullable Duration executionDeadline;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemotePrincipalJobFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemotePrincipalJobFacadeClient(
+        ApplicationProperties applicationProperties, GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+
+        ApplicationProperties.Remote remote = applicationProperties.getRemote();
+
+        ApplicationProperties.Remote.Grpc grpc = remote.getGrpc();
+
+        this.executionDeadline = grpc.getExecutionDeadline();
+        this.platformWorkflowExecutionProtoMapper = new PlatformWorkflowExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(PRINCIPAL_JOB_FACADE + "/create-child-job")
-                .build(),
-            new CreateChildJobRequest(parentJobId, jobParametersDTO, platformType), Long.class);
+        IdResponse idResponse = getStub().createChildJob(
+            CreateChildJobRequest.newBuilder()
+                .setJobParameters(platformWorkflowExecutionProtoMapper.toProto(jobParametersDTO))
+                .setParentJobId(parentJobId)
+                .setPlatformType(platformType.name())
+                .build());
+
+        return idResponse.getId();
     }
 
     @Override
     public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(PRINCIPAL_JOB_FACADE + "/create-job")
-                .build(),
-            new CreateJobRequest(jobParametersDTO, jobPrincipalId, type), Long.class);
+        IdResponse idResponse = getStub().createJob(
+            toCreatePrincipalJobRequest(jobParametersDTO, jobPrincipalId, type));
+
+        return idResponse.getId();
     }
 
     @Override
     public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(PRINCIPAL_JOB_FACADE + "/create-sync-job")
-                .build(),
-            new CreateJobRequest(jobParametersDTO, jobPrincipalId, type), Job.class);
+        return platformWorkflowExecutionProtoMapper.toJob(
+            getStub().createSyncJob(toCreatePrincipalJobRequest(jobParametersDTO, jobPrincipalId, type)));
     }
 
     @Override
     public long createPrincipalLinkedJob(
         long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
 
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(PRINCIPAL_JOB_FACADE + "/create-principal-linked-job")
-                .build(),
-            new CreatePrincipalLinkedJobRequest(referenceJobId, jobParametersDTO, platformType), Long.class);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -87,16 +95,25 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
             new CreateJobRequest(jobParametersDTO, jobPrincipalId, platformType), Long.class);
     }
 
-    @SuppressFBWarnings("EI")
-    public record CreateChildJobRequest(long parentJobId, JobParametersDTO jobParameters, PlatformType platformType) {
+    private PrincipalJobFacadeRemoteServiceGrpc.PrincipalJobFacadeRemoteServiceBlockingStub getStub() {
+        PrincipalJobFacadeRemoteServiceGrpc.PrincipalJobFacadeRemoteServiceBlockingStub stub =
+            PrincipalJobFacadeRemoteServiceGrpc.newBlockingStub(
+                grpcChannels.getChannel(EXECUTION_APP));
+
+        if (executionDeadline == null) {
+            return stub;
+        }
+
+        return stub.withDeadlineAfter(executionDeadline.toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParametersDTO jobParameters, long jobPrincipalId, PlatformType type) {
-    }
+    private CreatePrincipalJobRequest toCreatePrincipalJobRequest(
+        JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
 
-    @SuppressFBWarnings("EI")
-    public record CreatePrincipalLinkedJobRequest(
-        long referenceJobId, JobParametersDTO jobParameters, PlatformType platformType) {
+        return CreatePrincipalJobRequest.newBuilder()
+            .setJobParameters(platformWorkflowExecutionProtoMapper.toProto(jobParametersDTO))
+            .setJobPrincipalId(jobPrincipalId)
+            .setPlatformType(type.name())
+            .build();
     }
 }

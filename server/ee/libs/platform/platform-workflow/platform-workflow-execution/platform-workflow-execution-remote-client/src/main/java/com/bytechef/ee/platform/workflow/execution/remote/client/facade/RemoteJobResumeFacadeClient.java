@@ -7,13 +7,17 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.JobResumeFacadeRemoteServiceGrpc;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.ResumeJobRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.ResumeJobResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.function.LongConsumer;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -25,13 +29,13 @@ import org.springframework.stereotype.Component;
 public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String JOB_RESUME_FACADE = "/remote/job-resume-facade";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteJobResumeFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteJobResumeFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.platformWorkflowExecutionProtoMapper = new PlatformWorkflowExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -46,12 +50,12 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
     @Override
     public JobResumeOutcome resumeExpiredJob(String id) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(JOB_RESUME_FACADE + "/resume-expired-job")
-                .build(),
-            new ResumeExpiredJobRequest(id), JobResumeOutcome.class);
+        ResumeJobResponse resumeJobResponse = getStub().resumeExpiredJob(
+            ResumeJobRequest.newBuilder()
+                .setId(id)
+                .build());
+
+        return JobResumeOutcome.valueOf(resumeJobResponse.getOutcome());
     }
 
     @Override
@@ -61,7 +65,13 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
     @Override
     public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
-        throw new UnsupportedOperationException();
+        ResumeJobResponse resumeJobResponse = getStub().resumeJob(
+            ResumeJobRequest.newBuilder()
+                .setData(platformWorkflowExecutionProtoMapper.toBytes(data))
+                .setId(id)
+                .build());
+
+        return JobResumeOutcome.valueOf(resumeJobResponse.getOutcome());
     }
 
     @Override
@@ -76,6 +86,7 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
         throw new UnsupportedOperationException();
     }
 
-    private record ResumeExpiredJobRequest(String id) {
+    private JobResumeFacadeRemoteServiceGrpc.JobResumeFacadeRemoteServiceBlockingStub getStub() {
+        return JobResumeFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
     }
 }

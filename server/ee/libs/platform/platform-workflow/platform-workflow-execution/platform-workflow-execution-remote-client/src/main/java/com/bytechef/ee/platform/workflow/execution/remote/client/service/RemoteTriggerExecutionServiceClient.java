@@ -7,13 +7,16 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.client.service;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.TriggerExecutionRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -24,23 +27,19 @@ import org.springframework.stereotype.Component;
 public class RemoteTriggerExecutionServiceClient implements TriggerExecutionService {
 
     private static final String EXECUTION_APP = "execution-app";
-    private static final String TRIGGER_EXECUTION_SERVICE = "/remote/trigger-execution-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteTriggerExecutionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteTriggerExecutionServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.platformWorkflowExecutionProtoMapper = new PlatformWorkflowExecutionProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public TriggerExecution create(TriggerExecution triggerExecution) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TRIGGER_EXECUTION_SERVICE + "/create")
-                .build(),
-            triggerExecution, TriggerExecution.class);
+        return platformWorkflowExecutionProtoMapper
+            .toTriggerExecution(getStub().create(platformWorkflowExecutionProtoMapper.toProto(triggerExecution)));
     }
 
     @Override
@@ -70,21 +69,20 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
 
     @Override
     public TriggerExecution getTriggerExecution(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TRIGGER_EXECUTION_SERVICE + "/get-trigger-execution/{id}")
-                .build(id),
-            TriggerExecution.class);
+        return platformWorkflowExecutionProtoMapper.toTriggerExecution(
+            getStub().getTriggerExecution(
+                IdRequest.newBuilder()
+                    .setId(id)
+                    .build()));
     }
 
     @Override
     public TriggerExecution update(TriggerExecution triggerExecution) {
-        return loadBalancedRestClient.put(
-            uriBuilder -> uriBuilder
-                .host(EXECUTION_APP)
-                .path(TRIGGER_EXECUTION_SERVICE + "/update")
-                .build(),
-            triggerExecution, TriggerExecution.class);
+        return platformWorkflowExecutionProtoMapper
+            .toTriggerExecution(getStub().update(platformWorkflowExecutionProtoMapper.toProto(triggerExecution)));
+    }
+
+    private TriggerExecutionRemoteServiceGrpc.TriggerExecutionRemoteServiceBlockingStub getStub() {
+        return TriggerExecutionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
     }
 }
