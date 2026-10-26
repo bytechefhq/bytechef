@@ -9,9 +9,12 @@ package com.bytechef.worker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.grpc.BindableService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
 /**
@@ -21,6 +24,9 @@ import org.springframework.core.env.Environment;
  */
 @SpringBootTest(classes = WorkerApplication.class)
 public class WorkerApplicationIntTest {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private Environment environment;
@@ -33,5 +39,23 @@ public class WorkerApplicationIntTest {
     public void testSharedAndAppConfigurationLoad() {
         assertThat(environment.getProperty("spring.task.execution.thread-name-prefix")).isEqualTo("worker-app-task-");
         assertThat(environment.getProperty("docs.documentation-url")).isEqualTo("https://docs.bytechef.io");
+    }
+
+    @Test
+    void testComponentGrpcServicesAreServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains("bytechef.platform.component.remote.v1.ComponentDefinitionRemoteService",
+            "bytechef.platform.component.remote.v1.ActionDefinitionRemoteService",
+            "bytechef.platform.component.remote.v1.TriggerDefinitionRemoteService",
+            "bytechef.platform.component.remote.v1.ConnectionDefinitionRemoteService",
+            "bytechef.platform.component.remote.v1.ActionDefinitionFacadeRemoteService",
+            "bytechef.platform.component.remote.v1.TriggerDefinitionFacadeRemoteService");
     }
 }

@@ -1,6 +1,11 @@
 server:
   port: 9999
 
+spring:
+  grpc:
+    server:
+      port: 0
+
 bytechef:
   discovery-service:
     provider: REDIS
@@ -13,6 +18,10 @@ bytechef:
     provider: JDBC
   message-broker:
     provider: MEMORY
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
   workflow:
     execution:
       agent:

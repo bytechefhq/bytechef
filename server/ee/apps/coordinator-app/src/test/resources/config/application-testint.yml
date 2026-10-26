@@ -1,6 +1,11 @@
 server:
   port: 9999
 
+spring:
+  grpc:
+    server:
+      port: 0
+
 bytechef:
   edition: EE
   file-storage:
@@ -9,6 +14,10 @@ bytechef:
     provider: JDBC
   message-broker:
     provider: MEMORY
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
   webhook-delivery:
     concurrency-limit: 10
     max-pending-deliveries: 1000

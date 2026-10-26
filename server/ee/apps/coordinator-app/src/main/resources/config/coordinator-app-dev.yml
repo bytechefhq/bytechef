@@ -2,6 +2,9 @@ server:
   port: 7333
 
 spring:
+  grpc:
+    server:
+      port: 17333
   devtools:
     livereload:
         port: 35730

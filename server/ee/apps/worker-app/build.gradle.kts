@@ -64,6 +64,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:config:microservice-config"))
+    implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
@@ -72,7 +73,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
-    implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-client"))
@@ -83,6 +84,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:modules:components:app-event"))
 
+    testImplementation("io.grpc:grpc-api")
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
