@@ -8,6 +8,10 @@ server:
   port: 7111
 
 bytechef:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bytechef
+    username: postgres
+    password: postgres
   mail:
     host: localhost
     port: 1025
