@@ -188,6 +188,11 @@ public class ApplicationProperties {
     private Redis redis = new Redis();
 
     /**
+     * Calls between EE microservices
+     */
+    private Remote remote = new Remote();
+
+    /**
      * Static resources configuration
      */
     private Resources resources = new Resources();
@@ -364,6 +369,10 @@ public class ApplicationProperties {
         return redis;
     }
 
+    public Remote getRemote() {
+        return remote;
+    }
+
     public Resources getResources() {
         return resources;
     }
@@ -530,6 +539,10 @@ public class ApplicationProperties {
 
     public void setRedis(Redis redis) {
         this.redis = redis;
+    }
+
+    public void setRemote(Remote remote) {
+        this.remote = remote;
     }
 
     public void setResources(Resources resources) {
@@ -4985,6 +4998,71 @@ public class ApplicationProperties {
 
         public void setTimeout(long timeout) {
             this.timeout = timeout;
+        }
+    }
+
+    /**
+     * Calls between EE microservices.
+     */
+    public static class Remote {
+
+        /**
+         * gRPC transport configuration
+         */
+        private Grpc grpc = new Grpc();
+
+        public Grpc getGrpc() {
+            return grpc;
+        }
+
+        public void setGrpc(Grpc grpc) {
+            this.grpc = grpc;
+        }
+
+        /**
+         * gRPC transport between EE microservices.
+         */
+        public static class Grpc {
+
+            /**
+             * Send calls without TLS. Only for a trusted network, such as a Docker Compose network
+             */
+            private boolean plaintext;
+
+            /**
+             * Shared secret every call between microservices carries; a server refuses to start without it
+             */
+            private String serviceToken;
+
+            /**
+             * Fixed gRPC targets by service id, such as {@code localhost:17111}; services without one are found through
+             * service discovery
+             */
+            private Map<String, String> targets;
+
+            public String getServiceToken() {
+                return serviceToken;
+            }
+
+            public Map<String, String> getTargets() {
+                return targets;
+            }
+
+            public boolean isPlaintext() {
+                return plaintext;
+            }
+
+            public void setPlaintext(boolean plaintext) {
+                this.plaintext = plaintext;
+            }
+
+            public void setServiceToken(String serviceToken) {
+                this.serviceToken = serviceToken;
+            }
+
+            public void setTargets(Map<String, String> targets) {
+                this.targets = targets;
+            }
         }
     }
 
