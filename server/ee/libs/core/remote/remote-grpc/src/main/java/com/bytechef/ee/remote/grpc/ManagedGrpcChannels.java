@@ -8,6 +8,7 @@
 package com.bytechef.ee.remote.grpc;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.remote.grpc.discovery.DiscoveryClientNameResolver;
 import com.bytechef.ee.remote.grpc.discovery.DiscoveryClientNameResolverProvider;
 import com.bytechef.ee.remote.grpc.interceptor.DeadlineClientInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenClientInterceptor;
@@ -19,7 +20,9 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.stereotype.Component;
+import org.springframework.util.unit.DataSize;
 
 /**
  * One channel per service id, using TLS unless the trusted-network switch {@code bytechef.remote.grpc.plaintext} is on.
@@ -31,7 +34,9 @@ import org.springframework.stereotype.Component;
 public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
 
     private final Duration deadline;
+    private final Map<String, ManagedChannel> instanceManagedChannels = new ConcurrentHashMap<>();
     private final Map<String, ManagedChannel> managedChannels = new ConcurrentHashMap<>();
+    private final DataSize maxInboundMessageSize;
     private final boolean plaintext;
     private final String serviceToken;
     private final Map<String, String> targets;
@@ -44,6 +49,7 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         Map<String, String> configuredTargets = grpc.getTargets();
 
         this.deadline = grpc.getDeadline();
+        this.maxInboundMessageSize = grpc.getMaxInboundMessageSize();
         this.plaintext = grpc.isPlaintext();
         this.serviceToken = grpc.getServiceToken();
         this.targets = configuredTargets == null ? Map.of() : Map.copyOf(configuredTargets);
@@ -56,29 +62,67 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
         }
 
         managedChannels.clear();
+
+        for (ManagedChannel managedChannel : instanceManagedChannels.values()) {
+            managedChannel.shutdownNow();
+        }
+
+        instanceManagedChannels.clear();
     }
 
     @Override
     public Channel getChannel(String serviceId) {
-        if (StringUtils.isBlank(serviceToken)) {
-            throw new IllegalStateException(
-                "bytechef.remote.grpc.service-token must be set to call another microservice");
-        }
+        checkServiceToken();
 
-        return managedChannels.computeIfAbsent(serviceId, this::createManagedChannel);
+        return managedChannels.computeIfAbsent(
+            serviceId, curServiceId -> createManagedChannel(getTarget(curServiceId)));
+    }
+
+    @Override
+    public Channel getChannel(ServiceInstance serviceInstance) {
+        checkServiceToken();
+
+        return instanceManagedChannels.computeIfAbsent(
+            serviceInstance.getInstanceId(), instanceId -> createManagedChannel(getInstanceTarget(serviceInstance)));
     }
 
     public String getTarget(String serviceId) {
         return targets.getOrDefault(serviceId, DiscoveryClientNameResolverProvider.SCHEME + ":///" + serviceId);
     }
 
-    private ManagedChannel createManagedChannel(String serviceId) {
-        ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forTarget(getTarget(serviceId))
+    private static String getInstanceTarget(ServiceInstance serviceInstance) {
+        Map<String, String> metadata = serviceInstance.getMetadata();
+
+        String grpcPort = metadata == null ? null : metadata.get(DiscoveryClientNameResolver.GRPC_PORT_METADATA_KEY);
+
+        if (StringUtils.isBlank(grpcPort)) {
+            throw new IllegalStateException(
+                "Service instance %s of %s publishes no %s".formatted(
+                    serviceInstance.getInstanceId(), serviceInstance.getServiceId(),
+                    DiscoveryClientNameResolver.GRPC_PORT_METADATA_KEY));
+        }
+
+        return serviceInstance.getHost() + ":" + grpcPort;
+    }
+
+    private void checkServiceToken() {
+        if (StringUtils.isBlank(serviceToken)) {
+            throw new IllegalStateException(
+                "bytechef.remote.grpc.service-token must be set to call another microservice");
+        }
+    }
+
+    private ManagedChannel createManagedChannel(String target) {
+        ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forTarget(target)
             .defaultLoadBalancingPolicy("round_robin")
             .intercept(new TenantContextClientInterceptor(), new ServiceTokenClientInterceptor(serviceToken));
 
         if (deadline != null) {
             managedChannelBuilder.intercept(new DeadlineClientInterceptor(deadline));
+        }
+
+        if (maxInboundMessageSize != null) {
+            managedChannelBuilder.maxInboundMessageSize(Math.toIntExact(maxInboundMessageSize.toBytes()));
         }
 
         if (plaintext) {

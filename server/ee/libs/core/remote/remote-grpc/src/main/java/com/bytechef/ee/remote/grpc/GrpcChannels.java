@@ -8,14 +8,16 @@
 package com.bytechef.ee.remote.grpc;
 
 import io.grpc.Channel;
+import org.springframework.cloud.client.ServiceInstance;
 
 /**
  * Gives remote clients a channel to the microservice that serves them.
  *
  * @version ee
  */
-@FunctionalInterface
 public interface GrpcChannels {
 
     Channel getChannel(String serviceId);
+
+    Channel getChannel(ServiceInstance serviceInstance);
 }

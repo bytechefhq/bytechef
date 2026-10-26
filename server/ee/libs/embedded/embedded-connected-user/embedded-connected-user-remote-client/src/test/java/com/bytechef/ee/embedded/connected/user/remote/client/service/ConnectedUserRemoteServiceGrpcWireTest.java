@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.remote.grpc.ConnectedUserRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -48,7 +49,7 @@ class ConnectedUserRemoteServiceGrpcWireTest {
             .directExecutor()
             .build();
 
-        remoteConnectedUserServiceClient = new RemoteConnectedUserServiceClient(serviceId -> managedChannel);
+        remoteConnectedUserServiceClient = new RemoteConnectedUserServiceClient(new FixedGrpcChannels(managedChannel));
     }
 
     @AfterEach
