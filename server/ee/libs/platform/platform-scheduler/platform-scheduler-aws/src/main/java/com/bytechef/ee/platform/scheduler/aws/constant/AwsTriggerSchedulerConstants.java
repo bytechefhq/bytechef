@@ -25,6 +25,7 @@ public class AwsTriggerSchedulerConstants {
     public static final String DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID = "dynamicWebhookTriggerRefreshSqsListener";
     public static final String ONE_TIME_TASK_LISTENER_ID = "oneTimeTaskSqsListener";
     public static final String ONE_TIME_TASK_MESSAGE_PREFIX = "resume:";
+    public static final String ONE_TIME_TASK_TENANT_SEPARATOR = ":";
     public static final String POLLING_TRIGGER_LISTENER_ID = "pollingTriggerSqsListener";
     public static final String SCHEDULE_TRIGGER_LISTENER_ID = "scheduleTriggerSqsListener";
 }

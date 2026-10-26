@@ -19,6 +19,7 @@ package com.bytechef.platform.scheduler.job;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
@@ -32,10 +33,12 @@ import com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -239,6 +242,70 @@ class OneTimeSchedulerJobTest {
         }
 
         verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void testExecuteResumesTheExpiredSuspendInTheTenantTheTaskWasScheduledIn() {
+        AtomicReference<String> facadeTenantId = new AtomicReference<>();
+
+        when(jobResumeFacade.resumeExpiredJob(JOB_RESUME_ID)).thenAnswer(invocation -> {
+            facadeTenantId.set(TenantContext.getCurrentTenantId());
+
+            return JobResumeOutcome.OK;
+        });
+
+        oneTimeSchedulerJob.setJobResumeFacade(jobResumeFacade);
+
+        JobExecutionContext context = createContext(Map.of(JobResumeId.TIMEOUT_TASK_PARAMETER, JOB_RESUME_ID));
+
+        context.getMergedJobDataMap()
+            .put(OneTimeSchedulerJob.TENANT_ID, "000002");
+
+        oneTimeSchedulerJob.execute(context);
+
+        assertEquals("000002", facadeTenantId.get());
+        assertEquals(TenantContext.DEFAULT_TENANT_ID, TenantContext.getCurrentTenantId());
+    }
+
+    @Test
+    void testExecutePublishesTheResumeJobEventInTheTenantTheTaskWasScheduledIn() {
+        AtomicReference<String> eventTenantId = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            eventTenantId.set(TenantContext.getCurrentTenantId());
+
+            return null;
+        }).when(eventPublisher)
+            .publishEvent(any(ResumeJobEvent.class));
+
+        JobExecutionContext context = createContext(Map.of());
+
+        context.getMergedJobDataMap()
+            .put(OneTimeSchedulerJob.TENANT_ID, "000002");
+
+        oneTimeSchedulerJob.execute(context);
+
+        verifyResumeJobEventPublished();
+
+        assertEquals("000002", eventTenantId.get());
+    }
+
+    @Test
+    void testExecutePublishesTheResumeJobEventInTheCurrentTenantForATaskScheduledWithoutATenant() {
+        AtomicReference<String> eventTenantId = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            eventTenantId.set(TenantContext.getCurrentTenantId());
+
+            return null;
+        }).when(eventPublisher)
+            .publishEvent(any(ResumeJobEvent.class));
+
+        oneTimeSchedulerJob.execute(createContext(Map.of()));
+
+        verifyResumeJobEventPublished();
+
+        assertEquals(TenantContext.DEFAULT_TENANT_ID, eventTenantId.get());
     }
 
     @Test
