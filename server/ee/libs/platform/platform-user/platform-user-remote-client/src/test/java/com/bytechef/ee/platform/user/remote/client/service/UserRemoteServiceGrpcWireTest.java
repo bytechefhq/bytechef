@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.user.remote.grpc.AuthorityRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.user.remote.grpc.UserRemoteServiceGrpcServer;
+import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
@@ -58,8 +59,8 @@ class UserRemoteServiceGrpcWireTest {
             .directExecutor()
             .build();
 
-        remoteAuthorityServiceClient = new RemoteAuthorityServiceClient(serviceId -> managedChannel);
-        remoteUserServiceClient = new RemoteUserServiceClient(serviceId -> managedChannel);
+        remoteAuthorityServiceClient = new RemoteAuthorityServiceClient(new FixedGrpcChannels(managedChannel));
+        remoteUserServiceClient = new RemoteUserServiceClient(new FixedGrpcChannels(managedChannel));
     }
 
     @AfterEach

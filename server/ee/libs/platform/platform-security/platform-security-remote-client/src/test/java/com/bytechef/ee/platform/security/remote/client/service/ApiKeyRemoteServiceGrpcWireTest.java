@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.security.remote.grpc.ApiKeyRemoteServiceGrpcServer;
+import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -50,7 +51,7 @@ class ApiKeyRemoteServiceGrpcWireTest {
             .directExecutor()
             .build();
 
-        remoteApiKeyServiceClient = new RemoteApiKeyServiceClient(serviceId -> managedChannel);
+        remoteApiKeyServiceClient = new RemoteApiKeyServiceClient(new FixedGrpcChannels(managedChannel));
     }
 
     @AfterEach

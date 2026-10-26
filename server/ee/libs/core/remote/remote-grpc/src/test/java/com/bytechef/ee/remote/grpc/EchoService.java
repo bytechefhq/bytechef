@@ -42,8 +42,19 @@ public final class EchoService implements BindableService {
         .setResponseMarshaller(new StringMarshaller())
         .build();
 
+    public static final MethodDescriptor<String, String> LARGE = MethodDescriptor.<String, String>newBuilder()
+        .setType(MethodDescriptor.MethodType.UNARY)
+        .setFullMethodName(MethodDescriptor.generateFullMethodName("test.Echo", "Large"))
+        .setRequestMarshaller(new StringMarshaller())
+        .setResponseMarshaller(new StringMarshaller())
+        .build();
+
     public static String echoTenant(Channel channel) {
         return ClientCalls.blockingUnaryCall(channel, ECHO_TENANT, CallOptions.DEFAULT, "");
+    }
+
+    public static String large(Channel channel, int length) {
+        return ClientCalls.blockingUnaryCall(channel, LARGE, CallOptions.DEFAULT, String.valueOf(length));
     }
 
     public static String neverAnswer(Channel channel) {
@@ -55,6 +66,10 @@ public final class EchoService implements BindableService {
         return ServerServiceDefinition.builder("test.Echo")
             .addMethod(ECHO_TENANT, ServerCalls.asyncUnaryCall((request, responseObserver) -> {
                 responseObserver.onNext(TenantContext.getCurrentTenantId());
+                responseObserver.onCompleted();
+            }))
+            .addMethod(LARGE, ServerCalls.asyncUnaryCall((request, responseObserver) -> {
+                responseObserver.onNext("x".repeat(Integer.parseInt(request)));
                 responseObserver.onCompleted();
             }))
             .addMethod(NEVER_ANSWER, ServerCalls.asyncUnaryCall((request, responseObserver) -> {}))
