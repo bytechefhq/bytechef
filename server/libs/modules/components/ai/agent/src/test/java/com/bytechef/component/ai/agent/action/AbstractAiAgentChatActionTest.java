@@ -1291,7 +1291,7 @@ class AbstractAiAgentChatActionTest {
 
         List<Advisor> advisors = action.getAdvisors(
             clusterElementMap, Map.of(), chatModel, actionContext, Optional.empty(), null, false,
-            sensitiveDataMetrics);
+            sensitiveDataMetrics, null);
 
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
         ToolCallingManager wiredToolCallingManager = readToolCallingManager(toolCallAdvisor);
