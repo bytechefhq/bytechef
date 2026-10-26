@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package bytechef.platform.user.remote.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.user.remote.grpc.proto";
+
+service UserRemoteService {
+  rpc FetchUserByEmail(FetchUserByEmailRequest) returns (FetchUserResponse);
+  rpc FetchUserById(FetchUserByIdRequest) returns (FetchUserResponse);
+  rpc FetchUserByLogin(FetchUserByLoginRequest) returns (FetchUserResponse);
+}
+
+service AuthorityRemoteService {
+  rpc FetchAuthority(FetchAuthorityRequest) returns (FetchAuthorityResponse);
+  rpc GetAuthorities(GetAuthoritiesRequest) returns (GetAuthoritiesResponse);
+}
+
+// A user without its password hash, TOTP secret, activation key and reset key, which never leave the gateway.
+message RemoteUser {
+  optional int64 id = 1;
+  optional string uuid = 2;
+  optional string login = 3;
+  optional string email = 4;
+  optional string first_name = 5;
+  optional string last_name = 6;
+  optional string image_url = 7;
+  optional string lang_key = 8;
+  bool activated = 9;
+  optional string auth_provider = 10;
+  optional string provider_id = 11;
+  bool totp_enabled = 12;
+  optional google.protobuf.Timestamp created_date = 13;
+  repeated int64 authority_ids = 14;
+}
+
+message RemoteAuthority {
+  optional int64 id = 1;
+  optional string name = 2;
+}
+
+message FetchUserByEmailRequest {
+  string email = 1;
+}
+
+message FetchUserByIdRequest {
+  int64 id = 1;
+}
+
+message FetchUserByLoginRequest {
+  string login = 1;
+}
+
+message FetchUserResponse {
+  optional RemoteUser user = 1;
+}
+
+message FetchAuthorityRequest {
+  int64 id = 1;
+}
+
+message FetchAuthorityResponse {
+  optional RemoteAuthority authority = 1;
+}
+
+message GetAuthoritiesRequest {
+}
+
+message GetAuthoritiesResponse {
+  repeated RemoteAuthority authorities = 1;
+}
