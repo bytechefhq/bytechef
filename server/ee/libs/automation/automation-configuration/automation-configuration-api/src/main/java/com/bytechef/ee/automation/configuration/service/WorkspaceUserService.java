@@ -27,6 +27,12 @@ public interface WorkspaceUserService {
      */
     long countByCustomRoleId(long customRoleId);
 
+    /**
+     * Removes every workspace membership of the given user, regardless of role, and evicts their cached workspace
+     * scopes. Called when the user is deleted.
+     */
+    void deleteUserWorkspaceUsers(long userId);
+
     Optional<WorkspaceUser> fetchWorkspaceUser(long userId, long workspaceId);
 
     List<WorkspaceUser> getUserWorkspaceUsers(long userId);
