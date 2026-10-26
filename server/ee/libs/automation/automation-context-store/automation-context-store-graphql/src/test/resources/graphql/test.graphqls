@@ -1,0 +1,21 @@
+type Query {
+    _placeholder: Boolean
+}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+scalar Long
+
+scalar Map
+
+type Tag {
+    id: ID!
+    name: String!
+}
+
+input TagInput {
+    id: ID
+    name: String!
+}

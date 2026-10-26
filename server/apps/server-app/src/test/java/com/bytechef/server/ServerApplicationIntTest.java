@@ -30,6 +30,11 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
+import com.bytechef.ee.platform.contextstore.clickhouse.ClickHouseTableMigrator;
+import com.bytechef.ee.platform.contextstore.clickhouse.ClickHouseTableProvisioner;
+import com.bytechef.ee.platform.contextstore.service.ContextStoreService;
 import com.bytechef.platform.component.log.JdbcLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
@@ -125,6 +130,20 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(CopilotVectorStoreService.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(CopilotPgVectorConfiguration.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(CopilotApiController.class)).isEmpty();
+    }
+
+    @Test
+    void testClickHouseContextStoreBeansAbsentWhenUrlNotConfigured() {
+        assertThat(applicationContext.getBeanNamesForType(ClickHouseTableProvisioner.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(ClickHouseTableMigrator.class)).isEmpty();
+        assertThat(applicationContext.getBeansOfType(DataSource.class)).doesNotContainKey("clickHouseDataSource");
+    }
+
+    @Test
+    void testContextStoreBeansNotPresentWhenFeatureDisabled() {
+        assertThat(applicationContext.getBeanNamesForType(ContextStoreService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(ContextStoreFacade.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(ContextStoreSourceFacade.class)).isEmpty();
     }
 
     @Test
@@ -327,6 +346,30 @@ class ServerApplicationIntTest {
         void testSchedulerIsClustered() throws Exception {
             assertThat(scheduler.getMetaData()
                 .isJobStoreClustered()).isTrue();
+        }
+    }
+
+    @Nested
+    @TestPropertySource(properties = {
+        "bytechef.context-store.enabled=true", "spring.quartz.scheduler-name=contextStoreScheduler"
+    })
+    class ContextStoreEnabledIntTest {
+
+        @Autowired
+        private ApplicationContext contextStoreApplicationContext;
+
+        @Autowired
+        private DataSource contextStoreDataSource;
+
+        @Test
+        void testContextStoreBeansPresentWhenFeatureEnabled() throws Exception {
+            assertThat(contextStoreApplicationContext.getBeanNamesForType(ContextStoreService.class)).hasSize(1);
+            assertThat(contextStoreApplicationContext.getBeanNamesForType(ContextStoreFacade.class)).hasSize(1);
+            assertThat(contextStoreApplicationContext.getBeanNamesForType(ContextStoreSourceFacade.class)).hasSize(1);
+
+            try (Connection connection = contextStoreDataSource.getConnection()) {
+                assertThat(tableExists(connection.getMetaData(), "context_store_source")).isTrue();
+            }
         }
     }
 

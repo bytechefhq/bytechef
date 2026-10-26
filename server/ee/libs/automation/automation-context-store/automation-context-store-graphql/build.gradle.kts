@@ -1,0 +1,21 @@
+dependencies {
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.graphql:spring-graphql")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-web")
+    implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-api"))
+    implementation(project(":server:ee:libs:platform:platform-context-store:platform-context-store-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
+
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation(project(":server:libs:test:test-int-support"))
+}

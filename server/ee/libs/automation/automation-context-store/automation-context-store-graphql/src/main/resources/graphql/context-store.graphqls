@@ -1,0 +1,154 @@
+extend type Query {
+    """Returns the parent Context Stores in the workspace, filtered by environment. Each Context Store is
+    env-stamped at creation; sources, records, and ClickHouse projection tables hang off context_store_id and
+    inherit env transitively."""
+    contextStores(workspaceId: ID!, environmentId: ID!): [ContextStore!]!
+    contextStore(id: ID!): ContextStore
+    """All tags used across Context Stores in this workspace. Drives the TagList autocomplete (remainingTags)
+    on the management page."""
+    contextStoreTags(workspaceId: ID!): [Tag!]!
+    """Resolve a (workspace, name, environment) triple to a Context Store id. Building block for env-aware
+    workflows that target a store by stable name across DEVELOPMENT / STAGING / PRODUCTION instead of a
+    hardcoded id. Returns null when no store matches in the given environment."""
+    contextStoreIdByName(workspaceId: ID!, name: String!, environmentId: ID!): ID
+    contextStoreSource(id: ID!): ContextStoreSource
+    contextStoreSources(workspaceId: ID!, environmentId: ID!, filter: ContextStoreSourceFilter): [ContextStoreSource!]!
+}
+
+extend type Mutation {
+    createContextStore(workspaceId: ID!, environmentId: ID!, input: CreateContextStoreInput!): ContextStore!
+    updateContextStore(workspaceId: ID!, id: ID!, input: UpdateContextStoreInput!): ContextStore!
+    """Replace the tag list on a Context Store. Existing tags whose name matches an entry in {@code tags} are
+    re-used; names not yet in the tag table are created on the fly via TagService.save. Returns the updated tags
+    so the client can refresh its remainingTags cache."""
+    updateContextStoreTags(workspaceId: ID!, id: ID!, tags: [TagInput!]!): [Tag!]!
+    deleteContextStore(workspaceId: ID!, id: ID!): Boolean!
+    createContextStoreSource(input: CreateContextStoreSourceInput!): ContextStoreSource!
+    updateContextStoreSource(id: ID!, input: UpdateContextStoreSourceInput!): ContextStoreSource!
+    deleteContextStoreSource(id: ID!): Boolean!
+    refreshContextStoreSource(id: ID!): ID!
+    setContextStoreSourceEnabled(id: ID!, enabled: Boolean!): ContextStoreSource!
+}
+
+"""Parent Context Store entity. Env-stamped at creation; sources hang off this via contextStoreId."""
+type ContextStore {
+    id: ID!
+    name: String!
+    description: String
+    environment: String!
+    """Full Tag objects (id + name) resolved from the store's tagIds. Use {@code tags} when rendering the
+    TagList picker; use {@code tagIds} when you just need the ID list (e.g. for filter set membership)."""
+    tags: [Tag!]!
+    tagIds: [ID!]!
+    version: Int!
+}
+
+input CreateContextStoreInput {
+    name: String!
+    description: String
+    tagIds: [ID!]
+}
+
+input UpdateContextStoreInput {
+    name: String!
+    description: String
+    tagIds: [ID!]
+    version: Int!
+}
+
+"""A Context Store source binds a workspace, a source component (with its ItemReader cluster element and
+optional connection), and a record-shape definition to a periodic sync cadence. Source is 1:1 with its
+record shape — {@code entityName}, {@code idField}, {@code indexedFields}, etc. live directly on the source
+row."""
+type ContextStoreSource {
+    id: ID!
+    workspaceId: ID
+    """FK to the parent ContextStore. Environment is inherited via this relationship — there is no
+    environment column on the source itself."""
+    contextStoreId: ID!
+    name: String!
+    """Stable wire identifier for the source's records (independent of the display {@code name}). Used by
+    the destination component handler and ClickHouse table naming."""
+    entityName: String!
+    description: String
+    idField: String!
+    storedFields: Map
+    indexedFields: Map!
+    semanticIndexFields: Map
+    parameters: Map
+    sourceComponentName: String!
+    sourceComponentVersion: Int!
+    sourceClusterElementName: String
+    connectionId: ID
+    cadence: String!
+    status: ContextStoreSourceStatus!
+    enabled: Boolean!
+    lastSyncRunAt: Long
+    lastSyncJobExecutionId: ID
+    workflowId: ID
+    """Phase 17b: optional rare full-replace cadence paired with the regular incremental cadence.
+    Null = single-trigger MVP behavior."""
+    fullReplaceCadence: String
+    """Phase 17b: tombstone-derivation strategy."""
+    tombstoneStrategy: ContextStoreTombstoneStrategy!
+}
+
+enum ContextStoreSourceStatus {
+    BUILDING_PREVIEW
+    PREVIEW
+    READY
+    FAILED
+    DISABLED
+}
+
+enum ContextStoreTombstoneStrategy {
+    PERIODIC_FULL_REPLACE
+    UPSTREAM_CHANGE_FEED
+    NONE
+}
+
+input ContextStoreSourceFilter {
+    enabled: Boolean
+}
+
+input CreateContextStoreSourceInput {
+    workspaceId: ID!
+    environmentId: ID
+    """Parent Context Store ID. Required — sources must hang off an existing ContextStore in the
+    same workspace. Defense in depth: the facade verifies the store belongs to workspaceId."""
+    contextStoreId: ID!
+    name: String!
+    """Stable wire identifier for the source's records. Used by the destination component handler and
+    ClickHouse table naming; independent of the display {@code name} (which can be renamed without
+    invalidating already-synced records)."""
+    entityName: String!
+    description: String
+    idField: String!
+    storedFields: Map
+    indexedFields: Map!
+    semanticIndexFields: Map
+    parameters: Map
+    sourceComponentName: String!
+    sourceComponentVersion: Int!
+    """Optional. When omitted, the server picks the first ItemReader cluster element on the
+    source component. Supply a name only when the component defines more than one ItemReader."""
+    sourceClusterElementName: String
+    connectionId: ID
+    cadence: String!
+    """Phase 17b: optional rare full-replace cadence paired with the regular incremental cadence
+    (e.g., '@daily' alongside an '@hourly' cadence). Null = single-trigger MVP."""
+    fullReplaceCadence: String
+    """Phase 17b: tombstone-derivation strategy. Defaults to PERIODIC_FULL_REPLACE when omitted."""
+    tombstoneStrategy: ContextStoreTombstoneStrategy
+}
+
+input UpdateContextStoreSourceInput {
+    name: String
+    cadence: String
+    enabled: Boolean
+    """Phase 17b: optional full-replace cadence update. Null leaves the current value unchanged.
+    Empty string \"\" clears it (drops back to single-trigger). Any other value replaces it."""
+    fullReplaceCadence: String
+    """Phase 17b: optional tombstone strategy update. Null leaves the current value unchanged."""
+    tombstoneStrategy: ContextStoreTombstoneStrategy
+}
