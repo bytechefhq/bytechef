@@ -296,6 +296,8 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-graphql"))
     implementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-service"))
+    implementation(project(":server:ee:libs:automation:automation-promotion:automation-promotion-graphql"))
+    implementation(project(":server:ee:libs:automation:automation-promotion:automation-promotion-service"))
     implementation(project(":server:ee:libs:automation:automation-security-web:automation-security-web-impl"))
     implementation(project(":server:ee:libs:config:cache-invalidation-config"))
     implementation(project(":server:ee:libs:config:cloud-config"))
