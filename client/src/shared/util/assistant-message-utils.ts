@@ -174,6 +174,21 @@ export function setLastAssistantMessageContent(messages: ThreadMessageLike[], co
     return [...updatedMessages, {content, role: 'assistant'} as ThreadMessageLike];
 }
 
+export function setLastAssistantMessageError(messages: ThreadMessageLike[], errorMessage: string): ThreadMessageLike[] {
+    const updatedMessages = [...messages];
+    const errorStatus = {error: errorMessage, reason: 'error' as const, type: 'incomplete' as const};
+
+    for (let i = updatedMessages.length - 1; i >= 0; i--) {
+        if (updatedMessages[i]?.role === 'assistant') {
+            updatedMessages[i] = {...updatedMessages[i], status: errorStatus};
+
+            return updatedMessages;
+        }
+    }
+
+    return [...updatedMessages, {content: '', role: 'assistant', status: errorStatus} as ThreadMessageLike];
+}
+
 /**
  * Formats an ask_user_question event as a readable assistant message with the questions and options.
  */
