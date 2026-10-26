@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @version ee
@@ -31,6 +32,17 @@ class GrpcRemoteExceptionHandlerTest {
             .getCode()).isEqualTo(Status.Code.INVALID_ARGUMENT);
         assertThat(statusException.getStatus()
             .getDescription()).isEqualTo("No worker instance offers component missing");
+    }
+
+    @Test
+    void testAccessDeniedBecomesPermissionDenied() {
+        StatusException statusException = grpcRemoteExceptionHandler.handleException(
+            new AccessDeniedException("Only the connection creator or an admin can modify connection 7"));
+
+        assertThat(statusException.getStatus()
+            .getCode()).isEqualTo(Status.Code.PERMISSION_DENIED);
+        assertThat(statusException.getStatus()
+            .getDescription()).isEqualTo("Only the connection creator or an admin can modify connection 7");
     }
 
     @Test

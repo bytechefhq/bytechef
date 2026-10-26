@@ -12,6 +12,7 @@ import io.grpc.StatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.grpc.server.exception.GrpcExceptionHandler;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Logs every exception a gRPC service throws and returns it to the caller with its message, so another microservice
@@ -31,6 +32,12 @@ public class GrpcRemoteExceptionHandler implements GrpcExceptionHandler {
 
         Class<? extends Throwable> throwableClass = throwable.getClass();
         String message = throwable.getMessage();
+
+        if (throwable instanceof AccessDeniedException) {
+            return Status.PERMISSION_DENIED.withDescription(message == null ? throwableClass.getSimpleName() : message)
+                .withCause(throwable)
+                .asException();
+        }
 
         if (throwable instanceof IllegalArgumentException) {
             return Status.INVALID_ARGUMENT.withDescription(message == null ? throwableClass.getSimpleName() : message)

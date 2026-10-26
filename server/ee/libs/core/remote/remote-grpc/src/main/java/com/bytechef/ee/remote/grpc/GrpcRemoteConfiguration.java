@@ -13,15 +13,20 @@ import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
 import io.grpc.BindableService;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.grpc.server.GlobalServerInterceptor;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Secures every gRPC service a microservice serves with the internal service token and its tenant, refuses to serve
@@ -108,5 +113,21 @@ public class GrpcRemoteConfiguration {
     @GlobalServerInterceptor
     UserContextServerInterceptor userContextServerInterceptor() {
         return new UserContextServerInterceptor();
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    static class GrpcStatusWebConfiguration {
+
+        @Bean
+        WebMvcConfigurer grpcStatusWebMvcConfigurer(ObjectMapper objectMapper) {
+            return new WebMvcConfigurer() {
+
+                @Override
+                public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+                    resolvers.addFirst(new GrpcStatusHandlerExceptionResolver(objectMapper));
+                }
+            };
+        }
     }
 }
