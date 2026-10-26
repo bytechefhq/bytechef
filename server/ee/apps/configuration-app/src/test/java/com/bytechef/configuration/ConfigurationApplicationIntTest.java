@@ -19,6 +19,7 @@ package com.bytechef.configuration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +31,7 @@ import org.springframework.core.env.Environment;
  */
 @SpringBootTest(classes = ConfigurationApplication.class)
 @Import({
-    PostgreSQLContainerConfiguration.class,
+    PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
 })
 public class ConfigurationApplicationIntTest {
 

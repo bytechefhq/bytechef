@@ -9,9 +9,11 @@ package com.bytechef.webhook;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 /**
@@ -19,6 +21,7 @@ import org.springframework.core.env.Environment;
  *
  * @author Ivica Cardic
  */
+@Import(RedisContainerConfiguration.class)
 @SpringBootTest(classes = WebhookApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WebhookApplicationIntTest {
 

@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ import org.springframework.core.env.Environment;
  */
 @SpringBootTest
 @Import({
-    PostgreSQLContainerConfiguration.class
+    PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
 })
 public class ExecutionApplicationIntTest {
 
