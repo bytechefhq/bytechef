@@ -7,10 +7,18 @@
 
 package com.bytechef.ee.platform.scheduler.remote.client;
 
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.platform.scheduler.remote.grpc.SchedulerProtoTimestamps;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.JobIdRequest;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ScheduleDynamicWebhookTriggerRefreshRequest;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ScheduleOneTimeTaskRequest;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.ScheduleScheduleTriggerRequest;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.TriggerSchedulerRemoteServiceGrpc;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.TriggerSchedulerRemoteServiceGrpc.TriggerSchedulerRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.scheduler.remote.grpc.proto.WorkflowExecutionIdRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -24,48 +32,34 @@ import org.springframework.stereotype.Component;
 public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     private static final String SCHEDULER_APP = "scheduler-app";
-    private static final String TRIGGER_SCHEDULER = "/remote/trigger-scheduler";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteTriggerSchedulerClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteTriggerSchedulerClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/cancel-dynamic-webhook-trigger-refresh")
-                .build(),
-            workflowExecutionId);
+        getStub().cancelDynamicWebhookTriggerRefresh(toWorkflowExecutionIdRequest(workflowExecutionId));
     }
 
     @Override
     public void cancelOneTimeTask(long jobId) {
-        throw new UnsupportedOperationException();
+        getStub().cancelOneTimeTask(
+            JobIdRequest.newBuilder()
+                .setJobId(jobId)
+                .build());
     }
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/cancel-polling-trigger")
-                .build(),
-            workflowExecutionId);
+        getStub().cancelPollingTrigger(toWorkflowExecutionIdRequest(workflowExecutionId));
     }
 
     @Override
     public void cancelScheduleTrigger(String workflowExecutionId) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/cancel-schedule-trigger")
-                .build(),
-            workflowExecutionId);
+        getStub().cancelScheduleTrigger(toWorkflowExecutionIdRequest(workflowExecutionId));
     }
 
     @Override
@@ -73,59 +67,67 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
         Instant webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/schedule-dynamic-webhook-trigger-refresh")
-                .build(),
-            new DynamicWebhookRefreshTaskRequest(
-                workflowExecutionId, webhookExpirationDate, componentName, componentVersion, connectionId));
+        ScheduleDynamicWebhookTriggerRefreshRequest.Builder builder =
+            ScheduleDynamicWebhookTriggerRefreshRequest.newBuilder()
+                .setComponentName(componentName)
+                .setComponentVersion(componentVersion)
+                .setWorkflowExecutionId(workflowExecutionId.toString());
+
+        if (webhookExpirationDate != null) {
+            builder.setWebhookExpirationDate(SchedulerProtoTimestamps.toTimestamp(webhookExpirationDate));
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        getStub().scheduleDynamicWebhookTriggerRefresh(builder.build());
     }
 
     @Override
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/schedule-polling-trigger")
-                .build(),
-            workflowExecutionId);
+        getStub().schedulePollingTrigger(toWorkflowExecutionIdRequest(workflowExecutionId.toString()));
     }
 
     @Override
     public void scheduleScheduleTrigger(
         String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId) {
 
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/schedule-schedule-trigger")
-                .build(),
-            new TriggerWorkflowTaskRequest(workflowExecutionId, pattern, zoneId, output));
+        ScheduleScheduleTriggerRequest.Builder builder = ScheduleScheduleTriggerRequest.newBuilder()
+            .setPattern(pattern)
+            .setWorkflowExecutionId(workflowExecutionId.toString());
+
+        if (zoneId != null) {
+            builder.setZoneId(zoneId);
+        }
+
+        if (output != null) {
+            builder.setOutput(ProtoValues.toStruct(output));
+        }
+
+        getStub().scheduleScheduleTrigger(builder.build());
     }
 
     @Override
     public void scheduleOneTimeTask(Instant executeAt, Map<String, ?> output, long jobId) {
-        loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(SCHEDULER_APP)
-                .path(TRIGGER_SCHEDULER + "/schedule-one-time-task-resume")
-                .build(),
-            new ResumeOneTimeTaskRequest(executeAt, jobId, output));
+        ScheduleOneTimeTaskRequest.Builder builder = ScheduleOneTimeTaskRequest.newBuilder()
+            .setExecuteAt(SchedulerProtoTimestamps.toTimestamp(executeAt))
+            .setJobId(jobId);
+
+        if (output != null) {
+            builder.setOutput(ProtoValues.toStruct(output));
+        }
+
+        getStub().scheduleOneTimeTask(builder.build());
     }
 
-    @SuppressFBWarnings("EI")
-    private record DynamicWebhookRefreshTaskRequest(
-        WorkflowExecutionId workflowExecutionId, Instant webhookExpirationDate, String componentName,
-        int componentVersion, Long connectionId) {
+    private TriggerSchedulerRemoteServiceBlockingStub getStub() {
+        return TriggerSchedulerRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(SCHEDULER_APP));
     }
 
-    @SuppressFBWarnings("EI")
-    private record ResumeOneTimeTaskRequest(Instant executeAt, long jobId, Map<String, ?> continueParameters) {
-    }
-
-    @SuppressFBWarnings("EI")
-    private record TriggerWorkflowTaskRequest(
-        WorkflowExecutionId workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
+    private static WorkflowExecutionIdRequest toWorkflowExecutionIdRequest(String workflowExecutionId) {
+        return WorkflowExecutionIdRequest.newBuilder()
+            .setWorkflowExecutionId(workflowExecutionId)
+            .build();
     }
 }
