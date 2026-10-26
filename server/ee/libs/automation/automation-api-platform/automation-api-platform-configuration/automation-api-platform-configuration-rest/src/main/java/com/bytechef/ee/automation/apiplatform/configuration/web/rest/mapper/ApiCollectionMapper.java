@@ -36,6 +36,7 @@ public interface ApiCollectionMapper extends Converter<ApiCollectionDTO, ApiColl
     @InheritInverseConfiguration
     @DelegatingConverter
     @Mapping(target = "environment", source = "environmentId")
+    @Mapping(target = "uuid", ignore = true)
     ApiCollectionDTO invertConvert(ApiCollectionModel apiCollectionModel);
 
     @Mapping(target = "environmentId", source = "environment")
@@ -46,6 +47,7 @@ public interface ApiCollectionMapper extends Converter<ApiCollectionDTO, ApiColl
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "tagIds", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
     ProjectDeployment mapToProjectDeployment(ProjectDeploymentBasicModel projectDeploymentBasicModel);
 
     @Mapping(target = "workspaceId", ignore = true)

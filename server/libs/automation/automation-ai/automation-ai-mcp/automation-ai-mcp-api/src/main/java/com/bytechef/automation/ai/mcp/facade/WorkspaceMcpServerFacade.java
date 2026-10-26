@@ -23,6 +23,8 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Defines the interface for managing and retrieving MCP servers associated with specific workspaces. This facade
@@ -58,6 +60,16 @@ public interface WorkspaceMcpServerFacade {
     McpServer createWorkspaceMcpServer(
         String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
         Long workspaceId);
+
+    /**
+     * Creates a new MCP server carrying the given lineage identifier and assigns it to the specified workspace.
+     *
+     * @param uuid the cross-environment lineage identifier, or {@code null} to generate a new one
+     * @return the created MCP server
+     */
+    McpServer createWorkspaceMcpServer(
+        String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
+        Boolean enforceToolAuthorization, Long workspaceId, @Nullable UUID uuid);
 
     McpServer updateWorkspaceMcpServer(Long mcpServerId, String name, Boolean enabled);
 

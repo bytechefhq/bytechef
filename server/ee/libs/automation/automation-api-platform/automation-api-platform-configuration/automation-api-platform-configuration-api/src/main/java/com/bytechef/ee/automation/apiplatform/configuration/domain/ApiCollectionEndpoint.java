@@ -124,7 +124,7 @@ public class ApiCollectionEndpoint {
     }
 
     public Long getProjectDeploymentWorkflowId() {
-        return projectDeploymentWorkflowId.getId();
+        return projectDeploymentWorkflowId == null ? null : projectDeploymentWorkflowId.getId();
     }
 
     public int getVersion() {

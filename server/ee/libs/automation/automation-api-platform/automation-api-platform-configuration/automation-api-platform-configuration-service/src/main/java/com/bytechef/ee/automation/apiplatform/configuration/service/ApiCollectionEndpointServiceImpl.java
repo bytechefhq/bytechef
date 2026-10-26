@@ -71,6 +71,12 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
         curApiCollectionEndpoint.setName(apiCollectionEndpoint.getName());
         curApiCollectionEndpoint.setPath(apiCollectionEndpoint.getPath());
 
+        Long projectDeploymentWorkflowId = apiCollectionEndpoint.getProjectDeploymentWorkflowId();
+
+        if (projectDeploymentWorkflowId != null) {
+            curApiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+        }
+
         return apiEndpointRepository.save(curApiCollectionEndpoint);
     }
 }

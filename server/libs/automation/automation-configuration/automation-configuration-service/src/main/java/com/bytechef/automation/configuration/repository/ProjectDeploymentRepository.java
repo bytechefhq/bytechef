@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.repository;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
@@ -36,4 +37,6 @@ public interface ProjectDeploymentRepository
     List<ProjectDeployment> findAllByProjectId(long projectId);
 
     Optional<ProjectDeployment> findByProjectIdAndEnvironment(long projectId, int environment);
+
+    Optional<ProjectDeployment> findByUuidAndEnvironment(UUID uuid, int environment);
 }

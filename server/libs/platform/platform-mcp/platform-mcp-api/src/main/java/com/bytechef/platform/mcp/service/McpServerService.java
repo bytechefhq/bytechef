@@ -21,6 +21,8 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Service interface for managing MCP servers within the system. Provides methods to create, update, delete, and query
@@ -55,6 +57,16 @@ public interface McpServerService {
     void delete(long mcpServerId);
 
     /**
+     * Reports whether an MCP server named {@code name} already exists in {@code environment}.
+     *
+     * @param name        the server name
+     * @param environment the environment
+     * @param excludeUuid a lineage identifier whose servers are ignored, or {@code null}
+     * @return {@code true} when a server of that name exists in that environment
+     */
+    boolean existsByNameAndEnvironment(String name, Environment environment, @Nullable UUID excludeUuid);
+
+    /**
      * Retrieves an MCP server by its unique identifier.
      *
      * @param mcpServerId the unique identifier of the MCP server to retrieve
@@ -73,6 +85,15 @@ public interface McpServerService {
      * @return the MCP server associated with the specified secret key
      */
     McpServer getMcpServer(String secretKey);
+
+    /**
+     * Retrieves an MCP server by its cross-environment lineage identifier and environment.
+     *
+     * @param uuid        the lineage identifier
+     * @param environment the environment
+     * @return the MCP server, if one exists
+     */
+    Optional<McpServer> fetchMcpServer(UUID uuid, Environment environment);
 
     /**
      * Gets MCP servers filtered by type.

@@ -169,6 +169,7 @@ class McpWorkflowPreDeleteListenerIntTest {
         projectDeployment.setName("test-deployment");
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         projectDeployment = projectDeploymentRepository.save(projectDeployment);
 
@@ -210,6 +211,7 @@ class McpWorkflowPreDeleteListenerIntTest {
         projectDeployment.setName("test-system-project-deployment");
         projectDeployment.setProjectId(systemProject.getId());
         projectDeployment.setProjectVersion(1);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         projectDeployment = projectDeploymentRepository.save(projectDeployment);
 
@@ -244,6 +246,7 @@ class McpWorkflowPreDeleteListenerIntTest {
         projectDeployment.setName("test-project-deployment");
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         projectDeployment = projectDeploymentRepository.save(projectDeployment);
 

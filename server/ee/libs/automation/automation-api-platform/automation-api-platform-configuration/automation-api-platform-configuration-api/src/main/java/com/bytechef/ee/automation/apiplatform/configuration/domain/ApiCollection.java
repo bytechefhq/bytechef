@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -39,6 +40,9 @@ public class ApiCollection {
 
     @Column("project_deployment_id")
     private AggregateReference<ProjectDeployment, Long> projectDeploymentId;
+
+    @Column("uuid")
+    private UUID uuid;
 
     @Column
     private String name;
@@ -100,6 +104,14 @@ public class ApiCollection {
         return projectDeploymentId == null ? null : projectDeploymentId.getId();
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getUuidAsString() {
+        return uuid == null ? null : uuid.toString();
+    }
+
     public String getName() {
         return name;
     }
@@ -151,6 +163,10 @@ public class ApiCollection {
         this.projectDeploymentId = projectDeploymentId == null ? null : AggregateReference.to(projectDeploymentId);
     }
 
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -194,6 +210,7 @@ public class ApiCollection {
         return "ApiCollection{" +
             "id=" + id +
             ", projectDeploymentId=" + projectDeploymentId +
+            ", uuid=" + uuid +
             ", name='" + name + '\'' +
             ", contextPath='" + contextPath + '\'' +
             ", collectionVersion=" + collectionVersion +

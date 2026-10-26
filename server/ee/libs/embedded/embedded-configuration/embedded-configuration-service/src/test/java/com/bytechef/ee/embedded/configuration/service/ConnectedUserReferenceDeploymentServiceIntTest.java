@@ -154,8 +154,8 @@ class ConnectedUserReferenceDeploymentServiceIntTest {
                 """
                     INSERT INTO project_deployment
                         (project_id, project_version, name, enabled, environment, created_date, created_by,
-                         last_modified_date, last_modified_by, version)
-                    VALUES (?, 1, 'test', true, 2, now(), 'test', now(), 'test', 0)
+                         last_modified_date, last_modified_by, version, uuid)
+                    VALUES (?, 1, 'test', true, 2, now(), 'test', now(), 'test', 0, gen_random_uuid())
                     RETURNING id
                     """,
                 Long.class, projectId),

@@ -140,6 +140,6 @@ class ApiCollectionFacadeIntTest {
     private ApiCollectionDTO getApiCollectionDTO(String name) {
         return new ApiCollectionDTO(
             1, "test-context-path", null, null, "test description", false, List.of(), Environment.DEVELOPMENT, null,
-            null, null, name, null, project.getId(), null, 0, 1, List.of(), 0);
+            null, null, name, null, project.getId(), null, 0, 1, List.of(), 0, null);
     }
 }
