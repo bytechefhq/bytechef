@@ -245,6 +245,17 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testHasComponentDefinition() {
+        when(componentDefinitionService.fetchComponentDefinition("keep", 2))
+            .thenReturn(Optional.of(componentDefinition("keep", 2)));
+        when(componentDefinitionService.fetchComponentDefinition("drop", null)).thenReturn(Optional.empty());
+
+        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("keep", 2)).isTrue();
+        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("drop", null)).isFalse();
+        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("missing", null)).isFalse();
+    }
+
+    @Test
     void testGetConnectionComponentDefinition() {
         ComponentDefinition componentDefinition = componentDefinition("keep", 1);
 
