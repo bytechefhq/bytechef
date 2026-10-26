@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.component.remote.client.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionFacadeRemoteServiceGrpc;
@@ -31,8 +32,10 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -46,13 +49,19 @@ import tools.jackson.databind.ObjectMapper;
 public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFacade {
 
     private final ComponentProtoMapper componentProtoMapper;
+    private final Duration executionDeadline;
     private final GrpcChannels grpcChannels;
     private final WorkerInstances workerInstances;
 
     public RemoteTriggerDefinitionFacadeClient(
-        GrpcChannels grpcChannels, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        ApplicationProperties applicationProperties, GrpcChannels grpcChannels, DiscoveryClient discoveryClient,
+        ObjectMapper objectMapper) {
+
+        ApplicationProperties.Remote remote = applicationProperties.getRemote();
+        ApplicationProperties.Remote.Grpc grpc = remote.getGrpc();
 
         this.componentProtoMapper = new ComponentProtoMapper(objectMapper);
+        this.executionDeadline = grpc.getExecutionDeadline();
         this.grpcChannels = grpcChannels;
         this.workerInstances = new WorkerInstances(discoveryClient);
     }
@@ -310,7 +319,14 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
     }
 
     private TriggerDefinitionFacadeRemoteServiceBlockingStub getStub(String componentName) {
-        return TriggerDefinitionFacadeRemoteServiceGrpc.newBlockingStub(
-            grpcChannels.getChannel(workerInstances.getInstance(componentName)));
+        TriggerDefinitionFacadeRemoteServiceBlockingStub stub =
+            TriggerDefinitionFacadeRemoteServiceGrpc.newBlockingStub(
+                grpcChannels.getChannel(workerInstances.getInstance(componentName)));
+
+        if (executionDeadline == null) {
+            return stub;
+        }
+
+        return stub.withDeadlineAfter(executionDeadline.toMillis(), TimeUnit.MILLISECONDS);
     }
 }

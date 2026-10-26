@@ -22,10 +22,12 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentTy
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.component.remote.grpc.ActionDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.ee.remote.grpc.interceptor.DeadlineClientInterceptor;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -36,10 +38,12 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import io.grpc.ClientInterceptors;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +84,6 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         ComponentProtoMapper componentProtoMapper = new ComponentProtoMapper(jsonMapper);
 
         server = InProcessServerBuilder.forName(name)
-            .directExecutor()
             .addService(new ActionDefinitionFacadeRemoteServiceGrpcServer(actionDefinitionFacade, componentProtoMapper))
             .addService(
                 new TriggerDefinitionFacadeRemoteServiceGrpcServer(triggerDefinitionFacade, componentProtoMapper))
@@ -99,9 +102,9 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         FixedGrpcChannels fixedGrpcChannels = new FixedGrpcChannels(managedChannel);
 
         remoteActionDefinitionFacadeClient = new RemoteActionDefinitionFacadeClient(
-            fixedGrpcChannels, discoveryClient, jsonMapper);
+            applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteTriggerDefinitionFacadeClient = new RemoteTriggerDefinitionFacadeClient(
-            fixedGrpcChannels, discoveryClient, jsonMapper);
+            applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
     }
 
     @AfterEach
@@ -181,6 +184,31 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
             "keep", 1, "get", 11L, 12L, 13L, 14L, "workflow-1", INPUT_PARAMETERS, Map.of("keep", 7L),
             Map.of("tool", "x"), 2L, PlatformType.AUTOMATION, true, Map.of("page", 2), null, suspendExpiresAt))
                 .isEqualTo(result);
+    }
+
+    @Test
+    void testExecutePerformIsNotCutOffByTheLookupDeadline() {
+        RemoteActionDefinitionFacadeClient deadlineRemoteActionDefinitionFacadeClient =
+            new RemoteActionDefinitionFacadeClient(
+                applicationProperties(),
+                new FixedGrpcChannels(
+                    ClientInterceptors.intercept(
+                        managedChannel, new DeadlineClientInterceptor(Duration.ofMillis(100)))),
+                discoveryClient, jsonMapper);
+
+        when(actionDefinitionFacade.executePerform(
+            "keep", 1, "slow", null, null, null, null, null, Map.of(), Map.of(), Map.of(), null, null, false, null,
+            null, null))
+                .thenAnswer(invocation -> {
+                    Thread.sleep(500);
+
+                    return "done";
+                });
+
+        assertThat(deadlineRemoteActionDefinitionFacadeClient.executePerform(
+            "keep", 1, "slow", null, null, null, null, null, Map.of(), Map.of(), Map.of(), null, null, false, null,
+            null, null))
+                .isEqualTo("done");
     }
 
     @Test
@@ -321,6 +349,16 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         String expectedJson = jsonMapper.writeValueAsString(expected);
 
         return argThat(actual -> expectedJson.equals(jsonMapper.writeValueAsString(actual)));
+    }
+
+    private static ApplicationProperties applicationProperties() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getRemote()
+            .getGrpc()
+            .setExecutionDeadline(Duration.ofSeconds(5));
+
+        return applicationProperties;
     }
 
     private static List<Option> options() {

@@ -4647,6 +4647,11 @@ public class ApplicationProperties {
             private Duration deadline;
 
             /**
+             * Longest a call that runs component code on another microservice may take, such as an action or a trigger
+             */
+            private Duration executionDeadline;
+
+            /**
              * Largest message a microservice accepts from another one, such as a list of component definitions with
              * their icons
              */
@@ -4672,6 +4677,10 @@ public class ApplicationProperties {
                 return deadline;
             }
 
+            public Duration getExecutionDeadline() {
+                return executionDeadline;
+            }
+
             public DataSize getMaxInboundMessageSize() {
                 return maxInboundMessageSize;
             }
@@ -4690,6 +4699,10 @@ public class ApplicationProperties {
 
             public void setDeadline(Duration deadline) {
                 this.deadline = deadline;
+            }
+
+            public void setExecutionDeadline(Duration executionDeadline) {
+                this.executionDeadline = executionDeadline;
             }
 
             public void setMaxInboundMessageSize(DataSize maxInboundMessageSize) {

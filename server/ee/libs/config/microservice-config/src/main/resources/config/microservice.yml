@@ -322,6 +322,8 @@ bytechef:
     grpc:
       # Longest a call to another microservice may take
       deadline: 10s
+      # Longest a call that runs component code on another microservice may take, such as an action or a trigger
+      execution-deadline: 1h
       # Largest message a microservice accepts from another one, such as all component definitions with their icons
       max-inbound-message-size: 64MB
       # Send calls between microservices without TLS; only on a trusted network such as a Docker Compose network
