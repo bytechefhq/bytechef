@@ -63,7 +63,8 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
         List existing connections for a component, scoped to the current environment. Use before
         createConnection so the user can pick an existing connection rather than re-entering credentials. Returns
         componentName, connectionVersion (the connection definition's version, NOT the component version), and
-        a connections array of {id, name, environmentId, active}.""";
+        a connections array of {id, name, environmentId, inUse}. inUse only says whether a workflow already uses
+        the connection: an unused connection works just as well, so offer it like any other.""";
 
     private static final String INPUT_SCHEMA = """
         {
@@ -228,13 +229,13 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
         return envelope;
     }
 
-    private static Map<String, Object> buildRow(long id, String name, int environmentId, boolean active) {
+    private static Map<String, Object> buildRow(long id, String name, int environmentId, boolean inUse) {
         Map<String, Object> row = new LinkedHashMap<>();
 
         row.put("id", id);
         row.put("name", name);
         row.put("environmentId", environmentId);
-        row.put("active", active);
+        row.put("inUse", inUse);
 
         return row;
     }
