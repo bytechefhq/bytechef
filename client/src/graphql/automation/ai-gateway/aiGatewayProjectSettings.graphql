@@ -1,0 +1,23 @@
+query aiGatewayProjectSettings($projectId: ID!) {
+    aiGatewayProjectSettings(projectId: $projectId) {
+        blockedTerms
+        injectionDetectionEnabled
+        moderationEnabled
+        projectId
+        redactPii
+        redactSecrets
+        scanResponses
+    }
+}
+
+mutation updateAiGatewayProjectSettings($input: AiGatewayProjectSettingsInput!) {
+    updateAiGatewayProjectSettings(input: $input) {
+        blockedTerms
+        injectionDetectionEnabled
+        moderationEnabled
+        projectId
+        redactPii
+        redactSecrets
+        scanResponses
+    }
+}

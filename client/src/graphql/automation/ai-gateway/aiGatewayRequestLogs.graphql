@@ -1,0 +1,20 @@
+query aiGatewayRequestLogs($startDate: Long!, $endDate: Long!) {
+    aiGatewayRequestLogs(startDate: $startDate, endDate: $endDate) {
+        apiKeyId
+        cacheHit
+        cost
+        createdDate
+        errorMessage
+        id
+        inputTokens
+        latencyMs
+        outputTokens
+        requestId
+        requestedModel
+        routedModel
+        routedProvider
+        routingPolicyId
+        routingStrategy
+        status
+    }
+}

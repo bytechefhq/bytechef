@@ -1,0 +1,98 @@
+query aiModels {
+    aiModels {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+query aiModelsByProvider($providerId: ID!) {
+    aiModelsByProvider(providerId: $providerId) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation createAiModel($input: CreateAiModelInput!) {
+    createAiModel(input: $input) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation updateAiModel($id: ID!, $input: UpdateAiModelInput!) {
+    updateAiModel(id: $id, input: $input) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}
+
+mutation deleteAiModel($id: ID!) {
+    deleteAiModel(id: $id)
+}
+
+mutation unpinAiModel($id: ID!) {
+    unpinAiModel(id: $id) {
+        alias
+        capabilities
+        catalogManaged
+        catalogPinned
+        contextWindow
+        createdDate
+        enabled
+        id
+        inputCostPerMTokens
+        lastModifiedDate
+        name
+        outputCostPerMTokens
+        providerId
+        version
+    }
+}

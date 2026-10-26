@@ -1,0 +1,67 @@
+query aiGatewayProviders {
+    aiGatewayProviders {
+        baseUrl
+        config
+        createdBy
+        createdDate
+        enabled
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        type
+        version
+    }
+}
+
+query aiGatewayProvider($id: ID!) {
+    aiGatewayProvider(id: $id) {
+        baseUrl
+        config
+        createdBy
+        createdDate
+        enabled
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        type
+        version
+    }
+}
+
+mutation createAiGatewayProvider($input: CreateAiGatewayProviderInput!) {
+    createAiGatewayProvider(input: $input) {
+        baseUrl
+        config
+        createdBy
+        createdDate
+        enabled
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        type
+        version
+    }
+}
+
+mutation updateAiGatewayProvider($id: ID!, $input: UpdateAiGatewayProviderInput!) {
+    updateAiGatewayProvider(id: $id, input: $input) {
+        baseUrl
+        config
+        createdBy
+        createdDate
+        enabled
+        id
+        lastModifiedBy
+        lastModifiedDate
+        name
+        type
+        version
+    }
+}
+
+mutation deleteAiGatewayProvider($id: ID!) {
+    deleteAiGatewayProvider(id: $id)
+}
