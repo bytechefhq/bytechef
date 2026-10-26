@@ -92,4 +92,17 @@ public class ProjectDeploymentWorkflowRemoteServiceGrpcServer
                 .build());
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void isProjectDeploymentWorkflowEnabled(
+        ProjectDeploymentWorkflowRequest request, StreamObserver<BoolResponse> responseObserver) {
+
+        responseObserver.onNext(
+            BoolResponse.newBuilder()
+                .setValue(
+                    projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
+                        request.getProjectDeploymentId(), request.getWorkflowId()))
+                .build());
+        responseObserver.onCompleted();
+    }
 }

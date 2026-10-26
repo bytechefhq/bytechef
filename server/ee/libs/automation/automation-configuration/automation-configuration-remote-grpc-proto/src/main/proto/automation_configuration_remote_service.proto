@@ -17,6 +17,7 @@ service ProjectRemoteService {
 
 service ProjectDeploymentRemoteService {
   rpc GetProjectDeployment(IdRequest) returns (RemoteProjectDeployment);
+  rpc IsProjectDeploymentEnabled(IdRequest) returns (BoolResponse);
 }
 
 service ProjectDeploymentWorkflowRemoteService {
@@ -26,6 +27,12 @@ service ProjectDeploymentWorkflowRemoteService {
   rpc GetProjectDeploymentWorkflowConnections(ProjectDeploymentWorkflowRequest)
       returns (RemoteProjectDeploymentWorkflowConnections);
   rpc IsConnectionUsed(IdRequest) returns (BoolResponse);
+  rpc IsProjectDeploymentWorkflowEnabled(ProjectDeploymentWorkflowRequest) returns (BoolResponse);
+}
+
+service ProjectWorkflowRemoteService {
+  rpc GetLastWorkflowId(WorkflowUuidRequest) returns (StringResponse);
+  rpc GetProjectWorkflowWorkflowId(WorkflowUuidRequest) returns (StringResponse);
 }
 
 message IdRequest {
@@ -41,6 +48,15 @@ message ProjectDeploymentWorkflowRequest {
   string workflow_id = 2;
   optional string workflow_node_name = 3;
   optional string workflow_connection_key = 4;
+}
+
+message WorkflowUuidRequest {
+  optional int64 project_deployment_id = 1;
+  string workflow_uuid = 2;
+}
+
+message StringResponse {
+  string value = 1;
 }
 
 message BoolResponse {

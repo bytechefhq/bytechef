@@ -9,6 +9,10 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectWorkflowRemoteServiceGrpc;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.StringResponse;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.WorkflowUuidRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +27,14 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnEEVersion
 public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowService {
+
+    private static final String CONFIGURATION_APP = "configuration-app";
+
+    private final GrpcChannels grpcChannels;
+
+    public RemoteProjectWorkflowServiceClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
+    }
 
     @Override
     public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId) {
@@ -58,7 +70,12 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public String getLastWorkflowId(String workflowUuid) {
-        throw new UnsupportedOperationException();
+        StringResponse stringResponse = getStub().getLastWorkflowId(
+            WorkflowUuidRequest.newBuilder()
+                .setWorkflowUuid(workflowUuid)
+                .build());
+
+        return stringResponse.getValue();
     }
 
     @Override
@@ -83,7 +100,13 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public String getProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid) {
-        throw new UnsupportedOperationException();
+        StringResponse stringResponse = getStub().getProjectWorkflowWorkflowId(
+            WorkflowUuidRequest.newBuilder()
+                .setProjectDeploymentId(projectDeploymentId)
+                .setWorkflowUuid(workflowUuid)
+                .build());
+
+        return stringResponse.getValue();
     }
 
     @Override
@@ -163,4 +186,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
         throw new UnsupportedOperationException();
     }
 
+    private ProjectWorkflowRemoteServiceGrpc.ProjectWorkflowRemoteServiceBlockingStub getStub() {
+        return ProjectWorkflowRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+    }
 }
