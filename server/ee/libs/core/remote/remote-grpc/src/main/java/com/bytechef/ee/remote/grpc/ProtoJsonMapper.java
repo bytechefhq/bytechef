@@ -91,7 +91,7 @@ public class ProtoJsonMapper {
 
     private JsonNode encode(JsonNode jsonNode) {
         if (jsonNode.isNull()) {
-            return jsonNode;
+            return StringNode.valueOf("");
         }
 
         return StringNode.valueOf(EncodingUtils.base64EncodeToString(objectMapper.writeValueAsBytes(jsonNode)));
@@ -131,7 +131,11 @@ public class ProtoJsonMapper {
                     Descriptors.FieldDescriptor valueFieldDescriptor = fieldDescriptor.getMessageType()
                         .findFieldByName("value");
 
-                    if (valueFieldDescriptor.getJavaType() == Descriptors.FieldDescriptor.JavaType.MESSAGE) {
+                    if (valueFieldDescriptor.getType() == Descriptors.FieldDescriptor.Type.BYTES) {
+                        for (Map.Entry<String, JsonNode> entry : fieldNode.properties()) {
+                            entry.setValue(bytesTransformer.apply(entry.getValue()));
+                        }
+                    } else if (valueFieldDescriptor.getJavaType() == Descriptors.FieldDescriptor.JavaType.MESSAGE) {
                         for (Map.Entry<String, JsonNode> entry : fieldNode.properties()) {
                             transformBytes(entry.getValue(), valueFieldDescriptor.getMessageType(), bytesTransformer);
                         }
