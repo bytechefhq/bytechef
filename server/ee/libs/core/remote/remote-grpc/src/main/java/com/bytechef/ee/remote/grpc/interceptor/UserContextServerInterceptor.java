@@ -12,7 +12,8 @@ import io.grpc.Metadata;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,18 +33,23 @@ public class UserContextServerInterceptor implements ServerInterceptor {
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
         ServerCall<ReqT, RespT> serverCall, Metadata metadata, ServerCallHandler<ReqT, RespT> serverCallHandler) {
 
+        byte[] login = metadata.get(GrpcMetadataKeys.USER_LOGIN);
+        Iterable<byte[]> authorities = metadata.getAll(GrpcMetadataKeys.USER_AUTHORITY);
+
         return new UserBindingListener<>(
-            serverCallHandler.startCall(serverCall, metadata), metadata.get(GrpcMetadataKeys.USER_LOGIN),
-            metadata.get(GrpcMetadataKeys.USER_AUTHORITIES));
+            serverCallHandler.startCall(serverCall, metadata),
+            login == null ? null : new String(login, StandardCharsets.UTF_8), toGrantedAuthorities(authorities));
     }
 
     private static final class UserBindingListener<ReqT>
         extends ForwardingServerCallListener.SimpleForwardingServerCallListener<ReqT> {
 
-        private final String authorities;
+        private final List<GrantedAuthority> authorities;
         private final String login;
 
-        private UserBindingListener(ServerCall.Listener<ReqT> delegate, String login, String authorities) {
+        private UserBindingListener(
+            ServerCall.Listener<ReqT> delegate, String login, List<GrantedAuthority> authorities) {
+
             super(delegate);
 
             this.authorities = authorities;
@@ -62,7 +68,7 @@ public class UserContextServerInterceptor implements ServerInterceptor {
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
             securityContext.setAuthentication(
-                UsernamePasswordAuthenticationToken.authenticated(login, null, toGrantedAuthorities(authorities)));
+                UsernamePasswordAuthenticationToken.authenticated(login, null, authorities));
 
             SecurityContextHolder.setContext(securityContext);
 
@@ -72,16 +78,19 @@ public class UserContextServerInterceptor implements ServerInterceptor {
                 SecurityContextHolder.setContext(originalSecurityContext);
             }
         }
+    }
 
-        private static List<GrantedAuthority> toGrantedAuthorities(String authorities) {
-            if (StringUtils.isBlank(authorities)) {
-                return List.of();
-            }
+    private static List<GrantedAuthority> toGrantedAuthorities(Iterable<byte[]> authorities) {
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
-            return Arrays.stream(authorities.split(","))
-                .filter(StringUtils::isNotBlank)
-                .<GrantedAuthority>map(SimpleGrantedAuthority::new)
-                .toList();
+        if (authorities == null) {
+            return grantedAuthorities;
         }
+
+        for (byte[] authority : authorities) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(new String(authority, StandardCharsets.UTF_8)));
+        }
+
+        return grantedAuthorities;
     }
 }

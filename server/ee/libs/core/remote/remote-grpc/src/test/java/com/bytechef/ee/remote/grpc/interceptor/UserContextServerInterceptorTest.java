@@ -15,9 +15,11 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * @version ee
@@ -54,6 +56,35 @@ class UserContextServerInterceptorTest {
                         "key", "anonymousUser", List.of(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
 
             assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
+    @Test
+    void testApiKeyPrincipalCarriesNoIdentity() throws Exception {
+        TestingAuthenticationToken apiKeyAuthenticationToken = new TestingAuthenticationToken(
+            new User("external-user-1", "", List.of(new SimpleGrantedAuthority("ROLE_USER"))), null, "ROLE_USER");
+
+        apiKeyAuthenticationToken.setAuthenticated(true);
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(apiKeyAuthenticationToken);
+
+        try (InProcessGrpc inProcessGrpc = start()) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
+    @Test
+    void testNonAsciiLoginAndCommaAuthoritySurvive() throws Exception {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                UsernamePasswordAuthenticationToken.authenticated(
+                    "jos\u00e9@example.com", null,
+                    List.of(new SimpleGrantedAuthority("ROLE_A,B"), new SimpleGrantedAuthority("ROLE_USER"))));
+
+        try (InProcessGrpc inProcessGrpc = start()) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel()))
+                .isEqualTo("jos\u00e9@example.com|true|ROLE_A,B,ROLE_USER");
         }
     }
 
