@@ -37,6 +37,7 @@ export enum Source {
     API_COLLECTION = 'API_COLLECTION',
     ASSET_FILE = 'ASSET_FILE',
     COMPONENT_RULE = 'COMPONENT_RULE',
+    CONTEXT_STORE = 'CONTEXT_STORE',
 }
 
 export const isWorkflowEditorSource = (source: Source) =>

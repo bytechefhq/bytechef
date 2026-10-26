@@ -42,6 +42,9 @@ export interface ApplicationInfoI {
             javaEnabled: boolean;
         };
     };
+    contextStore: {
+        enabled: boolean;
+    };
     embedded: {
         allowedParentOrigins: string[];
     } | null;
@@ -132,6 +135,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                         javaEnabled: true,
                     },
                 },
+                contextStore: {
+                    enabled: false,
+                },
                 docs: {
                     changelogUrl: undefined,
                     communitySupportUrl: undefined,
@@ -185,6 +191,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 customComponent: {
                                     javaEnabled: json.component?.customComponent?.javaEnabled !== 'false',
                                 },
+                            },
+                            contextStore: {
+                                enabled: json.contextStore?.enabled === 'true',
                             },
                             docs: {
                                 changelogUrl: json.docs?.changelogUrl || undefined,

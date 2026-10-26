@@ -50,6 +50,7 @@ interface LeftSidebarNavItemProps {
     };
     toLink?: string;
     icon?: ReactNode;
+    trailing?: ReactNode;
 }
 
 const LeftSidebarNavItem = ({
@@ -58,37 +59,53 @@ const LeftSidebarNavItem = ({
     icon,
     item: {current, id, name, onItemClick},
     toLink = '',
-}: LeftSidebarNavItemProps) => (
-    <Link
-        aria-current={current ? 'page' : undefined}
-        aria-disabled={disabled || undefined}
-        className={cn(
-            buttonVariants({variant: 'ghost'}),
-            current
-                ? 'bg-accent text-sidebar-accent-foreground hover:bg-accent hover:text-sidebar-accent-foreground'
-                : 'text-sidebar-foreground hover:bg-accent hover:text-sidebar-accent-foreground',
-            'w-full justify-start px-2 font-normal',
-            disabled && 'pointer-events-none opacity-50',
-            className
-        )}
-        onClick={(event) => {
-            if (disabled) {
-                event.preventDefault();
+    trailing,
+}: LeftSidebarNavItemProps) => {
+    const link = (
+        <Link
+            aria-current={current ? 'page' : undefined}
+            aria-disabled={disabled || undefined}
+            className={cn(
+                buttonVariants({variant: 'ghost'}),
+                current
+                    ? 'bg-accent text-sidebar-accent-foreground hover:bg-accent hover:text-sidebar-accent-foreground'
+                    : 'text-sidebar-foreground hover:bg-accent hover:text-sidebar-accent-foreground',
+                'w-full justify-start px-2 font-normal',
+                trailing && 'pr-8',
+                disabled && 'pointer-events-none opacity-50',
+                className
+            )}
+            onClick={(event) => {
+                if (disabled) {
+                    event.preventDefault();
 
-                return;
-            }
+                    return;
+                }
 
-            if (onItemClick) {
-                onItemClick(id);
-            }
-        }}
-        tabIndex={disabled ? -1 : undefined}
-        to={toLink}
-    >
-        {icon}
+                if (onItemClick) {
+                    onItemClick(id);
+                }
+            }}
+            tabIndex={disabled ? -1 : undefined}
+            to={toLink}
+        >
+            {icon}
 
-        <span className={cn('truncate', current && 'font-semibold')}>{name}</span>
-    </Link>
-);
+            <span className={cn('truncate', current && 'font-semibold')}>{name}</span>
+        </Link>
+    );
+
+    if (!trailing) {
+        return link;
+    }
+
+    return (
+        <div className="group relative flex items-center rounded-md hover:bg-accent">
+            {link}
+
+            <div className="absolute right-1">{trailing}</div>
+        </div>
+    );
+};
 
 export {LeftSidebarNav, LeftSidebarNavItem};

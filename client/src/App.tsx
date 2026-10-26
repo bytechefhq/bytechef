@@ -98,10 +98,11 @@ const platformNavigation = [
 function App() {
     const [searchOpen, setSearchOpen] = useState(false);
 
-    const {ai, billingEnabled, edition} = useApplicationInfoStore(
+    const {ai, billingEnabled, contextStoreEnabled, edition} = useApplicationInfoStore(
         useShallow((state) => ({
             ai: state.ai,
             billingEnabled: state.billing.enabled,
+            contextStoreEnabled: state.contextStore.enabled,
             edition: state.application?.edition,
         }))
     );
@@ -135,10 +136,12 @@ function App() {
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
+    const ff_4855 = useFeatureFlagsStore()('ff-4855');
 
     const filteredAutomationNavigation = filterAutomationNavigation({
         aiHubEnabled: ai.hub.enabled,
         apiPlatformEnabled: ff_1023,
+        contextStoreEnabled: ff_4855 && contextStoreEnabled,
         currentEnvironmentId,
         edition,
         knowledgeBaseEnabled: ai.knowledgeBase.enabled,

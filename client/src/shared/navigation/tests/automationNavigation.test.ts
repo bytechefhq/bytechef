@@ -5,6 +5,7 @@ import {describe, expect, it} from 'vitest';
 const baseFilter = {
     aiHubEnabled: true,
     apiPlatformEnabled: false,
+    contextStoreEnabled: false,
     currentEnvironmentId: 0,
     edition: EditionType.EE,
     knowledgeBaseEnabled: false,
@@ -53,5 +54,14 @@ describe('filterAutomationNavigation', () => {
         expect(hrefs(EditionType.EE, true)).not.toContain('/automation/chats');
         expect(hrefs(EditionType.EE, false)).not.toContain('/automation/chats');
         expect(hrefs(undefined, false)).not.toContain('/automation/chats');
+    });
+
+    it('shows the Context Store entry only on the EE edition with the context store enabled', () => {
+        const hrefs = (edition: EditionType | undefined, contextStoreEnabled: boolean) =>
+            filterAutomationNavigation({...baseFilter, contextStoreEnabled, edition}).map((navItem) => navItem.href);
+
+        expect(hrefs(EditionType.EE, true)).toContain('/automation/context-stores');
+        expect(hrefs(EditionType.EE, false)).not.toContain('/automation/context-stores');
+        expect(hrefs(EditionType.CE, true)).not.toContain('/automation/context-stores');
     });
 });

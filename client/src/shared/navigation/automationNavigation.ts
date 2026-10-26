@@ -2,6 +2,7 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {EditionType} from '@/shared/stores/useApplicationInfoStore';
 import {
     ActivityIcon,
+    BoxesIcon,
     FileTextIcon,
     FolderIcon,
     HammerIcon,
@@ -91,6 +92,11 @@ export const automationNavigation: NavigationType[] = [
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
     },
+    {
+        href: '/automation/context-stores',
+        icon: BoxesIcon,
+        name: 'Context Store',
+    },
     {href: '/automation/asset-files', icon: FileTextIcon, name: 'Files'},
     {href: '/automation/chats', icon: MessageSquareIcon, name: 'Chats'},
 ];
@@ -98,6 +104,7 @@ export const automationNavigation: NavigationType[] = [
 interface AutomationNavigationFilterI {
     aiHubEnabled: boolean;
     apiPlatformEnabled: boolean;
+    contextStoreEnabled: boolean;
     currentEnvironmentId: number;
     edition: EditionType | undefined;
     knowledgeBaseEnabled: boolean;
@@ -106,6 +113,7 @@ interface AutomationNavigationFilterI {
 export const filterAutomationNavigation = ({
     aiHubEnabled,
     apiPlatformEnabled,
+    contextStoreEnabled,
     currentEnvironmentId,
     edition,
     knowledgeBaseEnabled,
@@ -141,6 +149,10 @@ export const filterAutomationNavigation = ({
 
         if (navItem.href === '/automation/external-invocations') {
             return edition === EditionType.EE;
+        }
+
+        if (navItem.href === '/automation/context-stores') {
+            return edition === EditionType.EE && contextStoreEnabled;
         }
 
         return true;
