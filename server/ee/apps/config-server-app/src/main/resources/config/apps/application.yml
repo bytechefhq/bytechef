@@ -250,6 +250,9 @@ bytechef:
   cache:
     # Cache provider (CAFFEINE) default: CAFFEINE
     provider: CAFFEINE
+  context-store:
+    # Whether the Context Store is enabled (default: false)
+    enabled: false
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true

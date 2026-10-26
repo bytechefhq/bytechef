@@ -701,6 +701,8 @@ include("server:ee:libs:platform:platform-configuration:platform-configuration-r
 include("server:ee:libs:platform:platform-configuration:platform-configuration-service")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-client")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-rest")
+include("server:ee:libs:platform:platform-context-store:platform-context-store-api")
+include("server:ee:libs:platform:platform-context-store:platform-context-store-service")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api")

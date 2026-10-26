@@ -90,6 +90,11 @@ public class ApplicationProperties {
     private Component component = new Component();
 
     /**
+     * Context Store configuration
+     */
+    private ContextStore contextStore = new ContextStore();
+
+    /**
      * Workflow coordinator configuration
      */
     private Coordinator coordinator = new Coordinator();
@@ -283,6 +288,10 @@ public class ApplicationProperties {
         return component;
     }
 
+    public ContextStore getContextStore() {
+        return contextStore;
+    }
+
     public Coordinator getCoordinator() {
         return coordinator;
     }
@@ -449,6 +458,10 @@ public class ApplicationProperties {
 
     public void setComponent(Component component) {
         this.component = component;
+    }
+
+    public void setContextStore(ContextStore contextStore) {
+        this.contextStore = contextStore;
     }
 
     public void setCoordinator(Coordinator coordinator) {
@@ -3489,6 +3502,83 @@ public class ApplicationProperties {
 
             public void setExclude(List<String> exclude) {
                 this.exclude = exclude;
+            }
+        }
+    }
+
+    /**
+     * Context Store configuration.
+     */
+    public static class ContextStore {
+
+        /**
+         * Whether the Context Store is enabled
+         */
+        private boolean enabled;
+
+        /**
+         * ClickHouse records backend configuration, active when the URL is set
+         */
+        private ClickHouse clickhouse = new ClickHouse();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public ClickHouse getClickhouse() {
+            return clickhouse;
+        }
+
+        public void setClickhouse(ClickHouse clickhouse) {
+            this.clickhouse = clickhouse;
+        }
+
+        /**
+         * ClickHouse datasource configuration.
+         */
+        public static class ClickHouse {
+
+            /**
+             * Database password
+             */
+            private String password;
+
+            /**
+             * JDBC URL for the ClickHouse server, e.g. jdbc:clickhouse://host:8123/database
+             */
+            private String url;
+
+            /**
+             * Database username
+             */
+            private String username;
+
+            public String getPassword() {
+                return password;
+            }
+
+            public void setPassword(String password) {
+                this.password = password;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+            public String getUsername() {
+                return username;
+            }
+
+            public void setUsername(String username) {
+                this.username = username;
             }
         }
     }
