@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc;
 
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.dynamicProperties;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.fileEntry;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.platform.domain.OutputResponse;
@@ -61,6 +64,26 @@ class TaskDispatcherProtoMapperTest {
                 .withEqualsForFieldsMatchingRegexes(this::jsonEquals, FREE_FORM_FIELDS)
                 .isEqualTo(taskDispatcherDefinition);
         }
+    }
+
+    @Test
+    void testFileEntryAndDynamicPropertiesRoundTrip() {
+        TaskDispatcherDefinition taskDispatcherDefinition = new TaskDispatcherDefinition(
+            taskDispatcher("probe")
+                .title("Probe")
+                .description("Probe dispatcher")
+                .properties(
+                    fileEntry("file"),
+                    dynamicProperties("fields")
+                        .propertiesLookupDependsOn("file")
+                        .properties(inputParameters -> List.of())));
+
+        assertThat(
+            taskDispatcherProtoMapper
+                .toTaskDispatcherDefinition(taskDispatcherProtoMapper.toProto(taskDispatcherDefinition)))
+                    .usingRecursiveComparison()
+                    .withEqualsForFieldsMatchingRegexes(this::jsonEquals, FREE_FORM_FIELDS)
+                    .isEqualTo(taskDispatcherDefinition);
     }
 
     @Test

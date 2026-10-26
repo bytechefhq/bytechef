@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class OptionsDataSource {
 
-    private final List<String> optionsLookupDependsOn;
+    private List<String> optionsLookupDependsOn;
 
     public OptionsDataSource() {
         this.optionsLookupDependsOn = List.of();
