@@ -2367,6 +2367,21 @@ export type UpdateIntegrationCodeWorkflowSourceMutationVariables = Exact<{
 
 export type UpdateIntegrationCodeWorkflowSourceMutation = { updateIntegrationCodeWorkflowSource: boolean };
 
+export type AiGuardrailsWorkspaceSettingsQueryVariables = Exact<{
+  workspaceId?: string | number | null | undefined;
+  scope?: Types.AiGuardrailsSettingsScope | null | undefined;
+}>;
+
+
+export type AiGuardrailsWorkspaceSettingsQuery = { aiGuardrailsWorkspaceSettings: { blockedTerms: string | null, blockingMode: Types.AiGuardrailsBlockingMode | null, injectionDetectionEnabled: boolean | null, minConfidence: number | null, moderationEnabled: boolean | null, redactMcpResults: boolean | null, redactPii: boolean | null, redactSecrets: boolean | null, restoreIntoWorkflowOutput: boolean | null, scanResponses: boolean | null, scope: Types.AiGuardrailsSettingsScope | null, workspaceId: string | null } | null };
+
+export type UpdateAiGuardrailsWorkspaceSettingsMutationVariables = Exact<{
+  input: Types.AiGuardrailsWorkspaceSettingsInput;
+}>;
+
+
+export type UpdateAiGuardrailsWorkspaceSettingsMutation = { updateAiGuardrailsWorkspaceSettings: { blockedTerms: string | null, blockingMode: Types.AiGuardrailsBlockingMode | null, injectionDetectionEnabled: boolean | null, minConfidence: number | null, moderationEnabled: boolean | null, redactMcpResults: boolean | null, redactPii: boolean | null, redactSecrets: boolean | null, restoreIntoWorkflowOutput: boolean | null, scanResponses: boolean | null, workspaceId: string | null } | null };
+
 export type AiDefaultModelQueryVariables = Exact<{
   environment: string | number;
 }>;
@@ -11715,6 +11730,72 @@ export const useUpdateIntegrationCodeWorkflowSourceMutation = <
       {
     mutationKey: ['updateIntegrationCodeWorkflowSource'],
     mutationFn: (variables?: UpdateIntegrationCodeWorkflowSourceMutationVariables) => fetcher<UpdateIntegrationCodeWorkflowSourceMutation, UpdateIntegrationCodeWorkflowSourceMutationVariables>(UpdateIntegrationCodeWorkflowSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiGuardrailsWorkspaceSettingsDocument = new TypedDocumentString(`
+    query aiGuardrailsWorkspaceSettings($workspaceId: ID, $scope: AiGuardrailsSettingsScope) {
+  aiGuardrailsWorkspaceSettings(workspaceId: $workspaceId, scope: $scope) {
+    blockedTerms
+    blockingMode
+    injectionDetectionEnabled
+    minConfidence
+    moderationEnabled
+    redactMcpResults
+    redactPii
+    redactSecrets
+    restoreIntoWorkflowOutput
+    scanResponses
+    scope
+    workspaceId
+  }
+}
+    `);
+
+export const useAiGuardrailsWorkspaceSettingsQuery = <
+      TData = AiGuardrailsWorkspaceSettingsQuery,
+      TError = unknown
+    >(
+      variables?: AiGuardrailsWorkspaceSettingsQueryVariables,
+      options?: Omit<UseQueryOptions<AiGuardrailsWorkspaceSettingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiGuardrailsWorkspaceSettingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiGuardrailsWorkspaceSettingsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiGuardrailsWorkspaceSettings'] : ['aiGuardrailsWorkspaceSettings', variables],
+    queryFn: fetcher<AiGuardrailsWorkspaceSettingsQuery, AiGuardrailsWorkspaceSettingsQueryVariables>(AiGuardrailsWorkspaceSettingsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateAiGuardrailsWorkspaceSettingsDocument = new TypedDocumentString(`
+    mutation updateAiGuardrailsWorkspaceSettings($input: AiGuardrailsWorkspaceSettingsInput!) {
+  updateAiGuardrailsWorkspaceSettings(input: $input) {
+    blockedTerms
+    blockingMode
+    injectionDetectionEnabled
+    minConfidence
+    moderationEnabled
+    redactMcpResults
+    redactPii
+    redactSecrets
+    restoreIntoWorkflowOutput
+    scanResponses
+    workspaceId
+  }
+}
+    `);
+
+export const useUpdateAiGuardrailsWorkspaceSettingsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiGuardrailsWorkspaceSettingsMutation, TError, UpdateAiGuardrailsWorkspaceSettingsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiGuardrailsWorkspaceSettingsMutation, TError, UpdateAiGuardrailsWorkspaceSettingsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiGuardrailsWorkspaceSettings'],
+    mutationFn: (variables?: UpdateAiGuardrailsWorkspaceSettingsMutationVariables) => fetcher<UpdateAiGuardrailsWorkspaceSettingsMutation, UpdateAiGuardrailsWorkspaceSettingsMutationVariables>(UpdateAiGuardrailsWorkspaceSettingsDocument, variables)(),
     ...options
   }
     )};
