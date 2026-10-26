@@ -774,7 +774,9 @@ export const buildAiHubSubscriber = ({
             }
 
             const toolResultContent = contentToText(event.content);
-            const toolCallName = toolCallNamesById.get(event.toolCallId);
+            const toolCallName =
+                toolCallNamesById.get(event.toolCallId) ??
+                aiChatToolCallStore.getState().toolCalls[event.toolCallId]?.toolName;
 
             toolCallNamesById.delete(event.toolCallId);
 

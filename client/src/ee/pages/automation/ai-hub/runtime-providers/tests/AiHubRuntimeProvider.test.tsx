@@ -499,6 +499,20 @@ describe('buildAiHubSubscriber', () => {
             expect(onWorkflowMutated).toHaveBeenNthCalledWith(1, 'Workflow updated.');
         });
 
+        it('notifies onWorkflowMutated when an approved call resumes in a continuation run', () => {
+            const onWorkflowMutated = vi.fn();
+
+            createSubscriber().onToolCallStartEvent!(
+                makeToolCallStartParams({toolCallId: 'call-gated', toolCallName: 'buildWorkflow'})
+            );
+
+            createSubscriber({onWorkflowMutated}).onToolCallResultEvent!(
+                makeToolCallResultParams({content: 'Workflow updated.', toolCallId: 'call-gated'})
+            );
+
+            expect(onWorkflowMutated).toHaveBeenCalledTimes(1);
+        });
+
         it('does not warn about a prose tool result and keeps the prose as the result', () => {
             const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
