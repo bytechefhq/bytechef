@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +38,7 @@ public final class ConnectionDefinition {
     private List<? extends Property> properties;
     private int version;
 
+    @JsonCreator
     private ConnectionDefinition() {
     }
 

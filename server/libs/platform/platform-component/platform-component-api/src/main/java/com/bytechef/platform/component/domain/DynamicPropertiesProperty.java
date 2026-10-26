@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Objects;
 
 /**
@@ -27,6 +28,7 @@ public class DynamicPropertiesProperty extends Property {
     private String header;
     private PropertiesDataSource propertiesDataSource;
 
+    @JsonCreator
     private DynamicPropertiesProperty() {
     }
 

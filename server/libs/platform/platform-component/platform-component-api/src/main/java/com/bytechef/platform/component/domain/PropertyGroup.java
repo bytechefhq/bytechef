@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,7 @@ public class PropertyGroup {
     private String name;
     private List<? extends Property> properties;
 
+    @JsonCreator
     private PropertyGroup() {
     }
 

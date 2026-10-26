@@ -17,12 +17,14 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.platform.domain.BaseHelp;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  * @author Ivica Cardic
  */
 public class Help extends BaseHelp {
 
+    @JsonCreator
     private Help() {
     }
 

@@ -17,12 +17,14 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.component.definition.Property;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  * @author Ivica Cardic
  */
 public class NullProperty extends ValueProperty<Void> {
 
+    @JsonCreator
     private NullProperty() {
     }
 

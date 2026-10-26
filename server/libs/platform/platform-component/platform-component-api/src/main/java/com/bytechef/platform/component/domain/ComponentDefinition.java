@@ -24,6 +24,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ public final class ComponentDefinition {
     private UnifiedApiCategory unifiedApiCategory;
     private int version;
 
+    @JsonCreator
     private ComponentDefinition() {
     }
 

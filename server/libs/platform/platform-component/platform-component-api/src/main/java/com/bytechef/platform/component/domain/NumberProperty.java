@@ -19,6 +19,7 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +38,7 @@ public class NumberProperty extends ValueProperty<Double> implements OptionsData
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
 
+    @JsonCreator
     private NumberProperty() {
     }
 
