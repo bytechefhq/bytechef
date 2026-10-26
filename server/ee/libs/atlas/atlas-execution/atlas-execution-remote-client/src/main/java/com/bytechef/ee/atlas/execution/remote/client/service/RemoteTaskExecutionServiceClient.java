@@ -13,6 +13,7 @@ import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.TaskExecutionRemoteServiceGrpc;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.TaskExecutionResult;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,13 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public Optional<TaskExecution> fetchLastJobTaskExecution(long jobId) {
-        throw new UnsupportedOperationException();
+        TaskExecutionResult taskExecutionResult = getStub().fetchLastJobTaskExecution(toIdRequest(jobId));
+
+        if (!taskExecutionResult.hasTaskExecution()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(atlasExecutionProtoMapper.toTaskExecution(taskExecutionResult.getTaskExecution()));
     }
 
     @Override

@@ -8,7 +8,11 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.BoolResponse;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserProjectRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
@@ -24,9 +28,25 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class RemoteConnectedUserProjectServiceClient implements ConnectedUserProjectService {
 
+    private static final String CONFIGURATION_APP = "configuration-app";
+
+    private final GrpcChannels grpcChannels;
+
+    public RemoteConnectedUserProjectServiceClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
+    }
+
     @Override
     public boolean containsProjectDeployment(long projectDeploymentId) {
-        throw new UnsupportedOperationException();
+        ConnectedUserProjectRemoteServiceGrpc.ConnectedUserProjectRemoteServiceBlockingStub stub =
+            ConnectedUserProjectRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        BoolResponse boolResponse = stub.containsProjectDeployment(
+            IdRequest.newBuilder()
+                .setId(projectDeploymentId)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override

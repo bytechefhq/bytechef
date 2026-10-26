@@ -221,6 +221,20 @@ class AtlasExecutionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testFetchLastJobTaskExecution() {
+        when(taskExecutionService.fetchLastJobTaskExecution(7L)).thenReturn(Optional.of(taskExecution(11L)));
+        when(taskExecutionService.fetchLastJobTaskExecution(8L)).thenReturn(Optional.empty());
+
+        RemoteTaskExecutionServiceClient remoteTaskExecutionServiceClient = new RemoteTaskExecutionServiceClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteTaskExecutionServiceClient.fetchLastJobTaskExecution(7L)).get()
+            .extracting(TaskExecution::getId)
+            .isEqualTo(11L);
+        assertThat(remoteTaskExecutionServiceClient.fetchLastJobTaskExecution(8L)).isEmpty();
+    }
+
+    @Test
     void testPeekWithAndWithoutSubStack() {
         FileEntry fileEntry = new FileEntry("context.json", "base64:///abc");
         FileEntry subStackFileEntry = new FileEntry("sub.json", "base64:///def");
