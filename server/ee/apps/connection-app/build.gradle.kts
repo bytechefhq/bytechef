@@ -42,10 +42,9 @@ dependencies {
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
-    implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
-    implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
@@ -54,5 +53,6 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
 
+    testImplementation("io.grpc:grpc-api")
     testImplementation(project(":server:libs:test:test-int-support"))
 }
