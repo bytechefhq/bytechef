@@ -82,6 +82,10 @@ export interface ConnectionBase {
      */
     credentialStatus?: CredentialStatus;
     /**
+     * Backend that stores the credential payload. Defaults to DATABASE.
+     */
+    credentialStoreType?: ConnectionBaseCredentialStoreTypeEnum;
+    /**
      * The id of an environment.
      */
     environmentId?: number;
@@ -116,6 +120,16 @@ export interface ConnectionBase {
 }
 
 
+/**
+ * @export
+ */
+export const ConnectionBaseCredentialStoreTypeEnum = {
+    Database: 'DATABASE',
+    AwsSecretsManager: 'AWS_SECRETS_MANAGER',
+    HashicorpVault: 'HASHICORP_VAULT',
+} as const;
+export type ConnectionBaseCredentialStoreTypeEnum = typeof ConnectionBaseCredentialStoreTypeEnum[keyof typeof ConnectionBaseCredentialStoreTypeEnum];
+
 
 /**
  * Check if a given object implements the ConnectionBase interface.
@@ -148,6 +162,7 @@ export function ConnectionBaseFromJSONTyped(json: any, ignoreDiscriminator: bool
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
+        'credentialStoreType': json['credentialStoreType'] == null ? undefined : json['credentialStoreType'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -175,6 +190,7 @@ export function ConnectionBaseToJSONTyped(value?: Omit<ConnectionBase, 'active'|
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
+        'credentialStoreType': value['credentialStoreType'],
         'environmentId': value['environmentId'],
         'name': value['name'],
         'parameters': value['parameters'],

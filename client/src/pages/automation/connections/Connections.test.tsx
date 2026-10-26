@@ -23,7 +23,8 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
         selector({application: {edition: 'EE'}}),
 }));
 
-vi.mock('@/shared/middleware/graphql', () => ({
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useEnvironmentsQuery: () => ({data: {environments: hoisted.environments}}),
 }));
 

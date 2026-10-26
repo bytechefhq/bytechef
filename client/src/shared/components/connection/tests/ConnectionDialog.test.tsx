@@ -1,12 +1,28 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {useConnectionCredentialStoresQuery} from '@/shared/middleware/graphql';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
-import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+
+const hoisted = vi.hoisted(() => ({
+    createMutate: vi.fn(),
+    registerMutate: vi.fn(),
+}));
+
+vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
+    useRegisterExistingConnectionMutation: () => ({
+        error: null,
+        isPending: false,
+        mutate: hoisted.registerMutate,
+        mutateAsync: hoisted.registerMutate,
+        reset: vi.fn(),
+    }),
+}));
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
@@ -250,5 +266,201 @@ describe('ConnectionDialog', () => {
 
         expect(screen.getByText('Component', {selector: 'label'})).toHaveTextContent(/^Component\*$/);
         expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
+    });
+
+    describe('credential store', () => {
+        const mockCredentialStores = (result: Record<string, unknown>) =>
+            vi.mocked(useConnectionCredentialStoresQuery).mockReturnValue(result as never);
+
+        const renderCreateDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = {}) =>
+            renderDialog({
+                componentDefinition: {name: 'acme', title: 'Acme'} as never,
+                componentDefinitions: [{name: 'acme', title: 'Acme'}] as never,
+                useCreateConnectionMutation: (() => ({
+                    error: null,
+                    isPending: false,
+                    mutate: hoisted.createMutate,
+                    mutateAsync: hoisted.createMutate,
+                    reset: vi.fn(),
+                })) as never,
+                ...props,
+            });
+
+        beforeEach(() => {
+            hoisted.createMutate.mockClear();
+            hoisted.registerMutate.mockClear();
+        });
+
+        afterEach(() => {
+            vi.mocked(useConnectionCredentialStoresQuery).mockReturnValue({data: undefined} as never);
+        });
+
+        it('hides the credential storage picker when only DATABASE is registered', () => {
+            mockCredentialStores({
+                data: {connectionCredentialStores: [{readOnly: false, type: 'DATABASE'}]},
+                isLoading: false,
+            });
+
+            renderCreateDialog();
+
+            expect(screen.queryByText(/credential storage/i)).not.toBeInTheDocument();
+        });
+
+        it('shows the credential storage picker when an external store is configured', () => {
+            mockCredentialStores({
+                data: {
+                    connectionCredentialStores: [
+                        {readOnly: false, type: 'DATABASE'},
+                        {readOnly: false, type: 'AWS_SECRETS_MANAGER'},
+                    ],
+                },
+                isLoading: false,
+            });
+
+            renderCreateDialog();
+
+            expect(screen.getByText('Credential storage')).toBeInTheDocument();
+        });
+
+        it('shows the register-existing toggle when an external read-write store is selected', async () => {
+            mockCredentialStores({
+                data: {
+                    connectionCredentialStores: [
+                        {readOnly: false, type: 'DATABASE'},
+                        {readOnly: false, type: 'AWS_SECRETS_MANAGER'},
+                    ],
+                },
+                isLoading: false,
+            });
+
+            renderCreateDialog();
+
+            const selectTrigger = screen.getByRole('combobox', {name: /credential storage/i});
+
+            fireEvent.click(selectTrigger);
+
+            fireEvent.click(await screen.findByText('AWS Secrets Manager'));
+
+            const toggle = await screen.findByLabelText(/register existing credential/i);
+
+            expect(toggle).toBeInTheDocument();
+            expect(toggle).not.toBeChecked();
+            expect(toggle).not.toBeDisabled();
+        });
+
+        it('auto-enables and locks the toggle when the selected external store is read-only', async () => {
+            mockCredentialStores({
+                data: {
+                    connectionCredentialStores: [
+                        {readOnly: false, type: 'DATABASE'},
+                        {readOnly: true, type: 'HASHICORP_VAULT'},
+                    ],
+                },
+                isLoading: false,
+            });
+
+            renderCreateDialog();
+
+            const selectTrigger = screen.getByRole('combobox', {name: /credential storage/i});
+
+            fireEvent.click(selectTrigger);
+
+            fireEvent.click(await screen.findByText('HashiCorp Vault'));
+
+            await waitFor(() => {
+                const toggle = screen.getByLabelText(/register existing credential/i);
+
+                expect(toggle).toBeChecked();
+                expect(toggle).toBeDisabled();
+            });
+
+            expect(screen.getByText(/configured read-only by your administrator/i)).toBeInTheDocument();
+        });
+
+        it('shows a disabled credential storage input with explanatory caption in edit mode', () => {
+            mockCredentialStores({
+                data: {
+                    connectionCredentialStores: [
+                        {readOnly: false, type: 'DATABASE'},
+                        {readOnly: false, type: 'AWS_SECRETS_MANAGER'},
+                    ],
+                },
+                isLoading: false,
+            });
+
+            renderCreateDialog({
+                connection: {
+                    componentName: 'acme',
+                    connectionVersion: 1,
+                    environmentId: 0,
+                    id: 42,
+                    name: 'Existing Acme Connection',
+                    parameters: {},
+                    version: 1,
+                },
+            });
+
+            expect(screen.getByText(/credential storage cannot be changed after creation/i)).toBeInTheDocument();
+
+            expect(screen.queryByLabelText(/register existing credential/i)).not.toBeInTheDocument();
+        });
+
+        it('calls useRegisterExistingConnectionMutation when the register-existing toggle is on at submit', async () => {
+            const user = userEvent.setup();
+
+            mockCredentialStores({
+                data: {
+                    connectionCredentialStores: [
+                        {readOnly: false, type: 'DATABASE'},
+                        {readOnly: false, type: 'HASHICORP_VAULT'},
+                    ],
+                },
+                isLoading: false,
+            });
+
+            renderCreateDialog();
+
+            const selectTrigger = screen.getByRole('combobox', {name: /credential storage/i});
+
+            fireEvent.click(selectTrigger);
+
+            fireEvent.click(await screen.findByText('HashiCorp Vault'));
+
+            const toggle = await screen.findByLabelText(/register existing credential/i);
+
+            await user.click(toggle);
+
+            expect(toggle).toBeChecked();
+
+            const nameInput = screen.getByPlaceholderText(/my connection/i);
+
+            await user.clear(nameInput);
+            await user.type(nameInput, 'My Vault Connection');
+
+            const credRefInput = await screen.findByPlaceholderText(/bytechef\/connections\//i);
+
+            await user.type(credRefInput, 'secret/bytechef/acme');
+
+            const saveButton = screen.getByRole('button', {name: /save/i});
+
+            await user.click(saveButton);
+
+            await waitFor(() => {
+                expect(hoisted.registerMutate).toHaveBeenCalled();
+                expect(hoisted.createMutate).not.toHaveBeenCalled();
+            });
+        });
+
+        it('falls back to no-picker DATABASE behavior when the stores query returns no data', () => {
+            mockCredentialStores({
+                data: undefined,
+                error: new Error('GraphQL network error'),
+                isLoading: false,
+            });
+
+            renderCreateDialog();
+
+            expect(screen.queryByText(/credential storage/i)).not.toBeInTheDocument();
+        });
     });
 });
