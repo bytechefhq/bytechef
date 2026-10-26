@@ -40,6 +40,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.MediaType;
@@ -118,7 +119,7 @@ public class WebhookRequestUtils {
 
         String subtype = mimeType.getSubtype();
 
-        return "file." + subtype.toLowerCase();
+        return "file.%s.%s.binary".formatted(UUID.randomUUID(), subtype.toLowerCase());
     }
 
     @SuppressWarnings("unchecked")
