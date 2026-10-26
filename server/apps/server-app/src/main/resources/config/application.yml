@@ -40,6 +40,8 @@ info:
       enabled: ${bytechef.ai.copilot.enabled}
     knowledgeBase:
       enabled: ${bytechef.ai.knowledge-base.enabled:false}
+  contextStore:
+    enabled: ${bytechef.context-store.enabled:false}
   analytics:
     enabled: ${bytechef.analytics.enabled}
     postHog:

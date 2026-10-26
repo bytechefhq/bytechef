@@ -1,0 +1,6 @@
+spring:
+  liquibase:
+    contexts: configuration
+
+bytechef:
+  webhook-url: /webhooks/{id}

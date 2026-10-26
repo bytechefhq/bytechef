@@ -1,0 +1,183 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.contextstore.facade;
+
+import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreService;
+import com.bytechef.ee.platform.contextstore.domain.ContextStore;
+import com.bytechef.ee.platform.contextstore.domain.ContextStoreSource;
+import com.bytechef.ee.platform.contextstore.service.ContextStoreService;
+import com.bytechef.ee.platform.contextstore.service.ContextStoreSourceService;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author Ivica Cardic
+ * @version ee
+ */
+@Service
+@Transactional
+@ConditionalOnProperty(prefix = "bytechef.context-store", name = "enabled", havingValue = "true")
+public class WorkspaceContextStoreFacadeImpl implements WorkspaceContextStoreFacade {
+
+    private final ContextStoreService contextStoreService;
+    private final ContextStoreSourceService contextStoreSourceService;
+    private final TagService tagService;
+    private final WorkspaceContextStoreService workspaceContextStoreService;
+    private final WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade;
+
+    @SuppressFBWarnings("EI2")
+    public WorkspaceContextStoreFacadeImpl(
+        ContextStoreService contextStoreService, ContextStoreSourceService contextStoreSourceService,
+        TagService tagService, WorkspaceContextStoreService workspaceContextStoreService,
+        WorkspaceContextStoreSourceFacade workspaceContextStoreSourceFacade) {
+
+        this.contextStoreService = contextStoreService;
+        this.contextStoreSourceService = contextStoreSourceService;
+        this.tagService = tagService;
+        this.workspaceContextStoreService = workspaceContextStoreService;
+        this.workspaceContextStoreSourceFacade = workspaceContextStoreSourceFacade;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ContextStore> getWorkspaceContextStores(Long workspaceId, long environmentId) {
+        Environment environment = resolveEnvironment(environmentId);
+
+        return workspaceContextStoreService.getAllStoresByWorkspaceIdAndEnvironment(workspaceId, environment);
+    }
+
+    @Override
+    public ContextStore createWorkspaceContextStore(ContextStore contextStore, Long workspaceId, long environmentId) {
+        Environment environment = resolveEnvironment(environmentId);
+
+        contextStore.setEnvironment(environment);
+
+        boolean nameTaken = workspaceContextStoreService.getAllStoresByWorkspaceIdAndEnvironment(
+            workspaceId, environment)
+            .stream()
+            .anyMatch(existing -> Objects.equals(existing.getName(), contextStore.getName()));
+
+        if (nameTaken) {
+            throw new IllegalArgumentException(
+                "Context Store named '%s' already exists in this workspace at environment %s".formatted(
+                    contextStore.getName(), environment.name()));
+        }
+
+        contextStore.setWorkspaceId(workspaceId);
+
+        return contextStoreService.create(contextStore);
+    }
+
+    @Override
+    public ContextStore updateWorkspaceContextStore(Long workspaceId, ContextStore contextStore) {
+        Long contextStoreId = Objects.requireNonNull(contextStore.getId(), "contextStore.id");
+
+        if (!workspaceContextStoreService.isStoreInWorkspace(workspaceId, contextStoreId)) {
+            throw new IllegalArgumentException(
+                "Context Store " + contextStoreId + " is not in workspace " + workspaceId);
+        }
+
+        ContextStore current = contextStoreService.get(contextStoreId);
+
+        current.setName(contextStore.getName());
+        current.setDescription(contextStore.getDescription());
+        current.setTagIds(contextStore.getTagIds());
+        current.setVersion(contextStore.getVersion());
+
+        return contextStoreService.update(current);
+    }
+
+    @Override
+    public void deleteWorkspaceContextStore(Long workspaceId, Long contextStoreId) {
+        if (!workspaceContextStoreService.isStoreInWorkspace(workspaceId, contextStoreId)) {
+            throw new IllegalArgumentException(
+                "Context Store " + contextStoreId + " is not in workspace " + workspaceId);
+        }
+
+        for (ContextStoreSource contextStoreSource : contextStoreSourceService
+            .findAllByContextStoreId(contextStoreId)) {
+            workspaceContextStoreSourceFacade.delete(workspaceId, contextStoreSource.getId());
+        }
+
+        contextStoreService.delete(contextStoreId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> findContextStoreIdByName(Long workspaceId, String name, long environmentId) {
+        Environment environment = resolveEnvironment(environmentId);
+
+        return workspaceContextStoreService.getAllStoresByWorkspaceIdAndEnvironment(workspaceId, environment)
+            .stream()
+            .filter(store -> Objects.equals(store.getName(), name))
+            .map(ContextStore::getId)
+            .findFirst();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> getWorkspaceContextStoreTags(Long workspaceId) {
+        Map<Long, Tag> distinctTags = new LinkedHashMap<>();
+
+        List<Long> tagIds = workspaceContextStoreService.getAllStoresByWorkspaceId(workspaceId)
+            .stream()
+            .flatMap(store -> store.getTagIds()
+                .stream())
+            .distinct()
+            .toList();
+
+        if (tagIds.isEmpty()) {
+            return List.of();
+        }
+
+        for (Tag tag : tagService.getTags(tagIds)) {
+            distinctTags.put(tag.getId(), tag);
+        }
+
+        return new ArrayList<>(distinctTags.values());
+    }
+
+    @Override
+    public List<Tag> updateWorkspaceContextStoreTags(Long workspaceId, Long contextStoreId, List<Tag> tags) {
+        if (!workspaceContextStoreService.isStoreInWorkspace(workspaceId, contextStoreId)) {
+            throw new IllegalArgumentException(
+                "Context Store " + contextStoreId + " is not in workspace " + workspaceId);
+        }
+
+        List<Tag> resolvedTags = tagService.save(tags == null ? List.of() : tags);
+
+        ContextStore current = contextStoreService.get(contextStoreId);
+
+        current.setTags(resolvedTags);
+
+        contextStoreService.update(current);
+
+        return resolvedTags;
+    }
+
+    private Environment resolveEnvironment(long environmentId) {
+        Environment[] environments = Environment.values();
+
+        if (environmentId < 0 || environmentId >= environments.length) {
+            throw new IllegalArgumentException("Invalid environmentId: " + environmentId);
+        }
+
+        return environments[(int) environmentId];
+    }
+}
