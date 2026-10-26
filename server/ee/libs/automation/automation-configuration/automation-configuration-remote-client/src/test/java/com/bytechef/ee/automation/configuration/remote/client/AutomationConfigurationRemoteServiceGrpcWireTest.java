@@ -19,13 +19,16 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectDeploymentServiceClient;
 import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectDeploymentWorkflowServiceClient;
 import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectServiceClient;
+import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectWorkflowServiceClient;
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectDeploymentRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectDeploymentWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectRemoteServiceGrpcServer;
+import com.bytechef.ee.automation.configuration.remote.grpc.ProjectWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -59,11 +62,13 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
         mock(ProjectDeploymentWorkflowService.class);
     private final ProjectService projectService = mock(ProjectService.class);
+    private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
 
     private ManagedChannel managedChannel;
     private RemoteProjectDeploymentServiceClient remoteProjectDeploymentServiceClient;
     private RemoteProjectDeploymentWorkflowServiceClient remoteProjectDeploymentWorkflowServiceClient;
     private RemoteProjectServiceClient remoteProjectServiceClient;
+    private RemoteProjectWorkflowServiceClient remoteProjectWorkflowServiceClient;
     private Server server;
 
     @BeforeEach
@@ -86,6 +91,9 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
                     serverInterceptor))
             .addService(
                 ServerInterceptors.intercept(
+                    new ProjectWorkflowRemoteServiceGrpcServer(projectWorkflowService), serverInterceptor))
+            .addService(
+                ServerInterceptors.intercept(
                     new ProjectDeploymentWorkflowRemoteServiceGrpcServer(
                         projectDeploymentWorkflowService, automationConfigurationProtoMapper),
                     serverInterceptor))
@@ -102,6 +110,7 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
         remoteProjectDeploymentWorkflowServiceClient = new RemoteProjectDeploymentWorkflowServiceClient(
             fixedGrpcChannels, JSON_MAPPER);
         remoteProjectServiceClient = new RemoteProjectServiceClient(fixedGrpcChannels, JSON_MAPPER);
+        remoteProjectWorkflowServiceClient = new RemoteProjectWorkflowServiceClient(fixedGrpcChannels);
     }
 
     @AfterEach
@@ -206,6 +215,28 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
 
         assertThat(remoteProjectDeploymentWorkflowServiceClient.isConnectionUsed(7L)).isTrue();
         assertThat(remoteProjectDeploymentWorkflowServiceClient.isConnectionUsed(8L)).isFalse();
+    }
+
+    @Test
+    void testDeploymentEnabledChecks() {
+        when(projectDeploymentService.isProjectDeploymentEnabled(9L)).thenReturn(true);
+        when(projectDeploymentService.isProjectDeploymentEnabled(10L)).thenReturn(false);
+        when(projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(9L, WORKFLOW_ID)).thenReturn(true);
+
+        assertThat(remoteProjectDeploymentServiceClient.isProjectDeploymentEnabled(9L)).isTrue();
+        assertThat(remoteProjectDeploymentServiceClient.isProjectDeploymentEnabled(10L)).isFalse();
+        assertThat(remoteProjectDeploymentWorkflowServiceClient.isProjectDeploymentWorkflowEnabled(9L, WORKFLOW_ID))
+            .isTrue();
+    }
+
+    @Test
+    void testProjectWorkflowIds() {
+        when(projectWorkflowService.getProjectWorkflowWorkflowId(1051L, "workflow-uuid")).thenReturn("workflow-1");
+        when(projectWorkflowService.getLastWorkflowId("workflow-uuid")).thenReturn("workflow-2");
+
+        assertThat(remoteProjectWorkflowServiceClient.getProjectWorkflowWorkflowId(1051L, "workflow-uuid"))
+            .isEqualTo("workflow-1");
+        assertThat(remoteProjectWorkflowServiceClient.getLastWorkflowId("workflow-uuid")).isEqualTo("workflow-2");
     }
 
     private static ProjectDeploymentWorkflowConnection connection(long connectionId) {

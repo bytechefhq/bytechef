@@ -76,7 +76,10 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
 
     @Override
     public boolean isProjectDeploymentWorkflowEnabled(long projectDeploymentId, String workflowId) {
-        throw new UnsupportedOperationException();
+        BoolResponse boolResponse = getStub().isProjectDeploymentWorkflowEnabled(
+            toRequest(projectDeploymentId, workflowId));
+
+        return boolResponse.getValue();
     }
 
     @Override
