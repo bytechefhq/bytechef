@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.junit.jupiter.api.extension.ExtendWith;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -36,6 +37,20 @@ class TaskExecutionProtoMapperTest {
     @Test
     void testTaskExecutionRoundTrip() {
         TaskExecution taskExecution = taskExecution();
+
+        assertThat(taskExecutionProtoMapper.toTaskExecution(taskExecutionProtoMapper.toProto(taskExecution)))
+            .usingRecursiveComparison()
+            .isEqualTo(taskExecution);
+    }
+
+    @Test
+    void testSavedTaskExecutionRoundTrip() {
+        TaskExecution taskExecution = taskExecution();
+
+        ReflectionTestUtils.setField(taskExecution, "createdBy", "admin@localhost.com");
+        ReflectionTestUtils.setField(taskExecution, "createdDate", Instant.parse("2026-10-26T09:59:00Z"));
+        ReflectionTestUtils.setField(taskExecution, "lastModifiedBy", "user@localhost.com");
+        ReflectionTestUtils.setField(taskExecution, "lastModifiedDate", Instant.parse("2026-10-26T10:00:01Z"));
 
         assertThat(taskExecutionProtoMapper.toTaskExecution(taskExecutionProtoMapper.toProto(taskExecution)))
             .usingRecursiveComparison()
