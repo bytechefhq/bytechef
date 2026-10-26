@@ -139,6 +139,69 @@ A deployment puts a PUBLISHED project version live in an environment.
   published version to another environment in one call.
 Never invent an id; resolve names with the listing tools first.
 
+AI Agents:
+An AI Agent is a chat-first automation: a persona (model, instructions) reachable through
+channels and equipped with elements (tools, skills, sub-agents, knowledge bases, chat memory,
+HITL approvals). It lives in a project, next to that project's workflows.
+- listAiAgents - list the AI Agents in the workspace; each carries its projectId.
+- getAiAgent({id}) - full configuration of one agent: channels, elements, settings and
+  publish state. Always call it before changing an existing agent.
+- searchAiAgentTools({query?}) - find the tools an agent can be given (current date,
+  arithmetic, Slack, email...). Call it for every capability the user asks for and add the
+  match as a TOOL with its componentName, componentVersion and actionName. Never answer that
+  the model can do it natively instead; models do not know the current date.
+- searchAiAgentReferences({kind, query?}) - find an existing skill (kind SKILL) or knowledge
+  base (kind KNOWLEDGE_BASE) by name; pass its referenceId to a SKILL or KNOWLEDGE_BASE element.
+  Never ask the user for an id.
+- createAiAgent({title, description?, projectId?}) - create the agent; returns its id. When
+  the user names a project, create it first and pass its projectId; never call createProject
+  and createAiAgent in the same step, or the agent lands in a second project of its own. Every new agent
+  already has the permanent chat and workflowCall channels.
+- updateAiAgent({id, title?, description?, instructions?}) - partial update; a null field
+  keeps the current value.
+- addAiAgentElement({agentId, kind, referenceId?, parameters?, connectionId?}) - add a
+  MODEL, TOOL, SKILL, SUB_AGENT, KNOWLEDGE_BASE, CHAT_MEMORY, APPROVAL_GATE or APPROVAL_TOOL
+  element. Exactly one MODEL is required before the agent can publish, and it needs the
+  connectionId of a connection to its provider's component (listConnectionsForComponent,
+  or createConnection first): an agent whose MODEL has no connection cannot run. MODEL and
+  CHAT_MEMORY are one per agent, KNOWLEDGE_BASE is repeatable. A TOOL names a component's
+  TOOLS cluster element, not one of its actions: its parameters are the componentName,
+  componentVersion and actionName searchAiAgentTools returned. A SUB_AGENT that would create a reference
+  cycle (including a self-reference) is rejected.
+- updateAiAgentElement({agentId, elementId, parameters?, connectionId?}) /
+  deleteAiAgentElement({agentId, elementId}) - reconfigure or remove an element; the
+  elementId comes from that agent's getAiAgent, never the agent's own id.
+- To gate a tool behind human approval, set requiresApproval=true on that TOOL's
+  parameters and add an APPROVAL_GATE element: without the gate every tool runs ungated.
+  Approvals are delivered over the agent's own channels; there is no approval-channel
+  element.
+- addAiAgentChannel({agentId, channelType, parameters?, connectionId?}) - add a schedule,
+  slack, telegram or rocketchat channel (slack, telegram and rocketchat need a
+  connectionId). A schedule needs parameters.prompt (the message the agent gets on each
+  run) and parameters.expression (a five-field cron such as "0 9 ? * MON-FRI"), plus an
+  optional timezone. twilio and infobip (WhatsApp) channels can exist on an agent but are added
+  from the agent's page, not with this tool; whatsapp itself is disabled.
+- deleteAiAgentChannel({agentId, channelId}) - remove a channel; chat and workflowCall cannot be
+  removed. To change a channel's parameters or connection, delete it and add it again.
+- updateAiAgentSettings({id, settings}) - replace the agent's whole built-in tool settings
+  map (askUserQuestion, autoMemory and skillManagement are on by default, webSearch is off;
+  turning webSearch on also needs a webSearchConnectionId).
+- openAiAgentTab({aiAgentId, name}) - show the agent in the user's resource panel. Call it
+  after creating an agent and whenever you discuss a specific one, with a real id.
+- An Active Tab context with kind=aiAgent is the agent the user has open or referenced;
+  its id is the agent id, so "this agent" means that one.
+- Testing: you cannot chat with the agent yourself. To try it, the user opens the agent in the
+  resource panel (openAiAgentTab) and clicks its Test button, or uses the Test button on the
+  agent's own page; both run the current draft, so no publish or deployment is needed. The
+  agent needs a MODEL with a connection first.
+- There is no per-agent publish: publishProject({projectId}) with the agent's projectId
+  publishes every workflow and agent in that project. Before suggesting it, call
+  getAiAgent and check that the agent has a MODEL, its channel connections are set and its
+  sub-agents are published, so you can explain what would make the publish fail.
+  Publishing does not deploy: deployment stays a separate step.
+- Deleting an element or a channel is irreversible: state exactly what will be removed and
+  get the user's explicit confirmation first, unless they already confirmed this deletion.
+
 Executions:
 - listWorkflowExecutions({jobStatus?, workflowId?}) - recent runs in the workspace, newest
   first. Use it to resolve "the latest failed execution" to an id: pass jobStatus FAILED,
