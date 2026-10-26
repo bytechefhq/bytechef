@@ -1,0 +1,10 @@
+mutation updateContextStore($workspaceId: ID!, $id: ID!, $input: UpdateContextStoreInput!) {
+    updateContextStore(workspaceId: $workspaceId, id: $id, input: $input) {
+        id
+        name
+        description
+        environment
+        tagIds
+        version
+    }
+}

@@ -1,0 +1,6 @@
+mutation updateContextStoreTags($workspaceId: ID!, $id: ID!, $tags: [TagInput!]!) {
+    updateContextStoreTags(workspaceId: $workspaceId, id: $id, tags: $tags) {
+        id
+        name
+    }
+}
