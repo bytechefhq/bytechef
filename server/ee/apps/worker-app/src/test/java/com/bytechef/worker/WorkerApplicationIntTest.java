@@ -58,4 +58,18 @@ public class WorkerApplicationIntTest {
             "bytechef.platform.component.remote.v1.ActionDefinitionFacadeRemoteService",
             "bytechef.platform.component.remote.v1.TriggerDefinitionFacadeRemoteService");
     }
+
+    @Test
+    void testTaskHandlerGrpcServiceIsServed() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).contains(
+            "bytechef.platform.workflow.worker.remote.v1.TaskHandlerRemoteService");
+    }
 }

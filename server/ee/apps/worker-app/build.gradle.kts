@@ -70,7 +70,6 @@ dependencies {
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
-    implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-grpc"))
@@ -80,7 +79,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-data-table:platform-data-table-remote-client"))
     implementation(project(":server:ee:libs:automation:automation-task:automation-task-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
-    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-grpc"))
 
     implementation(project(":server:ee:libs:modules:components:app-event"))
 
