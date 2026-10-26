@@ -13,7 +13,7 @@ import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEn
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint.HttpMethod;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
-import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiGenerator;
+import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiComponentDefinitionFactory;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.exception.ConfigurationException;
@@ -99,11 +99,11 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
         OpenAPI openAPI = parseOpenAPIFile(openApiSpecificationPath.toString());
 
-        Path definitionFilePath;
+        String definition;
 
         try {
-            definitionFilePath = OpenApiGenerator.generate(name, openApiSpecificationPath);
-        } catch (Exception e) {
+            definition = OpenApiComponentDefinitionFactory.createComponentDefinitionJson(name, openAPI);
+        } catch (RuntimeException e) {
             throw new ConfigurationException(e.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
         }
 
@@ -119,14 +119,7 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         apiConnector.setName(name);
         apiConnector.setConnectorVersion(1);
 
-        try {
-            apiConnector.setDefinition(
-                apiConnectorFileStorage.storeApiConnectorDefinition(
-                    "definition.json", Files.readString(definitionFilePath)));
-        } catch (IOException e) {
-            throw new ConfigurationException(e.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
-        }
-
+        apiConnector.setDefinition(apiConnectorFileStorage.storeApiConnectorDefinition("definition.json", definition));
         apiConnector.setDescription(getDescription(openAPI.getInfo()));
         apiConnector.setSpecification(
             apiConnectorFileStorage.storeApiConnectorSpecification("specification.yaml", specification));
