@@ -206,7 +206,9 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
 
     @Override
     public boolean hasComponentDefinition(String name, @Nullable Integer version) {
-        throw new UnsupportedOperationException();
+        Optional<ComponentDefinition> componentDefinition = fetchComponentDefinition(name, version);
+
+        return componentDefinition.isPresent();
     }
 
     private List<ComponentDefinition> filterByPlatformType(
