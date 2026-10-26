@@ -17,6 +17,7 @@ Name | Type
 `createdBy` | string
 `createdDate` | Date
 `credentialStatus` | [CredentialStatus](CredentialStatus.md)
+`credentialStoreType` | string
 `environmentId` | number
 `id` | number
 `lastModifiedBy` | string
@@ -43,6 +44,7 @@ const example = {
   "createdBy": null,
   "createdDate": null,
   "credentialStatus": null,
+  "credentialStoreType": null,
   "environmentId": null,
   "id": null,
   "lastModifiedBy": null,

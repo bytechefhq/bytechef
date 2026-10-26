@@ -82,6 +82,10 @@ export interface Connection {
      */
     credentialStatus?: CredentialStatus;
     /**
+     * Backend that stores the credential payload. Defaults to DATABASE.
+     */
+    credentialStoreType?: ConnectionCredentialStoreTypeEnum;
+    /**
      * The id of an environment.
      */
     environmentId?: number;
@@ -127,6 +131,16 @@ export interface Connection {
 /**
  * @export
  */
+export const ConnectionCredentialStoreTypeEnum = {
+    Database: 'DATABASE',
+    AwsSecretsManager: 'AWS_SECRETS_MANAGER',
+    HashicorpVault: 'HASHICORP_VAULT',
+} as const;
+export type ConnectionCredentialStoreTypeEnum = typeof ConnectionCredentialStoreTypeEnum[keyof typeof ConnectionCredentialStoreTypeEnum];
+
+/**
+ * @export
+ */
 export const ConnectionStatusEnum = {
     Active: 'ACTIVE',
     PendingReassignment: 'PENDING_REASSIGNMENT',
@@ -166,6 +180,7 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (parseDateTime(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
+        'credentialStoreType': json['credentialStoreType'] == null ? undefined : json['credentialStoreType'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -195,6 +210,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
+        'credentialStoreType': value['credentialStoreType'],
         'environmentId': value['environmentId'],
         'name': value['name'],
         'parameters': value['parameters'],

@@ -13,6 +13,8 @@ import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/emb
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
+import {connectionCredentialStoreLabels} from '@/shared/components/connection/connectionCredentialStoreLabels';
+import {ConnectionCredentialStoreType} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
@@ -141,6 +143,25 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                                             weight="semibold"
                                         />
                                     )}
+
+                                    {connection.credentialStoreType &&
+                                        connection.credentialStoreType !== 'DATABASE' && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Badge
+                                                        label={
+                                                            connectionCredentialStoreLabels[
+                                                                connection.credentialStoreType as unknown as ConnectionCredentialStoreType
+                                                            ]
+                                                        }
+                                                        styleType="secondary-outline"
+                                                        weight="semibold"
+                                                    />
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>Credentials stored externally</TooltipContent>
+                                            </Tooltip>
+                                        )}
                                 </div>
 
                                 {connection.createdDate && (

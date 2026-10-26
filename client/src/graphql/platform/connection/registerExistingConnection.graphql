@@ -1,0 +1,3 @@
+mutation RegisterExistingConnection($input: RegisterExistingConnectionInput!) {
+    registerExistingConnection(input: $input)
+}

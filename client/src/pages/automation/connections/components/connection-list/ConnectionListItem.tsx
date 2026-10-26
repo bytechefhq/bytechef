@@ -5,7 +5,9 @@ import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
+import {connectionCredentialStoreLabels} from '@/shared/components/connection/connectionCredentialStoreLabels';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
+import {ConnectionCredentialStoreType} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
 import {
@@ -155,21 +157,42 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
                         <div className="flex items-center justify-end gap-x-6">
                             <div className="flex min-w-52 flex-col items-end gap-y-4">
-                                {connection.credentialStatus === 'VALID' ? (
-                                    <Badge
-                                        className="border-transparent uppercase"
-                                        label={connection.active ? 'Active' : 'Not Active'}
-                                        styleType={connection.active ? 'success-outline' : 'secondary-outline'}
-                                        weight="semibold"
-                                    />
-                                ) : (
-                                    <Badge
-                                        className="border-transparent uppercase"
-                                        label={connection.credentialStatus ?? 'INVALID'}
-                                        styleType="destructive-outline"
-                                        weight="semibold"
-                                    />
-                                )}
+                                <div className="flex flex-wrap items-center justify-end gap-2">
+                                    {connection.credentialStatus === 'VALID' ? (
+                                        <Badge
+                                            className="border-transparent uppercase"
+                                            label={connection.active ? 'Active' : 'Not Active'}
+                                            styleType={connection.active ? 'success-outline' : 'secondary-outline'}
+                                            weight="semibold"
+                                        />
+                                    ) : (
+                                        <Badge
+                                            className="border-transparent uppercase"
+                                            label={connection.credentialStatus ?? 'INVALID'}
+                                            styleType="destructive-outline"
+                                            weight="semibold"
+                                        />
+                                    )}
+
+                                    {connection.credentialStoreType &&
+                                        connection.credentialStoreType !== 'DATABASE' && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Badge
+                                                        label={
+                                                            connectionCredentialStoreLabels[
+                                                                connection.credentialStoreType as unknown as ConnectionCredentialStoreType
+                                                            ]
+                                                        }
+                                                        styleType="secondary-outline"
+                                                        weight="semibold"
+                                                    />
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>Credentials stored externally</TooltipContent>
+                                            </Tooltip>
+                                        )}
+                                </div>
 
                                 {connection.createdDate && (
                                     <Tooltip>
