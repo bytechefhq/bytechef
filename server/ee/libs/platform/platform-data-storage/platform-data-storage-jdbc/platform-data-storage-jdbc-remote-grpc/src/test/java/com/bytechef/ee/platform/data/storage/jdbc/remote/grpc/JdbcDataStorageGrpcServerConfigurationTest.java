@@ -13,6 +13,8 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -28,6 +30,8 @@ class JdbcDataStorageGrpcServerConfigurationTest {
     void testServedWhenTheProviderIsJdbc() {
         applicationContextRunner.withPropertyValues("bytechef.data-storage.provider=jdbc")
             .withBean(JdbcDataStorageService.class, () -> mock(JdbcDataStorageService.class))
+            .withBean(ObjectMapper.class, () -> JsonMapper.builder()
+                .build())
             .run(context -> assertThat(context).hasSingleBean(JdbcDataStorageRemoteServiceGrpcServer.class));
     }
 

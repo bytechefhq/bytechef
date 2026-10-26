@@ -7,26 +7,27 @@
 
 package com.bytechef.ee.remote.grpc;
 
+import com.bytechef.commons.util.EncodingUtils;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.IntNode;
-import tools.jackson.databind.node.LongNode;
+import tools.jackson.databind.node.NullNode;
 import tools.jackson.databind.node.ObjectNode;
 import tools.jackson.databind.node.StringNode;
 
 /**
  * Moves objects between Java and proto messages through JSON: the proto schema fixes the wire contract and rejects any
- * field it does not declare, while the Java objects are written and read the way Jackson handles them. Integral numbers
- * in free-form values come back as {@link Integer} when they fit, else {@link Long}.
+ * field it does not declare, while the Java objects are written and read the way Jackson handles them. A {@code bytes}
+ * field carries the Jackson JSON of the property with the same name, so free-form values keep their Java types; an
+ * empty one reads as {@code null}.
  *
  * @version ee
  *
@@ -34,7 +35,6 @@ import tools.jackson.databind.node.StringNode;
  */
 public class ProtoJsonMapper {
 
-    private static final BigInteger MAX_EXACT_INTEGER = BigInteger.TWO.pow(53);
     private static final JsonFormat.Parser PARSER = JsonFormat.parser();
     private static final JsonFormat.Printer PRINTER = JsonFormat.printer()
         .alwaysPrintFieldsWithNoPresence();
@@ -50,7 +50,8 @@ public class ProtoJsonMapper {
         try {
             JsonNode jsonNode = objectMapper.readTree(PRINTER.print(messageOrBuilder));
 
-            return objectMapper.treeToValue(transformNumbers(jsonNode, ProtoJsonMapper::toIntegralNumber), valueType);
+            return objectMapper.treeToValue(
+                transformBytes(jsonNode, messageOrBuilder.getDescriptorForType(), this::decode), valueType);
         } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
             throw new IllegalStateException(
                 "Unable to read %s from its proto message".formatted(valueType.getSimpleName()),
@@ -64,7 +65,9 @@ public class ProtoJsonMapper {
             JsonNode jsonNode = objectMapper.valueToTree(value);
 
             PARSER.merge(
-                objectMapper.writeValueAsString(transformNumbers(jsonNode, ProtoJsonMapper::toExactNumber)), builder);
+                objectMapper.writeValueAsString(
+                    transformBytes(jsonNode, builder.getDescriptorForType(), this::encode)),
+                builder);
         } catch (InvalidProtocolBufferException invalidProtocolBufferException) {
             throw new IllegalStateException(
                 "Unable to write %s to its proto message".formatted(
@@ -76,47 +79,73 @@ public class ProtoJsonMapper {
         return (M) builder.build();
     }
 
-    private static JsonNode toExactNumber(JsonNode jsonNode) {
-        if (jsonNode.isIntegralNumber() && jsonNode.bigIntegerValue()
-            .abs()
-            .compareTo(MAX_EXACT_INTEGER) > 0) {
+    private JsonNode decode(JsonNode jsonNode) {
+        String base64 = jsonNode.asString();
 
-            return StringNode.valueOf(jsonNode.asString());
+        if (base64.isEmpty()) {
+            return NullNode.getInstance();
         }
 
-        return jsonNode;
+        return objectMapper.readTree(EncodingUtils.base64Decode(base64));
     }
 
-    private static JsonNode toIntegralNumber(JsonNode jsonNode) {
-        if (jsonNode.isDouble()) {
-            double number = jsonNode.doubleValue();
-
-            if (number == Math.rint(number) && Math.abs(number) <= 0x1p53) {
-                long longValue = (long) number;
-
-                return longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE
-                    ? IntNode.valueOf((int) longValue) : LongNode.valueOf(longValue);
-            }
+    private JsonNode encode(JsonNode jsonNode) {
+        if (jsonNode.isNull()) {
+            return jsonNode;
         }
 
-        return jsonNode;
+        return StringNode.valueOf(EncodingUtils.base64EncodeToString(objectMapper.writeValueAsBytes(jsonNode)));
     }
 
-    private static JsonNode transformNumbers(JsonNode jsonNode, UnaryOperator<JsonNode> numberTransformer) {
-        if (jsonNode.isNumber()) {
-            return numberTransformer.apply(jsonNode);
+    private static JsonNode transformBytes(
+        JsonNode jsonNode, Descriptors.Descriptor descriptor, UnaryOperator<JsonNode> bytesTransformer) {
+
+        if (!(jsonNode instanceof ObjectNode objectNode)) {
+            return jsonNode;
         }
 
-        if (jsonNode instanceof ObjectNode objectNode) {
-            for (Map.Entry<String, JsonNode> entry : objectNode.properties()) {
-                entry.setValue(transformNumbers(entry.getValue(), numberTransformer));
+        for (Descriptors.FieldDescriptor fieldDescriptor : descriptor.getFields()) {
+            String name = fieldDescriptor.getJsonName();
+            JsonNode fieldNode = objectNode.get(name);
+
+            if (fieldNode == null) {
+                continue;
             }
-        } else if (jsonNode instanceof ArrayNode arrayNode) {
-            for (int index = 0; index < arrayNode.size(); index++) {
-                arrayNode.set(index, transformNumbers(arrayNode.get(index), numberTransformer));
+
+            if (fieldDescriptor.getType() == Descriptors.FieldDescriptor.Type.BYTES) {
+                if (fieldDescriptor.isRepeated() && fieldNode instanceof ArrayNode arrayNode) {
+                    for (int index = 0; index < arrayNode.size(); index++) {
+                        arrayNode.set(index, bytesTransformer.apply(arrayNode.get(index)));
+                    }
+                } else {
+                    JsonNode transformedNode = bytesTransformer.apply(fieldNode);
+
+                    if (transformedNode.isNull()) {
+                        objectNode.remove(name);
+                    } else {
+                        objectNode.set(name, transformedNode);
+                    }
+                }
+            } else if (fieldDescriptor.getJavaType() == Descriptors.FieldDescriptor.JavaType.MESSAGE) {
+                if (fieldDescriptor.isMapField()) {
+                    Descriptors.FieldDescriptor valueFieldDescriptor = fieldDescriptor.getMessageType()
+                        .findFieldByName("value");
+
+                    if (valueFieldDescriptor.getJavaType() == Descriptors.FieldDescriptor.JavaType.MESSAGE) {
+                        for (Map.Entry<String, JsonNode> entry : fieldNode.properties()) {
+                            transformBytes(entry.getValue(), valueFieldDescriptor.getMessageType(), bytesTransformer);
+                        }
+                    }
+                } else if (fieldDescriptor.isRepeated()) {
+                    for (JsonNode itemNode : fieldNode) {
+                        transformBytes(itemNode, fieldDescriptor.getMessageType(), bytesTransformer);
+                    }
+                } else {
+                    transformBytes(fieldNode, fieldDescriptor.getMessageType(), bytesTransformer);
+                }
             }
         }
 
-        return jsonNode;
+        return objectNode;
     }
 }

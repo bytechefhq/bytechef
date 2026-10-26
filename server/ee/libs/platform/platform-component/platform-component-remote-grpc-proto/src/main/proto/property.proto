@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package bytechef.platform.component.remote.v1;
 
-import "google/protobuf/struct.proto";
 
 option java_multiple_files = true;
 option java_package = "com.bytechef.ee.platform.component.remote.grpc.proto";
@@ -18,11 +17,11 @@ message RemoteProperty {
   optional bool advanced_option = 6;
   optional bool expression_enabled = 7;
   optional string display_condition = 8;
-  optional google.protobuf.Struct metadata = 9;
+  optional bytes metadata = 9;
   optional string resource_type = 10;
   optional string control_type = 11;
-  optional google.protobuf.Value default_value = 12;
-  optional google.protobuf.Value example_value = 13;
+  optional bytes default_value = 12;
+  optional bytes example_value = 13;
   optional string label = 14;
   optional string placeholder = 15;
   repeated RemoteOption options = 16;
@@ -50,7 +49,7 @@ message RemoteProperty {
 message RemoteOption {
   optional string label = 1;
   optional string description = 2;
-  optional google.protobuf.Value value = 3;
+  optional bytes value = 3;
 }
 
 message RemoteOptionsDataSource {

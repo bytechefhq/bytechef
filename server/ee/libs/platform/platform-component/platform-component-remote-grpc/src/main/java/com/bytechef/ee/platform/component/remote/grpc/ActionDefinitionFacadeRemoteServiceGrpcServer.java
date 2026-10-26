@@ -16,7 +16,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.OutputResponseResult
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOptions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteProperties;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ValueResponse;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.PlatformType;
@@ -52,7 +51,7 @@ public class ActionDefinitionFacadeRemoteServiceGrpcServer
             componentProtoMapper.toRemoteProperties(
                 actionDefinitionFacade.executeDynamicProperties(
                     request.getComponentName(), request.getComponentVersion(), request.getActionName(),
-                    request.getPropertyName(), ProtoValues.toMap(request.getInputParameters()),
+                    request.getPropertyName(), componentProtoMapper.toMap(request.getInputParameters()),
                     List.copyOf(request.getLookupDependsOnPathsList()),
                     request.hasWorkflowId() ? request.getWorkflowId() : null,
                     request.hasConnectionId() ? request.getConnectionId() : null)));
@@ -66,14 +65,14 @@ public class ActionDefinitionFacadeRemoteServiceGrpcServer
         if (request.getMultipleConnections()) {
             options = actionDefinitionFacade.executeOptions(
                 request.getComponentName(), request.getComponentVersion(), request.getActionName(),
-                request.getPropertyName(), ProtoValues.toMap(request.getInputParameters()),
+                request.getPropertyName(), componentProtoMapper.toMap(request.getInputParameters()),
                 List.copyOf(request.getLookupDependsOnPathsList()),
                 request.hasSearchText() ? request.getSearchText() : null, request.getConnectionIdsMap(),
-                request.hasExtensions() ? ProtoValues.toMap(request.getExtensions()) : null);
+                request.hasExtensions() ? componentProtoMapper.toMap(request.getExtensions()) : null);
         } else {
             options = actionDefinitionFacade.executeOptions(
                 request.getComponentName(), request.getComponentVersion(), request.getActionName(),
-                request.getPropertyName(), ProtoValues.toMap(request.getInputParameters()),
+                request.getPropertyName(), componentProtoMapper.toMap(request.getInputParameters()),
                 List.copyOf(request.getLookupDependsOnPathsList()),
                 request.hasSearchText() ? request.getSearchText() : null,
                 request.hasConnectionId() ? request.getConnectionId() : null);
@@ -89,7 +88,7 @@ public class ActionDefinitionFacadeRemoteServiceGrpcServer
 
         OutputResponse outputResponse = actionDefinitionFacade.executeOutput(
             request.getComponentName(), request.getComponentVersion(), request.getActionName(),
-            ProtoValues.toMap(request.getInputParameters()), request.getConnectionIdsMap());
+            componentProtoMapper.toMap(request.getInputParameters()), request.getConnectionIdsMap());
 
         responseObserver.onNext(componentProtoMapper.toOutputResponseResult(outputResponse));
         responseObserver.onCompleted();
@@ -103,18 +102,20 @@ public class ActionDefinitionFacadeRemoteServiceGrpcServer
             request.hasJobPrincipalWorkflowId() ? request.getJobPrincipalWorkflowId() : null,
             request.hasJobId() ? request.getJobId() : null,
             request.hasTaskExecutionId() ? request.getTaskExecutionId() : null,
-            request.hasWorkflowId() ? request.getWorkflowId() : null, ProtoValues.toMap(request.getInputParameters()),
-            request.getConnectionIdsMap(), request.hasExtensions() ? ProtoValues.toMap(request.getExtensions()) : null,
+            request.hasWorkflowId() ? request.getWorkflowId() : null,
+            componentProtoMapper.toMap(request.getInputParameters()),
+            request.getConnectionIdsMap(),
+            request.hasExtensions() ? componentProtoMapper.toMap(request.getExtensions()) : null,
             request.hasEnvironmentId() ? request.getEnvironmentId() : null,
             request.hasPlatformType() ? PlatformType.valueOf(request.getPlatformType()) : null,
             request.getEditorEnvironment(),
-            request.hasContinueParameters() ? ProtoValues.toMap(request.getContinueParameters()) : null,
-            request.hasResumeData() ? ProtoValues.toMap(request.getResumeData()) : null,
+            request.hasContinueParameters() ? componentProtoMapper.toMap(request.getContinueParameters()) : null,
+            request.hasResumeData() ? componentProtoMapper.toMap(request.getResumeData()) : null,
             request.hasSuspendExpiresAt() ? toInstant(request.getSuspendExpiresAt()) : null);
 
         responseObserver.onNext(
             ValueResponse.newBuilder()
-                .setValue(ProtoValues.toValue(result))
+                .setValue(componentProtoMapper.toBytes(result))
                 .build());
         responseObserver.onCompleted();
     }

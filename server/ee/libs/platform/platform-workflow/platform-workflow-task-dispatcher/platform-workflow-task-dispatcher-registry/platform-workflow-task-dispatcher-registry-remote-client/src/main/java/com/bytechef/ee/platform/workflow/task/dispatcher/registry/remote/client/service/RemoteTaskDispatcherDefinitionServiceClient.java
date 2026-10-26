@@ -20,7 +20,6 @@ import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskD
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionRemoteServiceGrpc.TaskDispatcherDefinitionRemoteServiceBlockingStub;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionResult;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Option;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
@@ -61,7 +60,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
                 .setName(name)
                 .setVersion(version)
                 .setPropertyName(propertyName)
-                .setInputParameters(ProtoValues.toStruct(inputParameters))
+                .setInputParameters(taskDispatcherProtoMapper.toBytes(inputParameters))
                 .build();
 
         return taskDispatcherProtoMapper.toProperties(
@@ -165,13 +164,13 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
         return boolResponse.getValue();
     }
 
-    private static ExecuteTaskDispatcherOutputRequest getExecuteTaskDispatcherOutputRequest(
+    private ExecuteTaskDispatcherOutputRequest getExecuteTaskDispatcherOutputRequest(
         String name, int version, Map<String, ?> inputParameters) {
 
         return ExecuteTaskDispatcherOutputRequest.newBuilder()
             .setName(name)
             .setVersion(version)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(taskDispatcherProtoMapper.toBytes(inputParameters))
             .build();
     }
 

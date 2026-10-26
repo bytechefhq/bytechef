@@ -21,7 +21,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerDefinitionRemoteServiceGrpc.TriggerDefinitionRemoteServiceBlockingStub;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -148,7 +147,7 @@ public class RemoteTriggerDefinitionServiceClient implements TriggerDefinitionSe
                 .setComponentName(componentName)
                 .setComponentVersion(componentVersion)
                 .setTriggerName(triggerName)
-                .setInputParameters(ProtoValues.toStruct(inputParameters))
+                .setInputParameters(componentProtoMapper.toBytes(inputParameters))
                 .build();
 
         StringResponse stringResponse = getStub(componentName).executeWorkflowNodeDescription(

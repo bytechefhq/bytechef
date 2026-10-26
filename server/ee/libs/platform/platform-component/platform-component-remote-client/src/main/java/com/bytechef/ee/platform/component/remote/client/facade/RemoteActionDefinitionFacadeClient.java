@@ -18,7 +18,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.ActionExecuteOutputR
 import com.bytechef.ee.platform.component.remote.grpc.proto.ActionExecutePerformRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ValueResponse;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -70,7 +69,7 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
             .setComponentVersion(componentVersion)
             .setActionName(actionName)
             .setPropertyName(propertyName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
             .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
 
         if (workflowId != null) {
@@ -116,7 +115,7 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
         }
 
         if (extensions != null) {
-            builder.setExtensions(ProtoValues.toStruct(extensions));
+            builder.setExtensions(componentProtoMapper.toBytes(extensions));
         }
 
         return componentProtoMapper.toOptions(getStub(componentName).executeOptions(builder.build()));
@@ -131,7 +130,7 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setActionName(actionName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters));
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
 
         if (connectionIds != null) {
             builder.putAllConnectionIds(connectionIds);
@@ -152,7 +151,7 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
             .setComponentName(componentName)
             .setComponentVersion(componentVersion)
             .setActionName(actionName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
             .setEditorEnvironment(editorEnvironment);
 
         if (jobPrincipalId != null) {
@@ -180,7 +179,7 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
         }
 
         if (extensions != null) {
-            builder.setExtensions(ProtoValues.toStruct(extensions));
+            builder.setExtensions(componentProtoMapper.toBytes(extensions));
         }
 
         if (environmentId != null) {
@@ -192,11 +191,11 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
         }
 
         if (continueParameters != null) {
-            builder.setContinueParameters(ProtoValues.toStruct(continueParameters));
+            builder.setContinueParameters(componentProtoMapper.toBytes(continueParameters));
         }
 
         if (resumeData != null) {
-            builder.setResumeData(ProtoValues.toStruct(resumeData));
+            builder.setResumeData(componentProtoMapper.toBytes(resumeData));
         }
 
         if (suspendExpiresAt != null) {
@@ -209,10 +208,10 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
 
         ValueResponse valueResponse = getStub(componentName).executePerform(builder.build());
 
-        return ProtoValues.toObject(valueResponse.getValue());
+        return componentProtoMapper.toObject(valueResponse.getValue());
     }
 
-    private static ActionExecuteOptionsRequest.Builder getExecuteOptionsRequestBuilder(
+    private ActionExecuteOptionsRequest.Builder getExecuteOptionsRequestBuilder(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText) {
 
@@ -221,7 +220,7 @@ public class RemoteActionDefinitionFacadeClient implements ActionDefinitionFacad
             .setComponentVersion(componentVersion)
             .setActionName(actionName)
             .setPropertyName(propertyName)
-            .setInputParameters(ProtoValues.toStruct(inputParameters))
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters))
             .addAllLookupDependsOnPaths(lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths);
 
         if (searchText != null) {

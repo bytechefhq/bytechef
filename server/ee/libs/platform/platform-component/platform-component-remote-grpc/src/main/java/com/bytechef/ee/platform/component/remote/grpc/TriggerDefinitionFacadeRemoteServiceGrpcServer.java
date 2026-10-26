@@ -24,7 +24,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhoo
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookEnableRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookValidateRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookEnableOutputResult;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.constant.PlatformType;
@@ -58,7 +57,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
             componentProtoMapper.toRemoteProperties(
                 triggerDefinitionFacade.executeDynamicProperties(
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-                    request.getPropertyName(), ProtoValues.toMap(request.getInputParameters()),
+                    request.getPropertyName(), componentProtoMapper.toMap(request.getInputParameters()),
                     List.copyOf(request.getLookupDependsOnPathsList()),
                     request.hasConnectionId() ? request.getConnectionId() : null)));
         responseObserver.onCompleted();
@@ -71,7 +70,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
 
         WebhookEnableOutput webhookEnableOutput = triggerDefinitionFacade.executeDynamicWebhookRefresh(
             request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-            ProtoValues.toMap(request.getOutputParameters()),
+            componentProtoMapper.toMap(request.getOutputParameters()),
             request.hasConnectionId() ? request.getConnectionId() : null);
 
         responseObserver.onNext(componentProtoMapper.toWebhookEnableOutputResult(webhookEnableOutput));
@@ -82,7 +81,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
     public void executeListenerDisable(TriggerExecuteListenerRequest request, StreamObserver<Empty> responseObserver) {
         triggerDefinitionFacade.executeListenerDisable(
             request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-            ProtoValues.toMap(request.getInputParameters()),
+            componentProtoMapper.toMap(request.getInputParameters()),
             request.hasWorkflowExecutionId() ? request.getWorkflowExecutionId() : null,
             request.hasConnectionId() ? request.getConnectionId() : null);
 
@@ -94,7 +93,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
     public void executeListenerEnable(TriggerExecuteListenerRequest request, StreamObserver<Empty> responseObserver) {
         triggerDefinitionFacade.executeListenerEnable(
             request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-            ProtoValues.toMap(request.getInputParameters()),
+            componentProtoMapper.toMap(request.getInputParameters()),
             request.hasWorkflowExecutionId() ? request.getWorkflowExecutionId() : null,
             request.hasConnectionId() ? request.getConnectionId() : null);
 
@@ -108,7 +107,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
             componentProtoMapper.toRemoteOptions(
                 triggerDefinitionFacade.executeOptions(
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-                    request.getPropertyName(), ProtoValues.toMap(request.getInputParameters()),
+                    request.getPropertyName(), componentProtoMapper.toMap(request.getInputParameters()),
                     List.copyOf(request.getLookupDependsOnPathsList()),
                     request.hasSearchText() ? request.getSearchText() : null,
                     request.hasConnectionId() ? request.getConnectionId() : null)));
@@ -123,7 +122,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
             componentProtoMapper.toOutputResponseResult(
                 triggerDefinitionFacade.executeOutput(
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-                    ProtoValues.toMap(request.getInputParameters()),
+                    componentProtoMapper.toMap(request.getInputParameters()),
                     request.hasConnectionId() ? request.getConnectionId() : null)));
         responseObserver.onCompleted();
     }
@@ -137,8 +136,8 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
             request.hasJobPrincipalId() ? request.getJobPrincipalId() : null,
             request.hasWorkflowUuid() ? request.getWorkflowUuid() : null,
             request.hasTriggerExecutionId() ? request.getTriggerExecutionId() : null,
-            ProtoValues.toMap(request.getInputParameters()),
-            request.hasTriggerState() ? ProtoValues.toObject(request.getTriggerState()) : null,
+            componentProtoMapper.toMap(request.getInputParameters()),
+            request.hasTriggerState() ? componentProtoMapper.toObject(request.getTriggerState()) : null,
             request.hasWebhookRequest() ? componentProtoMapper.toWebhookRequest(request.getWebhookRequest()) : null,
             request.hasConnectionId() ? request.getConnectionId() : null,
             request.hasEnvironmentId() ? request.getEnvironmentId() : null,
@@ -155,9 +154,9 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
 
         triggerDefinitionFacade.executeWebhookDisable(
             request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-            ProtoValues.toMap(request.getInputParameters()),
+            componentProtoMapper.toMap(request.getInputParameters()),
             request.hasWorkflowExecutionId() ? request.getWorkflowExecutionId() : null,
-            ProtoValues.toMap(request.getOutputParameters()),
+            componentProtoMapper.toMap(request.getOutputParameters()),
             request.hasConnectionId() ? request.getConnectionId() : null);
 
         responseObserver.onNext(Empty.getDefaultInstance());
@@ -170,7 +169,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
 
         WebhookEnableOutput webhookEnableOutput = triggerDefinitionFacade.executeWebhookEnable(
             request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-            ProtoValues.toMap(request.getInputParameters()),
+            componentProtoMapper.toMap(request.getInputParameters()),
             request.hasWorkflowExecutionId() ? request.getWorkflowExecutionId() : null,
             request.hasConnectionId() ? request.getConnectionId() : null,
             request.hasWebhookUrl() ? request.getWebhookUrl() : null, request.getEnvironmentId());
@@ -187,7 +186,7 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
             componentProtoMapper.toProto(
                 triggerDefinitionFacade.executeWebhookValidate(
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
-                    ProtoValues.toMap(request.getInputParameters()),
+                    componentProtoMapper.toMap(request.getInputParameters()),
                     request.hasWebhookRequest() ? componentProtoMapper.toWebhookRequest(request.getWebhookRequest())
                         : null,
                     request.hasConnectionId() ? request.getConnectionId() : null)));

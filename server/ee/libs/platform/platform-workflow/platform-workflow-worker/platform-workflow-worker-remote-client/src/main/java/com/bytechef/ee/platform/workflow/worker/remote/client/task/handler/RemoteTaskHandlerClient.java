@@ -17,7 +17,6 @@ import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.HandleTaskResp
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.TaskHandlerRemoteServiceGrpc;
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.TaskHandlerRemoteServiceGrpc.TaskHandlerRemoteServiceBlockingStub;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import io.grpc.Channel;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -82,7 +81,8 @@ public class RemoteTaskHandlerClient {
                 description == null ? statusRuntimeException.getMessage() : description, statusRuntimeException);
         }
 
-        return handleTaskResponse.hasOutput() ? ProtoValues.toObject(handleTaskResponse.getOutput()) : null;
+        return handleTaskResponse.hasOutput() ? taskExecutionProtoMapper.toObject(handleTaskResponse.getOutput())
+            : null;
     }
 
     private Channel getChannel(String type) {

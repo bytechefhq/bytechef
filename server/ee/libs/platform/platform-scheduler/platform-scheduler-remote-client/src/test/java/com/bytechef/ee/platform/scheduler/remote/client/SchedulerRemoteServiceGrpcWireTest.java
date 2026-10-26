@@ -32,6 +32,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -40,6 +41,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
 class SchedulerRemoteServiceGrpcWireTest {
+
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+        .build();
 
     private static final Instant INSTANT = Instant.parse("2026-10-26T10:15:30.123Z");
 
@@ -58,7 +62,7 @@ class SchedulerRemoteServiceGrpcWireTest {
 
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
-            .addService(new TriggerSchedulerRemoteServiceGrpcServer(triggerScheduler))
+            .addService(new TriggerSchedulerRemoteServiceGrpcServer(triggerScheduler, JSON_MAPPER))
             .addService(new ConnectionRefreshSchedulerRemoteServiceGrpcServer(connectionRefreshScheduler))
             .build()
             .start();
@@ -69,7 +73,7 @@ class SchedulerRemoteServiceGrpcWireTest {
         FixedGrpcChannels fixedGrpcChannels = new FixedGrpcChannels(managedChannel);
 
         remoteConnectionRefreshSchedulerClient = new RemoteConnectionRefreshSchedulerClient(fixedGrpcChannels);
-        remoteTriggerSchedulerClient = new RemoteTriggerSchedulerClient(fixedGrpcChannels);
+        remoteTriggerSchedulerClient = new RemoteTriggerSchedulerClient(fixedGrpcChannels, JSON_MAPPER);
         workflowExecutionId = WorkflowExecutionId.of(PlatformType.AUTOMATION, 11L, "workflow-uuid", "trigger_1");
     }
 

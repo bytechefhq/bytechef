@@ -15,7 +15,6 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.GetActionDefinitionR
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinitions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import io.grpc.stub.StreamObserver;
@@ -44,7 +43,7 @@ public class ActionDefinitionRemoteServiceGrpcServer
 
         String workflowNodeDescription = actionDefinitionService.executeWorkflowNodeDescription(
             request.getComponentName(), request.getComponentVersion(), request.getActionName(),
-            ProtoValues.toMap(request.getInputParameters()));
+            componentProtoMapper.toMap(request.getInputParameters()));
 
         StringResponse.Builder builder = StringResponse.newBuilder();
 

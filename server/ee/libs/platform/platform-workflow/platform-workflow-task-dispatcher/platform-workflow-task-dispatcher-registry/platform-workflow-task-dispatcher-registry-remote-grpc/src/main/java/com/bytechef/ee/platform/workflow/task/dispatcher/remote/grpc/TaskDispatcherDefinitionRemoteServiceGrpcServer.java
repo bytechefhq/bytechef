@@ -22,7 +22,6 @@ import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.Remot
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.RemoteTaskDispatcherDefinitions;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.proto.TaskDispatcherDefinitionResult;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.google.protobuf.Empty;
@@ -56,7 +55,7 @@ public class TaskDispatcherDefinitionRemoteServiceGrpcServer
             taskDispatcherProtoMapper.toRemoteProperties(
                 taskDispatcherDefinitionService.executeDynamicProperties(
                     request.getName(), request.getVersion(), request.getPropertyName(),
-                    ProtoValues.toMap(request.getInputParameters()))));
+                    taskDispatcherProtoMapper.toMap(request.getInputParameters()))));
         responseObserver.onCompleted();
     }
 
@@ -79,7 +78,8 @@ public class TaskDispatcherDefinitionRemoteServiceGrpcServer
         responseObserver.onNext(
             taskDispatcherProtoMapper.toOutputResponseResult(
                 taskDispatcherDefinitionService.executeOutput(
-                    request.getName(), request.getVersion(), ProtoValues.toMap(request.getInputParameters()))));
+                    request.getName(), request.getVersion(),
+                    taskDispatcherProtoMapper.toMap(request.getInputParameters()))));
         responseObserver.onCompleted();
     }
 
@@ -90,7 +90,8 @@ public class TaskDispatcherDefinitionRemoteServiceGrpcServer
         responseObserver.onNext(
             taskDispatcherProtoMapper.toOutputResponseResult(
                 taskDispatcherDefinitionService.executeVariableProperties(
-                    request.getName(), request.getVersion(), ProtoValues.toMap(request.getInputParameters()))));
+                    request.getName(), request.getVersion(),
+                    taskDispatcherProtoMapper.toMap(request.getInputParameters()))));
         responseObserver.onCompleted();
     }
 
@@ -99,7 +100,7 @@ public class TaskDispatcherDefinitionRemoteServiceGrpcServer
         ExecuteTaskDispatcherOutputRequest request, StreamObserver<StringResponse> responseObserver) {
 
         String workflowNodeDescription = taskDispatcherDefinitionService.executeWorkflowNodeDescription(
-            request.getName(), request.getVersion(), ProtoValues.toMap(request.getInputParameters()));
+            request.getName(), request.getVersion(), taskDispatcherProtoMapper.toMap(request.getInputParameters()));
 
         StringResponse.Builder builder = StringResponse.newBuilder();
 

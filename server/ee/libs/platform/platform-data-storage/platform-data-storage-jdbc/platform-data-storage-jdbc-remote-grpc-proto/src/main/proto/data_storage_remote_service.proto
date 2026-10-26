@@ -3,7 +3,6 @@ syntax = "proto3";
 package bytechef.platform.data.storage.remote.v1;
 
 import "google/protobuf/empty.proto";
-import "google/protobuf/struct.proto";
 
 option java_multiple_files = true;
 option java_package = "com.bytechef.ee.platform.data.storage.jdbc.remote.grpc.proto";
@@ -12,7 +11,7 @@ service JdbcDataStorageRemoteService {
   rpc Delete(DataStorageKeyRequest) returns (google.protobuf.Empty);
   rpc DeleteScopeData(DeleteScopeDataRequest) returns (google.protobuf.Empty);
   rpc Fetch(DataStorageKeyRequest) returns (FetchDataStorageValueResponse);
-  rpc GetAll(DataStorageScopeRequest) returns (google.protobuf.Struct);
+  rpc GetAll(DataStorageScopeRequest) returns (JsonValue);
   rpc Put(PutDataStorageValueRequest) returns (google.protobuf.Empty);
 }
 
@@ -40,9 +39,13 @@ message DeleteScopeDataRequest {
 
 message PutDataStorageValueRequest {
   DataStorageKeyRequest key = 1;
-  google.protobuf.Value value = 2;
+  bytes value = 2;
 }
 
 message FetchDataStorageValueResponse {
-  optional google.protobuf.Value value = 1;
+  optional bytes value = 1;
+}
+
+message JsonValue {
+  bytes value = 1;
 }

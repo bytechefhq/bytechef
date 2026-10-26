@@ -9,8 +9,12 @@ package com.bytechef.ee.platform.workflow.worker.remote.grpc;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.RemoteTaskExecution;
+import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.protobuf.ByteString;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -23,13 +27,27 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class TaskExecutionProtoMapper {
 
+    private final JsonBytes jsonBytes;
     private final ProtoJsonMapper protoJsonMapper;
 
     public TaskExecutionProtoMapper(ObjectMapper objectMapper) {
+        this.jsonBytes = new JsonBytes(objectMapper);
         this.protoJsonMapper = new ProtoJsonMapper(
             objectMapper.rebuild()
                 .addMixIn(TaskExecution.class, TaskExecutionMixIn.class)
                 .build());
+    }
+
+    public ByteString toBytes(@Nullable Object value) {
+        return jsonBytes.write(value);
+    }
+
+    public @Nullable Map<String, Object> toMap(ByteString bytes) {
+        return jsonBytes.readMap(bytes);
+    }
+
+    public @Nullable Object toObject(ByteString bytes) {
+        return jsonBytes.read(bytes);
     }
 
     public RemoteTaskExecution toProto(TaskExecution taskExecution) {

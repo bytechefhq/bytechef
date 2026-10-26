@@ -22,7 +22,6 @@ import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteConnections;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.TypeRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionTagIdsRequest;
-import com.bytechef.ee.remote.grpc.ProtoValues;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -64,7 +63,7 @@ public class ConnectionRemoteServiceGrpcServer extends ConnectionRemoteServiceGr
             connectionService.create(
                 request.hasAuthorizationType() ? AuthorizationType.valueOf(request.getAuthorizationType()) : null,
                 request.getComponentName(), request.getConnectionVersion(), request.getEnvironmentId(),
-                request.getName(), ProtoValues.toMap(request.getParameters()),
+                request.getName(), connectionProtoMapper.toMap(request.getParameters()),
                 request.hasType() ? PlatformType.valueOf(request.getType()) : null),
             responseObserver);
     }
@@ -135,7 +134,7 @@ public class ConnectionRemoteServiceGrpcServer extends ConnectionRemoteServiceGr
 
         reply(
             connectionService.replaceConnectionParameters(
-                request.getConnectionId(), ProtoValues.toMap(request.getParameters())),
+                request.getConnectionId(), connectionProtoMapper.toMap(request.getParameters())),
             responseObserver);
     }
 
@@ -163,7 +162,7 @@ public class ConnectionRemoteServiceGrpcServer extends ConnectionRemoteServiceGr
 
         reply(
             connectionService.updateConnectionParameters(
-                request.getConnectionId(), ProtoValues.toMap(request.getParameters())),
+                request.getConnectionId(), connectionProtoMapper.toMap(request.getParameters())),
             responseObserver);
     }
 
