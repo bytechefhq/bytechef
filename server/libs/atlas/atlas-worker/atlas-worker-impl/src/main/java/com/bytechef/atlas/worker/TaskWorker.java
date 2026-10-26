@@ -50,6 +50,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jspecify.annotations.Nullable;
@@ -114,8 +115,11 @@ public class TaskWorker {
 
         TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
         CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean started = new AtomicBoolean();
 
         Future<?> future = taskExecutor.submit(() -> {
+            started.set(true);
+
             try {
                 eventPublisher.publishEvent(
                     new TaskStartedApplicationEvent(
@@ -151,10 +155,12 @@ public class TaskWorker {
         } catch (CancellationException e) {
             log.debug("Cancelled task: {}", taskExecution.getId());
         } finally {
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                handleException(taskExecution, e);
+            if (started.get() || !future.isCancelled()) {
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    handleException(taskExecution, e);
+                }
             }
 
             taskExecutionFutureMap.remove(taskExecution.getId());
