@@ -6,6 +6,11 @@ spring:
     password: ${bytechef.datasource.password}
     hikari:
       poolName: Hikari
+  graphql:
+    http:
+      path: /api/user/graphql
+    schema:
+      locations: classpath*:graphql/**/
   liquibase:
     contexts: user
   mail:
