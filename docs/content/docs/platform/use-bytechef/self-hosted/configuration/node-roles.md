@@ -37,7 +37,7 @@ How each webhook mode runs on a webhook node:
 | N workers | Yes | Yes |
 | N separate webhook nodes (optional) | Yes | Yes |
 | N coordinators (high availability) | No | Yes |
-| Clustered Quartz | Not applicable | Yes |
+| Clustered Quartz | Optional, enables the warning about a second coordinator | Yes, required for N coordinators |
 | Cluster-wide cache invalidation over the message broker | Not applicable | Yes |
 | Shared HTTP sessions (no sticky sessions) | No, memory only | Yes, Redis or JDBC |
 
@@ -65,17 +65,15 @@ In the reference nginx configuration, a request that cannot reach a coordinator 
 
 ## One coordinator in CE
 
-A CE coordinator takes a PostgreSQL advisory lock when it starts and holds it for as long as it runs. A second CE coordinator on the same database stops at startup with:
+CE supports one coordinator. More than one starts and runs, but CE has no cache invalidation and no shared sessions, so the coordinators serve stale data and users are logged out when the load balancer switches coordinator. Without clustered Quartz, each coordinator also fires every schedule, so scheduled workflows run more than once.
+
+With `BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED=true`, every running coordinator checks in to the shared Quartz job store. A CE coordinator that sees another coordinator checking in logs, about a minute after startup and every 10 minutes after that:
 
 ```
-Another coordinator is already running. Running more than one coordinator requires ByteChef Enterprise Edition (bytechef.edition=ee, BYTECHEF_EDITION=ee).
+Another coordinator is running against this database. The Community Edition supports one coordinator: with more, caches go stale and sessions are not shared. Running more than one coordinator requires ByteChef Enterprise Edition (bytechef.edition=ee, BYTECHEF_EDITION=ee).
 ```
 
-A starting coordinator waits for the lock before it gives up: it retries every 2 seconds for up to `BYTECHEF_COORDINATOR_LOCK_WAIT` (default `60s`) and only then stops with the message above. A running coordinator that loses its lock connection shuts down at once, so it never runs alongside a coordinator that took the lock in the meantime. The orchestrator restarts it (the reference Compose file uses `restart: unless-stopped`), and on startup it waits for the lock as above. EE takes no lock.
-
-The lock connection asks PostgreSQL for TCP keepalives, so the database releases the lock within about 25 seconds after a crashed host or a network partition instead of after the operating system's default timeout.
-
-**Rolling deployments.** Stop the old CE coordinator before the new one starts: use the Recreate strategy in Kubernetes, or stop the old container first in Docker. The new coordinator then waits up to the lock wait for the old one to release the lock. A rolling update that keeps the old coordinator running for longer than the lock wait makes the new one stop with the edition message.
+The coordinator keeps running. Running more than one coordinator requires EE.
 
 ## Scheduler clustering
 
@@ -162,6 +160,6 @@ BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker
 | `BYTECHEF_PORT` | `8080` | published port of the load balancer |
 | `RABBITMQ_MANAGEMENT_PORT` | `15672` | published port of the RabbitMQ management UI (user `bytechef`, password `RABBITMQ_PASSWORD`) |
 
-With `BYTECHEF_EDITION=ce` and more than one coordinator, the second coordinator keeps restarting with the edition message, and the load balancer never starts because it waits for every coordinator to be healthy. The file storage is a volume all nodes mount; in production, mount shared storage (NFS, EFS) or use the `aws` provider.
+With `BYTECHEF_EDITION=ce` and more than one coordinator, every coordinator starts and logs the warning above. The file storage is a volume all nodes mount; in production, mount shared storage (NFS, EFS) or use the `aws` provider.
 
 The file sets `BYTECHEF_SESSION_STORE=redis` on every node. In EE with the `redis` session store, the Redis connection opens at startup, so the nodes fail to start when Redis is unreachable. PostgreSQL, the message broker and the load balancer are single containers in this file; for production, use managed or clustered services.
