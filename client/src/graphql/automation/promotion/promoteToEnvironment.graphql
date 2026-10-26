@@ -1,0 +1,8 @@
+mutation promoteToEnvironment($input: PromoteToEnvironmentInput!) {
+    promoteToEnvironment(input: $input) {
+        created
+        targetId
+        targetUrl
+        unresolvedConnectionIds
+    }
+}

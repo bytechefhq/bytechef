@@ -1,0 +1,29 @@
+query environmentPromotionPreview($resourceType: PromotionResourceType!, $sourceId: ID!, $targetEnvironmentId: ID!) {
+    environmentPromotionPreview(
+        resourceType: $resourceType
+        sourceId: $sourceId
+        targetEnvironmentId: $targetEnvironmentId
+    ) {
+        connections {
+            componentName
+            connectionVersion
+            sourceConnectionId
+            sourceConnectionName
+            suggestedTargetConnectionId
+            usedBy
+        }
+        existingTargetId
+        existingTargetName
+        projects {
+            projectId
+            projectName
+            sourceProjectVersion
+            targetProjectVersion
+        }
+        resourceType
+        sourceEnvironmentId
+        sourceId
+        targetEnvironmentId
+        warnings
+    }
+}
