@@ -936,6 +936,18 @@ export type ConnectedUserProjectWorkflow = {
   workflowVersion?: Maybe<Scalars['Int']['output']>;
 };
 
+export type ConnectionCredentialStoreInfo = {
+  __typename?: 'ConnectionCredentialStoreInfo';
+  readOnly: Scalars['Boolean']['output'];
+  type: ConnectionCredentialStoreType;
+};
+
+export enum ConnectionCredentialStoreType {
+  AwsSecretsManager = 'AWS_SECRETS_MANAGER',
+  Database = 'DATABASE',
+  HashicorpVault = 'HASHICORP_VAULT'
+}
+
 export type ConnectionDefinition = {
   __typename?: 'ConnectionDefinition';
   authorizationRequired: Scalars['Boolean']['output'];
@@ -1913,6 +1925,8 @@ export type Mutation = {
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
+  /** Register an existing connection backed by an externally-provisioned credential (e.g. AWS Secrets Manager). */
+  registerExistingConnection: Scalars['Long']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
@@ -2553,6 +2567,11 @@ export type MutationProvisionConnectedUserProjectWorkflowsArgs = {
 export type MutationPublishAutomationWorkflowProjectArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationRegisterExistingConnectionArgs = {
+  input: RegisterExistingConnectionInput;
 };
 
 
@@ -3386,6 +3405,7 @@ export type Query = {
   connectedUserProjects: Array<ConnectedUserProject>;
   connectedUsers?: Maybe<ConnectedUserPage>;
   connectionComponentDefinition: ComponentDefinition;
+  connectionCredentialStores: Array<ConnectionCredentialStoreInfo>;
   connectionDefinition: ConnectionDefinition;
   connectionDefinitions: Array<ConnectionDefinition>;
   customComponent?: Maybe<CustomComponent>;
@@ -4418,6 +4438,16 @@ export type QueryWorkspaceToolInvocationLogsArgs = {
   surface?: InputMaybe<Scalars['String']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
   type: PlatformType;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type RegisterExistingConnectionInput = {
+  componentName: Scalars['String']['input'];
+  connectionVersion: Scalars['Int']['input'];
+  credentialRef: Scalars['String']['input'];
+  credentialStoreType: ConnectionCredentialStoreType;
+  environmentId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
   workspaceId: Scalars['ID']['input'];
 };
 

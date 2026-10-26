@@ -2282,6 +2282,18 @@ export type WorkflowNodeScriptInputQueryVariables = Exact<{
 
 export type WorkflowNodeScriptInputQuery = { workflowNodeScriptInput: any };
 
+export type ConnectionCredentialStoresQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ConnectionCredentialStoresQuery = { connectionCredentialStores: Array<{ type: Types.ConnectionCredentialStoreType, readOnly: boolean }> };
+
+export type RegisterExistingConnectionMutationVariables = Exact<{
+  input: Types.RegisterExistingConnectionInput;
+}>;
+
+
+export type RegisterExistingConnectionMutation = { registerExistingConnection: any };
+
 export type CustomComponentQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -10968,6 +10980,50 @@ export const useWorkflowNodeScriptInputQuery = <
       {
     queryKey: ['workflowNodeScriptInput', variables],
     queryFn: fetcher<WorkflowNodeScriptInputQuery, WorkflowNodeScriptInputQueryVariables>(WorkflowNodeScriptInputDocument, variables),
+    ...options
+  }
+    )};
+
+export const ConnectionCredentialStoresDocument = new TypedDocumentString(`
+    query ConnectionCredentialStores {
+  connectionCredentialStores {
+    type
+    readOnly
+  }
+}
+    `);
+
+export const useConnectionCredentialStoresQuery = <
+      TData = ConnectionCredentialStoresQuery,
+      TError = unknown
+    >(
+      variables?: ConnectionCredentialStoresQueryVariables,
+      options?: Omit<UseQueryOptions<ConnectionCredentialStoresQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectionCredentialStoresQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ConnectionCredentialStoresQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['ConnectionCredentialStores'] : ['ConnectionCredentialStores', variables],
+    queryFn: fetcher<ConnectionCredentialStoresQuery, ConnectionCredentialStoresQueryVariables>(ConnectionCredentialStoresDocument, variables),
+    ...options
+  }
+    )};
+
+export const RegisterExistingConnectionDocument = new TypedDocumentString(`
+    mutation RegisterExistingConnection($input: RegisterExistingConnectionInput!) {
+  registerExistingConnection(input: $input)
+}
+    `);
+
+export const useRegisterExistingConnectionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RegisterExistingConnectionMutation, TError, RegisterExistingConnectionMutationVariables, TContext>) => {
+    
+    return useMutation<RegisterExistingConnectionMutation, TError, RegisterExistingConnectionMutationVariables, TContext>(
+      {
+    mutationKey: ['RegisterExistingConnection'],
+    mutationFn: (variables?: RegisterExistingConnectionMutationVariables) => fetcher<RegisterExistingConnectionMutation, RegisterExistingConnectionMutationVariables>(RegisterExistingConnectionDocument, variables)(),
     ...options
   }
     )};
