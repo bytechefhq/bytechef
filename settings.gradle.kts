@@ -637,6 +637,7 @@ include("server:ee:libs:automation:automation-context-store:automation-context-s
 include("server:ee:libs:automation:automation-context-store:automation-context-store-service")
 include("server:ee:libs:automation:automation-data-table:automation-data-table-remote-client")
 include("server:ee:libs:automation:automation-promotion:automation-promotion-api")
+include("server:ee:libs:automation:automation-promotion:automation-promotion-service")
 include("server:ee:libs:automation:automation-task:automation-task-remote-client")
 include("server:ee:libs:automation:automation-task:automation-task-remote-rest")
 include("server:ee:libs:automation:automation-security-web:automation-security-web-impl")

@@ -1,0 +1,10 @@
+spring:
+  liquibase:
+    contexts: configuration, connection
+
+bytechef:
+  edition: ee
+  workflow:
+    repository:
+      jdbc:
+        enabled: true
