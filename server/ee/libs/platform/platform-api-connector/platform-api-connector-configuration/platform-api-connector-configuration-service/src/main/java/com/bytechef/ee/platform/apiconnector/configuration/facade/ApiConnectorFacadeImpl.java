@@ -11,11 +11,15 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint.HttpMethod;
+import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
+import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecificationRequestDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiComponentDefinitionFactory;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
+import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
+import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -40,6 +44,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -65,17 +70,29 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
     private final ApiConnectorAiService apiConnectorAiService;
     private final ApiConnectorFileStorage apiConnectorFileStorage;
+    private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private final ApiConnectorService apiConnectorService;
+    private final OpenApiSpecificationGenerator openApiSpecificationGenerator;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorFacadeImpl(
         @Nullable ApiConnectorAiService apiConnectorAiService,
         ApiConnectorFileStorage apiConnectorFileStorage,
-        ApiConnectorService apiConnectorService) {
+        ApiConnectorGenerationJobService apiConnectorGenerationJobService,
+        ApiConnectorService apiConnectorService,
+        OpenApiSpecificationGenerator openApiSpecificationGenerator) {
 
         this.apiConnectorAiService = apiConnectorAiService;
         this.apiConnectorFileStorage = apiConnectorFileStorage;
+        this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
         this.apiConnectorService = apiConnectorService;
+        this.openApiSpecificationGenerator = openApiSpecificationGenerator;
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public boolean cancelGenerationJob(String jobId) {
+        return apiConnectorGenerationJobService.requestCancellation(jobId);
     }
 
     @Override
@@ -96,17 +113,24 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     }
 
     @Override
+    public Optional<ApiConnectorGenerationJob> fetchGenerationJob(String jobId) {
+        return apiConnectorGenerationJobService.get(jobId);
+    }
+
+    @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector generateFromDocumentation(String name, String documentationUrl, String icon) {
-        if (apiConnectorAiService == null) {
-            throw new ConfigurationException(
-                "AI service is not configured. Please configure bytechef.ai.copilot settings.",
-                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
-        }
+        ApiConnectorAiService requiredApiConnectorAiService = getApiConnectorAiService();
 
-        String specification = apiConnectorAiService.generateOpenApiSpecification(documentationUrl);
+        String specification = requiredApiConnectorAiService.generateOpenApiSpecification(documentationUrl);
 
         return importOpenApiSpecification(name, icon, specification);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public String generateSpecification(GenerateSpecificationRequestDTO generateSpecificationRequestDTO) {
+        return openApiSpecificationGenerator.generate(generateSpecificationRequestDTO);
     }
 
     @Override
@@ -142,6 +166,24 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
             apiConnectorFileStorage::deleteApiConnectorSpecification);
 
         return updatedApiConnector;
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnectorGenerationJob startGenerateFromDocumentationPreview(
+        String documentationUrl, String userPrompt, Integer maxPages) {
+
+        ApiConnectorAiService requiredApiConnectorAiService = getApiConnectorAiService();
+
+        ApiConnectorGenerationJob apiConnectorGenerationJob = apiConnectorGenerationJobService.create(
+            documentationUrl);
+
+        int effectiveMaxPages = maxPages == null ? 1 : Math.max(1, maxPages);
+
+        requiredApiConnectorAiService.generateOpenApiSpecificationAsync(
+            apiConnectorGenerationJob.getId(), documentationUrl, userPrompt, effectiveMaxPages);
+
+        return apiConnectorGenerationJob;
     }
 
     @Override
@@ -210,6 +252,16 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         }
 
         return apiConnectorService.update(apiConnector);
+    }
+
+    private ApiConnectorAiService getApiConnectorAiService() {
+        if (apiConnectorAiService == null) {
+            throw new ConfigurationException(
+                "AI service is not configured. Please configure bytechef.ai.copilot settings.",
+                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
+
+        return apiConnectorAiService;
     }
 
     private GeneratedDefinition generateDefinition(String name, String specification) {

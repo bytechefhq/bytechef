@@ -14,10 +14,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
+import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
+import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecificationRequestDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacade;
-import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
-import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
 import com.bytechef.test.config.graphql.GraphQLScalarTypes;
+import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +50,6 @@ class ApiConnectorGraphQlControllerIntTest {
 
     @MockitoBean
     private ApiConnectorFacade apiConnectorFacade;
-
-    @MockitoBean
-    private ApiConnectorGenerationJobService apiConnectorGenerationJobService;
-
-    @MockitoBean
-    private OpenApiSpecificationGenerator openApiSpecificationGenerator;
 
     @Autowired
     private GraphQlTester graphQlTester;
@@ -126,6 +121,112 @@ class ApiConnectorGraphQlControllerIntTest {
             verify(apiConnectorFacade).updateApiConnector(1L, "petstore", null, "openapi: 3.0.0", 3);
             verify(apiConnectorFacade, never()).updateApiConnectorMetadata(
                 anyLong(), any(), any(), any(), any(), any());
+        }
+    }
+
+    @Nested
+    class GenerationJobs {
+
+        @Test
+        void testStartGenerateFromDocumentationPreviewRoutesThroughFacade() {
+            when(apiConnectorFacade.startGenerateFromDocumentationPreview("https://docs.example.com", "Only pets", 3))
+                .thenReturn(new ApiConnectorGenerationJob("job-1", "https://docs.example.com"));
+
+            graphQlTester.document("""
+                mutation {
+                    startGenerateFromDocumentationPreview(input: {
+                        name: "petstore", documentationUrl: "https://docs.example.com", userPrompt: "Only pets",
+                        maxPages: 3}) {
+                        jobId
+                        status
+                    }
+                }
+                """)
+                .execute()
+                .path("startGenerateFromDocumentationPreview.status")
+                .entity(String.class)
+                .isEqualTo("PENDING");
+
+            verify(apiConnectorFacade).startGenerateFromDocumentationPreview(
+                "https://docs.example.com", "Only pets", 3);
+        }
+
+        @Test
+        void testCancelGenerationJobRoutesThroughFacade() {
+            when(apiConnectorFacade.cancelGenerationJob("job-1")).thenReturn(true);
+
+            graphQlTester.document("""
+                mutation {
+                    cancelGenerationJob(jobId: "job-1")
+                }
+                """)
+                .execute()
+                .path("cancelGenerationJob")
+                .entity(Boolean.class)
+                .isEqualTo(true);
+
+            verify(apiConnectorFacade).cancelGenerationJob("job-1");
+        }
+
+        @Test
+        void testGenerationJobStatusRoutesThroughFacade() {
+            when(apiConnectorFacade.fetchGenerationJob("job-1"))
+                .thenReturn(Optional.of(new ApiConnectorGenerationJob("job-1", "https://docs.example.com")));
+
+            graphQlTester.document("""
+                query {
+                    generationJobStatus(jobId: "job-1") {
+                        jobId
+                        status
+                    }
+                }
+                """)
+                .execute()
+                .path("generationJobStatus.jobId")
+                .entity(String.class)
+                .isEqualTo("job-1");
+
+            verify(apiConnectorFacade).fetchGenerationJob("job-1");
+        }
+
+        @Test
+        void testGenerationJobStatusReturnsNullForUnknownJob() {
+            when(apiConnectorFacade.fetchGenerationJob("missing")).thenReturn(Optional.empty());
+
+            graphQlTester.document("""
+                query {
+                    generationJobStatus(jobId: "missing") {
+                        jobId
+                    }
+                }
+                """)
+                .execute()
+                .path("generationJobStatus")
+                .valueIsNull();
+        }
+    }
+
+    @Nested
+    class GenerateSpecification {
+
+        @Test
+        void testGenerateSpecificationRoutesThroughFacade() {
+            when(apiConnectorFacade.generateSpecification(any(GenerateSpecificationRequestDTO.class)))
+                .thenReturn("openapi: 3.0.0");
+
+            graphQlTester.document("""
+                mutation {
+                    generateSpecification(input: {name: "petstore", endpoints: []}) {
+                        specification
+                    }
+                }
+                """)
+                .execute()
+                .path("generateSpecification.specification")
+                .entity(String.class)
+                .isEqualTo("openapi: 3.0.0");
+
+            verify(apiConnectorFacade).generateSpecification(any(GenerateSpecificationRequestDTO.class));
         }
     }
 
