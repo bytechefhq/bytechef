@@ -8,16 +8,24 @@
 package com.bytechef.ee.discovery.redis.registry;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.redis.connection.RedisListCommands;
 import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
+ * Keeps one discovery entry per instance: registering an instance again after its metadata changed replaces the entry
+ * it registered before.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -51,16 +59,14 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
     }
 
     @Override
-    public void deregister(@Nullable RedisRegistration redisRegistration) {
+    public synchronized void deregister(@Nullable RedisRegistration redisRegistration) {
         if (redisRegistration == null) {
             return;
         }
 
-        ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
-
-        listOperations.remove(redisRegistration.getServiceId(), 1, redisRegistration);
-
         this.redisRegistration = null;
+
+        removeRegistrations(redisRegistration);
     }
 
     @Override
@@ -107,18 +113,53 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
         }
     }
 
+    private static String getKey(RedisRegistration redisRegistration) {
+        return "discovery/" + redisRegistration.getServiceId();
+    }
+
     @SuppressFBWarnings("RCN")
-    private void registerService(RedisRegistration redisRegistration) {
-        String serviceId = "discovery/" + redisRegistration.getServiceId();
+    private synchronized void registerService(RedisRegistration redisRegistration) {
+        String key = getKey(redisRegistration);
 
         ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
 
-        Long index = listOperations.indexOf(serviceId, redisRegistration);
+        Long index = listOperations.indexOf(key, redisRegistration);
 
         if (index == null) {
-            listOperations.leftPush(serviceId, redisRegistration);
+            removeRegistrations(redisRegistration);
+
+            listOperations.leftPush(key, redisRegistration);
         }
 
-        redisTemplate.expire(serviceId, 15, TimeUnit.SECONDS);
+        redisTemplate.expire(key, 15, TimeUnit.SECONDS);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void removeRegistrations(RedisRegistration redisRegistration) {
+        RedisSerializer<String> keySerializer = (RedisSerializer<String>) redisTemplate.getKeySerializer();
+        RedisSerializer<RedisRegistration> valueSerializer =
+            (RedisSerializer<RedisRegistration>) redisTemplate.getValueSerializer();
+
+        byte[] rawKey = Objects.requireNonNull(keySerializer.serialize(getKey(redisRegistration)), "rawKey");
+
+        redisTemplate.execute((RedisCallback<Void>) redisConnection -> {
+            RedisListCommands redisListCommands = redisConnection.listCommands();
+
+            List<byte[]> rawRegistrations = redisListCommands.lRange(rawKey, 0, -1);
+
+            if (rawRegistrations == null) {
+                return null;
+            }
+
+            for (byte[] rawRegistration : rawRegistrations) {
+                RedisRegistration registeredRedisRegistration = valueSerializer.deserialize(rawRegistration);
+
+                if (redisRegistration.equals(registeredRedisRegistration)) {
+                    redisListCommands.lRem(rawKey, 0, rawRegistration);
+                }
+            }
+
+            return null;
+        });
     }
 }
