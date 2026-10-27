@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -266,6 +267,13 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
 
         assertThat(remoteProjectDeploymentWorkflowServiceClient.isConnectionUsed(7L)).isTrue();
         assertThat(remoteProjectDeploymentWorkflowServiceClient.isConnectionUsed(8L)).isFalse();
+    }
+
+    @Test
+    void testDisableProjectDeploymentWorkflowByConnectionId() {
+        remoteProjectDeploymentWorkflowServiceClient.disableProjectDeploymentWorkflowByConnectionId(4L);
+
+        verify(projectDeploymentWorkflowService).disableProjectDeploymentWorkflowByConnectionId(4L);
     }
 
     @Test
