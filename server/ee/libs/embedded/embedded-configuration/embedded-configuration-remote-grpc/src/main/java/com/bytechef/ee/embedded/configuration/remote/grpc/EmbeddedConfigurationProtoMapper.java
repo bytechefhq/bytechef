@@ -25,6 +25,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegratio
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnections;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurations;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrations;
@@ -85,6 +86,15 @@ public class EmbeddedConfigurationProtoMapper {
         RemoteIntegrationInstanceConfiguration remoteIntegrationInstanceConfiguration) {
 
         return protoJsonMapper.toObject(remoteIntegrationInstanceConfiguration, IntegrationInstanceConfiguration.class);
+    }
+
+    public List<IntegrationInstanceConfiguration> toIntegrationInstanceConfigurations(
+        RemoteIntegrationInstanceConfigurations remoteIntegrationInstanceConfigurations) {
+
+        return remoteIntegrationInstanceConfigurations.getIntegrationInstanceConfigurationsList()
+            .stream()
+            .map(this::toIntegrationInstanceConfiguration)
+            .toList();
     }
 
     public IntegrationInstanceConfigurationWorkflow toIntegrationInstanceConfigurationWorkflow(
@@ -205,6 +215,17 @@ public class EmbeddedConfigurationProtoMapper {
         }
 
         return builder.build();
+    }
+
+    public RemoteIntegrationInstanceConfigurations toRemoteIntegrationInstanceConfigurations(
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
+
+        return RemoteIntegrationInstanceConfigurations.newBuilder()
+            .addAllIntegrationInstanceConfigurations(
+                integrationInstanceConfigurations.stream()
+                    .map(this::toProto)
+                    .toList())
+            .build();
     }
 
     public RemoteIntegrations toRemoteIntegrations(List<Integration> integrations) {
