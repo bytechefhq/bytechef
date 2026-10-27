@@ -81,7 +81,9 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-grpc"))
 
+    implementation(project(":server:ee:libs:modules:components:api-platform"))
     implementation(project(":server:ee:libs:modules:components:app-event"))
+    implementation(project(":server:ee:libs:modules:components:request"))
 
     testImplementation("io.grpc:grpc-api")
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))

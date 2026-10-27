@@ -9,10 +9,13 @@ package com.bytechef.worker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import io.grpc.BindableService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
@@ -29,10 +32,24 @@ public class WorkerApplicationIntTest {
     private ApplicationContext applicationContext;
 
     @Autowired
+    @Qualifier("componentDefinitionService")
+    private ComponentDefinitionService componentDefinitionService;
+
+    @Autowired
     private Environment environment;
 
     @Test
     public void testContextLoads() {
+    }
+
+    @Test
+    void testEnterpriseComponentsAreOffered() {
+        List<String> componentNames = componentDefinitionService.getComponentDefinitions()
+            .stream()
+            .map(ComponentDefinition::getName)
+            .toList();
+
+        assertThat(componentNames).contains("apiPlatform", "appEvent", "request");
     }
 
     @Test
