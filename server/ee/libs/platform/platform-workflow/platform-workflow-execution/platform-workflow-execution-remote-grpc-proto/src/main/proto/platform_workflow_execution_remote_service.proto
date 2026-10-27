@@ -39,6 +39,12 @@ service PrincipalJobRemoteService {
   rpc GetJobIdsPage(GetJobIdsPageRequest) returns (JobIdsPage);
 }
 
+service TaskStateRemoteService {
+  rpc Delete(JobResumeIdRequest) returns (google.protobuf.Empty);
+  rpc FetchValue(JobResumeIdRequest) returns (TaskStateValue);
+  rpc Save(SaveTaskStateRequest) returns (google.protobuf.Empty);
+}
+
 service TriggerExecutionRemoteService {
   rpc Create(RemoteTriggerExecution) returns (RemoteTriggerExecution);
   rpc DeleteJobTriggerExecution(bytechef.atlas.execution.remote.v1.IdRequest) returns (google.protobuf.Empty);
@@ -135,6 +141,20 @@ message OptionalIdResponse {
 
 message WorkflowExecutionIdRequest {
   string workflow_execution_id = 1;
+}
+
+message JobResumeIdRequest {
+  string job_resume_id = 1;
+}
+
+message TaskStateValue {
+  optional bytes value = 1;
+  optional string classname = 2;
+}
+
+message SaveTaskStateRequest {
+  string job_resume_id = 1;
+  TaskStateValue value = 2;
 }
 
 message TriggerStateValue {

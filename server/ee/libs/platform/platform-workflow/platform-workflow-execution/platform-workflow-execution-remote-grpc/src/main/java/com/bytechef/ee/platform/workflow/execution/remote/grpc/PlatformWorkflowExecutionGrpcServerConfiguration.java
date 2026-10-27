@@ -12,8 +12,9 @@ import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,6 +65,14 @@ public class PlatformWorkflowExecutionGrpcServerConfiguration {
     }
 
     @Bean
+    TaskStateRemoteServiceGrpcServer taskStateRemoteServiceGrpcServer(
+        TaskStateFacade taskStateFacade,
+        PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper) {
+
+        return new TaskStateRemoteServiceGrpcServer(taskStateFacade, platformWorkflowExecutionProtoMapper);
+    }
+
+    @Bean
     TriggerExecutionRemoteServiceGrpcServer triggerExecutionRemoteServiceGrpcServer(
         TriggerExecutionService triggerExecutionService,
         PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper) {
@@ -83,9 +92,9 @@ public class PlatformWorkflowExecutionGrpcServerConfiguration {
 
     @Bean
     TriggerStateRemoteServiceGrpcServer triggerStateRemoteServiceGrpcServer(
-        TriggerStateService triggerStateService,
+        TriggerStateFacade triggerStateFacade,
         PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper) {
 
-        return new TriggerStateRemoteServiceGrpcServer(triggerStateService, platformWorkflowExecutionProtoMapper);
+        return new TriggerStateRemoteServiceGrpcServer(triggerStateFacade, platformWorkflowExecutionProtoMapper);
     }
 }
