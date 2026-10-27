@@ -72,6 +72,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @version ee
@@ -508,6 +509,27 @@ class McpServerPromotionHandlerTest {
     }
 
     @Test
+    void testPromoteOmitsTheTargetUrlWhenTheCallerMayNotReadTheSecretKey() {
+        stubSource();
+        stubSourceProjects();
+        stubSourceComponents();
+        stubConnectionMappings(Map.of(), Map.of());
+        stubExistingTarget();
+        stubTargetProjects();
+
+        when(mcpComponentService.getMcpServerMcpComponents(TARGET_ID)).thenReturn(List.of());
+        when(mcpServerFacade.getMcpServerSecretKey(TARGET_ID)).thenThrow(new AccessDeniedException("Access Denied"));
+
+        EnvironmentPromotionResult result =
+            mcpServerPromotionHandler.promote(SOURCE_ID, Environment.STAGING, Map.of());
+
+        assertThat(result.targetId()).isEqualTo(TARGET_ID);
+        assertThat(result.targetUrl()).isNull();
+
+        verify(mcpServerService, never()).getMcpServerSecretKey(anyLong());
+    }
+
+    @Test
     void testPromoteUpdateCreatesATargetProjectForASourceProjectTheTargetIsMissing() {
         stubSource();
         stubSourceProjects(sourceMcpProject(SOURCE_MCP_PROJECT_ID));
@@ -712,7 +734,7 @@ class McpServerPromotionHandlerTest {
     }
 
     private void stubSecretKey() {
-        when(mcpServerService.getMcpServerSecretKey(TARGET_ID)).thenReturn(SECRET_KEY);
+        when(mcpServerFacade.getMcpServerSecretKey(TARGET_ID)).thenReturn(SECRET_KEY);
     }
 
     private void stubSource() {

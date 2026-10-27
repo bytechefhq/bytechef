@@ -542,6 +542,48 @@ class EnvironmentPromotionFacadeIntTest {
     }
 
     @Test
+    void testMcpServerPromotionReturnsTheTargetUrlToAnMcpEditorWhoIsNotATenantAdmin() {
+        McpServer sourceMcpServer = createMcpServer("creator-mcp", Environment.DEVELOPMENT);
+
+        long sourceMcpServerId = Objects.requireNonNull(sourceMcpServer.getId(), "id");
+
+        mcpProjectFacade.createMcpProject(sourceMcpServerId, projectId, 1, List.of(projectWorkflowId(1)));
+
+        permissionService.reset();
+        permissionService.setTenantAdmin(false);
+
+        EnvironmentPromotionResult result = environmentPromotionFacade.promote(
+            PromotionResourceType.MCP_SERVER, sourceMcpServerId, Environment.STAGING.ordinal(), Map.of());
+
+        McpServer targetMcpServer = mcpServerService.getMcpServer(result.targetId());
+
+        assertThat(result.created()).isTrue();
+        assertThat(result.targetUrl()).endsWith("/api/automation/" + targetMcpServer.getSecretKey() + "/mcp");
+        assertThat(permissionService.getResourceScopeChecks())
+            .contains(
+                new ResourceScopeCheck(workspaceId, "Workspace", "MCP_CREATE"),
+                new ResourceScopeCheck(result.targetId(), "McpServer", "MCP_EDIT"));
+
+        assertThat(targetMcpServer.getUuid()).isEqualTo(sourceMcpServer.getUuid());
+        assertThat(targetMcpServer.getEnvironment()).isEqualTo(Environment.STAGING);
+        assertThat(singleMcpProjectId(result.targetId())).isPositive();
+    }
+
+    @Test
+    void testMcpServerPromotionReturnsTheTargetUrlToATenantAdmin() {
+        McpServer sourceMcpServer = createMcpServer("admin-mcp", Environment.DEVELOPMENT);
+
+        long sourceMcpServerId = Objects.requireNonNull(sourceMcpServer.getId(), "id");
+
+        EnvironmentPromotionResult result = environmentPromotionFacade.promote(
+            PromotionResourceType.MCP_SERVER, sourceMcpServerId, Environment.STAGING.ordinal(), Map.of());
+
+        McpServer targetMcpServer = mcpServerService.getMcpServer(result.targetId());
+
+        assertThat(result.targetUrl()).endsWith("/api/automation/" + targetMcpServer.getSecretKey() + "/mcp");
+    }
+
+    @Test
     void testProjectDeploymentPromotionCreatesDisabledCounterpartAndPreservesTargetOnRePromotion() {
         ProjectDeployment sourceProjectDeployment = createProjectDeployment("billing-deployment");
 
