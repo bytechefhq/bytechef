@@ -5,6 +5,7 @@ dependencies {
 
     implementation("org.springframework:spring-context")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.grpc:spring-grpc-core")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-api"))

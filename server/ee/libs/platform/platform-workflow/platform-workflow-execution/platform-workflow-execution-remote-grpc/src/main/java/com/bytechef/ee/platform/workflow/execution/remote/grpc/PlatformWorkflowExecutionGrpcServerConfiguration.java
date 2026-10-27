@@ -15,9 +15,11 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -38,9 +40,11 @@ public class PlatformWorkflowExecutionGrpcServerConfiguration {
 
     @Bean
     JobResumeFacadeRemoteServiceGrpcServer jobResumeFacadeRemoteServiceGrpcServer(
-        JobResumeFacade jobResumeFacade, PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper) {
+        JobResumeFacade jobResumeFacade, PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper,
+        @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor) {
 
-        return new JobResumeFacadeRemoteServiceGrpcServer(jobResumeFacade, platformWorkflowExecutionProtoMapper);
+        return new JobResumeFacadeRemoteServiceGrpcServer(
+            jobResumeFacade, platformWorkflowExecutionProtoMapper, syncWorkerExecutor);
     }
 
     @Bean
