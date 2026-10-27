@@ -164,6 +164,7 @@ public class ConfigurationApplicationIntTest {
             "bytechef.embedded.configuration.remote.v1.ConnectedUserProjectFacadeRemoteService",
             "bytechef.embedded.configuration.remote.v1.IntegrationInstanceConfigurationRemoteService",
             "bytechef.embedded.configuration.remote.v1.IntegrationInstanceConfigurationWorkflowRemoteService",
+            "bytechef.embedded.configuration.remote.v1.IntegrationInstanceRemoteService",
             "bytechef.embedded.configuration.remote.v1.IntegrationInstanceWorkflowRemoteService",
             "bytechef.embedded.configuration.remote.v1.IntegrationRemoteService",
             "bytechef.platform.configuration.remote.v1.ComponentConnectionFacadeRemoteService",
