@@ -9,6 +9,9 @@ import A2aServerListItem from '../A2aServerListItem';
 
 const hoisted = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
+    edition: 'EE',
+    environments: [{id: '0', name: 'Development'}] as {id: string; name: string}[],
+    promotionDialogProps: [] as Record<string, unknown>[],
     tagsMutationOptions: undefined as {onSuccess?: () => void} | undefined,
     updateMutate: vi.fn(),
 }));
@@ -25,11 +28,29 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         isLoading: false,
     }),
     useDeleteA2aServerMutation: () => ({mutate: hoisted.deleteMutate}),
+    useEnvironmentsQuery: () => ({data: {environments: hoisted.environments}}),
     useUpdateA2aServerMutation: () => ({isPending: false, mutate: hoisted.updateMutate}),
     useUpdateA2aServerTagsMutation: (options?: {onSuccess?: () => void}) => {
         hoisted.tagsMutationOptions = options;
 
         return {isPending: false, mutate: vi.fn()};
+    },
+}));
+
+vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
+    useWorkspaceStore: (selector: (state: Record<string, unknown>) => unknown) => selector({currentWorkspaceId: 1}),
+}));
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: (selector: (state: Record<string, unknown>) => unknown) =>
+        selector({application: {edition: hoisted.edition}}),
+}));
+
+vi.mock('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog', () => ({
+    default: (props: Record<string, unknown>) => {
+        hoisted.promotionDialogProps.push(props);
+
+        return <div data-testid="environment-promotion-dialog" />;
     },
 }));
 
@@ -67,6 +88,9 @@ describe('A2aServerListItem', () => {
     beforeEach(() => {
         hoisted.deleteMutate.mockReset();
         hoisted.updateMutate.mockReset();
+        hoisted.edition = 'EE';
+        hoisted.environments = [{id: '0', name: 'Development'}];
+        hoisted.promotionDialogProps.length = 0;
     });
 
     it('disables the server from the enabled toggle', async () => {
@@ -255,5 +279,56 @@ describe('A2aServerListItem', () => {
         await user.click(await screen.findByRole('menuitem', {name: 'Edit'}));
 
         expect(await screen.findByText('Editing the A2A server')).toBeInTheDocument();
+    });
+
+    it('hides the Promote to environment menu item when fewer than two environments exist', async () => {
+        const user = userEvent.setup();
+
+        renderListItem();
+
+        await user.click(screen.getByRole('button', {name: 'Server actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Promote to environment…'})).not.toBeInTheDocument();
+    });
+
+    it('hides the Promote to environment menu item on CE even with multiple environments', async () => {
+        const user = userEvent.setup();
+
+        hoisted.edition = 'CE';
+        hoisted.environments = [
+            {id: '0', name: 'Development'},
+            {id: '2', name: 'Production'},
+        ];
+
+        renderListItem();
+
+        await user.click(screen.getByRole('button', {name: 'Server actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Promote to environment…'})).not.toBeInTheDocument();
+    });
+
+    it('opens the promotion dialog with the server as the source', async () => {
+        const user = userEvent.setup();
+
+        hoisted.environments = [
+            {id: '0', name: 'Development'},
+            {id: '2', name: 'Production'},
+        ];
+
+        renderListItem();
+
+        await user.click(screen.getByRole('button', {name: 'Server actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Promote to environment…'}));
+
+        expect(await screen.findByTestId('environment-promotion-dialog')).toBeInTheDocument();
+        expect(hoisted.promotionDialogProps.at(-1)).toMatchObject({
+            resourceType: 'A2A_SERVER',
+            sourceEnvironmentId: 2,
+            sourceId: '7',
+            sourceName: 'Sales agent',
+            workspaceId: 1,
+        });
     });
 });

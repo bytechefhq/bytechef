@@ -32,7 +32,10 @@ export interface EnvironmentPromotionDialogProps {
     workspaceId: number;
 }
 
-const MINTS_NEW_URL_RESOURCE_TYPES: PromotionResourceType[] = [PromotionResourceType.McpServer];
+const MINTS_NEW_URL_RESOURCE_TYPES: PromotionResourceType[] = [
+    PromotionResourceType.A2AServer,
+    PromotionResourceType.McpServer,
+];
 
 const EnvironmentPromotionDialog = ({
     onClose,
