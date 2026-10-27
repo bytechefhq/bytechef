@@ -11,13 +11,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.config.ApplicationProperties;
+import com.google.common.util.concurrent.ListenableFuture;
+import io.grpc.CallOptions;
 import io.grpc.Channel;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import io.grpc.stub.ClientCalls;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
@@ -138,6 +142,31 @@ class ManagedGrpcChannelsTest {
                         statusRuntimeException -> assertThat(statusRuntimeException.getStatus()
                             .getCode()).isEqualTo(Status.Code.RESOURCE_EXHAUSTED));
             }
+        } finally {
+            server.shutdownNow();
+        }
+    }
+
+    @Test
+    void testCloseLetsAnInFlightCallFinish() throws Exception {
+        Server server = ServerBuilder.forPort(0)
+            .addService(new EchoService())
+            .build()
+            .start();
+
+        try {
+            ManagedGrpcChannels managedGrpcChannels = new ManagedGrpcChannels(applicationProperties("token", Map.of()));
+
+            Channel channel = managedGrpcChannels.getChannel(serviceInstance("echo:1", server.getPort()));
+
+            ListenableFuture<String> responseFuture = ClientCalls.futureUnaryCall(
+                channel.newCall(EchoService.SLOW_ECHO, CallOptions.DEFAULT), "300");
+
+            Thread.sleep(50);
+
+            managedGrpcChannels.close();
+
+            assertThat(responseFuture.get(5, TimeUnit.SECONDS)).isEqualTo("done");
         } finally {
             server.shutdownNow();
         }
