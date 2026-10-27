@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.remote.grpc;
 
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -49,6 +50,13 @@ public class AutomationConfigurationGrpcServerConfiguration {
     }
 
     @Bean
+    ProjectFacadeRemoteServiceGrpcServer projectFacadeRemoteServiceGrpcServer(
+        ProjectFacade projectFacade, AutomationConfigurationProtoMapper automationConfigurationProtoMapper) {
+
+        return new ProjectFacadeRemoteServiceGrpcServer(projectFacade, automationConfigurationProtoMapper);
+    }
+
+    @Bean
     ProjectRemoteServiceGrpcServer projectRemoteServiceGrpcServer(
         ProjectService projectService, AutomationConfigurationProtoMapper automationConfigurationProtoMapper) {
 
@@ -57,8 +65,9 @@ public class AutomationConfigurationGrpcServerConfiguration {
 
     @Bean
     ProjectWorkflowRemoteServiceGrpcServer projectWorkflowRemoteServiceGrpcServer(
-        ProjectWorkflowService projectWorkflowService) {
+        ProjectWorkflowService projectWorkflowService,
+        AutomationConfigurationProtoMapper automationConfigurationProtoMapper) {
 
-        return new ProjectWorkflowRemoteServiceGrpcServer(projectWorkflowService);
+        return new ProjectWorkflowRemoteServiceGrpcServer(projectWorkflowService, automationConfigurationProtoMapper);
     }
 }
