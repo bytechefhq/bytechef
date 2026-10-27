@@ -83,6 +83,12 @@ public class ApiGatewayApplicationIntTest {
     }
 
     @Test
+    void testUserMailLinksPointAtThePublicUrl() {
+        assertThat(environment.getProperty("bytechef.mail.base-url"))
+            .isEqualTo(environment.getProperty("bytechef.public-url"));
+    }
+
+    @Test
     void testUserMailMessagesResolve() {
         assertThat(applicationContext.getMessage("email.activation.title", null, Locale.ENGLISH)).isNotBlank();
         assertThat(applicationContext.getMessage("email.invitation.title", null, Locale.ENGLISH)).isNotBlank();
