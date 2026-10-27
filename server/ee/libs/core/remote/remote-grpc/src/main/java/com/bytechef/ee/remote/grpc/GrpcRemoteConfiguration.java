@@ -13,6 +13,7 @@ import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
 import io.grpc.BindableService;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -36,7 +38,8 @@ import tools.jackson.databind.ObjectMapper;
 
 /**
  * Secures every gRPC service a microservice serves with the internal service token and its tenant, refuses to serve
- * without a token or, unless the trusted-network switch is on, without TLS, and resolves discovery targets.
+ * without a token or, unless the trusted-network switch is on, without TLS, refuses to start a microservice that calls
+ * another one without a token, and resolves discovery targets.
  *
  * @version ee
  */
@@ -48,6 +51,32 @@ public class GrpcRemoteConfiguration {
         ObjectProvider<DiscoveryClient> discoveryClientProvider) {
 
         return new GrpcDiscoveryNameResolverRegistration(discoveryClientProvider);
+    }
+
+    @Bean
+    SmartInitializingSingleton grpcClientSecurityCheck(
+        ApplicationProperties applicationProperties, ConfigurableListableBeanFactory beanFactory) {
+
+        return () -> {
+            String[] managedGrpcChannelsBeanNames = beanFactory.getBeanNamesForType(
+                ManagedGrpcChannels.class, false, false);
+
+            boolean callsAnotherMicroservice = Arrays.stream(managedGrpcChannelsBeanNames)
+                .anyMatch(beanName -> beanFactory.getDependentBeans(beanName).length > 0);
+
+            if (!callsAnotherMicroservice) {
+                return;
+            }
+
+            ApplicationProperties.Remote remote = applicationProperties.getRemote();
+
+            ApplicationProperties.Remote.Grpc grpc = remote.getGrpc();
+
+            if (StringUtils.isBlank(grpc.getServiceToken())) {
+                throw new IllegalStateException(
+                    "bytechef.remote.grpc.service-token must be set to call another microservice");
+            }
+        };
     }
 
     @Bean
