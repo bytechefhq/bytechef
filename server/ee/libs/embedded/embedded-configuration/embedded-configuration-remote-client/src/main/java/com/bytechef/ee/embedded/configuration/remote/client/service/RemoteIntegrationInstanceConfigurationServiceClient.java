@@ -9,14 +9,17 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationsFilterRequest;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -51,7 +54,10 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
 
     @Override
     public boolean isIntegrationInstanceConfigurationEnabled(long integrationInstanceConfigurationId) {
-        throw new UnsupportedOperationException();
+        BoolResponse boolResponse = getStub().isIntegrationInstanceConfigurationEnabled(
+            toIdRequest(integrationInstanceConfigurationId));
+
+        return boolResponse.getValue();
     }
 
     @Override
@@ -98,9 +104,26 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
     }
 
     @Override
-    public List<IntegrationInstanceConfiguration>
-        getIntegrationInstanceConfigurations(Environment environment, Long integrationId, Long tagId) {
-        throw new UnsupportedOperationException();
+    public List<IntegrationInstanceConfiguration> getIntegrationInstanceConfigurations(
+        @Nullable Environment environment, @Nullable Long integrationId, @Nullable Long tagId) {
+
+        IntegrationInstanceConfigurationsFilterRequest.Builder builder =
+            IntegrationInstanceConfigurationsFilterRequest.newBuilder();
+
+        if (environment != null) {
+            builder.setEnvironment(environment.ordinal());
+        }
+
+        if (integrationId != null) {
+            builder.setIntegrationId(integrationId);
+        }
+
+        if (tagId != null) {
+            builder.setTagId(tagId);
+        }
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurations(
+            getStub().getIntegrationInstanceConfigurationsByFilter(builder.build()));
     }
 
     @Override

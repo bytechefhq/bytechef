@@ -7,12 +7,15 @@
 
 package com.bytechef.ee.embedded.configuration.remote.grpc;
 
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationsFilterRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurations;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
 
@@ -52,6 +55,35 @@ public class IntegrationInstanceConfigurationRemoteServiceGrpcServer
         responseObserver.onNext(
             embeddedConfigurationProtoMapper.toRemoteIntegrationInstanceConfigurations(
                 integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(request.getIdsList())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getIntegrationInstanceConfigurationsByFilter(
+        IntegrationInstanceConfigurationsFilterRequest request,
+        StreamObserver<RemoteIntegrationInstanceConfigurations> responseObserver) {
+
+        Environment environment = request.hasEnvironment()
+            ? EmbeddedConfigurationProtoMapper.toEnvironment(request.getEnvironment()) : null;
+        Long integrationId = request.hasIntegrationId() ? request.getIntegrationId() : null;
+        Long tagId = request.hasTagId() ? request.getTagId() : null;
+
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toRemoteIntegrationInstanceConfigurations(
+                integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                    environment, integrationId, tagId)));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void isIntegrationInstanceConfigurationEnabled(
+        IdRequest request, StreamObserver<BoolResponse> responseObserver) {
+
+        responseObserver.onNext(
+            BoolResponse.newBuilder()
+                .setValue(
+                    integrationInstanceConfigurationService.isIntegrationInstanceConfigurationEnabled(request.getId()))
+                .build());
         responseObserver.onCompleted();
     }
 }

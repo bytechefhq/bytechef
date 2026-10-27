@@ -19,6 +19,9 @@ service IntegrationRemoteService {
 service IntegrationInstanceConfigurationRemoteService {
   rpc GetIntegrationInstanceConfiguration(IdRequest) returns (RemoteIntegrationInstanceConfiguration);
   rpc GetIntegrationInstanceConfigurations(IdsRequest) returns (RemoteIntegrationInstanceConfigurations);
+  rpc GetIntegrationInstanceConfigurationsByFilter(IntegrationInstanceConfigurationsFilterRequest)
+      returns (RemoteIntegrationInstanceConfigurations);
+  rpc IsIntegrationInstanceConfigurationEnabled(IdRequest) returns (BoolResponse);
 }
 
 service IntegrationInstanceConfigurationWorkflowRemoteService {
@@ -90,6 +93,12 @@ message ConfigurationWorkflowRequest {
   string workflow_id = 2;
   optional string workflow_node_name = 3;
   optional string workflow_connection_key = 4;
+}
+
+message IntegrationInstanceConfigurationsFilterRequest {
+  optional int32 environment = 1;
+  optional int64 integration_id = 2;
+  optional int64 tag_id = 3;
 }
 
 message CopyWorkflowTemplateRequest {

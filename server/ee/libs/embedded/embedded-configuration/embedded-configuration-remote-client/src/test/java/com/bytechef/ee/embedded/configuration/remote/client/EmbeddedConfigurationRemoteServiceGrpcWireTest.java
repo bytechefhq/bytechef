@@ -241,6 +241,45 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testIntegrationInstanceConfigurationLookups() {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setEnabled(true);
+        integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
+        integrationInstanceConfiguration.setId(5L);
+        integrationInstanceConfiguration.setIntegrationId(7L);
+
+        when(integrationInstanceConfigurationService.isIntegrationInstanceConfigurationEnabled(5L)).thenReturn(true);
+        when(integrationInstanceConfigurationService.isIntegrationInstanceConfigurationEnabled(6L)).thenReturn(false);
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+            Environment.PRODUCTION, 7L, 3L))
+                .thenReturn(List.of(integrationInstanceConfiguration));
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(null, null, null))
+            .thenReturn(List.of(integrationInstanceConfiguration));
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+            Environment.DEVELOPMENT, null, null))
+                .thenReturn(List.of());
+
+        RemoteIntegrationInstanceConfigurationServiceClient remoteIntegrationInstanceConfigurationServiceClient =
+            new RemoteIntegrationInstanceConfigurationServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationInstanceConfigurationServiceClient.isIntegrationInstanceConfigurationEnabled(5L))
+            .isTrue();
+        assertThat(remoteIntegrationInstanceConfigurationServiceClient.isIntegrationInstanceConfigurationEnabled(6L))
+            .isFalse();
+        assertThat(remoteIntegrationInstanceConfigurationServiceClient.getIntegrationInstanceConfigurations(
+            Environment.PRODUCTION, 7L, 3L))
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(integrationInstanceConfiguration);
+        assertThat(remoteIntegrationInstanceConfigurationServiceClient.getIntegrationInstanceConfigurations(
+            null, null, null))
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(integrationInstanceConfiguration);
+        assertThat(remoteIntegrationInstanceConfigurationServiceClient.getIntegrationInstanceConfigurations(
+            Environment.DEVELOPMENT, null, null)).isEmpty();
+    }
+
+    @Test
     void testIntegrationInstanceConfigurationWorkflowCalls() {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             new IntegrationInstanceConfigurationWorkflow();
