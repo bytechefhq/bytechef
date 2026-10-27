@@ -62,6 +62,7 @@ import io.grpc.ServerInterceptors;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -71,6 +72,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.grpc.server.exception.GrpcExceptionHandlerInterceptor;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -112,7 +116,7 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
                 connectionLifecycleFacade, platformWorkflowExecutionProtoMapper),
             new JobResumeFacadeRemoteServiceGrpcServer(jobResumeFacade, platformWorkflowExecutionProtoMapper),
             new PrincipalJobFacadeRemoteServiceGrpcServer(principalJobFacade, platformWorkflowExecutionProtoMapper),
-            new PrincipalJobRemoteServiceGrpcServer(principalJobService),
+            new PrincipalJobRemoteServiceGrpcServer(principalJobService, platformWorkflowExecutionProtoMapper),
             new TriggerExecutionRemoteServiceGrpcServer(
                 triggerExecutionService, platformWorkflowExecutionProtoMapper),
             new TriggerLifecycleFacadeRemoteServiceGrpcServer(
@@ -239,7 +243,7 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
             .thenReturn(Optional.of(8L));
 
         RemotePrincipalJobServiceClient remotePrincipalJobServiceClient = new RemotePrincipalJobServiceClient(
-            fixedGrpcChannels);
+            fixedGrpcChannels, JSON_MAPPER);
 
         assertThat(remotePrincipalJobServiceClient.fetchLastJobId(1051L, PlatformType.AUTOMATION)).contains(7L);
         assertThat(remotePrincipalJobServiceClient.fetchJobPrincipalId(7L, PlatformType.AUTOMATION)).contains(1051L);
@@ -252,15 +256,67 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
         when(principalJobService.fetchLastWorkflowJobId(1051L, List.of("a"), PlatformType.AUTOMATION))
             .thenReturn(Optional.empty());
 
-        assertThat(new RemotePrincipalJobServiceClient(fixedGrpcChannels).fetchLastWorkflowJobId(
+        assertThat(new RemotePrincipalJobServiceClient(fixedGrpcChannels, JSON_MAPPER).fetchLastWorkflowJobId(
             1051L, List.of("a"), PlatformType.AUTOMATION)).isEmpty();
+    }
+
+    @Test
+    void testGetJobIdsOfAPrincipal() {
+        when(principalJobService.getJobIds(1051L, PlatformType.AUTOMATION)).thenReturn(List.of(7L, 8L));
+
+        assertThat(new RemotePrincipalJobServiceClient(fixedGrpcChannels, JSON_MAPPER).getJobIds(1051L,
+            PlatformType.AUTOMATION))
+                .containsExactly(7L, 8L);
+    }
+
+    @Test
+    void testGetJobIdsPage() {
+        Instant startDate = Instant.parse("2026-10-26T10:00:00Z");
+        Instant endDate = Instant.parse("2026-10-27T11:30:00.123456789Z");
+
+        when(principalJobService.getJobIds(
+            Job.Status.STARTED, startDate, endDate, List.of(1051L, 1052L), PlatformType.EMBEDDED, List.of("a"), true,
+            1))
+                .thenReturn(new PageImpl<>(List.of(9L, 8L), PageRequest.of(1, 2), 5));
+
+        Page<Long> page = new RemotePrincipalJobServiceClient(fixedGrpcChannels, JSON_MAPPER).getJobIds(
+            Job.Status.STARTED, startDate, endDate, List.of(1051L, 1052L), PlatformType.EMBEDDED, List.of("a"), true,
+            1);
+
+        assertThat(page.getContent()).containsExactly(9L, 8L);
+        assertThat(page.getNumber()).isEqualTo(1);
+        assertThat(page.getSize()).isEqualTo(2);
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.hasNext()).isTrue();
+    }
+
+    @Test
+    void testGetJobIdsPageWithoutFiltersOrJobs() {
+        when(principalJobService.getJobIds(
+            isNull(), isNull(), isNull(), eq(List.of()), eq(PlatformType.AUTOMATION), eq(List.of()), eq(false),
+            eq(0)))
+                .thenReturn(Page.empty());
+
+        Page<Long> page = new RemotePrincipalJobServiceClient(fixedGrpcChannels, JSON_MAPPER).getJobIds(
+            null, null, null, null, PlatformType.AUTOMATION, null, false, 0);
+
+        assertThat(page.getContent()).isEmpty();
+        assertThat(page.hasNext()).isFalse();
+    }
+
+    @Test
+    void testDeletePrincipalJobs() {
+        new RemotePrincipalJobServiceClient(fixedGrpcChannels, JSON_MAPPER).deletePrincipalJobs(7L,
+            PlatformType.EMBEDDED);
+
+        verify(principalJobService).deletePrincipalJobs(7L, PlatformType.EMBEDDED);
     }
 
     @Test
     void testGetJobPrincipalIdReturnsThePrincipal() {
         when(principalJobService.fetchJobPrincipalId(7L, PlatformType.AUTOMATION)).thenReturn(Optional.of(1051L));
 
-        assertThat(new RemotePrincipalJobServiceClient(fixedGrpcChannels).getJobPrincipalId(
+        assertThat(new RemotePrincipalJobServiceClient(fixedGrpcChannels, JSON_MAPPER).getJobPrincipalId(
             7L, PlatformType.AUTOMATION)).isEqualTo(1051L);
     }
 
@@ -269,7 +325,7 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
         when(principalJobService.fetchJobPrincipalId(7L, PlatformType.AUTOMATION)).thenReturn(Optional.empty());
 
         RemotePrincipalJobServiceClient remotePrincipalJobServiceClient = new RemotePrincipalJobServiceClient(
-            fixedGrpcChannels);
+            fixedGrpcChannels, JSON_MAPPER);
 
         assertThatThrownBy(() -> remotePrincipalJobServiceClient.getJobPrincipalId(7L, PlatformType.AUTOMATION))
             .isInstanceOf(NoSuchElementException.class);

@@ -56,8 +56,11 @@ public class PlatformWorkflowExecutionGrpcServerConfiguration {
     }
 
     @Bean
-    PrincipalJobRemoteServiceGrpcServer principalJobRemoteServiceGrpcServer(PrincipalJobService principalJobService) {
-        return new PrincipalJobRemoteServiceGrpcServer(principalJobService);
+    PrincipalJobRemoteServiceGrpcServer principalJobRemoteServiceGrpcServer(
+        PrincipalJobService principalJobService,
+        PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper) {
+
+        return new PrincipalJobRemoteServiceGrpcServer(principalJobService, platformWorkflowExecutionProtoMapper);
     }
 
     @Bean
