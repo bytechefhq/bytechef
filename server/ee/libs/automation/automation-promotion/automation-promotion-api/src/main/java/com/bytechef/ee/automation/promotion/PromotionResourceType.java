@@ -14,5 +14,5 @@ package com.bytechef.ee.automation.promotion;
  */
 public enum PromotionResourceType {
 
-    API_COLLECTION, MCP_SERVER, PROJECT_DEPLOYMENT
+    A2A_SERVER, API_COLLECTION, MCP_SERVER, PROJECT_DEPLOYMENT
 }
