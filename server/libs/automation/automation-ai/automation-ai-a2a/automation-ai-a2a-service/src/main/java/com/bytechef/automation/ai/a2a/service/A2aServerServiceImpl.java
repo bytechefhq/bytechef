@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.a2a.service;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.repository.A2aServerRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,6 +62,12 @@ public class A2aServerServiceImpl implements A2aServerService {
     @Transactional(readOnly = true)
     public Optional<A2aServer> fetchA2aServer(String secretKey) {
         return a2aServerRepository.findBySecretKey(secretKey);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<A2aServer> fetchA2aServer(UUID uuid, Environment environment) {
+        return a2aServerRepository.findByUuidAndEnvironment(uuid, environment.ordinal());
     }
 
     @Override

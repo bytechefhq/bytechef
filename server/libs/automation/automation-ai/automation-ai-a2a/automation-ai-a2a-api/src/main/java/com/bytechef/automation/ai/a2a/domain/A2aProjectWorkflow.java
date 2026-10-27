@@ -162,6 +162,10 @@ public final class A2aProjectWorkflow {
         this.id = id;
     }
 
+    public void setParameters(Map<String, ?> parameters) {
+        this.parameters = new MapWrapper(parameters);
+    }
+
     public void setSkillDescription(@Nullable String skillDescription) {
         putParameter(SKILL_DESCRIPTION,
             skillDescription == null || skillDescription.isBlank() ? null : skillDescription);
