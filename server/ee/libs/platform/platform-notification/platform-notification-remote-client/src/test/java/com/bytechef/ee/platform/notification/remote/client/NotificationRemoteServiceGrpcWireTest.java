@@ -8,15 +8,25 @@
 package com.bytechef.ee.platform.notification.remote.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.notification.remote.client.handler.RemoteEmailNotificationSender;
+import com.bytechef.ee.platform.notification.remote.client.handler.RemoteWebhookNotificationSender;
 import com.bytechef.ee.platform.notification.remote.client.service.RemoteNotificationServiceClient;
 import com.bytechef.ee.platform.notification.remote.grpc.NotificationProtoMapper;
 import com.bytechef.ee.platform.notification.remote.grpc.NotificationRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
+import com.bytechef.platform.notification.handler.EmailNotificationHandler;
+import com.bytechef.platform.notification.handler.NotificationHandler;
+import com.bytechef.platform.notification.handler.NotificationHandlerContext;
+import com.bytechef.platform.notification.handler.NotificationSender;
+import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
+import com.bytechef.platform.notification.handler.WebhookNotificationHandler;
 import com.bytechef.platform.notification.service.NotificationService;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -28,6 +38,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -40,7 +51,11 @@ class NotificationRemoteServiceGrpcWireTest {
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
         .build();
 
+    private final NotificationSender<EmailNotificationHandler> emailNotificationSender = mockNotificationSender(
+        Notification.Type.EMAIL);
     private final NotificationService notificationService = mock(NotificationService.class);
+    private final NotificationSender<WebhookNotificationHandler> webhookNotificationSender = mockNotificationSender(
+        Notification.Type.WEBHOOK);
 
     private ManagedChannel managedChannel;
     private RemoteNotificationServiceClient remoteNotificationServiceClient;
@@ -53,7 +68,10 @@ class NotificationRemoteServiceGrpcWireTest {
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
             .addService(
-                new NotificationRemoteServiceGrpcServer(notificationService, new NotificationProtoMapper(JSON_MAPPER)))
+                new NotificationRemoteServiceGrpcServer(
+                    notificationService,
+                    new NotificationSenderRegistry(List.of(emailNotificationSender, webhookNotificationSender)),
+                    new NotificationProtoMapper(JSON_MAPPER)))
             .build()
             .start();
         managedChannel = InProcessChannelBuilder.forName(name)
@@ -91,6 +109,84 @@ class NotificationRemoteServiceGrpcWireTest {
         assertThat(remoteNotificationServiceClient.getNotifications())
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactly(notification);
+    }
+
+    @Test
+    void testSendEmailNotificationWithTheServingAppsSender() {
+        Notification notification = notification();
+        EmailNotificationHandler emailNotificationHandler = new EmailNotificationHandler() {
+
+            @Override
+            public String getContent(NotificationHandlerContext notificationHandlerContext) {
+                return "<p>Job " + notificationHandlerContext.getJobId() + " failed</p>";
+            }
+
+            @Override
+            public String getSubject(NotificationHandlerContext notificationHandlerContext) {
+                return "Job " + notificationHandlerContext.getJobName() + " failed";
+            }
+
+            @Override
+            public boolean isHtml() {
+                return true;
+            }
+        };
+
+        NotificationHandlerContext notificationHandlerContext = new NotificationHandlerContext.Builder()
+            .eventType(NotificationEvent.Type.JOB_FAILED)
+            .jobId(7L)
+            .jobName("Nightly")
+            .build();
+
+        new RemoteEmailNotificationSender(new FixedGrpcChannels(managedChannel), JSON_MAPPER)
+            .send(notification, emailNotificationHandler, notificationHandlerContext);
+
+        ArgumentCaptor<Notification> notificationArgumentCaptor = ArgumentCaptor.forClass(Notification.class);
+        ArgumentCaptor<EmailNotificationHandler> emailNotificationHandlerArgumentCaptor =
+            ArgumentCaptor.forClass(EmailNotificationHandler.class);
+        ArgumentCaptor<NotificationHandlerContext> notificationHandlerContextArgumentCaptor =
+            ArgumentCaptor.forClass(NotificationHandlerContext.class);
+
+        verify(emailNotificationSender).send(
+            notificationArgumentCaptor.capture(), emailNotificationHandlerArgumentCaptor.capture(),
+            notificationHandlerContextArgumentCaptor.capture());
+
+        assertThat(notificationArgumentCaptor.getValue())
+            .usingRecursiveComparison()
+            .isEqualTo(notification);
+
+        EmailNotificationHandler sentEmailNotificationHandler = emailNotificationHandlerArgumentCaptor.getValue();
+        NotificationHandlerContext sentNotificationHandlerContext =
+            notificationHandlerContextArgumentCaptor.getValue();
+
+        assertThat(sentEmailNotificationHandler.getSubject(sentNotificationHandlerContext))
+            .isEqualTo("Job Nightly failed");
+        assertThat(sentEmailNotificationHandler.getContent(sentNotificationHandlerContext))
+            .isEqualTo("<p>Job 7 failed</p>");
+        assertThat(sentEmailNotificationHandler.isHtml()).isTrue();
+    }
+
+    @Test
+    void testSendWebhookNotificationWithTheServingAppsSender() {
+        Notification notification = notification();
+
+        notification.setType(Notification.Type.WEBHOOK);
+
+        new RemoteWebhookNotificationSender(new FixedGrpcChannels(managedChannel), JSON_MAPPER)
+            .send(notification, null, new NotificationHandlerContext.Builder().build());
+
+        verify(webhookNotificationSender).send(any(Notification.class), any(), any());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends NotificationHandler> NotificationSender<T>
+        mockNotificationSender(Notification.Type type) {
+
+        NotificationSender<T> notificationSender = mock(NotificationSender.class);
+
+        when(notificationSender.getType()).thenReturn(type);
+
+        return notificationSender;
     }
 
     private static Notification notification() {

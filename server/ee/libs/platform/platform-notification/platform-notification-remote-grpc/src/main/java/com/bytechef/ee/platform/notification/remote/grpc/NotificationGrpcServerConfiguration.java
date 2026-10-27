@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.notification.remote.grpc;
 
+import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +25,10 @@ public class NotificationGrpcServerConfiguration {
 
     @Bean
     NotificationRemoteServiceGrpcServer notificationRemoteServiceGrpcServer(
-        NotificationService notificationService, ObjectMapper objectMapper) {
+        NotificationService notificationService, NotificationSenderRegistry notificationSenderRegistry,
+        ObjectMapper objectMapper) {
 
-        return new NotificationRemoteServiceGrpcServer(notificationService, new NotificationProtoMapper(objectMapper));
+        return new NotificationRemoteServiceGrpcServer(
+            notificationService, notificationSenderRegistry, new NotificationProtoMapper(objectMapper));
     }
 }
