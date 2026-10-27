@@ -48,6 +48,18 @@ class EnvironmentPromotionHandlerTest {
     };
 
     @Test
+    void testA2aServerPromotionHandlerPreviewRequiresAdmin() {
+        assertPromotionExpression(
+            A2aServerPromotionHandler.class, "preview", PREVIEW_PARAMETER_TYPES, "hasAuthority('ROLE_ADMIN')");
+    }
+
+    @Test
+    void testA2aServerPromotionHandlerPromoteRequiresAdmin() {
+        assertPromotionExpression(
+            A2aServerPromotionHandler.class, "promote", PROMOTE_PARAMETER_TYPES, "hasAuthority('ROLE_ADMIN')");
+    }
+
+    @Test
     void testApiCollectionPromotionHandlerPreviewRequiresProjectDeploymentPush() {
         assertPromotionExpression(
             ApiCollectionPromotionHandler.class, "preview", PREVIEW_PARAMETER_TYPES,
@@ -99,8 +111,8 @@ class EnvironmentPromotionHandlerTest {
             .as("classes assignable to %s discovered under %s", EnvironmentPromotionHandler.class.getSimpleName(),
                 HANDLER_PACKAGE)
             .contains(
-                ApiCollectionPromotionHandler.class, McpServerPromotionHandler.class,
-                ProjectDeploymentPromotionHandler.class);
+                A2aServerPromotionHandler.class, ApiCollectionPromotionHandler.class,
+                McpServerPromotionHandler.class, ProjectDeploymentPromotionHandler.class);
 
         for (Class<?> handlerClass : handlerClasses) {
             assertThat(promoteCallsConnectionScopeCheck(handlerClass))

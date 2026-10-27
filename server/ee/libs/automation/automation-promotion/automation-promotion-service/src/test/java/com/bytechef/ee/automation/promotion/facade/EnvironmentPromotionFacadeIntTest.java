@@ -18,6 +18,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.a2a.domain.A2aProject;
+import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
+import com.bytechef.automation.ai.a2a.domain.A2aServer;
+import com.bytechef.automation.ai.a2a.facade.A2aProjectFacade;
+import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
+import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
@@ -80,6 +86,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -92,6 +99,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -111,6 +122,15 @@ class EnvironmentPromotionFacadeIntTest {
     private static final String CONNECTION_NAME = "slack-account";
     private static final String WORKFLOW_CONNECTION_KEY = "slack";
     private static final String WORKFLOW_NODE_NAME = "slack_1";
+
+    @Autowired
+    private A2aProjectFacade a2aProjectFacade;
+
+    @Autowired
+    private A2aProjectWorkflowService a2aProjectWorkflowService;
+
+    @Autowired
+    private A2aServerService a2aServerService;
 
     @Autowired
     private ApiCollectionEndpointService apiCollectionEndpointService;
@@ -242,8 +262,110 @@ class EnvironmentPromotionFacadeIntTest {
     @AfterEach
     void afterEach() {
         jdbcTemplate.execute(
-            "TRUNCATE TABLE api_collection, category, connection, mcp_server, project, " +
+            "TRUNCATE TABLE a2a_server, api_collection, category, connection, mcp_server, project, " +
                 "project_deployment, project_workflow, tag, workflow, workspace CASCADE");
+    }
+
+    @Test
+    void testA2aServerPromotionCreatesTargetInTargetEnvironmentAndSyncsOnRePromotion() {
+        A2aServer sourceA2aServer = createA2aServer("billing-a2a", "Billing agent");
+
+        long sourceA2aServerId = Objects.requireNonNull(sourceA2aServer.getId(), "id");
+
+        A2aProject sourceA2aProject = a2aProjectFacade.createA2aProject(
+            sourceA2aServerId, projectId, 1, List.of(projectWorkflowId(1)));
+
+        long sourceProjectDeploymentId =
+            Objects.requireNonNull(sourceA2aProject.getProjectDeploymentId(), "projectDeploymentId");
+
+        bindConnection(sourceProjectDeploymentId, developmentConnectionId);
+
+        long sourceA2aProjectWorkflowId = Objects.requireNonNull(
+            singleA2aProjectWorkflow(sourceA2aProject.getId()).getId(), "id");
+
+        a2aProjectWorkflowService.updateParameters(
+            sourceA2aProjectWorkflowId, Map.of("skillName", "invoice", "skillDescription", "Creates an invoice"));
+
+        EnvironmentPromotionResult firstResult = environmentPromotionFacade.promote(
+            PromotionResourceType.A2A_SERVER, sourceA2aServerId, Environment.STAGING.ordinal(), Map.of());
+
+        assertThat(firstResult.created()).isTrue();
+        assertThat(firstResult.unresolvedConnectionIds()).isEmpty();
+
+        A2aServer targetA2aServer = a2aServerService.getA2aServer(firstResult.targetId());
+
+        assertThat(targetA2aServer.getUuid()).isEqualTo(sourceA2aServer.getUuid());
+        assertThat(targetA2aServer.getEnvironment()).isEqualTo(Environment.STAGING);
+        assertThat(targetA2aServer.getWorkspaceId()).isEqualTo(workspaceId);
+        assertThat(targetA2aServer.isEnabled()).isFalse();
+        assertThat(targetA2aServer.getSecretKey()).isNotEqualTo(sourceA2aServer.getSecretKey());
+        assertThat(firstResult.targetUrl())
+            .endsWith("/api/automation/a2a/" + targetA2aServer.getSecretKey() + "/.well-known/agent-card.json");
+
+        A2aProjectWorkflow targetA2aProjectWorkflow =
+            singleA2aProjectWorkflow(singleA2aProjectId(firstResult.targetId()));
+
+        assertThat(a2aProjectWorkflowParameters(targetA2aProjectWorkflow))
+            .containsEntry("skillName", "invoice")
+            .containsEntry("skillDescription", "Creates an invoice");
+
+        long stableProjectDeploymentWorkflowId = Objects.requireNonNull(
+            targetA2aProjectWorkflow.getProjectDeploymentWorkflowId(), "projectDeploymentWorkflowId");
+
+        ProjectDeploymentWorkflow targetProjectDeploymentWorkflow =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflow(stableProjectDeploymentWorkflowId);
+        ProjectDeployment targetProjectDeployment = projectDeploymentOfWorkflow(stableProjectDeploymentWorkflowId);
+
+        assertThat(targetProjectDeployment.getEnvironment()).isEqualTo(Environment.STAGING);
+        assertThat(targetProjectDeployment.getProjectVersion()).isEqualTo(1);
+        assertThat(connectionIds(targetProjectDeploymentWorkflow)).containsExactly(stagingConnectionId);
+
+        projectFacade.publishProject(projectId, "v2", false);
+        changeProjectVersion(sourceProjectDeploymentId, 2);
+        a2aProjectWorkflowService.updateParameters(
+            sourceA2aProjectWorkflowId, Map.of("skillName", "invoice", "skillDescription", "Creates a new invoice"));
+
+        targetA2aServer.setName("staging-billing-a2a");
+        targetA2aServer.setEnabled(true);
+
+        a2aServerService.update(targetA2aServer);
+
+        EnvironmentPromotionResult secondResult = environmentPromotionFacade.promote(
+            PromotionResourceType.A2A_SERVER, sourceA2aServerId, Environment.STAGING.ordinal(), Map.of());
+
+        assertThat(secondResult.created()).isFalse();
+        assertThat(secondResult.targetId()).isEqualTo(firstResult.targetId());
+
+        A2aServer rePromotedA2aServer = a2aServerService.getA2aServer(firstResult.targetId());
+
+        assertThat(rePromotedA2aServer.getName()).isEqualTo("staging-billing-a2a");
+        assertThat(rePromotedA2aServer.isEnabled()).isTrue();
+        assertThat(rePromotedA2aServer.getSecretKey()).isEqualTo(targetA2aServer.getSecretKey());
+
+        A2aProjectWorkflow rePromotedA2aProjectWorkflow =
+            singleA2aProjectWorkflow(singleA2aProjectId(firstResult.targetId()));
+
+        assertThat(a2aProjectWorkflowParameters(rePromotedA2aProjectWorkflow))
+            .containsEntry("skillDescription", "Creates a new invoice");
+        assertThat(rePromotedA2aProjectWorkflow.getProjectDeploymentWorkflowId())
+            .isEqualTo(stableProjectDeploymentWorkflowId);
+        assertThat(projectDeploymentOfWorkflow(stableProjectDeploymentWorkflowId).getProjectVersion()).isEqualTo(2);
+    }
+
+    @Test
+    void testA2aServerPromotionIsDeniedToANonAdmin() {
+        A2aServer sourceA2aServer = createA2aServer("guarded-a2a", null);
+
+        long sourceA2aServerId = Objects.requireNonNull(sourceA2aServer.getId(), "id");
+
+        runAs(
+            "user@localhost.com", AuthorityConstants.USER,
+            () -> assertThatThrownBy(
+                () -> environmentPromotionFacade.promote(
+                    PromotionResourceType.A2A_SERVER, sourceA2aServerId, Environment.STAGING.ordinal(), Map.of()))
+                        .isInstanceOf(AccessDeniedException.class));
+
+        assertThat(a2aServerService.fetchA2aServer(sourceA2aServer.getUuid(), Environment.STAGING)).isEmpty();
     }
 
     @Test
@@ -531,7 +653,7 @@ class EnvironmentPromotionFacadeIntTest {
 
         assertThat(constraintNames).doesNotContain("uk_api_collection_name", "uk_mcp_server_name");
         assertThat(constraintNames).contains(
-            "uk_mcp_server_name_environment", "uk_mcp_server_uuid_environment",
+            "uk_a2a_server_uuid_environment", "uk_mcp_server_name_environment", "uk_mcp_server_uuid_environment",
             "uk_project_deployment_uuid_environment");
 
         createMcpServer("shared-name", Environment.DEVELOPMENT);
@@ -626,6 +748,14 @@ class EnvironmentPromotionFacadeIntTest {
         return Objects.requireNonNull(connection.getId(), "id");
     }
 
+    private A2aServer createA2aServer(String name, @Nullable String description) {
+        A2aServer a2aServer = new A2aServer(name, description, Environment.DEVELOPMENT);
+
+        a2aServer.setWorkspaceId(workspaceId);
+
+        return a2aServerService.create(a2aServer);
+    }
+
     private McpServer createMcpServer(String name, Environment environment) {
         return workspaceMcpServerFacade.createWorkspaceMcpServer(
             name, PlatformType.AUTOMATION, environment, false, false, false, workspaceId, null);
@@ -718,6 +848,43 @@ class EnvironmentPromotionFacadeIntTest {
 
         return projectWorkflows.getFirst()
             .getUuidAsString();
+    }
+
+    private static Map<String, Object> a2aProjectWorkflowParameters(A2aProjectWorkflow a2aProjectWorkflow) {
+        return new HashMap<>(a2aProjectWorkflow.getParameters());
+    }
+
+    private long singleA2aProjectId(long a2aServerId) {
+        Long a2aProjectId = jdbcTemplate.queryForObject(
+            "SELECT id FROM a2a_project WHERE a2a_server_id = ?", Long.class, a2aServerId);
+
+        return Objects.requireNonNull(a2aProjectId, "id");
+    }
+
+    private A2aProjectWorkflow singleA2aProjectWorkflow(Long a2aProjectId) {
+        List<A2aProjectWorkflow> a2aProjectWorkflows =
+            a2aProjectWorkflowService.getA2aProjectA2aProjectWorkflows(a2aProjectId);
+
+        assertThat(a2aProjectWorkflows).hasSize(1);
+
+        return a2aProjectWorkflows.getFirst();
+    }
+
+    private static void runAs(String username, String authority, Runnable runnable) {
+        SecurityContext previousSecurityContext = SecurityContextHolder.getContext();
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                username, "n/a", List.of(new SimpleGrantedAuthority(authority))));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        try {
+            runnable.run();
+        } finally {
+            SecurityContextHolder.setContext(previousSecurityContext);
+        }
     }
 
     private long singleMcpProjectId(long mcpServerId) {
