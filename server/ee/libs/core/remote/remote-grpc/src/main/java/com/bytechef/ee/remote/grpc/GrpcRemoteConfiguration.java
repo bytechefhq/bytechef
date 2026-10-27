@@ -13,7 +13,9 @@ import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
 import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
 import io.grpc.BindableService;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -53,13 +55,12 @@ public class GrpcRemoteConfiguration {
         ApplicationProperties applicationProperties, Environment environment, ListableBeanFactory beanFactory) {
 
         return () -> {
-            boolean servesBytechefService = beanFactory.getBeansOfType(BindableService.class)
-                .values()
-                .stream()
-                .anyMatch(bindableService -> StringUtils.startsWith(
-                    bindableService.getClass()
-                        .getName(),
-                    "com.bytechef."));
+            Map<String, BindableService> bindableServiceMap = beanFactory.getBeansOfType(BindableService.class);
+
+            Collection<BindableService> bindableServices = bindableServiceMap.values();
+
+            boolean servesBytechefService = bindableServices.stream()
+                .anyMatch(GrpcRemoteConfiguration::isBytechefService);
 
             if (!servesBytechefService) {
                 return;
@@ -117,6 +118,12 @@ public class GrpcRemoteConfiguration {
     @GlobalServerInterceptor
     UserContextServerInterceptor userContextServerInterceptor() {
         return new UserContextServerInterceptor();
+    }
+
+    private static boolean isBytechefService(BindableService bindableService) {
+        Class<? extends BindableService> bindableServiceClass = bindableService.getClass();
+
+        return StringUtils.startsWith(bindableServiceClass.getName(), "com.bytechef.");
     }
 
     @Configuration(proxyBeanMethods = false)
