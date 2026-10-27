@@ -9,9 +9,11 @@ package com.bytechef.ee.platform.workflow.worker.remote.grpc;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.ee.atlas.execution.remote.grpc.TaskExecutionProtoMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -25,9 +27,10 @@ public class TaskHandlerGrpcServerConfiguration {
 
     @Bean
     TaskHandlerRemoteServiceGrpcServer taskHandlerRemoteServiceGrpcServer(
-        TaskHandlerRegistry taskHandlerRegistry, ObjectMapper objectMapper) {
+        TaskHandlerRegistry taskHandlerRegistry, ObjectMapper objectMapper,
+        @Qualifier("workerExecutor") TaskExecutor workerExecutor) {
 
         return new TaskHandlerRemoteServiceGrpcServer(
-            taskHandlerRegistry, new TaskExecutionProtoMapper(objectMapper));
+            taskHandlerRegistry, new TaskExecutionProtoMapper(objectMapper), workerExecutor);
     }
 }
