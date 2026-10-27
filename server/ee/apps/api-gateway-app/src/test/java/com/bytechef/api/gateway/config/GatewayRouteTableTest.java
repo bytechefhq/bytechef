@@ -10,27 +10,36 @@ package com.bytechef.api.gateway.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.context.properties.bind.Bindable;
-import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
-import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.env.YamlPropertySourceLoader;
-import org.springframework.cloud.gateway.server.mvc.config.PredicateProperties;
-import org.springframework.cloud.gateway.server.mvc.config.RouteProperties;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cloud.gateway.server.mvc.GatewayServerMvcAutoConfiguration;
+import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcPropertiesBeanDefinitionRegistrar;
+import org.springframework.cloud.gateway.server.mvc.filter.FilterAutoConfiguration;
+import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctionAutoConfiguration;
+import org.springframework.cloud.gateway.server.mvc.predicate.PredicateAutoConfiguration;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.server.PathContainer;
-import org.springframework.web.util.pattern.PathPatternParser;
+import org.springframework.core.io.Resource;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.servlet.function.HandlerFunction;
+import org.springframework.web.servlet.function.RequestPredicate;
+import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.RouterFunctions;
+import org.springframework.web.servlet.function.ServerRequest;
 
 /**
  * @version ee
@@ -39,19 +48,39 @@ class GatewayRouteTableTest {
 
     private static final String USER_SCHEMA_HEADER = "X-ByteChef-GraphQL-Schema";
 
-    private static List<RouteProperties> routes;
+    private static RouterFunction<?> gatewayRouterFunction;
+    private static Map<String, RouterFunction<?>> routeRouterFunctions;
 
     @BeforeAll
     static void beforeAll() throws IOException {
         List<PropertySource<?>> propertySources = new YamlPropertySourceLoader().load(
             "api-gateway-app", new ClassPathResource("config/api-gateway-app.yml"));
 
-        Binder binder = new Binder(
-            ConfigurationPropertySources.from(propertySources), null,
-            ApplicationConversionService.getSharedInstance());
+        new ApplicationContextRunner()
+            .withInitializer(applicationContext -> {
+                ConfigurableEnvironment configurableEnvironment = applicationContext.getEnvironment();
 
-        routes = binder.bind("spring.cloud.gateway.server.webmvc.routes", Bindable.listOf(RouteProperties.class))
-            .orElse(List.of());
+                MutablePropertySources mutablePropertySources = configurableEnvironment.getPropertySources();
+
+                propertySources.forEach(mutablePropertySources::addLast);
+            })
+            .withBean(RestClient.Builder.class, RestClient::builder)
+            .withConfiguration(
+                AutoConfigurations.of(
+                    FilterAutoConfiguration.class, GatewayServerMvcAutoConfiguration.class,
+                    HandlerFunctionAutoConfiguration.class, PredicateAutoConfiguration.class))
+            .run(applicationContext -> {
+                GatewayMvcPropertiesBeanDefinitionRegistrar.RouterFunctionHolder routerFunctionHolder =
+                    applicationContext.getBean(GatewayMvcPropertiesBeanDefinitionRegistrar.RouterFunctionHolder.class);
+
+                gatewayRouterFunction = routerFunctionHolder.getRouterFunction();
+
+                RouteRouterFunctionsVisitor routeRouterFunctionsVisitor = new RouteRouterFunctionsVisitor();
+
+                gatewayRouterFunction.accept(routeRouterFunctionsVisitor);
+
+                routeRouterFunctions = routeRouterFunctionsVisitor.routeRouterFunctions;
+            });
     }
 
     @ParameterizedTest
@@ -105,40 +134,63 @@ class GatewayRouteTableTest {
     }
 
     private static Optional<String> resolve(String path, Map<String, String> headers) {
-        for (RouteProperties route : routes) {
-            if (matches(route, path, headers)) {
-                return Optional.of(route.getId());
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest("GET", path);
+
+        headers.forEach(mockHttpServletRequest::addHeader);
+
+        ServerRequest serverRequest = ServerRequest.create(mockHttpServletRequest, List.of());
+
+        Optional<? extends HandlerFunction<?>> handlerFunction = gatewayRouterFunction.route(serverRequest);
+
+        if (handlerFunction.isEmpty()) {
+            return Optional.empty();
+        }
+
+        for (Map.Entry<String, RouterFunction<?>> entry : routeRouterFunctions.entrySet()) {
+            RouterFunction<?> routeRouterFunction = entry.getValue();
+
+            Optional<? extends HandlerFunction<?>> routeHandlerFunction = routeRouterFunction.route(serverRequest);
+
+            if (routeHandlerFunction.isPresent()) {
+                return Optional.of(entry.getKey());
             }
         }
 
-        return Optional.empty();
+        throw new IllegalStateException("The gateway routed " + path + " through no configured route");
     }
 
-    private static boolean matches(RouteProperties route, String path, Map<String, String> headers) {
-        boolean pathMatched = false;
+    private static final class RouteRouterFunctionsVisitor implements RouterFunctions.Visitor {
 
-        for (PredicateProperties predicate : route.getPredicates()) {
-            List<String> args = new ArrayList<>(predicate.getArgs()
-                .values());
+        private Map<String, RouterFunction<?>> routeRouterFunctions = new LinkedHashMap<>();
 
-            switch (Objects.requireNonNull(predicate.getName())) {
-                case "Path" -> pathMatched = args.stream()
-                    .map(pattern -> PathPatternParser.defaultInstance.parse(pattern.trim()))
-                    .anyMatch(pathPattern -> pathPattern.matches(PathContainer.parsePath(path)));
-                case "Header" -> {
-                    String value = headers.get(args.get(0)
-                        .trim());
+        @Override
+        @SuppressWarnings("unchecked")
+        public void attributes(Map<String, Object> attributes) {
+            Object gatewayRouterFunctions = attributes.get("gatewayRouterFunctions");
 
-                    if (value == null || !value.matches(args.get(1)
-                        .trim())) {
-
-                        return false;
-                    }
-                }
-                default -> throw new IllegalStateException("Unsupported predicate " + predicate.getName());
+            if (gatewayRouterFunctions instanceof Map<?, ?> gatewayRouterFunctionMap) {
+                routeRouterFunctions = new LinkedHashMap<>((Map<String, RouterFunction<?>>) gatewayRouterFunctionMap);
             }
         }
 
-        return pathMatched;
+        @Override
+        public void endNested(RequestPredicate requestPredicate) {
+        }
+
+        @Override
+        public void resources(Function<ServerRequest, Optional<Resource>> lookupFunction) {
+        }
+
+        @Override
+        public void route(RequestPredicate requestPredicate, HandlerFunction<?> handlerFunction) {
+        }
+
+        @Override
+        public void startNested(RequestPredicate requestPredicate) {
+        }
+
+        @Override
+        public void unknown(RouterFunction<?> routerFunction) {
+        }
     }
 }
