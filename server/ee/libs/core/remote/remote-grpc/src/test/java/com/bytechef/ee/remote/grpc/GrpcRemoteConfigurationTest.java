@@ -8,11 +8,18 @@
 package com.bytechef.ee.remote.grpc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.config.ApplicationProperties;
+import io.grpc.NameResolver;
+import io.grpc.NameResolverRegistry;
+import io.grpc.SynchronizationContext;
+import java.net.URI;
+import java.util.concurrent.ScheduledExecutorService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -69,6 +76,31 @@ class GrpcRemoteConfigurationTest {
         applicationContextRunner
             .withPropertyValues("bytechef.remote.grpc.plaintext=false", "bytechef.remote.grpc.service-token=")
             .run(context -> assertThat(context).hasNotFailed());
+    }
+
+    @Test
+    void testClosedContextNoLongerResolvesThroughItsDiscoveryClient() {
+        applicationContextRunner
+            .withBean(DiscoveryClient.class, () -> mock(DiscoveryClient.class))
+            .withPropertyValues("bytechef.remote.grpc.plaintext=true", "bytechef.remote.grpc.service-token=secret")
+            .run(context -> assertThat(newDiscoveryNameResolver()).isNotNull());
+
+        assertThat(newDiscoveryNameResolver()).isNull();
+    }
+
+    private static NameResolver newDiscoveryNameResolver() {
+        NameResolver.Factory factory = NameResolverRegistry.getDefaultRegistry()
+            .asFactory();
+
+        return factory.newNameResolver(
+            URI.create("discovery:///configuration-app"),
+            NameResolver.Args.newBuilder()
+                .setDefaultPort(9090)
+                .setProxyDetector(socketAddress -> null)
+                .setSynchronizationContext(new SynchronizationContext((thread, throwable) -> {}))
+                .setServiceConfigParser(mock(NameResolver.ServiceConfigParser.class))
+                .setScheduledExecutorService(mock(ScheduledExecutorService.class))
+                .build());
     }
 
     @Configuration
