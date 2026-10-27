@@ -27,6 +27,8 @@ public interface ApiConnectorFacade {
      */
     int deleteOrphanedFiles();
 
+    void enableApiConnector(long id, boolean enable);
+
     ApiConnector generateFromDocumentation(String componentName, String documentationUrl, String icon);
 
     ApiConnectorDTO getApiConnector(long id);
@@ -40,4 +42,11 @@ public interface ApiConnectorFacade {
      * {@code version} must match the stored version.
      */
     ApiConnector updateApiConnector(long id, String componentName, String icon, String specification, Integer version);
+
+    /**
+     * Updates the metadata of an existing API connector without touching its specification or definition. Null
+     * arguments leave the corresponding field unchanged.
+     */
+    ApiConnector updateApiConnectorMetadata(
+        long id, String name, String title, String description, String icon, Integer connectorVersion);
 }

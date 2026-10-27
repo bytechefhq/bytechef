@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -24,9 +25,15 @@ import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @version ee
@@ -153,6 +160,119 @@ class ApiConnectorFacadeTest {
             verify(apiConnectorFileStorage, never()).deleteApiConnectorDefinition(apiConnector.getDefinition());
             verify(apiConnectorFileStorage, never())
                 .deleteApiConnectorSpecification(apiConnector.getSpecification());
+        }
+    }
+
+    @Nested
+    class UpdateApiConnectorMetadata {
+
+        @Test
+        void testUpdateApiConnectorMetadataAppliesOnlyNonNullFields() {
+            ApiConnector apiConnector = new ApiConnector();
+
+            apiConnector.setId(1L);
+            apiConnector.setName("petstore");
+            apiConnector.setTitle("Petstore");
+            apiConnector.setDescription("Old description");
+            apiConnector.setConnectorVersion(1);
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.update(apiConnector)).thenReturn(apiConnector);
+
+            ApiConnector updatedApiConnector = apiConnectorFacade.updateApiConnectorMetadata(
+                1L, null, "Pet Store", null, "icon.svg", 2);
+
+            assertThat(updatedApiConnector.getName()).isEqualTo("petstore");
+            assertThat(updatedApiConnector.getTitle()).isEqualTo("Pet Store");
+            assertThat(updatedApiConnector.getDescription()).isEqualTo("Old description");
+            assertThat(updatedApiConnector.getIcon()).isEqualTo("icon.svg");
+            assertThat(updatedApiConnector.getConnectorVersion()).isEqualTo(2);
+
+            verify(apiConnectorService).update(apiConnector);
+        }
+    }
+
+    @Nested
+    class EnableApiConnector {
+
+        @Test
+        void testEnableApiConnectorDelegatesToService() {
+            apiConnectorFacade.enableApiConnector(1L, true);
+
+            verify(apiConnectorService).enableApiConnector(1L, true);
+        }
+    }
+
+    @Nested
+    class Authorization {
+
+        private ApiConnectorFacade securedApiConnectorFacade;
+
+        @BeforeEach
+        void beforeEachCreateSecuredFacade() {
+            ProxyFactory proxyFactory = new ProxyFactory(apiConnectorFacade);
+
+            proxyFactory.addAdvice(AuthorizationManagerBeforeMethodInterceptor.preAuthorize());
+
+            securedApiConnectorFacade = (ApiConnectorFacade) proxyFactory.getProxy();
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testEnableApiConnectorRejectsNonAdmin() {
+            authenticate("ROLE_USER");
+
+            assertThatThrownBy(() -> securedApiConnectorFacade.enableApiConnector(1L, true))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(apiConnectorService, never()).enableApiConnector(1L, true);
+        }
+
+        @Test
+        void testEnableApiConnectorAllowsAdmin() {
+            authenticate("ROLE_ADMIN");
+
+            securedApiConnectorFacade.enableApiConnector(1L, false);
+
+            verify(apiConnectorService).enableApiConnector(1L, false);
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataRejectsNonAdmin() {
+            authenticate("ROLE_USER");
+
+            assertThatThrownBy(
+                () -> securedApiConnectorFacade.updateApiConnectorMetadata(1L, null, "Title", null, null, null))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(apiConnectorService, never()).update(any());
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataAllowsAdmin() {
+            ApiConnector apiConnector = new ApiConnector();
+
+            apiConnector.setId(1L);
+            apiConnector.setName("petstore");
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.update(apiConnector)).thenReturn(apiConnector);
+
+            authenticate("ROLE_ADMIN");
+
+            ApiConnector updatedApiConnector = securedApiConnectorFacade.updateApiConnectorMetadata(
+                1L, null, "Title", null, null, null);
+
+            assertThat(updatedApiConnector.getTitle()).isEqualTo("Title");
+        }
+
+        private void authenticate(String authority) {
+            SecurityContextHolder.getContext()
+                .setAuthentication(new TestingAuthenticationToken("user", "password", authority));
         }
     }
 }

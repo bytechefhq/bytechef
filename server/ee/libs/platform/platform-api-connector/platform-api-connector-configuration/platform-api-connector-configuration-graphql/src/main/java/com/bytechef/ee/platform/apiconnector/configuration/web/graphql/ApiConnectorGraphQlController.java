@@ -21,7 +21,6 @@ import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnecto
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacade;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
-import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -48,19 +47,17 @@ public class ApiConnectorGraphQlController {
     private final ApiConnectorAiService apiConnectorAiService;
     private final ApiConnectorFacade apiConnectorFacade;
     private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
-    private final ApiConnectorService apiConnectorService;
     private final OpenApiSpecificationGenerator openApiSpecificationGenerator;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorGraphQlController(
         Optional<ApiConnectorAiService> apiConnectorAiService, ApiConnectorFacade apiConnectorFacade,
-        ApiConnectorGenerationJobService apiConnectorGenerationJobService, ApiConnectorService apiConnectorService,
+        ApiConnectorGenerationJobService apiConnectorGenerationJobService,
         OpenApiSpecificationGenerator openApiSpecificationGenerator) {
 
         this.apiConnectorAiService = apiConnectorAiService.orElse(null);
         this.apiConnectorFacade = apiConnectorFacade;
         this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
-        this.apiConnectorService = apiConnectorService;
         this.openApiSpecificationGenerator = openApiSpecificationGenerator;
     }
 
@@ -95,7 +92,7 @@ public class ApiConnectorGraphQlController {
 
     @MutationMapping
     public boolean enableApiConnector(@Argument long id, @Argument boolean enable) {
-        apiConnectorService.enableApiConnector(id, enable);
+        apiConnectorFacade.enableApiConnector(id, enable);
 
         return true;
     }
@@ -107,30 +104,8 @@ public class ApiConnectorGraphQlController {
                 id, input.name(), input.icon(), input.specification(), input.version());
         }
 
-        ApiConnector apiConnector = apiConnectorService.getApiConnector(id);
-
-        if (input.name() != null) {
-            apiConnector.setName(input.name());
-        }
-
-        if (input.title() != null) {
-            apiConnector.setTitle(input.title());
-        }
-
-        if (input.description() != null) {
-            apiConnector.setDescription(input.description());
-        }
-
-        if (input.icon() != null) {
-            apiConnector.setIcon(input.icon());
-        }
-
-        if (input.connectorVersion() != null) {
-            apiConnector.setConnectorVersion(input.connectorVersion()
-                .intValue());
-        }
-
-        return apiConnectorService.update(apiConnector);
+        return apiConnectorFacade.updateApiConnectorMetadata(
+            id, input.name(), input.title(), input.description(), input.icon(), input.connectorVersion());
     }
 
     @MutationMapping

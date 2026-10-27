@@ -91,6 +91,12 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void enableApiConnector(long id, boolean enable) {
+        apiConnectorService.enableApiConnector(id, enable);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector generateFromDocumentation(String name, String documentationUrl, String icon) {
         if (apiConnectorAiService == null) {
             throw new ConfigurationException(
@@ -174,6 +180,36 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
             apiConnectorFileStorage::deleteApiConnectorSpecification);
 
         return updatedApiConnector;
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnector updateApiConnectorMetadata(
+        long id, String name, String title, String description, String icon, Integer connectorVersion) {
+
+        ApiConnector apiConnector = apiConnectorService.getApiConnector(id);
+
+        if (name != null) {
+            apiConnector.setName(name);
+        }
+
+        if (title != null) {
+            apiConnector.setTitle(title);
+        }
+
+        if (description != null) {
+            apiConnector.setDescription(description);
+        }
+
+        if (icon != null) {
+            apiConnector.setIcon(icon);
+        }
+
+        if (connectorVersion != null) {
+            apiConnector.setConnectorVersion(connectorVersion);
+        }
+
+        return apiConnectorService.update(apiConnector);
     }
 
     private GeneratedDefinition generateDefinition(String name, String specification) {
