@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
@@ -89,7 +90,11 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
 
     @Override
     public List<IntegrationInstanceConfiguration> getIntegrationInstanceConfigurations(List<Long> ids) {
-        throw new UnsupportedOperationException();
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurations(
+            getStub().getIntegrationInstanceConfigurations(
+                IdsRequest.newBuilder()
+                    .addAllIds(ids)
+                    .build()));
     }
 
     @Override
