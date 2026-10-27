@@ -120,7 +120,6 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public String getMcpServerSecretKey(long mcpServerId) {
         return mcpServerRepository.findById(mcpServerId)
             .map(McpServer::getSecretKey)

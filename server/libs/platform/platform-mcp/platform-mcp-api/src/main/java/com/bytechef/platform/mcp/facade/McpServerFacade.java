@@ -95,6 +95,14 @@ public interface McpServerFacade {
     McpServer rotateMcpServerSecretKey(long mcpServerId);
 
     /**
+     * Returns the secret key of an MCP server to an editor of that server.
+     *
+     * @param mcpServerId the MCP server ID
+     * @return the secret key embedded in the MCP server URL
+     */
+    String getMcpServerSecretKey(long mcpServerId);
+
+    /**
      * Updates an existing MCP component with associated tools.
      *
      * @param mcpComponent        the MCP component to update (must have ID set)

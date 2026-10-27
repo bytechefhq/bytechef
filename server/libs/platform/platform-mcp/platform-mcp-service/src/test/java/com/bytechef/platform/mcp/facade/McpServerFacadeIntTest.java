@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -536,6 +537,27 @@ class McpServerFacadeIntTest {
                 .isInstanceOf(AccessDeniedException.class);
 
             verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_VIEW"));
+        }
+
+        @Test
+        void testGetMcpServerSecretKeyRequiresEditor() {
+            long mcpServerId = mcpServer.getId();
+
+            assertThatThrownBy(() -> securedMcpServerFacade.getMcpServerSecretKey(mcpServerId))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionEvaluator).hasPermission(any(), eq(mcpServerId), eq("McpServer"), eq("MCP_EDIT"));
+        }
+
+        @Test
+        void testGetMcpServerSecretKeyReturnsTheKeyToAnEditor() {
+            long mcpServerId = mcpServer.getId();
+
+            when(permissionEvaluator.hasPermission(any(), eq(mcpServerId), eq("McpServer"), eq("MCP_EDIT")))
+                .thenReturn(true);
+
+            assertThat(securedMcpServerFacade.getMcpServerSecretKey(mcpServerId))
+                .isEqualTo(mcpServer.getSecretKey());
         }
 
         @Test

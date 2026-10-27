@@ -464,11 +464,11 @@ class McpServerServiceIntTest {
         }
 
         @Test
-        void testGetSecretKeyRequiresEditor() {
+        void testGetSecretKeyLeavesTheEditorCheckToTheFacade() {
             assertThatThrownBy(() -> mcpServerService.getMcpServerSecretKey(7L))
-                .isInstanceOf(AccessDeniedException.class);
+                .isInstanceOf(NoSuchElementException.class);
 
-            verify(permissionEvaluator).hasPermission(any(), eq(7L), eq("McpServer"), eq("MCP_EDIT"));
+            verifyNoInteractions(permissionEvaluator);
         }
 
         @Test
