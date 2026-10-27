@@ -10,11 +10,13 @@ package com.bytechef.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.grpc.BindableService;
 import java.util.List;
+import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
  * @version ee
@@ -91,6 +99,26 @@ public class ExecutionApplicationIntTest {
             "bytechef.platform.workflow.execution.remote.v1.TriggerExecutionRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerLifecycleFacadeRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerStateRemoteService");
+    }
+
+    @Test
+    void testIsTenantAdminResolvesInMethodSecurityExpressions() throws Throwable {
+        MethodSecurityExpressionHandler methodSecurityExpressionHandler =
+            applicationContext.getBean(MethodSecurityExpressionHandler.class);
+
+        Authentication authentication = UsernamePasswordAuthenticationToken.authenticated("admin", null, List.of());
+        MethodInvocation methodInvocation =
+            new SimpleMethodInvocation(new Object(), Object.class.getMethod("toString"));
+
+        EvaluationContext evaluationContext = methodSecurityExpressionHandler.createEvaluationContext(
+            () -> authentication, methodInvocation);
+        Expression expression = methodSecurityExpressionHandler.getExpressionParser()
+            .parseExpression("isTenantAdmin()");
+
+        Boolean tenantAdmin = AutomationAuthorizationContext.callSkippingChecks(
+            () -> expression.getValue(evaluationContext, Boolean.class));
+
+        assertThat(tenantAdmin).isTrue();
     }
 
     @Test
