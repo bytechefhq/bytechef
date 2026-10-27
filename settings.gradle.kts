@@ -737,6 +737,8 @@ include("server:ee:libs:platform:platform-external-invocation-log:platform-exter
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-graphql")
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-service")
 include("server:ee:libs:platform:platform-notification:platform-notification-remote-client")
+include("server:ee:libs:platform:platform-notification:platform-notification-remote-grpc")
+include("server:ee:libs:platform:platform-notification:platform-notification-remote-grpc-proto")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-aws")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-impl")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client")
