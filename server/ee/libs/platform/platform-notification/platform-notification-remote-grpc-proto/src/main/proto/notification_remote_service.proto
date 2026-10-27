@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package bytechef.platform.notification.remote.v1;
 
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 option java_multiple_files = true;
@@ -9,10 +10,18 @@ option java_package = "com.bytechef.ee.platform.notification.remote.grpc.proto";
 
 service NotificationRemoteService {
   rpc GetNotifications(GetNotificationsRequest) returns (RemoteNotifications);
+  rpc SendNotification(SendNotificationRequest) returns (google.protobuf.Empty);
 }
 
 message GetNotificationsRequest {
   optional string event_type = 1;
+}
+
+message SendNotificationRequest {
+  RemoteNotification notification = 1;
+  optional string subject = 2;
+  optional string content = 3;
+  bool html = 4;
 }
 
 message RemoteNotifications {
