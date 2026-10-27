@@ -22,6 +22,7 @@ service ConnectionLifecycleFacadeRemoteService {
 service JobResumeFacadeRemoteService {
   rpc ResumeExpiredJob(ResumeJobRequest) returns (ResumeJobResponse);
   rpc ResumeJob(ResumeJobRequest) returns (ResumeJobResponse);
+  rpc ResumeJobStreaming(stream ResumeJobStreamingRequest) returns (stream ResumeJobStreamingResponse);
 }
 
 service PrincipalJobFacadeRemoteService {
@@ -87,6 +88,20 @@ message ResumeJobRequest {
 
 message ResumeJobResponse {
   string outcome = 1;
+}
+
+message ResumeJobStreamingRequest {
+  oneof message {
+    ResumeJobRequest resume_job = 1;
+    google.protobuf.Empty job_id_accepted = 2;
+  }
+}
+
+message ResumeJobStreamingResponse {
+  oneof message {
+    int64 job_id = 1;
+    string outcome = 2;
+  }
 }
 
 message CreateChildJobRequest {
