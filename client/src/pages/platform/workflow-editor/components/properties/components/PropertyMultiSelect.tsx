@@ -244,10 +244,10 @@ const PropertyMultiSelect = ({
     const placeholderClassName = twMerge(
         leadingIcon && 'ml-9',
         (!!(lookupDependsOnValues?.length && !options?.length) || !!missingConnection || !connectionRequirementMet) &&
-            'text-destructive',
+            'text-content-destructive-primary',
         options?.length && 'text-normal',
         lookupDependsOnValues?.length && lookupDependsOnPaths?.length && !options?.length && 'text-normal',
-        dependencyMissing && 'text-destructive'
+        dependencyMissing && 'text-content-destructive-primary'
     );
 
     return (
