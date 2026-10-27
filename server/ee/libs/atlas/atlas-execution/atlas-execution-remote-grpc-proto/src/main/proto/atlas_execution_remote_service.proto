@@ -13,7 +13,9 @@ service JobFacadeRemoteService {
 }
 
 service JobRemoteService {
+  rpc FetchJob(IdRequest) returns (JobResult);
   rpc FetchLastWorkflowJob(WorkflowIdRequest) returns (JobResult);
+  rpc FetchTaskExecutionJob(IdRequest) returns (JobResult);
   rpc GetJob(IdRequest) returns (RemoteJob);
   rpc GetTaskExecutionJob(IdRequest) returns (RemoteJob);
   rpc ResumeToStatusStarted(IdRequest) returns (RemoteJob);
