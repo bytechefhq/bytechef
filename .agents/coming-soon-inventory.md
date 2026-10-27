@@ -72,7 +72,7 @@ Both are reversible and neither deletes anything.
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
-| Distributed (Coordinator/Worker) | [`/platform/use-bytechef/self-hosted/installation/distributed`](/platform/use-bytechef/self-hosted/installation/distributed) | CE | **hidden** |
+| Distributed (Microservices) | [`/platform/use-bytechef/self-hosted/installation/distributed`](/platform/use-bytechef/self-hosted/installation/distributed) | CE | **hidden** |
 
 ---
 
