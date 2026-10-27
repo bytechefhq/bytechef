@@ -1,10 +1,19 @@
 import {Accordion} from '@/components/ui/accordion';
 import {TaskExecution} from '@/shared/middleware/automation/workflow/execution';
 import {act, render, screen, userEvent} from '@/shared/util/test-utils';
+import {ReactNode} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionsAccordionItem from '../WorkflowExecutionsAccordionItem';
 import WorkflowTaskExecutionItem from '../WorkflowTaskExecutionItem';
+
+vi.mock('@/components/ui/hover-card', () => ({
+    HoverCard: ({children}: {children: ReactNode}) => <>{children}</>,
+    HoverCardContent: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    HoverCardTrigger: ({children, className}: {children: ReactNode; className?: string}) => (
+        <div className={className}>{children}</div>
+    ),
+}));
 
 function createTaskExecution(id: string, status: string): TaskExecution {
     return {
