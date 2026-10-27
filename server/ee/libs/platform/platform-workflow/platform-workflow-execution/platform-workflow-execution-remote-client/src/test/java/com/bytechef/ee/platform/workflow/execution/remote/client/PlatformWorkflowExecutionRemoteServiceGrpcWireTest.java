@@ -82,6 +82,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -296,6 +297,22 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
         assertThat(serverConsumerFailure)
             .succeedsWithin(Duration.ofSeconds(5))
             .isNotNull();
+    }
+
+    @Test
+    void testConcurrentResumeKeepsItsOptimisticLockingFailure() {
+        RemoteJobResumeFacadeClient remoteJobResumeFacadeClient = new RemoteJobResumeFacadeClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        when(jobResumeFacade.resumeJob("def", Map.of())).thenThrow(
+            new OptimisticLockingFailureException("Job def was resumed concurrently"));
+        when(jobResumeFacade.resumeJobStreaming(eq("abc"), eq(Map.of()), any(LongConsumer.class))).thenThrow(
+            new OptimisticLockingFailureException("Job abc was resumed concurrently"));
+
+        assertThatThrownBy(() -> remoteJobResumeFacadeClient.resumeJob("def", Map.of()))
+            .isInstanceOf(OptimisticLockingFailureException.class);
+        assertThatThrownBy(() -> remoteJobResumeFacadeClient.resumeJobStreaming("abc", Map.of(), jobId -> {}))
+            .isInstanceOf(OptimisticLockingFailureException.class);
     }
 
     @Test
