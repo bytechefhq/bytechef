@@ -17,6 +17,7 @@
 package com.bytechef.runtime.job.configuration.workflow.contributor;
 
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import java.util.List;
 
 /**
@@ -24,22 +25,8 @@ import java.util.List;
  */
 public class WorkflowReservedWordContributorImpl implements WorkflowReservedWordContributor {
 
-    private static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
-    private static final String CATEGORY = "category";
-    private static final String CLUSTER_ELEMENTS = "clusterElements";
-    private static final String COMPONENT_NAME = "componentName";
-    private static final String COMPONENT_VERSION = "componentVersion";
-    private static final String CONNECTIONS = "connections";
-    private static final String GROUP_NAME = "groupName";
-    private static final String INTERNAL_ONLY = "internalOnly";
-    private static final String OBJECT_NAME = "objectName";
-    private static final String TRIGGERS = "triggers";
-    private static final String TAGS = "tags";
-
     @Override
     public List<String> getReservedWords() {
-        return List.of(
-            AUTHORIZATION_REQUIRED, CATEGORY, CLUSTER_ELEMENTS, COMPONENT_NAME, COMPONENT_VERSION, CONNECTIONS,
-            GROUP_NAME, INTERNAL_ONLY, OBJECT_NAME, TAGS, TRIGGERS);
+        return WorkflowExtConstants.WORKFLOW_RESERVED_WORDS;
     }
 }
