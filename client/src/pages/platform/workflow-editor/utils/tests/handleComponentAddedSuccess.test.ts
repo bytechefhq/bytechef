@@ -72,12 +72,12 @@ describe('openNodeDetailsPanelForNewNode', () => {
         expect(afterSecondSave.has('logger_1')).toBe(false);
     });
 
-    it('should reset activeTab to description when opening the panel for a new node', () => {
-        useWorkflowNodeDetailsPanelStore.setState({activeTab: 'properties'});
+    it('should open a new node on the properties tab', () => {
+        useWorkflowNodeDetailsPanelStore.setState({activeTab: 'output'});
 
         openNodeDetailsPanelForNewNode(makeNodeData());
 
-        expect(useWorkflowNodeDetailsPanelStore.getState().activeTab).toBe('description');
+        expect(useWorkflowNodeDetailsPanelStore.getState().activeTab).toBe('properties');
     });
 
     it('should not open the panel for cluster element nodes', () => {

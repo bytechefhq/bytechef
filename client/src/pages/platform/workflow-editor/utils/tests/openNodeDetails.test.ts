@@ -66,6 +66,12 @@ describe('openNodeDetails', () => {
         expect(useWorkflowIssuesStore.getState().issuesSidebarOpen).toBe(false);
     });
 
+    it('opens the properties tab by default', () => {
+        openNodeDetails(nodeData);
+
+        expect(hoisted.setActiveTab).toHaveBeenCalledWith('properties');
+    });
+
     it('closes the other right docked panels', () => {
         openNodeDetails(nodeData);
 

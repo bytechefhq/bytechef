@@ -38,7 +38,7 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
             setCurrentNode({...currentNode, ...nodeData});
         }
     } else {
-        setActiveTab('description');
+        setActiveTab('properties');
         setCurrentNode({...nodeData, description: ''});
         setWorkflowNodeDetailsPanelOpen(true);
     }

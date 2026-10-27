@@ -91,6 +91,7 @@ import getMissingRequiredConnectionErrors, {
 } from './getMissingRequiredConnectionErrors';
 import isActionDefinitionFresh from './isActionDefinitionFresh';
 import {resolveDisplayConditionsQueryTarget} from './resolveDisplayConditionsQueryTarget';
+import resolveFallbackTab from './resolveFallbackTab';
 import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
 import resolveShowOutputTab from './resolveShowOutputTab';
@@ -1210,43 +1211,23 @@ export default function useWorkflowNodeDetailsPanel({
 
     // Tab switching logic
     useEffect(() => {
-        if (activeTab === 'connection' && currentWorkflowNodeConnections.length === 0) {
-            setActiveTab('description');
+        const fallbackTab = resolveFallbackTab({
+            actionFetched: currentActionFetched,
+            activeTab,
+            componentName: currentComponentDefinition?.name,
+            connectionsCount: currentWorkflowNodeConnections.length,
+            operationDataMissing: !!operationDataMissing,
+            operationDefinition: currentOperationDefinition,
+            operationProperties: currentOperationProperties,
+            showOutputTab,
+            taskDispatcher: currentNode?.taskDispatcher,
+            taskDispatcherDefinition: currentTaskDispatcherDefinition,
+            trigger: currentNode?.trigger,
+            triggerFetched: currentTriggerFetched,
+        });
 
-            return;
-        }
-
-        if (currentComponentDefinition?.name === 'manual') {
-            setActiveTab('description');
-
-            return;
-        }
-
-        if (
-            activeTab === 'properties' &&
-            ((!currentNode?.trigger && currentActionFetched) || (currentNode?.trigger && currentTriggerFetched)) &&
-            !currentOperationProperties
-        ) {
-            setActiveTab('description');
-
-            return;
-        }
-
-        if (activeTab === 'output' && !showOutputTab) {
-            setActiveTab('description');
-
-            return;
-        }
-
-        if (
-            activeTab === 'properties' &&
-            !operationDataMissing &&
-            currentOperationDefinition &&
-            !currentOperationDefinition.properties?.length
-        ) {
-            setActiveTab('description');
-
-            return;
+        if (fallbackTab) {
+            setActiveTab(fallbackTab);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
@@ -1256,6 +1237,7 @@ export default function useWorkflowNodeDetailsPanel({
         currentActionFetched,
         currentOperationProperties?.length,
         currentComponentDefinition?.name,
+        currentTaskDispatcherDefinition,
         currentWorkflowNodeConnections.length,
     ]);
 
