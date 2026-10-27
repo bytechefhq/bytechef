@@ -79,6 +79,10 @@ service ClusterElementDefinitionFacadeRemoteService {
   rpc ExecuteTool(ClusterElementExecuteToolRequest) returns (ValueResponse);
 }
 
+service UnifiedApiDefinitionRemoteService {
+  rpc GetUnifiedApiComponentDefinitions(GetUnifiedApiComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
+}
+
 message RemoteComponentDefinition {
   optional bytes action_cluster_element_types = 1;
   repeated RemoteActionDefinition actions = 2;
@@ -620,4 +624,8 @@ message ClusterElementExecuteToolRequest {
   bytes input_parameters = 4;
   optional int64 connection_id = 5;
   bool editor_environment = 6;
+}
+
+message GetUnifiedApiComponentDefinitionsRequest {
+  optional string category = 1;
 }

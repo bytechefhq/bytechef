@@ -14,6 +14,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.definition.ComponentDsl.unifiedApi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -25,12 +26,14 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
 import com.bytechef.ee.platform.component.remote.grpc.ActionDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ClusterElementDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.ConnectionDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionRemoteServiceGrpcServer;
+import com.bytechef.ee.platform.component.remote.grpc.UnifiedApiDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
@@ -48,6 +51,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.service.UnifiedApiDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.grpc.Channel;
@@ -89,6 +93,7 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     private final JsonMapper jsonMapper = JsonMapper.builder()
         .build();
     private final TriggerDefinitionService triggerDefinitionService = mock(TriggerDefinitionService.class);
+    private final UnifiedApiDefinitionService unifiedApiDefinitionService = mock(UnifiedApiDefinitionService.class);
 
     private ManagedChannel managedChannel;
     private RemoteActionDefinitionServiceClient remoteActionDefinitionServiceClient;
@@ -96,6 +101,7 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     private RemoteComponentDefinitionServiceClient remoteComponentDefinitionServiceClient;
     private RemoteConnectionDefinitionServiceClient remoteConnectionDefinitionServiceClient;
     private RemoteTriggerDefinitionServiceClient remoteTriggerDefinitionServiceClient;
+    private RemoteUnifiedApiDefinitionServiceClient remoteUnifiedApiDefinitionServiceClient;
     private Server server;
 
     @BeforeEach
@@ -118,6 +124,8 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
                     new ConnectionDefinitionRemoteServiceGrpcServer(connectionDefinitionService, componentProtoMapper),
                     new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .addService(new TriggerDefinitionRemoteServiceGrpcServer(triggerDefinitionService, componentProtoMapper))
+            .addService(
+                new UnifiedApiDefinitionRemoteServiceGrpcServer(unifiedApiDefinitionService, componentProtoMapper))
             .build()
             .start();
         managedChannel = InProcessChannelBuilder.forName(name)
@@ -144,6 +152,8 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         remoteConnectionDefinitionServiceClient = new RemoteConnectionDefinitionServiceClient(
             fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteTriggerDefinitionServiceClient = new RemoteTriggerDefinitionServiceClient(
+            fixedGrpcChannels, discoveryClient, jsonMapper);
+        remoteUnifiedApiDefinitionServiceClient = new RemoteUnifiedApiDefinitionServiceClient(
             fixedGrpcChannels, discoveryClient, jsonMapper);
     }
 
@@ -594,6 +604,67 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
                     .hasMessageContaining("Authorization oauth2_client_credentials not found");
     }
 
+    @Test
+    void testGetUnifiedApiComponentDefinitionsAreMergedAcrossWorkers() {
+        ComponentDefinition componentDefinition = unifiedApiComponentDefinition("keep", 1);
+
+        when(unifiedApiDefinitionService.getUnifiedApiComponentDefinitions(UnifiedApiCategory.CRM))
+            .thenReturn(List.of(componentDefinition));
+
+        assertThat(remoteUnifiedApiDefinitionServiceClient.getUnifiedApiComponentDefinitions(UnifiedApiCategory.CRM))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(componentDefinition);
+    }
+
+    @Test
+    void testGetUnifiedApiComponentDefinitionsWithoutCategory() {
+        when(unifiedApiDefinitionService.getUnifiedApiComponentDefinitions(null))
+            .thenReturn(List.of(unifiedApiComponentDefinition("keep", 2), unifiedApiComponentDefinition("drop", 1)));
+
+        assertThat(remoteUnifiedApiDefinitionServiceClient.getUnifiedApiComponentDefinitions(null))
+            .extracting(ComponentDefinition::getName, ComponentDefinition::getUnifiedApiCategory)
+            .containsExactly(
+                org.assertj.core.groups.Tuple.tuple("keep", UnifiedApiCategory.CRM),
+                org.assertj.core.groups.Tuple.tuple("drop", UnifiedApiCategory.CRM));
+    }
+
+    @Test
+    void testGetUnifiedApiComponentDefinitionsSkipsAnUnreachableWorker() {
+        ManagedChannel unreachableManagedChannel = InProcessChannelBuilder.forName("unreachable-worker")
+            .directExecutor()
+            .build();
+
+        GrpcChannels grpcChannels = new GrpcChannels() {
+
+            @Override
+            public Channel getChannel(String serviceId) {
+                return managedChannel;
+            }
+
+            @Override
+            public Channel getChannel(ServiceInstance serviceInstance) {
+                return "worker-app:2".equals(serviceInstance.getInstanceId()) ? unreachableManagedChannel
+                    : managedChannel;
+            }
+        };
+
+        RemoteUnifiedApiDefinitionServiceClient oneWorkerDownRemoteUnifiedApiDefinitionServiceClient =
+            new RemoteUnifiedApiDefinitionServiceClient(grpcChannels, discoveryClient, jsonMapper);
+
+        when(unifiedApiDefinitionService.getUnifiedApiComponentDefinitions(UnifiedApiCategory.CRM))
+            .thenReturn(List.of(unifiedApiComponentDefinition("keep", 1)));
+
+        try {
+            assertThat(
+                oneWorkerDownRemoteUnifiedApiDefinitionServiceClient.getUnifiedApiComponentDefinitions(
+                    UnifiedApiCategory.CRM))
+                        .extracting(ComponentDefinition::getName)
+                        .containsExactly("keep");
+        } finally {
+            unreachableManagedChannel.shutdownNow();
+        }
+    }
+
     private static ClusterElementDefinition clusterElementDefinition() {
         return new ClusterElementDefinition(
             clusterElement("search")
@@ -623,6 +694,14 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
                         .title("New")
                         .description("New record")
                         .type(TriggerType.POLLING)));
+    }
+
+    private static ComponentDefinition unifiedApiComponentDefinition(String name, int version) {
+        return new ComponentDefinition(
+            component(name)
+                .title(name)
+                .version(version)
+                .unifiedApi(unifiedApi(UnifiedApiCategory.CRM)));
     }
 
     private static class DropForAutomationComponentDefinitionFilter implements ComponentDefinitionFilter {
