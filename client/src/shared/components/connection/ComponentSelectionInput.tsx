@@ -1,6 +1,7 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {Input} from '@/components/Input/Input';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import RequiredMark from '@/components/RequiredMark';
 import {FormControl, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ControllerRenderProps} from 'react-hook-form';
@@ -22,7 +23,10 @@ const ComponentSelectionInput = ({
     selectedComponentDefinition?: ComponentDefinitionBasic;
 }) => (
     <FormItem>
-        <FormLabel>Component</FormLabel>
+        <FormLabel className="gap-0">
+            Component
+            <RequiredMark />
+        </FormLabel>
 
         <FormControl>
             {items && items?.length > 1 && handleComponentDefinitionChange && field ? (

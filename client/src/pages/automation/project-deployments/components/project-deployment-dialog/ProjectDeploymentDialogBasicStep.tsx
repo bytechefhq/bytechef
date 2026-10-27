@@ -2,6 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import {Input} from '@/components/Input/Input';
 import {Note} from '@/components/Note';
 import ReadOnlyInput from '@/components/ReadOnlyInput/ReadOnlyInput';
+import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Empty} from '@/components/ui/empty';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
@@ -148,7 +149,10 @@ const ProjectDeploymentDialogBasicStep = ({
                     name="projectId"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Project</FormLabel>
+                            <FormLabel className="gap-0">
+                                Project
+                                <RequiredMark />
+                            </FormLabel>
 
                             <FormControl>
                                 <ProjectDeploymentDialogBasicStepProjectsComboBox
@@ -208,7 +212,10 @@ const ProjectDeploymentDialogBasicStep = ({
                     name="name"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel className="gap-0">
+                                Name
+                                <RequiredMark />
+                            </FormLabel>
 
                             <FormControl>
                                 <Input onChange={field.onChange} placeholder="My CRM Project" value={field.value} />
@@ -227,7 +234,10 @@ const ProjectDeploymentDialogBasicStep = ({
                     name="projectVersion"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Version</FormLabel>
+                            <FormLabel className="gap-0">
+                                Version
+                                <RequiredMark />
+                            </FormLabel>
 
                             <FormControl>
                                 <ProjectDeploymentDialogBasicStepProjectVersionsSelect
@@ -430,7 +440,10 @@ const ProjectDeploymentDialogBasicStep = ({
                             name="projectVersion"
                             render={() => (
                                 <FormItem>
-                                    <FormLabel>Version</FormLabel>
+                                    <FormLabel className="gap-0">
+                                        Version
+                                        <RequiredMark />
+                                    </FormLabel>
 
                                     <FormControl>
                                         <ProjectDeploymentDialogBasicStepProjectVersionsSelect

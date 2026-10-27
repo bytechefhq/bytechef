@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import {FormLabel} from '@/components/ui/form';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/ui/tooltip';
 import {InfoIcon} from 'lucide-react';
@@ -10,19 +11,13 @@ interface FormLabelWithDescriptionPropsI {
     required?: boolean;
 }
 
-const RequiredMarker = () => (
-    <span aria-hidden="true" className="ml-0.5 text-destructive">
-        *
-    </span>
-);
-
 export const FormLabelWithDescription = ({description, label, required}: FormLabelWithDescriptionPropsI) => {
     if (!description) {
         return (
             <FormLabel className="gap-0">
                 {label}
 
-                {required && <RequiredMarker />}
+                {required && <RequiredMark />}
             </FormLabel>
         );
     }
@@ -32,7 +27,7 @@ export const FormLabelWithDescription = ({description, label, required}: FormLab
             <span>
                 {label}
 
-                {required && <RequiredMarker />}
+                {required && <RequiredMark />}
             </span>
 
             <TooltipProvider delayDuration={150}>

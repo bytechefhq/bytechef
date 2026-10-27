@@ -222,4 +222,11 @@ describe('ConnectionDialog', () => {
             expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
         });
     });
+
+    it('should mark the required component and name fields with an asterisk', () => {
+        renderDialog();
+
+        expect(screen.getByText('Component', {selector: 'label'})).toHaveTextContent(/^Component\*$/);
+        expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
+    });
 });

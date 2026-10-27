@@ -245,4 +245,15 @@ describe('ProjectDeploymentDialogBasicStep', () => {
 
         expect(screen.queryByText('Selected V3')).not.toBeInTheDocument();
     });
+
+    it('should mark only the required fields with an asterisk', async () => {
+        render(<BasicStepHarness />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Choose Learn ByteChef by doing'}));
+
+        expect(screen.getByText('Project', {selector: 'label'})).toHaveTextContent(/^Project\*$/);
+        expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
+        expect(screen.getByText('Version', {selector: 'label'})).toHaveTextContent(/^Version\*$/);
+        expect(screen.getByText('Description', {selector: 'label'})).toHaveTextContent(/^Description$/);
+    });
 });

@@ -138,4 +138,14 @@ describe('IntegrationInstanceConfigurationDialogBasicStep', () => {
             expect(authorizationSelect).toHaveTextContent('API Key');
         });
     });
+
+    it('should mark only the required fields with an asterisk', () => {
+        render(<BasicStepHarness authorizations={authorizations} curIntegrationId={2} />);
+
+        expect(screen.getByText('Integration', {selector: 'label'})).toHaveTextContent(/^Integration\*$/);
+        expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
+        expect(screen.getByText('Version', {selector: 'label'})).toHaveTextContent(/^Version\*$/);
+        expect(screen.getByText('Authorization', {selector: 'label'})).toHaveTextContent(/^Authorization\*$/);
+        expect(screen.getByText('Description', {selector: 'label'})).toHaveTextContent(/^Description$/);
+    });
 });
