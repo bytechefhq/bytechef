@@ -35,14 +35,20 @@ public class JobRemoteServiceGrpcServer extends JobRemoteServiceGrpc.JobRemoteSe
     }
 
     @Override
+    public void fetchJob(IdRequest request, StreamObserver<JobResult> responseObserver) {
+        responseObserver.onNext(toJobResult(jobService.fetchJob(request.getId())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void fetchLastWorkflowJob(WorkflowIdRequest request, StreamObserver<JobResult> responseObserver) {
-        Optional<Job> job = jobService.fetchLastWorkflowJob(request.getWorkflowId());
+        responseObserver.onNext(toJobResult(jobService.fetchLastWorkflowJob(request.getWorkflowId())));
+        responseObserver.onCompleted();
+    }
 
-        JobResult.Builder builder = JobResult.newBuilder();
-
-        job.ifPresent(curJob -> builder.setJob(atlasExecutionProtoMapper.toProto(curJob)));
-
-        responseObserver.onNext(builder.build());
+    @Override
+    public void fetchTaskExecutionJob(IdRequest request, StreamObserver<JobResult> responseObserver) {
+        responseObserver.onNext(toJobResult(jobService.fetchTaskExecutionJob(request.getId())));
         responseObserver.onCompleted();
     }
 
@@ -81,5 +87,13 @@ public class JobRemoteServiceGrpcServer extends JobRemoteServiceGrpc.JobRemoteSe
         responseObserver
             .onNext(atlasExecutionProtoMapper.toProto(jobService.update(atlasExecutionProtoMapper.toJob(request))));
         responseObserver.onCompleted();
+    }
+
+    private JobResult toJobResult(Optional<Job> jobOptional) {
+        JobResult.Builder builder = JobResult.newBuilder();
+
+        jobOptional.ifPresent(job -> builder.setJob(atlasExecutionProtoMapper.toProto(job)));
+
+        return builder.build();
     }
 }

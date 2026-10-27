@@ -59,7 +59,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Optional<Job> fetchJob(Long id) {
-        throw new UnsupportedOperationException();
+        return toJob(getStub().fetchJob(toIdRequest(id)));
     }
 
     @Override
@@ -74,11 +74,7 @@ public class RemoteJobServiceClient implements JobService {
                 .setWorkflowId(workflowId)
                 .build());
 
-        if (!jobResult.hasJob()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(atlasExecutionProtoMapper.toJob(jobResult.getJob()));
+        return toJob(jobResult);
     }
 
     @Override
@@ -88,7 +84,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Optional<Job> fetchTaskExecutionJob(long taskExecutionId) {
-        throw new UnsupportedOperationException();
+        return toJob(getStub().fetchTaskExecutionJob(toIdRequest(taskExecutionId)));
     }
 
     @Override
@@ -172,6 +168,14 @@ public class RemoteJobServiceClient implements JobService {
 
     private JobRemoteServiceGrpc.JobRemoteServiceBlockingStub getStub() {
         return JobRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private Optional<Job> toJob(JobResult jobResult) {
+        if (!jobResult.hasJob()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(atlasExecutionProtoMapper.toJob(jobResult.getJob()));
     }
 
     private static IdRequest toIdRequest(long id) {
