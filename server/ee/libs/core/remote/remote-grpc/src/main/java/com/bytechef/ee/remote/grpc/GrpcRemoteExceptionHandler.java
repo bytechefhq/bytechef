@@ -11,6 +11,7 @@ import io.grpc.Status;
 import io.grpc.StatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.grpc.server.exception.GrpcExceptionHandler;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -39,6 +40,12 @@ public class GrpcRemoteExceptionHandler implements GrpcExceptionHandler {
                 .asException();
         }
 
+        if (isOptimisticLockingFailure(throwable)) {
+            return Status.ABORTED.withDescription(message == null ? throwableClass.getSimpleName() : message)
+                .withCause(throwable)
+                .asException();
+        }
+
         if (throwable instanceof IllegalArgumentException) {
             return Status.INVALID_ARGUMENT.withDescription(message == null ? throwableClass.getSimpleName() : message)
                 .withCause(throwable)
@@ -49,5 +56,15 @@ public class GrpcRemoteExceptionHandler implements GrpcExceptionHandler {
             message == null ? throwableClass.getSimpleName() : throwableClass.getSimpleName() + ": " + message)
             .withCause(throwable)
             .asException();
+    }
+
+    private static boolean isOptimisticLockingFailure(Throwable throwable) {
+        for (Throwable cause = throwable; cause != null; cause = cause.getCause()) {
+            if (cause instanceof OptimisticLockingFailureException) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -1,5 +1,6 @@
 dependencies {
     implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))

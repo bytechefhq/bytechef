@@ -9,6 +9,7 @@ configurations.testFixturesImplementation {
 dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-webmvc")
     compileOnly("org.springframework.graphql:spring-graphql")

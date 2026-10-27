@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.grpc.Status;
 import io.grpc.StatusException;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -43,6 +44,15 @@ class GrpcRemoteExceptionHandlerTest {
             .getCode()).isEqualTo(Status.Code.PERMISSION_DENIED);
         assertThat(statusException.getStatus()
             .getDescription()).isEqualTo("Only the connection creator or an admin can modify connection 7");
+    }
+
+    @Test
+    void testOptimisticLockingFailureBecomesAborted() {
+        StatusException statusException = grpcRemoteExceptionHandler.handleException(
+            new RuntimeException(new OptimisticLockingFailureException("Job 7 was resumed concurrently")));
+
+        assertThat(statusException.getStatus()
+            .getCode()).isEqualTo(Status.Code.ABORTED);
     }
 
     @Test
