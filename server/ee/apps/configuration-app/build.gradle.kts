@@ -136,6 +136,7 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.security:spring-security-saml2-service-provider")
     testImplementation("org.springframework.session:spring-session-core")
     testImplementation(project(":server:libs:core:commons:commons-util"))
     testImplementation("io.grpc:grpc-netty")

@@ -89,6 +89,7 @@ dependencies {
     testImplementation("io.grpc:grpc-api")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.security:spring-security-saml2-service-provider")
     testImplementation("org.springframework.session:spring-session-core")
     testImplementation(libs.jjwt.api)
     testRuntimeOnly(libs.jjwt.impl)
