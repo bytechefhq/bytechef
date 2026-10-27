@@ -44,6 +44,10 @@ public final class DiscoveryClientNameResolverProvider extends NameResolverProvi
         INSTANCE.discoveryClientReference.set(discoveryClient);
     }
 
+    public static void clearDiscoveryClient(DiscoveryClient discoveryClient) {
+        INSTANCE.discoveryClientReference.compareAndSet(discoveryClient, null);
+    }
+
     @Override
     public String getDefaultScheme() {
         return SCHEME;

@@ -15,6 +15,7 @@ import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
 import io.grpc.BindableService;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -41,10 +42,10 @@ import tools.jackson.databind.ObjectMapper;
 public class GrpcRemoteConfiguration {
 
     @Bean
-    SmartInitializingSingleton grpcDiscoveryNameResolverRegistration(
+    GrpcDiscoveryNameResolverRegistration grpcDiscoveryNameResolverRegistration(
         ObjectProvider<DiscoveryClient> discoveryClientProvider) {
 
-        return () -> DiscoveryClientNameResolverProvider.setDiscoveryClient(discoveryClientProvider.getIfAvailable());
+        return new GrpcDiscoveryNameResolverRegistration(discoveryClientProvider);
     }
 
     @Bean
@@ -142,6 +143,29 @@ public class GrpcRemoteConfiguration {
                     resolvers.addFirst(new GrpcStatusHandlerExceptionResolver(objectMapper));
                 }
             };
+        }
+    }
+
+    static final class GrpcDiscoveryNameResolverRegistration implements SmartInitializingSingleton, DisposableBean {
+
+        private final ObjectProvider<DiscoveryClient> discoveryClientProvider;
+
+        private GrpcDiscoveryNameResolverRegistration(ObjectProvider<DiscoveryClient> discoveryClientProvider) {
+            this.discoveryClientProvider = discoveryClientProvider;
+        }
+
+        @Override
+        public void afterSingletonsInstantiated() {
+            DiscoveryClientNameResolverProvider.setDiscoveryClient(discoveryClientProvider.getIfAvailable());
+        }
+
+        @Override
+        public void destroy() {
+            DiscoveryClient discoveryClient = discoveryClientProvider.getIfAvailable();
+
+            if (discoveryClient != null) {
+                DiscoveryClientNameResolverProvider.clearDiscoveryClient(discoveryClient);
+            }
         }
     }
 }
