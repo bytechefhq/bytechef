@@ -4,6 +4,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.jjwt.api)
     implementation("org.springframework.boot:spring-boot-actuator")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))

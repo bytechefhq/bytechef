@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -116,6 +117,11 @@ class WebhookEmbeddedAuthenticationIntTest {
     @Test
     void testTokenForAnotherUserIsRejected() throws Exception {
         assertThat(status(authorized(token("external-user-2", KEY_PAIR)))).isEqualTo(401);
+    }
+
+    @Test
+    void testEmbeddedPagesAreDenied() throws Exception {
+        assertThat(status(get("/workflow-builder.html"))).isEqualTo(403);
     }
 
     private static MockHttpServletRequestBuilder authorized(String bearerToken) {
