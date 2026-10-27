@@ -31,6 +31,7 @@ const WorkflowExecutionsHeader = ({actions, job, triggerExecution}: WorkflowExec
                 <span className="text-base font-bold uppercase">
                     {workflowStatus === 'completed' && (
                         <Badge
+                            className="border-transparent"
                             icon={<CheckIcon className="size-5 text-success" />}
                             label="DONE"
                             styleType="success-outline"
@@ -40,6 +41,7 @@ const WorkflowExecutionsHeader = ({actions, job, triggerExecution}: WorkflowExec
 
                     {workflowStatus === 'running' && (
                         <Badge
+                            className="border-transparent"
                             icon={<LoaderCircleIcon className="size-5 animate-spin" />}
                             label="Running"
                             styleType="primary-outline"
@@ -48,7 +50,12 @@ const WorkflowExecutionsHeader = ({actions, job, triggerExecution}: WorkflowExec
                     )}
 
                     {workflowStatus === 'stopped' && (
-                        <Badge label="Workflow stopped" styleType="secondary-outline" weight="semibold" />
+                        <Badge
+                            className="border-transparent"
+                            label="Workflow stopped"
+                            styleType="secondary-outline"
+                            weight="semibold"
+                        />
                     )}
 
                     {workflowStatus === 'failed' && (
