@@ -31,7 +31,7 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
             <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto" ref={listRef}>
                 {items.length ? (
                     items.map((item, index) => (
-                        <li key={item.name}>
+                        <li key={`${item.name}${formatFunctionSignature(item)}`}>
                             <button
                                 className={twMerge('flex-col items-start', index === selectedIndex && 'is-selected')}
                                 onClick={() => selectItem(index)}

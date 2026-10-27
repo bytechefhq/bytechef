@@ -71,9 +71,9 @@ export const FunctionSignature = Extension.create({
 
                         const definitions: EvaluatorFunctionDefinition[] =
                             editor.storage.FunctionSuggestion?.functionDefinitions ?? [];
-                        const definition = definitions.find((candidate) => candidate.name === call.name);
+                        const matchingDefinitions = definitions.filter((candidate) => candidate.name === call.name);
 
-                        if (!definition) {
+                        if (matchingDefinitions.length === 0) {
                             hide();
 
                             return;
@@ -95,7 +95,7 @@ export const FunctionSignature = Extension.create({
                                 y: coords.top,
                             }) as DOMRect;
 
-                        const props = {activeArgIndex: call.argIndex, definition};
+                        const props = {activeArgIndex: call.argIndex, definitions: matchingDefinitions};
 
                         if (component) {
                             component.updateProps(props);
