@@ -87,7 +87,7 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
         <div className={twMerge(sharedClasses, className || defaultPositionClasses)}>
             <div className="flex h-full flex-col divide-y divide-stroke-neutral-secondary bg-surface-neutral-primary dark:bg-popover">
                 <header className="flex h-20 shrink-0 content-center items-center p-4 text-lg font-medium">
-                    <div className="flex items-center self-start">
+                    <div className="flex items-center">
                         <span>Data Pill Panel</span>
 
                         <Tooltip>
