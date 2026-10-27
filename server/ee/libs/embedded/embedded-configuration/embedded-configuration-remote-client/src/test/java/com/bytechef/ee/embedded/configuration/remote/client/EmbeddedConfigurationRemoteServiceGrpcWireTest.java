@@ -290,6 +290,48 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testIntegrationInstanceConfigurationWorkflowLookups() {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setConnections(List.of(connection(4L)));
+        integrationInstanceConfigurationWorkflow.setEnabled(true);
+        integrationInstanceConfigurationWorkflow.setId(11L);
+        integrationInstanceConfigurationWorkflow.setInputs(Map.of("count", 5));
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(5L);
+        integrationInstanceConfigurationWorkflow.setWorkflowId("workflow-1");
+
+        when(integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(11L))
+            .thenReturn(integrationInstanceConfigurationWorkflow);
+        when(integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(99L))
+            .thenThrow(new IllegalArgumentException("Integration instance configuration workflow not found"));
+        when(integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(5L))
+            .thenReturn(List.of(integrationInstanceConfigurationWorkflow));
+        when(integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(6L))
+            .thenReturn(List.of());
+        when(integrationInstanceConfigurationWorkflowService.isIntegrationInstanceWorkflowEnabled(5L, "workflow-1"))
+            .thenReturn(true);
+        when(integrationInstanceConfigurationWorkflowService.isIntegrationInstanceWorkflowEnabled(5L, "workflow-2"))
+            .thenReturn(false);
+
+        RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceClient client =
+            new RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceClient(
+                fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(client.getIntegrationInstanceConfigurationWorkflow(11L)).usingRecursiveComparison()
+            .isEqualTo(integrationInstanceConfigurationWorkflow);
+        assertThatThrownBy(() -> client.getIntegrationInstanceConfigurationWorkflow(99L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Integration instance configuration workflow not found");
+        assertThat(client.getIntegrationInstanceConfigurationWorkflows(5L))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(integrationInstanceConfigurationWorkflow);
+        assertThat(client.getIntegrationInstanceConfigurationWorkflows(6L)).isEmpty();
+        assertThat(client.isIntegrationInstanceWorkflowEnabled(5L, "workflow-1")).isTrue();
+        assertThat(client.isIntegrationInstanceWorkflowEnabled(5L, "workflow-2")).isFalse();
+    }
+
+    @Test
     void testIsConnectionUsed() {
         when(integrationInstanceConfigurationWorkflowService.isConnectionUsed(7L)).thenReturn(true);
         when(integrationInstanceConfigurationWorkflowService.isConnectionUsed(8L)).thenReturn(false);

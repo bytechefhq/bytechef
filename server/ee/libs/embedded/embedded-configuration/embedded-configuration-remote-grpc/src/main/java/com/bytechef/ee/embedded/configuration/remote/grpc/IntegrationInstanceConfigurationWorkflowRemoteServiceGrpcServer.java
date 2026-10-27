@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInsta
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnections;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflows;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
@@ -74,6 +75,17 @@ public class IntegrationInstanceConfigurationWorkflowRemoteServiceGrpcServer ext
     }
 
     @Override
+    public void getIntegrationInstanceConfigurationWorkflowById(
+        IdRequest request, StreamObserver<RemoteIntegrationInstanceConfigurationWorkflow> responseObserver) {
+
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toProto(
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                    request.getId())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void getIntegrationInstanceConfigurationWorkflowConnection(
         ConfigurationWorkflowRequest request,
         StreamObserver<RemoteIntegrationInstanceConfigurationWorkflowConnection> responseObserver) {
@@ -101,10 +113,34 @@ public class IntegrationInstanceConfigurationWorkflowRemoteServiceGrpcServer ext
     }
 
     @Override
+    public void getIntegrationInstanceConfigurationWorkflows(
+        IdRequest request, StreamObserver<RemoteIntegrationInstanceConfigurationWorkflows> responseObserver) {
+
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toRemoteIntegrationInstanceConfigurationWorkflows(
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                    request.getId())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void isConnectionUsed(IdRequest request, StreamObserver<BoolResponse> responseObserver) {
         responseObserver.onNext(
             BoolResponse.newBuilder()
                 .setValue(integrationInstanceConfigurationWorkflowService.isConnectionUsed(request.getId()))
+                .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void isIntegrationInstanceWorkflowEnabled(
+        ConfigurationWorkflowRequest request, StreamObserver<BoolResponse> responseObserver) {
+
+        responseObserver.onNext(
+            BoolResponse.newBuilder()
+                .setValue(
+                    integrationInstanceConfigurationWorkflowService.isIntegrationInstanceWorkflowEnabled(
+                        request.getIntegrationInstanceConfigurationId(), request.getWorkflowId()))
                 .build());
         responseObserver.onCompleted();
     }

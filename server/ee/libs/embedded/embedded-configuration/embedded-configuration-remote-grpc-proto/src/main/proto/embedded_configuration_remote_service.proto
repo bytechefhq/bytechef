@@ -26,11 +26,14 @@ service IntegrationInstanceConfigurationWorkflowRemoteService {
       returns (IntegrationInstanceConfigurationWorkflowConnectionResult);
   rpc GetIntegrationInstanceConfigurationWorkflow(ConfigurationWorkflowRequest)
       returns (RemoteIntegrationInstanceConfigurationWorkflow);
+  rpc GetIntegrationInstanceConfigurationWorkflowById(IdRequest) returns (RemoteIntegrationInstanceConfigurationWorkflow);
   rpc GetIntegrationInstanceConfigurationWorkflowConnection(ConfigurationWorkflowRequest)
       returns (RemoteIntegrationInstanceConfigurationWorkflowConnection);
   rpc GetIntegrationInstanceConfigurationWorkflowConnections(ConfigurationWorkflowRequest)
       returns (RemoteIntegrationInstanceConfigurationWorkflowConnections);
+  rpc GetIntegrationInstanceConfigurationWorkflows(IdRequest) returns (RemoteIntegrationInstanceConfigurationWorkflows);
   rpc IsConnectionUsed(IdRequest) returns (BoolResponse);
+  rpc IsIntegrationInstanceWorkflowEnabled(ConfigurationWorkflowRequest) returns (BoolResponse);
 }
 
 service IntegrationInstanceRemoteService {
@@ -172,6 +175,10 @@ message RemoteIntegrationInstanceConfigurationWorkflow {
   optional google.protobuf.Timestamp last_modified_date = 9;
   optional int32 version = 10;
   optional string workflow_id = 11;
+}
+
+message RemoteIntegrationInstanceConfigurationWorkflows {
+  repeated RemoteIntegrationInstanceConfigurationWorkflow integration_instance_configuration_workflows = 1;
 }
 
 message RemoteIntegrationInstanceConfigurationWorkflowConnection {
