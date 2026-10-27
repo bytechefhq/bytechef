@@ -27,19 +27,26 @@ public class NotificationProtoMapper {
         this.protoJsonMapper = new ProtoJsonMapper(objectMapper);
     }
 
+    public Notification toNotification(RemoteNotification remoteNotification) {
+        return protoJsonMapper.toObject(remoteNotification, Notification.class);
+    }
+
     public List<Notification> toNotifications(RemoteNotifications remoteNotifications) {
         return remoteNotifications.getNotificationsList()
             .stream()
-            .map(remoteNotification -> protoJsonMapper.toObject(remoteNotification, Notification.class))
+            .map(this::toNotification)
             .toList();
+    }
+
+    public RemoteNotification toProto(Notification notification) {
+        return protoJsonMapper.toProto(notification, RemoteNotification.newBuilder());
     }
 
     public RemoteNotifications toProto(List<Notification> notifications) {
         RemoteNotifications.Builder builder = RemoteNotifications.newBuilder();
 
         for (Notification notification : notifications) {
-            builder.addNotifications(
-                protoJsonMapper.<RemoteNotification>toProto(notification, RemoteNotification.newBuilder()));
+            builder.addNotifications(toProto(notification));
         }
 
         return builder.build();
