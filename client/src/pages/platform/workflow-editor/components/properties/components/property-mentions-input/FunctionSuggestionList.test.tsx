@@ -1,4 +1,4 @@
-import {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
+import {EvaluatorFunctionDefinition, EvaluatorFunctionType} from '@/shared/middleware/graphql';
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import {SuggestionProps} from '@tiptap/suggestion';
 import {type Ref, createRef} from 'react';
@@ -40,6 +40,27 @@ describe('FunctionSuggestionList', () => {
         expect(screen.getByText('concat description')).toBeInTheDocument();
         // Non-highlighted row detail is not rendered.
         expect(screen.queryByText('contains description')).not.toBeInTheDocument();
+    });
+
+    it('renders every overload of a function without duplicate keys', () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+        renderFunctionSuggestionList(
+            [
+                definition('contains', {
+                    parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Boolean}],
+                }),
+                definition('contains', {
+                    parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Map}],
+                }),
+            ],
+            vi.fn()
+        );
+
+        expect(screen.getAllByText('contains')).toHaveLength(2);
+        expect(consoleErrorSpy).not.toHaveBeenCalledWith(expect.stringContaining('same key'), expect.anything());
+
+        consoleErrorSpy.mockRestore();
     });
 
     it('renders an empty state when there are no items', () => {
