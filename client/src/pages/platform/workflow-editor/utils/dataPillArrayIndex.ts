@@ -4,6 +4,8 @@ const NUMERIC_BRACKET_SEGMENT_PATTERN = /\[(\d+)\]/g;
 
 const ARRAY_INDEX_PLACEHOLDER_PATTERN = /\[index\]/g;
 
+const ARRAY_INDEX_EXPRESSION_PATTERN = /\[[^[\]'"]+\]/g;
+
 const DOT_BEFORE_ARRAY_INDEX_PLACEHOLDER = `.${ARRAY_INDEX_PLACEHOLDER}`;
 
 export interface ArrayIndexSegmentI {
@@ -64,7 +66,7 @@ export function toArrayIndexTemplate(reference: string): string {
         return reference;
     }
 
-    return reference.replace(NUMERIC_BRACKET_SEGMENT_PATTERN, ARRAY_INDEX_PLACEHOLDER);
+    return reference.replace(ARRAY_INDEX_EXPRESSION_PATTERN, ARRAY_INDEX_PLACEHOLDER);
 }
 
 export function resolveArrayIndexTemplate(reference: string, arrayIndex = 0): string {
