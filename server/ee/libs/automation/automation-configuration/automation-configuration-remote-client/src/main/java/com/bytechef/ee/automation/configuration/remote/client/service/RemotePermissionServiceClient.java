@@ -7,28 +7,32 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.service;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.BoolResponse;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.OptionalStringResponse;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.PermissionRemoteServiceGrpc;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectScopeRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ResourceOwnerRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ResourceRoleRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ResourceScopeRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.StringsResponse;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.WorkflowScopeRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.WorkspaceRoleRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.WorkspaceScopeRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.google.protobuf.Empty;
 import java.io.Serializable;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Remote client stub for {@link PermissionService}. Wired into lightweight EE app variants (worker, webhook, execution,
- * coordinator, connection) that do not host the authoritative permission service. These methods are not expected to be
- * reached from those apps; if they are, it typically means a {@code @PreAuthorize("hasPermission(...)")} method (whose
- * evaluator resolves the check through this {@link PermissionService}) is being invoked inside an app variant that
- * should not be exposing the guarded endpoint in the first place.
- *
- * <p>
- * Design choice: fail closed rather than throw. Throwing {@link UnsupportedOperationException} from SpEL evaluation
- * surfaces as an opaque HTTP 500 with no audit trail. Returning {@code false} from every check makes Spring Security
- * translate the invocation into an {@link org.springframework.security.access.AccessDeniedException}, which the
- * {@code AuditAspect} records as a {@code PERMISSION_CHECK} event with result DENIED. Each call also emits an ERROR log
- * so operators detect the misconfiguration. Cache evictions are silent no-ops (idempotent).
+ * Answers permission checks on configuration-app, which evaluates them for the caller whose identity travels on every
+ * gRPC call. Checks skipped for an embedded delegation are granted locally, since the skip flag is bound to this
+ * thread. Workspace scope caches live on configuration-app, so evictions here are no-ops.
  *
  * @version ee
  *
@@ -39,99 +43,181 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings("PMD.UnusedFormalParameter")
 public class RemotePermissionServiceClient implements PermissionService {
 
-    private static final Logger log = LoggerFactory.getLogger(RemotePermissionServiceClient.class);
+    private static final String SERVICE_ID = "configuration-app";
+
+    private final GrpcChannels grpcChannels;
+
+    public RemotePermissionServiceClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
+    }
 
     @Override
     public boolean isTenantAdmin() {
-        logError("isTenantAdmin");
+        BoolResponse boolResponse = getStub().isTenantAdmin(Empty.getDefaultInstance());
 
-        return false;
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean isCurrentUser(long userId) {
-        logError("isCurrentUser");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().isCurrentUser(toIdRequest(userId));
+
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean hasWorkspaceRole(long workspaceId, String minimumRole) {
-        logError("hasWorkspaceRole");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().hasWorkspaceRole(
+            WorkspaceRoleRequest.newBuilder()
+                .setWorkspaceId(workspaceId)
+                .setMinimumRole(minimumRole)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean hasWorkspaceScope(long workspaceId, String scope) {
-        logError("hasWorkspaceScope");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().hasWorkspaceScope(
+            WorkspaceScopeRequest.newBuilder()
+                .setWorkspaceId(workspaceId)
+                .setScope(scope)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
-        logError("hasWorkspaceScopeForProject");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().hasWorkspaceScopeForProject(
+            ProjectScopeRequest.newBuilder()
+                .setProjectId(projectId)
+                .setScope(scope)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean hasResourceScope(Serializable id, String resourceType, String scope) {
-        logError("hasResourceScope");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().hasResourceScope(toResourceScopeRequest(id, resourceType, scope));
+
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean isResourceOwner(String resourceType, long id) {
-        logError("isResourceOwner");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().isResourceOwner(
+            ResourceOwnerRequest.newBuilder()
+                .setResourceType(resourceType)
+                .setId(id)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean hasResourceRole(long id, String resourceType, String minimumRole) {
-        logError("hasResourceRole");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().hasResourceRole(
+            ResourceRoleRequest.newBuilder()
+                .setId(id)
+                .setResourceType(resourceType)
+                .setMinimumRole(minimumRole)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope) {
-        logError("hasWorkflowScope");
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
 
-        return false;
+        BoolResponse boolResponse = getStub().hasWorkflowScope(
+            WorkflowScopeRequest.newBuilder()
+                .setWorkflowId(workflowId)
+                .setScope(scope)
+                .build());
+
+        return boolResponse.getValue();
     }
 
     @Override
     public Set<String> getMyWorkspaceScopes(long workspaceId) {
-        logError("getMyWorkspaceScopes");
+        StringsResponse stringsResponse = getStub().getMyWorkspaceScopes(toIdRequest(workspaceId));
 
-        return Set.of();
+        return Set.copyOf(stringsResponse.getValuesList());
     }
 
     @Override
     public @Nullable String getMyWorkspaceRole(long workspaceId) {
-        logError("getMyWorkspaceRole");
+        OptionalStringResponse optionalStringResponse = getStub().getMyWorkspaceRole(toIdRequest(workspaceId));
 
-        return null;
+        return optionalStringResponse.hasValue() ? optionalStringResponse.getValue() : null;
     }
 
     @Override
     public void evictWorkspaceScopeCache(long userId, long workspaceId) {
-        logError("evictWorkspaceScopeCache");
     }
 
     @Override
     public void evictAllWorkspaceScopeCache() {
-        logError("evictAllWorkspaceScopeCache");
     }
 
-    private static void logError(String method) {
-        log.error(
-            "PermissionService.{} invoked on a remote client stub. Returning fail-closed default. This app variant "
-                + "does not host the authoritative PermissionService \u2014 check @PreAuthorize wiring.",
-            method);
+    private PermissionRemoteServiceGrpc.PermissionRemoteServiceBlockingStub getStub() {
+        return PermissionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(SERVICE_ID));
+    }
+
+    private static ResourceScopeRequest toResourceScopeRequest(Serializable id, String resourceType, String scope) {
+        ResourceScopeRequest.Builder builder = ResourceScopeRequest.newBuilder()
+            .setResourceType(resourceType)
+            .setScope(scope);
+
+        if (id instanceof Long || id instanceof Integer) {
+            Number numericId = (Number) id;
+
+            builder.setNumericId(numericId.longValue());
+        } else if (id instanceof String stringId) {
+            builder.setStringId(stringId);
+        } else {
+            throw new IllegalArgumentException("Unsupported resource id for a remote permission check: " + id);
+        }
+
+        return builder.build();
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 }

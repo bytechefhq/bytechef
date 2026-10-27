@@ -30,6 +30,8 @@ dependencies {
 
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
 
+    testFixturesApi("io.grpc:grpc-inprocess")
+
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation("io.grpc:grpc-services")
     testImplementation("org.springframework.graphql:spring-graphql")

@@ -9,6 +9,7 @@ dependencies {
 
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation("org.springframework.grpc:spring-grpc-core")
+    testImplementation("org.springframework.security:spring-security-core")
     testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
     testImplementation(project(":server:libs:test:test-support"))
 }
