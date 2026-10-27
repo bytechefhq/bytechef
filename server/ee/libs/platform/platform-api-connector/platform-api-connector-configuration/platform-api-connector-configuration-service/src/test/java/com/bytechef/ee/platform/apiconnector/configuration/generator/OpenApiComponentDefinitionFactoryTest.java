@@ -283,6 +283,44 @@ class OpenApiComponentDefinitionFactoryTest {
     }
 
     @Test
+    void testUpdateComponentDefinitionJsonRewritesOnlyTheMetadataFields() throws Exception {
+        String definitionJson = OpenApiComponentDefinitionFactory.createComponentDefinitionJson(
+            "wizardconnector", parseSpecification("wizardconnector", COMPONENTLESS_SPECIFICATION));
+
+        JsonNode originalDefinition = OBJECT_MAPPER.readTree(definitionJson);
+
+        JsonNode updatedDefinition = OBJECT_MAPPER.readTree(
+            OpenApiComponentDefinitionFactory.updateComponentDefinitionJson(
+                definitionJson, "renamed.connector", "Renamed Connector", "Renamed description", 3));
+
+        assertThat(updatedDefinition.get("name")
+            .asText()).isEqualTo("renamed.connector");
+        assertThat(updatedDefinition.get("title")
+            .asText()).isEqualTo("Renamed Connector");
+        assertThat(updatedDefinition.get("description")
+            .asText()).isEqualTo("Renamed description");
+        assertThat(updatedDefinition.get("version")
+            .asInt()).isEqualTo(3);
+        assertThat(updatedDefinition.get("actions")).isEqualTo(originalDefinition.get("actions"));
+        assertThat(updatedDefinition.get("connection")).isEqualTo(originalDefinition.get("connection"));
+    }
+
+    @Test
+    void testUpdateComponentDefinitionJsonFallsBackToTheComponentNameForABlankTitle() throws Exception {
+        String definitionJson = OpenApiComponentDefinitionFactory.createComponentDefinitionJson(
+            "wizardconnector", parseSpecification("wizardconnector", COMPONENTLESS_SPECIFICATION));
+
+        JsonNode updatedDefinition = OBJECT_MAPPER.readTree(
+            OpenApiComponentDefinitionFactory.updateComponentDefinitionJson(
+                definitionJson, "renamedconnector", null, null, 1));
+
+        assertThat(updatedDefinition.get("title")
+            .asText()).isEqualTo("Renamedconnector");
+        assertThat(updatedDefinition.get("description")
+            .isNull()).isTrue();
+    }
+
+    @Test
     void testOAuth2ScopesSpecificationMatchesGeneratorOutput() throws Exception {
         assertMapperMatchesGenerator("scopedconnector", OAUTH2_SCOPES_SPECIFICATION);
     }

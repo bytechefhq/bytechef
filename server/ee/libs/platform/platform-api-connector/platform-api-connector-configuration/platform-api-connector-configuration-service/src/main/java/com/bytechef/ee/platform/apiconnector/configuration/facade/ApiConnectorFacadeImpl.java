@@ -249,7 +249,37 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
             apiConnector.setConnectorVersion(connectorVersion);
         }
 
-        return apiConnectorService.update(apiConnector);
+        FileEntry oldDefinition = apiConnector.getDefinition();
+
+        if (oldDefinition != null && (name != null || title != null || description != null ||
+            connectorVersion != null)) {
+
+            apiConnector.setDefinition(storeUpdatedDefinition(apiConnector, oldDefinition));
+        }
+
+        ApiConnector updatedApiConnector = apiConnectorService.update(apiConnector);
+
+        deleteReplacedFileEntry(oldDefinition, updatedApiConnector.getDefinition(),
+            apiConnectorFileStorage::deleteApiConnectorDefinition);
+
+        return updatedApiConnector;
+    }
+
+    private FileEntry storeUpdatedDefinition(ApiConnector apiConnector, FileEntry definitionFileEntry) {
+        String definition = apiConnectorFileStorage.readApiConnectorDefinition(definitionFileEntry);
+
+        String updatedDefinition;
+
+        try {
+            updatedDefinition = OpenApiComponentDefinitionFactory.updateComponentDefinitionJson(
+                definition, apiConnector.getName(), apiConnector.getTitle(), apiConnector.getDescription(),
+                apiConnector.getConnectorVersion());
+        } catch (RuntimeException exception) {
+            throw new ConfigurationException(
+                exception.getMessage(), ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
+
+        return apiConnectorFileStorage.storeApiConnectorDefinition("definition.json", updatedDefinition);
     }
 
     private void validateComponentNameAvailable(long id, String componentName) {

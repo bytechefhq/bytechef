@@ -53,6 +53,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.models.Components;
@@ -116,6 +117,33 @@ public class OpenApiComponentDefinitionFactory {
     public static String createComponentDefinitionJson(String componentName, OpenAPI openAPI) {
         try {
             return OBJECT_MAPPER.writeValueAsString(createComponentDefinition(componentName, openAPI));
+        } catch (JsonProcessingException exception) {
+            throw new IllegalStateException("Unable to serialize the component definition", exception);
+        }
+    }
+
+    public static String updateComponentDefinitionJson(
+        String definitionJson, String componentName, String title, String description, int version) {
+
+        JsonNode definitionNode;
+
+        try {
+            definitionNode = OBJECT_MAPPER.readTree(definitionJson);
+        } catch (JsonProcessingException exception) {
+            throw new IllegalArgumentException("Unable to parse the component definition", exception);
+        }
+
+        if (!(definitionNode instanceof ObjectNode definitionObjectNode)) {
+            throw new IllegalArgumentException("The component definition must be a JSON object");
+        }
+
+        definitionObjectNode.put("name", StringUtils.uncapitalize(getComponentClassName(componentName)));
+        definitionObjectNode.put("title", StringUtils.isEmpty(title) ? getComponentClassName(componentName) : title);
+        definitionObjectNode.put("description", description);
+        definitionObjectNode.put("version", version);
+
+        try {
+            return OBJECT_MAPPER.writeValueAsString(definitionObjectNode);
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Unable to serialize the component definition", exception);
         }

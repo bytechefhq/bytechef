@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecificationRequestDTO;
+import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiComponentDefinitionFactory;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
@@ -48,6 +49,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Ivica Cardic
  */
 class ApiConnectorFacadeTest {
+
+    private static final String STORED_DEFINITION = """
+        {"name": "petstore", "title": "Petstore", "description": "Old description", "version": 1, "actions": []}
+        """;
 
     private ApiConnectorAiService apiConnectorAiService;
     private ApiConnectorFileStorage apiConnectorFileStorage;
@@ -263,6 +268,111 @@ class ApiConnectorFacadeTest {
                     .hasMessageContaining("already exists");
 
             verify(apiConnectorService, never()).update(any());
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataRewritesTheStoredDefinitionOnRename() {
+            FileEntry oldDefinition = new FileEntry("definition.json", "file:///definitions/old.json");
+            FileEntry newDefinition = new FileEntry("definition.json", "file:///definitions/new.json");
+
+            ApiConnector apiConnector = createApiConnectorWithDefinition(oldDefinition);
+
+            String expectedDefinition = OpenApiComponentDefinitionFactory.updateComponentDefinitionJson(
+                STORED_DEFINITION, "pet.store", "Petstore", "Old description", 1);
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.fetchApiConnector("pet.store", 1)).thenReturn(Optional.empty());
+            when(apiConnectorService.update(apiConnector)).thenReturn(apiConnector);
+            when(apiConnectorFileStorage.readApiConnectorDefinition(oldDefinition)).thenReturn(STORED_DEFINITION);
+            when(apiConnectorFileStorage.storeApiConnectorDefinition("definition.json", expectedDefinition))
+                .thenReturn(newDefinition);
+
+            ApiConnector updatedApiConnector = apiConnectorFacade.updateApiConnectorMetadata(
+                1L, "pet-store", null, null, null, null);
+
+            assertThat(updatedApiConnector.getName()).isEqualTo("pet.store");
+            assertThat(updatedApiConnector.getDefinition()).isEqualTo(newDefinition);
+            assertThat(expectedDefinition).contains("\"pet.store\"")
+                .doesNotContain("\"petstore\"");
+
+            verify(apiConnectorFileStorage).storeApiConnectorDefinition("definition.json", expectedDefinition);
+            verify(apiConnectorFileStorage).deleteApiConnectorDefinition(oldDefinition);
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataRewritesTheStoredDefinitionOnTitleAndVersionChange() {
+            FileEntry oldDefinition = new FileEntry("definition.json", "file:///definitions/old.json");
+            FileEntry newDefinition = new FileEntry("definition.json", "file:///definitions/new.json");
+
+            ApiConnector apiConnector = createApiConnectorWithDefinition(oldDefinition);
+
+            String expectedDefinition = OpenApiComponentDefinitionFactory.updateComponentDefinitionJson(
+                STORED_DEFINITION, "petstore", "Pet Store", "New description", 2);
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.update(apiConnector)).thenReturn(apiConnector);
+            when(apiConnectorFileStorage.readApiConnectorDefinition(oldDefinition)).thenReturn(STORED_DEFINITION);
+            when(apiConnectorFileStorage.storeApiConnectorDefinition("definition.json", expectedDefinition))
+                .thenReturn(newDefinition);
+
+            ApiConnector updatedApiConnector = apiConnectorFacade.updateApiConnectorMetadata(
+                1L, null, "Pet Store", "New description", null, 2);
+
+            assertThat(updatedApiConnector.getDefinition()).isEqualTo(newDefinition);
+
+            verify(apiConnectorFileStorage).deleteApiConnectorDefinition(oldDefinition);
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataKeepsTheStoredDefinitionOnIconOnlyChange() {
+            FileEntry oldDefinition = new FileEntry("definition.json", "file:///definitions/old.json");
+
+            ApiConnector apiConnector = createApiConnectorWithDefinition(oldDefinition);
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.update(apiConnector)).thenReturn(apiConnector);
+
+            ApiConnector updatedApiConnector = apiConnectorFacade.updateApiConnectorMetadata(
+                1L, null, null, null, "icon.svg", null);
+
+            assertThat(updatedApiConnector.getDefinition()).isEqualTo(oldDefinition);
+
+            verify(apiConnectorFileStorage, never()).storeApiConnectorDefinition(any(), any());
+            verify(apiConnectorFileStorage, never()).deleteApiConnectorDefinition(any());
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataDoesNotStoreADefinitionWhenTheNameIsTaken() {
+            FileEntry oldDefinition = new FileEntry("definition.json", "file:///definitions/old.json");
+
+            ApiConnector apiConnector = createApiConnectorWithDefinition(oldDefinition);
+
+            ApiConnector otherApiConnector = new ApiConnector();
+
+            otherApiConnector.setId(2L);
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.fetchApiConnector("taken", 1)).thenReturn(Optional.of(otherApiConnector));
+
+            assertThatThrownBy(
+                () -> apiConnectorFacade.updateApiConnectorMetadata(1L, "taken", null, null, null, null))
+                    .isInstanceOf(ConfigurationException.class);
+
+            verify(apiConnectorFileStorage, never()).storeApiConnectorDefinition(any(), any());
+            verify(apiConnectorFileStorage, never()).deleteApiConnectorDefinition(any());
+        }
+
+        private ApiConnector createApiConnectorWithDefinition(FileEntry definition) {
+            ApiConnector apiConnector = new ApiConnector();
+
+            apiConnector.setId(1L);
+            apiConnector.setName("petstore");
+            apiConnector.setTitle("Petstore");
+            apiConnector.setDescription("Old description");
+            apiConnector.setConnectorVersion(1);
+            apiConnector.setDefinition(definition);
+
+            return apiConnector;
         }
     }
 
