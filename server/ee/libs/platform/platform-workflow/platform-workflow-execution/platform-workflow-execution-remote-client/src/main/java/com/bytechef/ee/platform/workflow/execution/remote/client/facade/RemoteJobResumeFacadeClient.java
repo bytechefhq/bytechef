@@ -17,11 +17,13 @@ import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.google.protobuf.Empty;
+import io.grpc.Status;
 import io.grpc.StatusException;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.BlockingClientCall;
 import java.util.Map;
 import java.util.function.LongConsumer;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -56,10 +58,16 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
     @Override
     public JobResumeOutcome resumeExpiredJob(String id) {
-        ResumeJobResponse resumeJobResponse = getStub().resumeExpiredJob(
-            ResumeJobRequest.newBuilder()
-                .setId(id)
-                .build());
+        ResumeJobResponse resumeJobResponse;
+
+        try {
+            resumeJobResponse = getStub().resumeExpiredJob(
+                ResumeJobRequest.newBuilder()
+                    .setId(id)
+                    .build());
+        } catch (StatusRuntimeException statusRuntimeException) {
+            throw toException(statusRuntimeException);
+        }
 
         return JobResumeOutcome.valueOf(resumeJobResponse.getOutcome());
     }
@@ -71,11 +79,17 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
     @Override
     public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
-        ResumeJobResponse resumeJobResponse = getStub().resumeJob(
-            ResumeJobRequest.newBuilder()
-                .setData(platformWorkflowExecutionProtoMapper.toBytes(data))
-                .setId(id)
-                .build());
+        ResumeJobResponse resumeJobResponse;
+
+        try {
+            resumeJobResponse = getStub().resumeJob(
+                ResumeJobRequest.newBuilder()
+                    .setData(platformWorkflowExecutionProtoMapper.toBytes(data))
+                    .setId(id)
+                    .build());
+        } catch (StatusRuntimeException statusRuntimeException) {
+            throw toException(statusRuntimeException);
+        }
 
         return JobResumeOutcome.valueOf(resumeJobResponse.getOutcome());
     }
@@ -123,7 +137,7 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
             return JobResumeOutcome.valueOf(resumeJobStreamingResponse.getOutcome());
         } catch (StatusException statusException) {
-            throw new StatusRuntimeException(statusException.getStatus(), statusException.getTrailers());
+            throw toException(new StatusRuntimeException(statusException.getStatus(), statusException.getTrailers()));
         } catch (InterruptedException interruptedException) {
             Thread currentThread = Thread.currentThread();
 
@@ -137,6 +151,16 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
 
             throw exception;
         }
+    }
+
+    private static RuntimeException toException(StatusRuntimeException statusRuntimeException) {
+        Status status = statusRuntimeException.getStatus();
+
+        if (status.getCode() == Status.Code.ABORTED) {
+            return new OptimisticLockingFailureException(status.getDescription(), statusRuntimeException);
+        }
+
+        return statusRuntimeException;
     }
 
     private JobResumeFacadeRemoteServiceGrpc.JobResumeFacadeRemoteServiceBlockingStub getStub() {
