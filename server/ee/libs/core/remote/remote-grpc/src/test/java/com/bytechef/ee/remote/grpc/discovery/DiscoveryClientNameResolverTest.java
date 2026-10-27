@@ -57,6 +57,17 @@ class DiscoveryClientNameResolverTest {
     }
 
     @Test
+    void testInstanceWithAnInvalidGrpcPortIsSkipped() {
+        when(discoveryClient.getInstances("api-gateway-app")).thenReturn(
+            List.of(
+                instance("localhost", 8080, Map.of(DiscoveryClientNameResolver.GRPC_PORT_METADATA_KEY, "ninety")),
+                instance("localhost", 8081,
+                    Map.of(DiscoveryClientNameResolver.GRPC_PORT_METADATA_KEY, "9091"))));
+
+        assertThat(resolve()).containsExactly(new InetSocketAddress("localhost", 9091));
+    }
+
+    @Test
     void testNoInstancesIsUnavailable() {
         when(discoveryClient.getInstances("api-gateway-app")).thenReturn(
             List.of(instance("localhost", 8080, Map.of())));

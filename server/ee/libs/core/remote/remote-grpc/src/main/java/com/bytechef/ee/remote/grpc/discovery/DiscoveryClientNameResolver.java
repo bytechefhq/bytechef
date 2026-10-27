@@ -19,6 +19,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
@@ -33,6 +35,8 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 public class DiscoveryClientNameResolver extends NameResolver {
 
     public static final String GRPC_PORT_METADATA_KEY = "grpc-port";
+
+    private static final Logger log = LoggerFactory.getLogger(DiscoveryClientNameResolver.class);
 
     private final DiscoveryClient discoveryClient;
     private @Nullable Listener2 listener;
@@ -104,12 +108,11 @@ public class DiscoveryClientNameResolver extends NameResolver {
         for (ServiceInstance serviceInstance : discoveryClient.getInstances(serviceId)) {
             Map<String, String> metadata = serviceInstance.getMetadata();
 
-            String grpcPort = metadata == null ? null : metadata.get(GRPC_PORT_METADATA_KEY);
+            Integer grpcPort = fetchGrpcPort(serviceInstance, metadata);
 
             if (grpcPort != null) {
                 equivalentAddressGroups.add(
-                    new EquivalentAddressGroup(
-                        new InetSocketAddress(serviceInstance.getHost(), Integer.parseInt(grpcPort))));
+                    new EquivalentAddressGroup(new InetSocketAddress(serviceInstance.getHost(), grpcPort)));
             }
         }
 
@@ -124,5 +127,24 @@ public class DiscoveryClientNameResolver extends NameResolver {
             ResolutionResult.newBuilder()
                 .setAddresses(equivalentAddressGroups)
                 .build());
+    }
+
+    private static @Nullable Integer
+        fetchGrpcPort(ServiceInstance serviceInstance, @Nullable Map<String, String> metadata) {
+        String grpcPort = metadata == null ? null : metadata.get(GRPC_PORT_METADATA_KEY);
+
+        if (grpcPort == null) {
+            return null;
+        }
+
+        try {
+            return Integer.parseInt(grpcPort);
+        } catch (NumberFormatException numberFormatException) {
+            log.warn(
+                "Skipping service instance {} of {} with an invalid {}: {}", serviceInstance.getInstanceId(),
+                serviceInstance.getServiceId(), GRPC_PORT_METADATA_KEY, grpcPort);
+
+            return null;
+        }
     }
 }
