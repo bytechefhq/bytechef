@@ -90,11 +90,7 @@ const WorkflowBuilderHeader = ({
                 <Badge label={`V${(workflowVersion ?? 0) + 1} DRAFT`} styleType="outline-outline" weight="semibold" />
 
                 {(isSaving > 0 || !isOnline) && (
-                    <LoadingIndicator
-                        className="size-6 rounded-full hover:bg-surface-neutral-secondary-hover"
-                        isFetching={isSaving}
-                        isOnline={isOnline}
-                    />
+                    <LoadingIndicator isFetching={isSaving} isOnline={isOnline} showLabel />
                 )}
             </div>
 

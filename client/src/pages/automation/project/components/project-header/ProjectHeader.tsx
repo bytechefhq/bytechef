@@ -99,7 +99,7 @@ const ProjectHeader = ({
     });
 
     const loadingIndicator = (isSaving > 0 || !isOnline) && (
-        <LoadingIndicator className="size-6 rounded-full" isFetching={isSaving} isOnline={isOnline} />
+        <LoadingIndicator isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
     if (!project) {

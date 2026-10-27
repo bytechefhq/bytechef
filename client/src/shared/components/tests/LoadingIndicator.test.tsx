@@ -5,10 +5,10 @@ import {expect, it} from 'vitest';
 
 screen.debug();
 
-const renderLoadingIndicator = (isFetching: number, isOnline: boolean) => {
+const renderLoadingIndicator = (isFetching: number, isOnline: boolean, showLabel = false) => {
     render(
         <TooltipProvider>
-            <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
+            <LoadingIndicator isFetching={isFetching} isOnline={isOnline} showLabel={showLabel} />
         </TooltipProvider>
     );
 };
@@ -47,4 +47,22 @@ it('should render the offline message when isOnline is false ', async () => {
     await waitFor(() => {
         expect(screen.getByRole('tooltip', {hidden: true, name: 'You are offline'})).toBeVisible();
     });
+});
+
+it('should show a saving label while saving when the label is enabled', () => {
+    renderLoadingIndicator(1, true, true);
+
+    expect(screen.getByLabelText('Loading indicator')).toHaveTextContent('Saving…');
+});
+
+it('should show an offline label when offline and the label is enabled', () => {
+    renderLoadingIndicator(0, false, true);
+
+    expect(screen.getByLabelText('Loading indicator')).toHaveTextContent('Offline');
+});
+
+it('should show no label while saving when the label is disabled', () => {
+    renderLoadingIndicator(1, true);
+
+    expect(screen.getByLabelText('Loading indicator')).toHaveTextContent(/^$/);
 });
