@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.remote.grpc;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,9 +21,11 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.json.ProblemDetailJacksonMixin;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.MapperBuilder;
 
 /**
  * Answers a REST request that failed in a remote call with the remote description as the problem detail: an invalid
@@ -39,9 +40,11 @@ public class GrpcStatusHandlerExceptionResolver implements HandlerExceptionResol
 
     private final ObjectMapper objectMapper;
 
-    @SuppressFBWarnings("EI")
     public GrpcStatusHandlerExceptionResolver(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+        MapperBuilder<?, ?> mapperBuilder = objectMapper.rebuild();
+
+        this.objectMapper = mapperBuilder.addMixIn(ProblemDetail.class, ProblemDetailJacksonMixin.class)
+            .build();
     }
 
     @Override
@@ -77,7 +80,13 @@ public class GrpcStatusHandlerExceptionResolver implements HandlerExceptionResol
 
         problemDetail.setInstance(URI.create(httpServletRequest.getRequestURI()));
 
-        httpServletResponse.setStatus(httpStatus.value());
+        writeProblemDetail(httpServletResponse, problemDetail);
+
+        return new ModelAndView();
+    }
+
+    void writeProblemDetail(HttpServletResponse httpServletResponse, ProblemDetail problemDetail) {
+        httpServletResponse.setStatus(problemDetail.getStatus());
         httpServletResponse.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
 
         try {
@@ -85,8 +94,6 @@ public class GrpcStatusHandlerExceptionResolver implements HandlerExceptionResol
         } catch (IOException ioException) {
             throw new UncheckedIOException(ioException);
         }
-
-        return new ModelAndView();
     }
 
     private static HttpStatus toHttpStatus(Status.Code code) {

@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.grpc.Status;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
@@ -42,6 +44,37 @@ class GrpcStatusHandlerExceptionResolverTest {
             .asString()).isEqualTo("Only the connection creator or an admin can modify connection 7");
         assertThat(problemDetail.get("status")
             .asInt()).isEqualTo(500);
+    }
+
+    @Test
+    void testProblemDetailHasTheShapeOfTheGlobalErrorHandler() throws Exception {
+        JsonNode problemDetail = JSON_MAPPER.readTree(resolve(Status.NOT_FOUND.withDescription("Connection 7"))
+            .getContentAsString());
+
+        assertThat(problemDetail.has("properties")).isFalse();
+        assertThat(problemDetail.get("instance")
+            .asString()).isEqualTo("/api/connections");
+        assertThat(problemDetail.get("title")
+            .asString()).isEqualTo("Not Found");
+    }
+
+    @Test
+    void testProblemDetailPropertiesAreWrittenAtTopLevel() throws Exception {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "Connection 7");
+
+        problemDetail.setProperty("errorKey", 101);
+
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        grpcStatusHandlerExceptionResolver.writeProblemDetail(mockHttpServletResponse, problemDetail);
+
+        JsonNode body = JSON_MAPPER.readTree(mockHttpServletResponse.getContentAsString());
+
+        assertThat(body.has("properties")).isFalse();
+        assertThat(body.get("errorKey")
+            .asInt()).isEqualTo(101);
+        assertThat(body.get("detail")
+            .asString()).isEqualTo("Connection 7");
     }
 
     @Test
