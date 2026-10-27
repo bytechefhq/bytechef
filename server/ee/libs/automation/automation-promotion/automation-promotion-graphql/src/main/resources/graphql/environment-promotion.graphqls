@@ -2,6 +2,7 @@
 The kinds of environment-scoped automation resources that can be promoted from one environment to another.
 """
 enum PromotionResourceType {
+    A2A_SERVER
     API_COLLECTION
     MCP_SERVER
     PROJECT_DEPLOYMENT
