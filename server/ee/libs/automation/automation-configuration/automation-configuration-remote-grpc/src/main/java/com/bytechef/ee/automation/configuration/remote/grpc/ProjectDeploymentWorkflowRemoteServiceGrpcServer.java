@@ -16,6 +16,7 @@ import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploym
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentWorkflowRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.RemoteProjectDeploymentWorkflow;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.RemoteProjectDeploymentWorkflowConnections;
+import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
 import java.util.Optional;
@@ -38,6 +39,16 @@ public class ProjectDeploymentWorkflowRemoteServiceGrpcServer
 
         this.automationConfigurationProtoMapper = automationConfigurationProtoMapper;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+    }
+
+    @Override
+    public void disableProjectDeploymentWorkflowByConnectionId(
+        IdRequest request, StreamObserver<Empty> responseObserver) {
+
+        projectDeploymentWorkflowService.disableProjectDeploymentWorkflowByConnectionId(request.getId());
+
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
     }
 
     @Override

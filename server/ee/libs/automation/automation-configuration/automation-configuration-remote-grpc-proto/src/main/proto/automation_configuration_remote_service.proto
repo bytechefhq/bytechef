@@ -33,6 +33,7 @@ service ProjectDeploymentRemoteService {
 }
 
 service ProjectDeploymentWorkflowRemoteService {
+  rpc DisableProjectDeploymentWorkflowByConnectionId(IdRequest) returns (google.protobuf.Empty);
   rpc FetchProjectDeploymentWorkflowConnection(ProjectDeploymentWorkflowRequest)
       returns (ProjectDeploymentWorkflowConnectionResult);
   rpc GetProjectDeploymentWorkflow(ProjectDeploymentWorkflowRequest) returns (RemoteProjectDeploymentWorkflow);

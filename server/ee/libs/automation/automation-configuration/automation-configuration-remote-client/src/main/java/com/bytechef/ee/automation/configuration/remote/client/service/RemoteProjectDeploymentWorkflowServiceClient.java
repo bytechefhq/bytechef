@@ -64,7 +64,10 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
 
     @Override
     public void disableProjectDeploymentWorkflowByConnectionId(long connectionId) {
-        throw new UnsupportedOperationException();
+        getStub().disableProjectDeploymentWorkflowByConnectionId(
+            IdRequest.newBuilder()
+                .setId(connectionId)
+                .build());
     }
 
     @Override
