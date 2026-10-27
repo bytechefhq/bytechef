@@ -18,10 +18,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.grpc.server.GlobalServerInterceptor;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -113,6 +116,17 @@ public class GrpcRemoteConfiguration {
     @GlobalServerInterceptor
     UserContextServerInterceptor userContextServerInterceptor() {
         return new UserContextServerInterceptor();
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(name = "org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter")
+    static class GrpcStatusGraphQlConfiguration {
+
+        @Bean
+        @Order(Ordered.HIGHEST_PRECEDENCE)
+        GrpcStatusDataFetcherExceptionResolver grpcStatusDataFetcherExceptionResolver() {
+            return new GrpcStatusDataFetcherExceptionResolver();
+        }
     }
 
     @Configuration(proxyBeanMethods = false)

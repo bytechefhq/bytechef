@@ -54,6 +54,30 @@ class GrpcStatusHandlerExceptionResolverTest {
     }
 
     @Test
+    void testUnavailableAndTimedOutRemoteCallsMapToGatewayStatuses() {
+        assertThat(resolve(Status.UNAVAILABLE).getStatus()).isEqualTo(503);
+        assertThat(resolve(Status.DEADLINE_EXCEEDED).getStatus()).isEqualTo(504);
+    }
+
+    @Test
+    void testCommittedResponseIsLeftAsItIs() throws Exception {
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+
+        mockHttpServletResponse.setStatus(200);
+        mockHttpServletResponse.getWriter()
+            .write("partial");
+        mockHttpServletResponse.setCommitted(true);
+
+        ModelAndView modelAndView = grpcStatusHandlerExceptionResolver.resolveException(
+            new MockHttpServletRequest("GET", "/api/connections"), mockHttpServletResponse, null,
+            Status.UNAVAILABLE.asRuntimeException());
+
+        assertThat(modelAndView).isNotNull();
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(200);
+        assertThat(mockHttpServletResponse.getContentAsString()).isEqualTo("partial");
+    }
+
+    @Test
     void testOtherExceptionsAreLeftToTheNextResolver() {
         ModelAndView modelAndView = grpcStatusHandlerExceptionResolver.resolveException(
             new MockHttpServletRequest(), new MockHttpServletResponse(), null, new IllegalStateException("boom"));
