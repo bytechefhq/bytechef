@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.workflow.execution.remote.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -63,6 +64,7 @@ import io.grpc.inprocess.InProcessServerBuilder;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
@@ -252,6 +254,25 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
 
         assertThat(new RemotePrincipalJobServiceClient(fixedGrpcChannels).fetchLastWorkflowJobId(
             1051L, List.of("a"), PlatformType.AUTOMATION)).isEmpty();
+    }
+
+    @Test
+    void testGetJobPrincipalIdReturnsThePrincipal() {
+        when(principalJobService.fetchJobPrincipalId(7L, PlatformType.AUTOMATION)).thenReturn(Optional.of(1051L));
+
+        assertThat(new RemotePrincipalJobServiceClient(fixedGrpcChannels).getJobPrincipalId(
+            7L, PlatformType.AUTOMATION)).isEqualTo(1051L);
+    }
+
+    @Test
+    void testGetJobPrincipalIdWithoutPrincipalThrows() {
+        when(principalJobService.fetchJobPrincipalId(7L, PlatformType.AUTOMATION)).thenReturn(Optional.empty());
+
+        RemotePrincipalJobServiceClient remotePrincipalJobServiceClient = new RemotePrincipalJobServiceClient(
+            fixedGrpcChannels);
+
+        assertThatThrownBy(() -> remotePrincipalJobServiceClient.getJobPrincipalId(7L, PlatformType.AUTOMATION))
+            .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
