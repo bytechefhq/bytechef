@@ -53,16 +53,12 @@ public class UserContextServerInterceptor implements ServerInterceptor {
 
         @Override
         public void onHalfClose() {
-            if (authentication == null) {
-                super.onHalfClose();
-
-                return;
-            }
-
             SecurityContext originalSecurityContext = SecurityContextHolder.getContext();
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
-            securityContext.setAuthentication(authentication);
+            if (authentication != null) {
+                securityContext.setAuthentication(authentication);
+            }
 
             SecurityContextHolder.setContext(securityContext);
 

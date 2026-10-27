@@ -117,6 +117,20 @@ class UserContextServerInterceptorTest {
     }
 
     @Test
+    void testCallWithoutIdentityDoesNotSeeAContextLeftOnTheServerThread() throws Exception {
+        try (InProcessGrpc inProcessGrpc = start(metadata -> {})) {
+            inProcessGrpc.serverExecutorService()
+                .submit(() -> SecurityContextHolder.getContext()
+                    .setAuthentication(
+                        UsernamePasswordAuthenticationToken.authenticated(
+                            "stale@localhost.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))))
+                .get();
+
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
+    @Test
     void testConnectedUserIsRebuiltAsConnectedUser() throws Exception {
         SecurityContextHolder.getContext()
             .setAuthentication(new TestConnectedUserAuthentication("external-user-1", 7L, 2L, true));
