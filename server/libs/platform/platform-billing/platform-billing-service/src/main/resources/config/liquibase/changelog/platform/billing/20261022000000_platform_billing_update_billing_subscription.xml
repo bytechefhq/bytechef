@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20261022000000-1" author="Matija Petanjek" dbms="postgresql">
+        <addColumn tableName="billing_subscription">
+            <column name="plan_unit_total" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="plan_unit_used" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="extra_unit_total" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="extra_unit_used" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20261022000000-2" author="Matija Petanjek" dbms="postgresql">
+        <addColumn tableName="billing_subscription">
+            <column name="subscription_model" type="VARCHAR(16)" defaultValue="PREPAID">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <update tableName="billing_subscription">
+            <column name="subscription_model" value="METERED"/>
+            <where>usage_product_id IS NOT NULL</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>
