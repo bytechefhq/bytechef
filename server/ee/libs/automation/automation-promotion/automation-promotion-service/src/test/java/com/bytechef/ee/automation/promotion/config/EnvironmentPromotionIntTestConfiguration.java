@@ -13,6 +13,10 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
@@ -33,7 +37,9 @@ import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.credential.store.service.DatabaseCredentialStore;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,11 +67,11 @@ import tools.jackson.databind.ObjectMapper;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.automation.ai.mcp", "com.bytechef.automation.configuration",
+        "com.bytechef.automation.ai.a2a", "com.bytechef.automation.ai.mcp", "com.bytechef.automation.configuration",
         "com.bytechef.commons.util", "com.bytechef.ee.automation.apiplatform.configuration",
         "com.bytechef.ee.automation.promotion", "com.bytechef.encryption", "com.bytechef.jackson.config",
-        "com.bytechef.platform.category", "com.bytechef.platform.connection", "com.bytechef.platform.mcp",
-        "com.bytechef.platform.tag"
+        "com.bytechef.platform.category", "com.bytechef.platform.configuration.workflow.diff",
+        "com.bytechef.platform.connection", "com.bytechef.platform.mcp", "com.bytechef.platform.tag"
     },
     excludeFilters = @Filter(
         type = FilterType.REGEX,
@@ -79,6 +85,8 @@ import tools.jackson.databind.ObjectMapper;
 })
 @Configuration
 public class EnvironmentPromotionIntTestConfiguration {
+
+    private static final String MATCH_NOTHING = "%1$s = 0";
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -99,6 +107,42 @@ public class EnvironmentPromotionIntTestConfiguration {
     @Bean
     EnvironmentService environmentService() {
         return () -> Arrays.asList(Environment.values());
+    }
+
+    @Bean
+    McpServerTypeDefinition automationMcpServerTypeDefinition() {
+        return new McpServerTypeDefinition() {
+
+            @Override
+            public PlatformType getType() {
+                return PlatformType.AUTOMATION;
+            }
+
+            @Override
+            public boolean isSharedAdministration() {
+                return true;
+            }
+
+            @Override
+            public String resolvePath(String secretKey) {
+                return "/api/automation/" + secretKey + "/mcp";
+            }
+        };
+    }
+
+    @Bean
+    ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, MATCH_NOTHING);
+    }
+
+    @Bean
+    ProjectOwnerContributor embeddedConnectedUserProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, MATCH_NOTHING);
+    }
+
+    @Bean
+    ProjectDeploymentOwnerContributor embeddedProjectDeploymentOwnerContributor() {
+        return ProjectDeploymentOwnerContributor.of(ProjectDeploymentOwner.EMBEDDED, MATCH_NOTHING);
     }
 
     @Bean
