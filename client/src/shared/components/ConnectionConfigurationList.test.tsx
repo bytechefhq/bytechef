@@ -33,11 +33,13 @@ const connection: ConnectionI = {
 };
 
 interface ConnectionConfigurationListHarnessProps {
+    componentConnection?: ComponentConnection;
     connections?: ConnectionI[];
     handleConnectionIdChange: (index: number, connectionId: number | undefined) => void;
 }
 
 const ConnectionConfigurationListHarness = ({
+    componentConnection = optionalComponentConnection,
     connections,
     handleConnectionIdChange,
 }: ConnectionConfigurationListHarnessProps) => {
@@ -46,7 +48,7 @@ const ConnectionConfigurationListHarness = ({
     return (
         <Form {...form}>
             <ConnectionConfigurationList
-                componentConnections={[optionalComponentConnection]}
+                componentConnections={[componentConnection]}
                 connections={connections}
                 control={form.control as Control<FieldValues>}
                 handleConnectionIdChange={handleConnectionIdChange}
@@ -109,5 +111,23 @@ describe('ConnectionConfigurationList', () => {
         render(<ConnectionConfigurationListHarness handleConnectionIdChange={vi.fn()} />);
 
         expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
+
+    it('should mark a required connection with an asterisk', () => {
+        render(
+            <ConnectionConfigurationListHarness
+                componentConnection={{...optionalComponentConnection, required: true}}
+                connections={[connection]}
+                handleConnectionIdChange={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText('*')).toBeInTheDocument();
+    });
+
+    it('should not mark an optional connection with an asterisk', () => {
+        render(<ConnectionConfigurationListHarness connections={[connection]} handleConnectionIdChange={vi.fn()} />);
+
+        expect(screen.queryByText('*')).not.toBeInTheDocument();
     });
 });

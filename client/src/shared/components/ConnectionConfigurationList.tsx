@@ -1,6 +1,7 @@
 import SubflowIcon from '@/assets/subflow.svg';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
@@ -112,6 +113,8 @@ const ConnectionConfigurationListFormField = ({
 
                         <span className="max-w-[70%] truncate">
                             {workflowNodeLabel || `${componentDefinition?.title} Connection`}
+
+                            {componentConnection.required && <RequiredMark />}
                         </span>
 
                         {groupedIndices ? (

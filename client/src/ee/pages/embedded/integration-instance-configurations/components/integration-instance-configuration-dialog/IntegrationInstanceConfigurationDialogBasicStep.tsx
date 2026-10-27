@@ -1,4 +1,5 @@
 import {Input} from '@/components/Input/Input';
+import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
@@ -50,7 +51,10 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                     name="integrationId"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Integration</FormLabel>
+                            <FormLabel className="gap-0">
+                                Integration
+                                <RequiredMark />
+                            </FormLabel>
 
                             <FormControl>
                                 <IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox
@@ -87,7 +91,10 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                     name="name"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel className="gap-0">
+                                Name
+                                <RequiredMark />
+                            </FormLabel>
 
                             <FormControl>
                                 <Input placeholder="My Integration" {...field} />
@@ -106,7 +113,10 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                     name="integrationVersion"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Version</FormLabel>
+                            <FormLabel className="gap-0">
+                                Version
+                                <RequiredMark />
+                            </FormLabel>
 
                             <FormControl>
                                 <IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect
@@ -134,7 +144,10 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                     name="authorizationType"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Authorization</FormLabel>
+                            <FormLabel className="gap-0">
+                                Authorization
+                                <RequiredMark />
+                            </FormLabel>
 
                             <Select
                                 disabled={!!integrationInstanceConfiguration?.id}

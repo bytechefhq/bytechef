@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
@@ -65,7 +66,11 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                                 <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                             )}
 
-                            <span className="ml-1">{componentDefinition?.title} Connection</span>
+                            <span className="ml-1">
+                                {`${componentDefinition?.title} Connection`}
+
+                                {componentConnection.required && <RequiredMark />}
+                            </span>
 
                             <span className="ml-0.5 text-xs text-content-neutral-secondary">
                                 {`(${componentConnection.workflowNodeName})`}

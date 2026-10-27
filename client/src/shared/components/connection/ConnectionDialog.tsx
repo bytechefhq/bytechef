@@ -11,6 +11,7 @@ import {
     DialogTrigger,
 } from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
+import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
@@ -608,7 +609,10 @@ const ConnectionDialog = ({
                                         name="name"
                                         render={({field}) => (
                                             <FormItem className={twMerge(isUpdatingCredentials && 'hidden')}>
-                                                <FormLabel>Name</FormLabel>
+                                                <FormLabel className="gap-0">
+                                                    Name
+                                                    <RequiredMark />
+                                                </FormLabel>
 
                                                 <FormControl>
                                                     <Input placeholder="My Connection" {...field} />
