@@ -142,8 +142,8 @@ public class ConnectionFacadeRemoteServiceGrpcServer
     @Override
     public void update(UpdateConnectionDTORequest request, StreamObserver<Empty> responseObserver) {
         connectionFacade.update(
-            request.getId(), request.getName(), connectionProtoMapper.toTags(request.getTagsList()),
-            request.getVersion());
+            request.getId(), request.hasName() ? request.getName() : null,
+            request.getKeepTags() ? null : connectionProtoMapper.toTags(request.getTagsList()), request.getVersion());
 
         replyEmpty(responseObserver);
     }

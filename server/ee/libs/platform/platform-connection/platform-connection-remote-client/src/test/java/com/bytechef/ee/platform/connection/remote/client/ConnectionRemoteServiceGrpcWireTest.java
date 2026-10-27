@@ -208,6 +208,34 @@ class ConnectionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testUpdateWithoutNameOrTagsLeavesThemUnchanged() {
+        Connection connection = connection(7L);
+
+        when(connectionService.update(7L, null, null, 3)).thenReturn(connection);
+
+        assertThat(remoteConnectionServiceClient.update(7L, null, null, 3)).usingRecursiveComparison()
+            .isEqualTo(connection);
+
+        remoteConnectionFacadeClient.update(7L, null, null, 3);
+
+        verify(connectionFacade).update(7L, null, null, 3);
+    }
+
+    @Test
+    void testUpdateWithEmptyTagsClearsThem() {
+        Connection connection = connection(7L);
+
+        when(connectionService.update(7L, "Renamed", List.of(), 3)).thenReturn(connection);
+
+        assertThat(remoteConnectionServiceClient.update(7L, "Renamed", List.of(), 3)).usingRecursiveComparison()
+            .isEqualTo(connection);
+
+        remoteConnectionFacadeClient.update(7L, "Renamed", List.of(), 3);
+
+        verify(connectionFacade).update(7L, "Renamed", List.of(), 3);
+    }
+
+    @Test
     void testGetConnectionOfUnknownIdFailsWithItsMessage() {
         when(connectionService.getConnection(9L)).thenThrow(new IllegalArgumentException("Connection 9 not found"));
 

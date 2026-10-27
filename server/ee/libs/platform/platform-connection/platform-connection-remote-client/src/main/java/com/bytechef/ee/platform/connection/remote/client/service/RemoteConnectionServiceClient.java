@@ -175,14 +175,21 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Connection update(long id, String name, List<Long> tagIds, int version) {
-        UpdateConnectionRequest updateConnectionRequest = UpdateConnectionRequest.newBuilder()
+        UpdateConnectionRequest.Builder builder = UpdateConnectionRequest.newBuilder()
             .setId(id)
-            .setName(name)
-            .addAllTagIds(tagIds)
-            .setVersion(version)
-            .build();
+            .setVersion(version);
 
-        return connectionProtoMapper.toConnection(getStub().update(updateConnectionRequest));
+        if (name != null) {
+            builder.setName(name);
+        }
+
+        if (tagIds == null) {
+            builder.setKeepTagIds(true);
+        } else {
+            builder.addAllTagIds(tagIds);
+        }
+
+        return connectionProtoMapper.toConnection(getStub().update(builder.build()));
     }
 
     @Override

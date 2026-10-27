@@ -142,7 +142,8 @@ public class ConnectionRemoteServiceGrpcServer extends ConnectionRemoteServiceGr
     public void update(UpdateConnectionRequest request, StreamObserver<RemoteConnection> responseObserver) {
         reply(
             connectionService.update(
-                request.getId(), request.getName(), List.copyOf(request.getTagIdsList()), request.getVersion()),
+                request.getId(), request.hasName() ? request.getName() : null,
+                request.getKeepTagIds() ? null : List.copyOf(request.getTagIdsList()), request.getVersion()),
             responseObserver);
     }
 
