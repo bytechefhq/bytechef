@@ -169,6 +169,39 @@ class EnvironmentPromotionGraphQlControllerIntTest {
             eq(PromotionResourceType.MCP_SERVER), eq(1L), eq(2L), eq(Map.of(10L, 20L)));
     }
 
+    @Test
+    void testPromoteToEnvironmentAcceptsTheA2aServerResourceType() {
+        EnvironmentPromotionResult result = new EnvironmentPromotionResult(
+            66L, false, "https://example.com/api/automation/a2a/key/.well-known/agent-card.json", List.of());
+
+        when(environmentPromotionFacade.promote(eq(PromotionResourceType.A2A_SERVER), eq(3L), eq(1L), any()))
+            .thenReturn(result);
+
+        graphQlTester
+            .document("""
+                mutation {
+                    promoteToEnvironment(input: {
+                        resourceType: A2A_SERVER,
+                        sourceId: "3",
+                        targetEnvironmentId: "1",
+                        connectionMappings: []
+                    }) {
+                        targetId
+                        created
+                    }
+                }
+                """)
+            .execute()
+            .path("promoteToEnvironment.targetId")
+            .entity(String.class)
+            .isEqualTo("66")
+            .path("promoteToEnvironment.created")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+
+        verify(environmentPromotionFacade).promote(eq(PromotionResourceType.A2A_SERVER), eq(3L), eq(1L), eq(Map.of()));
+    }
+
     @TestConfiguration
     static class TestConfig {
 
