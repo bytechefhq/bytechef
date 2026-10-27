@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.grpc;
 
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -40,6 +41,11 @@ public class AutomationConfigurationGrpcServerConfiguration {
 
         return new ChildJobPrincipalFactoryRemoteServiceGrpcServer(
             childJobPrincipalFactory, automationConfigurationProtoMapper);
+    }
+
+    @Bean
+    PermissionRemoteServiceGrpcServer permissionRemoteServiceGrpcServer(PermissionService permissionService) {
+        return new PermissionRemoteServiceGrpcServer(permissionService);
     }
 
     @Bean
