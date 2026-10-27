@@ -74,6 +74,43 @@ describe('useUserGuiding', () => {
         expect(launchChecklist).toHaveBeenCalledWith(7);
     });
 
+    it('does not throw when the SDK has checklists but no checklist launcher', () => {
+        window.userGuiding = {
+            getAppState: () => ({api: {assistants: [{id: 7}], resourceCenters: []}}),
+        } as unknown as Window['userGuiding'];
+
+        expect(showUserGuidingLauncher()).toBe(false);
+    });
+
+    it('keeps polling until the SDK exposes the checklist launcher', () => {
+        const launchChecklist = vi.fn();
+        const getAppState = () => ({api: {assistants: [{id: 7}], resourceCenters: []}});
+
+        useUserGuidingStore.setState({launcherHidden: false});
+
+        window.userGuiding = {getAppState} as unknown as Window['userGuiding'];
+
+        showLauncherOnceSdkIsReady();
+
+        expect(() => vi.advanceTimersByTime(1000)).not.toThrow();
+
+        window.userGuiding = {getAppState, launchChecklist} as unknown as Window['userGuiding'];
+
+        vi.advanceTimersByTime(500);
+
+        expect(launchChecklist).toHaveBeenCalledWith(7);
+    });
+
+    it('hides the resource center when the SDK has no checklist API', () => {
+        const hideResourceCenter = vi.fn();
+
+        window.userGuiding = {hideResourceCenter} as unknown as Window['userGuiding'];
+
+        expect(() => hideUserGuidingLauncher()).not.toThrow();
+
+        expect(hideResourceCenter).toHaveBeenCalled();
+    });
+
     it('hides the launcher once the SDK registers its resource center API', () => {
         const hideChecklist = vi.fn();
         const hideResourceCenter = vi.fn();

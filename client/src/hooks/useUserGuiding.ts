@@ -9,7 +9,7 @@ const LAUNCHER_RETRY_LIMIT = 40;
 
 export function hideUserGuidingLauncher() {
     window.userGuiding?.hideResourceCenter?.();
-    window.userGuiding?.hideChecklist();
+    window.userGuiding?.hideChecklist?.();
 }
 
 export function showUserGuidingLauncher(): boolean {
@@ -26,7 +26,7 @@ export function showUserGuidingLauncher(): boolean {
 
     const checklistId = appState?.api?.assistants?.find((assistant) => assistant.id != null)?.id;
 
-    if (checklistId != null && userGuiding) {
+    if (checklistId != null && userGuiding?.launchChecklist) {
         userGuiding.launchChecklist(checklistId);
 
         return true;
@@ -110,7 +110,7 @@ export function initUserGuiding(containerId: string) {
     const methods = ['previewGuide', 'finishPreview', 'track', 'identify', 'hideChecklist', 'launchChecklist'] as const;
 
     for (const method of methods) {
-        userGuiding[method] = userGuiding.c(method) as (typeof userGuiding)[typeof method];
+        userGuiding[method] = userGuiding.c(method) as NonNullable<(typeof userGuiding)[typeof method]>;
     }
 
     window.userGuiding = userGuiding;
