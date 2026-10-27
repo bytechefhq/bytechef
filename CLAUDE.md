@@ -132,16 +132,18 @@ The `server/ee/` directory contains microservices for distributed deployment:
 **EE Code Conventions:**
 - Use ByteChef Enterprise license header (not Apache 2.0) for all files under `server/ee/`
 - Add `@version ee` Javadoc tag to all classes under `server/ee/`
-- `api-gateway-app/` - API Gateway with routing
+- `api-gateway-app/` - API Gateway: serves the client, owns users, login (Spring Session in Redis) and the user GraphQL, routes HTTP to the other apps
 - `ai-gateway-app/` - AI gateway service for routing model traffic
 - `configuration-app/` - Configuration management service
 - `connection-app/` - Connection management service
 - `coordinator-app/` - Workflow coordination service
-- `execution-app/` - Workflow execution service
+- `execution-app/` - Workflow execution service; the only app that owns job state
+- `migration-app/` - Runs every Liquibase changelog once before the other apps start
 - `scheduler-app/` - Scheduling service
 - `webhook-app/` - Webhook handling service
 - `worker-app/` - Task execution workers
 - `runtime-job-app/` - Runtime job execution
+- Services call each other over gRPC only (`server/ee/libs/core/remote/remote-grpc`, `bytechef.remote.grpc.*`), never REST; `docker-compose.microservices.yml` runs the stack
 
 ### Available Components
 ByteChef includes 250+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
@@ -590,7 +592,7 @@ class WorkflowServiceIntTest {
 ### EE Microservice Remote Client Pattern
 - EE apps (`server/ee/apps/`) use remote client stubs instead of local service implementations
 - When adding new SPI interfaces to platform modules, create corresponding `@Component @ConditionalOnEEVersion` stub classes in the relevant `*-remote-client` module (e.g., `automation-configuration-remote-client`)
-- Stubs throw `UnsupportedOperationException` — they satisfy Spring DI; actual work is done via REST calls
+- Methods no app calls yet throw `UnsupportedOperationException`; implemented methods call the owning app over gRPC (`*-remote-grpc-proto` + `*-remote-grpc` server, wire-tested in the client module)
 - `@ConditionalOnEEVersion` requires `bytechef.edition=ee` in the app's config
 - For lightweight EE apps (e.g., `runtime-job-app`) that can't pull in full remote client modules, use `@TestConfiguration` with mock/stub beans in the integration test
 

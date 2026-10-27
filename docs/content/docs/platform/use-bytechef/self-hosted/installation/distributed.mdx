@@ -1,6 +1,6 @@
 ---
-title: Distributed (Coordinator/Worker)
-description: Run ByteChef as separate coordinator, worker, and domain services instead of the monolith
+title: Distributed (Microservices)
+description: Run ByteChef as separate gateway, domain, coordinator, and worker services instead of the monolith
 ee: true
 comingSoon: true
 ---
@@ -10,45 +10,40 @@ coordinator, the task workers, all domain services, and the HTTP API. The Enterp
 instead be deployed as a set of cooperating microservices, so that task execution scales
 independently from the API and coordination layers.
 
-This page describes the services, the infrastructure they need, how they find each other, and the
-order to bring them up. It assumes you build the apps from source - there is currently no published
-Docker Compose file or Helm chart for the distributed set (the shipped `docker-compose.yml` and the
-`kubernetes/helm/bytechef` chart deploy the monolith only), so you compose the deployment with your
-own orchestration.
+This page describes the services, how a request moves between them, how to configure them, and how
+to start them with the shipped Docker Compose file.
 
 > **Edition note:** the distributed apps live under `server/ee/apps/` and run with
-> `bytechef.edition: EE`. Distributed mode is an Enterprise Edition deployment model.
+> `bytechef.edition: ee`. Distributed mode is an Enterprise Edition deployment model.
 
-{/* @coming-soon Hidden for now; tracked in .agents/coming-soon-inventory.md. Coming soon.
 ## The services
 
 | Service | App | Role |
 |---|---|---|
-| Config server | `config-server-app` | Spring Cloud Config Server; serves the shared configuration for every other app. |
-| API gateway | `api-gateway-app` | Edge router (Spring Cloud Gateway); routes `/api/**` and `/webhooks/**` to the backing services via service discovery. |
-| Configuration | `configuration-app` | Projects, workflows, and platform configuration domain (REST + database). |
-| Connection | `connection-app` | Connections domain (credentials to external services). |
-| Execution | `execution-app` | Workflow-execution read APIs (jobs, task executions). |
-| Coordinator | `coordinator-app` | The workflow engine's control plane: accepts jobs, runs task dispatchers (condition, loop, fork/join, each, map, parallel, subflow, approval), and dispatches task executions onto the message broker. Loads **no** components. |
-| Worker | `worker-app` | Executes task executions consumed from the broker. This is the only app with the component modules (all 180+) on its classpath - scale it horizontally for throughput. |
-| Scheduler | `scheduler-app` | Quartz-backed (JDBC job store) schedule and polling-trigger service. |
-| Webhook | `webhook-app` | Receives inbound `/webhooks/**` requests and turns them into trigger events. |
-| AI gateway | `ai-gateway-app` | Routes and meters model traffic (`/api/ai-gateway/**`). Optional. |
-| AI copilot | `ai-copilot-app` | Workflow copilot assistant service. Optional; carries its own full local configuration. |
-| Runtime job | `runtime-job-app` | One-shot workflow runner (an `ApplicationRunner`, not a long-lived server) with a self-contained in-memory configuration. Not part of the cluster wiring below. |
+| API gateway | `api-gateway-app` | The only app the browser talks to. Serves the web client, owns users, login, and the user GraphQL schema, keeps the login session in Redis, and routes `/api/**`, `/graphql`, and `/webhooks/**` to the apps behind it. |
+| Configuration | `configuration-app` | Projects, workflows, deployments, platform and embedded configuration, API keys, and connected users. |
+| Connection | `connection-app` | Connections (credentials to external services). |
+| Execution | `execution-app` | Jobs, task executions, trigger executions, and the workflow-execution APIs. The only app that owns job state. |
+| Coordinator | `coordinator-app` | The workflow engine's control plane: starts jobs, runs task dispatchers (condition, loop, fork/join, each, map, parallel, subflow, approval), and puts task executions on the message broker. Loads **no** components. |
+| Worker | `worker-app` | Runs task executions taken from the broker. The only app with the component modules on its classpath, and the app other services ask for component definitions. Scale it horizontally for throughput. |
+| Scheduler | `scheduler-app` | Quartz-backed (JDBC job store) schedules, polling triggers, and delayed wake-ups. |
+| Webhook | `webhook-app` | Receives inbound `/webhooks/**` requests, approval and callback links, and turns them into trigger events. Synchronous webhooks run their job inside `webhook-app` and keep the job's state on `execution-app`. |
 
-The split follows the engine architecture: the **coordinator** owns job state transitions and puts
-task executions on broker queues; **workers** consume those queues, execute the component action,
-and send completions back. Neither talks to the other over HTTP - all coordinator/worker traffic
-goes through the message broker.
+Two more apps exist under `server/ee/apps/` but are not part of the Compose deployment:
+`runtime-job-app` (a one-shot workflow runner with its own in-memory configuration) and
+`ai-gateway-app`.
+
+The coordinator owns job state transitions and puts task executions on broker queues; workers
+consume those queues, run the component action, and send completions back. All coordinator and
+worker traffic goes through the message broker.
 
 <Mermaid
   chart={`
 flowchart TB
-    CLIENT["Clients / providers"]
+    BROWSER["Browser / providers"]
 
     subgraph EDGE["Edge"]
-        GW["api-gateway-app - lb:// routes"]
+        GW["api-gateway-app - client, users, login"]
     end
 
     subgraph DOMAIN["Domain services"]
@@ -64,119 +59,125 @@ flowchart TB
         WRK["worker-app x N - all components"]
     end
 
-    CS["config-server-app - serves all app config"]
-
     subgraph INFRA["Infrastructure"]
-        PG[("PostgreSQL - shared, per-domain liquibase contexts")]
-        RED[("Redis - discovery")]
-        MB(["Message broker - redis / amqp / kafka"])
+        PG[("PostgreSQL - one shared database")]
+        RED[("Redis - sessions and discovery")]
+        MB(["Message broker - amqp / redis / kafka"])
     end
 
-    CLIENT --> GW
-    GW -- "/api/**" --> CFG
-    GW -- "/api/**" --> CON
-    GW -- "/api/**" --> EXEA
+    BROWSER --> GW
+    GW -- "HTTP routes" --> CFG
+    GW -- "HTTP routes" --> CON
+    GW -- "HTTP routes" --> EXEA
     GW -- "/webhooks/**" --> WHA
     WHA -- "trigger events" --> MB
     SCHED -- "trigger events" --> MB
     COORD <--> MB
     WRK <--> MB
-    COORD -- "/remote calls via discovery" --> CFG
-    WRK -- "/remote calls via discovery" --> CON
+    DOMAIN <-. "gRPC" .-> ENGINE
     CFG --> PG
     CON --> PG
     EXEA --> PG
     SCHED --> PG
+    GW --> PG
     DOMAIN -.->|register| RED
     ENGINE -.->|register| RED
-    CS -.->|config at boot| DOMAIN
-    CS -.->|config at boot| ENGINE
-    CS -.->|config at boot| GW
+    GW -.->|session| RED
 `}
 />
-*/}
+
+## How a request flows
+
+1. **Browser to gateway.** The browser loads the client from `api-gateway-app` and logs in there.
+   The gateway stores the login session in Redis (Spring Session).
+2. **Gateway to an app.** The gateway forwards the request, session cookie included, to the app that
+   owns the path. Every browser-facing app reads the same session from Redis, so a user logged in
+   at the gateway is logged in everywhere.
+3. **App to app.** When an app needs data or work another app owns, it calls that app over
+   **gRPC**. Every call carries the shared service token, the current tenant, and, for a user who
+   logged in through the web session, that user's login and authorities. The receiving app rejects
+   calls without the token. A failure on the receiving app comes back to the browser as 400 for a bad
+   request, 404 for a missing resource, and 500 for anything else.
+4. **Discovery.** Apps register in Redis under their `spring.application.name` and publish their
+   gRPC port in the registration. Callers find each other through that registry; there are no static
+   service addresses. A fixed address can still be set per service with
+   `bytechef.remote.grpc.targets.<app-name>`.
+
+There is no REST between services: the browser-facing APIs are HTTP, everything service to service
+is gRPC or the message broker.
 
 ## Required infrastructure
 
-- **PostgreSQL 15+** - one shared database. Each domain app applies its own Liquibase context
-  (`configuration`, `connection`, `execution`, `scheduler`), so they can share a single database
-  instance.
-- **Redis** - required regardless of broker choice: it backs **service discovery** (apps register
-  under their `spring.application.name`) and is the default message broker.
-- **Message broker** - `bytechef.message-broker.provider` set to one of `REDIS` (default in the EE
-  config), `AMQP` (RabbitMQ), `KAFKA`, or `JMS`/`AWS`. The `MEMORY` provider is in-process only and
-  **cannot** be used in distributed mode. All broker starters are on the worker/coordinator
-  classpath, so the provider is switched purely by configuration.
+- **PostgreSQL 15+** - one shared database. The `migrate` service (`migration-app`) applies every
+  Liquibase changelog once before the apps start; the apps themselves run with Liquibase disabled.
+- **Redis** - login sessions and service discovery.
+- **Caches** - `bytechef.cache.provider` stays `CAFFEINE`: the distributed apps keep their caches in
+  memory. Set to `REDIS`, they log a warning and keep `CAFFEINE`.
+- **Message broker** - `bytechef.message-broker.provider` set to `AMQP` (RabbitMQ, the Compose
+  default), `REDIS`, `KAFKA`, or `AWS`. The `MEMORY` provider is in-process only and **cannot** be
+  used in distributed mode.
+- **SMTP** - the Compose file starts [Mailpit](https://mailpit.axllent.org/) so sign-up and
+  password-reset mail can be read at `http://localhost:8025`. Point `BYTECHEF_MAIL_HOST` and
+  `BYTECHEF_MAIL_PORT` at your own server in production.
 
-For local experiments, `server/docker-compose.dev.infra.yml` starts PostgreSQL, Redis, and
-RabbitMQ.
+## Configuration
 
-## Configuration model
+Every app is configured through environment variables only. The Compose file passes the same set to
+each app; these must be set before it starts:
 
-Each app's own `application.yml` is nearly empty - it sets `spring.application.name` and imports
-everything else from the config server:
+| Variable | Purpose |
+|---|---|
+| `POSTGRES_PASSWORD` | Database password, also used for the bundled PostgreSQL container. |
+| `RABBITMQ_PASSWORD` | Broker password, also used for the bundled RabbitMQ container. |
+| `BYTECHEF_ENCRYPTION_KEY` | Encryption key for stored credentials (`openssl rand -base64 16`). |
+| `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember-me cookie key (`openssl rand -base64 32`). |
+| `BYTECHEF_REMOTE_GRPC_SERVICE_TOKEN` | Shared secret on every gRPC call between apps (`openssl rand -hex 32`). An app that serves gRPC refuses to start without it. |
 
-```yaml
-spring:
-  application:
-    name: coordinator-app
-  config:
-    import: optional:configserver:http://localhost:6111
-  cloud:
-    config:
-      username: configserver
-      password: ${BYTECHEF_CONFIG_SERVER_PASSWORD:dev-config-server-secret}
+Optional variables include `BYTECHEF_PUBLIC_URL` (default `http://localhost:8080`),
+`BYTECHEF_PORT` (the gateway's published port, default `8080`), `BYTECHEF_MESSAGE_BROKER_PROVIDER`
+(default `AMQP`), and `MAILPIT_UI_PORT` (default `8025`).
+
+gRPC settings, under `bytechef.remote.grpc`:
+
+| Property | Default | Purpose |
+|---|---|---|
+| `service-token` | none | The shared secret above. |
+| `plaintext` | `false` | Send gRPC without TLS. Set it to `true` only on a trusted network, such as the Docker Compose network; the Compose file does. |
+| `deadline` | `10s` | Longest an ordinary call between apps may take. |
+| `execution-deadline` | `1h` | Longest a call that runs component code on another app may take, such as an action or a trigger. |
+| `max-inbound-message-size` | `64MB` | Largest message an app accepts, such as all component definitions with their icons. |
+| `targets.<app-name>` | discovery | Fixed address for one app instead of discovery. |
+
+With `plaintext` off, each app that serves gRPC needs a TLS certificate: set
+`spring.grpc.server.ssl.bundle` to a Spring SSL bundle. An app with neither TLS nor
+`plaintext: true` refuses to start rather than serving gRPC unencrypted.
+
+## Running it with Docker Compose
+
+The repository root contains `docker-compose.microservices.yml`. Build the jars and the client,
+then start everything:
+
+```bash
+./gradlew :server:ee:apps:api-gateway-app:bootJar :server:ee:apps:configuration-app:bootJar \
+  :server:ee:apps:connection-app:bootJar :server:ee:apps:coordinator-app:bootJar \
+  :server:ee:apps:execution-app:bootJar :server:ee:apps:migration-app:bootJar \
+  :server:ee:apps:scheduler-app:bootJar :server:ee:apps:webhook-app:bootJar \
+  :server:ee:apps:worker-app:bootJar
+(cd client && npm run build)
+
+export POSTGRES_PASSWORD=... RABBITMQ_PASSWORD=...
+export BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16)
+export BYTECHEF_SECURITY_REMEMBER_ME_KEY=$(openssl rand -base64 32)
+export BYTECHEF_REMOTE_GRPC_SERVICE_TOKEN=$(openssl rand -hex 32)
+
+docker compose -f docker-compose.microservices.yml up -d --build --wait
 ```
 
-The real, shared configuration lives in `config-server-app`'s classpath at
-`src/main/resources/config/apps/` - a shared `application.yml` (+ `-dev`/`-prod` profiles) plus
-per-app override files such as `configuration-app.yml` or `worker-app.yml`. Although the import is
-marked `optional:`, the config server is **effectively required**: the datasource coordinates,
-broker provider, edition flag, and internal service token are only served from there. An app booted
-without it comes up mis-configured, not degraded.
+Compose starts PostgreSQL, Redis, RabbitMQ, and Mailpit, runs `migrate` to completion, then starts
+the eight apps and waits until each reports ready on `/actuator/health/readiness`. Open
+`http://localhost:8080` and sign up; the confirmation mail is in Mailpit.
 
-Key properties served to all apps:
-
-| Property | Value / purpose |
-|---|---|
-| `bytechef.edition` | `EE` |
-| `bytechef.message-broker.provider` | `REDIS` (or `AMQP`, `KAFKA`, `JMS`, `AWS`) |
-| `bytechef.cache.provider` | `CAFFEINE` - the distributed apps keep their caches in memory; with `REDIS` they log a warning and keep `CAFFEINE` |
-| `bytechef.discovery-service.provider` | `REDIS` - the only supported discovery backend |
-| `bytechef.data-storage.provider` / `bytechef.workflow.output-storage.provider` | `JDBC` |
-| `bytechef.scheduler.provider` | `QUARTZ` |
-| `bytechef.internal.service-token` | `${BYTECHEF_INTERNAL_SERVICE_TOKEN}` - shared secret for internal `/remote` calls. **Fail-closed**: internal calls are rejected when unset. |
-| `bytechef.worker.task.subscriptions.*` | per-queue worker consumer counts (see below) |
-
-Secrets you must set in every app's environment:
-
-- `BYTECHEF_CONFIG_SERVER_PASSWORD` (and the matching username) - basic auth to the config server.
-- `BYTECHEF_INTERNAL_SERVICE_TOKEN` - the shared internal service token.
-- The usual monolith secrets served through the config files: datasource credentials, encryption
-  key, etc.
-
-## Service discovery and internal calls
-
-Apps register themselves in **Redis** on startup (instance id
-`${spring.application.name}:${random.value}`) and resolve each other with Spring Cloud
-LoadBalancer on top of the Redis discovery client. There are no static service URLs and no Eureka.
-
-Cross-service calls use the *remote client* pattern: each domain module has a `*-remote-client`
-(REST stubs used by consumers) and a `*-remote-rest` (the `/remote/**` controllers on the owning
-app). The client sets the logical service name as the hostname - for example the coordinator
-fetches workflow definitions from `http://configuration-app/remote/workflow-service/...` - and the
-load balancer resolves it against the Redis registry. Every internal request carries the tenant id in a
-`CURRENT_TENANT_ID` header alongside the internal service token; the receiving app validates both.
-
-## API gateway routing
-
-`api-gateway-app` uses Spring Cloud Gateway (WebMVC flavor) with discovery-based `lb://` URIs:
-
-- `/api/automation/**`, `/api/embedded/**`, `/api/platform/**` → `configuration-app` (with
-  `connection-app` and `execution-app` matching their own overlapping predicates - route order
-  matters)
-- `/api/ai-gateway/**` → `ai-gateway-app`
-- `/webhooks/**` → `webhook-app`
+Keep the encryption key: credentials stored with one key cannot be read with another.
 
 ## Worker queues and scaling
 
@@ -267,8 +268,8 @@ component.
 
 `scheduler-app` runs [Quartz](https://www.quartz-scheduler.org/) with a **JDBC job store** against
 the shared database (`spring.quartz.job-store-type: jdbc`, the PostgreSQL driver delegate, and
-`initialize-schema: never` - the Quartz tables are created by the `scheduler` Liquibase context, not
-by Quartz itself). Schedules therefore live in the database and survive a restart.
+`initialize-schema: never` - the Quartz tables are created by Liquibase, not by Quartz itself).
+Schedules therefore live in the database and survive a restart.
 
 <Callout type="warn">
   Quartz clustering is not enabled in the shipped `scheduler-app` configuration. Run exactly one
@@ -335,26 +336,16 @@ entries idle for 60+ seconds (XCLAIM), and re-runs them through the normal invok
 Semantics are at-least-once, matching the AMQP/Kafka brokers - a task interrupted mid-flight runs
 again on another worker.
 
-## Bring-up order
-
-1. Infrastructure: PostgreSQL, Redis, and the message broker (if not Redis).
-2. `config-server-app` - everything else reads its configuration from it (dev port `6111`).
-3. Domain services: `configuration-app`, `connection-app`, `execution-app`, `scheduler-app`
-   (each runs its Liquibase context against the shared database).
-4. `coordinator-app` and one or more `worker-app` instances.
-5. `webhook-app`, and optionally `ai-gateway-app` / `ai-copilot-app`.
-6. `api-gateway-app` last, once its route targets are registered in discovery.
-
 ## Current limitations
 
-- **No shipped orchestration**: no Docker Compose file or Helm chart exists for the distributed
-  set - the shipped compose files and the `bytechef` Helm chart are monolith-only.
-- **Workflow alert rules are monolith-only for now**: job-status notifications work distributed on
-  all three channels - `coordinator-app` resolves delivery targets through `configuration-app`'s
-  `/remote/notification-service` endpoints, delivers webhook and Slack sends with the shared CE
-  transports, and proxies email sends to `configuration-app`'s mail service through
-  `/remote/notification-email-gateway` (SMTP credentials stay in one app) - but workflow alert
-  rules still require the monolith deployment.
-- **Config server reachability**: apps reach the config server via a static URL
-  (`http://localhost:6111` in dev) rather than discovery; point
-  `spring.config.import` at your config server's address in each app's environment.
+- **Single tenant verified.** The Compose deployment has been verified with
+  `BYTECHEF_TENANT_MODE=single` only.
+- **Web-session users only between apps.** Only users who logged in through the gateway's web
+  session are carried on gRPC calls. Embedded API-key and JWT authentication on `execution-app` and
+  `webhook-app`, and passing embedded connected users between apps, are not yet available.
+- **One database.** All services share one PostgreSQL database; there is no per-service schema
+  split.
+- **No Helm chart.** Kubernetes deployments of the microservices need your own manifests; the
+  `bytechef` Helm chart deploys the monolith only.
+- **Service token is the only trust root.** Any app holding the service token can call every other
+  app as any user. Keep it secret and rotate it by restarting every app with the new value.
