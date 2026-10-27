@@ -49,7 +49,10 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
 
     @Override
     public void deleteJobTriggerExecution(long jobId) {
-        throw new UnsupportedOperationException();
+        getStub().deleteJobTriggerExecution(
+            IdRequest.newBuilder()
+                .setId(jobId)
+                .build());
     }
 
     @Override

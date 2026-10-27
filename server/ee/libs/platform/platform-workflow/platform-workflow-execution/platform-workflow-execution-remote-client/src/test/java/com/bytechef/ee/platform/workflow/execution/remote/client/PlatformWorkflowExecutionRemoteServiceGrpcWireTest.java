@@ -358,6 +358,13 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testDeleteJobTriggerExecution() {
+        new RemoteTriggerExecutionServiceClient(fixedGrpcChannels, JSON_MAPPER).deleteJobTriggerExecution(7L);
+
+        verify(triggerExecutionService).deleteJobTriggerExecution(7L);
+    }
+
+    @Test
     void testTriggerStateKeepsNumberTypes() {
         when(triggerStateService.fetchValue(any(WorkflowExecutionId.class)))
             .thenReturn(Optional.of(9_007_199_254_740_993L));
