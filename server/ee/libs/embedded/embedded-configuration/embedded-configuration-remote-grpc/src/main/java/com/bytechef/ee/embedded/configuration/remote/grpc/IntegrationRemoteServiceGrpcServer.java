@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.remote.grpc;
 
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegration;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrations;
@@ -55,6 +56,14 @@ public class IntegrationRemoteServiceGrpcServer extends IntegrationRemoteService
     public void getIntegrations(Empty request, StreamObserver<RemoteIntegrations> responseObserver) {
         responseObserver
             .onNext(embeddedConfigurationProtoMapper.toRemoteIntegrations(integrationService.getIntegrations()));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getIntegrationsByIds(IdsRequest request, StreamObserver<RemoteIntegrations> responseObserver) {
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toRemoteIntegrations(
+                integrationService.getIntegrations(request.getIdsList())));
         responseObserver.onCompleted();
     }
 
