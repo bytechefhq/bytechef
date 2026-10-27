@@ -15,6 +15,7 @@ service ComponentDefinitionRemoteService {
   rpc GetComponentDefinitions(GetComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
   rpc GetComponentDefinitionVersions(GetComponentDefinitionVersionsRequest) returns (RemoteComponentDefinitions);
   rpc GetConnectionComponentDefinition(GetConnectionComponentDefinitionRequest) returns (RemoteComponentDefinition);
+  rpc HasComponentDefinition(GetComponentDefinitionRequest) returns (BoolResponse);
   rpc SearchComponentDefinitions(SearchComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
 }
 
