@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
 
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
+    implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-grpc"))
 
     testImplementation(project(":server:libs:test:test-support"))
 }

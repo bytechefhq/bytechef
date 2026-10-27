@@ -9,8 +9,15 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdsRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.OptionalStringResponse;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectWorkflowRemoteServiceGrpc;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectWorkflowUuidRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.StringResponse;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.StringsResponse;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.WorkflowIdsRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.WorkflowUuidRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -18,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -30,9 +38,11 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     private static final String CONFIGURATION_APP = "configuration-app";
 
+    private final AutomationConfigurationProtoMapper automationConfigurationProtoMapper;
     private final GrpcChannels grpcChannels;
 
-    public RemoteProjectWorkflowServiceClient(GrpcChannels grpcChannels) {
+    public RemoteProjectWorkflowServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.automationConfigurationProtoMapper = new AutomationConfigurationProtoMapper(objectMapper);
         this.grpcChannels = grpcChannels;
     }
 
@@ -65,7 +75,13 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public Optional<String> fetchProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid) {
-        throw new UnsupportedOperationException();
+        OptionalStringResponse optionalStringResponse = getStub().fetchProjectWorkflowWorkflowId(
+            WorkflowUuidRequest.newBuilder()
+                .setProjectDeploymentId(projectDeploymentId)
+                .setWorkflowUuid(workflowUuid)
+                .build());
+
+        return optionalStringResponse.hasValue() ? Optional.of(optionalStringResponse.getValue()) : Optional.empty();
     }
 
     @Override
@@ -121,7 +137,12 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public List<String> getProjectWorkflowIds(long projectId) {
-        throw new UnsupportedOperationException();
+        StringsResponse stringsResponse = getStub().getProjectWorkflowIds(
+            IdRequest.newBuilder()
+                .setId(projectId)
+                .build());
+
+        return List.copyOf(stringsResponse.getValuesList());
     }
 
     @Override
@@ -136,7 +157,11 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public List<ProjectWorkflow> getProjectWorkflows(List<Long> projectIds) {
-        throw new UnsupportedOperationException();
+        return automationConfigurationProtoMapper.toProjectWorkflows(
+            getStub().getProjectsProjectWorkflows(
+                IdsRequest.newBuilder()
+                    .addAllIds(projectIds)
+                    .build()));
     }
 
     @Override
@@ -151,7 +176,15 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public List<ProjectWorkflow> getProjectWorkflows(Long projectId, String workflowUuid) {
-        throw new UnsupportedOperationException();
+        ProjectWorkflowUuidRequest.Builder builder = ProjectWorkflowUuidRequest.newBuilder()
+            .setWorkflowUuid(workflowUuid);
+
+        if (projectId != null) {
+            builder.setProjectId(projectId);
+        }
+
+        return automationConfigurationProtoMapper.toProjectWorkflows(
+            getStub().getProjectUuidProjectWorkflows(builder.build()));
     }
 
     @Override
@@ -161,12 +194,20 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
 
     @Override
     public List<ProjectWorkflow> getWorkflowProjectWorkflows(List<String> workflowIds) {
-        throw new UnsupportedOperationException();
+        return automationConfigurationProtoMapper.toProjectWorkflows(
+            getStub().getWorkflowProjectWorkflows(
+                WorkflowIdsRequest.newBuilder()
+                    .addAllWorkflowIds(workflowIds)
+                    .build()));
     }
 
     @Override
     public List<ProjectWorkflow> getWorkflowUuidProjectWorkflows(String workflowUuid) {
-        throw new UnsupportedOperationException();
+        return automationConfigurationProtoMapper.toProjectWorkflows(
+            getStub().getWorkflowUuidProjectWorkflows(
+                WorkflowUuidRequest.newBuilder()
+                    .setWorkflowUuid(workflowUuid)
+                    .build()));
     }
 
     @Override

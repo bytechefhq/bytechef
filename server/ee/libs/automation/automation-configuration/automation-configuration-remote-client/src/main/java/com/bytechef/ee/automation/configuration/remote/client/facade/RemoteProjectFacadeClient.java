@@ -14,11 +14,16 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectFacadeRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -28,6 +33,16 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnEEVersion
 public class RemoteProjectFacadeClient implements ProjectFacade {
+
+    private static final String CONFIGURATION_APP = "configuration-app";
+
+    private final AutomationConfigurationProtoMapper automationConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
+
+    public RemoteProjectFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.automationConfigurationProtoMapper = new AutomationConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+    }
 
     @Override
     public long createProject(ProjectDTO projectDTO) {
@@ -99,7 +114,14 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
-        throw new UnsupportedOperationException();
+        ProjectFacadeRemoteServiceGrpc.ProjectFacadeRemoteServiceBlockingStub stub =
+            ProjectFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        return automationConfigurationProtoMapper.toProjectWorkflowDTOs(
+            stub.getWorkspaceProjectWorkflows(
+                IdRequest.newBuilder()
+                    .setId(workspaceId)
+                    .build()));
     }
 
     @Override
