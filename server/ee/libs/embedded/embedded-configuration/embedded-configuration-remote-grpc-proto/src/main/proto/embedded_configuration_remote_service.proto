@@ -18,6 +18,7 @@ service IntegrationRemoteService {
 
 service IntegrationInstanceConfigurationRemoteService {
   rpc GetIntegrationInstanceConfiguration(IdRequest) returns (RemoteIntegrationInstanceConfiguration);
+  rpc GetIntegrationInstanceConfigurations(IdsRequest) returns (RemoteIntegrationInstanceConfigurations);
 }
 
 service IntegrationInstanceConfigurationWorkflowRemoteService {
@@ -148,6 +149,10 @@ message RemoteIntegrationInstanceConfiguration {
   optional string name = 13;
   repeated int64 tag_ids = 14;
   optional int32 version = 15;
+}
+
+message RemoteIntegrationInstanceConfigurations {
+  repeated RemoteIntegrationInstanceConfiguration integration_instance_configurations = 1;
 }
 
 message RemoteIntegrationInstanceConfigurationWorkflow {

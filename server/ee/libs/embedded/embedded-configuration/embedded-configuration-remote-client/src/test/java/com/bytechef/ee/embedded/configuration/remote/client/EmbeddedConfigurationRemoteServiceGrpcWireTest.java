@@ -211,6 +211,30 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testGetIntegrationInstanceConfigurationsByIds() {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
+        integrationInstanceConfiguration.setId(5L);
+        integrationInstanceConfiguration.setIntegrationId(7L);
+
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(List.of(5L)))
+            .thenReturn(List.of(integrationInstanceConfiguration));
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(List.of()))
+            .thenReturn(List.of());
+
+        RemoteIntegrationInstanceConfigurationServiceClient remoteIntegrationInstanceConfigurationServiceClient =
+            new RemoteIntegrationInstanceConfigurationServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationInstanceConfigurationServiceClient.getIntegrationInstanceConfigurations(
+            List.of(5L)))
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(integrationInstanceConfiguration);
+        assertThat(remoteIntegrationInstanceConfigurationServiceClient.getIntegrationInstanceConfigurations(List.of()))
+            .isEmpty();
+    }
+
+    @Test
     void testIntegrationInstanceConfigurationWorkflowCalls() {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             new IntegrationInstanceConfigurationWorkflow();
