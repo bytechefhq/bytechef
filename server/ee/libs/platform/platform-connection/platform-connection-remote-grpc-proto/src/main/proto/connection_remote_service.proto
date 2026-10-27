@@ -160,9 +160,10 @@ message UpdateConnectionTagIdsRequest {
 
 message UpdateConnectionRequest {
   int64 id = 1;
-  string name = 2;
+  optional string name = 2;
   repeated int64 tag_ids = 3;
   int32 version = 4;
+  bool keep_tag_ids = 5;
 }
 
 message ConnectionStatusRequest {
@@ -203,7 +204,8 @@ message UpdateConnectionDTOTagsRequest {
 
 message UpdateConnectionDTORequest {
   int64 id = 1;
-  string name = 2;
+  optional string name = 2;
   repeated RemoteTag tags = 3;
   int32 version = 4;
+  bool keep_tags = 5;
 }

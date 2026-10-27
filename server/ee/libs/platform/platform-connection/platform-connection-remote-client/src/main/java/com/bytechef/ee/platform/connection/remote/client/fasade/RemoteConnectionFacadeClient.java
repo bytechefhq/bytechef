@@ -160,14 +160,21 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
 
     @Override
     public void update(long id, String name, List<Tag> tags, int version) {
-        UpdateConnectionDTORequest updateConnectionDTORequest = UpdateConnectionDTORequest.newBuilder()
+        UpdateConnectionDTORequest.Builder builder = UpdateConnectionDTORequest.newBuilder()
             .setId(id)
-            .setName(name)
-            .addAllTags(connectionProtoMapper.toRemoteTagList(tags))
-            .setVersion(version)
-            .build();
+            .setVersion(version);
 
-        getStub().update(updateConnectionDTORequest);
+        if (name != null) {
+            builder.setName(name);
+        }
+
+        if (tags == null) {
+            builder.setKeepTags(true);
+        } else {
+            builder.addAllTags(connectionProtoMapper.toRemoteTagList(tags));
+        }
+
+        getStub().update(builder.build());
     }
 
     @Override
