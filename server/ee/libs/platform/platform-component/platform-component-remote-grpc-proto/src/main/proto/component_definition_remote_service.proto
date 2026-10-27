@@ -79,6 +79,10 @@ service ClusterElementDefinitionFacadeRemoteService {
   rpc ExecuteTool(ClusterElementExecuteToolRequest) returns (ValueResponse);
 }
 
+service ComponentDefinitionFacadeRemoteService {
+  rpc ExecuteWorkflowInputOptions(ExecuteWorkflowInputOptionsRequest) returns (RemoteOptions);
+}
+
 service UnifiedApiDefinitionRemoteService {
   rpc GetUnifiedApiComponentDefinitions(GetUnifiedApiComponentDefinitionsRequest) returns (RemoteComponentDefinitions);
 }
@@ -628,4 +632,15 @@ message ClusterElementExecuteToolRequest {
 
 message GetUnifiedApiComponentDefinitionsRequest {
   optional string category = 1;
+}
+
+message ExecuteWorkflowInputOptionsRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string group_name = 3;
+  string property_name = 4;
+  bytes input_parameters = 5;
+  repeated string lookup_depends_on_paths = 6;
+  optional string search_text = 7;
+  optional int64 connection_id = 8;
 }
