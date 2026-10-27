@@ -127,6 +127,20 @@ class AtlasExecutionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testDeleteJob() {
+        new RemoteJobFacadeClient(fixedGrpcChannels, JSON_MAPPER).deleteJob(7L);
+
+        verify(jobFacade).deleteJob(7L);
+    }
+
+    @Test
+    void testStopJob() {
+        new RemoteJobFacadeClient(fixedGrpcChannels, JSON_MAPPER).stopJob(7L);
+
+        verify(jobFacade).stopJob(7L);
+    }
+
+    @Test
     void testJobCalls() {
         Job job = job(7L);
 

@@ -10,6 +10,7 @@ package com.bytechef.ee.atlas.execution.remote.client.facade;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobFacadeRemoteServiceGrpc;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
@@ -51,11 +52,7 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void deleteJob(long id) {
-        loadBalancedRestClient.delete(
-            uriBuilder -> uriBuilder
-                .host("execution-app")
-                .path("/remote/job-facade/delete-job/{id}")
-                .build(id));
+        getStub().deleteJob(toIdRequest(id));
     }
 
     @Override
@@ -80,10 +77,16 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void stopJob(long id) {
-        throw new UnsupportedOperationException();
+        getStub().stopJob(toIdRequest(id));
     }
 
     private JobFacadeRemoteServiceGrpc.JobFacadeRemoteServiceBlockingStub getStub() {
         return JobFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private static IdRequest toIdRequest(long id) {
+        return IdRequest.newBuilder()
+            .setId(id)
+            .build();
     }
 }
