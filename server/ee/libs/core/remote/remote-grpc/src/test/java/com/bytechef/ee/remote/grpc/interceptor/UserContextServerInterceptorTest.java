@@ -194,6 +194,43 @@ class UserContextServerInterceptorTest {
         }
     }
 
+    @Test
+    void testMalformedConnectedUserEnvironmentIdBindsNoIdentity() throws Exception {
+        try (InProcessGrpc inProcessGrpc = start(metadata -> {
+            metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "connected-user");
+            metadata.put(GrpcMetadataKeys.USER_LOGIN, "external-user-1".getBytes(StandardCharsets.UTF_8));
+            metadata.put(GrpcMetadataKeys.CONNECTED_USER_ID, "7");
+            metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, "production");
+            metadata.put(GrpcMetadataKeys.API_KEY_AUTHENTICATED, "false");
+        })) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
+    @Test
+    void testMalformedApiKeyEnvironmentIdBindsNoIdentity() throws Exception {
+        try (InProcessGrpc inProcessGrpc = start(metadata -> {
+            metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "api-key");
+            metadata.put(GrpcMetadataKeys.USER_LOGIN, "admin@localhost.com".getBytes(StandardCharsets.UTF_8));
+            metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, "production");
+        })) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
+    @Test
+    void testNonBooleanApiKeyAuthenticatedBindsNoIdentity() throws Exception {
+        try (InProcessGrpc inProcessGrpc = start(metadata -> {
+            metadata.put(GrpcMetadataKeys.PRINCIPAL_KIND, "connected-user");
+            metadata.put(GrpcMetadataKeys.USER_LOGIN, "external-user-1".getBytes(StandardCharsets.UTF_8));
+            metadata.put(GrpcMetadataKeys.CONNECTED_USER_ID, "7");
+            metadata.put(GrpcMetadataKeys.ENVIRONMENT_ID, "2");
+            metadata.put(GrpcMetadataKeys.API_KEY_AUTHENTICATED, "yes");
+        })) {
+            assertThat(EchoService.echoUser(inProcessGrpc.channel())).isEmpty();
+        }
+    }
+
     private static InProcessGrpc start(Consumer<Metadata> metadataWriter) throws Exception {
         ClientInterceptor metadataInterceptor = new ClientInterceptor() {
 
