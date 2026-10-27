@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -84,6 +85,15 @@ public class EmbeddedConfigurationGrpcServerConfiguration {
 
         return new IntegrationInstanceConfigurationWorkflowRemoteServiceGrpcServer(
             integrationInstanceConfigurationWorkflowService, embeddedConfigurationProtoMapper);
+    }
+
+    @Bean
+    IntegrationInstanceRemoteServiceGrpcServer integrationInstanceRemoteServiceGrpcServer(
+        IntegrationInstanceService integrationInstanceService,
+        EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper) {
+
+        return new IntegrationInstanceRemoteServiceGrpcServer(
+            integrationInstanceService, embeddedConfigurationProtoMapper);
     }
 
     @Bean

@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.remote.grpc;
 
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
@@ -19,11 +20,13 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAppEvent;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProject;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProjects;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegration;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstance;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnections;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrations;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -54,6 +57,7 @@ public class EmbeddedConfigurationProtoMapper {
                 .addMixIn(
                     IntegrationInstanceConfigurationWorkflowConnection.class,
                     IntegrationInstanceConfigurationWorkflowConnectionMixIn.class)
+                .addMixIn(IntegrationInstance.class, NoArgsCreatorMixIn.class)
                 .addMixIn(IntegrationInstanceWorkflow.class, NoArgsCreatorMixIn.class)
                 .addMixIn(IntegrationVersion.class, NoArgsCreatorMixIn.class)
                 .build());
@@ -106,6 +110,14 @@ public class EmbeddedConfigurationProtoMapper {
             .toList();
     }
 
+    public List<IntegrationInstance> toIntegrationInstances(RemoteIntegrationInstances remoteIntegrationInstances) {
+        return remoteIntegrationInstances.getIntegrationInstancesList()
+            .stream()
+            .map(remoteIntegrationInstance -> protoJsonMapper.toObject(
+                remoteIntegrationInstance, IntegrationInstance.class))
+            .toList();
+    }
+
     public IntegrationInstanceWorkflow toIntegrationInstanceWorkflow(
         RemoteIntegrationInstanceWorkflow remoteIntegrationInstanceWorkflow) {
 
@@ -147,6 +159,19 @@ public class EmbeddedConfigurationProtoMapper {
         return protoJsonMapper.toProto(
             integrationInstanceConfigurationWorkflowConnection,
             RemoteIntegrationInstanceConfigurationWorkflowConnection.newBuilder());
+    }
+
+    public RemoteIntegrationInstance toProto(IntegrationInstance integrationInstance) {
+        return protoJsonMapper.toProto(integrationInstance, RemoteIntegrationInstance.newBuilder());
+    }
+
+    public RemoteIntegrationInstances toProto(List<IntegrationInstance> integrationInstances) {
+        return RemoteIntegrationInstances.newBuilder()
+            .addAllIntegrationInstances(
+                integrationInstances.stream()
+                    .map(this::toProto)
+                    .toList())
+            .build();
     }
 
     public RemoteIntegrationInstanceWorkflow toProto(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
