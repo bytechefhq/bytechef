@@ -439,6 +439,34 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
                 .isEqualTo(webhookValidateResponse);
     }
 
+    @Test
+    void testTriggerExecuteWebhookValidateOnEnable() {
+        WebhookRequest webhookRequest = webhookRequest();
+        WebhookValidateResponse webhookValidateResponse = new WebhookValidateResponse(
+            Map.of("challenge", "abc"), Map.of("X-Hook", List.of("b")), 200);
+
+        when(triggerDefinitionFacade.executeWebhookValidateOnEnable(
+            eq("keep"), eq(1), eq("new"), eq(INPUT_PARAMETERS), sameJson(webhookRequest), eq(7L)))
+                .thenReturn(webhookValidateResponse);
+
+        assertThat(remoteTriggerDefinitionFacadeClient.executeWebhookValidateOnEnable(
+            "keep", 1, "new", INPUT_PARAMETERS, webhookRequest, 7L))
+                .isEqualTo(webhookValidateResponse);
+    }
+
+    @Test
+    void testTriggerExecuteWebhookValidateOnEnableWithoutConnection() {
+        WebhookValidateResponse webhookValidateResponse = new WebhookValidateResponse(null, null, 200);
+
+        when(triggerDefinitionFacade.executeWebhookValidateOnEnable(
+            "keep", 1, "new", INPUT_PARAMETERS, null, null))
+                .thenReturn(webhookValidateResponse);
+
+        assertThat(remoteTriggerDefinitionFacadeClient.executeWebhookValidateOnEnable(
+            "keep", 1, "new", INPUT_PARAMETERS, null, null))
+                .isEqualTo(webhookValidateResponse);
+    }
+
     private WebhookRequest sameJson(WebhookRequest expected) {
         String expectedJson = jsonMapper.writeValueAsString(expected);
 

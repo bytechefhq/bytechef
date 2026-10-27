@@ -23,6 +23,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteOutput
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteTriggerRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookDisableRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookEnableRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookResponseRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookValidateRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.component.domain.Option;
@@ -82,6 +83,10 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
 
         if (connectionId != null) {
             builder.setConnectionId(connectionId);
+        }
+
+        if (workflowId != null) {
+            builder.setWorkflowId(workflowId);
         }
 
         return componentProtoMapper.toProperties(getStub(componentName).executeDynamicProperties(builder.build()));
@@ -149,6 +154,10 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
             builder.setConnectionId(connectionId);
         }
 
+        if (workflowId != null) {
+            builder.setWorkflowId(workflowId);
+        }
+
         return componentProtoMapper.toOptions(getStub(componentName).executeOptions(builder.build()));
     }
 
@@ -165,6 +174,10 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
 
         if (connectionId != null) {
             builder.setConnectionId(connectionId);
+        }
+
+        if (workflowId != null) {
+            builder.setWorkflowId(workflowId);
         }
 
         return componentProtoMapper.toOutputResponse(getStub(componentName).executeOutput(builder.build()));
@@ -272,7 +285,14 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
     public @Nullable WebhookResponse executeWebhookResponse(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
 
-        throw new UnsupportedOperationException();
+        return componentProtoMapper.toWebhookResponse(
+            getStub(componentName).executeWebhookResponse(
+                TriggerExecuteWebhookResponseRequest.newBuilder()
+                    .setComponentName(componentName)
+                    .setComponentVersion(componentVersion)
+                    .setTriggerName(triggerName)
+                    .setInputParameters(componentProtoMapper.toBytes(inputParameters))
+                    .build()));
     }
 
     @Override
@@ -280,22 +300,10 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         WebhookRequest webhookRequest, Long connectionId) {
 
-        TriggerExecuteWebhookValidateRequest.Builder builder = TriggerExecuteWebhookValidateRequest.newBuilder()
-            .setComponentName(componentName)
-            .setComponentVersion(componentVersion)
-            .setTriggerName(triggerName)
-            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
-
-        if (webhookRequest != null) {
-            builder.setWebhookRequest(componentProtoMapper.toProto(webhookRequest));
-        }
-
-        if (connectionId != null) {
-            builder.setConnectionId(connectionId);
-        }
-
         return componentProtoMapper.toWebhookValidateResponse(
-            getStub(componentName).executeWebhookValidate(builder.build()));
+            getStub(componentName).executeWebhookValidate(
+                getWebhookValidateRequest(
+                    componentName, componentVersion, triggerName, inputParameters, webhookRequest, connectionId)));
     }
 
     @Override
@@ -303,7 +311,10 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
 
-        throw new UnsupportedOperationException();
+        return componentProtoMapper.toWebhookValidateResponse(
+            getStub(componentName).executeWebhookValidateOnEnable(
+                getWebhookValidateRequest(
+                    componentName, componentVersion, triggerName, inputParameters, webhookRequest, connectionId)));
     }
 
     private TriggerExecuteListenerRequest getListenerRequest(
@@ -318,6 +329,27 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
 
         if (workflowExecutionId != null) {
             builder.setWorkflowExecutionId(workflowExecutionId);
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return builder.build();
+    }
+
+    private TriggerExecuteWebhookValidateRequest getWebhookValidateRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Long connectionId) {
+
+        TriggerExecuteWebhookValidateRequest.Builder builder = TriggerExecuteWebhookValidateRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
+
+        if (webhookRequest != null) {
+            builder.setWebhookRequest(componentProtoMapper.toProto(webhookRequest));
         }
 
         if (connectionId != null) {

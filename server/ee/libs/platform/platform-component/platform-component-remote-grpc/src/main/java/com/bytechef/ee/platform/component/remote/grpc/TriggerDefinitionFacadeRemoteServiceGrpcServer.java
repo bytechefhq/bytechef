@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.grpc;
 
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.ee.platform.component.remote.grpc.proto.OutputResponseResult;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOptions;
@@ -22,8 +23,10 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteOutput
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteTriggerRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookDisableRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookEnableRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookResponseRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.TriggerExecuteWebhookValidateRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookEnableOutputResult;
+import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookResponseResult;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.constant.PlatformType;
@@ -59,7 +62,8 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
                     request.getPropertyName(), componentProtoMapper.toMap(request.getInputParameters()),
                     List.copyOf(request.getLookupDependsOnPathsList()),
-                    request.hasConnectionId() ? request.getConnectionId() : null)));
+                    request.hasConnectionId() ? request.getConnectionId() : null,
+                    request.hasWorkflowId() ? request.getWorkflowId() : null)));
         responseObserver.onCompleted();
     }
 
@@ -110,7 +114,8 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
                     request.getPropertyName(), componentProtoMapper.toMap(request.getInputParameters()),
                     List.copyOf(request.getLookupDependsOnPathsList()),
                     request.hasSearchText() ? request.getSearchText() : null,
-                    request.hasConnectionId() ? request.getConnectionId() : null)));
+                    request.hasConnectionId() ? request.getConnectionId() : null,
+                    request.hasWorkflowId() ? request.getWorkflowId() : null)));
         responseObserver.onCompleted();
     }
 
@@ -123,7 +128,8 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
                 triggerDefinitionFacade.executeOutput(
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
                     componentProtoMapper.toMap(request.getInputParameters()),
-                    request.hasConnectionId() ? request.getConnectionId() : null)));
+                    request.hasConnectionId() ? request.getConnectionId() : null,
+                    request.hasWorkflowId() ? request.getWorkflowId() : null)));
         responseObserver.onCompleted();
     }
 
@@ -179,12 +185,39 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
     }
 
     @Override
+    public void executeWebhookResponse(
+        TriggerExecuteWebhookResponseRequest request, StreamObserver<WebhookResponseResult> responseObserver) {
+
+        WebhookResponse webhookResponse = triggerDefinitionFacade.executeWebhookResponse(
+            request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
+            componentProtoMapper.toMap(request.getInputParameters()));
+
+        responseObserver.onNext(componentProtoMapper.toWebhookResponseResult(webhookResponse));
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void executeWebhookValidate(
         TriggerExecuteWebhookValidateRequest request, StreamObserver<RemoteWebhookValidateResponse> responseObserver) {
 
         responseObserver.onNext(
             componentProtoMapper.toProto(
                 triggerDefinitionFacade.executeWebhookValidate(
+                    request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
+                    componentProtoMapper.toMap(request.getInputParameters()),
+                    request.hasWebhookRequest() ? componentProtoMapper.toWebhookRequest(request.getWebhookRequest())
+                        : null,
+                    request.hasConnectionId() ? request.getConnectionId() : null)));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void executeWebhookValidateOnEnable(
+        TriggerExecuteWebhookValidateRequest request, StreamObserver<RemoteWebhookValidateResponse> responseObserver) {
+
+        responseObserver.onNext(
+            componentProtoMapper.toProto(
+                triggerDefinitionFacade.executeWebhookValidateOnEnable(
                     request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
                     componentProtoMapper.toMap(request.getInputParameters()),
                     request.hasWebhookRequest() ? componentProtoMapper.toWebhookRequest(request.getWebhookRequest())
