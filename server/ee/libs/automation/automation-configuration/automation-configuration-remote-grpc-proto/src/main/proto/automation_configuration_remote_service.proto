@@ -4,9 +4,14 @@ package bytechef.automation.configuration.remote.v1;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "platform_configuration_remote_service.proto";
 
 option java_multiple_files = true;
 option java_package = "com.bytechef.ee.automation.configuration.remote.grpc.proto";
+
+service ProjectFacadeRemoteService {
+  rpc GetWorkspaceProjectWorkflows(IdRequest) returns (RemoteProjectWorkflowDTOs);
+}
 
 service ProjectRemoteService {
   rpc GetProject(IdRequest) returns (RemoteProject);
@@ -17,6 +22,8 @@ service ProjectRemoteService {
 
 service ProjectDeploymentRemoteService {
   rpc GetProjectDeployment(IdRequest) returns (RemoteProjectDeployment);
+  rpc GetProjectDeployments(IdsRequest) returns (RemoteProjectDeployments);
+  rpc GetProjectDeploymentsByFilter(ProjectDeploymentsFilterRequest) returns (RemoteProjectDeployments);
   rpc IsProjectDeploymentEnabled(IdRequest) returns (BoolResponse);
 }
 
@@ -31,16 +38,43 @@ service ProjectDeploymentWorkflowRemoteService {
 }
 
 service ProjectWorkflowRemoteService {
+  rpc FetchProjectWorkflowWorkflowId(WorkflowUuidRequest) returns (OptionalStringResponse);
   rpc GetLastWorkflowId(WorkflowUuidRequest) returns (StringResponse);
+  rpc GetProjectUuidProjectWorkflows(ProjectWorkflowUuidRequest) returns (RemoteProjectWorkflows);
+  rpc GetProjectWorkflowIds(IdRequest) returns (StringsResponse);
   rpc GetProjectWorkflowWorkflowId(WorkflowUuidRequest) returns (StringResponse);
+  rpc GetProjectsProjectWorkflows(IdsRequest) returns (RemoteProjectWorkflows);
+  rpc GetWorkflowProjectWorkflows(WorkflowIdsRequest) returns (RemoteProjectWorkflows);
+  rpc GetWorkflowUuidProjectWorkflows(WorkflowUuidRequest) returns (RemoteProjectWorkflows);
 }
 
 message IdRequest {
   int64 id = 1;
 }
 
+message IdsRequest {
+  repeated int64 ids = 1;
+}
+
 message WorkflowIdRequest {
   string workflow_id = 1;
+}
+
+message WorkflowIdsRequest {
+  repeated string workflow_ids = 1;
+}
+
+message ProjectWorkflowUuidRequest {
+  optional int64 project_id = 1;
+  string workflow_uuid = 2;
+}
+
+message ProjectDeploymentsFilterRequest {
+  optional bool embedded = 1;
+  optional string environment = 2;
+  optional int64 project_id = 3;
+  optional int64 tag_id = 4;
+  optional int64 workspace_id = 5;
 }
 
 message ProjectDeploymentWorkflowRequest {
@@ -57,6 +91,14 @@ message WorkflowUuidRequest {
 
 message StringResponse {
   string value = 1;
+}
+
+message OptionalStringResponse {
+  optional string value = 1;
+}
+
+message StringsResponse {
+  repeated string values = 1;
 }
 
 message BoolResponse {
@@ -104,6 +146,39 @@ message RemoteProjectDeployment {
   optional int32 project_version = 11;
   repeated int64 tag_ids = 12;
   optional int32 version = 13;
+}
+
+message RemoteProjectDeployments {
+  repeated RemoteProjectDeployment project_deployments = 1;
+}
+
+message RemoteProjectWorkflow {
+  optional string created_by = 1;
+  optional google.protobuf.Timestamp created_date = 2;
+  optional int64 id = 3;
+  optional string last_modified_by = 4;
+  optional google.protobuf.Timestamp last_modified_date = 5;
+  optional int64 project_id = 6;
+  optional int32 project_version = 7;
+  optional string uuid = 8;
+  optional int32 version = 9;
+  optional string workflow_id = 10;
+}
+
+message RemoteProjectWorkflows {
+  repeated RemoteProjectWorkflow project_workflows = 1;
+}
+
+message RemoteProjectWorkflowDTO {
+  bytechef.platform.configuration.remote.v1.RemoteWorkflow workflow = 1;
+  int32 project_version = 2;
+  int64 project_workflow_id = 3;
+  bool sse_stream_response = 4;
+  optional string workflow_uuid = 5;
+}
+
+message RemoteProjectWorkflowDTOs {
+  repeated RemoteProjectWorkflowDTO project_workflows = 1;
 }
 
 message RemoteProjectDeploymentWorkflow {

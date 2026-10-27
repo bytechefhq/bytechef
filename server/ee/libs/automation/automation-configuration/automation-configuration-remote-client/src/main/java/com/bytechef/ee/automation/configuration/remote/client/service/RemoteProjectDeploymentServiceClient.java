@@ -13,12 +13,12 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentRemoteServiceGrpc;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ProjectDeploymentsFilterRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
@@ -65,10 +65,7 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
 
     @Override
     public boolean isProjectDeploymentEnabled(long projectDeploymentId) {
-        ProjectDeploymentRemoteServiceGrpc.ProjectDeploymentRemoteServiceBlockingStub stub =
-            ProjectDeploymentRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
-
-        BoolResponse boolResponse = stub.isProjectDeploymentEnabled(
+        BoolResponse boolResponse = getStub().isProjectDeploymentEnabled(
             IdRequest.newBuilder()
                 .setId(projectDeploymentId)
                 .build());
@@ -83,11 +80,8 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
 
     @Override
     public ProjectDeployment getProjectDeployment(long id) {
-        ProjectDeploymentRemoteServiceGrpc.ProjectDeploymentRemoteServiceBlockingStub stub =
-            ProjectDeploymentRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
-
         return automationConfigurationProtoMapper.toProjectDeployment(
-            stub.getProjectDeployment(
+            getStub().getProjectDeployment(
                 IdRequest.newBuilder()
                     .setId(id)
                     .build()));
@@ -110,7 +104,11 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
 
     @Override
     public List<ProjectDeployment> getProjectDeployments(List<Long> ids) {
-        throw new UnsupportedOperationException();
+        return automationConfigurationProtoMapper.toProjectDeployments(
+            getStub().getProjectDeployments(
+                IdsRequest.newBuilder()
+                    .addAllIds(ids)
+                    .build()));
     }
 
     @Override
@@ -119,10 +117,33 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
-    public List<ProjectDeployment>
-        getProjectDeployments(
-            Boolean embedded, Environment environment, Long projectId, Long tagId, Long workspaceId) {
-        throw new UnsupportedOperationException();
+    public List<ProjectDeployment> getProjectDeployments(
+        Boolean embedded, Environment environment, Long projectId, Long tagId, Long workspaceId) {
+
+        ProjectDeploymentsFilterRequest.Builder builder = ProjectDeploymentsFilterRequest.newBuilder();
+
+        if (embedded != null) {
+            builder.setEmbedded(embedded);
+        }
+
+        if (environment != null) {
+            builder.setEnvironment(environment.name());
+        }
+
+        if (projectId != null) {
+            builder.setProjectId(projectId);
+        }
+
+        if (tagId != null) {
+            builder.setTagId(tagId);
+        }
+
+        if (workspaceId != null) {
+            builder.setWorkspaceId(workspaceId);
+        }
+
+        return automationConfigurationProtoMapper.toProjectDeployments(
+            getStub().getProjectDeploymentsByFilter(builder.build()));
     }
 
     @Override
@@ -150,5 +171,9 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     @Override
     public void updateEnabled(long id, boolean enabled) {
         throw new UnsupportedOperationException();
+    }
+
+    private ProjectDeploymentRemoteServiceGrpc.ProjectDeploymentRemoteServiceBlockingStub getStub() {
+        return ProjectDeploymentRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
     }
 }
