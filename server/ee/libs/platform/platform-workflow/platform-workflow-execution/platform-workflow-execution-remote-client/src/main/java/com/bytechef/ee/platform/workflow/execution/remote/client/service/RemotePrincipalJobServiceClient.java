@@ -8,6 +8,9 @@
 package com.bytechef.ee.platform.workflow.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.GetJobIdsPageRequest;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.JobIdsResponse;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.JobTypeRequest;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.OptionalIdResponse;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.PrincipalJobRemoteServiceGrpc;
@@ -21,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -33,9 +37,11 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     private static final String EXECUTION_APP = "execution-app";
 
     private final GrpcChannels grpcChannels;
+    private final PlatformWorkflowExecutionProtoMapper platformWorkflowExecutionProtoMapper;
 
-    public RemotePrincipalJobServiceClient(GrpcChannels grpcChannels) {
+    public RemotePrincipalJobServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
         this.grpcChannels = grpcChannels;
+        this.platformWorkflowExecutionProtoMapper = new PlatformWorkflowExecutionProtoMapper(objectMapper);
     }
 
     @Override
@@ -45,7 +51,7 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
 
     @Override
     public void deletePrincipalJobs(long jobId, PlatformType type) {
-        throw new UnsupportedOperationException();
+        getStub().deletePrincipalJobs(toJobTypeRequest(jobId, type));
     }
 
     @Override
@@ -66,11 +72,7 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
 
     @Override
     public Optional<Long> fetchJobPrincipalId(long jobId, PlatformType type) {
-        OptionalIdResponse optionalIdResponse = getStub().fetchJobPrincipalId(
-            JobTypeRequest.newBuilder()
-                .setJobId(jobId)
-                .setPlatformType(type.name())
-                .build());
+        OptionalIdResponse optionalIdResponse = getStub().fetchJobPrincipalId(toJobTypeRequest(jobId, type));
 
         return optionalIdResponse.hasId() ? Optional.of(optionalIdResponse.getId()) : Optional.empty();
     }
@@ -89,7 +91,9 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
 
     @Override
     public List<Long> getJobIds(long principalId, PlatformType type) {
-        throw new UnsupportedOperationException();
+        JobIdsResponse jobIdsResponse = getStub().getJobIds(toPrincipalTypeRequest(principalId, List.of(), type));
+
+        return List.copyOf(jobIdsResponse.getJobIdsList());
     }
 
     @Override
@@ -97,11 +101,43 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
         Status status, Instant startDate, Instant endDate, List<Long> principalIds, PlatformType type,
         List<String> workflowIds, boolean onlyRootJobs, int pageNumber) {
 
-        throw new UnsupportedOperationException();
+        GetJobIdsPageRequest.Builder builder = GetJobIdsPageRequest.newBuilder()
+            .setOnlyRootJobs(onlyRootJobs)
+            .setPageNumber(pageNumber)
+            .setPlatformType(type.name());
+
+        if (status != null) {
+            builder.setStatus(status.name());
+        }
+
+        if (startDate != null) {
+            builder.setStartDate(platformWorkflowExecutionProtoMapper.toTimestamp(startDate));
+        }
+
+        if (endDate != null) {
+            builder.setEndDate(platformWorkflowExecutionProtoMapper.toTimestamp(endDate));
+        }
+
+        if (principalIds != null) {
+            builder.addAllPrincipalIds(principalIds);
+        }
+
+        if (workflowIds != null) {
+            builder.addAllWorkflowIds(workflowIds);
+        }
+
+        return platformWorkflowExecutionProtoMapper.toJobIdsPage(getStub().getJobIdsPage(builder.build()));
     }
 
     private PrincipalJobRemoteServiceGrpc.PrincipalJobRemoteServiceBlockingStub getStub() {
         return PrincipalJobRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(EXECUTION_APP));
+    }
+
+    private static JobTypeRequest toJobTypeRequest(long jobId, PlatformType type) {
+        return JobTypeRequest.newBuilder()
+            .setJobId(jobId)
+            .setPlatformType(type.name())
+            .build();
     }
 
     private static PrincipalTypeRequest toPrincipalTypeRequest(

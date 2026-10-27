@@ -31,9 +31,12 @@ service PrincipalJobFacadeRemoteService {
 }
 
 service PrincipalJobRemoteService {
+  rpc DeletePrincipalJobs(JobTypeRequest) returns (google.protobuf.Empty);
   rpc FetchJobPrincipalId(JobTypeRequest) returns (OptionalIdResponse);
   rpc FetchLastJobId(PrincipalTypeRequest) returns (OptionalIdResponse);
   rpc FetchLastWorkflowJobId(PrincipalTypeRequest) returns (OptionalIdResponse);
+  rpc GetJobIds(PrincipalTypeRequest) returns (JobIdsResponse);
+  rpc GetJobIdsPage(GetJobIdsPageRequest) returns (JobIdsPage);
 }
 
 service TriggerExecutionRemoteService {
@@ -100,6 +103,29 @@ message PrincipalTypeRequest {
   int64 principal_id = 1;
   string platform_type = 2;
   repeated string workflow_ids = 3;
+}
+
+message JobIdsResponse {
+  repeated int64 job_ids = 1;
+}
+
+message GetJobIdsPageRequest {
+  optional string status = 1;
+  optional google.protobuf.Timestamp start_date = 2;
+  optional google.protobuf.Timestamp end_date = 3;
+  repeated int64 principal_ids = 4;
+  string platform_type = 5;
+  repeated string workflow_ids = 6;
+  bool only_root_jobs = 7;
+  int32 page_number = 8;
+}
+
+message JobIdsPage {
+  repeated int64 job_ids = 1;
+  bool paged = 2;
+  int32 page_number = 3;
+  int32 page_size = 4;
+  int64 total_elements = 5;
 }
 
 message OptionalIdResponse {

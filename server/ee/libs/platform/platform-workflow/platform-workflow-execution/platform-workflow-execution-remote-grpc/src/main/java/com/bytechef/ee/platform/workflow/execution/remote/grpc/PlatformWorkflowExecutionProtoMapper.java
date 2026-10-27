@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJob;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobParameters;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.JobIdsPage;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.RemoteTriggerExecution;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.RemoteWorkflowNodeType;
 import com.bytechef.ee.remote.grpc.JsonBytes;
@@ -22,8 +23,14 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Timestamp;
+import java.time.Instant;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -51,6 +58,20 @@ public class PlatformWorkflowExecutionProtoMapper {
         return jsonBytes.write(value);
     }
 
+    public Instant toInstant(Timestamp timestamp) {
+        return Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
+    }
+
+    public Page<Long> toJobIdsPage(JobIdsPage jobIdsPage) {
+        if (!jobIdsPage.getPaged()) {
+            return new PageImpl<>(jobIdsPage.getJobIdsList());
+        }
+
+        return new PageImpl<>(
+            jobIdsPage.getJobIdsList(), PageRequest.of(jobIdsPage.getPageNumber(), jobIdsPage.getPageSize()),
+            jobIdsPage.getTotalElements());
+    }
+
     public Job toJob(RemoteJob remoteJob) {
         return atlasExecutionProtoMapper.toJob(remoteJob);
     }
@@ -65,6 +86,22 @@ public class PlatformWorkflowExecutionProtoMapper {
 
     public @Nullable Object toObject(ByteString bytes) {
         return jsonBytes.read(bytes);
+    }
+
+    public JobIdsPage toProto(Page<Long> jobIdsPage) {
+        JobIdsPage.Builder builder = JobIdsPage.newBuilder()
+            .addAllJobIds(jobIdsPage.getContent())
+            .setTotalElements(jobIdsPage.getTotalElements());
+
+        Pageable pageable = jobIdsPage.getPageable();
+
+        if (pageable.isPaged()) {
+            builder.setPaged(true)
+                .setPageNumber(pageable.getPageNumber())
+                .setPageSize(pageable.getPageSize());
+        }
+
+        return builder.build();
     }
 
     public RemoteJob toProto(Job job) {
@@ -108,6 +145,13 @@ public class PlatformWorkflowExecutionProtoMapper {
         }
 
         return builder.build();
+    }
+
+    public Timestamp toTimestamp(Instant instant) {
+        return Timestamp.newBuilder()
+            .setSeconds(instant.getEpochSecond())
+            .setNanos(instant.getNano())
+            .build();
     }
 
     public TriggerExecution toTriggerExecution(RemoteTriggerExecution remoteTriggerExecution) {
