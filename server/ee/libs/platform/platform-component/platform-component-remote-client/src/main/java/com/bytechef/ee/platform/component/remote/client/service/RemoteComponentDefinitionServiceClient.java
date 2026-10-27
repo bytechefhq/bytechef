@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.component.remote.client.service;
 
 import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
+import com.bytechef.ee.platform.component.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc.ComponentDefinitionRemoteServiceBlockingStub;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionResult;
@@ -206,9 +207,22 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
 
     @Override
     public boolean hasComponentDefinition(String name, @Nullable Integer version) {
-        Optional<ComponentDefinition> componentDefinition = fetchComponentDefinition(name, version);
+        Optional<ServiceInstance> serviceInstance = workerInstances.fetchInstance(name);
 
-        return componentDefinition.isPresent();
+        if (serviceInstance.isEmpty()) {
+            return false;
+        }
+
+        GetComponentDefinitionRequest.Builder builder = GetComponentDefinitionRequest.newBuilder()
+            .setName(name);
+
+        if (version != null) {
+            builder.setVersion(version);
+        }
+
+        BoolResponse boolResponse = getStub(serviceInstance.get()).hasComponentDefinition(builder.build());
+
+        return boolResponse.getValue();
     }
 
     private List<ComponentDefinition> filterByPlatformType(

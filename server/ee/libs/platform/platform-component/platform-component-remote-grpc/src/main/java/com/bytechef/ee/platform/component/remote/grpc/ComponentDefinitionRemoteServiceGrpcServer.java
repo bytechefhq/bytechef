@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.grpc;
 
+import com.bytechef.ee.platform.component.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ComponentDefinitionResult;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetComponentDefinitionRequest;
@@ -109,6 +110,20 @@ public class ComponentDefinitionRemoteServiceGrpcServer
             componentProtoMapper.toProto(
                 componentDefinitionService.getConnectionComponentDefinition(
                     request.getName(), request.getConnectionVersion())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void hasComponentDefinition(
+        GetComponentDefinitionRequest request, StreamObserver<BoolResponse> responseObserver) {
+
+        boolean hasComponentDefinition = componentDefinitionService.hasComponentDefinition(
+            request.getName(), request.hasVersion() ? request.getVersion() : null);
+
+        responseObserver.onNext(
+            BoolResponse.newBuilder()
+                .setValue(hasComponentDefinition)
+                .build());
         responseObserver.onCompleted();
     }
 
