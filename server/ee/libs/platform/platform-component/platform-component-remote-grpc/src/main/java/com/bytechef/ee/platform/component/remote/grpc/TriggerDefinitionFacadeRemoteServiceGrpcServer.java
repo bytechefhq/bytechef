@@ -192,4 +192,19 @@ public class TriggerDefinitionFacadeRemoteServiceGrpcServer
                     request.hasConnectionId() ? request.getConnectionId() : null)));
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void executeWebhookValidateOnEnable(
+        TriggerExecuteWebhookValidateRequest request, StreamObserver<RemoteWebhookValidateResponse> responseObserver) {
+
+        responseObserver.onNext(
+            componentProtoMapper.toProto(
+                triggerDefinitionFacade.executeWebhookValidateOnEnable(
+                    request.getComponentName(), request.getComponentVersion(), request.getTriggerName(),
+                    componentProtoMapper.toMap(request.getInputParameters()),
+                    request.hasWebhookRequest() ? componentProtoMapper.toWebhookRequest(request.getWebhookRequest())
+                        : null,
+                    request.hasConnectionId() ? request.getConnectionId() : null)));
+        responseObserver.onCompleted();
+    }
 }
