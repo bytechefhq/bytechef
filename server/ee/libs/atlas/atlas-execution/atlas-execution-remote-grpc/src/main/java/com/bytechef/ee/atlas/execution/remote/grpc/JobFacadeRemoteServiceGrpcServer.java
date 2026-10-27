@@ -12,6 +12,7 @@ import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobFacadeRemoteServiceGrpc;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobParameters;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.ResumeApprovalRequest;
 import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
@@ -44,6 +45,14 @@ public class JobFacadeRemoteServiceGrpcServer extends JobFacadeRemoteServiceGrpc
     @Override
     public void deleteJob(IdRequest request, StreamObserver<Empty> responseObserver) {
         jobFacade.deleteJob(request.getId());
+
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void resumeApproval(ResumeApprovalRequest request, StreamObserver<Empty> responseObserver) {
+        jobFacade.resumeApproval(request.getJobId(), request.getUuid(), request.getApproved());
 
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
