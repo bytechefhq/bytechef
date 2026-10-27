@@ -178,6 +178,34 @@ class AtlasExecutionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testFetchJobAndTaskExecutionJob() {
+        Job job = job(7L);
+
+        when(jobService.fetchJob(7L)).thenReturn(Optional.of(job));
+        when(jobService.fetchTaskExecutionJob(11L)).thenReturn(Optional.of(job));
+
+        RemoteJobServiceClient remoteJobServiceClient = new RemoteJobServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteJobServiceClient.fetchJob(7L)).get()
+            .usingRecursiveComparison()
+            .isEqualTo(job);
+        assertThat(remoteJobServiceClient.fetchTaskExecutionJob(11L)).get()
+            .usingRecursiveComparison()
+            .isEqualTo(job);
+    }
+
+    @Test
+    void testFetchJobAndTaskExecutionJobWithoutJobAreEmpty() {
+        when(jobService.fetchJob(8L)).thenReturn(Optional.empty());
+        when(jobService.fetchTaskExecutionJob(12L)).thenReturn(Optional.empty());
+
+        RemoteJobServiceClient remoteJobServiceClient = new RemoteJobServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteJobServiceClient.fetchJob(8L)).isEmpty();
+        assertThat(remoteJobServiceClient.fetchTaskExecutionJob(12L)).isEmpty();
+    }
+
+    @Test
     void testGetUnknownJobFailsWithItsMessage() {
         when(jobService.getJob(7L)).thenThrow(new IllegalArgumentException("Job 7 not found"));
 
