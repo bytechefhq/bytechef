@@ -1,0 +1,11 @@
+# Test-only GraphQL base operations for GraphQL slice tests in this module.
+
+type Query {
+    _placeholder: Boolean
+}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+scalar Long
