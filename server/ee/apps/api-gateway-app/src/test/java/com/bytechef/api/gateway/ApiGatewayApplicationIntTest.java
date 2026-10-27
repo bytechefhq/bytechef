@@ -26,6 +26,7 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -79,6 +80,13 @@ public class ApiGatewayApplicationIntTest {
         assertThat(environment.getProperty("info.signUp.activationRequired")).isEqualTo("false");
         assertThat(environment.getProperty("info.signUp.enabled")).isEqualTo("true");
         assertThat(environment.getProperty("info.socialLogin.enabled")).isEqualTo("false");
+    }
+
+    @Test
+    void testUserMailMessagesResolve() {
+        assertThat(applicationContext.getMessage("email.activation.title", null, Locale.ENGLISH)).isNotBlank();
+        assertThat(applicationContext.getMessage("email.invitation.title", null, Locale.ENGLISH)).isNotBlank();
+        assertThat(applicationContext.getMessage("email.reset.title", null, Locale.ENGLISH)).isNotBlank();
     }
 
     @Test
