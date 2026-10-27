@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteClusterElement
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteClusterElementType;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOAuth2AuthorizationParameters;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOption;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOptions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOutputResponse;
@@ -34,6 +35,7 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -171,6 +173,12 @@ public class ComponentProtoMapper {
         return toDomain(remoteConnectionDefinition, ConnectionDefinition.class);
     }
 
+    public OAuth2AuthorizationParameters toOAuth2AuthorizationParameters(
+        RemoteOAuth2AuthorizationParameters remoteOAuth2AuthorizationParameters) {
+
+        return toDomain(remoteOAuth2AuthorizationParameters, OAuth2AuthorizationParameters.class);
+    }
+
     public Option toOption(RemoteOption remoteOption) {
         return toDomain(remoteOption, Option.class);
     }
@@ -201,6 +209,10 @@ public class ComponentProtoMapper {
 
     public RemoteConnectionDefinition toProto(ConnectionDefinition connectionDefinition) {
         return toProto(connectionDefinition, RemoteConnectionDefinition.newBuilder());
+    }
+
+    public RemoteOAuth2AuthorizationParameters toProto(OAuth2AuthorizationParameters oAuth2AuthorizationParameters) {
+        return toProto(oAuth2AuthorizationParameters, RemoteOAuth2AuthorizationParameters.newBuilder());
     }
 
     public RemoteOption toProto(Option option) {

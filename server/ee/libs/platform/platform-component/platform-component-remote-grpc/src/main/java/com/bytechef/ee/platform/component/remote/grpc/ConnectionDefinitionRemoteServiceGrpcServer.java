@@ -13,11 +13,14 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.ExecuteBaseUriReques
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationTypeRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetOAuth2AuthorizationParametersRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOAuth2AuthorizationParameters;
 import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
@@ -118,6 +121,23 @@ public class ConnectionDefinitionRemoteServiceGrpcServer
     @Override
     public void getConnectionDefinitions(Empty request, StreamObserver<RemoteConnectionDefinitions> responseObserver) {
         responseObserver.onNext(toRemoteConnectionDefinitions(connectionDefinitionService.getConnectionDefinitions()));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getOAuth2AuthorizationParameters(
+        GetOAuth2AuthorizationParametersRequest request,
+        StreamObserver<RemoteOAuth2AuthorizationParameters> responseObserver) {
+
+        Map<String, Object> connectionParameters = componentProtoMapper.toMap(request.getConnectionParameters());
+
+        OAuth2AuthorizationParameters oAuth2AuthorizationParameters =
+            connectionDefinitionService.getOAuth2AuthorizationParameters(
+                request.getComponentName(), request.getConnectionVersion(),
+                request.hasAuthorizationType() ? AuthorizationType.valueOf(request.getAuthorizationType()) : null,
+                connectionParameters == null ? Map.of() : connectionParameters);
+
+        responseObserver.onNext(componentProtoMapper.toProto(oAuth2AuthorizationParameters));
         responseObserver.onCompleted();
     }
 
