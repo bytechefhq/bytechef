@@ -322,6 +322,42 @@ describe('EnvironmentPromotionDialog', () => {
         );
     });
 
+    it('shows the new agent card URL in the success toast when promoting an A2A server creates a counterpart', async () => {
+        const user = userEvent.setup();
+
+        vi.mocked(mockUseEnvironmentPromotionPreviewQuery).mockReturnValue({
+            data: {environmentPromotionPreview: makePreview({resourceType: PromotionResourceType.A2AServer})},
+            isLoading: false,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
+
+        mockMutateAsync.mockResolvedValue({
+            promoteToEnvironment: {
+                created: true,
+                targetId: 'target-1',
+                targetUrl: 'https://example.com/api/automation/a2a/new-secret/.well-known/agent-card.json',
+                unresolvedConnectionIds: [],
+            },
+        });
+
+        render(<EnvironmentPromotionDialog {...defaultProps} resourceType={PromotionResourceType.A2AServer} />);
+
+        await screen.findByText('Slack Staging');
+
+        expect(screen.getByText('Creates a new URL')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Promote'}));
+
+        await waitFor(() => expect(mockToast.success).toHaveBeenCalledTimes(1));
+
+        const [, toastOptions] = vi.mocked(mockToast.success).mock.calls[0];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((toastOptions as any).description).toContain(
+            'New URL: https://example.com/api/automation/a2a/new-secret/.well-known/agent-card.json'
+        );
+    });
+
     it('does not show the new URL in the success toast when re-promoting updates an existing MCP server counterpart', async () => {
         const user = userEvent.setup();
 
