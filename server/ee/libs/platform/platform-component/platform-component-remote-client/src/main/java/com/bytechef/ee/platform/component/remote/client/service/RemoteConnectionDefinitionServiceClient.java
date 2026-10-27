@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.component.remote.client.WorkerInstances;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc.ConnectionDefinitionRemoteServiceBlockingStub;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ExecuteBaseUriRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationTypeRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
@@ -78,7 +79,22 @@ public class RemoteConnectionDefinitionServiceClient implements ConnectionDefini
 
     @Override
     public Optional<String> executeBaseUri(String componentName, ComponentConnection componentConnection) {
-        throw new UnsupportedOperationException();
+        ExecuteBaseUriRequest.Builder builder = ExecuteBaseUriRequest.newBuilder()
+            .setComponentName(componentName)
+            .setConnectionVersion(componentConnection.getVersion())
+            .setConnectionId(componentConnection.getConnectionId())
+            .setParameters(componentProtoMapper.toBytes(componentConnection.getParameters()));
+
+        AuthorizationType authorizationType = componentConnection.authorizationType();
+
+        if (authorizationType != null) {
+            builder.setAuthorizationType(authorizationType.name());
+        }
+
+        StringResponse stringResponse = getStub(workerInstances.getInstance(componentName))
+            .executeBaseUri(builder.build());
+
+        return stringResponse.hasValue() ? Optional.of(stringResponse.getValue()) : Optional.empty();
     }
 
     @Override
