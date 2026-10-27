@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -138,6 +139,26 @@ class AtlasExecutionRemoteServiceGrpcWireTest {
         new RemoteJobFacadeClient(fixedGrpcChannels, JSON_MAPPER).stopJob(7L);
 
         verify(jobFacade).stopJob(7L);
+    }
+
+    @Test
+    void testResumeApproval() {
+        new RemoteJobFacadeClient(fixedGrpcChannels, JSON_MAPPER).resumeApproval(7L, "approval-uuid", true);
+
+        verify(jobFacade).resumeApproval(7L, "approval-uuid", true);
+    }
+
+    @Test
+    void testResumeAnAlreadyProcessedApprovalFailsWithItsMessage() {
+        doThrow(new IllegalArgumentException("Approval already processed"))
+            .when(jobFacade)
+            .resumeApproval(7L, "approval-uuid", false);
+
+        RemoteJobFacadeClient remoteJobFacadeClient = new RemoteJobFacadeClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThatThrownBy(() -> remoteJobFacadeClient.resumeApproval(7L, "approval-uuid", false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Approval already processed");
     }
 
     @Test

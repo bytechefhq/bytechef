@@ -13,7 +13,10 @@ import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobFacadeRemoteServiceGrpc;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.ResumeApprovalRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import java.util.Map;
 import java.util.function.LongConsumer;
 import org.jspecify.annotations.Nullable;
@@ -57,7 +60,22 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void resumeApproval(long jobId, String uuid, boolean approved) {
-        throw new UnsupportedOperationException();
+        try {
+            getStub().resumeApproval(
+                ResumeApprovalRequest.newBuilder()
+                    .setApproved(approved)
+                    .setJobId(jobId)
+                    .setUuid(uuid)
+                    .build());
+        } catch (StatusRuntimeException statusRuntimeException) {
+            Status status = statusRuntimeException.getStatus();
+
+            if (status.getCode() == Status.Code.INVALID_ARGUMENT) {
+                throw new IllegalArgumentException(status.getDescription(), statusRuntimeException);
+            }
+
+            throw statusRuntimeException;
+        }
     }
 
     @Override
