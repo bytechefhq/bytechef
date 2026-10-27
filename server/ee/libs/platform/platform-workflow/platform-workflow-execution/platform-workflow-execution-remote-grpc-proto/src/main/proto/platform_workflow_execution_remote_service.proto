@@ -41,6 +41,7 @@ service PrincipalJobRemoteService {
 
 service TriggerExecutionRemoteService {
   rpc Create(RemoteTriggerExecution) returns (RemoteTriggerExecution);
+  rpc DeleteJobTriggerExecution(bytechef.atlas.execution.remote.v1.IdRequest) returns (google.protobuf.Empty);
   rpc GetTriggerExecution(bytechef.atlas.execution.remote.v1.IdRequest) returns (RemoteTriggerExecution);
   rpc Update(RemoteTriggerExecution) returns (RemoteTriggerExecution);
 }

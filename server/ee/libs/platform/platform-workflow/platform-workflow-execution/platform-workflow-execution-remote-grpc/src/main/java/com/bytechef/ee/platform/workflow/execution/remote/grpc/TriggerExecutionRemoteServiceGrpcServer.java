@@ -11,6 +11,7 @@ import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.RemoteTriggerExecution;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.TriggerExecutionRemoteServiceGrpc;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
 
@@ -36,6 +37,14 @@ public class TriggerExecutionRemoteServiceGrpcServer
     public void create(RemoteTriggerExecution request, StreamObserver<RemoteTriggerExecution> responseObserver) {
         responseObserver.onNext(platformWorkflowExecutionProtoMapper
             .toProto(triggerExecutionService.create(platformWorkflowExecutionProtoMapper.toTriggerExecution(request))));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deleteJobTriggerExecution(IdRequest request, StreamObserver<Empty> responseObserver) {
+        triggerExecutionService.deleteJobTriggerExecution(request.getId());
+
+        responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
 
