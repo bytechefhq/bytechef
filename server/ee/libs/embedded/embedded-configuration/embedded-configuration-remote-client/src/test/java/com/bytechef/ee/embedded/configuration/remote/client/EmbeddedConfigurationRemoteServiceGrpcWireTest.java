@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -22,10 +23,13 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.remote.client.facade.RemoteAutomationWorkflowProjectFacadeClient;
 import com.bytechef.ee.embedded.configuration.remote.client.facade.RemoteConnectedUserProjectFacadeClient;
+import com.bytechef.ee.embedded.configuration.remote.client.facade.RemoteIntegrationWorkflowFacadeClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteAppEventServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteConnectedUserProjectDeploymentResolverClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteConnectedUserProjectServiceClient;
@@ -46,6 +50,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceCon
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationRemoteServiceGrpcServer;
+import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationWorkflowFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserIntegrationInstancesRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceRemoteServiceGrpc;
@@ -60,6 +65,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.grpc.BindableService;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -78,6 +84,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.grpc.server.exception.GrpcExceptionHandlerInterceptor;
 import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.json.JsonMapper;
@@ -87,8 +94,13 @@ import tools.jackson.databind.json.JsonMapper;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class EmbeddedConfigurationRemoteServiceGrpcWireTest {
 
+    private static final String DEFINITION = """
+        {"label":"Live Workflow","tasks":[
+            {"name":"logger_1","type":"logger/v1/info","parameters":{"text":"hello"}}]}
+        """;
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
         .build();
 
@@ -107,6 +119,7 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService =
         mock(IntegrationInstanceWorkflowService.class);
     private final IntegrationService integrationService = mock(IntegrationService.class);
+    private final IntegrationWorkflowFacade integrationWorkflowFacade = mock(IntegrationWorkflowFacade.class);
     private final IntegrationWorkflowService integrationWorkflowService = mock(IntegrationWorkflowService.class);
 
     private FixedGrpcChannels fixedGrpcChannels;
@@ -139,6 +152,8 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
             new IntegrationInstanceWorkflowRemoteServiceGrpcServer(
                 integrationInstanceWorkflowService, embeddedConfigurationProtoMapper),
             new IntegrationRemoteServiceGrpcServer(integrationService, embeddedConfigurationProtoMapper),
+            new IntegrationWorkflowFacadeRemoteServiceGrpcServer(
+                integrationWorkflowFacade, embeddedConfigurationProtoMapper),
             new IntegrationWorkflowRemoteServiceGrpcServer(integrationWorkflowService,
                 embeddedConfigurationProtoMapper))) {
 
@@ -608,6 +623,21 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testGetIntegrationWorkflowDTOs() {
+        IntegrationWorkflowDTO integrationWorkflowDTO = new IntegrationWorkflowDTO(
+            workflow("workflow-1"), integrationWorkflow(31L, "workflow-1"));
+
+        when(integrationWorkflowFacade.getIntegrationWorkflows()).thenReturn(List.of(integrationWorkflowDTO));
+
+        RemoteIntegrationWorkflowFacadeClient remoteIntegrationWorkflowFacadeClient =
+            new RemoteIntegrationWorkflowFacadeClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationWorkflowFacadeClient.getIntegrationWorkflows()).singleElement()
+            .usingRecursiveComparison()
+            .isEqualTo(integrationWorkflowDTO);
+    }
+
+    @Test
     void testGetUnknownIntegrationWorkflowIsAnIllegalArgument() {
         when(integrationWorkflowService.getWorkflowId(12L, "unknown"))
             .thenThrow(new IllegalArgumentException("Workflow not found for uuid: unknown"));
@@ -726,6 +756,15 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
         ReflectionTestUtils.setField(integrationInstance, "lastModifiedDate", Instant.parse("2026-10-27T11:30:00Z"));
 
         return integrationInstance;
+    }
+
+    private static Workflow workflow(String id) {
+        Workflow workflow = new Workflow(
+            id, DEFINITION, Workflow.Format.JSON, Instant.parse("2026-10-26T11:00:00Z"), Map.of("source", "test"));
+
+        workflow.setVersion(3);
+
+        return workflow;
     }
 
     private static IntegrationWorkflow integrationWorkflow(long id, String workflowId) {

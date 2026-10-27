@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.remote.grpc;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -17,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAppEvent;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProject;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProjects;
@@ -32,8 +34,11 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegratio
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflows;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationWorkflowDTOs;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationWorkflows;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrations;
+import com.bytechef.ee.platform.configuration.remote.grpc.PlatformConfigurationProtoMapper;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -52,9 +57,11 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class EmbeddedConfigurationProtoMapper {
 
+    private final PlatformConfigurationProtoMapper platformConfigurationProtoMapper;
     private final ProtoJsonMapper protoJsonMapper;
 
     public EmbeddedConfigurationProtoMapper(ObjectMapper objectMapper) {
+        this.platformConfigurationProtoMapper = new PlatformConfigurationProtoMapper(objectMapper);
         this.protoJsonMapper = new ProtoJsonMapper(
             objectMapper.rebuild()
                 .addMixIn(Integration.class, IntegrationMixIn.class)
@@ -176,6 +183,30 @@ public class EmbeddedConfigurationProtoMapper {
         return protoJsonMapper.toObject(remoteIntegrationWorkflow, IntegrationWorkflow.class);
     }
 
+    public IntegrationWorkflowDTO toIntegrationWorkflowDTO(RemoteIntegrationWorkflowDTO remoteIntegrationWorkflowDTO) {
+        IntegrationWorkflow integrationWorkflow = new IntegrationWorkflow(
+            remoteIntegrationWorkflowDTO.getIntegrationWorkflowId());
+
+        integrationWorkflow.setIntegrationVersion(remoteIntegrationWorkflowDTO.getIntegrationVersion());
+
+        if (remoteIntegrationWorkflowDTO.hasWorkflowUuid()) {
+            integrationWorkflow.setUuid(remoteIntegrationWorkflowDTO.getWorkflowUuid());
+        }
+
+        Workflow workflow = platformConfigurationProtoMapper.toWorkflow(remoteIntegrationWorkflowDTO.getWorkflow());
+
+        return new IntegrationWorkflowDTO(workflow, integrationWorkflow);
+    }
+
+    public List<IntegrationWorkflowDTO> toIntegrationWorkflowDTOs(
+        RemoteIntegrationWorkflowDTOs remoteIntegrationWorkflowDTOs) {
+
+        return remoteIntegrationWorkflowDTOs.getIntegrationWorkflowsList()
+            .stream()
+            .map(this::toIntegrationWorkflowDTO)
+            .toList();
+    }
+
     public List<IntegrationWorkflow> toIntegrationWorkflows(RemoteIntegrationWorkflows remoteIntegrationWorkflows) {
         return remoteIntegrationWorkflows.getIntegrationWorkflowsList()
             .stream()
@@ -241,6 +272,21 @@ public class EmbeddedConfigurationProtoMapper {
         return protoJsonMapper.toProto(integrationWorkflow, RemoteIntegrationWorkflow.newBuilder());
     }
 
+    public RemoteIntegrationWorkflowDTO toProto(IntegrationWorkflowDTO integrationWorkflowDTO) {
+        RemoteIntegrationWorkflowDTO.Builder builder = RemoteIntegrationWorkflowDTO.newBuilder()
+            .setIntegrationVersion(integrationWorkflowDTO.getIntegrationVersion())
+            .setIntegrationWorkflowId(integrationWorkflowDTO.getIntegrationWorkflowId())
+            .setWorkflow(platformConfigurationProtoMapper.toProto(integrationWorkflowDTO.getWorkflow()));
+
+        String workflowUuid = integrationWorkflowDTO.getWorkflowUuid();
+
+        if (workflowUuid != null) {
+            builder.setWorkflowUuid(workflowUuid);
+        }
+
+        return builder.build();
+    }
+
     public RemoteAutomationWorkflowProjects toRemoteAutomationWorkflowProjects(
         List<AutomationWorkflowProjectDTO> automationWorkflowProjectDTOs) {
 
@@ -298,6 +344,17 @@ public class EmbeddedConfigurationProtoMapper {
         return RemoteIntegrationInstanceWorkflows.newBuilder()
             .addAllIntegrationInstanceWorkflows(
                 integrationInstanceWorkflows.stream()
+                    .map(this::toProto)
+                    .toList())
+            .build();
+    }
+
+    public RemoteIntegrationWorkflowDTOs toRemoteIntegrationWorkflowDTOs(
+        List<IntegrationWorkflowDTO> integrationWorkflowDTOs) {
+
+        return RemoteIntegrationWorkflowDTOs.newBuilder()
+            .addAllIntegrationWorkflows(
+                integrationWorkflowDTOs.stream()
                     .map(this::toProto)
                     .toList())
             .build();

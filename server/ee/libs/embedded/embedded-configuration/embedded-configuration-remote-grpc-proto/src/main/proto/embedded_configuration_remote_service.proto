@@ -4,6 +4,7 @@ package bytechef.embedded.configuration.remote.v1;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "platform_configuration_remote_service.proto";
 
 option java_multiple_files = true;
 option java_package = "com.bytechef.ee.embedded.configuration.remote.grpc.proto";
@@ -63,6 +64,10 @@ service IntegrationWorkflowRemoteService {
   rpc GetLastWorkflowId(WorkflowUuidRequest) returns (StringResponse);
   rpc GetWorkflowId(IntegrationInstanceWorkflowUuidRequest) returns (StringResponse);
   rpc GetWorkflowIntegrationWorkflow(WorkflowIdRequest) returns (RemoteIntegrationWorkflow);
+}
+
+service IntegrationWorkflowFacadeRemoteService {
+  rpc GetIntegrationWorkflows(google.protobuf.Empty) returns (RemoteIntegrationWorkflowDTOs);
 }
 
 service AppEventRemoteService {
@@ -311,6 +316,17 @@ message RemoteIntegrationWorkflow {
 
 message RemoteIntegrationWorkflows {
   repeated RemoteIntegrationWorkflow integration_workflows = 1;
+}
+
+message RemoteIntegrationWorkflowDTO {
+  bytechef.platform.configuration.remote.v1.RemoteWorkflow workflow = 1;
+  int32 integration_version = 2;
+  int64 integration_workflow_id = 3;
+  optional string workflow_uuid = 4;
+}
+
+message RemoteIntegrationWorkflowDTOs {
+  repeated RemoteIntegrationWorkflowDTO integration_workflows = 1;
 }
 
 message RemoteAppEvent {
