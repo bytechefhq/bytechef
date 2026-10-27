@@ -72,7 +72,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.LongConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,6 +101,7 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
     private final JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
     private final PrincipalJobFacade principalJobFacade = mock(PrincipalJobFacade.class);
     private final PrincipalJobService principalJobService = mock(PrincipalJobService.class);
+    private final ExecutorService resumeExecutorService = Executors.newVirtualThreadPerTaskExecutor();
     private final TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
     private final TriggerExecutionService triggerExecutionService = mock(TriggerExecutionService.class);
     private final TriggerLifecycleFacade triggerLifecycleFacade = mock(TriggerLifecycleFacade.class);
@@ -120,7 +126,8 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
         for (BindableService bindableService : List.<BindableService>of(
             new ConnectionLifecycleFacadeRemoteServiceGrpcServer(
                 connectionLifecycleFacade, platformWorkflowExecutionProtoMapper),
-            new JobResumeFacadeRemoteServiceGrpcServer(jobResumeFacade, platformWorkflowExecutionProtoMapper),
+            new JobResumeFacadeRemoteServiceGrpcServer(
+                jobResumeFacade, platformWorkflowExecutionProtoMapper, resumeExecutorService),
             new PrincipalJobFacadeRemoteServiceGrpcServer(principalJobFacade, platformWorkflowExecutionProtoMapper),
             new PrincipalJobRemoteServiceGrpcServer(principalJobService, platformWorkflowExecutionProtoMapper),
             new TaskStateRemoteServiceGrpcServer(taskStateFacade, platformWorkflowExecutionProtoMapper),
@@ -153,6 +160,7 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
     void afterEach() {
         managedChannel.shutdownNow();
         server.shutdownNow();
+        resumeExecutorService.shutdownNow();
     }
 
     @Test
@@ -212,6 +220,95 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
         assertThat(remoteJobResumeFacadeClient.resumeExpiredJob("abc")).isEqualTo(JobResumeOutcome.GONE);
         assertThat(remoteJobResumeFacadeClient.resumeJob("def", Map.of("approved", true)))
             .isEqualTo(JobResumeOutcome.OK);
+    }
+
+    @Test
+    void testResumeJobStreamingRunsTheConsumerBeforeTheJobResumes() {
+        AtomicLong acceptedJobId = new AtomicLong();
+        AtomicLong acceptedJobIdWhenResumed = new AtomicLong();
+
+        when(jobResumeFacade.resumeJobStreaming(eq("abc"), eq(Map.of("answer", "yes")), any(LongConsumer.class)))
+            .thenAnswer(invocation -> {
+                LongConsumer jobIdConsumer = invocation.getArgument(2);
+
+                jobIdConsumer.accept(7L);
+
+                acceptedJobIdWhenResumed.set(acceptedJobId.get());
+
+                return JobResumeOutcome.OK;
+            });
+
+        RemoteJobResumeFacadeClient remoteJobResumeFacadeClient = new RemoteJobResumeFacadeClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(
+            remoteJobResumeFacadeClient.resumeJobStreaming("abc", Map.of("answer", "yes"), acceptedJobId::set))
+                .isEqualTo(JobResumeOutcome.OK);
+        assertThat(acceptedJobId.get()).isEqualTo(7L);
+        assertThat(acceptedJobIdWhenResumed.get()).isEqualTo(7L);
+    }
+
+    @Test
+    void testResumeJobStreamingThatIsNotAllowedSkipsTheConsumer() {
+        AtomicLong acceptedJobId = new AtomicLong();
+
+        when(jobResumeFacade.resumeJobStreaming(eq("abc"), eq(Map.of()), any(LongConsumer.class)))
+            .thenReturn(JobResumeOutcome.STREAMING_NOT_ALLOWED);
+
+        RemoteJobResumeFacadeClient remoteJobResumeFacadeClient = new RemoteJobResumeFacadeClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteJobResumeFacadeClient.resumeJobStreaming("abc", Map.of(), acceptedJobId::set))
+            .isEqualTo(JobResumeOutcome.STREAMING_NOT_ALLOWED);
+        assertThat(acceptedJobId.get()).isZero();
+    }
+
+    @Test
+    void testResumeJobStreamingWithAFailingConsumerAbortsTheResume() {
+        CompletableFuture<Throwable> serverConsumerFailure = new CompletableFuture<>();
+
+        when(jobResumeFacade.resumeJobStreaming(eq("abc"), eq(Map.of()), any(LongConsumer.class)))
+            .thenAnswer(invocation -> {
+                LongConsumer jobIdConsumer = invocation.getArgument(2);
+
+                try {
+                    jobIdConsumer.accept(7L);
+                } catch (RuntimeException exception) {
+                    serverConsumerFailure.complete(exception);
+
+                    throw exception;
+                }
+
+                serverConsumerFailure.complete(null);
+
+                return JobResumeOutcome.OK;
+            });
+
+        RemoteJobResumeFacadeClient remoteJobResumeFacadeClient = new RemoteJobResumeFacadeClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        assertThatThrownBy(() -> remoteJobResumeFacadeClient.resumeJobStreaming(
+            "abc", Map.of(), jobId -> {
+                throw new IllegalStateException("Registration failed");
+            }))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Registration failed");
+        assertThat(serverConsumerFailure)
+            .succeedsWithin(Duration.ofSeconds(5))
+            .isNotNull();
+    }
+
+    @Test
+    void testResumeJobStreamingFailureFailsWithItsMessage() {
+        when(jobResumeFacade.resumeJobStreaming(eq("abc"), eq(Map.of()), any(LongConsumer.class)))
+            .thenThrow(new IllegalArgumentException("Job 7 not found"));
+
+        RemoteJobResumeFacadeClient remoteJobResumeFacadeClient = new RemoteJobResumeFacadeClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        assertThatThrownBy(() -> remoteJobResumeFacadeClient.resumeJobStreaming("abc", Map.of(), jobId -> {}))
+            .hasMessageContaining("INVALID_ARGUMENT")
+            .hasMessageContaining("Job 7 not found");
     }
 
     @Test
