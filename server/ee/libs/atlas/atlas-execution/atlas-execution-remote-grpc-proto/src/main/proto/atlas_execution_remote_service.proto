@@ -157,6 +157,8 @@ message RemoteTaskExecution {
   optional int32 retry_attempts = 14;
   optional string retry_delay = 15;
   optional int32 retry_delay_factor = 16;
+  reserved 17;
+  reserved "retry_delay_millis";
   optional google.protobuf.Timestamp start_date = 18;
   optional string status = 19;
   optional int32 task_number = 20;
