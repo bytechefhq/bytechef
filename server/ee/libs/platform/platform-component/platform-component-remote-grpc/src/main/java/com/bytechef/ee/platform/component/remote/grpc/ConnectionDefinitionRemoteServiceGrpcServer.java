@@ -14,6 +14,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationType
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetOAuth2AuthorizationParametersRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentConnection;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOAuth2AuthorizationParameters;
@@ -63,6 +64,17 @@ public class ConnectionDefinitionRemoteServiceGrpcServer
         baseUri.ifPresent(builder::setValue);
 
         responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void executeConnectionRefresh(
+        RemoteComponentConnection request, StreamObserver<RemoteComponentConnection> responseObserver) {
+
+        ComponentConnection componentConnection = connectionDefinitionService.executeConnectionRefresh(
+            componentProtoMapper.toComponentConnection(request));
+
+        responseObserver.onNext(componentProtoMapper.toProto(componentConnection));
         responseObserver.onCompleted();
     }
 

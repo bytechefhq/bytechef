@@ -21,6 +21,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationType
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetOAuth2AuthorizationParametersRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentConnection;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOAuth2AuthorizationParameters;
@@ -108,7 +109,11 @@ public class RemoteConnectionDefinitionServiceClient implements ConnectionDefini
 
     @Override
     public ComponentConnection executeConnectionRefresh(ComponentConnection componentConnection) {
-        throw new UnsupportedOperationException();
+        RemoteComponentConnection remoteComponentConnection = getStub(
+            workerInstances.getInstance(componentConnection.getComponentName()))
+                .executeConnectionRefresh(componentProtoMapper.toProto(componentConnection));
+
+        return componentProtoMapper.toComponentConnection(remoteComponentConnection);
     }
 
     @Override
