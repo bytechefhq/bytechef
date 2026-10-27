@@ -501,6 +501,8 @@ describe('ConnectionTabConnectionSelect', () => {
         );
 
         expect(screen.getByText('Test Connection 1')).toBeInTheDocument();
+
+        expect(screen.getByText('Test Connection 1')).toHaveClass('flex-1');
     });
 
     it('should offer a Select... option instead of a clear button when a connection is selected', () => {
