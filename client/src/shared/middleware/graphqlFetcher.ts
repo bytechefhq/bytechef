@@ -10,7 +10,9 @@ export class GraphQLResponseError extends Error {
     }
 }
 
-const OPERATION_NAME_PATTERN = /^\s*(?:query|mutation)\s+(\w+)/;
+const IGNORED_TOKEN_PATTERN = /"""[\s\S]*?"""|"(?:\\.|[^"\\])*"|#[^\n]*/g;
+
+const OPERATION_HEADER_PATTERN = /^\s*(?:query|mutation|subscription)\s+(\w+)/;
 
 export const USER_GRAPHQL_OPERATION_NAMES: ReadonlySet<string> = new Set([
     'authorities',
@@ -25,10 +27,52 @@ export const USER_GRAPHQL_OPERATION_NAMES: ReadonlySet<string> = new Set([
     'users',
 ]);
 
-function getSchemaHeaders(query: string): Record<string, string> {
-    const operationName = OPERATION_NAME_PATTERN.exec(query)?.[1];
+export function getOperationNames(document: string): string[] {
+    const strippedDocument = document.replace(IGNORED_TOKEN_PATTERN, ' ');
+    const operationNames: string[] = [];
 
-    if (operationName && USER_GRAPHQL_OPERATION_NAMES.has(operationName)) {
+    let braceDepth = 0;
+    let definitionStart = 0;
+    let parenthesisDepth = 0;
+
+    for (let index = 0; index < strippedDocument.length; index++) {
+        const character = strippedDocument[index];
+
+        if (character === '(') {
+            parenthesisDepth++;
+        } else if (character === ')') {
+            parenthesisDepth--;
+        } else if (parenthesisDepth > 0) {
+            continue;
+        } else if (character === '{') {
+            if (braceDepth === 0) {
+                const operationName = OPERATION_HEADER_PATTERN.exec(strippedDocument.slice(definitionStart, index))?.[1];
+
+                if (operationName) {
+                    operationNames.push(operationName);
+                }
+            }
+
+            braceDepth++;
+        } else if (character === '}') {
+            braceDepth--;
+
+            if (braceDepth === 0) {
+                definitionStart = index + 1;
+            }
+        }
+    }
+
+    return operationNames;
+}
+
+function getSchemaHeaders(query: string): Record<string, string> {
+    const operationNames = getOperationNames(query);
+
+    if (
+        operationNames.length > 0 &&
+        operationNames.every((operationName) => USER_GRAPHQL_OPERATION_NAMES.has(operationName))
+    ) {
         return {'X-ByteChef-GraphQL-Schema': 'user'};
     }
 
