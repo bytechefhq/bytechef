@@ -343,6 +343,70 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testIntegrationInstanceCalls() {
+        IntegrationInstance integrationInstance = integrationInstance();
+
+        when(integrationInstanceService.getIntegrationInstance(17L)).thenReturn(integrationInstance);
+        when(integrationInstanceService.fetchIntegrationInstance(7L, "airtable", Environment.PRODUCTION))
+            .thenReturn(Optional.of(integrationInstance));
+        when(integrationInstanceService.fetchIntegrationInstance(7L, "slack", Environment.PRODUCTION))
+            .thenReturn(Optional.empty());
+        when(integrationInstanceService.getIntegrationInstance(7L, "workflow-1", Environment.PRODUCTION))
+            .thenReturn(integrationInstance);
+        when(integrationInstanceService.getIntegrationInstances(List.of(17L))).thenReturn(List.of(integrationInstance));
+        when(integrationInstanceService.getIntegrationInstanceConfigurationIntegrationInstances(List.of(11L)))
+            .thenReturn(List.of(integrationInstance));
+        when(integrationInstanceService.getIntegrationInstanceConfigurationIntegrationInstances(List.of()))
+            .thenReturn(List.of());
+
+        RemoteIntegrationInstanceServiceClient remoteIntegrationInstanceServiceClient =
+            new RemoteIntegrationInstanceServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationInstanceServiceClient.getIntegrationInstance(17L))
+            .usingRecursiveComparison()
+            .isEqualTo(integrationInstance);
+        assertThat(remoteIntegrationInstanceServiceClient.fetchIntegrationInstance(
+            7L, "airtable", Environment.PRODUCTION))
+                .get()
+                .usingRecursiveComparison()
+                .isEqualTo(integrationInstance);
+        assertThat(remoteIntegrationInstanceServiceClient.fetchIntegrationInstance(
+            7L, "slack", Environment.PRODUCTION)).isEmpty();
+        assertThat(remoteIntegrationInstanceServiceClient.getIntegrationInstance(
+            7L, "workflow-1", Environment.PRODUCTION))
+                .usingRecursiveComparison()
+                .isEqualTo(integrationInstance);
+        assertThat(remoteIntegrationInstanceServiceClient.getIntegrationInstances(List.of(17L)))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(integrationInstance);
+        assertThat(remoteIntegrationInstanceServiceClient.getIntegrationInstanceConfigurationIntegrationInstances(
+            List.of(11L)))
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(integrationInstance);
+        assertThat(remoteIntegrationInstanceServiceClient.getIntegrationInstanceConfigurationIntegrationInstances(
+            List.of())).isEmpty();
+    }
+
+    @Test
+    void testGetUnknownIntegrationInstanceIsAnIllegalArgument() {
+        when(integrationInstanceService.getIntegrationInstance(99L))
+            .thenThrow(new IllegalArgumentException("Integration instance not found"));
+        when(integrationInstanceService.getIntegrationInstance(7L, "workflow-2", Environment.PRODUCTION))
+            .thenThrow(new IllegalArgumentException("Integration instance not found"));
+
+        RemoteIntegrationInstanceServiceClient remoteIntegrationInstanceServiceClient =
+            new RemoteIntegrationInstanceServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThatThrownBy(() -> remoteIntegrationInstanceServiceClient.getIntegrationInstance(99L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Integration instance not found");
+        assertThatThrownBy(() -> remoteIntegrationInstanceServiceClient.getIntegrationInstance(
+            7L, "workflow-2", Environment.PRODUCTION))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Integration instance not found");
+    }
+
+    @Test
     void testGetIntegrationInstanceWorkflow() {
         IntegrationInstanceWorkflow integrationInstanceWorkflow = new IntegrationInstanceWorkflow();
 

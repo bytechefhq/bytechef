@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegratio
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrations;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -78,6 +79,16 @@ public class EmbeddedConfigurationProtoMapper {
             .toList();
     }
 
+    public static Environment toEnvironment(int ordinal) {
+        Environment[] environments = Environment.values();
+
+        if (ordinal < 0 || ordinal >= environments.length) {
+            throw new IllegalArgumentException("Unknown environment: " + ordinal);
+        }
+
+        return environments[ordinal];
+    }
+
     public Integration toIntegration(RemoteIntegration remoteIntegration) {
         return protoJsonMapper.toObject(remoteIntegration, Integration.class);
     }
@@ -120,11 +131,14 @@ public class EmbeddedConfigurationProtoMapper {
             .toList();
     }
 
+    public IntegrationInstance toIntegrationInstance(RemoteIntegrationInstance remoteIntegrationInstance) {
+        return protoJsonMapper.toObject(remoteIntegrationInstance, IntegrationInstance.class);
+    }
+
     public List<IntegrationInstance> toIntegrationInstances(RemoteIntegrationInstances remoteIntegrationInstances) {
         return remoteIntegrationInstances.getIntegrationInstancesList()
             .stream()
-            .map(remoteIntegrationInstance -> protoJsonMapper.toObject(
-                remoteIntegrationInstance, IntegrationInstance.class))
+            .map(this::toIntegrationInstance)
             .toList();
     }
 

@@ -9,16 +9,25 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ComponentIntegrationInstanceRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserIntegrationInstancesRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceResult;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstance;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowIntegrationInstanceRequest;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -62,7 +71,19 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     public Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment) {
 
-        throw new UnsupportedOperationException();
+        IntegrationInstanceResult integrationInstanceResult = getStub().fetchIntegrationInstance(
+            ComponentIntegrationInstanceRequest.newBuilder()
+                .setComponentName(componentName)
+                .setConnectedUserId(connectedUserId)
+                .setEnvironment(environment.ordinal())
+                .build());
+
+        if (!integrationInstanceResult.hasIntegrationInstance()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+            embeddedConfigurationProtoMapper.toIntegrationInstance(integrationInstanceResult.getIntegrationInstance()));
     }
 
     @Override
@@ -138,25 +159,51 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     @Override
     public IntegrationInstance getIntegrationInstance(long id) {
-        throw new UnsupportedOperationException();
+        RemoteIntegrationInstance remoteIntegrationInstance = mapInvalidArgument(
+            () -> getStub().getIntegrationInstance(
+                IdRequest.newBuilder()
+                    .setId(id)
+                    .build()));
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstance(remoteIntegrationInstance);
     }
 
     @Override
     public List<IntegrationInstance> getIntegrationInstanceConfigurationIntegrationInstances(
         List<Long> integrationInstanceConfigurationIds) {
 
-        throw new UnsupportedOperationException();
+        RemoteIntegrationInstances remoteIntegrationInstances =
+            getStub().getIntegrationInstanceConfigurationIntegrationInstances(
+                IdsRequest.newBuilder()
+                    .addAllIds(integrationInstanceConfigurationIds)
+                    .build());
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstances(remoteIntegrationInstances);
     }
 
     @Override
     public IntegrationInstance
         getIntegrationInstance(long connectedUserId, String workflowId, Environment environment) {
-        throw new UnsupportedOperationException();
+
+        RemoteIntegrationInstance remoteIntegrationInstance = mapInvalidArgument(
+            () -> getStub().getWorkflowIntegrationInstance(
+                WorkflowIntegrationInstanceRequest.newBuilder()
+                    .setConnectedUserId(connectedUserId)
+                    .setEnvironment(environment.ordinal())
+                    .setWorkflowId(workflowId)
+                    .build()));
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstance(remoteIntegrationInstance);
     }
 
     @Override
     public List<IntegrationInstance> getIntegrationInstances(List<Long> ids) {
-        throw new UnsupportedOperationException();
+        RemoteIntegrationInstances remoteIntegrationInstances = getStub().getIntegrationInstances(
+            IdsRequest.newBuilder()
+                .addAllIds(ids)
+                .build());
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstances(remoteIntegrationInstances);
     }
 
     @Override
@@ -199,5 +246,19 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     private IntegrationInstanceRemoteServiceGrpc.IntegrationInstanceRemoteServiceBlockingStub getStub() {
         return IntegrationInstanceRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+    }
+
+    private static <T> T mapInvalidArgument(Supplier<T> remoteCall) {
+        try {
+            return remoteCall.get();
+        } catch (StatusRuntimeException statusRuntimeException) {
+            Status status = statusRuntimeException.getStatus();
+
+            if (status.getCode() == Status.Code.INVALID_ARGUMENT) {
+                throw new IllegalArgumentException(status.getDescription(), statusRuntimeException);
+            }
+
+            throw statusRuntimeException;
+        }
     }
 }

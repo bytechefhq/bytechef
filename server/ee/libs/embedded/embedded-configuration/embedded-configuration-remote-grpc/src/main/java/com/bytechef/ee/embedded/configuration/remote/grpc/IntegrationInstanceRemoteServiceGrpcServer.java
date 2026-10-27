@@ -8,14 +8,20 @@
 package com.bytechef.ee.embedded.configuration.remote.grpc;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ComponentIntegrationInstanceRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserIntegrationInstancesRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceResult;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstance;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowIntegrationInstanceRequest;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -36,6 +42,24 @@ public class IntegrationInstanceRemoteServiceGrpcServer
     }
 
     @Override
+    public void fetchIntegrationInstance(
+        ComponentIntegrationInstanceRequest request, StreamObserver<IntegrationInstanceResult> responseObserver) {
+
+        Optional<IntegrationInstance> integrationInstance = integrationInstanceService.fetchIntegrationInstance(
+            request.getConnectedUserId(), request.getComponentName(),
+            EmbeddedConfigurationProtoMapper.toEnvironment(request.getEnvironment()));
+
+        IntegrationInstanceResult.Builder builder = IntegrationInstanceResult.newBuilder();
+
+        integrationInstance.ifPresent(
+            curIntegrationInstance -> builder.setIntegrationInstance(
+                embeddedConfigurationProtoMapper.toProto(curIntegrationInstance)));
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void getConnectedUserIntegrationInstances(
         ConnectedUserIntegrationInstancesRequest request, StreamObserver<RemoteIntegrationInstances> responseObserver) {
 
@@ -46,7 +70,8 @@ public class IntegrationInstanceRemoteServiceGrpcServer
                 request.getConnectedUserId(), request.getEnabled());
         } else if (request.hasEnvironment()) {
             integrationInstances = integrationInstanceService.getConnectedUserIntegrationInstances(
-                request.getConnectedUserId(), toEnvironment(request.getEnvironment()));
+                request.getConnectedUserId(),
+                EmbeddedConfigurationProtoMapper.toEnvironment(request.getEnvironment()));
         } else {
             integrationInstances = integrationInstanceService.getConnectedUserIntegrationInstances(
                 request.getConnectedUserId());
@@ -56,13 +81,43 @@ public class IntegrationInstanceRemoteServiceGrpcServer
         responseObserver.onCompleted();
     }
 
-    private static Environment toEnvironment(int ordinal) {
-        Environment[] environments = Environment.values();
+    @Override
+    public void getIntegrationInstance(IdRequest request, StreamObserver<RemoteIntegrationInstance> responseObserver) {
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toProto(
+                integrationInstanceService.getIntegrationInstance(request.getId())));
+        responseObserver.onCompleted();
+    }
 
-        if (ordinal < 0 || ordinal >= environments.length) {
-            throw new IllegalArgumentException("Unknown environment: " + ordinal);
-        }
+    @Override
+    public void getIntegrationInstanceConfigurationIntegrationInstances(
+        IdsRequest request, StreamObserver<RemoteIntegrationInstances> responseObserver) {
 
-        return environments[ordinal];
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toProto(
+                integrationInstanceService.getIntegrationInstanceConfigurationIntegrationInstances(
+                    request.getIdsList())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void
+        getIntegrationInstances(IdsRequest request, StreamObserver<RemoteIntegrationInstances> responseObserver) {
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toProto(
+                integrationInstanceService.getIntegrationInstances(request.getIdsList())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getWorkflowIntegrationInstance(
+        WorkflowIntegrationInstanceRequest request, StreamObserver<RemoteIntegrationInstance> responseObserver) {
+
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toProto(
+                integrationInstanceService.getIntegrationInstance(
+                    request.getConnectedUserId(), request.getWorkflowId(),
+                    EmbeddedConfigurationProtoMapper.toEnvironment(request.getEnvironment()))));
+        responseObserver.onCompleted();
     }
 }
