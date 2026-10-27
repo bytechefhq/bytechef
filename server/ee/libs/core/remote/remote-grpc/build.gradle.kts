@@ -11,6 +11,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-webmvc")
+    compileOnly("org.springframework.graphql:spring-graphql")
     implementation("jakarta.servlet:jakarta.servlet-api")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-starter-grpc-server")
@@ -30,6 +31,7 @@ dependencies {
 
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation("io.grpc:grpc-services")
+    testImplementation("org.springframework.graphql:spring-graphql")
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(
         testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +34,8 @@ import tools.jackson.databind.ObjectMapper;
  * @version ee
  */
 public class GrpcStatusHandlerExceptionResolver implements HandlerExceptionResolver, Ordered {
+
+    private static final Logger log = LoggerFactory.getLogger(GrpcStatusHandlerExceptionResolver.class);
 
     private final ObjectMapper objectMapper;
 
@@ -58,6 +62,16 @@ public class GrpcStatusHandlerExceptionResolver implements HandlerExceptionResol
 
         HttpStatus httpStatus = toHttpStatus(status.getCode());
 
+        if (httpStatus.is5xxServerError()) {
+            log.error(
+                "Remote call for {} failed with {}", httpServletRequest.getRequestURI(), status,
+                statusRuntimeException);
+        }
+
+        if (httpServletResponse.isCommitted()) {
+            return new ModelAndView();
+        }
+
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
             httpStatus, status.getDescription() == null ? httpStatus.getReasonPhrase() : status.getDescription());
 
@@ -79,6 +93,8 @@ public class GrpcStatusHandlerExceptionResolver implements HandlerExceptionResol
         return switch (code) {
             case INVALID_ARGUMENT -> HttpStatus.BAD_REQUEST;
             case NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case UNAVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE;
+            case DEADLINE_EXCEEDED -> HttpStatus.GATEWAY_TIMEOUT;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
     }
