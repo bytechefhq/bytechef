@@ -181,7 +181,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 <div
                     className={twMerge(
                         'nodrag invisible absolute top-0 -left-8 z-10 group-hover:visible data-[open=true]:visible',
-                        isClusterElement && !isNestedClusterRoot && 'top-0 left-12'
+                        isClusterElement && !isNestedClusterRoot && 'top-0 left-0'
                     )}
                     data-open={nodeMenuOpen}
                     onMouseDown={(event) => event.stopPropagation()}
