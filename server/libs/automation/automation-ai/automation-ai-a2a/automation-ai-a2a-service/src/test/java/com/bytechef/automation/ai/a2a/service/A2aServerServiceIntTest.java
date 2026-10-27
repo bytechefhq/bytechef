@@ -17,13 +17,9 @@
 package com.bytechef.automation.ai.a2a.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +43,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -92,23 +87,12 @@ class A2aServerServiceIntTest {
         }
 
         @Test
-        void testSecretKeyIsDeniedWithoutTheA2aEditScope() {
+        void testSecretKeyLeavesTheEditCheckToTheFacade() {
             authenticate("ROLE_USER");
-
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> a2aServerService.getA2aServerSecretKey(1L));
-
-            verify(permissionService).hasResourceScope(1L, "A2aServer", "A2A_EDIT");
-            verify(a2aServerRepository, never()).findById(anyLong());
-        }
-
-        @Test
-        void testSecretKeyIsReturnedToAWorkspaceEditor() {
-            authenticate("ROLE_USER");
-
-            when(permissionService.hasResourceScope(1L, "A2aServer", "A2A_EDIT")).thenReturn(true);
 
             assertThat(a2aServerService.getA2aServerSecretKey(1L)).isEqualTo(a2aServer.getSecretKey());
+
+            verifyNoInteractions(permissionService);
         }
 
         @Test

@@ -53,6 +53,13 @@ public class A2aServerFacadeImpl implements A2aServerFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT')")
+    public String getA2aServerSecretKey(long a2aServerId) {
+        return a2aServerService.getA2aServerSecretKey(a2aServerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'A2A_VIEW')")
     public List<Tag> getA2aServerTags(long workspaceId) {
         List<Long> tagIds = a2aServerService.getWorkspaceA2aServers(workspaceId)
