@@ -18,6 +18,7 @@ import com.bytechef.ee.platform.workflow.worker.remote.grpc.proto.TaskHandlerRem
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @version ee
@@ -28,19 +29,37 @@ public class TaskHandlerRemoteServiceGrpcServer extends TaskHandlerRemoteService
 
     private final TaskExecutionProtoMapper taskExecutionProtoMapper;
     private final TaskHandlerRegistry taskHandlerRegistry;
+    private final TaskExecutor workerExecutor;
 
     @SuppressFBWarnings("EI")
     public TaskHandlerRemoteServiceGrpcServer(
-        TaskHandlerRegistry taskHandlerRegistry, TaskExecutionProtoMapper taskExecutionProtoMapper) {
+        TaskHandlerRegistry taskHandlerRegistry, TaskExecutionProtoMapper taskExecutionProtoMapper,
+        TaskExecutor workerExecutor) {
 
         this.taskExecutionProtoMapper = taskExecutionProtoMapper;
         this.taskHandlerRegistry = taskHandlerRegistry;
+        this.workerExecutor = workerExecutor;
     }
 
     @Override
     public void handle(HandleTaskRequest request, StreamObserver<HandleTaskResponse> responseObserver) {
         TaskHandler<?> taskHandler = taskHandlerRegistry.getTaskHandler(request.getType());
+
+        if (taskHandler == null) {
+            responseObserver.onError(
+                Status.INVALID_ARGUMENT.withDescription("Unknown task type: " + request.getType())
+                    .asRuntimeException());
+
+            return;
+        }
+
         TaskExecution taskExecution = taskExecutionProtoMapper.toTaskExecution(request.getTaskExecution());
+
+        workerExecutor.execute(() -> handle(taskHandler, taskExecution, responseObserver));
+    }
+
+    private void handle(
+        TaskHandler<?> taskHandler, TaskExecution taskExecution, StreamObserver<HandleTaskResponse> responseObserver) {
 
         Object output;
 
@@ -50,6 +69,16 @@ public class TaskHandlerRemoteServiceGrpcServer extends TaskHandlerRemoteService
             responseObserver.onError(
                 Status.INTERNAL.withDescription(taskExecutionException.getMessage())
                     .withCause(taskExecutionException)
+                    .asRuntimeException());
+
+            return;
+        } catch (RuntimeException runtimeException) {
+            Class<? extends RuntimeException> runtimeExceptionClass = runtimeException.getClass();
+
+            responseObserver.onError(
+                Status.INTERNAL
+                    .withDescription(runtimeExceptionClass.getSimpleName() + ": " + runtimeException.getMessage())
+                    .withCause(runtimeException)
                     .asRuntimeException());
 
             return;

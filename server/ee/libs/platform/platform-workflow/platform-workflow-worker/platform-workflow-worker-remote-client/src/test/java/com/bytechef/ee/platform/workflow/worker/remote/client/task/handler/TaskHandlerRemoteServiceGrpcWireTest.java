@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,19 +58,25 @@ class TaskHandlerRemoteServiceGrpcWireTest {
         .build();
     private final AtomicReference<TaskExecution> receivedTaskExecution = new AtomicReference<>();
     private final List<String> requestedTargets = new ArrayList<>();
-    private final TaskHandlerRegistry taskHandlerRegistry = type -> taskExecution -> {
-        receivedTaskExecution.set(taskExecution);
+    private final AtomicInteger workerExecutorRuns = new AtomicInteger();
+    private final TaskHandlerRegistry taskHandlerRegistry = type -> "randomHelper/v1/missing".equals(type) ? null
+        : taskExecution -> {
+            receivedTaskExecution.set(taskExecution);
 
-        if ("failing/v1/fail".equals(type)) {
-            throw new TaskExecutionException("Bad input");
-        }
+            if ("randomHelper/v1/broken".equals(type)) {
+                throw new IllegalStateException("Handler broke");
+            }
 
-        if ("bigNumber/v1/get".equals(type)) {
-            return Map.of("id", 9_007_199_254_740_993L);
-        }
+            if ("failing/v1/fail".equals(type)) {
+                throw new TaskExecutionException("Bad input");
+            }
 
-        return Map.of("type", type, "value", 0.5);
-    };
+            if ("bigNumber/v1/get".equals(type)) {
+                return Map.of("id", 9_007_199_254_740_993L);
+            }
+
+            return Map.of("type", type, "value", 0.5);
+        };
 
     private ManagedChannel managedChannel;
     private RemoteTaskHandlerClient remoteTaskHandlerClient;
@@ -84,7 +91,13 @@ class TaskHandlerRemoteServiceGrpcWireTest {
             .addService(
                 ServerInterceptors.intercept(
                     new TaskHandlerRemoteServiceGrpcServer(
-                        taskHandlerRegistry, new TaskExecutionProtoMapper(jsonMapper)),
+                        taskHandlerRegistry, new TaskExecutionProtoMapper(jsonMapper), runnable -> {
+                            workerExecutorRuns.incrementAndGet();
+
+                            Thread thread = new Thread(runnable);
+
+                            thread.start();
+                        }),
                     new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .build()
             .start();
@@ -132,6 +145,35 @@ class TaskHandlerRemoteServiceGrpcWireTest {
     void afterEach() {
         managedChannel.shutdownNow();
         server.shutdownNow();
+    }
+
+    @Test
+    void testHandleRunsOnTheWorkerExecutor() throws TaskExecutionException {
+        remoteTaskHandlerClient.handle(
+            "randomHelper/v1/randomFloat", taskExecution("randomHelper/v1/randomFloat", Map.of()));
+
+        assertThat(workerExecutorRuns.get()).isEqualTo(1);
+    }
+
+    @Test
+    void testUnknownTaskTypeFailsNamingTheType() {
+        assertThatThrownBy(
+            () -> remoteTaskHandlerClient.handle(
+                "randomHelper/v1/missing", taskExecution("randomHelper/v1/missing", Map.of())))
+                    .isInstanceOf(TaskExecutionException.class)
+                    .hasMessageContaining("randomHelper/v1/missing");
+    }
+
+    @Test
+    void testUnexpectedHandlerFailureIsReportedInsteadOfHanging() {
+        long startNanos = System.nanoTime();
+
+        assertThatThrownBy(
+            () -> remoteTaskHandlerClient.handle(
+                "randomHelper/v1/broken", taskExecution("randomHelper/v1/broken", Map.of())))
+                    .isInstanceOf(TaskExecutionException.class)
+                    .hasMessageContaining("Handler broke");
+        assertThat(Duration.ofNanos(System.nanoTime() - startNanos)).isLessThan(Duration.ofSeconds(3));
     }
 
     @Test
