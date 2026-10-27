@@ -40,6 +40,7 @@ service ConnectionDefinitionRemoteService {
   rpc GetConnectionConnectionDefinition(GetConnectionConnectionDefinitionRequest) returns (RemoteConnectionDefinition);
   rpc GetConnectionDefinition(GetConnectionDefinitionRequest) returns (RemoteConnectionDefinition);
   rpc GetConnectionDefinitions(google.protobuf.Empty) returns (RemoteConnectionDefinitions);
+  rpc GetOAuth2AuthorizationParameters(GetOAuth2AuthorizationParametersRequest) returns (RemoteOAuth2AuthorizationParameters);
 }
 
 service ActionDefinitionFacadeRemoteService {
@@ -370,6 +371,20 @@ message ExecuteBaseUriRequest {
   int64 connection_id = 3;
   bytes parameters = 4;
   optional string authorization_type = 5;
+}
+
+message GetOAuth2AuthorizationParametersRequest {
+  string component_name = 1;
+  int32 connection_version = 2;
+  optional string authorization_type = 3;
+  bytes connection_parameters = 4;
+}
+
+message RemoteOAuth2AuthorizationParameters {
+  optional string authorization_url = 1;
+  optional string client_id = 2;
+  optional bytes extra_query_parameters = 3;
+  optional bytes scopes = 4;
 }
 
 message GetConnectionConnectionDefinitionRequest {

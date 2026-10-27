@@ -39,6 +39,7 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
@@ -113,7 +114,9 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
             .addService(
                 new ComponentDefinitionRemoteServiceGrpcServer(componentDefinitionService, componentProtoMapper))
             .addService(
-                new ConnectionDefinitionRemoteServiceGrpcServer(connectionDefinitionService, componentProtoMapper))
+                ServerInterceptors.intercept(
+                    new ConnectionDefinitionRemoteServiceGrpcServer(connectionDefinitionService, componentProtoMapper),
+                    new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .addService(new TriggerDefinitionRemoteServiceGrpcServer(triggerDefinitionService, componentProtoMapper))
             .build()
             .start();
@@ -504,6 +507,51 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         when(connectionDefinitionService.executeBaseUri("keep", componentConnection)).thenReturn(Optional.empty());
 
         assertThat(remoteConnectionDefinitionServiceClient.executeBaseUri("keep", componentConnection)).isEmpty();
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParameters() {
+        Map<String, Object> connectionParameters = Map.of("clientId", "client-1", "scopes", List.of("read"));
+        OAuth2AuthorizationParameters oAuth2AuthorizationParameters = new OAuth2AuthorizationParameters(
+            "https://acme.example.com/oauth/authorize", "client-1", Map.of("prompt", "consent"),
+            Map.of("read", true, "write", false));
+
+        when(connectionDefinitionService.getOAuth2AuthorizationParameters(
+            "keep", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE, connectionParameters))
+                .thenReturn(oAuth2AuthorizationParameters);
+
+        assertThat(
+            remoteConnectionDefinitionServiceClient.getOAuth2AuthorizationParameters(
+                "keep", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE, connectionParameters))
+                    .isEqualTo(oAuth2AuthorizationParameters);
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersWithoutValues() {
+        OAuth2AuthorizationParameters oAuth2AuthorizationParameters = new OAuth2AuthorizationParameters(
+            null, null, Map.of(), Map.of());
+
+        when(connectionDefinitionService.getOAuth2AuthorizationParameters(
+            "keep", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE, Map.of()))
+                .thenReturn(oAuth2AuthorizationParameters);
+
+        assertThat(
+            remoteConnectionDefinitionServiceClient.getOAuth2AuthorizationParameters(
+                "keep", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE, Map.of()))
+                    .isEqualTo(oAuth2AuthorizationParameters);
+    }
+
+    @Test
+    void testGetOAuth2AuthorizationParametersForAnUnknownAuthorizationFailsWithItsMessage() {
+        when(connectionDefinitionService.getOAuth2AuthorizationParameters(
+            "keep", 1, AuthorizationType.OAUTH2_CLIENT_CREDENTIALS, Map.of()))
+                .thenThrow(new IllegalArgumentException("Authorization oauth2_client_credentials not found"));
+
+        assertThatThrownBy(
+            () -> remoteConnectionDefinitionServiceClient.getOAuth2AuthorizationParameters(
+                "keep", 1, AuthorizationType.OAUTH2_CLIENT_CREDENTIALS, Map.of()))
+                    .hasMessageContaining("INVALID_ARGUMENT")
+                    .hasMessageContaining("Authorization oauth2_client_credentials not found");
     }
 
     private static ClusterElementDefinition clusterElementDefinition() {

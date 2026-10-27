@@ -20,8 +20,10 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.ExecuteBaseUriReques
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationTypeRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
+import com.bytechef.ee.platform.component.remote.grpc.proto.GetOAuth2AuthorizationParametersRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOAuth2AuthorizationParameters;
 import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.component.ComponentConnection;
@@ -130,7 +132,19 @@ public class RemoteConnectionDefinitionServiceClient implements ConnectionDefini
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters) {
 
-        throw new UnsupportedOperationException();
+        GetOAuth2AuthorizationParametersRequest.Builder builder = GetOAuth2AuthorizationParametersRequest.newBuilder()
+            .setComponentName(componentName)
+            .setConnectionVersion(connectionVersion)
+            .setConnectionParameters(componentProtoMapper.toBytes(connectionParameters));
+
+        if (authorizationType != null) {
+            builder.setAuthorizationType(authorizationType.name());
+        }
+
+        RemoteOAuth2AuthorizationParameters remoteOAuth2AuthorizationParameters =
+            getStub(workerInstances.getInstance(componentName)).getOAuth2AuthorizationParameters(builder.build());
+
+        return componentProtoMapper.toOAuth2AuthorizationParameters(remoteOAuth2AuthorizationParameters);
     }
 
     @Override
