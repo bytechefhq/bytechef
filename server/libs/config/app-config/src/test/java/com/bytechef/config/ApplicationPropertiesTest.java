@@ -332,6 +332,45 @@ class ApplicationPropertiesTest {
                 .hasMessageContaining("bytechef.session.store");
     }
 
+    @Test
+    void testSsrfAllowedHostsBindsFromProperty() {
+        ApplicationProperties applicationProperties = bind(
+            new MapPropertySource(
+                "test", Map.of("bytechef.security.ssrf.allowed-hosts", "docs.internal,wiki.internal")));
+
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
+
+        ApplicationProperties.Security.Ssrf ssrf = security.getSsrf();
+
+        assertThat(ssrf.getAllowedHosts()).containsExactly("docs.internal", "wiki.internal");
+    }
+
+    @Test
+    void testSsrfAllowedHostsBindsFromEnvironmentVariable() {
+        ApplicationProperties applicationProperties = bind(
+            new SystemEnvironmentPropertySource(
+                StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                Map.of("BYTECHEF_SECURITY_SSRF_ALLOWED_HOSTS", "docs.internal")));
+
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
+
+        ApplicationProperties.Security.Ssrf ssrf = security.getSsrf();
+
+        assertThat(ssrf.getAllowedHosts()).containsExactly("docs.internal");
+    }
+
+    @Test
+    void testSsrfAllowedHostsBindsEmptyYamlList() {
+        ApplicationProperties applicationProperties = bind(
+            new MapPropertySource("test", Map.of("bytechef.security.ssrf.allowed-hosts", "")));
+
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
+
+        ApplicationProperties.Security.Ssrf ssrf = security.getSsrf();
+
+        assertThat(ssrf.getAllowedHosts()).isEmpty();
+    }
+
     private static ApplicationProperties bind(PropertySource<?> propertySource) {
         MutablePropertySources propertySources = new MutablePropertySources();
 

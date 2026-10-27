@@ -302,6 +302,8 @@ bytechef:
       password:
     sso:
       enabled: false
+    ssrf:
+      allowed-hosts: []
     two-factor-authentication:
       enabled: false
   session:

@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.apiconnector.configuration.service;
 
 import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.commons.util.UrlValidatorUtils.HostResolver;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.apiconnector.configuration.service.PinnedAddressHttpClient.Response;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
@@ -55,14 +57,19 @@ public class JsoupWebScrapeService implements WebScrapeService {
         "User-Agent", "ByteChef Web Scraper",
         "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 
+    private final Set<String> allowedHosts;
     private final HostResolver hostResolver;
     private final PinnedAddressHttpClient pinnedAddressHttpClient;
 
-    public JsoupWebScrapeService() {
-        this(InetAddress::getAllByName, Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS));
+    @Autowired
+    public JsoupWebScrapeService(ApplicationProperties applicationProperties) {
+        this(
+            getAllowedHosts(applicationProperties), InetAddress::getAllByName,
+            Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS));
     }
 
-    JsoupWebScrapeService(HostResolver hostResolver, Duration connectTimeout) {
+    JsoupWebScrapeService(Set<String> allowedHosts, HostResolver hostResolver, Duration connectTimeout) {
+        this.allowedHosts = Set.copyOf(allowedHosts);
         this.hostResolver = hostResolver;
         this.pinnedAddressHttpClient = new PinnedAddressHttpClient(
             connectTimeout, Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS), MAX_RESPONSE_BODY_BYTES,
@@ -239,9 +246,27 @@ public class JsoupWebScrapeService implements WebScrapeService {
     }
 
     ResolvedTarget resolveTarget(String url) {
-        List<InetAddress> addresses = UrlValidatorUtils.resolveValidatedAddresses(url, Set.of(), hostResolver);
+        List<InetAddress> addresses = UrlValidatorUtils.resolveValidatedAddresses(url, allowedHosts, hostResolver);
 
         return new ResolvedTarget(URI.create(url), addresses);
+    }
+
+    static Set<String> getAllowedHosts(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
+
+        if (security == null || security.getSsrf() == null) {
+            return Set.of();
+        }
+
+        ApplicationProperties.Security.Ssrf ssrf = security.getSsrf();
+
+        List<String> allowedHosts = ssrf.getAllowedHosts();
+
+        if (allowedHosts == null) {
+            return Set.of();
+        }
+
+        return Set.copyOf(allowedHosts);
     }
 
     static String resolveRedirectTarget(URI currentUri, String location) {

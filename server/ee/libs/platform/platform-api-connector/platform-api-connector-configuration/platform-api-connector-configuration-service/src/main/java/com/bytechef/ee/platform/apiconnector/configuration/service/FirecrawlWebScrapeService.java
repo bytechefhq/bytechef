@@ -47,6 +47,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     private static final int POLL_INTERVAL_MS = 2000;
     private static final int MAX_POLL_ATTEMPTS = 60;
 
+    private final Set<String> allowedHosts;
     private final String apiKey;
     private final String baseUrl;
     private final HttpClient httpClient;
@@ -57,6 +58,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
         ApplicationProperties.Ai.Firecrawl firecrawl = applicationProperties.getAi()
             .getFirecrawl();
 
+        this.allowedHosts = JsoupWebScrapeService.getAllowedHosts(applicationProperties);
         this.apiKey = firecrawl.getApiKey();
         this.baseUrl = firecrawl.getBaseUrl();
         this.objectMapper = objectMapper;
@@ -69,7 +71,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     @Override
     public ScrapeResult scrape(String url) {
         try {
-            UrlValidatorUtils.validate(url, Set.of());
+            UrlValidatorUtils.validate(url, allowedHosts);
 
             Map<String, Object> requestBody = new HashMap<>();
 
@@ -104,7 +106,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     @Override
     public CrawlResult crawl(String url, int maxPages, List<String> includePatterns) {
         try {
-            UrlValidatorUtils.validate(url, Set.of());
+            UrlValidatorUtils.validate(url, allowedHosts);
 
             Map<String, Object> requestBody = new HashMap<>();
 
