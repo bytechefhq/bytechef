@@ -21,6 +21,7 @@ import java.util.Objects;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -29,6 +30,14 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table("billing_subscription")
 public class BillingSubscription {
+
+    /**
+     * How the subscription pays for job executions. METERED is the legacy postpaid model, reported to a Stripe meter;
+     * PREPAID grants a number of units per period and gates executions on them.
+     */
+    public enum SubscriptionModel {
+        METERED, PREPAID
+    }
 
     public enum Status {
         INCOMPLETE, INCOMPLETE_EXPIRED, TRIALING, ACTIVE, PAST_DUE, CANCELED, UNPAID, PAUSED, UNKNOWN;
@@ -78,14 +87,41 @@ public class BillingSubscription {
     @Column("subscription_id")
     private String subscriptionId;
 
+    // Legacy METERED model only: the id of the metered Stripe subscription item.
+    @Deprecated
     @Column("usage_product_id")
     private String usageProductId;
 
+    // Legacy METERED model only
     @Column("product_unit_limit")
+    @Deprecated
     private int productUnitLimit;
 
+    // Replaces productUnitLimit for the PREPAID model: the number of units the plan grants per period.
+    @Column("plan_unit_total")
+    private int planUnitTotal;
+
+    @Column("extra_unit_total")
+    private int extraUnitTotal;
+
+    // Usage counters are @ReadOnlyProperty: save() never writes them, so a whole-row save from a webhook handler cannot
+    // overwrite a concurrent job's increment. They change only through the atomic repository queries; the setters
+    // exist for test fixtures only and are ignored by save().
+    @ReadOnlyProperty
+    @Column("plan_unit_used")
+    private int planUnitUsed;
+
+    @ReadOnlyProperty
+    @Column("extra_unit_used")
+    private int extraUnitUsed;
+
+    // Legacy METERED model only: the upper bound of the last usage report sent to the Stripe meter.
+    @Deprecated
     @Column("last_reported_at")
     private Instant lastReportedAt;
+
+    @Column("subscription_model")
+    private String subscriptionModel;
 
     @Override
     public boolean equals(Object object) {
@@ -153,12 +189,32 @@ public class BillingSubscription {
         return productUnitLimit;
     }
 
+    public int getPlanUnitTotal() {
+        return planUnitTotal;
+    }
+
+    public int getPlanUnitUsed() {
+        return planUnitUsed;
+    }
+
+    public int getExtraUnitTotal() {
+        return extraUnitTotal;
+    }
+
+    public int getExtraUnitUsed() {
+        return extraUnitUsed;
+    }
+
     public boolean isCancelAtPeriodEnd() {
         return cancelAtPeriodEnd;
     }
 
     public Instant getLastReportedAt() {
         return lastReportedAt;
+    }
+
+    public SubscriptionModel getSubscriptionModel() {
+        return SubscriptionModel.valueOf(subscriptionModel);
     }
 
     public void setCancelAtPeriodEnd(boolean cancelAtPeriodEnd) {
@@ -205,8 +261,28 @@ public class BillingSubscription {
         this.productUnitLimit = productUnitLimit;
     }
 
+    public void setPlanUnitTotal(int planUnitTotal) {
+        this.planUnitTotal = planUnitTotal;
+    }
+
+    public void setPlanUnitUsed(int planUnitUsed) {
+        this.planUnitUsed = planUnitUsed;
+    }
+
+    public void setExtraUnitTotal(int extraUnitTotal) {
+        this.extraUnitTotal = extraUnitTotal;
+    }
+
+    public void setExtraUnitUsed(int extraUnitUsed) {
+        this.extraUnitUsed = extraUnitUsed;
+    }
+
     public void setLastReportedAt(Instant lastReportedAt) {
         this.lastReportedAt = lastReportedAt;
+    }
+
+    public void setSubscriptionModel(SubscriptionModel subscriptionModel) {
+        this.subscriptionModel = subscriptionModel.name();
     }
 
     @Override
@@ -217,7 +293,12 @@ public class BillingSubscription {
             ", customerId='" + customerId + '\'' +
             ", status='" + status + '\'' +
             ", planName='" + planName + '\'' +
+            ", subscriptionModel='" + subscriptionModel + '\'' +
             ", productUnitLimit=" + productUnitLimit +
+            ", planUnitTotal=" + planUnitTotal +
+            ", planUnitUsed=" + planUnitUsed +
+            ", extraUnitTotal=" + extraUnitTotal +
+            ", extraUnitUsed=" + extraUnitUsed +
             ", currentPeriodStart=" + currentPeriodStart +
             ", currentPeriodEnd=" + currentPeriodEnd +
             ", cancelAtPeriodEnd=" + cancelAtPeriodEnd +
