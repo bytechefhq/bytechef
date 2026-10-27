@@ -22,7 +22,9 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
-    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api")) {
+        isTransitive = false
+    }
 
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
 
