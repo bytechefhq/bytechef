@@ -205,6 +205,65 @@ class ApiConnectorFacadeTest {
 
             verify(apiConnectorService).update(apiConnector);
         }
+
+        @Test
+        void testUpdateApiConnectorMetadataNormalizesName() {
+            ApiConnector apiConnector = new ApiConnector();
+
+            apiConnector.setId(1L);
+            apiConnector.setName("petstore");
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.fetchApiConnector("pet.store", 1)).thenReturn(Optional.empty());
+            when(apiConnectorService.update(apiConnector)).thenReturn(apiConnector);
+
+            ApiConnector updatedApiConnector = apiConnectorFacade.updateApiConnectorMetadata(
+                1L, "Pet-Store", null, null, null, null);
+
+            assertThat(updatedApiConnector.getName()).isEqualTo("pet.store");
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataRejectsInvalidName() {
+            ApiConnector apiConnector = new ApiConnector();
+
+            apiConnector.setId(1L);
+            apiConnector.setName("petstore");
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+
+            assertThatThrownBy(
+                () -> apiConnectorFacade.updateApiConnectorMetadata(1L, "../../etc/passwd", null, null, null, null))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("Invalid API connector name");
+
+            assertThat(apiConnector.getName()).isEqualTo("petstore");
+
+            verify(apiConnectorService, never()).update(any());
+        }
+
+        @Test
+        void testUpdateApiConnectorMetadataRejectsNameHeldByAnotherConnector() {
+            ApiConnector apiConnector = new ApiConnector();
+
+            apiConnector.setId(1L);
+            apiConnector.setName("petstore");
+
+            ApiConnector otherApiConnector = new ApiConnector();
+
+            otherApiConnector.setId(2L);
+            otherApiConnector.setName("taken");
+
+            when(apiConnectorService.getApiConnector(1L)).thenReturn(apiConnector);
+            when(apiConnectorService.fetchApiConnector("taken", 1)).thenReturn(Optional.of(otherApiConnector));
+
+            assertThatThrownBy(
+                () -> apiConnectorFacade.updateApiConnectorMetadata(1L, "taken", null, null, null, null))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("already exists");
+
+            verify(apiConnectorService, never()).update(any());
+        }
     }
 
     @Nested

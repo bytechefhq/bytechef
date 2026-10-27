@@ -199,13 +199,7 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
         String componentName = name == null ? curApiConnector.getName() : convertComponentName(name);
 
-        apiConnectorService.fetchApiConnector(componentName, 1)
-            .filter(existingApiConnector -> !Objects.equals(existingApiConnector.getId(), id))
-            .ifPresent(existingApiConnector -> {
-                throw new ConfigurationException(
-                    "An API connector named '%s' already exists".formatted(componentName),
-                    ApiConnectorErrorType.API_CONNECTOR_NAME_ALREADY_EXISTS);
-            });
+        validateComponentNameAvailable(id, componentName);
 
         GeneratedDefinition generatedDefinition = generateDefinition(componentName, specification);
 
@@ -232,7 +226,11 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         ApiConnector apiConnector = apiConnectorService.getApiConnector(id);
 
         if (name != null) {
-            apiConnector.setName(name);
+            String componentName = convertComponentName(name);
+
+            validateComponentNameAvailable(id, componentName);
+
+            apiConnector.setName(componentName);
         }
 
         if (title != null) {
@@ -252,6 +250,16 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         }
 
         return apiConnectorService.update(apiConnector);
+    }
+
+    private void validateComponentNameAvailable(long id, String componentName) {
+        apiConnectorService.fetchApiConnector(componentName, 1)
+            .filter(existingApiConnector -> !Objects.equals(existingApiConnector.getId(), id))
+            .ifPresent(existingApiConnector -> {
+                throw new ConfigurationException(
+                    "An API connector named '%s' already exists".formatted(componentName),
+                    ApiConnectorErrorType.API_CONNECTOR_NAME_ALREADY_EXISTS);
+            });
     }
 
     private ApiConnectorAiService getApiConnectorAiService() {
