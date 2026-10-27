@@ -109,6 +109,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-grpc"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-remote-grpc"))
     implementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-service"))
