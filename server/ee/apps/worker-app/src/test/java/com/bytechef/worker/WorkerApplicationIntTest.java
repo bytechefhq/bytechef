@@ -58,7 +58,8 @@ public class WorkerApplicationIntTest {
             "bytechef.platform.component.remote.v1.ActionDefinitionFacadeRemoteService",
             "bytechef.platform.component.remote.v1.TriggerDefinitionFacadeRemoteService",
             "bytechef.platform.component.remote.v1.ClusterElementDefinitionRemoteService",
-            "bytechef.platform.component.remote.v1.ClusterElementDefinitionFacadeRemoteService");
+            "bytechef.platform.component.remote.v1.ClusterElementDefinitionFacadeRemoteService",
+            "bytechef.platform.component.remote.v1.UnifiedApiDefinitionRemoteService");
     }
 
     @Test
