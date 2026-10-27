@@ -235,6 +235,29 @@ class A2aServerFacadeIntTest {
         }
 
         @Test
+        void testSecretKeyIsDeniedWithoutTheA2aEditScope() {
+            authenticate();
+
+            assertThatExceptionOfType(AccessDeniedException.class)
+                .isThrownBy(() -> a2aServerFacade.getA2aServerSecretKey(1L));
+
+            verify(permissionService).hasResourceScope(1L, "A2aServer", "A2A_EDIT");
+            verify(a2aServerRepository, never()).findById(anyLong());
+        }
+
+        @Test
+        void testSecretKeyIsReturnedToAWorkspaceEditor() {
+            authenticate();
+
+            when(permissionService.hasResourceScope(1L, "A2aServer", "A2A_EDIT")).thenReturn(true);
+
+            A2aServer a2aServer = a2aServerRepository.findById(1L)
+                .orElseThrow();
+
+            assertThat(a2aServerFacade.getA2aServerSecretKey(1L)).isEqualTo(a2aServer.getSecretKey());
+        }
+
+        @Test
         void testUnauthenticatedCallerCannotListServersOrTags() {
             assertThatExceptionOfType(AuthenticationCredentialsNotFoundException.class)
                 .isThrownBy(() -> a2aServerFacade.getWorkspaceA2aServers(1L));

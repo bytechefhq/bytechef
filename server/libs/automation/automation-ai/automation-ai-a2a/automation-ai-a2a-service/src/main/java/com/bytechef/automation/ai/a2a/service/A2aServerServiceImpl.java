@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +84,6 @@ public class A2aServerServiceImpl implements A2aServerService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT')")
     @Transactional(readOnly = true)
     public String getA2aServerSecretKey(long a2aServerId) {
         A2aServer a2aServer = getA2aServer(a2aServerId);
