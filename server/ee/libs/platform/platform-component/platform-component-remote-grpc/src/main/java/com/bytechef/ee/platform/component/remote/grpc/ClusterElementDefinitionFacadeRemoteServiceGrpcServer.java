@@ -112,7 +112,8 @@ public class ClusterElementDefinitionFacadeRemoteServiceGrpcServer
         if (request.hasComponentVersion()) {
             result = clusterElementDefinitionFacade.executeTool(
                 request.getComponentName(), request.getComponentVersion(), request.getClusterElementName(),
-                componentProtoMapper.toMap(request.getInputParameters()), connectionId);
+                componentProtoMapper.toMap(request.getInputParameters()), connectionId,
+                request.getEditorEnvironment());
         } else {
             result = clusterElementDefinitionFacade.executeTool(
                 request.getComponentName(), request.getClusterElementName(),

@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -43,6 +44,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -91,6 +93,9 @@ class WorkflowNodeTestOutputFacadeIntTest {
 
     @Autowired
     private ActionDefinitionFacade actionDefinitionFacade;
+
+    @Autowired
+    private ClusterElementDefinitionFacade clusterElementDefinitionFacade;
 
     @Autowired
     private ClusterElementDefinitionService clusterElementDefinitionService;
@@ -373,6 +378,48 @@ class WorkflowNodeTestOutputFacadeIntTest {
 
         assertThat(workflowNodeTestOutput.isSampleOutputTruncated()).isFalse();
         assertThat(workflowNodeTestOutput.getSampleOutput()).isEqualTo(rows);
+    }
+
+    @Test
+    void testSaveClusterElementTestOutputExecutesToolByConnectionIdInEditorEnvironment() {
+        Workflow workflow = createWorkflow(
+            """
+                {
+                    "triggers": [
+                        {"name": "trigger_1", "type": "manual/v1/manual", "parameters": {}}
+                    ],
+                    "tasks": [
+                        {
+                            "name": "aiAgent_1",
+                            "type": "aiAgent/v1/chat",
+                            "parameters": {},
+                            "clusterElements": {
+                                "tools": [
+                                    {"name": "googleMail_1", "type": "googleMail/v1/getEmail", "parameters": {"id": "m1"}}
+                                ]
+                            }
+                        }
+                    ]
+                }
+                """);
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflow.getId(), "aiAgent_1", "googleMail_1", 21L, false, ENVIRONMENT_ID);
+
+        when(clusterElementDefinitionService.getClusterElementType("aiAgent", 1, "tools"))
+            .thenReturn(new ClusterElementType("tools", "tools", "Tools", true, false));
+        when(clusterElementDefinitionFacade.executeTool(
+            eq("googleMail"), eq(1), eq("getEmail"), anyMap(), eq(21L), eq(true)))
+                .thenReturn(Map.of("id", "m1"));
+
+        workflowNodeTestOutputFacade.saveClusterElementTestOutput(
+            workflow.getId(), "aiAgent_1", "tools", "googleMail_1", ENVIRONMENT_ID);
+
+        WorkflowNodeTestOutput workflowNodeTestOutput = getTestOutput(workflow.getId(), "googleMail_1");
+
+        assertThat(workflowNodeTestOutput.getSampleOutput()).isEqualTo(Map.of("id", "m1"));
+
+        verifyNoInteractions(connectionService);
     }
 
     private Workflow createWorkflow(String definition) {

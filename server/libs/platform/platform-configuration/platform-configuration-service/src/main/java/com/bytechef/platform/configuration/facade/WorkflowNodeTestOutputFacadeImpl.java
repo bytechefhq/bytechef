@@ -33,6 +33,7 @@ import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -85,6 +86,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     private static final Logger log = LoggerFactory.getLogger(WorkflowNodeTestOutputFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders;
     private final ConnectionService connectionService;
@@ -102,6 +104,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, ApplicationProperties applicationProperties,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
         List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders, ConnectionService connectionService,
         EditorTempFileStorage editorTempFileStorage, Evaluator evaluator,
@@ -111,6 +114,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.codeEditorScriptInputProviders = codeEditorScriptInputProviders;
         this.connectionService = connectionService;
@@ -165,8 +169,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             (
                 workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
                 curEnvironmentId) -> executeClusterElement(
-                    workflowId, workflowNodeName, workflowNodeType, clusterElementWorkflowNodeName,
-                    curInputParameters, curConnectionIds, curExtensions, curEnvironmentId));
+                    workflowNodeType, clusterElementWorkflowNodeName, curInputParameters, curConnectionIds,
+                    curExtensions, curEnvironmentId));
     }
 
     @Override
@@ -195,8 +199,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             (
                 workflowNodeType, curInputParameters, curConnectionIds, curExtensions,
                 curEnvironmentId) -> executeClusterElement(
-                    workflowId, workflowNodeName, workflowNodeType, clusterElementWorkflowNodeName,
-                    curInputParameters, curConnectionIds, curExtensions, curEnvironmentId));
+                    workflowNodeType, clusterElementWorkflowNodeName, curInputParameters, curConnectionIds,
+                    curExtensions, curEnvironmentId));
     }
 
     @Override
@@ -372,9 +376,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     private Object executeClusterElement(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType,
-        String clusterElementWorkflowNodeName, Map<String, ?> inputParameters, Map<String, Long> connectionIds,
-        Map<String, ?> extensions, long environmentId) {
+        WorkflowNodeType workflowNodeType, String clusterElementWorkflowNodeName, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, long environmentId) {
 
         if (Objects.equals(workflowNodeType.name(), ScriptComponentDefinition.SCRIPT)) {
             return actionDefinitionFacade.executePerform(
@@ -382,13 +385,10 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                 null, null, null, inputParameters, connectionIds, extensions, environmentId, null, true,
                 null, null, null);
         } else {
-            ComponentConnection componentConnection = getClusterElementComponentConnection(
-                workflowId, workflowNodeName, clusterElementWorkflowNodeName, environmentId);
-
-            return clusterElementDefinitionService.executeTool(
+            return clusterElementDefinitionFacade.executeTool(
                 workflowNodeType.name(), workflowNodeType.version(),
-                Objects.requireNonNull(workflowNodeType.operation()), inputParameters, componentConnection,
-                true);
+                Objects.requireNonNull(workflowNodeType.operation()), inputParameters,
+                connectionIds.get(clusterElementWorkflowNodeName), true);
         }
     }
 
