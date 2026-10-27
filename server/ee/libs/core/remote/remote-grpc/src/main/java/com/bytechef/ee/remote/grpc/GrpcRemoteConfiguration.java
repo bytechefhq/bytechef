@@ -46,6 +46,12 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class GrpcRemoteConfiguration {
 
+    static final int SERVICE_TOKEN_INTERCEPTOR_ORDER = 100;
+
+    static final int TENANT_CONTEXT_INTERCEPTOR_ORDER = 200;
+
+    static final int USER_CONTEXT_INTERCEPTOR_ORDER = 300;
+
     @Bean
     GrpcDiscoveryNameResolverRegistration grpcDiscoveryNameResolverRegistration(
         ObjectProvider<DiscoveryClient> discoveryClientProvider) {
@@ -128,6 +134,7 @@ public class GrpcRemoteConfiguration {
     }
 
     @Bean
+    @Order(SERVICE_TOKEN_INTERCEPTOR_ORDER)
     @GlobalServerInterceptor
     ServiceTokenServerInterceptor serviceTokenServerInterceptor(ApplicationProperties applicationProperties) {
         ApplicationProperties.Remote remote = applicationProperties.getRemote();
@@ -138,12 +145,14 @@ public class GrpcRemoteConfiguration {
     }
 
     @Bean
+    @Order(TENANT_CONTEXT_INTERCEPTOR_ORDER)
     @GlobalServerInterceptor
     TenantContextServerInterceptor tenantContextServerInterceptor() {
         return new TenantContextServerInterceptor();
     }
 
     @Bean
+    @Order(USER_CONTEXT_INTERCEPTOR_ORDER)
     @GlobalServerInterceptor
     UserContextServerInterceptor userContextServerInterceptor() {
         return new UserContextServerInterceptor();
