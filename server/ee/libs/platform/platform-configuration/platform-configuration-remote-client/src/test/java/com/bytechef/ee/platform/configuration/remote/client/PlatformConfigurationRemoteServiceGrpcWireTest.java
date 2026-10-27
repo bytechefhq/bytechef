@@ -142,6 +142,32 @@ class PlatformConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testCreateWorkflow() {
+        Workflow workflow = workflow(WORKFLOW_ID);
+
+        workflow.setSourceType(Workflow.SourceType.JDBC);
+
+        when(workflowService.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC)).thenReturn(workflow);
+
+        Workflow createdWorkflow = remoteWorkflowServiceClient.create(
+            DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        assertThat(createdWorkflow.getId()).isEqualTo(WORKFLOW_ID);
+        assertThat(createdWorkflow.getDefinition()).isEqualTo(DEFINITION);
+        assertThat(createdWorkflow.getSourceType()).isEqualTo(Workflow.SourceType.JDBC);
+        assertThat(createdWorkflow.getVersion()).isEqualTo(3);
+    }
+
+    @Test
+    void testCreateWorkflowWithoutASourceTypeFailsWithItsMessage() {
+        when(workflowService.create(DEFINITION, Workflow.Format.JSON, null))
+            .thenThrow(new IllegalArgumentException("'sourceType' must not be null"));
+
+        assertThatThrownBy(() -> remoteWorkflowServiceClient.create(DEFINITION, Workflow.Format.JSON, null))
+            .hasMessageContaining("'sourceType' must not be null");
+    }
+
+    @Test
     void testFetchUnknownWorkflowIsEmpty() {
         when(workflowService.fetchWorkflow("unknown")).thenReturn(Optional.empty());
         when(workflowService.fetchWorkflow(WORKFLOW_ID)).thenReturn(Optional.of(workflow(WORKFLOW_ID)));

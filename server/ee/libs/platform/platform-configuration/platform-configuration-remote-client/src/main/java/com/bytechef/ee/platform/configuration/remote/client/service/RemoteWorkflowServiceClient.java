@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.configuration.remote.client.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.platform.configuration.remote.grpc.PlatformConfigurationProtoMapper;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.CreateWorkflowRequest;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowIdRequest;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowIdsRequest;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowRemoteServiceGrpc;
@@ -40,10 +41,22 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public Workflow create(
-        String definition, Workflow.Format format, Workflow.SourceType sourceType) {
+    public Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType) {
+        CreateWorkflowRequest.Builder builder = CreateWorkflowRequest.newBuilder();
 
-        throw new UnsupportedOperationException();
+        if (definition != null) {
+            builder.setDefinition(definition);
+        }
+
+        if (format != null) {
+            builder.setFormat(format.name());
+        }
+
+        if (sourceType != null) {
+            builder.setSourceType(sourceType.name());
+        }
+
+        return platformConfigurationProtoMapper.toWorkflow(getStub().createWorkflow(builder.build()));
     }
 
     @Override
