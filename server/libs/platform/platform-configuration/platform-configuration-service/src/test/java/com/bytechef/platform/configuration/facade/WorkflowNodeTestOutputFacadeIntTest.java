@@ -37,7 +37,6 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.Property;
@@ -45,8 +44,8 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.facade.CodeEditorScriptInputFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
@@ -74,7 +73,6 @@ import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -101,7 +99,7 @@ class WorkflowNodeTestOutputFacadeIntTest {
     private ClusterElementDefinitionService clusterElementDefinitionService;
 
     @MockitoBean
-    private CodeEditorScriptInputProvider codeEditorScriptInputProvider;
+    private CodeEditorScriptInputFacade codeEditorScriptInputFacade;
 
     @Autowired
     private ConnectionService connectionService;
@@ -268,7 +266,7 @@ class WorkflowNodeTestOutputFacadeIntTest {
     }
 
     @Test
-    void testSaveClusterElementTestOutputPassesTheSourceConnectionOfTheRootTaskToTheScriptInputProvider() {
+    void testSaveClusterElementTestOutputPassesTheSourceConnectionIdOfTheRootTaskToTheScriptInputFacade() {
         Workflow workflow = createWorkflow(
             """
                 {
@@ -297,9 +295,9 @@ class WorkflowNodeTestOutputFacadeIntTest {
             .thenReturn(new ClusterElementType("PROCESSOR", "processor", "Processor"));
         when(connectionService.getConnection(20L)).thenReturn(connection);
         when(connection.getId()).thenReturn(20L);
-        when(codeEditorScriptInputProvider.getRootComponentName()).thenReturn("dataStream");
-        when(codeEditorScriptInputProvider.getScriptInputParameters(
-            anyInt(), anyString(), anyInt(), anyString(), any(), any())).thenReturn(Map.of("row", "value"));
+        when(codeEditorScriptInputFacade.getScriptInputParameters(
+            anyString(), anyInt(), anyString(), anyInt(), anyString(), any(), any()))
+                .thenReturn(Map.of("row", "value"));
         when(actionDefinitionFacade.executePerform(
             eq("script"), eq(1), eq("javascript"), any(), any(), any(), any(), any(), anyMap(), anyMap(), anyMap(),
             any(), any(), anyBoolean(), any(), any(), any()))
@@ -308,16 +306,8 @@ class WorkflowNodeTestOutputFacadeIntTest {
         workflowNodeTestOutputFacade.saveClusterElementTestOutput(
             workflow.getId(), "dataStream_1", "PROCESSOR", "script_1", ENVIRONMENT_ID);
 
-        ArgumentCaptor<ComponentConnection> componentConnectionArgumentCaptor =
-            ArgumentCaptor.forClass(ComponentConnection.class);
-
-        verify(codeEditorScriptInputProvider).getScriptInputParameters(
-            eq(1), eq("postgresql"), eq(1), eq("read"), any(), componentConnectionArgumentCaptor.capture());
-
-        ComponentConnection componentConnection = componentConnectionArgumentCaptor.getValue();
-
-        assertThat(componentConnection).isNotNull();
-        assertThat(componentConnection.connectionId()).isEqualTo(20L);
+        verify(codeEditorScriptInputFacade).getScriptInputParameters(
+            eq("dataStream"), eq(1), eq("postgresql"), eq(1), eq("read"), any(), eq(20L));
 
         WorkflowNodeTestOutput workflowNodeTestOutput = getTestOutput(workflow.getId(), "script_1");
 

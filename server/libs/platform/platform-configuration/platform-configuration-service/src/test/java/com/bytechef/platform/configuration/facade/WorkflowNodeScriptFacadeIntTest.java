@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,9 +31,8 @@ import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.repository.jdbc.JdbcWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
+import com.bytechef.platform.component.facade.CodeEditorScriptInputFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfiguration;
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfigurationSharedMocks;
@@ -44,7 +42,6 @@ import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepo
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.Map;
 import java.util.Optional;
@@ -104,7 +101,7 @@ class WorkflowNodeScriptFacadeIntTest {
     private ClusterElementDefinitionService clusterElementDefinitionService;
 
     @MockitoBean
-    private CodeEditorScriptInputProvider codeEditorScriptInputProvider;
+    private CodeEditorScriptInputFacade codeEditorScriptInputFacade;
 
     @Autowired
     private ConnectionService connectionService;
@@ -277,27 +274,15 @@ class WorkflowNodeScriptFacadeIntTest {
         workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
             workflow.getId(), "dataStream_1", "postgresql_1", 20L, false, ENVIRONMENT_ID);
 
-        Connection connection = mock(Connection.class);
-
-        when(connectionService.getConnection(20L)).thenReturn(connection);
-        when(connection.getId()).thenReturn(20L);
-        when(codeEditorScriptInputProvider.getRootComponentName()).thenReturn("dataStream");
-        when(codeEditorScriptInputProvider.getScriptInputParameters(
-            anyInt(), anyString(), anyInt(), anyString(), any(), any())).thenReturn(Map.of("key", "value"));
+        when(codeEditorScriptInputFacade.getScriptInputParameters(
+            anyString(), anyInt(), anyString(), anyInt(), anyString(), any(), any()))
+                .thenReturn(Map.of("key", "value"));
 
         Map<String, Object> scriptInput = workflowNodeScriptFacade.getClusterElementScriptInput(
             workflow.getId(), "dataStream_1", "processor", "script_1", ENVIRONMENT_ID);
 
-        ArgumentCaptor<ComponentConnection> componentConnectionArgumentCaptor =
-            ArgumentCaptor.forClass(ComponentConnection.class);
-
-        verify(codeEditorScriptInputProvider).getScriptInputParameters(
-            eq(1), eq("postgresql"), eq(1), eq("read"), any(), componentConnectionArgumentCaptor.capture());
-
-        ComponentConnection componentConnection = componentConnectionArgumentCaptor.getValue();
-
-        assertThat(componentConnection).isNotNull();
-        assertThat(componentConnection.connectionId()).isEqualTo(20L);
+        verify(codeEditorScriptInputFacade).getScriptInputParameters(
+            eq("dataStream"), eq(1), eq("postgresql"), eq(1), eq("read"), any(), eq(20L));
         assertThat(scriptInput).isEqualTo(Map.of("key", "value"));
     }
 

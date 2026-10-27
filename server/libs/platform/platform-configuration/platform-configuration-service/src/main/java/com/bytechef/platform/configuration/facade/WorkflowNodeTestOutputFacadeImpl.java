@@ -28,14 +28,13 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.facade.CodeEditorScriptInputFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -49,8 +48,6 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.file.storage.EditorTempFileStorage;
@@ -88,8 +85,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    private final List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders;
-    private final ConnectionService connectionService;
+    private final CodeEditorScriptInputFacade codeEditorScriptInputFacade;
     private final EditorTempFileStorage editorTempFileStorage;
     private final Evaluator evaluator;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -106,8 +102,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         ActionDefinitionFacade actionDefinitionFacade, ApplicationProperties applicationProperties,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
-        List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders, ConnectionService connectionService,
-        EditorTempFileStorage editorTempFileStorage, Evaluator evaluator,
+        CodeEditorScriptInputFacade codeEditorScriptInputFacade, EditorTempFileStorage editorTempFileStorage,
+        Evaluator evaluator,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
@@ -116,8 +112,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
-        this.codeEditorScriptInputProviders = codeEditorScriptInputProviders;
-        this.connectionService = connectionService;
+        this.codeEditorScriptInputFacade = codeEditorScriptInputFacade;
         this.editorTempFileStorage = editorTempFileStorage;
         this.evaluator = evaluator;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
@@ -150,8 +145,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, Object> inputParameters = clusterElementTestContext.inputParameters();
 
         Map<String, Object> scriptInputParameters = getScriptInputParametersFromSource(
-            workflowId, workflowNodeName, clusterElementTestContext.workflowNodeType(),
-            clusterElementTestContext.clusterElementMap(), clusterElementTestContext.outputs(), environmentId);
+            clusterElementTestContext.workflowNodeType(), clusterElementTestContext.clusterElementMap(),
+            clusterElementTestContext.connectionIds(), clusterElementTestContext.outputs());
 
         inputParameters = MapUtils.concat(inputParameters, Map.of("input", scriptInputParameters));
 
@@ -442,34 +437,6 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             sampleOutput.truncated(), environmentId);
     }
 
-    @Nullable
-    private ComponentConnection getClusterElementComponentConnection(
-        String workflowId, String workflowNodeName, String clusterElementWorkflowNodeName, long environmentId) {
-
-        List<WorkflowTestConfigurationConnection> connections =
-            workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                workflowId, workflowNodeName, environmentId);
-
-        if (connections.isEmpty()) {
-            return null;
-        }
-
-        WorkflowTestConfigurationConnection workflowTestConfigurationConnection = connections.stream()
-            .filter(connection -> Objects.equals(connection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
-            .findFirst()
-            .orElse(null);
-
-        if (workflowTestConfigurationConnection == null) {
-            return null;
-        }
-
-        Connection connection = connectionService.getConnection(workflowTestConfigurationConnection.getConnectionId());
-
-        return new ComponentConnection(
-            connection.getComponentName(), connection.getConnectionVersion(), connection.getId(),
-            connection.getParameters(), connection.getAuthorizationType());
-    }
-
     @SuppressWarnings("unchecked")
     private ClusterElementTestContext getClusterElementTestContext(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -519,8 +486,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     private Map<String, Object> getScriptInputParametersFromSource(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType,
-        ClusterElementMap clusterElementMap, Map<String, ?> outputs, long environmentId) {
+        WorkflowNodeType workflowNodeType, ClusterElementMap clusterElementMap, Map<String, Long> connectionIds,
+        Map<String, ?> outputs) {
 
         Optional<ClusterElement> sourceClusterElementOptional = clusterElementMap.fetchClusterElement(SOURCE);
 
@@ -528,26 +495,14 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             return Map.of();
         }
 
-        CodeEditorScriptInputProvider codeEditorScriptInputProvider = codeEditorScriptInputProviders.stream()
-            .filter(inputProvider -> Objects.equals(inputProvider.getRootComponentName(), workflowNodeType.name()))
-            .findFirst()
-            .orElse(null);
-
-        if (codeEditorScriptInputProvider == null) {
-            return Map.of();
-        }
-
         ClusterElement sourceClusterElement = sourceClusterElementOptional.get();
 
         Map<String, ?> sourceInputParameters = evaluator.evaluate(sourceClusterElement.getParameters(), outputs);
 
-        ComponentConnection sourceComponentConnection = getClusterElementComponentConnection(
-            workflowId, workflowNodeName, sourceClusterElement.getWorkflowNodeName(), environmentId);
-
-        return codeEditorScriptInputProvider.getScriptInputParameters(
-            workflowNodeType.version(), sourceClusterElement.getComponentName(),
+        return codeEditorScriptInputFacade.getScriptInputParameters(
+            workflowNodeType.name(), workflowNodeType.version(), sourceClusterElement.getComponentName(),
             sourceClusterElement.getComponentVersion(), sourceClusterElement.getClusterElementName(),
-            sourceInputParameters, sourceComponentConnection);
+            sourceInputParameters, connectionIds.get(sourceClusterElement.getWorkflowNodeName()));
     }
 
     @SuppressWarnings("unchecked")
