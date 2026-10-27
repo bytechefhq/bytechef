@@ -1,8 +1,9 @@
 import {Form} from '@/components/ui/form';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionConfigurationList from '@/shared/components/ConnectionConfigurationList';
-import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {ComponentConnection, Environment, Workflow} from '@/shared/middleware/platform/configuration';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {Control, FieldValues, useForm} from 'react-hook-form';
 import {describe, expect, it, vi} from 'vitest';
 
@@ -35,12 +36,14 @@ const connection: ConnectionI = {
 interface ConnectionConfigurationListHarnessProps {
     componentConnection?: ComponentConnection;
     connections?: ConnectionI[];
+    getCurrentConnectionId?: (index: number) => number | undefined;
     handleConnectionIdChange: (index: number, connectionId: number | undefined) => void;
 }
 
 const ConnectionConfigurationListHarness = ({
     componentConnection = optionalComponentConnection,
     connections,
+    getCurrentConnectionId,
     handleConnectionIdChange,
 }: ConnectionConfigurationListHarnessProps) => {
     const form = useForm<FieldValues>({defaultValues: {connections: [{}]}});
@@ -51,6 +54,7 @@ const ConnectionConfigurationListHarness = ({
                 componentConnections={[componentConnection]}
                 connections={connections}
                 control={form.control as Control<FieldValues>}
+                getCurrentConnectionId={getCurrentConnectionId}
                 handleConnectionIdChange={handleConnectionIdChange}
                 workflow={workflow}
             />
@@ -129,5 +133,22 @@ describe('ConnectionConfigurationList', () => {
         render(<ConnectionConfigurationListHarness connections={[connection]} handleConnectionIdChange={vi.fn()} />);
 
         expect(screen.queryByText('*')).not.toBeInTheDocument();
+    });
+
+    it('should push the environment badge of the selected connection to the right edge', () => {
+        environmentStore.setState({environments: [{id: 1, name: 'DEVELOPMENT'} as Environment]});
+
+        render(
+            <ConnectionConfigurationListHarness
+                connections={[connection]}
+                getCurrentConnectionId={() => 42}
+                handleConnectionIdChange={vi.fn()}
+            />
+        );
+
+        const combobox = screen.getByRole('combobox');
+
+        expect(within(combobox).getByText('My HTTP Client connection')).toHaveClass('flex-1');
+        expect(within(combobox).getByText('DEVELOPMENT')).toBeInTheDocument();
     });
 });
