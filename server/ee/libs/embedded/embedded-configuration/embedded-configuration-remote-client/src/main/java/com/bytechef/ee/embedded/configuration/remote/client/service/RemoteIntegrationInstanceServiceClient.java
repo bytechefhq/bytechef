@@ -8,15 +8,19 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserIntegrationInstancesRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -28,13 +32,13 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationInstanceServiceClient implements IntegrationInstanceService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String INTEGRATION_INSTANCE_SERVICE = "/remote/integration-instance-service";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteIntegrationInstanceServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteIntegrationInstanceServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
@@ -84,7 +88,10 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     @Override
     public List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId) {
-        throw new UnsupportedOperationException();
+        return getConnectedUserIntegrationInstances(
+            ConnectedUserIntegrationInstancesRequest.newBuilder()
+                .setConnectedUserId(connectedUserId)
+                .build());
     }
 
     @Override
@@ -99,14 +106,22 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     @Override
     public List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId, boolean enabled) {
-        throw new UnsupportedOperationException();
+        return getConnectedUserIntegrationInstances(
+            ConnectedUserIntegrationInstancesRequest.newBuilder()
+                .setConnectedUserId(connectedUserId)
+                .setEnabled(enabled)
+                .build());
     }
 
     @Override
     public List<IntegrationInstance> getConnectedUserIntegrationInstances(
         long connectedUserId, Environment environment) {
 
-        throw new UnsupportedOperationException();
+        return getConnectedUserIntegrationInstances(
+            ConnectedUserIntegrationInstancesRequest.newBuilder()
+                .setConnectedUserId(connectedUserId)
+                .setEnvironment(environment.ordinal())
+                .build());
     }
 
     @Override
@@ -123,12 +138,7 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     @Override
     public IntegrationInstance getIntegrationInstance(long id) {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(INTEGRATION_INSTANCE_SERVICE + "/get-integration-instance/{id}")
-                .build(id),
-            IntegrationInstance.class);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -176,5 +186,18 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     @Override
     public IntegrationInstance lockIntegrationInstance(long id) {
         throw new UnsupportedOperationException();
+    }
+
+    private List<IntegrationInstance> getConnectedUserIntegrationInstances(
+        ConnectedUserIntegrationInstancesRequest connectedUserIntegrationInstancesRequest) {
+
+        RemoteIntegrationInstances remoteIntegrationInstances = getStub().getConnectedUserIntegrationInstances(
+            connectedUserIntegrationInstancesRequest);
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstances(remoteIntegrationInstances);
+    }
+
+    private IntegrationInstanceRemoteServiceGrpc.IntegrationInstanceRemoteServiceBlockingStub getStub() {
+        return IntegrationInstanceRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
     }
 }

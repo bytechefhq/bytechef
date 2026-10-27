@@ -31,6 +31,11 @@ service IntegrationInstanceConfigurationWorkflowRemoteService {
   rpc IsConnectionUsed(IdRequest) returns (BoolResponse);
 }
 
+service IntegrationInstanceRemoteService {
+  rpc GetConnectedUserIntegrationInstances(ConnectedUserIntegrationInstancesRequest)
+      returns (RemoteIntegrationInstances);
+}
+
 service IntegrationInstanceWorkflowRemoteService {
   rpc GetIntegrationInstanceWorkflow(IntegrationInstanceWorkflowRequest) returns (RemoteIntegrationInstanceWorkflow);
 }
@@ -166,6 +171,29 @@ message RemoteIntegrationInstanceConfigurationWorkflowConnections {
 
 message IntegrationInstanceConfigurationWorkflowConnectionResult {
   optional RemoteIntegrationInstanceConfigurationWorkflowConnection connection = 1;
+}
+
+message ConnectedUserIntegrationInstancesRequest {
+  int64 connected_user_id = 1;
+  optional bool enabled = 2;
+  optional int32 environment = 3;
+}
+
+message RemoteIntegrationInstance {
+  optional int64 connected_user_id = 1;
+  optional int64 connection_id = 2;
+  optional string created_by = 3;
+  optional google.protobuf.Timestamp created_date = 4;
+  optional bool enabled = 5;
+  optional int64 id = 6;
+  optional int64 integration_instance_configuration_id = 7;
+  optional string last_modified_by = 8;
+  optional google.protobuf.Timestamp last_modified_date = 9;
+  optional int32 version = 10;
+}
+
+message RemoteIntegrationInstances {
+  repeated RemoteIntegrationInstance integration_instances = 1;
 }
 
 message RemoteIntegrationInstanceWorkflow {
