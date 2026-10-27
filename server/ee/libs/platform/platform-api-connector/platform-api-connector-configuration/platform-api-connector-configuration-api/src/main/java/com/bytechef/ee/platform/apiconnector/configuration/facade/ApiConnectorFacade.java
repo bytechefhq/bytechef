@@ -8,8 +8,11 @@
 package com.bytechef.ee.platform.apiconnector.configuration.facade;
 
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
+import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
+import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecificationRequestDTO;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -17,6 +20,8 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface ApiConnectorFacade {
+
+    boolean cancelGenerationJob(String jobId);
 
     void deleteApiConnector(long id);
 
@@ -29,13 +34,24 @@ public interface ApiConnectorFacade {
 
     void enableApiConnector(long id, boolean enable);
 
+    Optional<ApiConnectorGenerationJob> fetchGenerationJob(String jobId);
+
     ApiConnector generateFromDocumentation(String componentName, String documentationUrl, String icon);
+
+    String generateSpecification(GenerateSpecificationRequestDTO generateSpecificationRequestDTO);
 
     ApiConnectorDTO getApiConnector(long id);
 
     List<ApiConnectorDTO> getApiConnectors();
 
     ApiConnector importOpenApiSpecification(String componentName, String icon, String specification);
+
+    /**
+     * Starts an asynchronous OpenAPI specification generation from API documentation and returns the tracking job. A
+     * null or non-positive {@code maxPages} scrapes a single page.
+     */
+    ApiConnectorGenerationJob startGenerateFromDocumentationPreview(
+        String documentationUrl, String userPrompt, Integer maxPages);
 
     /**
      * Updates an existing API connector from a new specification and regenerates its definition. A non-null

@@ -14,11 +14,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
+import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
+import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecificationRequestDTO;
+import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
+import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
+import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
@@ -42,16 +49,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 class ApiConnectorFacadeTest {
 
+    private ApiConnectorAiService apiConnectorAiService;
     private ApiConnectorFileStorage apiConnectorFileStorage;
+    private ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private ApiConnectorService apiConnectorService;
+    private OpenApiSpecificationGenerator openApiSpecificationGenerator;
     private ApiConnectorFacadeImpl apiConnectorFacade;
 
     @BeforeEach
     void beforeEach() {
+        apiConnectorAiService = mock(ApiConnectorAiService.class);
         apiConnectorFileStorage = mock(ApiConnectorFileStorage.class);
+        apiConnectorGenerationJobService = mock(ApiConnectorGenerationJobService.class);
         apiConnectorService = mock(ApiConnectorService.class);
+        openApiSpecificationGenerator = mock(OpenApiSpecificationGenerator.class);
 
-        apiConnectorFacade = new ApiConnectorFacadeImpl(null, apiConnectorFileStorage, apiConnectorService);
+        apiConnectorFacade = new ApiConnectorFacadeImpl(
+            apiConnectorAiService, apiConnectorFileStorage, apiConnectorGenerationJobService, apiConnectorService,
+            openApiSpecificationGenerator);
     }
 
     @Nested
@@ -204,6 +219,89 @@ class ApiConnectorFacadeTest {
     }
 
     @Nested
+    class GenerationJobs {
+
+        @Test
+        void testStartGenerateFromDocumentationPreviewCreatesJobAndStartsGeneration() {
+            ApiConnectorGenerationJob apiConnectorGenerationJob = new ApiConnectorGenerationJob(
+                "job-1", "https://docs.example.com");
+
+            when(apiConnectorGenerationJobService.create("https://docs.example.com"))
+                .thenReturn(apiConnectorGenerationJob);
+
+            ApiConnectorGenerationJob startedApiConnectorGenerationJob =
+                apiConnectorFacade.startGenerateFromDocumentationPreview("https://docs.example.com", "Only pets", 3);
+
+            assertThat(startedApiConnectorGenerationJob).isSameAs(apiConnectorGenerationJob);
+
+            verify(apiConnectorAiService).generateOpenApiSpecificationAsync(
+                "job-1", "https://docs.example.com", "Only pets", 3);
+        }
+
+        @Test
+        void testStartGenerateFromDocumentationPreviewDefaultsToSinglePage() {
+            ApiConnectorGenerationJob apiConnectorGenerationJob = new ApiConnectorGenerationJob(
+                "job-1", "https://docs.example.com");
+
+            when(apiConnectorGenerationJobService.create("https://docs.example.com"))
+                .thenReturn(apiConnectorGenerationJob);
+
+            apiConnectorFacade.startGenerateFromDocumentationPreview("https://docs.example.com", null, null);
+            apiConnectorFacade.startGenerateFromDocumentationPreview("https://docs.example.com", null, 0);
+
+            verify(apiConnectorAiService, times(2))
+                .generateOpenApiSpecificationAsync("job-1", "https://docs.example.com", null, 1);
+        }
+
+        @Test
+        void testStartGenerateFromDocumentationPreviewRejectsMissingAiService() {
+            ApiConnectorFacadeImpl apiConnectorFacadeWithoutAi = new ApiConnectorFacadeImpl(
+                null, apiConnectorFileStorage, apiConnectorGenerationJobService, apiConnectorService,
+                openApiSpecificationGenerator);
+
+            assertThatThrownBy(() -> apiConnectorFacadeWithoutAi.startGenerateFromDocumentationPreview(
+                "https://docs.example.com", null, 1))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("AI service is not configured");
+
+            verifyNoInteractions(apiConnectorGenerationJobService);
+        }
+
+        @Test
+        void testCancelGenerationJobRequestsCancellation() {
+            when(apiConnectorGenerationJobService.requestCancellation("job-1")).thenReturn(true);
+
+            assertThat(apiConnectorFacade.cancelGenerationJob("job-1")).isTrue();
+        }
+
+        @Test
+        void testFetchGenerationJobReturnsJob() {
+            ApiConnectorGenerationJob apiConnectorGenerationJob = new ApiConnectorGenerationJob(
+                "job-1", "https://docs.example.com");
+
+            when(apiConnectorGenerationJobService.get("job-1")).thenReturn(Optional.of(apiConnectorGenerationJob));
+
+            assertThat(apiConnectorFacade.fetchGenerationJob("job-1")).contains(apiConnectorGenerationJob);
+        }
+    }
+
+    @Nested
+    class GenerateSpecification {
+
+        @Test
+        void testGenerateSpecificationDelegatesToGenerator() {
+            GenerateSpecificationRequestDTO generateSpecificationRequestDTO = new GenerateSpecificationRequestDTO(
+                "petstore", "https://petstore.example.com", List.of());
+
+            when(openApiSpecificationGenerator.generate(generateSpecificationRequestDTO))
+                .thenReturn("openapi: 3.0.0");
+
+            assertThat(apiConnectorFacade.generateSpecification(generateSpecificationRequestDTO))
+                .isEqualTo("openapi: 3.0.0");
+        }
+    }
+
+    @Nested
     class Authorization {
 
         private ApiConnectorFacade securedApiConnectorFacade;
@@ -268,6 +366,73 @@ class ApiConnectorFacadeTest {
                 1L, null, "Title", null, null, null);
 
             assertThat(updatedApiConnector.getTitle()).isEqualTo("Title");
+        }
+
+        @Test
+        void testStartGenerateFromDocumentationPreviewRejectsNonAdmin() {
+            authenticate("ROLE_USER");
+
+            assertThatThrownBy(() -> securedApiConnectorFacade.startGenerateFromDocumentationPreview(
+                "https://docs.example.com", null, 1))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(apiConnectorGenerationJobService, apiConnectorAiService);
+        }
+
+        @Test
+        void testCancelGenerationJobRejectsNonAdmin() {
+            authenticate("ROLE_USER");
+
+            assertThatThrownBy(() -> securedApiConnectorFacade.cancelGenerationJob("job-1"))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(apiConnectorGenerationJobService);
+        }
+
+        @Test
+        void testGenerateSpecificationRejectsNonAdmin() {
+            authenticate("ROLE_USER");
+
+            GenerateSpecificationRequestDTO generateSpecificationRequestDTO = new GenerateSpecificationRequestDTO(
+                "petstore", null, List.of());
+
+            assertThatThrownBy(() -> securedApiConnectorFacade.generateSpecification(generateSpecificationRequestDTO))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(openApiSpecificationGenerator);
+        }
+
+        @Test
+        void testGenerationOperationsAllowAdmin() {
+            ApiConnectorGenerationJob apiConnectorGenerationJob = new ApiConnectorGenerationJob(
+                "job-1", "https://docs.example.com");
+
+            when(apiConnectorGenerationJobService.create("https://docs.example.com"))
+                .thenReturn(apiConnectorGenerationJob);
+            when(apiConnectorGenerationJobService.requestCancellation("job-1")).thenReturn(true);
+
+            authenticate("ROLE_ADMIN");
+
+            assertThat(securedApiConnectorFacade.startGenerateFromDocumentationPreview(
+                "https://docs.example.com", null, 1)).isSameAs(apiConnectorGenerationJob);
+            assertThat(securedApiConnectorFacade.cancelGenerationJob("job-1")).isTrue();
+
+            securedApiConnectorFacade.generateSpecification(
+                new GenerateSpecificationRequestDTO("petstore", null, List.of()));
+
+            verify(openApiSpecificationGenerator).generate(any());
+        }
+
+        @Test
+        void testFetchGenerationJobAllowsNonAdminLikeOtherReads() {
+            ApiConnectorGenerationJob apiConnectorGenerationJob = new ApiConnectorGenerationJob(
+                "job-1", "https://docs.example.com");
+
+            when(apiConnectorGenerationJobService.get("job-1")).thenReturn(Optional.of(apiConnectorGenerationJob));
+
+            authenticate("ROLE_USER");
+
+            assertThat(securedApiConnectorFacade.fetchGenerationJob("job-1")).contains(apiConnectorGenerationJob);
         }
 
         private void authenticate(String authority) {
