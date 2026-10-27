@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.cloud.gateway.server.mvc.config.GatewayMvcProperties;
 import org.springframework.cloud.gateway.server.mvc.config.PredicateProperties;
@@ -43,9 +44,9 @@ public class GatewayRoutedPaths implements SpaWebFilterContributor {
 
             for (PredicateProperties predicateProperties : routeProperties.getPredicates()) {
                 if ("Path".equals(predicateProperties.getName())) {
-                    for (String pathPattern : predicateProperties.getArgs()
-                        .values()) {
+                    Map<String, String> args = predicateProperties.getArgs();
 
+                    for (String pathPattern : args.values()) {
                         pathPatterns.add(pathPattern.trim());
                     }
                 }
