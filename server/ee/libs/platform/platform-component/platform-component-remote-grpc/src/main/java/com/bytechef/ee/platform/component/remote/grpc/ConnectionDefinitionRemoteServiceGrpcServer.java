@@ -9,17 +9,21 @@ package com.bytechef.ee.platform.component.remote.grpc;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.platform.component.remote.grpc.proto.ConnectionDefinitionRemoteServiceGrpc;
+import com.bytechef.ee.platform.component.remote.grpc.proto.ExecuteBaseUriRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetAuthorizationTypeRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.GetConnectionDefinitionRequest;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinitions;
 import com.bytechef.ee.platform.component.remote.grpc.proto.StringResponse;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -37,6 +41,26 @@ public class ConnectionDefinitionRemoteServiceGrpcServer
 
         this.componentProtoMapper = componentProtoMapper;
         this.connectionDefinitionService = connectionDefinitionService;
+    }
+
+    @Override
+    public void executeBaseUri(ExecuteBaseUriRequest request, StreamObserver<StringResponse> responseObserver) {
+        Map<String, Object> parameters = componentProtoMapper.toMap(request.getParameters());
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            request.getComponentName(), request.getConnectionVersion(), request.getConnectionId(),
+            parameters == null ? Map.of() : parameters,
+            request.hasAuthorizationType() ? AuthorizationType.valueOf(request.getAuthorizationType()) : null);
+
+        Optional<String> baseUri = connectionDefinitionService.executeBaseUri(
+            request.getComponentName(), componentConnection);
+
+        StringResponse.Builder builder = StringResponse.newBuilder();
+
+        baseUri.ifPresent(builder::setValue);
+
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
     }
 
     @Override
