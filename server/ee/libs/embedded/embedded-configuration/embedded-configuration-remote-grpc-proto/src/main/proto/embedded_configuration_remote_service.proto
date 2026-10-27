@@ -12,6 +12,7 @@ service IntegrationRemoteService {
   rpc GetIntegration(IdRequest) returns (RemoteIntegration);
   rpc GetIntegrationInstanceIntegration(IdRequest) returns (RemoteIntegration);
   rpc GetIntegrations(google.protobuf.Empty) returns (RemoteIntegrations);
+  rpc GetIntegrationsByIds(IdsRequest) returns (RemoteIntegrations);
   rpc GetWorkflowIntegration(WorkflowIdRequest) returns (RemoteIntegration);
 }
 
@@ -88,6 +89,10 @@ message CopyWorkflowTemplateRequest {
 
 message BoolResponse {
   bool value = 1;
+}
+
+message IdsRequest {
+  repeated int64 ids = 1;
 }
 
 message IdsResponse {

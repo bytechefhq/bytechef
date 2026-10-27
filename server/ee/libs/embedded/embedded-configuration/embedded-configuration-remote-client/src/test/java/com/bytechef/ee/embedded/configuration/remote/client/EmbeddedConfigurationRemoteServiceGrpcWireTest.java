@@ -167,6 +167,19 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testGetIntegrationsByIds() {
+        when(integrationService.getIntegrations(List.of(7L, 8L))).thenReturn(List.of(integration(7L), integration(8L)));
+        when(integrationService.getIntegrations(List.of())).thenReturn(List.of());
+
+        RemoteIntegrationServiceClient remoteIntegrationServiceClient = new RemoteIntegrationServiceClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationServiceClient.getIntegrations(List.of(7L, 8L))).extracting(Integration::getId)
+            .containsExactly(7L, 8L);
+        assertThat(remoteIntegrationServiceClient.getIntegrations(List.of())).isEmpty();
+    }
+
+    @Test
     void testGetUnknownIntegrationFailsWithItsMessage() {
         when(integrationService.getIntegration(7L)).thenThrow(new IllegalArgumentException("Integration 7 not found"));
 
