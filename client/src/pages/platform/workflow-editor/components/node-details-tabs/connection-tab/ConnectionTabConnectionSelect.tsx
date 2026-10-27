@@ -372,7 +372,7 @@ const ConnectionTabConnectionSelect = ({
                                     value={connection.id!.toString()}
                                 >
                                     <div className="flex w-full min-w-0 items-center space-x-1">
-                                        <span className="min-w-0 truncate">{connection.name}</span>
+                                        <span className="min-w-0 flex-1 truncate">{connection.name}</span>
 
                                         <span className="min-w-0 truncate text-xs text-content-neutral-secondary">
                                             {connection?.tags?.map((tag) => tag.name).join(', ')}
