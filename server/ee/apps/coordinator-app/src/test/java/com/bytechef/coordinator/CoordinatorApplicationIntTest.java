@@ -56,5 +56,12 @@ public class CoordinatorApplicationIntTest {
 
         assertThat(serviceNames)
             .contains("bytechef.platform.workflow.task.dispatcher.remote.v1.TaskDispatcherDefinitionRemoteService");
+        assertThat(serviceNames).doesNotContain(
+            "bytechef.platform.configuration.remote.v1.WorkflowRemoteService",
+            "bytechef.automation.configuration.remote.v1.ProjectRemoteService",
+            "bytechef.atlas.execution.remote.v1.JobRemoteService",
+            "bytechef.platform.connection.remote.v1.ConnectionRemoteService",
+            "bytechef.platform.component.remote.v1.ComponentDefinitionRemoteService",
+            "bytechef.platform.workflow.worker.remote.v1.TaskHandlerRemoteService");
     }
 }

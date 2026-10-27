@@ -63,6 +63,12 @@ public class SchedulerApplicationIntTest {
         assertThat(serviceNames).contains(
             "bytechef.platform.scheduler.remote.v1.TriggerSchedulerRemoteService",
             "bytechef.platform.scheduler.remote.v1.ConnectionRefreshSchedulerRemoteService");
+        assertThat(serviceNames).doesNotContain(
+            "bytechef.platform.configuration.remote.v1.WorkflowRemoteService",
+            "bytechef.automation.configuration.remote.v1.ProjectRemoteService",
+            "bytechef.atlas.execution.remote.v1.JobRemoteService",
+            "bytechef.platform.connection.remote.v1.ConnectionRemoteService",
+            "bytechef.platform.component.remote.v1.ComponentDefinitionRemoteService");
     }
 
     @Nested
