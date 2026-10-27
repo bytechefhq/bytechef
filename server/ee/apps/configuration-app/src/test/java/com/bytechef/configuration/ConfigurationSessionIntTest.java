@@ -103,5 +103,4 @@ class ConfigurationSessionIntTest {
 
         return session.getId();
     }
-
 }
