@@ -72,6 +72,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-service"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-rest"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
+    implementation(project(":server:ee:libs:platform:platform-notification:platform-notification-remote-grpc"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:libs:platform:platform-security:platform-security-graphql"))
