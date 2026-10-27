@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
+import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -67,6 +69,8 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     @Override
     public ScrapeResult scrape(String url) {
         try {
+            UrlValidatorUtils.validate(url, Set.of());
+
             Map<String, Object> requestBody = new HashMap<>();
 
             requestBody.put("url", url);
@@ -100,6 +104,8 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     @Override
     public CrawlResult crawl(String url, int maxPages, List<String> includePatterns) {
         try {
+            UrlValidatorUtils.validate(url, Set.of());
+
             Map<String, Object> requestBody = new HashMap<>();
 
             requestBody.put("url", url);
