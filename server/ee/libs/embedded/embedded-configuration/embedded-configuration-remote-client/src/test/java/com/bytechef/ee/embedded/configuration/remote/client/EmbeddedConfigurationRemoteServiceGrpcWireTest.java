@@ -608,6 +608,18 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
         assertThat(remoteConnectedUserProjectServiceClient.containsProjectDeployment(1052L)).isTrue();
     }
 
+    @Test
+    void testFetchConnectedUserId() {
+        when(connectedUserProjectService.fetchConnectedUserId(1051L)).thenReturn(Optional.of(7L));
+        when(connectedUserProjectService.fetchConnectedUserId(1052L)).thenReturn(Optional.empty());
+
+        RemoteConnectedUserProjectServiceClient remoteConnectedUserProjectServiceClient =
+            new RemoteConnectedUserProjectServiceClient(fixedGrpcChannels);
+
+        assertThat(remoteConnectedUserProjectServiceClient.fetchConnectedUserId(1051L)).contains(7L);
+        assertThat(remoteConnectedUserProjectServiceClient.fetchConnectedUserId(1052L)).isEmpty();
+    }
+
     private static IntegrationInstance integrationInstance() {
         IntegrationInstance integrationInstance = new IntegrationInstance();
 

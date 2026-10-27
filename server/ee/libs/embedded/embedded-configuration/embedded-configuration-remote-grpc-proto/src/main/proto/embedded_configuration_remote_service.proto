@@ -69,6 +69,7 @@ service AutomationWorkflowProjectFacadeRemoteService {
 
 service ConnectedUserProjectRemoteService {
   rpc ContainsProjectDeployment(IdRequest) returns (BoolResponse);
+  rpc FetchConnectedUserId(IdRequest) returns (OptionalIdResponse);
 }
 
 service ConnectedUserProjectFacadeRemoteService {
@@ -113,6 +114,10 @@ message BoolResponse {
 
 message IdsRequest {
   repeated int64 ids = 1;
+}
+
+message OptionalIdResponse {
+  optional int64 id = 1;
 }
 
 message IdsResponse {

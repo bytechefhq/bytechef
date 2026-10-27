@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.BoolResponse;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserProjectRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.OptionalIdResponse;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -38,10 +39,7 @@ public class RemoteConnectedUserProjectServiceClient implements ConnectedUserPro
 
     @Override
     public boolean containsProjectDeployment(long projectDeploymentId) {
-        ConnectedUserProjectRemoteServiceGrpc.ConnectedUserProjectRemoteServiceBlockingStub stub =
-            ConnectedUserProjectRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
-
-        BoolResponse boolResponse = stub.containsProjectDeployment(
+        BoolResponse boolResponse = getStub().containsProjectDeployment(
             IdRequest.newBuilder()
                 .setId(projectDeploymentId)
                 .build());
@@ -66,7 +64,16 @@ public class RemoteConnectedUserProjectServiceClient implements ConnectedUserPro
 
     @Override
     public Optional<Long> fetchConnectedUserId(long projectDeploymentId) {
-        throw new UnsupportedOperationException();
+        OptionalIdResponse optionalIdResponse = getStub().fetchConnectedUserId(
+            IdRequest.newBuilder()
+                .setId(projectDeploymentId)
+                .build());
+
+        if (!optionalIdResponse.hasId()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(optionalIdResponse.getId());
     }
 
     @Override
@@ -112,5 +119,9 @@ public class RemoteConnectedUserProjectServiceClient implements ConnectedUserPro
     @Override
     public ConnectedUserProject lockConnectedUserProject(long connectedUserProjectId) {
         throw new UnsupportedOperationException();
+    }
+
+    private ConnectedUserProjectRemoteServiceGrpc.ConnectedUserProjectRemoteServiceBlockingStub getStub() {
+        return ConnectedUserProjectRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
     }
 }
