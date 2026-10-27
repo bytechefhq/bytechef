@@ -302,8 +302,10 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
     void testClusterElementExecuteTool() {
         Map<String, Object> result = Map.of("rows", List.of(Map.of("id", 1)));
 
-        when(clusterElementDefinitionFacade.executeTool("keep", 1, "search", INPUT_PARAMETERS, 7L))
+        when(clusterElementDefinitionFacade.executeTool("keep", 1, "search", INPUT_PARAMETERS, 7L, false))
             .thenReturn(result);
+        when(clusterElementDefinitionFacade.executeTool("keep", 1, "search", INPUT_PARAMETERS, 7L, true))
+            .thenReturn("editor");
         when(clusterElementDefinitionFacade.executeTool("keep", "search", INPUT_PARAMETERS, null))
             .thenReturn("latest");
 
@@ -311,6 +313,9 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
             .isEqualTo(result);
         assertThat(remoteClusterElementDefinitionFacadeClient.executeTool("keep", "search", INPUT_PARAMETERS, null))
             .isEqualTo("latest");
+        assertThat(
+            remoteClusterElementDefinitionFacadeClient.executeTool("keep", 1, "search", INPUT_PARAMETERS, 7L, true))
+                .isEqualTo("editor");
     }
 
     @Test

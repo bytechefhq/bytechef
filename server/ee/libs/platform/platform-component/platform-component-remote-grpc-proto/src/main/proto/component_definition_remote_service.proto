@@ -594,4 +594,5 @@ message ClusterElementExecuteToolRequest {
   string cluster_element_name = 3;
   bytes input_parameters = 4;
   optional int64 connection_id = 5;
+  bool editor_environment = 6;
 }

@@ -166,9 +166,18 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable Long connectionId) {
 
+        return executeTool(componentName, componentVersion, clusterElementName, inputParameters, connectionId, false);
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId, boolean editorEnvironment) {
+
         return executeTool(
             getExecuteToolRequestBuilder(componentName, clusterElementName, inputParameters, connectionId)
-                .setComponentVersion(componentVersion));
+                .setComponentVersion(componentVersion)
+                .setEditorEnvironment(editorEnvironment));
     }
 
     private Object executeTool(ClusterElementExecuteToolRequest.Builder builder) {
