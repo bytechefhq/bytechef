@@ -510,6 +510,46 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testExecuteConnectionRefresh() {
+        ComponentConnection componentConnection = new ComponentConnection(
+            "keep", 1, 1050L, Map.of("access_token", "old", "refresh_token", "refresh-1"),
+            AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+        ComponentConnection refreshedComponentConnection = new ComponentConnection(
+            "keep", 1, 1050L, Map.of("access_token", "new", "refresh_token", "refresh-1", "expires_in", 3600),
+            AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+        when(connectionDefinitionService.executeConnectionRefresh(componentConnection))
+            .thenReturn(refreshedComponentConnection);
+
+        assertThat(remoteConnectionDefinitionServiceClient.executeConnectionRefresh(componentConnection))
+            .isEqualTo(refreshedComponentConnection);
+    }
+
+    @Test
+    void testExecuteConnectionRefreshWithoutAuthorizationType() {
+        ComponentConnection componentConnection = new ComponentConnection("keep", 2, 1051L, Map.of(), null);
+
+        when(connectionDefinitionService.executeConnectionRefresh(componentConnection))
+            .thenReturn(componentConnection);
+
+        assertThat(remoteConnectionDefinitionServiceClient.executeConnectionRefresh(componentConnection))
+            .isEqualTo(componentConnection);
+    }
+
+    @Test
+    void testExecuteConnectionRefreshFailureCarriesItsMessage() {
+        ComponentConnection componentConnection = new ComponentConnection(
+            "keep", 1, 1050L, Map.of("refresh_token", "revoked"), AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+        when(connectionDefinitionService.executeConnectionRefresh(componentConnection))
+            .thenThrow(new IllegalStateException("Refresh token revoked"));
+
+        assertThatThrownBy(() -> remoteConnectionDefinitionServiceClient.executeConnectionRefresh(componentConnection))
+            .hasMessageContaining("INTERNAL")
+            .hasMessageContaining("Refresh token revoked");
+    }
+
+    @Test
     void testGetOAuth2AuthorizationParameters() {
         Map<String, Object> connectionParameters = Map.of("clientId", "client-1", "scopes", List.of("read"));
         OAuth2AuthorizationParameters oAuth2AuthorizationParameters = new OAuth2AuthorizationParameters(

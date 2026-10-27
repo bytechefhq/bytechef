@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.grpc;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
@@ -14,6 +15,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.OutputResponseResult
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteClusterElementDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteClusterElementType;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentConnection;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOAuth2AuthorizationParameters;
@@ -31,6 +33,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteWebhookValidat
 import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookEnableOutputResult;
 import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -165,6 +168,16 @@ public class ComponentProtoMapper {
         return toDomain(remoteClusterElementType, ClusterElementType.class);
     }
 
+    public ComponentConnection toComponentConnection(RemoteComponentConnection remoteComponentConnection) {
+        Map<String, Object> parameters = toMap(remoteComponentConnection.getParameters());
+
+        return new ComponentConnection(
+            remoteComponentConnection.getComponentName(), remoteComponentConnection.getVersion(),
+            remoteComponentConnection.getConnectionId(), parameters == null ? Map.of() : parameters,
+            remoteComponentConnection.hasAuthorizationType()
+                ? AuthorizationType.valueOf(remoteComponentConnection.getAuthorizationType()) : null);
+    }
+
     public ComponentDefinition toComponentDefinition(RemoteComponentDefinition remoteComponentDefinition) {
         return toDomain(remoteComponentDefinition, ComponentDefinition.class);
     }
@@ -201,6 +214,22 @@ public class ComponentProtoMapper {
 
     public RemoteClusterElementType toProto(ClusterElementType clusterElementType) {
         return toProto(clusterElementType, RemoteClusterElementType.newBuilder());
+    }
+
+    public RemoteComponentConnection toProto(ComponentConnection componentConnection) {
+        RemoteComponentConnection.Builder builder = RemoteComponentConnection.newBuilder()
+            .setComponentName(componentConnection.getComponentName())
+            .setVersion(componentConnection.getVersion())
+            .setConnectionId(componentConnection.getConnectionId())
+            .setParameters(toBytes(componentConnection.getParameters()));
+
+        AuthorizationType authorizationType = componentConnection.getAuthorizationType();
+
+        if (authorizationType != null) {
+            builder.setAuthorizationType(authorizationType.name());
+        }
+
+        return builder.build();
     }
 
     public RemoteComponentDefinition toProto(ComponentDefinition componentDefinition) {
