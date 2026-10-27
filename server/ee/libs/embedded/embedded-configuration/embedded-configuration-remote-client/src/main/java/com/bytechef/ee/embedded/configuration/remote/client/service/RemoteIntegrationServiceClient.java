@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowIdRequest;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -74,7 +75,11 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
 
     @Override
     public List<Integration> getIntegrations(List<Long> ids) {
-        throw new UnsupportedOperationException();
+        return embeddedConfigurationProtoMapper.toIntegrations(
+            getStub().getIntegrationsByIds(
+                IdsRequest.newBuilder()
+                    .addAllIds(ids)
+                    .build()));
     }
 
     @Override

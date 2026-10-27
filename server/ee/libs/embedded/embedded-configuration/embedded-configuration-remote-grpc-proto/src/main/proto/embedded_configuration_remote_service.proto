@@ -12,6 +12,7 @@ service IntegrationRemoteService {
   rpc GetIntegration(IdRequest) returns (RemoteIntegration);
   rpc GetIntegrationInstanceIntegration(IdRequest) returns (RemoteIntegration);
   rpc GetIntegrations(google.protobuf.Empty) returns (RemoteIntegrations);
+  rpc GetIntegrationsByIds(IdsRequest) returns (RemoteIntegrations);
   rpc GetWorkflowIntegration(WorkflowIdRequest) returns (RemoteIntegration);
 }
 
