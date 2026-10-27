@@ -47,7 +47,9 @@ service IntegrationInstanceRemoteService {
 }
 
 service IntegrationInstanceWorkflowRemoteService {
+  rpc FetchIntegrationInstanceWorkflow(IntegrationInstanceWorkflowRequest) returns (IntegrationInstanceWorkflowResult);
   rpc GetIntegrationInstanceWorkflow(IntegrationInstanceWorkflowRequest) returns (RemoteIntegrationInstanceWorkflow);
+  rpc GetIntegrationInstanceWorkflows(IdRequest) returns (RemoteIntegrationInstanceWorkflows);
 }
 
 service AppEventRemoteService {
@@ -245,6 +247,14 @@ message RemoteIntegrationInstanceWorkflow {
   optional string last_modified_by = 8;
   optional google.protobuf.Timestamp last_modified_date = 9;
   optional int32 version = 10;
+}
+
+message RemoteIntegrationInstanceWorkflows {
+  repeated RemoteIntegrationInstanceWorkflow integration_instance_workflows = 1;
+}
+
+message IntegrationInstanceWorkflowResult {
+  optional RemoteIntegrationInstanceWorkflow integration_instance_workflow = 1;
 }
 
 message RemoteAppEvent {

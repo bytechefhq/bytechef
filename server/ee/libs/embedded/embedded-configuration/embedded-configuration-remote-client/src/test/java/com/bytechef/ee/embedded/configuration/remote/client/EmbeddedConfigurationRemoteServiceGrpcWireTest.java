@@ -469,6 +469,39 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testIntegrationInstanceWorkflowLookups() {
+        IntegrationInstanceWorkflow integrationInstanceWorkflow = new IntegrationInstanceWorkflow();
+
+        integrationInstanceWorkflow.setEnabled(true);
+        integrationInstanceWorkflow.setId(13L);
+        integrationInstanceWorkflow.setInputs(Map.of("count", 5));
+        integrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(11L);
+        integrationInstanceWorkflow.setIntegrationInstanceId(12L);
+
+        when(integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(12L))
+            .thenReturn(List.of(integrationInstanceWorkflow));
+        when(integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(14L)).thenReturn(List.of());
+        when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(12L, "workflow-1"))
+            .thenReturn(Optional.of(integrationInstanceWorkflow));
+        when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(12L, "workflow-2"))
+            .thenReturn(Optional.empty());
+
+        RemoteIntegrationInstanceWorkflowServiceClient remoteIntegrationInstanceWorkflowServiceClient =
+            new RemoteIntegrationInstanceWorkflowServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationInstanceWorkflowServiceClient.getIntegrationInstanceWorkflows(12L))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(integrationInstanceWorkflow);
+        assertThat(remoteIntegrationInstanceWorkflowServiceClient.getIntegrationInstanceWorkflows(14L)).isEmpty();
+        assertThat(remoteIntegrationInstanceWorkflowServiceClient.fetchIntegrationInstanceWorkflow(12L, "workflow-1"))
+            .get()
+            .usingRecursiveComparison()
+            .isEqualTo(integrationInstanceWorkflow);
+        assertThat(remoteIntegrationInstanceWorkflowServiceClient.fetchIntegrationInstanceWorkflow(12L, "workflow-2"))
+            .isEmpty();
+    }
+
+    @Test
     void testGetAppEvent() {
         AppEvent appEvent = new AppEvent();
 

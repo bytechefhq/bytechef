@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegratio
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflows;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurations;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflows;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrations;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
@@ -158,6 +159,15 @@ public class EmbeddedConfigurationProtoMapper {
         return protoJsonMapper.toObject(remoteIntegrationInstanceWorkflow, IntegrationInstanceWorkflow.class);
     }
 
+    public List<IntegrationInstanceWorkflow> toIntegrationInstanceWorkflows(
+        RemoteIntegrationInstanceWorkflows remoteIntegrationInstanceWorkflows) {
+
+        return remoteIntegrationInstanceWorkflows.getIntegrationInstanceWorkflowsList()
+            .stream()
+            .map(this::toIntegrationInstanceWorkflow)
+            .toList();
+    }
+
     public List<Integration> toIntegrations(RemoteIntegrations remoteIntegrations) {
         return remoteIntegrations.getIntegrationsList()
             .stream()
@@ -258,6 +268,17 @@ public class EmbeddedConfigurationProtoMapper {
         return RemoteIntegrationInstanceConfigurations.newBuilder()
             .addAllIntegrationInstanceConfigurations(
                 integrationInstanceConfigurations.stream()
+                    .map(this::toProto)
+                    .toList())
+            .build();
+    }
+
+    public RemoteIntegrationInstanceWorkflows toRemoteIntegrationInstanceWorkflows(
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows) {
+
+        return RemoteIntegrationInstanceWorkflows.newBuilder()
+            .addAllIntegrationInstanceWorkflows(
+                integrationInstanceWorkflows.stream()
                     .map(this::toProto)
                     .toList())
             .build();
