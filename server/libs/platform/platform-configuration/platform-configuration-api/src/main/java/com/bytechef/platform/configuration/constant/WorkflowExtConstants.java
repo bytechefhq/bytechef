@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.configuration.constant;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
@@ -30,4 +32,8 @@ public class WorkflowExtConstants {
     public static final String INTERNAL_ONLY = "internalOnly";
     public static final String OBJECT_NAME = "objectName";
     public static final String TRIGGERS = "triggers";
+
+    public static final List<String> WORKFLOW_RESERVED_WORDS = List.of(
+        AUTHORIZATION_REQUIRED, "category", CLUSTER_ELEMENTS, COMPONENT_NAME, COMPONENT_VERSION, CONNECTIONS,
+        GROUP_NAME, INTERNAL_ONLY, OBJECT_NAME, "tags", TRIGGERS);
 }
