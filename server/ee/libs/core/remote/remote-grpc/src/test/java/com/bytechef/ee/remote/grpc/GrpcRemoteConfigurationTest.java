@@ -79,6 +79,32 @@ class GrpcRemoteConfigurationTest {
     }
 
     @Test
+    void testBlankTokenFailsWhenABeanCallsAnotherMicroservice() {
+        applicationContextRunner
+            .withUserConfiguration(RemoteCallerConfiguration.class)
+            .withPropertyValues("bytechef.remote.grpc.plaintext=true", "bytechef.remote.grpc.service-token=")
+            .run(context -> assertThat(context).hasFailed()
+                .getFailure()
+                .hasStackTraceContaining("bytechef.remote.grpc.service-token must be set to call another"));
+    }
+
+    @Test
+    void testBlankTokenWithUnusedChannelsStarts() {
+        applicationContextRunner
+            .withBean(ManagedGrpcChannels.class)
+            .withPropertyValues("bytechef.remote.grpc.plaintext=true", "bytechef.remote.grpc.service-token=")
+            .run(context -> assertThat(context).hasNotFailed());
+    }
+
+    @Test
+    void testTokenWithRemoteCallerStarts() {
+        applicationContextRunner
+            .withUserConfiguration(RemoteCallerConfiguration.class)
+            .withPropertyValues("bytechef.remote.grpc.plaintext=true", "bytechef.remote.grpc.service-token=secret")
+            .run(context -> assertThat(context).hasNotFailed());
+    }
+
+    @Test
     void testClosedContextNoLongerResolvesThroughItsDiscoveryClient() {
         applicationContextRunner
             .withBean(DiscoveryClient.class, () -> mock(DiscoveryClient.class))
@@ -106,6 +132,23 @@ class GrpcRemoteConfigurationTest {
     @Configuration
     @EnableConfigurationProperties(ApplicationProperties.class)
     static class PropertiesConfiguration {
+    }
+
+    @Configuration
+    static class RemoteCallerConfiguration {
+
+        @Bean
+        ManagedGrpcChannels managedGrpcChannels(ApplicationProperties applicationProperties) {
+            return new ManagedGrpcChannels(applicationProperties);
+        }
+
+        @Bean
+        RemoteCaller remoteCaller(GrpcChannels grpcChannels) {
+            return new RemoteCaller(grpcChannels);
+        }
+    }
+
+    record RemoteCaller(GrpcChannels grpcChannels) {
     }
 
     @Configuration
