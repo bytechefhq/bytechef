@@ -9,12 +9,14 @@ package com.bytechef.ee.automation.configuration.remote.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -27,19 +29,25 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.configuration.remote.client.facade.RemoteProjectFacadeClient;
+import com.bytechef.ee.automation.configuration.remote.client.registry.RemoteSubflowResolverClient;
 import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectDeploymentServiceClient;
 import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectDeploymentWorkflowServiceClient;
 import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectServiceClient;
 import com.bytechef.ee.automation.configuration.remote.client.service.RemoteProjectWorkflowServiceClient;
+import com.bytechef.ee.automation.configuration.remote.client.subflow.RemoteChildJobPrincipalFactoryClient;
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.ChildJobPrincipalFactoryRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectDeploymentRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectDeploymentWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectRemoteServiceGrpcServer;
 import com.bytechef.ee.automation.configuration.remote.grpc.ProjectWorkflowRemoteServiceGrpcServer;
+import com.bytechef.ee.automation.configuration.remote.grpc.SubflowResolverRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -52,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,19 +86,23 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
     private static final String WORKFLOW_ID = "3e4078b4-87bb-43c0-9cc6-1270f73b131d";
     private static final String WORKFLOW_UUID = "8a1b6f0e-5c2d-4e7f-9a3b-2c1d0e9f8a7b";
 
+    private final ChildJobPrincipalFactory childJobPrincipalFactory = mock(ChildJobPrincipalFactory.class);
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService =
         mock(ProjectDeploymentWorkflowService.class);
     private final ProjectFacade projectFacade = mock(ProjectFacade.class);
     private final ProjectService projectService = mock(ProjectService.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+    private final SubflowResolver subflowResolver = mock(SubflowResolver.class);
 
     private ManagedChannel managedChannel;
+    private RemoteChildJobPrincipalFactoryClient remoteChildJobPrincipalFactoryClient;
     private RemoteProjectDeploymentServiceClient remoteProjectDeploymentServiceClient;
     private RemoteProjectDeploymentWorkflowServiceClient remoteProjectDeploymentWorkflowServiceClient;
     private RemoteProjectFacadeClient remoteProjectFacadeClient;
     private RemoteProjectServiceClient remoteProjectServiceClient;
     private RemoteProjectWorkflowServiceClient remoteProjectWorkflowServiceClient;
+    private RemoteSubflowResolverClient remoteSubflowResolverClient;
     private Server server;
 
     @BeforeEach
@@ -101,6 +114,14 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
 
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
+            .addService(
+                ServerInterceptors.intercept(
+                    new ChildJobPrincipalFactoryRemoteServiceGrpcServer(
+                        childJobPrincipalFactory, automationConfigurationProtoMapper),
+                    serverInterceptor))
+            .addService(
+                ServerInterceptors.intercept(
+                    new SubflowResolverRemoteServiceGrpcServer(subflowResolver), serverInterceptor))
             .addService(
                 ServerInterceptors.intercept(
                     new ProjectRemoteServiceGrpcServer(projectService, automationConfigurationProtoMapper),
@@ -132,6 +153,7 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
 
         FixedGrpcChannels fixedGrpcChannels = new FixedGrpcChannels(managedChannel);
 
+        remoteChildJobPrincipalFactoryClient = new RemoteChildJobPrincipalFactoryClient(fixedGrpcChannels, JSON_MAPPER);
         remoteProjectDeploymentServiceClient = new RemoteProjectDeploymentServiceClient(
             fixedGrpcChannels, JSON_MAPPER);
         remoteProjectDeploymentWorkflowServiceClient = new RemoteProjectDeploymentWorkflowServiceClient(
@@ -139,6 +161,7 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
         remoteProjectFacadeClient = new RemoteProjectFacadeClient(fixedGrpcChannels, JSON_MAPPER);
         remoteProjectServiceClient = new RemoteProjectServiceClient(fixedGrpcChannels, JSON_MAPPER);
         remoteProjectWorkflowServiceClient = new RemoteProjectWorkflowServiceClient(fixedGrpcChannels, JSON_MAPPER);
+        remoteSubflowResolverClient = new RemoteSubflowResolverClient(fixedGrpcChannels);
     }
 
     @AfterEach
@@ -349,6 +372,42 @@ class AutomationConfigurationRemoteServiceGrpcWireTest {
         assertThat(remoteProjectDeploymentServiceClient.getProjectDeployments(null, null, null, null, 1051L))
             .usingRecursiveFieldByFieldElementComparator()
             .containsExactly(otherProjectDeployment);
+    }
+
+    @Test
+    void testResolveSubflow() {
+        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, "callWorkflow", true))
+            .thenReturn(new SubflowResolver.Subflow(WORKFLOW_ID, "trigger_1"));
+
+        assertThat(remoteSubflowResolverClient.resolveSubflow(WORKFLOW_UUID, "callWorkflow", true))
+            .isEqualTo(new SubflowResolver.Subflow(WORKFLOW_ID, "trigger_1"));
+    }
+
+    @Test
+    void testResolveSubflowWithoutACallableTriggerFailsWithItsMessage() {
+        when(subflowResolver.resolveSubflow(WORKFLOW_UUID, "callWorkflow", false))
+            .thenThrow(new IllegalStateException("No callable trigger found in workflow '%s'".formatted(WORKFLOW_ID)));
+
+        assertThatThrownBy(() -> remoteSubflowResolverClient.resolveSubflow(WORKFLOW_UUID, "callWorkflow", false))
+            .hasMessageContaining("No callable trigger found in workflow '%s'".formatted(WORKFLOW_ID));
+    }
+
+    @Test
+    void testCreateChildJob() {
+        AtomicReference<JobParametersDTO> receivedJobParametersDTO = new AtomicReference<>();
+        JobParametersDTO jobParametersDTO = new JobParametersDTO(
+            WORKFLOW_ID, Map.of("id", 9_007_199_254_740_993L, "name", "child"));
+
+        when(childJobPrincipalFactory.createChildJob(eq(7L), any()))
+            .thenAnswer(invocation -> {
+                receivedJobParametersDTO.set(invocation.getArgument(1));
+
+                return 15L;
+            });
+
+        assertThat(remoteChildJobPrincipalFactoryClient.createChildJob(7L, jobParametersDTO)).isEqualTo(15L);
+        assertThat(receivedJobParametersDTO.get()).usingRecursiveComparison()
+            .isEqualTo(jobParametersDTO);
     }
 
     private static ProjectDeployment projectDeployment(long id) {

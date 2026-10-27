@@ -155,11 +155,13 @@ public class ConfigurationApplicationIntTest {
             .toList();
 
         assertThat(serviceNames).contains(
+            "bytechef.automation.configuration.remote.v1.ChildJobPrincipalFactoryRemoteService",
             "bytechef.automation.configuration.remote.v1.ProjectFacadeRemoteService",
             "bytechef.automation.configuration.remote.v1.ProjectRemoteService",
             "bytechef.automation.configuration.remote.v1.ProjectDeploymentRemoteService",
             "bytechef.automation.configuration.remote.v1.ProjectDeploymentWorkflowRemoteService",
             "bytechef.automation.configuration.remote.v1.ProjectWorkflowRemoteService",
+            "bytechef.automation.configuration.remote.v1.SubflowResolverRemoteService",
             "bytechef.embedded.configuration.remote.v1.AppEventRemoteService",
             "bytechef.embedded.configuration.remote.v1.AutomationWorkflowProjectFacadeRemoteService",
             "bytechef.embedded.configuration.remote.v1.ConnectedUserProjectDeploymentResolverRemoteService",
