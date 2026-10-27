@@ -135,6 +135,8 @@ public class ConfigurationApplicationIntTest {
 
         assertThat(serviceNames).contains(
             "bytechef.embedded.connected.user.remote.v1.ConnectedUserRemoteService",
+            "bytechef.embedded.security.remote.v1.JwtTokenRemoteService",
+            "bytechef.embedded.security.remote.v1.SigningKeyRemoteService",
             "bytechef.platform.security.remote.v1.ApiKeyRemoteService");
         assertThat(serviceNames).doesNotContain(
             "bytechef.platform.user.remote.v1.UserRemoteService",
