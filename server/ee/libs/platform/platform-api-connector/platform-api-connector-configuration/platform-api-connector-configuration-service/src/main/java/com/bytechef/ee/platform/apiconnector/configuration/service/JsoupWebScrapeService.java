@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
+import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.io.IOException;
 import java.net.URI;
@@ -46,13 +47,14 @@ public class JsoupWebScrapeService implements WebScrapeService {
 
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
     private static final int DEFAULT_MAX_CRAWL_PAGES = 20;
+    private static final int MAX_REDIRECTS = 5;
 
     private final HttpClient httpClient;
 
     public JsoupWebScrapeService() {
         this.httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
-            .followRedirects(HttpClient.Redirect.NORMAL)
+            .followRedirects(HttpClient.Redirect.NEVER)
             .build();
     }
 
@@ -74,7 +76,7 @@ public class JsoupWebScrapeService implements WebScrapeService {
         int effectiveMaxPages = maxPages > 0 ? Math.min(maxPages, DEFAULT_MAX_CRAWL_PAGES) : DEFAULT_MAX_CRAWL_PAGES;
 
         try {
-            URI baseUri = URI.create(url);
+            URI baseUri = validateUrl(url);
             String baseHost = baseUri.getHost();
 
             List<Pattern> patterns = includePatterns.stream()
@@ -168,21 +170,9 @@ public class JsoupWebScrapeService implements WebScrapeService {
     }
 
     private String fetchAndParse(String url) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
-            .header("User-Agent", "ByteChef Web Scraper")
-            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-            .GET()
-            .build();
+        FetchedPage fetchedPage = fetch(url);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            throw new IOException("HTTP " + response.statusCode());
-        }
-
-        Document document = Jsoup.parse(response.body());
+        Document document = Jsoup.parse(fetchedPage.body());
 
         document.select("script, style, nav, footer, header, aside, noscript, iframe")
             .remove();
@@ -195,21 +185,9 @@ public class JsoupWebScrapeService implements WebScrapeService {
         String url, String baseHost, List<Pattern> patterns, Queue<String> queue, Set<String> visited)
         throws IOException, InterruptedException {
 
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
-            .header("User-Agent", "ByteChef Web Scraper")
-            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-            .GET()
-            .build();
+        FetchedPage fetchedPage = fetch(url);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            throw new IOException("HTTP " + response.statusCode());
-        }
-
-        Document document = Jsoup.parse(response.body(), url);
+        Document document = Jsoup.parse(fetchedPage.body(), fetchedPage.url());
 
         Elements links = document.select("a[href]");
 
@@ -245,5 +223,66 @@ public class JsoupWebScrapeService implements WebScrapeService {
 
         return document.body()
             .text();
+    }
+
+    static URI validateUrl(String url) {
+        UrlValidatorUtils.validate(url, Set.of());
+
+        return URI.create(url);
+    }
+
+    static String resolveRedirectTarget(URI currentUri, String location) {
+        URI targetUri = currentUri.resolve(location);
+
+        String targetUrl = targetUri.toString();
+
+        validateUrl(targetUrl);
+
+        return targetUrl;
+    }
+
+    private FetchedPage fetch(String url) throws IOException, InterruptedException {
+        String currentUrl = url;
+
+        validateUrl(currentUrl);
+
+        for (int redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
+            URI currentUri = URI.create(currentUrl);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(currentUri)
+                .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
+                .header("User-Agent", "ByteChef Web Scraper")
+                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                .GET()
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            int statusCode = response.statusCode();
+
+            if (!isRedirect(statusCode)) {
+                if (statusCode != 200) {
+                    throw new IOException("HTTP " + statusCode);
+                }
+
+                return new FetchedPage(currentUrl, response.body());
+            }
+
+            String location = response.headers()
+                .firstValue("Location")
+                .orElseThrow(() -> new IOException("HTTP " + statusCode + " without a Location header"));
+
+            currentUrl = resolveRedirectTarget(currentUri, location);
+        }
+
+        throw new IOException("Too many redirects while fetching " + url);
+    }
+
+    private static boolean isRedirect(int statusCode) {
+        return statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 307 || statusCode == 308;
+    }
+
+    private record FetchedPage(String url, String body) {
     }
 }
