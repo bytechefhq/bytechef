@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.remote.grpc.ConnectedUserRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.platform.configuration.domain.Environment;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -71,6 +72,25 @@ class ConnectedUserRemoteServiceGrpcWireTest {
         when(connectedUserService.fetchConnectedUser("missing", 2L)).thenReturn(Optional.empty());
 
         assertThat(remoteConnectedUserServiceClient.fetchConnectedUser("missing", 2L)).isEmpty();
+    }
+
+    @Test
+    void testGetConnectedUserByExternalId() {
+        when(connectedUserService.fetchConnectedUser("ext-user", Environment.PRODUCTION.ordinal()))
+            .thenReturn(Optional.of(connectedUser()));
+
+        assertThat(remoteConnectedUserServiceClient.getConnectedUser("ext-user", Environment.PRODUCTION)
+            .getId()).isEqualTo(9L);
+    }
+
+    @Test
+    void testGetConnectedUserWithoutUserThrows() {
+        when(connectedUserService.fetchConnectedUser("missing", Environment.PRODUCTION.ordinal()))
+            .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> remoteConnectedUserServiceClient.getConnectedUser("missing", Environment.PRODUCTION))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Connected user not found");
     }
 
     @Test

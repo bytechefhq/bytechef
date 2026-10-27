@@ -118,7 +118,8 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override
     public ConnectedUser getConnectedUser(String externalId, Environment environment) {
-        throw new UnsupportedOperationException();
+        return fetchConnectedUser(externalId, environment)
+            .orElseThrow(() -> new IllegalArgumentException("Connected user not found"));
     }
 
     @Override
