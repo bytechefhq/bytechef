@@ -37,6 +37,7 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
@@ -148,6 +149,30 @@ class A2aProjectWorkflowServiceIntTest {
                 .get()
                 .extracting(A2aProjectWorkflow::isEnabled)
                 .isEqualTo(true);
+        }
+
+        @Test
+        void testUpdateParametersReplacesThePersistedParameters() {
+            A2aProjectWorkflow a2aProjectWorkflow = new A2aProjectWorkflow(
+                a2aProject.getId(), projectDeploymentWorkflow.getId());
+
+            a2aProjectWorkflow.setSkillName("Old skill");
+
+            a2aProjectWorkflow = a2aProjectWorkflowRepository.save(a2aProjectWorkflow);
+
+            long a2aProjectWorkflowId = Validate.notNull(a2aProjectWorkflow.getId(), "id");
+
+            authenticate("ROLE_ADMIN");
+
+            a2aProjectWorkflowService.updateParameters(
+                a2aProjectWorkflowId, Map.of("skillDescription", "Summarizes the order"));
+
+            A2aProjectWorkflow persistedA2aProjectWorkflow = a2aProjectWorkflowRepository.findById(
+                a2aProjectWorkflowId)
+                .orElseThrow();
+
+            assertThat(persistedA2aProjectWorkflow.getSkillName()).isNull();
+            assertThat(persistedA2aProjectWorkflow.getSkillDescription()).isEqualTo("Summarizes the order");
         }
 
         @Test

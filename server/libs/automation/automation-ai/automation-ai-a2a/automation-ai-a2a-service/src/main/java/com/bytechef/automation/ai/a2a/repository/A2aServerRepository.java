@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.a2a.repository;
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Repository;
 public interface A2aServerRepository extends ListCrudRepository<A2aServer, Long> {
 
     Optional<A2aServer> findBySecretKey(String secretKey);
+
+    Optional<A2aServer> findByUuidAndEnvironment(UUID uuid, int environment);
 
     List<A2aServer> findAllByOrderByIdAsc();
 

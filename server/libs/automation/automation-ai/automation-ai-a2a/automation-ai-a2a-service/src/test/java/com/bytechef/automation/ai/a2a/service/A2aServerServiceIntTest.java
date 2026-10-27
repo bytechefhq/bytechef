@@ -283,6 +283,26 @@ class A2aServerServiceIntTest {
         }
 
         @Test
+        void testFetchByUuidAndEnvironmentFindsOnlyTheServerOfThatEnvironment() {
+            A2aServer developmentA2aServer = a2aServerService.create(
+                new A2aServer("agent", null, Environment.DEVELOPMENT));
+
+            A2aServer stagingA2aServer = new A2aServer("agent", null, Environment.STAGING);
+
+            stagingA2aServer.setUuid(developmentA2aServer.getUuid());
+
+            stagingA2aServer = a2aServerService.create(stagingA2aServer);
+
+            long stagingA2aServerId = stagingA2aServer.getId();
+
+            assertThat(a2aServerService.fetchA2aServer(developmentA2aServer.getUuid(), Environment.STAGING))
+                .hasValueSatisfying(a2aServer -> assertThat(a2aServer.getId()).isEqualTo(stagingA2aServerId));
+            assertThat(a2aServerService.fetchA2aServer(developmentA2aServer.getUuid(), Environment.PRODUCTION))
+                .isEmpty();
+            assertThat(a2aServerService.fetchA2aServer(UUID.randomUUID(), Environment.DEVELOPMENT)).isEmpty();
+        }
+
+        @Test
         void testFetchBySecretKeyIsEmptyForAnUnknownKey() {
             assertThat(a2aServerService.fetchA2aServer("unknown")).isEmpty();
             assertThatIllegalArgumentException().isThrownBy(() -> a2aServerService.getA2aServer("unknown"));
