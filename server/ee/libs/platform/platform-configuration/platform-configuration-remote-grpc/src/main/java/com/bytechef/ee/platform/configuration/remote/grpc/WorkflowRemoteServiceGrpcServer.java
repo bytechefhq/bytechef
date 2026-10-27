@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.configuration.remote.grpc;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.platform.configuration.remote.grpc.proto.CreateWorkflowRequest;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.RemoteWorkflow;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.RemoteWorkflows;
 import com.bytechef.ee.platform.configuration.remote.grpc.proto.WorkflowIdRequest;
@@ -35,6 +36,17 @@ public class WorkflowRemoteServiceGrpcServer extends WorkflowRemoteServiceGrpc.W
 
         this.platformConfigurationProtoMapper = platformConfigurationProtoMapper;
         this.workflowService = workflowService;
+    }
+
+    @Override
+    public void createWorkflow(CreateWorkflowRequest request, StreamObserver<RemoteWorkflow> responseObserver) {
+        Workflow workflow = workflowService.create(
+            request.hasDefinition() ? request.getDefinition() : null,
+            request.hasFormat() ? Workflow.Format.valueOf(request.getFormat()) : null,
+            request.hasSourceType() ? Workflow.SourceType.valueOf(request.getSourceType()) : null);
+
+        responseObserver.onNext(platformConfigurationProtoMapper.toProto(workflow));
+        responseObserver.onCompleted();
     }
 
     @Override

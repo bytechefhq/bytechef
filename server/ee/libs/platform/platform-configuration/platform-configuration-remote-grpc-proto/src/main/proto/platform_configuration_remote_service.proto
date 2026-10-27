@@ -8,6 +8,7 @@ option java_multiple_files = true;
 option java_package = "com.bytechef.ee.platform.configuration.remote.grpc.proto";
 
 service WorkflowRemoteService {
+  rpc CreateWorkflow(CreateWorkflowRequest) returns (RemoteWorkflow);
   rpc FetchWorkflow(WorkflowIdRequest) returns (WorkflowResult);
   rpc GetWorkflow(WorkflowIdRequest) returns (RemoteWorkflow);
   rpc GetWorkflows(WorkflowIdsRequest) returns (RemoteWorkflows);
@@ -33,6 +34,12 @@ message BoolResponse {
 
 message WorkflowIdRequest {
   string id = 1;
+}
+
+message CreateWorkflowRequest {
+  optional string definition = 1;
+  optional string format = 2;
+  optional string source_type = 3;
 }
 
 message WorkflowIdsRequest {
