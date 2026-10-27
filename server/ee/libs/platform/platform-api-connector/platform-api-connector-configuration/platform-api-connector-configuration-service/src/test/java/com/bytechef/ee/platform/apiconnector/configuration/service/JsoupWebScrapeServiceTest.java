@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.commons.util.UrlValidationException;
 import com.bytechef.commons.util.UrlValidatorUtils.HostResolver;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.apiconnector.configuration.service.JsoupWebScrapeService.ResolvedTarget;
 import com.bytechef.ee.platform.apiconnector.configuration.service.WebScrapeService.CrawlResult;
 import com.bytechef.ee.platform.apiconnector.configuration.service.WebScrapeService.ScrapeResult;
@@ -24,6 +25,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 class JsoupWebScrapeServiceTest {
 
-    private final JsoupWebScrapeService jsoupWebScrapeService = new JsoupWebScrapeService();
+    private final JsoupWebScrapeService jsoupWebScrapeService = new JsoupWebScrapeService(
+        new ApplicationProperties());
 
     @Nested
     class ResolveTarget {
@@ -153,7 +156,7 @@ class JsoupWebScrapeServiceTest {
                     };
 
                 JsoupWebScrapeService rebindingJsoupWebScrapeService = new JsoupWebScrapeService(
-                    rebindingHostResolver, Duration.ofMillis(500));
+                    Set.of(), rebindingHostResolver, Duration.ofMillis(500));
 
                 InetSocketAddress serverAddress = httpServer.getAddress();
 
@@ -186,6 +189,132 @@ class JsoupWebScrapeServiceTest {
             httpServer.start();
 
             return httpServer;
+        }
+    }
+
+    @Nested
+    class AllowedHosts {
+
+        private final AtomicInteger requestCount = new AtomicInteger();
+        private final HostResolver loopbackHostResolver = host -> new InetAddress[] {
+            InetAddress.getLoopbackAddress()
+        };
+
+        @Test
+        void testScrapeFetchesAllowlistedLoopbackHost() throws IOException {
+            HttpServer httpServer = startServer();
+
+            try {
+                JsoupWebScrapeService allowlistJsoupWebScrapeService = new JsoupWebScrapeService(
+                    Set.of("docs.internal"), loopbackHostResolver, Duration.ofSeconds(5));
+
+                ScrapeResult scrapeResult = allowlistJsoupWebScrapeService.scrape(
+                    "http://docs.internal:" + getPort(httpServer) + "/docs");
+
+                assertThat(scrapeResult.success()).isTrue();
+                assertThat(scrapeResult.content()).isEqualTo("internal docs");
+                assertThat(requestCount.get()).isEqualTo(1);
+            } finally {
+                httpServer.stop(0);
+            }
+        }
+
+        @Test
+        void testScrapeRejectsLoopbackHostThatIsNotAllowlisted() throws IOException {
+            HttpServer httpServer = startServer();
+
+            try {
+                JsoupWebScrapeService allowlistJsoupWebScrapeService = new JsoupWebScrapeService(
+                    Set.of("other.internal"), loopbackHostResolver, Duration.ofSeconds(5));
+
+                ScrapeResult scrapeResult = allowlistJsoupWebScrapeService.scrape(
+                    "http://docs.internal:" + getPort(httpServer) + "/docs");
+
+                assertThat(scrapeResult.success()).isFalse();
+                assertThat(scrapeResult.error()).contains("private or loopback address");
+                assertThat(requestCount.get()).isZero();
+            } finally {
+                httpServer.stop(0);
+            }
+        }
+
+        @Test
+        void testScrapeRejectsRedirectFromAllowlistedHostToMetadataAddress() throws IOException {
+            HttpServer httpServer = startServer();
+
+            try {
+                JsoupWebScrapeService allowlistJsoupWebScrapeService = new JsoupWebScrapeService(
+                    Set.of("docs.internal"), host -> host.equals("docs.internal")
+                        ? new InetAddress[] {
+                            InetAddress.getLoopbackAddress()
+                        }
+                        : InetAddress.getAllByName(host),
+                    Duration.ofSeconds(5));
+
+                ScrapeResult scrapeResult = allowlistJsoupWebScrapeService.scrape(
+                    "http://docs.internal:" + getPort(httpServer) + "/redirect");
+
+                assertThat(scrapeResult.success()).isFalse();
+                assertThat(scrapeResult.error()).contains("link-local address");
+                assertThat(requestCount.get()).isEqualTo(1);
+            } finally {
+                httpServer.stop(0);
+            }
+        }
+
+        @Test
+        void testGetAllowedHostsReadsTheSecuritySsrfAllowlist() {
+            ApplicationProperties applicationProperties = new ApplicationProperties();
+            ApplicationProperties.Security security = new ApplicationProperties.Security();
+
+            security.getSsrf()
+                .setAllowedHosts(List.of("docs.internal", "10.0.0.5"));
+
+            applicationProperties.setSecurity(security);
+
+            assertThat(JsoupWebScrapeService.getAllowedHosts(applicationProperties))
+                .containsExactlyInAnyOrder("docs.internal", "10.0.0.5");
+        }
+
+        @Test
+        void testGetAllowedHostsIsEmptyWhenNotConfigured() {
+            assertThat(JsoupWebScrapeService.getAllowedHosts(new ApplicationProperties())).isEmpty();
+        }
+
+        private HttpServer startServer() throws IOException {
+            HttpServer httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+
+            httpServer.createContext("/docs", exchange -> {
+                requestCount.incrementAndGet();
+
+                byte[] body = "<html><body><p>internal docs</p></body></html>".getBytes(StandardCharsets.UTF_8);
+
+                exchange.sendResponseHeaders(200, body.length);
+
+                try (OutputStream outputStream = exchange.getResponseBody()) {
+                    outputStream.write(body);
+                }
+            });
+            httpServer.createContext("/redirect", exchange -> {
+                requestCount.incrementAndGet();
+
+                exchange.getResponseHeaders()
+                    .add("Location", "http://169.254.169.254/latest/meta-data");
+
+                exchange.sendResponseHeaders(302, -1);
+
+                exchange.close();
+            });
+
+            httpServer.start();
+
+            return httpServer;
+        }
+
+        private int getPort(HttpServer httpServer) {
+            InetSocketAddress serverAddress = httpServer.getAddress();
+
+            return serverAddress.getPort();
         }
     }
 }

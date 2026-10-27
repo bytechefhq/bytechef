@@ -4996,6 +4996,11 @@ public class ApplicationProperties {
         private SocialLogin socialLogin = new SocialLogin();
 
         /**
+         * Server-side request forgery protection for user-supplied URLs fetched by the server
+         */
+        private Ssrf ssrf = new Ssrf();
+
+        /**
          * System user credentials configuration
          */
         private System system = new System();
@@ -5035,6 +5040,14 @@ public class ApplicationProperties {
 
         public void setSocialLogin(SocialLogin socialLogin) {
             this.socialLogin = socialLogin;
+        }
+
+        public Ssrf getSsrf() {
+            return ssrf;
+        }
+
+        public void setSsrf(Ssrf ssrf) {
+            this.ssrf = ssrf;
         }
 
         public System getSystem() {
@@ -5088,6 +5101,25 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+        }
+
+        /**
+         * Server-side request forgery protection configuration.
+         */
+        public static class Ssrf {
+
+            /**
+             * Hosts that may be fetched even when they resolve to a private, loopback or link-local address
+             */
+            private List<String> allowedHosts;
+
+            public List<String> getAllowedHosts() {
+                return allowedHosts;
+            }
+
+            public void setAllowedHosts(List<String> allowedHosts) {
+                this.allowedHosts = allowedHosts;
             }
         }
 

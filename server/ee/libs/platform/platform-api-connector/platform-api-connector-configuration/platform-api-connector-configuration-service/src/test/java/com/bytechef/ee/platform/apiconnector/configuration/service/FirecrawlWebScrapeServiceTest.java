@@ -8,8 +8,11 @@
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.apiconnector.configuration.service.WebScrapeService.CrawlResult;
@@ -23,6 +26,7 @@ import tools.jackson.databind.ObjectMapper;
  *
  * @author Ivica Cardic
  */
+@SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 class FirecrawlWebScrapeServiceTest {
 
     private final ObjectMapper objectMapper = mock(ObjectMapper.class);
@@ -58,5 +62,28 @@ class FirecrawlWebScrapeServiceTest {
         assertThat(scrapeResult.error()).contains("Only HTTP and HTTPS are permitted");
 
         verifyNoInteractions(objectMapper);
+    }
+
+    @Test
+    void testScrapeAllowsAllowlistedPrivateHostThroughToFirecrawl() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+        ApplicationProperties.Security security = new ApplicationProperties.Security();
+
+        security.getSsrf()
+            .setAllowedHosts(List.of("10.0.0.1"));
+
+        applicationProperties.setSecurity(security);
+
+        when(objectMapper.writeValueAsString(any())).thenThrow(new IllegalStateException("request reached Firecrawl"));
+
+        FirecrawlWebScrapeService allowlistFirecrawlWebScrapeService = new FirecrawlWebScrapeService(
+            applicationProperties, objectMapper);
+
+        ScrapeResult scrapeResult = allowlistFirecrawlWebScrapeService.scrape("http://10.0.0.1/docs");
+
+        assertThat(scrapeResult.success()).isFalse();
+        assertThat(scrapeResult.error()).isEqualTo("request reached Firecrawl");
+
+        verify(objectMapper).writeValueAsString(any());
     }
 }
