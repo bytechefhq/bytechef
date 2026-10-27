@@ -8,7 +8,6 @@
 package com.bytechef.webhook;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -22,11 +21,11 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.SignatureException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -89,14 +88,18 @@ class WebhookEmbeddedAuthenticationIntTest {
 
     @Test
     void testValidApiKeyIsAccepted() throws Exception {
-        when(apiKeyService.exists(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(true);
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(1L);
+
+        when(apiKeyService.fetchApiKey(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(Optional.of(apiKey));
 
         assertThat(status(authorized(API_KEY))).isNotIn(401, 403);
     }
 
     @Test
     void testInvalidApiKeyIsRejected() throws Exception {
-        when(apiKeyService.exists(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(false);
+        when(apiKeyService.fetchApiKey(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(Optional.empty());
 
         assertThat(status(authorized(API_KEY))).isEqualTo(401);
     }
@@ -108,8 +111,7 @@ class WebhookEmbeddedAuthenticationIntTest {
 
     @Test
     void testTokenWithWrongSignatureIsRejected() throws Exception {
-        assertThatThrownBy(() -> mockMvc.perform(authorized(token("external-user-1", generateKeyPair()))))
-            .isInstanceOf(SignatureException.class);
+        assertThat(status(authorized(token("external-user-1", generateKeyPair())))).isEqualTo(401);
 
         verify(connectedUserService, never()).fetchConnectedUser(anyString(), anyLong());
     }

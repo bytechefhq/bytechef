@@ -8,7 +8,6 @@
 package com.bytechef.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -26,7 +25,6 @@ import com.bytechef.tenant.domain.TenantKey;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.SignatureException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -107,8 +105,7 @@ class ExecutionEmbeddedAuthenticationIntTest {
 
     @Test
     void testTokenWithWrongSignatureIsRejected() throws Exception {
-        assertThatThrownBy(() -> mockMvc.perform(authorized(token("external-user-1", generateKeyPair()))))
-            .isInstanceOf(SignatureException.class);
+        assertThat(status(authorized(token("external-user-1", generateKeyPair())))).isEqualTo(401);
 
         verify(connectedUserService, never()).fetchConnectedUser(anyString(), anyLong());
     }
