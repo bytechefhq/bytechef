@@ -40,10 +40,6 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return isFeatureFlagEnabled('ff-207');
         }
 
-        if (navItem.href?.includes('/account/appearance')) {
-            return isFeatureFlagEnabled('ff-445');
-        }
-
         if (navItem.href === 'custom-components') {
             return isFeatureFlagEnabled('ff-1024');
         }
@@ -93,14 +89,16 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             !isHeading(navItem) || (visibleNavItems[index + 1] !== undefined && !isHeading(visibleNavItems[index + 1]))
     );
 
-    const currentNavItemTitle = useMemo(
+    const currentNavItem = useMemo(
         () =>
             sidebarNavItems
                 .flatMap((navItem) => navItem.items ?? [navItem])
                 .filter((navItem) => navItem.href && isCurrentHref(location.pathname, navItem.href))
-                .sort((navItem, otherNavItem) => otherNavItem.href!.length - navItem.href!.length)[0]?.title,
+                .sort((navItem, otherNavItem) => otherNavItem.href!.length - navItem.href!.length)[0],
         [location.pathname, sidebarNavItems]
     );
+
+    const currentNavItemTitle = currentNavItem?.title;
 
     useEffect(() => {
         if (currentNavItemTitle) {
@@ -128,7 +126,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                             return (
                                 <LeftSidebarNavItem
                                     item={{
-                                        current: location.pathname.includes(navItem.href),
+                                        current: navItem.href === currentNavItem?.href,
                                         name: navItem.title,
                                     }}
                                     key={navItem.href}

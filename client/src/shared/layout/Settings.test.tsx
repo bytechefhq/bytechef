@@ -155,4 +155,23 @@ describe('Settings', () => {
 
         expect(document.title).toBe('Signing Keys');
     });
+
+    it('shows the Appearance page without a feature flag', () => {
+        renderSettings([{href: '/automation/account/appearance', title: 'Appearance'}]);
+
+        expect(screen.getByText('Appearance')).toBeInTheDocument();
+    });
+
+    it('marks only the most specific link as current when another link is its prefix', () => {
+        renderSettings(
+            [
+                {href: '/automation/account', title: 'Profile'},
+                {href: '/automation/account/sessions', title: 'Active sessions'},
+            ],
+            '/automation/account/sessions'
+        );
+
+        expect(screen.getByText('Active sessions').closest('a')).toHaveAttribute('aria-current', 'page');
+        expect(screen.getByText('Profile').closest('a')).not.toHaveAttribute('aria-current');
+    });
 });
