@@ -123,22 +123,16 @@ The output for this action is dynamic and may vary depending on the input parame
 ### Mask
 Name: mask
 
-`Uses AI to detect and redact sensitive content from text.`
+`Replaces sensitive content with reversible tokens and returns the map to restore them. Secrets are redacted irreversibly and are never in the map.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| provider | Provider | STRING | The AI provider to use. The list only shows AI providers added and enabled in Settings > AI > Providers, so add one there first. | true |
-| model | Model | STRING <details> <summary> Depends On </summary> provider </details> | The model name to use. | true |
-| model | Model | STRING | ID of the model to use. | true |
-| model | URL | STRING | Url of the inference endpoint. | true |
 | text | Text | STRING | The text to process. | true |
-| sensitiveKeywords | Sensitive Keywords | ARRAY <details> <summary> Items </summary> [STRING] </details> | Words or phrases to detect and redact. | false |
-| piiDetection | PII Detection | ARRAY <details> <summary> Items </summary> [STRING] </details> | Detect personally identifiable information (email, phone, SSN, credit card, IP address). | false |
-| customRegexPatterns | Custom Patterns | ARRAY <details> <summary> Items </summary> [STRING] </details> | Custom patterns to detect and redact. | false |
-| maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | false |
-| temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
+| sensitiveKeywords | Sensitive Keywords | ARRAY <details> <summary> Items </summary> [STRING] </details> | Words or phrases to mask, matched case-insensitively. | false |
+| piiDetection | PII Detection | ARRAY <details> <summary> Items </summary> [STRING] </details> | PII types to mask. Leave empty to mask every type in the curated default. | false |
+| customRegexPatterns | Custom Patterns | ARRAY <details> <summary> Items </summary> [STRING] </details> | Java regular expressions to mask. | false |
 
 #### Example JSON Structure
 ```json
@@ -146,14 +140,10 @@ Name: mask
   "label" : "Mask",
   "name" : "mask",
   "parameters" : {
-    "provider" : "",
-    "model" : "",
     "text" : "",
     "sensitiveKeywords" : [ "" ],
     "piiDetection" : [ "" ],
-    "customRegexPatterns" : [ "" ],
-    "maxTokens" : 1,
-    "temperature" : 0.0
+    "customRegexPatterns" : [ "" ]
   },
   "type" : "aiText/v1/mask"
 }
@@ -164,7 +154,7 @@ Name: mask
 
 ___Sample Output:___
 
-```{text=Hello, my name is [REDACTED_1] and my email is [EMAIL_1]., maskMap={[REDACTED_1]=John Doe, [EMAIL_1]=john@example.com}}```
+```{text=Hello, my name is [PII_KEYWORD_1_k3n9] and my email is [PII_EMAIL_ADDRESS_2_k3n9]., maskMap={[PII_EMAIL_ADDRESS_2_k3n9]=john@example.com, [PII_KEYWORD_1_k3n9]=John Doe}}```
 
 
 
@@ -175,8 +165,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| text | STRING | The text with sensitive content redacted. |
-| maskMap | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Mapping of mask tokens to their original values. |
+| text | STRING | The text with sensitive content replaced by tokens. |
+| maskMap | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Mapping of each token to the value it replaced. |
 
 
 
@@ -195,20 +185,14 @@ Type: OBJECT
 ### Unmask
 Name: unmask
 
-`Uses AI and a map of masking entities to unmask the text.`
+`Restores the tokens in a text from the map the Mask action returned.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| provider | Provider | STRING | The AI provider to use. The list only shows AI providers added and enabled in Settings > AI > Providers, so add one there first. | true |
-| model | Model | STRING <details> <summary> Depends On </summary> provider </details> | The model name to use. | true |
-| model | Model | STRING | ID of the model to use. | true |
-| model | URL | STRING | Url of the inference endpoint. | true |
 | text | Text | STRING | The text to process. | true |
-| maskMap | Masked map | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Map of masked entities to replace with values. | false |
-| maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | false |
-| temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
+| maskMap | Masked map | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Map of tokens to the values to restore. | false |
 
 #### Example JSON Structure
 ```json
@@ -216,12 +200,8 @@ Name: unmask
   "label" : "Unmask",
   "name" : "unmask",
   "parameters" : {
-    "provider" : "",
-    "model" : "",
     "text" : "",
-    "maskMap" : { },
-    "maxTokens" : 1,
-    "temperature" : 0.0
+    "maskMap" : { }
   },
   "type" : "aiText/v1/unmask"
 }
@@ -232,7 +212,7 @@ Name: unmask
 
 ___Sample Output:___
 
-```Hello, my name is [REDACTED] and my email is [EMAIL].```
+```Hello, my name is John Doe and my email is john@example.com.```
 
 
 
