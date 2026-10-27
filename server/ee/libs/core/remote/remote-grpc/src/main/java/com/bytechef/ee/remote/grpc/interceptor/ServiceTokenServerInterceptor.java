@@ -8,6 +8,7 @@
 package com.bytechef.ee.remote.grpc.interceptor;
 
 import io.grpc.Metadata;
+import io.grpc.MethodDescriptor;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
@@ -23,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ServiceTokenServerInterceptor implements ServerInterceptor {
 
+    private static final String HEALTH_SERVICE_NAME = "grpc.health.v1.Health";
+
     private final String serviceToken;
 
     public ServiceTokenServerInterceptor(String serviceToken) {
@@ -32,6 +35,12 @@ public class ServiceTokenServerInterceptor implements ServerInterceptor {
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
         ServerCall<ReqT, RespT> serverCall, Metadata metadata, ServerCallHandler<ReqT, RespT> serverCallHandler) {
+
+        MethodDescriptor<ReqT, RespT> methodDescriptor = serverCall.getMethodDescriptor();
+
+        if (HEALTH_SERVICE_NAME.equals(methodDescriptor.getServiceName())) {
+            return serverCallHandler.startCall(serverCall, metadata);
+        }
 
         String providedToken = metadata.get(GrpcMetadataKeys.SERVICE_TOKEN);
 

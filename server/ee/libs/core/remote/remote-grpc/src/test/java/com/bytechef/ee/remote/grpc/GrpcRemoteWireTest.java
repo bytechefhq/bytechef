@@ -40,11 +40,14 @@ class GrpcRemoteWireTest {
 
     @Test
     void testWrongTokenIsUnauthenticated() throws Exception {
-        try (InProcessGrpc inProcessGrpc = start("wrong")) {
-            assertThatThrownBy(() -> HealthGrpc.newBlockingStub(inProcessGrpc.channel())
-                .check(HealthCheckRequest.getDefaultInstance()))
-                    .isInstanceOfSatisfying(StatusRuntimeException.class, exception -> assertThat(exception.getStatus()
-                        .getCode()).isEqualTo(Status.Code.UNAUTHENTICATED));
+        try (InProcessGrpc inProcessGrpc = new InProcessGrpc(
+            new EchoService(),
+            List.of(new TenantContextServerInterceptor(), new ServiceTokenServerInterceptor("secret")),
+            List.of(new TenantContextClientInterceptor(), new ServiceTokenClientInterceptor("wrong")))) {
+
+            assertThatThrownBy(() -> EchoService.echoTenant(inProcessGrpc.channel()))
+                .isInstanceOfSatisfying(StatusRuntimeException.class, exception -> assertThat(exception.getStatus()
+                    .getCode()).isEqualTo(Status.Code.UNAUTHENTICATED));
         }
     }
 

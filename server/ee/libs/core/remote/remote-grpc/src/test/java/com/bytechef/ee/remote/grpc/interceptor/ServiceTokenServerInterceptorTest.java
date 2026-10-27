@@ -15,6 +15,10 @@ import com.bytechef.ee.remote.grpc.InProcessGrpc;
 import io.grpc.ClientInterceptor;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import io.grpc.health.v1.HealthCheckRequest;
+import io.grpc.health.v1.HealthCheckResponse;
+import io.grpc.health.v1.HealthGrpc;
+import io.grpc.protobuf.services.HealthStatusManager;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -48,6 +52,20 @@ class ServiceTokenServerInterceptorTest {
     void testBlankConfiguredTokenRejectsEverything() throws Exception {
         try (InProcessGrpc inProcessGrpc = start("", List.of(new ServiceTokenClientInterceptor("")))) {
             assertUnauthenticated(inProcessGrpc);
+        }
+    }
+
+    @Test
+    void testHealthCheckNeedsNoToken() throws Exception {
+        HealthStatusManager healthStatusManager = new HealthStatusManager();
+
+        try (InProcessGrpc inProcessGrpc = new InProcessGrpc(
+            healthStatusManager.getHealthService(), List.of(new ServiceTokenServerInterceptor("secret")), List.of())) {
+
+            HealthCheckResponse healthCheckResponse = HealthGrpc.newBlockingStub(inProcessGrpc.channel())
+                .check(HealthCheckRequest.getDefaultInstance());
+
+            assertThat(healthCheckResponse.getStatus()).isEqualTo(HealthCheckResponse.ServingStatus.SERVING);
         }
     }
 
