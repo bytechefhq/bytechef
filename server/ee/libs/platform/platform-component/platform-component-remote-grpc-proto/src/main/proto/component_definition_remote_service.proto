@@ -60,6 +60,7 @@ service TriggerDefinitionFacadeRemoteService {
   rpc ExecuteWebhookDisable(TriggerExecuteWebhookDisableRequest) returns (google.protobuf.Empty);
   rpc ExecuteWebhookEnable(TriggerExecuteWebhookEnableRequest) returns (WebhookEnableOutputResult);
   rpc ExecuteWebhookValidate(TriggerExecuteWebhookValidateRequest) returns (RemoteWebhookValidateResponse);
+  rpc ExecuteWebhookValidateOnEnable(TriggerExecuteWebhookValidateRequest) returns (RemoteWebhookValidateResponse);
 }
 
 service ClusterElementDefinitionRemoteService {

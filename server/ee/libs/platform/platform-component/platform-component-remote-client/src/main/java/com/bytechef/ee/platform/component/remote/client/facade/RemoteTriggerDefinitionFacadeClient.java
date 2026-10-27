@@ -270,22 +270,10 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         WebhookRequest webhookRequest, Long connectionId) {
 
-        TriggerExecuteWebhookValidateRequest.Builder builder = TriggerExecuteWebhookValidateRequest.newBuilder()
-            .setComponentName(componentName)
-            .setComponentVersion(componentVersion)
-            .setTriggerName(triggerName)
-            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
-
-        if (webhookRequest != null) {
-            builder.setWebhookRequest(componentProtoMapper.toProto(webhookRequest));
-        }
-
-        if (connectionId != null) {
-            builder.setConnectionId(connectionId);
-        }
-
         return componentProtoMapper.toWebhookValidateResponse(
-            getStub(componentName).executeWebhookValidate(builder.build()));
+            getStub(componentName).executeWebhookValidate(
+                getWebhookValidateRequest(
+                    componentName, componentVersion, triggerName, inputParameters, webhookRequest, connectionId)));
     }
 
     @Override
@@ -293,7 +281,10 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
 
-        throw new UnsupportedOperationException();
+        return componentProtoMapper.toWebhookValidateResponse(
+            getStub(componentName).executeWebhookValidateOnEnable(
+                getWebhookValidateRequest(
+                    componentName, componentVersion, triggerName, inputParameters, webhookRequest, connectionId)));
     }
 
     private TriggerExecuteListenerRequest getListenerRequest(
@@ -308,6 +299,27 @@ public class RemoteTriggerDefinitionFacadeClient implements TriggerDefinitionFac
 
         if (workflowExecutionId != null) {
             builder.setWorkflowExecutionId(workflowExecutionId);
+        }
+
+        if (connectionId != null) {
+            builder.setConnectionId(connectionId);
+        }
+
+        return builder.build();
+    }
+
+    private TriggerExecuteWebhookValidateRequest getWebhookValidateRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Long connectionId) {
+
+        TriggerExecuteWebhookValidateRequest.Builder builder = TriggerExecuteWebhookValidateRequest.newBuilder()
+            .setComponentName(componentName)
+            .setComponentVersion(componentVersion)
+            .setTriggerName(triggerName)
+            .setInputParameters(componentProtoMapper.toBytes(inputParameters));
+
+        if (webhookRequest != null) {
+            builder.setWebhookRequest(componentProtoMapper.toProto(webhookRequest));
         }
 
         if (connectionId != null) {
