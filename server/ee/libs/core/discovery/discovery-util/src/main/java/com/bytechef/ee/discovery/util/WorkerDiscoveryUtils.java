@@ -10,6 +10,8 @@ package com.bytechef.ee.discovery.util;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,11 +26,19 @@ import org.springframework.cloud.client.ServiceInstance;
 import tools.jackson.core.type.TypeReference;
 
 /**
+ * Routes calls to the worker instances that advertise components in their discovery metadata. Each distinct
+ * {@code components} metadata value is parsed once, so a changed registration is picked up as soon as discovery returns
+ * it.
+ *
  * @version ee
  *
  * @author Ivica Cardic
  */
 public class WorkerDiscoveryUtils {
+
+    private static final Cache<String, List<String>> COMPONENT_NAMES_CACHE = Caffeine.newBuilder()
+        .maximumSize(1_000)
+        .build();
 
     public static Optional<ServiceInstance> fetchServiceInstance(
         List<ServiceInstance> serviceInstances, String componentName) {
@@ -74,13 +84,17 @@ public class WorkerDiscoveryUtils {
             String componentsString = metadataMap.get("components");
 
             if (StringUtils.isNotBlank(componentsString)) {
-                List<Map<String, String>> components = JsonUtils.read(componentsString, new TypeReference<>() {});
-
-                return CollectionUtils.map(components, componentMap -> MapUtils.getString(componentMap, "name"));
+                return COMPONENT_NAMES_CACHE.get(componentsString, WorkerDiscoveryUtils::readComponentNames);
             }
         }
 
         return List.of();
+    }
+
+    private static List<String> readComponentNames(String componentsString) {
+        List<Map<String, String>> components = JsonUtils.read(componentsString, new TypeReference<>() {});
+
+        return CollectionUtils.map(components, componentMap -> MapUtils.getString(componentMap, "name"));
     }
 
     private static Set<String> toUniqueInstanceIds(List<ServiceInstance> serviceInstances) {
