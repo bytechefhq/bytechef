@@ -326,7 +326,7 @@ const ConnectionTabConnectionSelect = ({
                 >
                     <div className="flex w-full min-w-0 space-x-2">
                         {componentConnections && componentConnections.length > 0 && (
-                            <div className="min-w-0 flex-1 bg-content-onsurface-primary">
+                            <div className="min-w-0 flex-1">
                                 <SelectTrigger className="min-w-0 overflow-hidden text-left [&>span]:block [&>span]:min-w-0 [&>span]:flex-1 [&>span]:overflow-hidden">
                                     <SelectValue placeholder="Choose Connection..." />
                                 </SelectTrigger>
