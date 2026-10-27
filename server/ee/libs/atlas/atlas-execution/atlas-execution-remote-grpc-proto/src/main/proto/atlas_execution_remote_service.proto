@@ -10,6 +10,8 @@ option java_package = "com.bytechef.ee.atlas.execution.remote.grpc.proto";
 
 service JobFacadeRemoteService {
   rpc CreateJob(RemoteJobParameters) returns (IdResponse);
+  rpc DeleteJob(IdRequest) returns (google.protobuf.Empty);
+  rpc StopJob(IdRequest) returns (google.protobuf.Empty);
 }
 
 service JobRemoteService {
