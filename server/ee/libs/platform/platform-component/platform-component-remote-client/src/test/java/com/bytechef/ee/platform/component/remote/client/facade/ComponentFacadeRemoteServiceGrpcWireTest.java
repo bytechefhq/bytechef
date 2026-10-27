@@ -25,6 +25,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.component.remote.grpc.ActionDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ClusterElementDefinitionFacadeRemoteServiceGrpcServer;
+import com.bytechef.ee.platform.component.remote.grpc.CodeEditorScriptInputFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionFacadeRemoteServiceGrpcServer;
@@ -35,6 +36,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.facade.CodeEditorScriptInputFacade;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
@@ -74,6 +76,7 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
     private final ActionDefinitionFacade actionDefinitionFacade = mock(ActionDefinitionFacade.class);
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade =
         mock(ClusterElementDefinitionFacade.class);
+    private final CodeEditorScriptInputFacade codeEditorScriptInputFacade = mock(CodeEditorScriptInputFacade.class);
     private final ComponentDefinitionFacade componentDefinitionFacade = mock(ComponentDefinitionFacade.class);
     private final DiscoveryClient discoveryClient = mock(DiscoveryClient.class);
     private final JsonMapper jsonMapper = JsonMapper.builder()
@@ -83,6 +86,7 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
     private ManagedChannel managedChannel;
     private RemoteActionDefinitionFacadeClient remoteActionDefinitionFacadeClient;
     private RemoteClusterElementDefinitionFacadeClient remoteClusterElementDefinitionFacadeClient;
+    private RemoteCodeEditorScriptInputFacadeClient remoteCodeEditorScriptInputFacadeClient;
     private RemoteComponentDefinitionFacadeClient remoteComponentDefinitionFacadeClient;
     private RemoteTriggerDefinitionFacadeClient remoteTriggerDefinitionFacadeClient;
     private Server server;
@@ -97,6 +101,9 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
             .addService(
                 new ClusterElementDefinitionFacadeRemoteServiceGrpcServer(
                     clusterElementDefinitionFacade, componentProtoMapper))
+            .addService(
+                new CodeEditorScriptInputFacadeRemoteServiceGrpcServer(
+                    codeEditorScriptInputFacade, componentProtoMapper))
             .addService(
                 new ComponentDefinitionFacadeRemoteServiceGrpcServer(componentDefinitionFacade, componentProtoMapper))
             .addService(
@@ -118,6 +125,8 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         remoteActionDefinitionFacadeClient = new RemoteActionDefinitionFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteClusterElementDefinitionFacadeClient = new RemoteClusterElementDefinitionFacadeClient(
+            applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
+        remoteCodeEditorScriptInputFacadeClient = new RemoteCodeEditorScriptInputFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteComponentDefinitionFacadeClient = new RemoteComponentDefinitionFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
@@ -324,6 +333,41 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         assertThat(
             remoteClusterElementDefinitionFacadeClient.executeTool("keep", 1, "search", INPUT_PARAMETERS, 7L, true))
                 .isEqualTo("editor");
+    }
+
+    @Test
+    void testCodeEditorGetScriptInputParametersWithSourceConnection() {
+        Map<String, Object> scriptInputParameters = Map.of("name", "Ada", "address", Map.of("city", "Zagreb"));
+
+        when(codeEditorScriptInputFacade.getScriptInputParameters(
+            "keep", 1, "googleSheets", 2, "read", INPUT_PARAMETERS, 21L))
+                .thenReturn(scriptInputParameters);
+
+        assertThat(remoteCodeEditorScriptInputFacadeClient.getScriptInputParameters(
+            "keep", 1, "googleSheets", 2, "read", INPUT_PARAMETERS, 21L))
+                .isEqualTo(scriptInputParameters);
+    }
+
+    @Test
+    void testCodeEditorGetScriptInputParametersWithoutSourceConnection() {
+        when(codeEditorScriptInputFacade.getScriptInputParameters(
+            "keep", 1, "csvFile", 1, "read", INPUT_PARAMETERS, null))
+                .thenReturn(Map.of("id", 1));
+
+        assertThat(remoteCodeEditorScriptInputFacadeClient.getScriptInputParameters(
+            "keep", 1, "csvFile", 1, "read", INPUT_PARAMETERS, null))
+                .isEqualTo(Map.of("id", 1));
+    }
+
+    @Test
+    void testCodeEditorGetScriptInputParametersWithoutProviderReturnsEmptyMap() {
+        when(codeEditorScriptInputFacade.getScriptInputParameters(
+            "keep", 1, "csvFile", 1, "read", INPUT_PARAMETERS, null))
+                .thenReturn(Map.of());
+
+        assertThat(remoteCodeEditorScriptInputFacadeClient.getScriptInputParameters(
+            "keep", 1, "csvFile", 1, "read", INPUT_PARAMETERS, null))
+                .isEmpty();
     }
 
     @Test
