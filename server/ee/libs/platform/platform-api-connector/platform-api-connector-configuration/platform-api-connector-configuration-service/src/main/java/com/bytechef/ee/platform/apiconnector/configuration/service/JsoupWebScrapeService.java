@@ -8,20 +8,22 @@
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
 import com.bytechef.commons.util.UrlValidatorUtils;
+import com.bytechef.commons.util.UrlValidatorUtils.HostResolver;
+import com.bytechef.ee.platform.apiconnector.configuration.service.PinnedAddressHttpClient.Response;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javax.net.ssl.SSLSocketFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -48,14 +50,23 @@ public class JsoupWebScrapeService implements WebScrapeService {
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
     private static final int DEFAULT_MAX_CRAWL_PAGES = 20;
     private static final int MAX_REDIRECTS = 5;
+    private static final int MAX_RESPONSE_BODY_BYTES = 10 * 1024 * 1024;
+    private static final Map<String, String> REQUEST_HEADERS = Map.of(
+        "User-Agent", "ByteChef Web Scraper",
+        "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 
-    private final HttpClient httpClient;
+    private final HostResolver hostResolver;
+    private final PinnedAddressHttpClient pinnedAddressHttpClient;
 
     public JsoupWebScrapeService() {
-        this.httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
-            .followRedirects(HttpClient.Redirect.NEVER)
-            .build();
+        this(InetAddress::getAllByName, Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS));
+    }
+
+    JsoupWebScrapeService(HostResolver hostResolver, Duration connectTimeout) {
+        this.hostResolver = hostResolver;
+        this.pinnedAddressHttpClient = new PinnedAddressHttpClient(
+            connectTimeout, Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS), MAX_RESPONSE_BODY_BYTES,
+            (SSLSocketFactory) SSLSocketFactory.getDefault());
     }
 
     @Override
@@ -76,7 +87,9 @@ public class JsoupWebScrapeService implements WebScrapeService {
         int effectiveMaxPages = maxPages > 0 ? Math.min(maxPages, DEFAULT_MAX_CRAWL_PAGES) : DEFAULT_MAX_CRAWL_PAGES;
 
         try {
-            URI baseUri = validateUrl(url);
+            ResolvedTarget resolvedTarget = resolveTarget(url);
+
+            URI baseUri = resolvedTarget.uri();
             String baseHost = baseUri.getHost();
 
             List<Pattern> patterns = includePatterns.stream()
@@ -169,7 +182,7 @@ public class JsoupWebScrapeService implements WebScrapeService {
         return Pattern.compile(regex.toString());
     }
 
-    private String fetchAndParse(String url) throws IOException, InterruptedException {
+    private String fetchAndParse(String url) throws IOException {
         FetchedPage fetchedPage = fetch(url);
 
         Document document = Jsoup.parse(fetchedPage.body());
@@ -183,7 +196,7 @@ public class JsoupWebScrapeService implements WebScrapeService {
 
     private String fetchAndParseWithLinks(
         String url, String baseHost, List<Pattern> patterns, Queue<String> queue, Set<String> visited)
-        throws IOException, InterruptedException {
+        throws IOException {
 
         FetchedPage fetchedPage = fetch(url);
 
@@ -225,39 +238,26 @@ public class JsoupWebScrapeService implements WebScrapeService {
             .text();
     }
 
-    static URI validateUrl(String url) {
-        UrlValidatorUtils.validate(url, Set.of());
+    ResolvedTarget resolveTarget(String url) {
+        List<InetAddress> addresses = UrlValidatorUtils.resolveValidatedAddresses(url, Set.of(), hostResolver);
 
-        return URI.create(url);
+        return new ResolvedTarget(URI.create(url), addresses);
     }
 
     static String resolveRedirectTarget(URI currentUri, String location) {
         URI targetUri = currentUri.resolve(location);
 
-        String targetUrl = targetUri.toString();
-
-        validateUrl(targetUrl);
-
-        return targetUrl;
+        return targetUri.toString();
     }
 
-    private FetchedPage fetch(String url) throws IOException, InterruptedException {
+    private FetchedPage fetch(String url) throws IOException {
         String currentUrl = url;
 
-        validateUrl(currentUrl);
-
         for (int redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
-            URI currentUri = URI.create(currentUrl);
+            ResolvedTarget resolvedTarget = resolveTarget(currentUrl);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(currentUri)
-                .timeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
-                .header("User-Agent", "ByteChef Web Scraper")
-                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                .GET()
-                .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            Response response = pinnedAddressHttpClient.get(
+                resolvedTarget.uri(), resolvedTarget.addresses(), REQUEST_HEADERS);
 
             int statusCode = response.statusCode();
 
@@ -269,11 +269,13 @@ public class JsoupWebScrapeService implements WebScrapeService {
                 return new FetchedPage(currentUrl, response.body());
             }
 
-            String location = response.headers()
-                .firstValue("Location")
-                .orElseThrow(() -> new IOException("HTTP " + statusCode + " without a Location header"));
+            String location = response.location();
 
-            currentUrl = resolveRedirectTarget(currentUri, location);
+            if (location == null) {
+                throw new IOException("HTTP " + statusCode + " without a Location header");
+            }
+
+            currentUrl = resolveRedirectTarget(resolvedTarget.uri(), location);
         }
 
         throw new IOException("Too many redirects while fetching " + url);
@@ -284,5 +286,8 @@ public class JsoupWebScrapeService implements WebScrapeService {
     }
 
     private record FetchedPage(String url, String body) {
+    }
+
+    record ResolvedTarget(URI uri, List<InetAddress> addresses) {
     }
 }

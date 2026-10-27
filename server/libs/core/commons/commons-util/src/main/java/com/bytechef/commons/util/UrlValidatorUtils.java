@@ -21,6 +21,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -64,7 +65,43 @@ public final class UrlValidatorUtils {
         }
     }
 
+    public static List<InetAddress> resolveValidatedAddresses(String url, Set<String> allowedHosts) {
+        return resolveValidatedAddresses(url, allowedHosts, InetAddress::getAllByName);
+    }
+
+    public static List<InetAddress> resolveValidatedAddresses(
+        String url, Set<String> allowedHosts, HostResolver hostResolver) {
+
+        URI uri = parseUri(url);
+
+        String host = uri.getHost();
+
+        List<InetAddress> addresses = resolve(url, host, hostResolver);
+
+        if (!isAllowlisted(host, allowedHosts)) {
+            for (InetAddress address : addresses) {
+                rejectPrivateAddress(host, address);
+            }
+        }
+
+        return addresses;
+    }
+
     public static void validate(String url, Set<String> allowedHosts) {
+        URI uri = parseUri(url);
+
+        String host = uri.getHost();
+
+        if (isAllowlisted(host, allowedHosts)) {
+            return;
+        }
+
+        for (InetAddress address : resolve(url, host, InetAddress::getAllByName)) {
+            rejectPrivateAddress(host, address);
+        }
+    }
+
+    private static URI parseUri(String url) {
         if (url == null || url.isBlank()) {
             throw new UrlValidationException("URL must not be null or blank");
         }
@@ -90,23 +127,23 @@ public final class UrlValidatorUtils {
             throw new UrlValidationException("URL must contain a valid host");
         }
 
-        if (isAllowlisted(host, allowedHosts)) {
-            return;
-        }
+        return uri;
+    }
+
+    private static List<InetAddress> resolve(String url, String host, HostResolver hostResolver) {
+        InetAddress[] addresses;
 
         try {
-            InetAddress[] addresses = InetAddress.getAllByName(host);
-
-            if (addresses.length == 0) {
-                throw new UrlValidationException("Cannot resolve URL host: " + url);
-            }
-
-            for (InetAddress address : addresses) {
-                rejectPrivateAddress(host, address);
-            }
+            addresses = hostResolver.resolve(host);
         } catch (UnknownHostException unknownHostException) {
             throw new UrlValidationException("Cannot resolve URL host: " + url, unknownHostException);
         }
+
+        if (addresses == null || addresses.length == 0) {
+            throw new UrlValidationException("Cannot resolve URL host: " + url);
+        }
+
+        return List.of(addresses);
     }
 
     private static boolean isAllowlisted(String host, Set<String> allowedHosts) {
@@ -171,5 +208,14 @@ public final class UrlValidatorUtils {
                     "URL host '" + host + "' resolves to an IPv6 unique local address, which is not allowed");
             }
         }
+    }
+
+    /**
+     * Resolves a host name to its addresses.
+     */
+    @FunctionalInterface
+    public interface HostResolver {
+
+        InetAddress[] resolve(String host) throws UnknownHostException;
     }
 }

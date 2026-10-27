@@ -19,7 +19,11 @@ package com.bytechef.commons.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -79,5 +83,85 @@ class UrlValidatorUtilsTest {
         assertThat(UrlValidatorUtils.resolvesToPrivateAddress("127.0.0.1")).isTrue();
         assertThat(UrlValidatorUtils.resolvesToPrivateAddress("1.1.1.1")).isFalse();
         assertThat(UrlValidatorUtils.resolvesToPrivateAddress("nonexistent.invalid")).isFalse();
+    }
+
+    @Test
+    void testResolveValidatedAddressesReturnsTheResolvedPublicAddresses() throws UnknownHostException {
+        InetAddress publicAddress = InetAddress.getByAddress("docs.example.com", new byte[] {
+            93, (byte) 184, (byte) 216, 34
+        });
+
+        List<InetAddress> addresses = UrlValidatorUtils.resolveValidatedAddresses(
+            "https://docs.example.com/api", Set.of(), host -> new InetAddress[] {
+                publicAddress
+            });
+
+        assertThat(addresses).containsExactly(publicAddress);
+    }
+
+    @Test
+    void testResolveValidatedAddressesRejectsWhenAnyResolvedAddressIsPrivate() throws UnknownHostException {
+        InetAddress publicAddress = InetAddress.getByAddress("docs.example.com", new byte[] {
+            93, (byte) 184, (byte) 216, 34
+        });
+        InetAddress privateAddress = InetAddress.getByAddress("docs.example.com", new byte[] {
+            10, 0, 0, 1
+        });
+
+        assertThatThrownBy(() -> UrlValidatorUtils.resolveValidatedAddresses(
+            "https://docs.example.com/api", Set.of(), host -> new InetAddress[] {
+                publicAddress, privateAddress
+            }))
+                .isInstanceOf(UrlValidationException.class)
+                .hasMessageContaining("private or loopback");
+    }
+
+    @Test
+    void testResolveValidatedAddressesResolvesTheHostExactlyOnce() throws UnknownHostException {
+        InetAddress publicAddress = InetAddress.getByAddress("docs.example.com", new byte[] {
+            93, (byte) 184, (byte) 216, 34
+        });
+        AtomicInteger lookupCount = new AtomicInteger();
+
+        UrlValidatorUtils.resolveValidatedAddresses("https://docs.example.com/api", Set.of(), host -> {
+            lookupCount.incrementAndGet();
+
+            return new InetAddress[] {
+                publicAddress
+            };
+        });
+
+        assertThat(lookupCount.get()).isEqualTo(1);
+    }
+
+    @Test
+    void testResolveValidatedAddressesReturnsPrivateAddressesOfAllowlistedHost() throws UnknownHostException {
+        InetAddress privateAddress = InetAddress.getByAddress("intranet.local", new byte[] {
+            10, 0, 0, 1
+        });
+
+        List<InetAddress> addresses = UrlValidatorUtils.resolveValidatedAddresses(
+            "http://intranet.local/api", Set.of("intranet.local"), host -> new InetAddress[] {
+                privateAddress
+            });
+
+        assertThat(addresses).containsExactly(privateAddress);
+    }
+
+    @Test
+    void testResolveValidatedAddressesRejectsUnresolvableHost() {
+        assertThatThrownBy(() -> UrlValidatorUtils.resolveValidatedAddresses(
+            "https://docs.example.com/api", Set.of(), host -> {
+                throw new UnknownHostException(host);
+            }))
+                .isInstanceOf(UrlValidationException.class)
+                .hasMessageContaining("Cannot resolve URL host");
+    }
+
+    @Test
+    void testResolveValidatedAddressesRejectsNonHttpScheme() {
+        assertThatThrownBy(() -> UrlValidatorUtils.resolveValidatedAddresses("file:///etc/passwd", Set.of()))
+            .isInstanceOf(UrlValidationException.class)
+            .hasMessageContaining("Only HTTP and HTTPS are permitted");
     }
 }

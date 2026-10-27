@@ -11,10 +11,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.commons.util.UrlValidationException;
+import com.bytechef.commons.util.UrlValidatorUtils.HostResolver;
+import com.bytechef.ee.platform.apiconnector.configuration.service.JsoupWebScrapeService.ResolvedTarget;
 import com.bytechef.ee.platform.apiconnector.configuration.service.WebScrapeService.CrawlResult;
 import com.bytechef.ee.platform.apiconnector.configuration.service.WebScrapeService.ScrapeResult;
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,7 +41,7 @@ class JsoupWebScrapeServiceTest {
     private final JsoupWebScrapeService jsoupWebScrapeService = new JsoupWebScrapeService();
 
     @Nested
-    class ValidateUrl {
+    class ResolveTarget {
 
         @ParameterizedTest
         @ValueSource(strings = {
@@ -39,8 +49,8 @@ class JsoupWebScrapeServiceTest {
             "http://192.168.1.1/docs", "http://169.254.169.254/latest/meta-data", "http://0.0.0.0/docs",
             "http://100.64.0.1/docs"
         })
-        void testValidateUrlRejectsInternalTargets(String url) {
-            assertThatThrownBy(() -> JsoupWebScrapeService.validateUrl(url))
+        void testResolveTargetRejectsInternalTargets(String url) {
+            assertThatThrownBy(() -> jsoupWebScrapeService.resolveTarget(url))
                 .isInstanceOf(UrlValidationException.class)
                 .hasMessageContaining("not allowed");
         }
@@ -49,42 +59,26 @@ class JsoupWebScrapeServiceTest {
         @ValueSource(strings = {
             "file:///etc/passwd", "ftp://1.1.1.1/docs", "gopher://1.1.1.1/docs", "jar:file:/tmp/a.jar!/"
         })
-        void testValidateUrlRejectsNonHttpSchemes(String url) {
-            assertThatThrownBy(() -> JsoupWebScrapeService.validateUrl(url))
+        void testResolveTargetRejectsNonHttpSchemes(String url) {
+            assertThatThrownBy(() -> jsoupWebScrapeService.resolveTarget(url))
                 .isInstanceOf(UrlValidationException.class)
                 .hasMessageContaining("Only HTTP and HTTPS are permitted");
         }
 
         @Test
-        void testValidateUrlAllowsPublicAddress() {
-            URI uri = JsoupWebScrapeService.validateUrl("https://1.1.1.1/docs");
+        void testResolveTargetAllowsPublicAddress() {
+            ResolvedTarget resolvedTarget = jsoupWebScrapeService.resolveTarget("https://1.1.1.1/docs");
+
+            URI uri = resolvedTarget.uri();
 
             assertThat(uri.getHost()).isEqualTo("1.1.1.1");
+            assertThat(resolvedTarget.addresses()).extracting(InetAddress::getHostAddress)
+                .containsExactly("1.1.1.1");
         }
     }
 
     @Nested
     class ResolveRedirectTarget {
-
-        @Test
-        void testResolveRedirectTargetRejectsRedirectToMetadataAddress() {
-            URI currentUri = URI.create("https://1.1.1.1/docs");
-
-            assertThatThrownBy(
-                () -> JsoupWebScrapeService.resolveRedirectTarget(currentUri, "http://169.254.169.254/latest"))
-                    .isInstanceOf(UrlValidationException.class)
-                    .hasMessageContaining("link-local");
-        }
-
-        @Test
-        void testResolveRedirectTargetRejectsRedirectToLoopback() {
-            URI currentUri = URI.create("https://1.1.1.1/docs");
-
-            assertThatThrownBy(
-                () -> JsoupWebScrapeService.resolveRedirectTarget(currentUri, "http://127.0.0.1:8080/admin"))
-                    .isInstanceOf(UrlValidationException.class)
-                    .hasMessageContaining("loopback");
-        }
 
         @Test
         void testResolveRedirectTargetResolvesRelativeLocationOnPublicHost() {
@@ -132,6 +126,66 @@ class JsoupWebScrapeServiceTest {
 
             assertThat(crawlResult.success()).isFalse();
             assertThat(crawlResult.error()).contains("Only HTTP and HTTPS are permitted");
+        }
+    }
+
+    @Nested
+    class DnsRebinding {
+
+        @Test
+        void testScrapeConnectsOnlyToTheAddressThatPassedValidation() throws IOException {
+            AtomicInteger requestCount = new AtomicInteger();
+
+            HttpServer httpServer = startInternalServer(requestCount);
+
+            try {
+                AtomicInteger lookupCount = new AtomicInteger();
+                InetAddress publicAddress = InetAddress.getByAddress("localhost", new byte[] {
+                    (byte) 192, 0, 2, 1
+                });
+
+                HostResolver rebindingHostResolver = host -> lookupCount.getAndIncrement() == 0
+                    ? new InetAddress[] {
+                        publicAddress
+                    }
+                    : new InetAddress[] {
+                        InetAddress.getLoopbackAddress()
+                    };
+
+                JsoupWebScrapeService rebindingJsoupWebScrapeService = new JsoupWebScrapeService(
+                    rebindingHostResolver, Duration.ofMillis(500));
+
+                InetSocketAddress serverAddress = httpServer.getAddress();
+
+                ScrapeResult scrapeResult = rebindingJsoupWebScrapeService.scrape(
+                    "http://localhost:" + serverAddress.getPort() + "/docs");
+
+                assertThat(requestCount.get()).isZero();
+                assertThat(scrapeResult.success()).isFalse();
+                assertThat(scrapeResult.content()).isNull();
+            } finally {
+                httpServer.stop(0);
+            }
+        }
+
+        private HttpServer startInternalServer(AtomicInteger requestCount) throws IOException {
+            HttpServer httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+
+            httpServer.createContext("/", exchange -> {
+                requestCount.incrementAndGet();
+
+                byte[] body = "<html><body>internal secret</body></html>".getBytes(StandardCharsets.UTF_8);
+
+                exchange.sendResponseHeaders(200, body.length);
+
+                try (OutputStream outputStream = exchange.getResponseBody()) {
+                    outputStream.write(body);
+                }
+            });
+
+            httpServer.start();
+
+            return httpServer;
         }
     }
 }
