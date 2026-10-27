@@ -90,6 +90,65 @@ class ProtoJsonMapperTest {
         assertThat(int64Value.getValue()).isEqualTo(9_007_199_254_740_993L);
     }
 
+    @Test
+    void testMessageWithoutBytesFieldsRoundTrips() throws Descriptors.DescriptorValidationException {
+        Node node = new Node(
+            "parent", 9_007_199_254_740_993L, List.of(new Node("child", 5L, List.of(), Map.of("key", "value"))),
+            Map.of());
+
+        DynamicMessage dynamicMessage = protoJsonMapper.toProto(node, DynamicMessage.newBuilder(nodeDescriptor()));
+
+        Node readNode = protoJsonMapper.toObject(dynamicMessage, Node.class);
+
+        assertThat(readNode).isEqualTo(node);
+        assertThat(dynamicMessage.getField(dynamicMessage.getDescriptorForType()
+            .findFieldByName("count"))).isEqualTo(9_007_199_254_740_993L);
+    }
+
+    private static Descriptors.Descriptor nodeDescriptor() throws Descriptors.DescriptorValidationException {
+        DescriptorProto nodeProto = DescriptorProto.newBuilder()
+            .setName("Node")
+            .addField(
+                field("name", 1, FieldDescriptorProto.Type.TYPE_STRING, FieldDescriptorProto.Label.LABEL_OPTIONAL))
+            .addField(
+                field("count", 2, FieldDescriptorProto.Type.TYPE_INT64, FieldDescriptorProto.Label.LABEL_OPTIONAL))
+            .addField(
+                field("children", 3, FieldDescriptorProto.Type.TYPE_MESSAGE, FieldDescriptorProto.Label.LABEL_REPEATED)
+                    .toBuilder()
+                    .setTypeName(".test.Node")
+                    .build())
+            .addField(
+                field("labels", 4, FieldDescriptorProto.Type.TYPE_MESSAGE, FieldDescriptorProto.Label.LABEL_REPEATED)
+                    .toBuilder()
+                    .setTypeName(".test.Node.LabelsEntry")
+                    .build())
+            .addNestedType(
+                DescriptorProto.newBuilder()
+                    .setName("LabelsEntry")
+                    .addField(
+                        field("key", 1, FieldDescriptorProto.Type.TYPE_STRING,
+                            FieldDescriptorProto.Label.LABEL_OPTIONAL))
+                    .addField(
+                        field("value", 2, FieldDescriptorProto.Type.TYPE_STRING,
+                            FieldDescriptorProto.Label.LABEL_OPTIONAL))
+                    .setOptions(
+                        MessageOptions.newBuilder()
+                            .setMapEntry(true)))
+            .build();
+
+        FileDescriptorProto fileDescriptorProto = FileDescriptorProto.newBuilder()
+            .setName("node.proto")
+            .setPackage("test")
+            .setSyntax("proto3")
+            .addMessageType(nodeProto)
+            .build();
+
+        Descriptors.FileDescriptor fileDescriptor = Descriptors.FileDescriptor.buildFrom(
+            fileDescriptorProto, new Descriptors.FileDescriptor[0]);
+
+        return fileDescriptor.findMessageTypeByName("Node");
+    }
+
     private static Descriptors.Descriptor holderDescriptor() throws Descriptors.DescriptorValidationException {
         DescriptorProto holderProto = DescriptorProto.newBuilder()
             .setName("Holder")
@@ -145,6 +204,9 @@ class ProtoJsonMapperTest {
             .setType(type)
             .setLabel(label)
             .build();
+    }
+
+    record Node(String name, long count, List<Node> children, Map<String, String> labels) {
     }
 
     record Holder(
