@@ -87,6 +87,13 @@ describe('datapillReferenceValidation', () => {
             expect(isDataPillReferenceValid('airtable.rows[2].cells[9].value', set)).toBe(true);
         });
 
+        it('accepts a computed array index when catalog uses [index]', () => {
+            const set = buildValidDataPillReferenceSet([pill('var_1[index]')]);
+
+            expect(isDataPillReferenceValid('var_1[size(var_1) -1]', set)).toBe(true);
+            expect(isDataPillReferenceValid('var_1[size(var_1) -1].missing', set)).toBe(false);
+        });
+
         it('still rejects a reference whose path is not in the catalog', () => {
             const set = buildValidDataPillReferenceSet([pill('airtable.rows[index].id')]);
 
