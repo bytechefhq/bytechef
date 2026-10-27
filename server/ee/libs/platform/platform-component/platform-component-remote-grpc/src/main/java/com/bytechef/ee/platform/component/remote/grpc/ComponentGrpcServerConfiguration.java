@@ -15,6 +15,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.service.UnifiedApiDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -90,5 +91,12 @@ public class ComponentGrpcServerConfiguration {
         TriggerDefinitionService triggerDefinitionService, ComponentProtoMapper componentProtoMapper) {
 
         return new TriggerDefinitionRemoteServiceGrpcServer(triggerDefinitionService, componentProtoMapper);
+    }
+
+    @Bean
+    UnifiedApiDefinitionRemoteServiceGrpcServer unifiedApiDefinitionRemoteServiceGrpcServer(
+        UnifiedApiDefinitionService unifiedApiDefinitionService, ComponentProtoMapper componentProtoMapper) {
+
+        return new UnifiedApiDefinitionRemoteServiceGrpcServer(unifiedApiDefinitionService, componentProtoMapper);
     }
 }
