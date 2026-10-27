@@ -8,4 +8,8 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-commons")
     implementation("org.springframework.data:spring-data-redis")
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
+
+    testImplementation("io.lettuce:lettuce-core")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation(project(":server:libs:test:test-support"))
 }
