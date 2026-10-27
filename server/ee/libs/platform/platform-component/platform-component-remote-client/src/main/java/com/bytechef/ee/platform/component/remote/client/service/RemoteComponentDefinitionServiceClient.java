@@ -27,7 +27,11 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.protobuf.Message;
 import io.grpc.StatusRuntimeException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -35,7 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +59,18 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
 
     private static final Logger log = LoggerFactory.getLogger(RemoteComponentDefinitionServiceClient.class);
 
+    private static final String COMPONENTS_METADATA_KEY = "components";
+    private static final Duration MERGED_COMPONENT_DEFINITIONS_TIME_TO_LIVE = Duration.ofSeconds(30);
+    private static final int MERGED_COMPONENT_DEFINITIONS_MAXIMUM_SIZE = 16;
+
     private final ComponentProtoMapper componentProtoMapper;
     private final List<ComponentDefinitionFilter> componentDefinitionFilters;
     private final GrpcChannels grpcChannels;
+    private final Cache<MergedComponentDefinitionsKey, List<ComponentDefinition>> mergedComponentDefinitionsCache =
+        Caffeine.newBuilder()
+            .expireAfterWrite(MERGED_COMPONENT_DEFINITIONS_TIME_TO_LIVE)
+            .maximumSize(MERGED_COMPONENT_DEFINITIONS_MAXIMUM_SIZE)
+            .build();
     private final WorkerInstances workerInstances;
 
     public RemoteComponentDefinitionServiceClient(
@@ -122,7 +136,8 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
     @Override
     public List<ComponentDefinition> getComponentDefinitions() {
         return getMergedComponentDefinitions(
-            stub -> stub.getComponentDefinitions(GetComponentDefinitionsRequest.getDefaultInstance()));
+            GetComponentDefinitionsRequest.getDefaultInstance(),
+            ComponentDefinitionRemoteServiceBlockingStub::getComponentDefinitions);
     }
 
     @Override
@@ -155,7 +170,7 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
         GetComponentDefinitionsRequest getComponentDefinitionsRequest = builder.build();
 
         List<ComponentDefinition> componentDefinitions = getMergedComponentDefinitions(
-            stub -> stub.getComponentDefinitions(getComponentDefinitionsRequest));
+            getComponentDefinitionsRequest, ComponentDefinitionRemoteServiceBlockingStub::getComponentDefinitions);
 
         componentDefinitions = filterByPlatformType(componentDefinitions, platformType);
 
@@ -177,7 +192,9 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
                 .build();
 
         return filterByPlatformType(
-            getMergedComponentDefinitions(stub -> stub.searchComponentDefinitions(searchComponentDefinitionsRequest)),
+            getMergedComponentDefinitions(
+                searchComponentDefinitionsRequest,
+                ComponentDefinitionRemoteServiceBlockingStub::searchComponentDefinitions),
             platformType);
     }
 
@@ -189,7 +206,8 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
                 .build();
 
         return getMergedComponentDefinitions(
-            stub -> stub.getComponentDefinitionVersions(getComponentDefinitionVersionsRequest));
+            getComponentDefinitionVersionsRequest,
+            ComponentDefinitionRemoteServiceBlockingStub::getComponentDefinitionVersions);
     }
 
     @Override
@@ -242,11 +260,22 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
             .toList();
     }
 
-    private List<ComponentDefinition> getMergedComponentDefinitions(
-        Function<ComponentDefinitionRemoteServiceBlockingStub, RemoteComponentDefinitions> call) {
+    private <R extends Message> List<ComponentDefinition> getMergedComponentDefinitions(
+        R request, BiFunction<ComponentDefinitionRemoteServiceBlockingStub, R, RemoteComponentDefinitions> call) {
+
+        Set<ServiceInstance> serviceInstances = workerInstances.getInstances();
+
+        MergedComponentDefinitionsKey mergedComponentDefinitionsKey = new MergedComponentDefinitionsKey(
+            request, toWorkerInstanceKeys(serviceInstances));
+
+        List<ComponentDefinition> cachedComponentDefinitions = mergedComponentDefinitionsCache.getIfPresent(
+            mergedComponentDefinitionsKey);
+
+        if (cachedComponentDefinitions != null) {
+            return new ArrayList<>(cachedComponentDefinitions);
+        }
 
         Map<String, ComponentDefinition> componentDefinitionMap = new LinkedHashMap<>();
-        Set<ServiceInstance> serviceInstances = workerInstances.getInstances();
         StatusRuntimeException lastStatusRuntimeException = null;
         int failedInstanceCount = 0;
 
@@ -254,7 +283,7 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
             RemoteComponentDefinitions remoteComponentDefinitions;
 
             try {
-                remoteComponentDefinitions = call.apply(getStub(serviceInstance));
+                remoteComponentDefinitions = call.apply(getStub(serviceInstance), request);
             } catch (StatusRuntimeException statusRuntimeException) {
                 log.warn(
                     "Skipping worker instance {} while listing component definitions: {}",
@@ -288,10 +317,33 @@ public class RemoteComponentDefinitionServiceClient implements ComponentDefiniti
             Comparator.comparing(ComponentDefinition::getName)
                 .thenComparing(ComponentDefinition::getVersion));
 
+        if (failedInstanceCount == 0) {
+            mergedComponentDefinitionsCache.put(mergedComponentDefinitionsKey, List.copyOf(componentDefinitions));
+        }
+
         return componentDefinitions;
     }
 
     private ComponentDefinitionRemoteServiceBlockingStub getStub(ServiceInstance serviceInstance) {
         return ComponentDefinitionRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(serviceInstance));
+    }
+
+    private static Set<WorkerInstanceKey> toWorkerInstanceKeys(Set<ServiceInstance> serviceInstances) {
+        return serviceInstances.stream()
+            .map(RemoteComponentDefinitionServiceClient::toWorkerInstanceKey)
+            .collect(Collectors.toSet());
+    }
+
+    private static WorkerInstanceKey toWorkerInstanceKey(ServiceInstance serviceInstance) {
+        Map<String, String> metadata = serviceInstance.getMetadata();
+
+        return new WorkerInstanceKey(
+            serviceInstance.getInstanceId(), metadata == null ? null : metadata.get(COMPONENTS_METADATA_KEY));
+    }
+
+    private record MergedComponentDefinitionsKey(Message request, Set<WorkerInstanceKey> workerInstanceKeys) {
+    }
+
+    private record WorkerInstanceKey(String instanceId, @Nullable String components) {
     }
 }

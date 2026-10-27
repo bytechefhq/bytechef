@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -234,6 +235,101 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         } finally {
             unreachableManagedChannel.shutdownNow();
         }
+    }
+
+    @Test
+    void testRepeatedListIsServedFromTheCacheWhileTheWorkersAreUnchanged() {
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(componentDefinition("keep", 1)));
+
+        remoteComponentDefinitionServiceClient.getComponentDefinitions();
+
+        assertThat(remoteComponentDefinitionServiceClient.getComponentDefinitions())
+            .extracting(ComponentDefinition::getName)
+            .containsExactly("keep");
+
+        verify(componentDefinitionService, times(2)).getComponentDefinitions();
+    }
+
+    @Test
+    void testListIsFetchedAgainWhenAWorkerJoins() {
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(componentDefinition("keep", 1)));
+
+        remoteComponentDefinitionServiceClient.getComponentDefinitions();
+
+        when(discoveryClient.getInstances("worker-app")).thenReturn(
+            List.of(
+                workerInstance("worker-app:1", COMPONENTS_METADATA),
+                workerInstance("worker-app:2", COMPONENTS_METADATA),
+                workerInstance("worker-app:3", COMPONENTS_METADATA)));
+
+        remoteComponentDefinitionServiceClient.getComponentDefinitions();
+
+        verify(componentDefinitionService, times(5)).getComponentDefinitions();
+    }
+
+    @Test
+    void testListIsFetchedAgainWhenAWorkerOffersOtherComponents() {
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(componentDefinition("keep", 1)));
+
+        remoteComponentDefinitionServiceClient.getComponentDefinitions();
+
+        when(discoveryClient.getInstances("worker-app")).thenReturn(
+            List.of(
+                workerInstance("worker-app:1", COMPONENTS_METADATA),
+                workerInstance("worker-app:2", "[{\"name\":\"keep\"}]")));
+
+        remoteComponentDefinitionServiceClient.getComponentDefinitions();
+
+        verify(componentDefinitionService, times(4)).getComponentDefinitions();
+    }
+
+    @Test
+    void testListsOfDifferentRequestsAreCachedSeparately() {
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(componentDefinition("keep", 1)));
+        when(componentDefinitionService.getComponentDefinitions(true, null, null, true, null, null))
+            .thenReturn(List.of(componentDefinition("drop", 1)));
+
+        assertThat(remoteComponentDefinitionServiceClient.getComponentDefinitions())
+            .extracting(ComponentDefinition::getName)
+            .containsExactly("keep");
+        assertThat(remoteComponentDefinitionServiceClient.getComponentDefinitions(true, null, null, true, null, null))
+            .extracting(ComponentDefinition::getName)
+            .containsExactly("drop");
+    }
+
+    @Test
+    void testListMissingAnUnreachableWorkerIsNotCached() {
+        ManagedChannel unreachableManagedChannel = InProcessChannelBuilder.forName("unreachable-worker")
+            .directExecutor()
+            .build();
+
+        GrpcChannels grpcChannels = new GrpcChannels() {
+
+            @Override
+            public Channel getChannel(String serviceId) {
+                return managedChannel;
+            }
+
+            @Override
+            public Channel getChannel(ServiceInstance serviceInstance) {
+                return "worker-app:2".equals(serviceInstance.getInstanceId()) ? unreachableManagedChannel
+                    : managedChannel;
+            }
+        };
+
+        RemoteComponentDefinitionServiceClient oneWorkerDownRemoteComponentDefinitionServiceClient =
+            new RemoteComponentDefinitionServiceClient(grpcChannels, discoveryClient, jsonMapper, List.of());
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(componentDefinition("keep", 1)));
+
+        try {
+            oneWorkerDownRemoteComponentDefinitionServiceClient.getComponentDefinitions();
+            oneWorkerDownRemoteComponentDefinitionServiceClient.getComponentDefinitions();
+        } finally {
+            unreachableManagedChannel.shutdownNow();
+        }
+
+        verify(componentDefinitionService, times(2)).getComponentDefinitions();
     }
 
     @Test
@@ -680,6 +776,12 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
                         .label("Query")
                         .required(true)),
             "keep", 1, "icon");
+    }
+
+    private static ServiceInstance workerInstance(String instanceId, String componentsMetadata) {
+        return new DefaultServiceInstance(
+            instanceId, "worker-app", "worker", 8080, false,
+            Map.of("components", componentsMetadata, "grpc-port", "9090"));
     }
 
     private static ComponentDefinition componentDefinition(String name, int version) {
