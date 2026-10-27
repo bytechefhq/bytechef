@@ -59,6 +59,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -300,9 +301,17 @@ public class McpServerPromotionHandler implements EnvironmentPromotionHandler {
         unresolvedConnectionIds.addAll(
             reconcileComponents(sourceMcpComponents, targetId, created, requestedMappings, suggestedMappings));
 
-        String targetUrl = publicUrl + "/api/automation/" + mcpServerService.getMcpServerSecretKey(targetId) + "/mcp";
+        return new EnvironmentPromotionResult(
+            targetId, created, getTargetUrl(targetId), List.copyOf(unresolvedConnectionIds));
+    }
 
-        return new EnvironmentPromotionResult(targetId, created, targetUrl, List.copyOf(unresolvedConnectionIds));
+    @Nullable
+    private String getTargetUrl(long targetId) {
+        try {
+            return publicUrl + "/api/automation/" + mcpServerFacade.getMcpServerSecretKey(targetId) + "/mcp";
+        } catch (AccessDeniedException accessDeniedException) {
+            return null;
+        }
     }
 
     private Set<Long> reconcileComponents(
