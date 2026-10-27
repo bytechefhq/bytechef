@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.security.remote.client.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.security.remote.grpc.JwtTokenRemoteServiceGrpcServer;
@@ -104,5 +106,38 @@ class EmbeddedSecurityRemoteServiceGrpcWireTest {
         when(jwtTokenService.getPublicKey("kid-1")).thenReturn(null);
 
         assertThat(remoteJwtTokenServiceClient.getPublicKey("kid-1")).isNull();
+    }
+
+    @Test
+    void testJwtPublicKeyIsFetchedOncePerKeyId() {
+        when(jwtTokenService.getPublicKey("kid-1")).thenReturn(publicKey);
+
+        remoteJwtTokenServiceClient.getPublicKey("kid-1");
+
+        assertThat(remoteJwtTokenServiceClient.getPublicKey("kid-1")
+            .getEncoded()).isEqualTo(publicKey.getEncoded());
+
+        verify(jwtTokenService, times(1)).getPublicKey("kid-1");
+    }
+
+    @Test
+    void testMissingJwtPublicKeyIsFetchedOncePerKeyId() {
+        when(jwtTokenService.getPublicKey("kid-2")).thenReturn(null);
+
+        remoteJwtTokenServiceClient.getPublicKey("kid-2");
+
+        assertThat(remoteJwtTokenServiceClient.getPublicKey("kid-2")).isNull();
+
+        verify(jwtTokenService, times(1)).getPublicKey("kid-2");
+    }
+
+    @Test
+    void testSigningKeyPublicKeyIsFetchedEveryTime() {
+        when(signingKeyService.getPublicKey("kid-1", 2L)).thenReturn(publicKey);
+
+        remoteSigningKeyServiceClient.getPublicKey("kid-1", 2L);
+        remoteSigningKeyServiceClient.getPublicKey("kid-1", 2L);
+
+        verify(signingKeyService, times(2)).getPublicKey("kid-1", 2L);
     }
 }

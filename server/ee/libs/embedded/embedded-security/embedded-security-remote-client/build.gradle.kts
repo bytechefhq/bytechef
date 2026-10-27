@@ -1,4 +1,5 @@
 dependencies {
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:platform:platform-api"))
 
