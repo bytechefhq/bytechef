@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.a2a.service;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
 import com.bytechef.automation.ai.a2a.repository.A2aProjectWorkflowRepository;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +67,16 @@ public class A2aProjectWorkflowServiceImpl implements A2aProjectWorkflowService 
             .orElseThrow(() -> new IllegalArgumentException("A2aProjectWorkflow not found with id: " + id));
 
         existingA2aProjectWorkflow.setEnabled(enabled);
+
+        return a2aProjectWorkflowRepository.save(existingA2aProjectWorkflow);
+    }
+
+    @Override
+    public A2aProjectWorkflow updateParameters(long id, Map<String, ?> parameters) {
+        A2aProjectWorkflow existingA2aProjectWorkflow = a2aProjectWorkflowRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("A2aProjectWorkflow not found with id: " + id));
+
+        existingA2aProjectWorkflow.setParameters(parameters);
 
         return a2aProjectWorkflowRepository.save(existingA2aProjectWorkflow);
     }
