@@ -3301,6 +3301,7 @@ export type PromotionProjectPreview = {
 
 /** The kinds of environment-scoped automation resources that can be promoted from one environment to another. */
 export enum PromotionResourceType {
+  A2AServer = 'A2A_SERVER',
   ApiCollection = 'API_COLLECTION',
   McpServer = 'MCP_SERVER',
   ProjectDeployment = 'PROJECT_DEPLOYMENT'
