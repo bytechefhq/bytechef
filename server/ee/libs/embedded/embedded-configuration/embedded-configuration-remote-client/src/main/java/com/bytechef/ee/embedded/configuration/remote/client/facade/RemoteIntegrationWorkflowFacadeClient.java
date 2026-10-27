@@ -9,11 +9,16 @@ package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationWorkflowFacadeRemoteServiceGrpc;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
+import com.google.protobuf.Empty;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -23,6 +28,16 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnEEVersion
 public class RemoteIntegrationWorkflowFacadeClient implements IntegrationWorkflowFacade {
+
+    private static final String CONFIGURATION_APP = "configuration-app";
+
+    private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
+
+    public RemoteIntegrationWorkflowFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.embeddedConfigurationProtoMapper = new EmbeddedConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
+    }
 
     @Override
     public long addWorkflow(long integrationId, String definition) {
@@ -64,7 +79,11 @@ public class RemoteIntegrationWorkflowFacadeClient implements IntegrationWorkflo
 
     @Override
     public List<IntegrationWorkflowDTO> getIntegrationWorkflows() {
-        throw new UnsupportedOperationException();
+        IntegrationWorkflowFacadeRemoteServiceGrpc.IntegrationWorkflowFacadeRemoteServiceBlockingStub stub =
+            IntegrationWorkflowFacadeRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        return embeddedConfigurationProtoMapper.toIntegrationWorkflowDTOs(
+            stub.getIntegrationWorkflows(Empty.getDefaultInstance()));
     }
 
     @Override
