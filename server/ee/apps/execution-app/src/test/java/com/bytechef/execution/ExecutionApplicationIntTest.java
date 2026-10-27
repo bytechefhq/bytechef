@@ -87,6 +87,7 @@ public class ExecutionApplicationIntTest {
             "bytechef.platform.workflow.execution.remote.v1.JobResumeFacadeRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.PrincipalJobFacadeRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.PrincipalJobRemoteService",
+            "bytechef.platform.workflow.execution.remote.v1.TaskStateRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerExecutionRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerLifecycleFacadeRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerStateRemoteService");

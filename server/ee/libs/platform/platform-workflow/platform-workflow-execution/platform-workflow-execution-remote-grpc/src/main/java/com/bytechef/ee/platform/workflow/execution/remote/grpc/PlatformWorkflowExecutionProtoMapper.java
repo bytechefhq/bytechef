@@ -15,6 +15,7 @@ import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobParameters;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.JobIdsPage;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.RemoteTriggerExecution;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.RemoteWorkflowNodeType;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.TaskStateValue;
 import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -24,7 +25,9 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
@@ -41,13 +44,18 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class PlatformWorkflowExecutionProtoMapper {
 
+    private static final List<String> ALLOWED_TASK_STATE_CLASS_PREFIXES = List.of("java.", "com.bytechef.");
+
     private final AtlasExecutionProtoMapper atlasExecutionProtoMapper;
     private final JsonBytes jsonBytes;
+    private final ObjectMapper objectMapper;
     private final ProtoJsonMapper protoJsonMapper;
 
+    @SuppressFBWarnings("EI2")
     public PlatformWorkflowExecutionProtoMapper(ObjectMapper objectMapper) {
         this.atlasExecutionProtoMapper = new AtlasExecutionProtoMapper(objectMapper);
         this.jsonBytes = new JsonBytes(objectMapper);
+        this.objectMapper = objectMapper;
         this.protoJsonMapper = new ProtoJsonMapper(
             objectMapper.rebuild()
                 .addMixIn(TriggerExecution.class, TriggerExecutionMixIn.class)
@@ -145,6 +153,39 @@ public class PlatformWorkflowExecutionProtoMapper {
         }
 
         return builder.build();
+    }
+
+    public TaskStateValue toTaskStateValue(@Nullable Object value) {
+        TaskStateValue.Builder builder = TaskStateValue.newBuilder();
+
+        if (value != null) {
+            Class<?> valueClass = value.getClass();
+
+            builder.setClassname(valueClass.getName())
+                .setValue(jsonBytes.write(value));
+        }
+
+        return builder.build();
+    }
+
+    public @Nullable Object toTaskStateObject(TaskStateValue taskStateValue) {
+        if (!taskStateValue.hasClassname()) {
+            return null;
+        }
+
+        String classname = taskStateValue.getClassname();
+
+        if (ALLOWED_TASK_STATE_CLASS_PREFIXES.stream()
+            .noneMatch(classname::startsWith)) {
+
+            throw new IllegalArgumentException("Disallowed class in task state: " + classname);
+        }
+
+        try {
+            return objectMapper.convertValue(jsonBytes.read(taskStateValue.getValue()), Class.forName(classname));
+        } catch (ClassNotFoundException classNotFoundException) {
+            throw new IllegalArgumentException("Unknown class in task state: " + classname, classNotFoundException);
+        }
     }
 
     public Timestamp toTimestamp(Instant instant) {

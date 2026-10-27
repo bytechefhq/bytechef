@@ -22,19 +22,22 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.workflow.execution.remote.client.facade.RemoteConnectionLifecycleFacadeClient;
 import com.bytechef.ee.platform.workflow.execution.remote.client.facade.RemoteJobResumeFacadeClient;
 import com.bytechef.ee.platform.workflow.execution.remote.client.facade.RemotePrincipalJobFacadeClient;
 import com.bytechef.ee.platform.workflow.execution.remote.client.facade.RemoteTriggerLifecycleFacadeClient;
 import com.bytechef.ee.platform.workflow.execution.remote.client.service.RemotePrincipalJobServiceClient;
+import com.bytechef.ee.platform.workflow.execution.remote.client.facade.RemoteTaskStateFacadeClient;
 import com.bytechef.ee.platform.workflow.execution.remote.client.service.RemoteTriggerExecutionServiceClient;
-import com.bytechef.ee.platform.workflow.execution.remote.client.service.RemoteTriggerStateServiceClient;
+import com.bytechef.ee.platform.workflow.execution.remote.client.facade.RemoteTriggerStateFacadeClient;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.ConnectionLifecycleFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.JobResumeFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.PlatformWorkflowExecutionProtoMapper;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.PrincipalJobFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.PrincipalJobRemoteServiceGrpcServer;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.TaskStateRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.TriggerExecutionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.TriggerLifecycleFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.TriggerStateRemoteServiceGrpcServer;
@@ -44,6 +47,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
@@ -51,8 +55,9 @@ import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResume
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.grpc.BindableService;
 import io.grpc.ManagedChannel;
@@ -91,9 +96,10 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
     private final JobResumeFacade jobResumeFacade = mock(JobResumeFacade.class);
     private final PrincipalJobFacade principalJobFacade = mock(PrincipalJobFacade.class);
     private final PrincipalJobService principalJobService = mock(PrincipalJobService.class);
+    private final TaskStateFacade taskStateFacade = mock(TaskStateFacade.class);
     private final TriggerExecutionService triggerExecutionService = mock(TriggerExecutionService.class);
     private final TriggerLifecycleFacade triggerLifecycleFacade = mock(TriggerLifecycleFacade.class);
-    private final TriggerStateService triggerStateService = mock(TriggerStateService.class);
+    private final TriggerStateFacade triggerStateFacade = mock(TriggerStateFacade.class);
 
     private ApplicationProperties applicationProperties;
     private FixedGrpcChannels fixedGrpcChannels;
@@ -117,11 +123,12 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
             new JobResumeFacadeRemoteServiceGrpcServer(jobResumeFacade, platformWorkflowExecutionProtoMapper),
             new PrincipalJobFacadeRemoteServiceGrpcServer(principalJobFacade, platformWorkflowExecutionProtoMapper),
             new PrincipalJobRemoteServiceGrpcServer(principalJobService, platformWorkflowExecutionProtoMapper),
+            new TaskStateRemoteServiceGrpcServer(taskStateFacade, platformWorkflowExecutionProtoMapper),
             new TriggerExecutionRemoteServiceGrpcServer(
                 triggerExecutionService, platformWorkflowExecutionProtoMapper),
             new TriggerLifecycleFacadeRemoteServiceGrpcServer(
                 triggerLifecycleFacade, platformWorkflowExecutionProtoMapper),
-            new TriggerStateRemoteServiceGrpcServer(triggerStateService, platformWorkflowExecutionProtoMapper))) {
+            new TriggerStateRemoteServiceGrpcServer(triggerStateFacade, platformWorkflowExecutionProtoMapper))) {
 
             inProcessServerBuilder.addService(ServerInterceptors.intercept(bindableService, serverInterceptor));
         }
@@ -365,26 +372,58 @@ class PlatformWorkflowExecutionRemoteServiceGrpcWireTest {
     }
 
     @Test
-    void testTriggerStateKeepsNumberTypes() {
-        when(triggerStateService.fetchValue(any(WorkflowExecutionId.class)))
-            .thenReturn(Optional.of(9_007_199_254_740_993L));
+    void testTaskStateKeepsTheValueType() {
+        JobResumeId jobResumeId = JobResumeId.of("public", 7L);
+        Suspend suspend = new Suspend(
+            Map.of("approvalResume", true, "fields", List.of("name")), Instant.parse("2026-10-28T10:00:00Z"));
 
-        RemoteTriggerStateServiceClient remoteTriggerStateServiceClient = new RemoteTriggerStateServiceClient(
+        when(taskStateFacade.fetchValue(jobResumeId)).thenReturn(Optional.of(suspend));
+
+        RemoteTaskStateFacadeClient remoteTaskStateFacadeClient = new RemoteTaskStateFacadeClient(
             fixedGrpcChannels, JSON_MAPPER);
 
-        assertThat(remoteTriggerStateServiceClient.<Object>fetchValue(workflowExecutionId))
+        assertThat(remoteTaskStateFacadeClient.<Suspend>fetchValue(jobResumeId))
+            .containsInstanceOf(Suspend.class)
+            .contains(suspend);
+
+        remoteTaskStateFacadeClient.save(jobResumeId, suspend);
+        remoteTaskStateFacadeClient.delete(jobResumeId);
+
+        verify(taskStateFacade).save(jobResumeId, suspend);
+        verify(taskStateFacade).delete(jobResumeId);
+    }
+
+    @Test
+    void testFetchMissingTaskStateIsEmpty() {
+        JobResumeId jobResumeId = JobResumeId.of("public", 7L);
+
+        when(taskStateFacade.fetchValue(jobResumeId)).thenReturn(Optional.empty());
+
+        assertThat(new RemoteTaskStateFacadeClient(fixedGrpcChannels, JSON_MAPPER).<Suspend>fetchValue(jobResumeId))
+            .isEmpty();
+    }
+
+    @Test
+    void testTriggerStateKeepsNumberTypes() {
+        when(triggerStateFacade.fetchValue(any(WorkflowExecutionId.class)))
+            .thenReturn(Optional.of(9_007_199_254_740_993L));
+
+        RemoteTriggerStateFacadeClient remoteTriggerStateFacadeClient = new RemoteTriggerStateFacadeClient(
+            fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteTriggerStateFacadeClient.<Object>fetchValue(workflowExecutionId))
             .containsInstanceOf(Long.class)
             .contains(9_007_199_254_740_993L);
 
-        when(triggerStateService.fetchValue(any(WorkflowExecutionId.class))).thenReturn(Optional.empty());
+        when(triggerStateFacade.fetchValue(any(WorkflowExecutionId.class))).thenReturn(Optional.empty());
 
-        assertThat(remoteTriggerStateServiceClient.<Object>fetchValue(workflowExecutionId)).isEmpty();
+        assertThat(remoteTriggerStateFacadeClient.<Object>fetchValue(workflowExecutionId)).isEmpty();
 
-        remoteTriggerStateServiceClient.save(workflowExecutionId, Map.of("cursor", 5));
-        remoteTriggerStateServiceClient.delete(workflowExecutionId);
+        remoteTriggerStateFacadeClient.save(workflowExecutionId, Map.of("cursor", 5));
+        remoteTriggerStateFacadeClient.delete(workflowExecutionId);
 
-        verify(triggerStateService).save(any(WorkflowExecutionId.class), eq(Map.of("cursor", 5)));
-        verify(triggerStateService).delete(any(WorkflowExecutionId.class));
+        verify(triggerStateFacade).save(any(WorkflowExecutionId.class), eq(Map.of("cursor", 5)));
+        verify(triggerStateFacade).delete(any(WorkflowExecutionId.class));
     }
 
     private RemoteTriggerLifecycleFacadeClient triggerLifecycleFacadeClient() {
