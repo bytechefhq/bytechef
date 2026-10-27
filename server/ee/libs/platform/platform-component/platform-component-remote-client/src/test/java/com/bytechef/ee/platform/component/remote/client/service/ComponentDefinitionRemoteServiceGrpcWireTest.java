@@ -17,9 +17,11 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.ComponentDsl.unifiedApi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -235,6 +237,19 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testHasComponentDefinitionAsksTheWorkerWithoutFetchingTheDefinition() {
+        when(componentDefinitionService.hasComponentDefinition("keep", 2)).thenReturn(true);
+        when(componentDefinitionService.hasComponentDefinition("keep", null)).thenReturn(true);
+
+        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("keep", 2)).isTrue();
+        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("keep", null)).isTrue();
+        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("keep", 3)).isFalse();
+        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("missing", null)).isFalse();
+
+        verify(componentDefinitionService, never()).fetchComponentDefinition(any(), any());
+    }
+
+    @Test
     void testComponentOnNoWorkerFailsNamingTheComponent() {
         assertThatThrownBy(() -> remoteComponentDefinitionServiceClient.getComponentDefinition("missing", 1))
             .isInstanceOf(IllegalArgumentException.class)
@@ -276,17 +291,6 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
             .isEqualTo(componentDefinition);
         assertThat(remoteComponentDefinitionServiceClient.fetchComponentDefinition("drop", null)).isEmpty();
         assertThat(remoteComponentDefinitionServiceClient.fetchComponentDefinition("missing", null)).isEmpty();
-    }
-
-    @Test
-    void testHasComponentDefinition() {
-        when(componentDefinitionService.fetchComponentDefinition("keep", 2))
-            .thenReturn(Optional.of(componentDefinition("keep", 2)));
-        when(componentDefinitionService.fetchComponentDefinition("drop", null)).thenReturn(Optional.empty());
-
-        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("keep", 2)).isTrue();
-        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("drop", null)).isFalse();
-        assertThat(remoteComponentDefinitionServiceClient.hasComponentDefinition("missing", null)).isFalse();
     }
 
     @Test
@@ -483,7 +487,7 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
             .isEqualTo(List.of(connectionDefinition));
 
         verify(connectionDefinitionService).getConnectionDefinition("keep", null);
-        verify(componentDefinitionService, org.mockito.Mockito.never())
+        verify(componentDefinitionService, never())
             .getComponentDefinitions(anyBoolean(), isNull(), isNull(), isNull(), isNull(), isNull());
     }
 
