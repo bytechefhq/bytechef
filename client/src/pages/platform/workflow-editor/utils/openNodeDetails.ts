@@ -11,7 +11,7 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {getNodeLabel} from './getNodeLabel';
 
-export default function openNodeDetails(data: NodeDataType, activeTab: TabNameType = 'description'): void {
+export default function openNodeDetails(data: NodeDataType, activeTab: TabNameType = 'properties'): void {
     const {
         currentNode: existingCurrentNode,
         setActiveTab,
