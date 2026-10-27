@@ -8,9 +8,11 @@
 package com.bytechef.ee.atlas.execution.remote.grpc;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.IdResponse;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.JobFacadeRemoteServiceGrpc;
 import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobParameters;
+import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
 
@@ -36,6 +38,22 @@ public class JobFacadeRemoteServiceGrpcServer extends JobFacadeRemoteServiceGrpc
             IdResponse.newBuilder()
                 .setId(jobFacade.createJob(atlasExecutionProtoMapper.toJobParametersDTO(request)))
                 .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deleteJob(IdRequest request, StreamObserver<Empty> responseObserver) {
+        jobFacade.deleteJob(request.getId());
+
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void stopJob(IdRequest request, StreamObserver<Empty> responseObserver) {
+        jobFacade.stopJob(request.getId());
+
+        responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
 }
