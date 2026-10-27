@@ -48,7 +48,9 @@ describe('FunctionSuggestionList', () => {
         renderFunctionSuggestionList(
             [
                 definition('contains', {
-                    parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Boolean}],
+                    parameters: [
+                        {description: '', name: 'element', required: true, type: EvaluatorFunctionType.Boolean},
+                    ],
                 }),
                 definition('contains', {
                     parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Map}],
