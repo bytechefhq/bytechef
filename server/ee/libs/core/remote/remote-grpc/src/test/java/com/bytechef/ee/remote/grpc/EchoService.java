@@ -63,6 +63,13 @@ public final class EchoService implements BindableService {
         .setResponseMarshaller(new StringMarshaller())
         .build();
 
+    public static final MethodDescriptor<String, String> SLOW_ECHO = MethodDescriptor.<String, String>newBuilder()
+        .setType(MethodDescriptor.MethodType.UNARY)
+        .setFullMethodName(MethodDescriptor.generateFullMethodName("test.Echo", "SlowEcho"))
+        .setRequestMarshaller(new StringMarshaller())
+        .setResponseMarshaller(new StringMarshaller())
+        .build();
+
     public static final MethodDescriptor<String, String> LARGE = MethodDescriptor.<String, String>newBuilder()
         .setType(MethodDescriptor.MethodType.UNARY)
         .setFullMethodName(MethodDescriptor.generateFullMethodName("test.Echo", "Large"))
@@ -112,6 +119,17 @@ public final class EchoService implements BindableService {
                 responseObserver.onCompleted();
             }))
             .addMethod(NEVER_ANSWER, ServerCalls.asyncUnaryCall((request, responseObserver) -> {}))
+            .addMethod(SLOW_ECHO, ServerCalls.asyncUnaryCall((request, responseObserver) -> {
+                try {
+                    Thread.sleep(Long.parseLong(request));
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread()
+                        .interrupt();
+                }
+
+                responseObserver.onNext("done");
+                responseObserver.onCompleted();
+            }))
             .build();
     }
 
