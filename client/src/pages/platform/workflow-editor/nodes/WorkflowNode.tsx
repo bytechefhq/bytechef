@@ -4,8 +4,10 @@ import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components
 import WorkflowNodeDropdownMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu';
 import WorkflowNodeIssueBadge from '@/pages/platform/workflow-editor/components/WorkflowNodeIssueBadge';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
+import {getDataPillIconSource} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/getDataPillIconSource';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {getNodeLabel} from '@/pages/platform/workflow-editor/utils/getNodeLabel';
+import renderDataPillsInNodeDescription from '@/pages/platform/workflow-editor/utils/renderDataPillsInNodeDescription';
 import {NODE_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
@@ -15,7 +17,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {CheckIcon, ComponentIcon, EllipsisVerticalIcon, TriangleAlertIcon, XIcon} from 'lucide-react';
 import {CSSProperties, KeyboardEvent, ReactNode, forwardRef, memo, useCallback, useMemo, useState} from 'react';
-import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -330,14 +331,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                 <div
                                     className="flex"
                                     dangerouslySetInnerHTML={{
-                                        __html: sanitize(nodeDescription, {
-                                            allowedAttributes: {
-                                                div: ['class'],
-                                                table: ['class'],
-                                                td: ['class'],
-                                                tr: ['class'],
-                                            },
-                                        }),
+                                        __html: nodeDescription,
                                     }}
                                 />
                             ) : (
@@ -554,12 +548,15 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }))
     );
 
-    const {incrementLayoutResetCounter, workflow} = useWorkflowDataStore(
-        useShallow((state) => ({
-            incrementLayoutResetCounter: state.incrementLayoutResetCounter,
-            workflow: state.workflow,
-        }))
-    );
+    const {componentDefinitions, incrementLayoutResetCounter, taskDispatcherDefinitions, workflow} =
+        useWorkflowDataStore(
+            useShallow((state) => ({
+                componentDefinitions: state.componentDefinitions,
+                incrementLayoutResetCounter: state.incrementLayoutResetCounter,
+                taskDispatcherDefinitions: state.taskDispatcherDefinitions,
+                workflow: state.workflow,
+            }))
+        );
 
     const {
         clusterRootComponentDefinitions,
@@ -898,10 +895,25 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
 
-    const nodeDescription =
+    const rawNodeDescription =
         workflowNodeDescription?.description && !data.clusterElementType
             ? workflowNodeDescription.description
             : clusterElementDefinitionData?.description;
+
+    const nodeDescription = useMemo(() => {
+        if (!rawNodeDescription) {
+            return undefined;
+        }
+
+        return renderDataPillsInNodeDescription(rawNodeDescription, (reference) =>
+            getDataPillIconSource({
+                componentDefinitions,
+                mentionDisplay: reference,
+                taskDispatcherDefinitions,
+                workflow,
+            })
+        );
+    }, [componentDefinitions, rawNodeDescription, taskDispatcherDefinitions, workflow]);
 
     if (!updateWorkflowMutation || !invalidateWorkflowQueries || !cancelWorkflowQueries) {
         return null;
