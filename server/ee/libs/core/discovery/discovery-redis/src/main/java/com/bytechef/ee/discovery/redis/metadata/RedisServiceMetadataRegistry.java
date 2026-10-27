@@ -10,11 +10,9 @@ package com.bytechef.ee.discovery.redis.metadata;
 import com.bytechef.ee.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.ee.discovery.redis.registry.RedisRegistration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @version ee
@@ -32,14 +30,11 @@ public class RedisServiceMetadataRegistry implements ServiceMetadataRegistry {
 
     @Override
     public void registerMetadata(Map<String, String> metadata) {
-        Map<String, String> curMetadataMap = Objects.requireNonNull(
-            redisRegistration.getMetadata(), "metadata");
+        Map<String, String> mergedMetadata = new HashMap<>(
+            Objects.requireNonNull(redisRegistration.getMetadata(), "metadata"));
 
-        Set<Map.Entry<String, String>> curMetadataEntry = curMetadataMap.entrySet();
-        Set<Map.Entry<String, String>> metadataEntry = metadata.entrySet();
+        mergedMetadata.putAll(metadata);
 
-        redisRegistration.setMetadata(
-            Stream.concat(curMetadataEntry.stream(), metadataEntry.stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        redisRegistration.setMetadata(mergedMetadata);
     }
 }
