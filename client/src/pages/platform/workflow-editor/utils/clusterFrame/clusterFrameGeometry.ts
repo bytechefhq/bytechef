@@ -40,6 +40,8 @@ export const CLUSTER_FRAME_PLACEHOLDER_Y =
     CLUSTER_FRAME_HANDLE_LABEL_HEIGHT +
     (CLUSTER_FRAME_EDGE_LENGTH - PLACEHOLDER_NODE_HEIGHT) / 2;
 
+export const CLUSTER_FRAME_NESTED_ROOT_EXTRA_HEIGHT = 16;
+
 interface ClusterMemberNodeDataI {
     clusterElementType?: string;
     clusterElementTypesCount?: number;
