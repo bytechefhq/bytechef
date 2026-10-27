@@ -11,6 +11,10 @@ bytechef:
     provider: JDBC
   oauth2:
     redirect-uri:
+  remote:
+    grpc:
+      plaintext: true
+      service-token: test-service-token
   workflow:
     output-storage:
       provider: JDBC
