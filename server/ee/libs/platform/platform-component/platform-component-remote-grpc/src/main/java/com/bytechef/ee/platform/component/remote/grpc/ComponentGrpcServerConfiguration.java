@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.component.remote.grpc;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -58,6 +59,13 @@ public class ComponentGrpcServerConfiguration {
 
         return new ClusterElementDefinitionRemoteServiceGrpcServer(
             clusterElementDefinitionService, componentProtoMapper);
+    }
+
+    @Bean
+    ComponentDefinitionFacadeRemoteServiceGrpcServer componentDefinitionFacadeRemoteServiceGrpcServer(
+        ComponentDefinitionFacade componentDefinitionFacade, ComponentProtoMapper componentProtoMapper) {
+
+        return new ComponentDefinitionFacadeRemoteServiceGrpcServer(componentDefinitionFacade, componentProtoMapper);
     }
 
     @Bean

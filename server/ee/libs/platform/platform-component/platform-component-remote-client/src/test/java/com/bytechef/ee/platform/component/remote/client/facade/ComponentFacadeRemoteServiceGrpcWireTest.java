@@ -25,6 +25,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.component.remote.grpc.ActionDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ClusterElementDefinitionFacadeRemoteServiceGrpcServer;
+import com.bytechef.ee.platform.component.remote.grpc.ComponentDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
@@ -34,6 +35,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -72,6 +74,7 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
     private final ActionDefinitionFacade actionDefinitionFacade = mock(ActionDefinitionFacade.class);
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade =
         mock(ClusterElementDefinitionFacade.class);
+    private final ComponentDefinitionFacade componentDefinitionFacade = mock(ComponentDefinitionFacade.class);
     private final DiscoveryClient discoveryClient = mock(DiscoveryClient.class);
     private final JsonMapper jsonMapper = JsonMapper.builder()
         .build();
@@ -80,6 +83,7 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
     private ManagedChannel managedChannel;
     private RemoteActionDefinitionFacadeClient remoteActionDefinitionFacadeClient;
     private RemoteClusterElementDefinitionFacadeClient remoteClusterElementDefinitionFacadeClient;
+    private RemoteComponentDefinitionFacadeClient remoteComponentDefinitionFacadeClient;
     private RemoteTriggerDefinitionFacadeClient remoteTriggerDefinitionFacadeClient;
     private Server server;
 
@@ -93,6 +97,8 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
             .addService(
                 new ClusterElementDefinitionFacadeRemoteServiceGrpcServer(
                     clusterElementDefinitionFacade, componentProtoMapper))
+            .addService(
+                new ComponentDefinitionFacadeRemoteServiceGrpcServer(componentDefinitionFacade, componentProtoMapper))
             .addService(
                 new TriggerDefinitionFacadeRemoteServiceGrpcServer(triggerDefinitionFacade, componentProtoMapper))
             .build()
@@ -112,6 +118,8 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         remoteActionDefinitionFacadeClient = new RemoteActionDefinitionFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteClusterElementDefinitionFacadeClient = new RemoteClusterElementDefinitionFacadeClient(
+            applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
+        remoteComponentDefinitionFacadeClient = new RemoteComponentDefinitionFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteTriggerDefinitionFacadeClient = new RemoteTriggerDefinitionFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
@@ -465,6 +473,34 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         assertThat(remoteTriggerDefinitionFacadeClient.executeWebhookValidateOnEnable(
             "keep", 1, "new", INPUT_PARAMETERS, null, null))
                 .isEqualTo(webhookValidateResponse);
+    }
+
+    @Test
+    void testExecuteWorkflowInputOptions() {
+        List<Option> options = options();
+
+        when(componentDefinitionFacade.executeWorkflowInputOptions(
+            "keep", 1, "inputs", "status", INPUT_PARAMETERS, LOOKUP_DEPENDS_ON_PATHS, "op", 7L))
+                .thenReturn(options);
+
+        assertThat(remoteComponentDefinitionFacadeClient.executeWorkflowInputOptions(
+            "keep", 1, "inputs", "status", INPUT_PARAMETERS, LOOKUP_DEPENDS_ON_PATHS, "op", 7L))
+                .usingRecursiveComparison()
+                .isEqualTo(options);
+    }
+
+    @Test
+    void testExecuteWorkflowInputOptionsWithoutConnectionOrSearchText() {
+        List<Option> options = options();
+
+        when(componentDefinitionFacade.executeWorkflowInputOptions(
+            "keep", 1, "inputs", "status", INPUT_PARAMETERS, List.of(), null, null))
+                .thenReturn(options);
+
+        assertThat(remoteComponentDefinitionFacadeClient.executeWorkflowInputOptions(
+            "keep", 1, "inputs", "status", INPUT_PARAMETERS, List.of(), null, null))
+                .usingRecursiveComparison()
+                .isEqualTo(options);
     }
 
     private WebhookRequest sameJson(WebhookRequest expected) {
