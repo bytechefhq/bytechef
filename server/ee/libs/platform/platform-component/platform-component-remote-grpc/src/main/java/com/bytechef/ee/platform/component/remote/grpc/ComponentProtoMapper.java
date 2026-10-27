@@ -7,10 +7,13 @@
 
 package com.bytechef.ee.platform.component.remote.grpc;
 
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.ee.platform.component.remote.grpc.proto.OutputResponseResult;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteActionDefinition;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteClusterElementDefinition;
+import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteClusterElementType;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteComponentDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteConnectionDefinition;
 import com.bytechef.ee.platform.component.remote.grpc.proto.RemoteOption;
@@ -28,6 +31,7 @@ import com.bytechef.ee.platform.component.remote.grpc.proto.WebhookEnableOutputR
 import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -149,6 +153,16 @@ public class ComponentProtoMapper {
         return toDomain(remoteActionDefinition, ActionDefinition.class);
     }
 
+    public ClusterElementDefinition toClusterElementDefinition(
+        RemoteClusterElementDefinition remoteClusterElementDefinition) {
+
+        return toDomain(remoteClusterElementDefinition, ClusterElementDefinition.class);
+    }
+
+    public ClusterElementType toClusterElementType(RemoteClusterElementType remoteClusterElementType) {
+        return toDomain(remoteClusterElementType, ClusterElementType.class);
+    }
+
     public ComponentDefinition toComponentDefinition(RemoteComponentDefinition remoteComponentDefinition) {
         return toDomain(remoteComponentDefinition, ComponentDefinition.class);
     }
@@ -171,6 +185,14 @@ public class ComponentProtoMapper {
 
     public RemoteActionDefinition toProto(ActionDefinition actionDefinition) {
         return toProto(actionDefinition, RemoteActionDefinition.newBuilder());
+    }
+
+    public RemoteClusterElementDefinition toProto(ClusterElementDefinition clusterElementDefinition) {
+        return toProto(clusterElementDefinition, RemoteClusterElementDefinition.newBuilder());
+    }
+
+    public RemoteClusterElementType toProto(ClusterElementType clusterElementType) {
+        return toProto(clusterElementType, RemoteClusterElementType.newBuilder());
     }
 
     public RemoteComponentDefinition toProto(ComponentDefinition componentDefinition) {

@@ -24,6 +24,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.component.remote.grpc.ActionDefinitionFacadeRemoteServiceGrpcServer;
+import com.bytechef.ee.platform.component.remote.grpc.ClusterElementDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
@@ -32,6 +33,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -68,6 +70,8 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
     private static final List<String> LOOKUP_DEPENDS_ON_PATHS = List.of("count");
 
     private final ActionDefinitionFacade actionDefinitionFacade = mock(ActionDefinitionFacade.class);
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade =
+        mock(ClusterElementDefinitionFacade.class);
     private final DiscoveryClient discoveryClient = mock(DiscoveryClient.class);
     private final JsonMapper jsonMapper = JsonMapper.builder()
         .build();
@@ -75,6 +79,7 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
 
     private ManagedChannel managedChannel;
     private RemoteActionDefinitionFacadeClient remoteActionDefinitionFacadeClient;
+    private RemoteClusterElementDefinitionFacadeClient remoteClusterElementDefinitionFacadeClient;
     private RemoteTriggerDefinitionFacadeClient remoteTriggerDefinitionFacadeClient;
     private Server server;
 
@@ -85,6 +90,9 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
 
         server = InProcessServerBuilder.forName(name)
             .addService(new ActionDefinitionFacadeRemoteServiceGrpcServer(actionDefinitionFacade, componentProtoMapper))
+            .addService(
+                new ClusterElementDefinitionFacadeRemoteServiceGrpcServer(
+                    clusterElementDefinitionFacade, componentProtoMapper))
             .addService(
                 new TriggerDefinitionFacadeRemoteServiceGrpcServer(triggerDefinitionFacade, componentProtoMapper))
             .build()
@@ -102,6 +110,8 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
         FixedGrpcChannels fixedGrpcChannels = new FixedGrpcChannels(managedChannel);
 
         remoteActionDefinitionFacadeClient = new RemoteActionDefinitionFacadeClient(
+            applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
+        remoteClusterElementDefinitionFacadeClient = new RemoteClusterElementDefinitionFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteTriggerDefinitionFacadeClient = new RemoteTriggerDefinitionFacadeClient(
             applicationProperties(), fixedGrpcChannels, discoveryClient, jsonMapper);
@@ -222,6 +232,85 @@ class ComponentFacadeRemoteServiceGrpcWireTest {
             "keep", 1, "get", null, null, null, null, null, INPUT_PARAMETERS, Map.of(), Map.of(), null, null, false,
             null, null, null))
                 .isEqualTo("done");
+    }
+
+    @Test
+    void testClusterElementExecuteDynamicProperties() {
+        List<Property> properties = properties();
+
+        when(clusterElementDefinitionFacade.executeDynamicProperties(
+            "keep", 1, "search", "fields", INPUT_PARAMETERS, LOOKUP_DEPENDS_ON_PATHS, 7L))
+                .thenReturn(properties);
+
+        assertThat(remoteClusterElementDefinitionFacadeClient.executeDynamicProperties(
+            "keep", 1, "search", "fields", INPUT_PARAMETERS, LOOKUP_DEPENDS_ON_PATHS, 7L))
+                .usingRecursiveComparison()
+                .isEqualTo(properties);
+    }
+
+    @Test
+    void testClusterElementExecuteDynamicPropertiesWithClusterElements() {
+        List<Property> properties = properties();
+        Map<String, Object> extensions = Map.of("parent", "agent");
+        Map<String, Long> clusterElementConnectionIds = Map.of("model", 8L);
+        Map<String, Map<String, ?>> clusterElementInputParameters = Map.of("model", Map.of("temperature", 1));
+
+        when(clusterElementDefinitionFacade.executeDynamicProperties(
+            "keep", 1, "search", "fields", INPUT_PARAMETERS, extensions, LOOKUP_DEPENDS_ON_PATHS, null,
+            clusterElementConnectionIds, clusterElementInputParameters))
+                .thenReturn(properties);
+
+        assertThat(remoteClusterElementDefinitionFacadeClient.executeDynamicProperties(
+            "keep", 1, "search", "fields", INPUT_PARAMETERS, extensions, LOOKUP_DEPENDS_ON_PATHS, null,
+            clusterElementConnectionIds, clusterElementInputParameters))
+                .usingRecursiveComparison()
+                .isEqualTo(properties);
+    }
+
+    @Test
+    void testClusterElementExecuteOptions() {
+        List<Option> options = options();
+        Map<String, Object> extensions = Map.of("parent", "agent");
+        Map<String, Long> clusterElementConnectionIds = Map.of("model", 8L);
+        Map<String, Map<String, ?>> clusterElementInputParameters = Map.of("model", Map.of("temperature", 1));
+
+        when(clusterElementDefinitionFacade.executeOptions(
+            "keep", 1, "search", "status", INPUT_PARAMETERS, extensions, LOOKUP_DEPENDS_ON_PATHS, "op", 7L,
+            clusterElementConnectionIds, clusterElementInputParameters))
+                .thenReturn(options);
+
+        assertThat(remoteClusterElementDefinitionFacadeClient.executeOptions(
+            "keep", 1, "search", "status", INPUT_PARAMETERS, extensions, LOOKUP_DEPENDS_ON_PATHS, "op", 7L,
+            clusterElementConnectionIds, clusterElementInputParameters))
+                .usingRecursiveComparison()
+                .isEqualTo(options);
+    }
+
+    @Test
+    void testClusterElementExecuteOutput() {
+        OutputResponse outputResponse = outputResponse();
+
+        when(clusterElementDefinitionFacade.executeOutput("keep", 1, "search", INPUT_PARAMETERS, 7L))
+            .thenReturn(outputResponse);
+
+        assertThat(remoteClusterElementDefinitionFacadeClient.executeOutput("keep", 1, "search", INPUT_PARAMETERS, 7L))
+            .usingRecursiveComparison()
+            .isEqualTo(outputResponse);
+    }
+
+    @Test
+    void testClusterElementExecuteTool() {
+        Map<String, Object> result = Map.of("rows", List.of(Map.of("id", 1)));
+
+        when(clusterElementDefinitionFacade.executeTool("keep", 1, "search", INPUT_PARAMETERS, 7L))
+            .thenReturn(result);
+        when(clusterElementDefinitionFacade.executeTool("keep", "search", INPUT_PARAMETERS, null))
+            .thenReturn("latest");
+
+        assertThat(remoteClusterElementDefinitionFacadeClient.executeTool("keep", 1, "search", INPUT_PARAMETERS, 7L))
+            .isEqualTo(result);
+        assertThat(remoteClusterElementDefinitionFacadeClient.executeTool("keep", "search", INPUT_PARAMETERS, null))
+            .isEqualTo("latest");
     }
 
     @Test
