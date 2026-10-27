@@ -25,6 +25,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegratio
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflowConnections;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflows;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurations;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
@@ -113,6 +114,15 @@ public class EmbeddedConfigurationProtoMapper {
 
         return protoJsonMapper.toObject(
             remoteIntegrationInstanceConfigurationWorkflow, IntegrationInstanceConfigurationWorkflow.class);
+    }
+
+    public List<IntegrationInstanceConfigurationWorkflow> toIntegrationInstanceConfigurationWorkflows(
+        RemoteIntegrationInstanceConfigurationWorkflows remoteIntegrationInstanceConfigurationWorkflows) {
+
+        return remoteIntegrationInstanceConfigurationWorkflows.getIntegrationInstanceConfigurationWorkflowsList()
+            .stream()
+            .map(this::toIntegrationInstanceConfigurationWorkflow)
+            .toList();
     }
 
     public IntegrationInstanceConfigurationWorkflowConnection toIntegrationInstanceConfigurationWorkflowConnection(
@@ -229,6 +239,17 @@ public class EmbeddedConfigurationProtoMapper {
         }
 
         return builder.build();
+    }
+
+    public RemoteIntegrationInstanceConfigurationWorkflows toRemoteIntegrationInstanceConfigurationWorkflows(
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows) {
+
+        return RemoteIntegrationInstanceConfigurationWorkflows.newBuilder()
+            .addAllIntegrationInstanceConfigurationWorkflows(
+                integrationInstanceConfigurationWorkflows.stream()
+                    .map(this::toProto)
+                    .toList())
+            .build();
     }
 
     public RemoteIntegrationInstanceConfigurations toRemoteIntegrationInstanceConfigurations(

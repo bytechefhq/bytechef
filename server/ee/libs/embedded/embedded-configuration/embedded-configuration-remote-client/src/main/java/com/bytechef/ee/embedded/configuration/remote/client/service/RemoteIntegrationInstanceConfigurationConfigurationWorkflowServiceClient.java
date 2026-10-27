@@ -16,9 +16,13 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationWorkflowConnectionResult;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationWorkflowRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceConfigurationWorkflowRemoteServiceGrpc.IntegrationInstanceConfigurationWorkflowRemoteServiceBlockingStub;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfigurationWorkflows;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -86,7 +90,25 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
 
     @Override
     public IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(long id) {
-        throw new UnsupportedOperationException();
+        RemoteIntegrationInstanceConfigurationWorkflow remoteIntegrationInstanceConfigurationWorkflow;
+
+        try {
+            remoteIntegrationInstanceConfigurationWorkflow = getStub().getIntegrationInstanceConfigurationWorkflowById(
+                IdRequest.newBuilder()
+                    .setId(id)
+                    .build());
+        } catch (StatusRuntimeException statusRuntimeException) {
+            Status status = statusRuntimeException.getStatus();
+
+            if (status.getCode() == Status.Code.INVALID_ARGUMENT) {
+                throw new IllegalArgumentException(status.getDescription(), statusRuntimeException);
+            }
+
+            throw statusRuntimeException;
+        }
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflow(
+            remoteIntegrationInstanceConfigurationWorkflow);
     }
 
     @Override
@@ -122,7 +144,14 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     public List<IntegrationInstanceConfigurationWorkflow> getIntegrationInstanceConfigurationWorkflows(
         long integrationInstanceConfigurationId) {
 
-        throw new UnsupportedOperationException();
+        RemoteIntegrationInstanceConfigurationWorkflows remoteIntegrationInstanceConfigurationWorkflows =
+            getStub().getIntegrationInstanceConfigurationWorkflows(
+                IdRequest.newBuilder()
+                    .setId(integrationInstanceConfigurationId)
+                    .build());
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstanceConfigurationWorkflows(
+            remoteIntegrationInstanceConfigurationWorkflows);
     }
 
     @Override
@@ -144,7 +173,10 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
 
     @Override
     public boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceConfigurationId, String workflowId) {
-        throw new UnsupportedOperationException();
+        BoolResponse boolResponse = getStub().isIntegrationInstanceWorkflowEnabled(
+            toRequest(integrationInstanceConfigurationId, workflowId, null, null));
+
+        return boolResponse.getValue();
     }
 
     @Override
