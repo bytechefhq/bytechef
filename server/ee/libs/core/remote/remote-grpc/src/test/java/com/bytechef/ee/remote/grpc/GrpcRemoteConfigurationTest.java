@@ -11,10 +11,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
+import com.bytechef.ee.remote.grpc.interceptor.TenantContextServerInterceptor;
+import com.bytechef.ee.remote.grpc.interceptor.UserContextServerInterceptor;
+import io.grpc.Metadata;
 import io.grpc.NameResolver;
 import io.grpc.NameResolverRegistry;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
 import io.grpc.SynchronizationContext;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -22,6 +30,9 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.grpc.internal.ApplicationContextBeanLookupUtils;
+import org.springframework.grpc.server.GlobalServerInterceptor;
 
 /**
  * @version ee
@@ -114,6 +125,27 @@ class GrpcRemoteConfigurationTest {
         assertThat(newDiscoveryNameResolver()).isNull();
     }
 
+    @Test
+    void testServerAppliesServiceTokenThenTenantThenUserInterceptors() {
+        new ApplicationContextRunner()
+            .withUserConfiguration(
+                PropertiesConfiguration.class, UnorderedInterceptorConfiguration.class, GrpcRemoteConfiguration.class,
+                ObservationInterceptorConfiguration.class)
+            .withPropertyValues("bytechef.remote.grpc.plaintext=true", "bytechef.remote.grpc.service-token=secret")
+            .run(context -> {
+                List<ServerInterceptor> globalServerInterceptors =
+                    ApplicationContextBeanLookupUtils.getBeansWithAnnotation(
+                        context, ServerInterceptor.class, GlobalServerInterceptor.class);
+
+                assertThat(globalServerInterceptors)
+                    .extracting(Object::getClass)
+                    .containsExactly(
+                        ObservationInterceptor.class, ServiceTokenServerInterceptor.class,
+                        TenantContextServerInterceptor.class, UserContextServerInterceptor.class,
+                        UnorderedInterceptor.class);
+            });
+    }
+
     private static NameResolver newDiscoveryNameResolver() {
         NameResolver.Factory factory = NameResolverRegistry.getDefaultRegistry()
             .asFactory();
@@ -149,6 +181,40 @@ class GrpcRemoteConfigurationTest {
     }
 
     record RemoteCaller(GrpcChannels grpcChannels) {
+    }
+
+    @Configuration
+    static class UnorderedInterceptorConfiguration {
+
+        @Bean
+        @GlobalServerInterceptor
+        UnorderedInterceptor unorderedInterceptor() {
+            return new UnorderedInterceptor();
+        }
+    }
+
+    @Configuration
+    static class ObservationInterceptorConfiguration {
+
+        @Bean
+        @Order(0)
+        @GlobalServerInterceptor
+        ObservationInterceptor observationInterceptor() {
+            return new ObservationInterceptor();
+        }
+    }
+
+    static class UnorderedInterceptor implements ServerInterceptor {
+
+        @Override
+        public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
+            ServerCall<ReqT, RespT> serverCall, Metadata metadata, ServerCallHandler<ReqT, RespT> serverCallHandler) {
+
+            return serverCallHandler.startCall(serverCall, metadata);
+        }
+    }
+
+    static class ObservationInterceptor extends UnorderedInterceptor {
     }
 
     @Configuration
