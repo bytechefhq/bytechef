@@ -25,6 +25,7 @@ import com.bytechef.ai.copilot.config.CopilotPgVectorConfiguration;
 import com.bytechef.ai.copilot.service.CopilotVectorStoreService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.web.rest.WorkflowApiController;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
@@ -72,6 +73,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
@@ -142,6 +144,12 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentFacade.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentChunkFacade.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(WorkspaceKnowledgeBaseFacade.class)).isEmpty();
+    }
+
+    @Test
+    void testAutomationMethodSecurityExpressionHandlerIsRegistered() {
+        assertThat(applicationContext.getBean(MethodSecurityExpressionHandler.class))
+            .isInstanceOf(AutomationMethodSecurityExpressionHandler.class);
     }
 
     @Test

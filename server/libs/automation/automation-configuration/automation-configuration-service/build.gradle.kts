@@ -1,4 +1,6 @@
 dependencies {
+    api(project(":server:libs:automation:automation-configuration:automation-configuration-security"))
+
     implementation("org.springframework.boot:spring-boot-actuator")
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
