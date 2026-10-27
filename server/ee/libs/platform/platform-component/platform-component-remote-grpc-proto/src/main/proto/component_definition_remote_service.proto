@@ -62,6 +62,20 @@ service TriggerDefinitionFacadeRemoteService {
   rpc ExecuteWebhookValidate(TriggerExecuteWebhookValidateRequest) returns (RemoteWebhookValidateResponse);
 }
 
+service ClusterElementDefinitionRemoteService {
+  rpc ExecuteWorkflowNodeDescription(ClusterElementExecuteWorkflowNodeDescriptionRequest) returns (StringResponse);
+  rpc GetClusterElementDefinition(GetClusterElementDefinitionRequest) returns (RemoteClusterElementDefinition);
+  rpc GetClusterElementDefinitions(GetClusterElementDefinitionsRequest) returns (RemoteClusterElementDefinitions);
+  rpc GetClusterElementType(GetClusterElementTypeRequest) returns (RemoteClusterElementType);
+}
+
+service ClusterElementDefinitionFacadeRemoteService {
+  rpc ExecuteDynamicProperties(ClusterElementExecuteDynamicPropertiesRequest) returns (RemoteProperties);
+  rpc ExecuteOptions(ClusterElementExecuteOptionsRequest) returns (RemoteOptions);
+  rpc ExecuteOutput(ClusterElementExecuteOutputRequest) returns (OutputResponseResult);
+  rpc ExecuteTool(ClusterElementExecuteToolRequest) returns (ValueResponse);
+}
+
 message RemoteComponentDefinition {
   optional bytes action_cluster_element_types = 1;
   repeated RemoteActionDefinition actions = 2;
@@ -161,6 +175,10 @@ message RemoteClusterElementDefinition {
   optional bool testable = 12;
   optional string title = 13;
   optional RemoteClusterElementType type = 14;
+}
+
+message RemoteClusterElementDefinitions {
+  repeated RemoteClusterElementDefinition cluster_element_definitions = 1;
 }
 
 message RemoteClusterElementType {
@@ -506,4 +524,74 @@ message TriggerExecuteWebhookValidateRequest {
   bytes input_parameters = 4;
   optional RemoteWebhookRequest webhook_request = 5;
   optional int64 connection_id = 6;
+}
+
+message GetClusterElementDefinitionRequest {
+  string component_name = 1;
+  optional int32 component_version = 2;
+  string cluster_element_name = 3;
+  optional string cluster_element_type_name = 4;
+}
+
+message GetClusterElementDefinitionsRequest {
+  optional string component_name = 1;
+  optional int32 component_version = 2;
+  RemoteClusterElementType cluster_element_type = 3;
+}
+
+message GetClusterElementTypeRequest {
+  string root_component_name = 1;
+  int32 root_component_version = 2;
+  string cluster_element_type_name = 3;
+}
+
+message ClusterElementExecuteWorkflowNodeDescriptionRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string cluster_element_name = 3;
+  bytes input_parameters = 4;
+}
+
+message ClusterElementExecuteDynamicPropertiesRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string cluster_element_name = 3;
+  string property_name = 4;
+  bytes input_parameters = 5;
+  repeated string lookup_depends_on_paths = 6;
+  optional int64 connection_id = 7;
+  bool cluster_elements = 8;
+  optional bytes extensions = 9;
+  map<string, int64> cluster_element_connection_ids = 10;
+  optional bytes cluster_element_input_parameters = 11;
+}
+
+message ClusterElementExecuteOptionsRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string cluster_element_name = 3;
+  string property_name = 4;
+  bytes input_parameters = 5;
+  repeated string lookup_depends_on_paths = 6;
+  optional string search_text = 7;
+  optional int64 connection_id = 8;
+  optional bytes extensions = 9;
+  map<string, int64> cluster_element_connection_ids = 10;
+  optional bytes cluster_element_input_parameters = 11;
+}
+
+message ClusterElementExecuteOutputRequest {
+  string component_name = 1;
+  int32 component_version = 2;
+  string cluster_element_name = 3;
+  bytes input_parameters = 4;
+  optional int64 connection_id = 5;
+}
+
+message ClusterElementExecuteToolRequest {
+  string component_name = 1;
+  optional int32 component_version = 2;
+  string cluster_element_name = 3;
+  bytes input_parameters = 4;
+  optional int64 connection_id = 5;
 }

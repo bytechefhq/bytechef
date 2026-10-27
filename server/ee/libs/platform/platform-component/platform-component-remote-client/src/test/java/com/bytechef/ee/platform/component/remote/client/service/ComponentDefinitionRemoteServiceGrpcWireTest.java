@@ -9,8 +9,10 @@ package com.bytechef.ee.platform.component.remote.client.service;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.clusterElement;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,22 +23,27 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.ee.platform.component.remote.grpc.ActionDefinitionRemoteServiceGrpcServer;
+import com.bytechef.ee.platform.component.remote.grpc.ClusterElementDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.ComponentProtoMapper;
 import com.bytechef.ee.platform.component.remote.grpc.ConnectionDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -45,6 +52,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
+import io.grpc.ServerInterceptors;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.util.List;
@@ -57,6 +65,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.grpc.server.exception.GrpcExceptionHandlerInterceptor;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -68,8 +77,11 @@ import tools.jackson.databind.json.JsonMapper;
 class ComponentDefinitionRemoteServiceGrpcWireTest {
 
     private static final String COMPONENTS_METADATA = "[{\"name\":\"keep\"},{\"name\":\"drop\"}]";
+    private static final ClusterElementType TOOLS = new ClusterElementType("tools", "tools", "Tools", true, false);
 
     private final ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
+    private final ClusterElementDefinitionService clusterElementDefinitionService =
+        mock(ClusterElementDefinitionService.class);
     private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
     private final ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
     private final DiscoveryClient discoveryClient = mock(DiscoveryClient.class);
@@ -79,6 +91,7 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
 
     private ManagedChannel managedChannel;
     private RemoteActionDefinitionServiceClient remoteActionDefinitionServiceClient;
+    private RemoteClusterElementDefinitionServiceClient remoteClusterElementDefinitionServiceClient;
     private RemoteComponentDefinitionServiceClient remoteComponentDefinitionServiceClient;
     private RemoteConnectionDefinitionServiceClient remoteConnectionDefinitionServiceClient;
     private RemoteTriggerDefinitionServiceClient remoteTriggerDefinitionServiceClient;
@@ -92,6 +105,11 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
             .addService(new ActionDefinitionRemoteServiceGrpcServer(actionDefinitionService, componentProtoMapper))
+            .addService(
+                ServerInterceptors.intercept(
+                    new ClusterElementDefinitionRemoteServiceGrpcServer(
+                        clusterElementDefinitionService, componentProtoMapper),
+                    new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .addService(
                 new ComponentDefinitionRemoteServiceGrpcServer(componentDefinitionService, componentProtoMapper))
             .addService(
@@ -115,6 +133,8 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         FixedGrpcChannels fixedGrpcChannels = new FixedGrpcChannels(managedChannel);
 
         remoteActionDefinitionServiceClient = new RemoteActionDefinitionServiceClient(
+            fixedGrpcChannels, discoveryClient, jsonMapper);
+        remoteClusterElementDefinitionServiceClient = new RemoteClusterElementDefinitionServiceClient(
             fixedGrpcChannels, discoveryClient, jsonMapper);
         remoteComponentDefinitionServiceClient = new RemoteComponentDefinitionServiceClient(
             fixedGrpcChannels, discoveryClient, jsonMapper, List.of(new DropForAutomationComponentDefinitionFilter()));
@@ -309,6 +329,91 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testGetClusterElementDefinition() {
+        ClusterElementDefinition clusterElementDefinition = clusterElementDefinition();
+
+        when(clusterElementDefinitionService.getClusterElementDefinition("keep", "search"))
+            .thenReturn(clusterElementDefinition);
+        when(clusterElementDefinitionService.getClusterElementDefinition("keep", 1, "search"))
+            .thenReturn(clusterElementDefinition);
+        when(clusterElementDefinitionService.getClusterElementDefinition("keep", 1, "search", "tools"))
+            .thenReturn(clusterElementDefinition);
+
+        assertThat(remoteClusterElementDefinitionServiceClient.getClusterElementDefinition("keep", "search"))
+            .usingRecursiveComparison()
+            .isEqualTo(clusterElementDefinition);
+        assertThat(remoteClusterElementDefinitionServiceClient.getClusterElementDefinition("keep", 1, "search"))
+            .usingRecursiveComparison()
+            .isEqualTo(clusterElementDefinition);
+        assertThat(
+            remoteClusterElementDefinitionServiceClient.getClusterElementDefinition("keep", 1, "search", "tools"))
+                .usingRecursiveComparison()
+                .isEqualTo(clusterElementDefinition);
+    }
+
+    @Test
+    void testGetUnknownClusterElementDefinitionFailsWithItsMessage() {
+        when(clusterElementDefinitionService.getClusterElementDefinition("keep", 1, "missing"))
+            .thenThrow(new IllegalArgumentException("Cluster element missing not found"));
+
+        assertThatThrownBy(
+            () -> remoteClusterElementDefinitionServiceClient.getClusterElementDefinition("keep", 1, "missing"))
+                .hasMessageContaining("Cluster element missing not found");
+    }
+
+    @Test
+    void testGetComponentClusterElementDefinitions() {
+        ClusterElementDefinition clusterElementDefinition = clusterElementDefinition();
+
+        when(clusterElementDefinitionService.getClusterElementDefinitions("keep", 1, TOOLS))
+            .thenReturn(List.of(clusterElementDefinition));
+
+        assertThat(remoteClusterElementDefinitionServiceClient.getClusterElementDefinitions("keep", 1, TOOLS))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(clusterElementDefinition);
+    }
+
+    @Test
+    void testGetClusterElementDefinitionsOfATypeAreMergedAcrossWorkers() {
+        ClusterElementDefinition clusterElementDefinition = clusterElementDefinition();
+
+        when(clusterElementDefinitionService.getClusterElementDefinitions(TOOLS))
+            .thenReturn(List.of(clusterElementDefinition));
+
+        assertThat(remoteClusterElementDefinitionServiceClient.getClusterElementDefinitions(TOOLS))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(clusterElementDefinition);
+    }
+
+    @Test
+    void testGetRootClusterElementDefinitions() {
+        ClusterElementDefinition clusterElementDefinition = clusterElementDefinition();
+
+        when(clusterElementDefinitionService.getClusterElementType("keep", 1, "tools")).thenReturn(TOOLS);
+        when(clusterElementDefinitionService.getClusterElementDefinitions(TOOLS))
+            .thenReturn(List.of(clusterElementDefinition));
+
+        assertThat(remoteClusterElementDefinitionServiceClient.getClusterElementType("keep", 1, "tools"))
+            .isEqualTo(TOOLS);
+        assertThat(remoteClusterElementDefinitionServiceClient.getRootClusterElementDefinitions("keep", 1, "tools"))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(clusterElementDefinition);
+    }
+
+    @Test
+    void testClusterElementExecuteWorkflowNodeDescription() {
+        Map<String, Object> inputParameters = Map.of("query", "x");
+
+        when(clusterElementDefinitionService.executeWorkflowNodeDescription("keep", 1, "search", inputParameters))
+            .thenReturn("Search x");
+
+        assertThat(
+            remoteClusterElementDefinitionServiceClient.executeWorkflowNodeDescription(
+                "keep", 1, "search", inputParameters))
+                    .isEqualTo("Search x");
+    }
+
+    @Test
     void testTriggerIsDynamicOutputDefined() {
         when(triggerDefinitionService.isDynamicOutputDefined("keep", 1, "new")).thenReturn(true);
 
@@ -399,6 +504,19 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         when(connectionDefinitionService.executeBaseUri("keep", componentConnection)).thenReturn(Optional.empty());
 
         assertThat(remoteConnectionDefinitionServiceClient.executeBaseUri("keep", componentConnection)).isEmpty();
+    }
+
+    private static ClusterElementDefinition clusterElementDefinition() {
+        return new ClusterElementDefinition(
+            clusterElement("search")
+                .title("Search")
+                .description("Searches records")
+                .type(TOOLS)
+                .properties(
+                    string("query")
+                        .label("Query")
+                        .required(true)),
+            "keep", 1, "icon");
     }
 
     private static ComponentDefinition componentDefinition(String name, int version) {

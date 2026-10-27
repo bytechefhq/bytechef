@@ -18,11 +18,13 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.AiAgentComponentHandler;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.schedule.ScheduleComponentHandler;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -138,6 +140,35 @@ class ComponentProtoMapperTest {
         assertThat(componentProtoMapper.toWebhookRequest(componentProtoMapper.toProto(webhookRequest)))
             .usingRecursiveComparison()
             .isEqualTo(webhookRequest);
+    }
+
+    @Test
+    void testClusterElementDefinitionsRoundTrip() {
+        List<ClusterElementDefinition> clusterElementDefinitions = getComponentDefinitions().stream()
+            .flatMap(componentDefinition -> componentDefinition.getClusterElements()
+                .stream())
+            .toList();
+
+        assertThat(clusterElementDefinitions).isNotEmpty();
+
+        for (ClusterElementDefinition clusterElementDefinition : clusterElementDefinitions) {
+            ClusterElementDefinition roundTripClusterElementDefinition =
+                componentProtoMapper.toClusterElementDefinition(componentProtoMapper.toProto(clusterElementDefinition));
+
+            assertThat(roundTripClusterElementDefinition)
+                .as(clusterElementDefinition.getComponentName() + "/" + clusterElementDefinition.getName())
+                .usingRecursiveComparison()
+                .withEqualsForFieldsMatchingRegexes(this::jsonEquals, FREE_FORM_FIELDS)
+                .isEqualTo(clusterElementDefinition);
+        }
+    }
+
+    @Test
+    void testClusterElementTypeRoundTrip() {
+        ClusterElementType clusterElementType = new ClusterElementType("tools", "tools", "Tools", true, false);
+
+        assertThat(componentProtoMapper.toClusterElementType(componentProtoMapper.toProto(clusterElementType)))
+            .isEqualTo(clusterElementType);
     }
 
     private boolean jsonEquals(Object actual, Object expected) {

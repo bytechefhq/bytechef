@@ -8,8 +8,10 @@
 package com.bytechef.ee.platform.component.remote.grpc;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -39,6 +41,22 @@ public class ComponentGrpcServerConfiguration {
         ActionDefinitionService actionDefinitionService, ComponentProtoMapper componentProtoMapper) {
 
         return new ActionDefinitionRemoteServiceGrpcServer(actionDefinitionService, componentProtoMapper);
+    }
+
+    @Bean
+    ClusterElementDefinitionFacadeRemoteServiceGrpcServer clusterElementDefinitionFacadeRemoteServiceGrpcServer(
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade, ComponentProtoMapper componentProtoMapper) {
+
+        return new ClusterElementDefinitionFacadeRemoteServiceGrpcServer(
+            clusterElementDefinitionFacade, componentProtoMapper);
+    }
+
+    @Bean
+    ClusterElementDefinitionRemoteServiceGrpcServer clusterElementDefinitionRemoteServiceGrpcServer(
+        ClusterElementDefinitionService clusterElementDefinitionService, ComponentProtoMapper componentProtoMapper) {
+
+        return new ClusterElementDefinitionRemoteServiceGrpcServer(
+            clusterElementDefinitionService, componentProtoMapper);
     }
 
     @Bean
