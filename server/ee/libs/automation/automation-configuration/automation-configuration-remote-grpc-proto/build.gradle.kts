@@ -31,6 +31,7 @@ dependencies {
     api("com.google.protobuf:protobuf-java")
     api("io.grpc:grpc-protobuf")
     api("io.grpc:grpc-stub")
+    api(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-grpc-proto"))
     api(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-grpc-proto"))
 
     compileOnly("org.apache.tomcat:annotations-api:6.0.53")

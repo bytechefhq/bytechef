@@ -8,11 +8,15 @@
 package com.bytechef.ee.automation.configuration.remote.client.subflow;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.ChildJobPrincipalFactoryRemoteServiceGrpc;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.CreateChildJobRequest;
+import com.bytechef.ee.automation.configuration.remote.grpc.proto.IdResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -23,32 +27,32 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class RemoteChildJobPrincipalFactoryClient implements ChildJobPrincipalFactory {
 
-    private static final String CHILD_JOB_PRINCIPAL_FACTORY = "/remote/child-job-principal-factory";
     private static final String CONFIGURATION_APP = "configuration-app";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final AutomationConfigurationProtoMapper automationConfigurationProtoMapper;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteChildJobPrincipalFactoryClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteChildJobPrincipalFactoryClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        this.automationConfigurationProtoMapper = new AutomationConfigurationProtoMapper(objectMapper);
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
-        throw new UnsupportedOperationException();
+        ChildJobPrincipalFactoryRemoteServiceGrpc.ChildJobPrincipalFactoryRemoteServiceBlockingStub stub =
+            ChildJobPrincipalFactoryRemoteServiceGrpc.newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
+
+        IdResponse idResponse = stub.createChildJob(
+            CreateChildJobRequest.newBuilder()
+                .setJobParameters(automationConfigurationProtoMapper.toProto(jobParametersDTO))
+                .setParentJobId(parentJobId)
+                .build());
+
+        return idResponse.getId();
     }
 
     @Override
     public long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO) {
-        return loadBalancedRestClient.post(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(CHILD_JOB_PRINCIPAL_FACTORY + "/create-principal-linked-job")
-                .build(),
-            new CreatePrincipalLinkedJobRequest(referenceJobId, jobParametersDTO), Long.class);
-    }
-
-    @SuppressFBWarnings("EI")
-    public record CreatePrincipalLinkedJobRequest(long referenceJobId, JobParametersDTO jobParameters) {
+        throw new UnsupportedOperationException();
     }
 }

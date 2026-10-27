@@ -12,6 +12,8 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +31,15 @@ public class AutomationConfigurationGrpcServerConfiguration {
     @Bean
     AutomationConfigurationProtoMapper automationConfigurationProtoMapper(ObjectMapper objectMapper) {
         return new AutomationConfigurationProtoMapper(objectMapper);
+    }
+
+    @Bean
+    ChildJobPrincipalFactoryRemoteServiceGrpcServer childJobPrincipalFactoryRemoteServiceGrpcServer(
+        ChildJobPrincipalFactory childJobPrincipalFactory,
+        AutomationConfigurationProtoMapper automationConfigurationProtoMapper) {
+
+        return new ChildJobPrincipalFactoryRemoteServiceGrpcServer(
+            childJobPrincipalFactory, automationConfigurationProtoMapper);
     }
 
     @Bean
@@ -69,5 +80,10 @@ public class AutomationConfigurationGrpcServerConfiguration {
         AutomationConfigurationProtoMapper automationConfigurationProtoMapper) {
 
         return new ProjectWorkflowRemoteServiceGrpcServer(projectWorkflowService, automationConfigurationProtoMapper);
+    }
+
+    @Bean
+    SubflowResolverRemoteServiceGrpcServer subflowResolverRemoteServiceGrpcServer(SubflowResolver subflowResolver) {
+        return new SubflowResolverRemoteServiceGrpcServer(subflowResolver);
     }
 }

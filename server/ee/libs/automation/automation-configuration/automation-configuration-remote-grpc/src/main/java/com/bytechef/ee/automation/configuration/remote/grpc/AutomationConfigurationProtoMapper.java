@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.grpc;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -15,6 +16,8 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.ee.atlas.execution.remote.grpc.AtlasExecutionProtoMapper;
+import com.bytechef.ee.atlas.execution.remote.grpc.proto.RemoteJobParameters;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.RemoteProject;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.RemoteProjectDeployment;
 import com.bytechef.ee.automation.configuration.remote.grpc.proto.RemoteProjectDeploymentWorkflow;
@@ -44,10 +47,12 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class AutomationConfigurationProtoMapper {
 
+    private final AtlasExecutionProtoMapper atlasExecutionProtoMapper;
     private final PlatformConfigurationProtoMapper platformConfigurationProtoMapper;
     private final ProtoJsonMapper protoJsonMapper;
 
     public AutomationConfigurationProtoMapper(ObjectMapper objectMapper) {
+        this.atlasExecutionProtoMapper = new AtlasExecutionProtoMapper(objectMapper);
         this.platformConfigurationProtoMapper = new PlatformConfigurationProtoMapper(objectMapper);
         this.protoJsonMapper = new ProtoJsonMapper(
             objectMapper.rebuild()
@@ -59,6 +64,10 @@ public class AutomationConfigurationProtoMapper {
                 .addMixIn(ProjectVersion.class, NoArgsCreatorMixIn.class)
                 .addMixIn(ProjectWorkflow.class, ProjectWorkflowMixIn.class)
                 .build());
+    }
+
+    public JobParametersDTO toJobParametersDTO(RemoteJobParameters remoteJobParameters) {
+        return atlasExecutionProtoMapper.toJobParametersDTO(remoteJobParameters);
     }
 
     public Project toProject(RemoteProject remoteProject) {
@@ -135,6 +144,10 @@ public class AutomationConfigurationProtoMapper {
             .stream()
             .map(this::toProject)
             .toList();
+    }
+
+    public RemoteJobParameters toProto(JobParametersDTO jobParametersDTO) {
+        return atlasExecutionProtoMapper.toProto(jobParametersDTO);
     }
 
     public RemoteProject toProto(Project project) {
