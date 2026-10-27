@@ -275,6 +275,9 @@ bytechef:
     provider: REDIS
   # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
   edition: EE
+  embedded:
+    pages:
+      enabled: false
   # Encryption key provider (FILESYSTEM - the key generated on filesystem, PROPERTY - the key read from property) default: FILESYSTEM
   encryption:
     provider: FILESYSTEM

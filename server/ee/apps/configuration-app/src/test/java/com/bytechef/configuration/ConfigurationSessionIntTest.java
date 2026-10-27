@@ -56,6 +56,13 @@ class ConfigurationSessionIntTest {
     }
 
     @Test
+    void testEmbeddedPagesAreDenied() throws Exception {
+        mockMvc.perform(get("/workflow-builder.html"))
+            .andExpect(result -> assertThat(result.getResponse()
+                .getStatus()).isEqualTo(403));
+    }
+
+    @Test
     void testSessionWrittenElsewhereIsAccepted() throws Exception {
         String sessionId = saveSession(sessionRepository);
 

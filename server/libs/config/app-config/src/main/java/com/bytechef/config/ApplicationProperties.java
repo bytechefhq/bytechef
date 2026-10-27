@@ -3765,13 +3765,35 @@ public class ApplicationProperties {
     public static class Embedded {
 
         private List<String> allowedParentOrigins = List.of();
+        private Pages pages = new Pages();
 
         public List<String> getAllowedParentOrigins() {
             return allowedParentOrigins;
         }
 
+        public Pages getPages() {
+            return pages;
+        }
+
         public void setAllowedParentOrigins(List<String> allowedParentOrigins) {
             this.allowedParentOrigins = allowedParentOrigins;
+        }
+
+        public void setPages(Pages pages) {
+            this.pages = pages;
+        }
+
+        public static class Pages {
+
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
         }
     }
 

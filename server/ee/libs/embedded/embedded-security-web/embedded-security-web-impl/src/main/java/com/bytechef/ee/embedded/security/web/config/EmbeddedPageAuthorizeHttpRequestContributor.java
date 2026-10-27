@@ -11,6 +11,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
+@ConditionalOnProperty(name = "bytechef.embedded.pages.enabled", havingValue = "true", matchIfMissing = true)
 class EmbeddedPageAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
 
     private static final List<String> EMBEDDED_PAGE_PATHS = List.of(

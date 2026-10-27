@@ -169,6 +169,9 @@ bytechef:
     # Origins allowed to embed the Automation Hub, Workflow Builder and Integration Marketplace pages (EE), e.g.
     # https://app.example.com,https://admin.example.com. Empty lets any origin embed them.
     allowed-parent-origins: []
+    pages:
+      # Whether this app opens the Automation Hub, Workflow Builder and Integration Marketplace pages (ee) default: true
+      enabled: true
   # Encryption key provider (FILESYSTEM - the key generated on filesystem, PROPERTY - the key read from property) default: FILESYSTEM
   encryption:
     provider: FILESYSTEM
