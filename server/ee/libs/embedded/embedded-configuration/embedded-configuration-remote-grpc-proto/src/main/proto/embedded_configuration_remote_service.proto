@@ -55,6 +55,16 @@ service IntegrationInstanceWorkflowRemoteService {
   rpc GetIntegrationInstanceWorkflows(IdRequest) returns (RemoteIntegrationInstanceWorkflows);
 }
 
+service IntegrationWorkflowRemoteService {
+  rpc FetchLastWorkflowId(WorkflowUuidRequest) returns (OptionalStringResponse);
+  rpc GetIntegrationIntegrationWorkflows(IdRequest) returns (RemoteIntegrationWorkflows);
+  rpc GetIntegrationWorkflows(google.protobuf.Empty) returns (RemoteIntegrationWorkflows);
+  rpc GetIntegrationsIntegrationWorkflows(IdsRequest) returns (RemoteIntegrationWorkflows);
+  rpc GetLastWorkflowId(WorkflowUuidRequest) returns (StringResponse);
+  rpc GetWorkflowId(IntegrationInstanceWorkflowUuidRequest) returns (StringResponse);
+  rpc GetWorkflowIntegrationWorkflow(WorkflowIdRequest) returns (RemoteIntegrationWorkflow);
+}
+
 service AppEventRemoteService {
   rpc GetAppEvent(IdRequest) returns (RemoteAppEvent);
 }
@@ -82,6 +92,16 @@ message IdRequest {
 
 message WorkflowIdRequest {
   string workflow_id = 1;
+}
+
+message WorkflowUuidRequest {
+  string workflow_uuid = 1;
+  optional int32 environment = 2;
+}
+
+message IntegrationInstanceWorkflowUuidRequest {
+  int64 integration_instance_id = 1;
+  string workflow_uuid = 2;
 }
 
 message IntegrationInstanceWorkflowRequest {
@@ -126,6 +146,10 @@ message IdsResponse {
 
 message StringResponse {
   string value = 1;
+}
+
+message OptionalStringResponse {
+  optional string value = 1;
 }
 
 message RemoteIntegration {
@@ -269,6 +293,24 @@ message RemoteIntegrationInstanceWorkflows {
 
 message IntegrationInstanceWorkflowResult {
   optional RemoteIntegrationInstanceWorkflow integration_instance_workflow = 1;
+}
+
+message RemoteIntegrationWorkflow {
+  optional string created_by = 1;
+  optional google.protobuf.Timestamp created_date = 2;
+  optional int64 id = 3;
+  optional int64 integration_id = 4;
+  optional int32 integration_version = 5;
+  optional string last_modified_by = 6;
+  optional string last_modified_date = 7;
+  optional string permission_expression = 8;
+  optional string uuid = 9;
+  optional int32 version = 10;
+  optional string workflow_id = 11;
+}
+
+message RemoteIntegrationWorkflows {
+  repeated RemoteIntegrationWorkflow integration_workflows = 1;
 }
 
 message RemoteAppEvent {

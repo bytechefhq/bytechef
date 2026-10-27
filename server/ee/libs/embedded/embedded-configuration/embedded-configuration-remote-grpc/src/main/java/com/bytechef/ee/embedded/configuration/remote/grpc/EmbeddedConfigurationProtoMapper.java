@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAppEvent;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProject;
@@ -30,6 +31,8 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegratio
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceWorkflows;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationWorkflows;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrations;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -64,6 +67,7 @@ public class EmbeddedConfigurationProtoMapper {
                 .addMixIn(IntegrationInstance.class, NoArgsCreatorMixIn.class)
                 .addMixIn(IntegrationInstanceWorkflow.class, NoArgsCreatorMixIn.class)
                 .addMixIn(IntegrationVersion.class, NoArgsCreatorMixIn.class)
+                .addMixIn(IntegrationWorkflow.class, IntegrationWorkflowMixIn.class)
                 .build());
     }
 
@@ -168,6 +172,17 @@ public class EmbeddedConfigurationProtoMapper {
             .toList();
     }
 
+    public IntegrationWorkflow toIntegrationWorkflow(RemoteIntegrationWorkflow remoteIntegrationWorkflow) {
+        return protoJsonMapper.toObject(remoteIntegrationWorkflow, IntegrationWorkflow.class);
+    }
+
+    public List<IntegrationWorkflow> toIntegrationWorkflows(RemoteIntegrationWorkflows remoteIntegrationWorkflows) {
+        return remoteIntegrationWorkflows.getIntegrationWorkflowsList()
+            .stream()
+            .map(this::toIntegrationWorkflow)
+            .toList();
+    }
+
     public List<Integration> toIntegrations(RemoteIntegrations remoteIntegrations) {
         return remoteIntegrations.getIntegrationsList()
             .stream()
@@ -220,6 +235,10 @@ public class EmbeddedConfigurationProtoMapper {
 
     public RemoteIntegrationInstanceWorkflow toProto(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         return protoJsonMapper.toProto(integrationInstanceWorkflow, RemoteIntegrationInstanceWorkflow.newBuilder());
+    }
+
+    public RemoteIntegrationWorkflow toProto(IntegrationWorkflow integrationWorkflow) {
+        return protoJsonMapper.toProto(integrationWorkflow, RemoteIntegrationWorkflow.newBuilder());
     }
 
     public RemoteAutomationWorkflowProjects toRemoteAutomationWorkflowProjects(
@@ -284,6 +303,15 @@ public class EmbeddedConfigurationProtoMapper {
             .build();
     }
 
+    public RemoteIntegrationWorkflows toRemoteIntegrationWorkflows(List<IntegrationWorkflow> integrationWorkflows) {
+        return RemoteIntegrationWorkflows.newBuilder()
+            .addAllIntegrationWorkflows(
+                integrationWorkflows.stream()
+                    .map(this::toProto)
+                    .toList())
+            .build();
+    }
+
     public RemoteIntegrations toRemoteIntegrations(List<Integration> integrations) {
         RemoteIntegrations.Builder builder = RemoteIntegrations.newBuilder();
 
@@ -325,6 +353,17 @@ public class EmbeddedConfigurationProtoMapper {
             @JsonProperty("workflowConnectionKey") String workflowConnectionKey,
             @JsonProperty("workflowNodeName") String workflowNodeName) {
         }
+    }
+
+    @JsonIgnoreProperties("uuidAsString")
+    private abstract static class IntegrationWorkflowMixIn {
+
+        @JsonCreator
+        IntegrationWorkflowMixIn() {
+        }
+
+        @JsonProperty("uuid")
+        abstract void setUuid(String uuid);
     }
 
     private abstract static class NoArgsCreatorMixIn {

@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
@@ -33,6 +34,7 @@ import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegr
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceWorkflowServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationServiceClient;
+import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationWorkflowServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.grpc.AppEventRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.AutomationWorkflowProjectFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectDeploymentResolverRemoteServiceGrpcServer;
@@ -44,6 +46,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceCon
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationRemoteServiceGrpcServer;
+import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserIntegrationInstancesRequest;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
@@ -53,6 +56,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -66,9 +70,11 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,6 +107,7 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService =
         mock(IntegrationInstanceWorkflowService.class);
     private final IntegrationService integrationService = mock(IntegrationService.class);
+    private final IntegrationWorkflowService integrationWorkflowService = mock(IntegrationWorkflowService.class);
 
     private FixedGrpcChannels fixedGrpcChannels;
     private ManagedChannel managedChannel;
@@ -131,7 +138,9 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
                 embeddedConfigurationProtoMapper),
             new IntegrationInstanceWorkflowRemoteServiceGrpcServer(
                 integrationInstanceWorkflowService, embeddedConfigurationProtoMapper),
-            new IntegrationRemoteServiceGrpcServer(integrationService, embeddedConfigurationProtoMapper))) {
+            new IntegrationRemoteServiceGrpcServer(integrationService, embeddedConfigurationProtoMapper),
+            new IntegrationWorkflowRemoteServiceGrpcServer(integrationWorkflowService,
+                embeddedConfigurationProtoMapper))) {
 
             inProcessServerBuilder.addService(ServerInterceptors.intercept(bindableService, serverInterceptor));
         }
@@ -541,6 +550,87 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testIntegrationWorkflowLookups() {
+        IntegrationWorkflow integrationWorkflow = integrationWorkflow(31L, "workflow-1");
+        String workflowUuid = integrationWorkflow.getUuidAsString();
+
+        when(integrationWorkflowService.getWorkflowId(12L, workflowUuid)).thenReturn("workflow-1");
+        when(integrationWorkflowService.getLastWorkflowId(workflowUuid)).thenReturn("workflow-2");
+        when(integrationWorkflowService.getLastWorkflowId(workflowUuid, Environment.PRODUCTION))
+            .thenReturn("workflow-3");
+        when(integrationWorkflowService.fetchLastWorkflowId(workflowUuid, Environment.PRODUCTION))
+            .thenReturn(Optional.of("workflow-3"));
+        when(integrationWorkflowService.fetchLastWorkflowId(workflowUuid, Environment.DEVELOPMENT))
+            .thenReturn(Optional.empty());
+        when(integrationWorkflowService.getWorkflowIntegrationWorkflow("workflow-1")).thenReturn(integrationWorkflow);
+
+        RemoteIntegrationWorkflowServiceClient remoteIntegrationWorkflowServiceClient =
+            new RemoteIntegrationWorkflowServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationWorkflowServiceClient.getWorkflowId(12L, workflowUuid)).isEqualTo("workflow-1");
+        assertThat(remoteIntegrationWorkflowServiceClient.getLastWorkflowId(workflowUuid)).isEqualTo("workflow-2");
+        assertThat(remoteIntegrationWorkflowServiceClient.getLastWorkflowId(workflowUuid, Environment.PRODUCTION))
+            .isEqualTo("workflow-3");
+        assertThat(remoteIntegrationWorkflowServiceClient.fetchLastWorkflowId(workflowUuid, Environment.PRODUCTION))
+            .contains("workflow-3");
+        assertThat(remoteIntegrationWorkflowServiceClient.fetchLastWorkflowId(workflowUuid, Environment.DEVELOPMENT))
+            .isEmpty();
+        assertThat(remoteIntegrationWorkflowServiceClient.getWorkflowIntegrationWorkflow("workflow-1"))
+            .usingRecursiveComparison()
+            .isEqualTo(integrationWorkflow);
+    }
+
+    @Test
+    void testGetIntegrationWorkflows() {
+        IntegrationWorkflow integrationWorkflow = integrationWorkflow(31L, "workflow-1");
+        IntegrationWorkflow otherIntegrationWorkflow = integrationWorkflow(32L, "workflow-2");
+
+        when(integrationWorkflowService.getIntegrationWorkflows())
+            .thenReturn(List.of(integrationWorkflow, otherIntegrationWorkflow));
+        when(integrationWorkflowService.getIntegrationWorkflows(7L)).thenReturn(List.of(integrationWorkflow));
+        when(integrationWorkflowService.getIntegrationWorkflows(List.of(7L, 8L)))
+            .thenReturn(List.of(integrationWorkflow, otherIntegrationWorkflow));
+        when(integrationWorkflowService.getIntegrationWorkflows(List.of())).thenReturn(List.of());
+
+        RemoteIntegrationWorkflowServiceClient remoteIntegrationWorkflowServiceClient =
+            new RemoteIntegrationWorkflowServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationWorkflowServiceClient.getIntegrationWorkflows())
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(integrationWorkflow, otherIntegrationWorkflow);
+        assertThat(remoteIntegrationWorkflowServiceClient.getIntegrationWorkflows(7L))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(integrationWorkflow);
+        assertThat(remoteIntegrationWorkflowServiceClient.getIntegrationWorkflows(List.of(7L, 8L)))
+            .usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(integrationWorkflow, otherIntegrationWorkflow);
+        assertThat(remoteIntegrationWorkflowServiceClient.getIntegrationWorkflows(List.of())).isEmpty();
+    }
+
+    @Test
+    void testGetUnknownIntegrationWorkflowIsAnIllegalArgument() {
+        when(integrationWorkflowService.getWorkflowId(12L, "unknown"))
+            .thenThrow(new IllegalArgumentException("Workflow not found for uuid: unknown"));
+        when(integrationWorkflowService.getLastWorkflowId("unknown"))
+            .thenThrow(new IllegalArgumentException("Workflow not found for uuid: unknown"));
+        when(integrationWorkflowService.getWorkflowIntegrationWorkflow("unknown"))
+            .thenThrow(new IllegalArgumentException("Workflow not found for id: unknown"));
+
+        RemoteIntegrationWorkflowServiceClient remoteIntegrationWorkflowServiceClient =
+            new RemoteIntegrationWorkflowServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThatThrownBy(() -> remoteIntegrationWorkflowServiceClient.getWorkflowId(12L, "unknown"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Workflow not found for uuid: unknown");
+        assertThatThrownBy(() -> remoteIntegrationWorkflowServiceClient.getLastWorkflowId("unknown"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Workflow not found for uuid: unknown");
+        assertThatThrownBy(() -> remoteIntegrationWorkflowServiceClient.getWorkflowIntegrationWorkflow("unknown"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Workflow not found for id: unknown");
+    }
+
+    @Test
     void testGetAppEvent() {
         AppEvent appEvent = new AppEvent();
 
@@ -636,6 +726,23 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
         ReflectionTestUtils.setField(integrationInstance, "lastModifiedDate", Instant.parse("2026-10-27T11:30:00Z"));
 
         return integrationInstance;
+    }
+
+    private static IntegrationWorkflow integrationWorkflow(long id, String workflowId) {
+        IntegrationWorkflow integrationWorkflow = new IntegrationWorkflow(
+            7L, 2, workflowId, UUID.fromString("5f0c3f1e-6a0b-4c3e-9d1a-2b7e8f9a0c1d"));
+
+        integrationWorkflow.setPermissionExpression("hasRole('ADMIN')");
+        integrationWorkflow.setVersion(3);
+
+        ReflectionTestUtils.setField(integrationWorkflow, "id", id);
+        ReflectionTestUtils.setField(integrationWorkflow, "createdBy", "admin@localhost.com");
+        ReflectionTestUtils.setField(integrationWorkflow, "createdDate", Instant.parse("2026-10-26T10:00:00Z"));
+        ReflectionTestUtils.setField(integrationWorkflow, "lastModifiedBy", "user@localhost.com");
+        ReflectionTestUtils.setField(
+            integrationWorkflow, "lastModifiedDate", LocalDateTime.parse("2026-10-27T11:30:00"));
+
+        return integrationWorkflow;
     }
 
     private static IntegrationInstanceConfigurationWorkflowConnection connection(long connectionId) {
