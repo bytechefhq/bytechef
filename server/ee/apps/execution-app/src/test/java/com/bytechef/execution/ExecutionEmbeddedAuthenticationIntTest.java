@@ -118,6 +118,11 @@ class ExecutionEmbeddedAuthenticationIntTest {
         assertThat(status(authorized(token("external-user-2", KEY_PAIR)))).isEqualTo(401);
     }
 
+    @Test
+    void testEmbeddedPagesAreDenied() throws Exception {
+        assertThat(status(get("/workflow-builder.html"))).isEqualTo(403);
+    }
+
     private static MockHttpServletRequestBuilder authorized(String bearerToken) {
         return request().header("Authorization", "Bearer " + bearerToken)
             .header("X-ENVIRONMENT", Environment.PRODUCTION.name());
