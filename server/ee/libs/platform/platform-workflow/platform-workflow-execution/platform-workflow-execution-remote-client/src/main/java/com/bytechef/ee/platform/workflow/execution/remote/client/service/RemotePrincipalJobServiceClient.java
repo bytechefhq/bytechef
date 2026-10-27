@@ -82,7 +82,9 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
 
     @Override
     public long getJobPrincipalId(long jobId, PlatformType type) {
-        throw new UnsupportedOperationException();
+        Optional<Long> jobPrincipalIdOptional = fetchJobPrincipalId(jobId, type);
+
+        return jobPrincipalIdOptional.orElseThrow();
     }
 
     @Override
