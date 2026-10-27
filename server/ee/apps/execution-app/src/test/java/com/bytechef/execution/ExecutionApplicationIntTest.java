@@ -10,18 +10,24 @@ package com.bytechef.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.bytechef.atlas.coordinator.event.StartJobEvent;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
+import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.grpc.BindableService;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.EvaluationContext;
@@ -46,7 +52,13 @@ public class ExecutionApplicationIntTest {
     private ApplicationContext applicationContext;
 
     @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
     private Environment environment;
+
+    @Autowired
+    private MemoryMessageBroker memoryMessageBroker;
 
     @Autowired
     private ObjectProvider<ToolInvocationLogRetentionJob> toolInvocationLogRetentionJobProvider;
@@ -106,6 +118,20 @@ public class ExecutionApplicationIntTest {
             "bytechef.platform.component.remote.v1.ComponentDefinitionRemoteService",
             "bytechef.platform.workflow.task.dispatcher.remote.v1.TaskDispatcherDefinitionRemoteService",
             "bytechef.platform.scheduler.remote.v1.TriggerSchedulerRemoteService");
+    }
+
+    @Test
+    void testJobEventsPublishedHereReachTheMessageBroker() throws Exception {
+        CompletableFuture<Object> receivedMessage = new CompletableFuture<>();
+
+        memoryMessageBroker.receive(TaskCoordinatorMessageRoute.JOB_START_EVENTS, receivedMessage::complete);
+
+        applicationEventPublisher.publishEvent(new StartJobEvent(42L));
+
+        Object message = receivedMessage.get(10, TimeUnit.SECONDS);
+
+        assertThat(message).isInstanceOfSatisfying(
+            StartJobEvent.class, startJobEvent -> assertThat(startJobEvent.getJobId()).isEqualTo(42L));
     }
 
     @Test
