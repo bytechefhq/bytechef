@@ -147,7 +147,9 @@ const ConnectionConfigurationListFormField = ({
                                         <SelectValue placeholder="Select a connection...">
                                             {currentConnection && (
                                                 <div className="flex w-full min-w-0 items-center space-x-1">
-                                                    <span className="min-w-0 truncate">{currentConnection.name}</span>
+                                                    <span className="min-w-0 flex-1 truncate">
+                                                        {currentConnection.name}
+                                                    </span>
 
                                                     <span className="shrink-0">
                                                         <EnvironmentBadge
