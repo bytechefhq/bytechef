@@ -29,6 +29,7 @@ public class RecordingPermissionService implements PermissionService {
     private final List<ResourceScopeCheck> resourceScopeChecks = new ArrayList<>();
 
     private boolean granted = true;
+    private boolean tenantAdmin = true;
 
     public List<ResourceScopeCheck> getResourceScopeChecks() {
         return List.copyOf(resourceScopeChecks);
@@ -38,10 +39,15 @@ public class RecordingPermissionService implements PermissionService {
         resourceScopeChecks.clear();
 
         granted = true;
+        tenantAdmin = true;
     }
 
     public void setGranted(boolean granted) {
         this.granted = granted;
+    }
+
+    public void setTenantAdmin(boolean tenantAdmin) {
+        this.tenantAdmin = tenantAdmin;
     }
 
     @Override
@@ -106,6 +112,6 @@ public class RecordingPermissionService implements PermissionService {
 
     @Override
     public boolean isTenantAdmin() {
-        return granted;
+        return granted && tenantAdmin;
     }
 }
