@@ -18,8 +18,11 @@ import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cloud.client.ServiceInstance;
@@ -34,6 +37,8 @@ import org.springframework.util.unit.DataSize;
  */
 @Component
 public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
+
+    private static final Duration SHUTDOWN_GRACE_PERIOD = Duration.ofSeconds(10);
 
     private final Duration deadline;
     private final Map<String, ManagedChannel> instanceManagedChannels = new ConcurrentHashMap<>();
@@ -59,17 +64,37 @@ public class ManagedGrpcChannels implements AutoCloseable, GrpcChannels {
 
     @Override
     public void close() {
-        for (ManagedChannel managedChannel : managedChannels.values()) {
-            managedChannel.shutdownNow();
-        }
+        List<ManagedChannel> channels = new ArrayList<>(managedChannels.values());
+
+        channels.addAll(instanceManagedChannels.values());
 
         managedChannels.clear();
+        instanceManagedChannels.clear();
 
-        for (ManagedChannel managedChannel : instanceManagedChannels.values()) {
-            managedChannel.shutdownNow();
+        for (ManagedChannel managedChannel : channels) {
+            managedChannel.shutdown();
         }
 
-        instanceManagedChannels.clear();
+        long deadlineNanos = System.nanoTime() + SHUTDOWN_GRACE_PERIOD.toNanos();
+
+        for (ManagedChannel managedChannel : channels) {
+            awaitTermination(managedChannel, deadlineNanos);
+        }
+    }
+
+    private static void awaitTermination(ManagedChannel managedChannel, long deadlineNanos) {
+        try {
+            if (!managedChannel.awaitTermination(
+                Math.max(0, deadlineNanos - System.nanoTime()), TimeUnit.NANOSECONDS)) {
+
+                managedChannel.shutdownNow();
+            }
+        } catch (InterruptedException interruptedException) {
+            managedChannel.shutdownNow();
+
+            Thread.currentThread()
+                .interrupt();
+        }
     }
 
     @Override
