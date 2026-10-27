@@ -46,7 +46,7 @@ public class IntegrationInstanceRemoteServiceGrpcServer
                 request.getConnectedUserId(), request.getEnabled());
         } else if (request.hasEnvironment()) {
             integrationInstances = integrationInstanceService.getConnectedUserIntegrationInstances(
-                request.getConnectedUserId(), Environment.values()[request.getEnvironment()]);
+                request.getConnectedUserId(), toEnvironment(request.getEnvironment()));
         } else {
             integrationInstances = integrationInstanceService.getConnectedUserIntegrationInstances(
                 request.getConnectedUserId());
@@ -54,5 +54,15 @@ public class IntegrationInstanceRemoteServiceGrpcServer
 
         responseObserver.onNext(embeddedConfigurationProtoMapper.toProto(integrationInstances));
         responseObserver.onCompleted();
+    }
+
+    private static Environment toEnvironment(int ordinal) {
+        Environment[] environments = Environment.values();
+
+        if (ordinal < 0 || ordinal >= environments.length) {
+            throw new IllegalArgumentException("Unknown environment: " + ordinal);
+        }
+
+        return environments[ordinal];
     }
 }

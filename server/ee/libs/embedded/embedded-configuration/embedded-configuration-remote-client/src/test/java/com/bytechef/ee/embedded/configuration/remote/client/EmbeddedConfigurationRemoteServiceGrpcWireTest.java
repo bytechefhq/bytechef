@@ -44,6 +44,8 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceCon
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceWorkflowRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationRemoteServiceGrpcServer;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserIntegrationInstancesRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInstanceRemoteServiceGrpc;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -59,8 +61,11 @@ import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.ServerInterceptor;
 import io.grpc.ServerInterceptors;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +73,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.grpc.server.exception.GrpcExceptionHandlerInterceptor;
+import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -321,6 +327,22 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testGetConnectedUserIntegrationInstancesWithUnknownEnvironmentIsAnInvalidArgument() {
+        IntegrationInstanceRemoteServiceGrpc.IntegrationInstanceRemoteServiceBlockingStub stub =
+            IntegrationInstanceRemoteServiceGrpc.newBlockingStub(managedChannel);
+        ConnectedUserIntegrationInstancesRequest request = ConnectedUserIntegrationInstancesRequest.newBuilder()
+            .setConnectedUserId(7L)
+            .setEnvironment(Environment.values().length)
+            .build();
+
+        assertThatThrownBy(() -> stub.getConnectedUserIntegrationInstances(request))
+            .isInstanceOfSatisfying(
+                StatusRuntimeException.class,
+                exception -> assertThat(exception.getStatus()
+                    .getCode()).isEqualTo(Status.Code.INVALID_ARGUMENT));
+    }
+
+    @Test
     void testGetIntegrationInstanceWorkflow() {
         IntegrationInstanceWorkflow integrationInstanceWorkflow = new IntegrationInstanceWorkflow();
 
@@ -417,6 +439,11 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
         integrationInstance.setId(17L);
         integrationInstance.setIntegrationInstanceConfigurationId(11L);
         integrationInstance.setVersion(2);
+
+        ReflectionTestUtils.setField(integrationInstance, "createdBy", "admin@localhost.com");
+        ReflectionTestUtils.setField(integrationInstance, "createdDate", Instant.parse("2026-10-26T10:00:00Z"));
+        ReflectionTestUtils.setField(integrationInstance, "lastModifiedBy", "user@localhost.com");
+        ReflectionTestUtils.setField(integrationInstance, "lastModifiedDate", Instant.parse("2026-10-27T11:30:00Z"));
 
         return integrationInstance;
     }
