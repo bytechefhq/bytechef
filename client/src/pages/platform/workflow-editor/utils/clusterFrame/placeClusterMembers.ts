@@ -2,7 +2,11 @@ import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
 import {getClusterElementsLayoutElements} from '../layoutUtils';
-import {CLUSTER_FRAME_MEMBER_ROW_Y, CLUSTER_FRAME_PLACEHOLDER_Y} from './clusterFrameGeometry';
+import {
+    CLUSTER_FRAME_MEMBER_ROW_Y,
+    CLUSTER_FRAME_NESTED_ROOT_EXTRA_HEIGHT,
+    CLUSTER_FRAME_PLACEHOLDER_Y,
+} from './clusterFrameGeometry';
 
 interface PlaceClusterMembersProps {
     clusterRootId: string;
@@ -50,7 +54,12 @@ export function placeClusterMembers({
 
     return memberNodes.map((memberNode) => {
         if (memberNode.type === 'placeholder') {
-            return {...memberNode, position: {...memberNode.position, y: CLUSTER_FRAME_PLACEHOLDER_Y}};
+            const placeholderY =
+                memberNode.parentId === clusterRootId
+                    ? CLUSTER_FRAME_PLACEHOLDER_Y
+                    : CLUSTER_FRAME_PLACEHOLDER_Y + CLUSTER_FRAME_NESTED_ROOT_EXTRA_HEIGHT;
+
+            return {...memberNode, position: {...memberNode.position, y: placeholderY}};
         }
 
         const placedPosition = placedPositionsById.get(memberNode.id);

@@ -11,6 +11,7 @@ import {
     CLUSTER_FRAME_MEMBER_ROW_Y,
     CLUSTER_FRAME_MIN_HEIGHT,
     CLUSTER_FRAME_MIN_WIDTH,
+    CLUSTER_FRAME_NESTED_ROOT_EXTRA_HEIGHT,
     CLUSTER_FRAME_PADDING,
     CLUSTER_FRAME_PLACEHOLDER_Y,
     CLUSTER_FRAME_TITLE_LINE_HEIGHT,
@@ -47,11 +48,11 @@ function buildElementNode(id: string, position: {x: number; y: number}, parentId
     };
 }
 
-function buildPlaceholderElementNode(id: string, position: {x: number; y: number}): Node {
+function buildPlaceholderElementNode(id: string, position: {x: number; y: number}, parentId: string = ROOT_ID): Node {
     return {
         data: {clusterElementType: 'model', label: '+'},
         id,
-        parentId: ROOT_ID,
+        parentId,
         position,
         type: 'placeholder',
     };
@@ -219,6 +220,33 @@ describe('layoutClusterFrames', () => {
 
         expect(contentYById.get('model_1')).toBe(CLUSTER_FRAME_MEMBER_ROW_Y);
         expect(contentYById.get(`${ROOT_ID}-model-placeholder-0`)).toBe(CLUSTER_FRAME_PLACEHOLDER_Y);
+    });
+
+    it('places a nested root placeholder below the taller nested root card', () => {
+        const nestedRootNode = buildElementNode('chatMemory_1', {x: 100, y: 200});
+
+        const result = layoutClusterFrames(
+            [buildRootNode()],
+            [],
+            {
+                edgesByRootId: {[ROOT_ID]: []},
+                nodesByRootId: {
+                    [ROOT_ID]: [
+                        nestedRootNode,
+                        buildPlaceholderElementNode('chatMemory_1-model-placeholder-0', {x: 0, y: 0}, 'chatMemory_1'),
+                    ],
+                },
+            },
+            {}
+        );
+
+        const nestedPlaceholderNode = result.memberNodes.find(
+            (memberNode) => memberNode.id === 'chatMemory_1-model-placeholder-0'
+        )!;
+
+        expect(nestedPlaceholderNode.position.y).toBe(
+            CLUSTER_FRAME_PLACEHOLDER_Y + CLUSTER_FRAME_NESTED_ROOT_EXTRA_HEIGHT
+        );
     });
 
     it('leaves as much space below the last element label as the header leaves below its title', () => {
