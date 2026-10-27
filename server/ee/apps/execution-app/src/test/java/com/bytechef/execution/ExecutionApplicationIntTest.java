@@ -99,6 +99,13 @@ public class ExecutionApplicationIntTest {
             "bytechef.platform.workflow.execution.remote.v1.TriggerExecutionRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerLifecycleFacadeRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerStateRemoteService");
+        assertThat(serviceNames).doesNotContain(
+            "bytechef.platform.configuration.remote.v1.WorkflowRemoteService",
+            "bytechef.automation.configuration.remote.v1.ProjectRemoteService",
+            "bytechef.platform.connection.remote.v1.ConnectionRemoteService",
+            "bytechef.platform.component.remote.v1.ComponentDefinitionRemoteService",
+            "bytechef.platform.workflow.task.dispatcher.remote.v1.TaskDispatcherDefinitionRemoteService",
+            "bytechef.platform.scheduler.remote.v1.TriggerSchedulerRemoteService");
     }
 
     @Test
