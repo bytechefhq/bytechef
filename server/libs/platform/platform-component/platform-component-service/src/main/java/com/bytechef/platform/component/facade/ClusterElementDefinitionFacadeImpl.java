@@ -140,9 +140,17 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable Long connectionId) {
 
+        return executeTool(componentName, componentVersion, clusterElementName, inputParameters, connectionId, false);
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId, boolean editorEnvironment) {
+
         return clusterElementDefinitionService.executeTool(
             componentName, componentVersion, clusterElementName, inputParameters, getComponentConnection(connectionId),
-            false);
+            editorEnvironment);
     }
 
     private ClusterElementResolverFunction createClusterElementResolver(
