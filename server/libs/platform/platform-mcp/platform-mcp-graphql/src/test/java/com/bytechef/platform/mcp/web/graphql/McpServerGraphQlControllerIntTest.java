@@ -108,7 +108,7 @@ public class McpServerGraphQlControllerIntTest {
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
         when(mcpServerFacade.getMcpServer(1L)).thenReturn(mockServer);
-        when(mcpServerService.getMcpServerSecretKey(1L)).thenThrow(new AccessDeniedException("Access Denied"));
+        when(mcpServerFacade.getMcpServerSecretKey(1L)).thenThrow(new AccessDeniedException("Access Denied"));
 
         this.graphQlTester
             .document("""
@@ -125,6 +125,8 @@ public class McpServerGraphQlControllerIntTest {
                 assertThat(url).doesNotContain("secret-key-1");
                 assertThat(url).endsWith("/mcp");
             });
+
+        verify(mcpServerService, never()).getMcpServerSecretKey(anyLong());
     }
 
     @Test
@@ -133,7 +135,7 @@ public class McpServerGraphQlControllerIntTest {
             1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
 
         when(mcpServerFacade.getMcpServer(1L)).thenReturn(mockServer);
-        when(mcpServerService.getMcpServerSecretKey(1L)).thenReturn("secret-key-1");
+        when(mcpServerFacade.getMcpServerSecretKey(1L)).thenReturn("secret-key-1");
 
         this.graphQlTester
             .document("""
@@ -147,6 +149,53 @@ public class McpServerGraphQlControllerIntTest {
             .path("mcpServer.url")
             .entity(String.class)
             .satisfies(url -> assertThat(url).contains("secret-key-1"));
+
+        verify(mcpServerService, never()).getMcpServerSecretKey(anyLong());
+    }
+
+    @Test
+    void testSecretKeyIsDeniedWhenTheCallerIsNotAnEditor() {
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerFacade.getMcpServer(1L)).thenReturn(mockServer);
+        when(mcpServerFacade.getMcpServerSecretKey(1L)).thenThrow(new AccessDeniedException("Access Denied"));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    mcpServer(id: "1") {
+                        secretKey
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .satisfy(errors -> assertThat(errors).isNotEmpty());
+
+        verify(mcpServerService, never()).getMcpServerSecretKey(anyLong());
+    }
+
+    @Test
+    void testSecretKeyIsReturnedToAnEditor() {
+        McpServer mockServer = createMockMcpServer(
+            1L, "Test Server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerFacade.getMcpServer(1L)).thenReturn(mockServer);
+        when(mcpServerFacade.getMcpServerSecretKey(1L)).thenReturn("secret-key-1");
+
+        this.graphQlTester
+            .document("""
+                query {
+                    mcpServer(id: "1") {
+                        secretKey
+                    }
+                }
+                """)
+            .execute()
+            .path("mcpServer.secretKey")
+            .entity(String.class)
+            .isEqualTo("secret-key-1");
     }
 
     @Test
