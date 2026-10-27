@@ -29,6 +29,7 @@ import com.bytechef.ee.platform.component.remote.grpc.ConnectionDefinitionRemote
 import com.bytechef.ee.platform.component.remote.grpc.TriggerDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
@@ -377,6 +378,27 @@ class ComponentDefinitionRemoteServiceGrpcWireTest {
         assertThat(remoteConnectionDefinitionServiceClient.getConnectionConnectionDefinition("keep", 1))
             .usingRecursiveComparison()
             .isEqualTo(connectionDefinition);
+    }
+
+    @Test
+    void testExecuteBaseUri() {
+        ComponentConnection componentConnection = new ComponentConnection(
+            "keep", 1, 1050L, Map.of("subdomain", "acme"), AuthorizationType.BEARER_TOKEN);
+
+        when(connectionDefinitionService.executeBaseUri("keep", componentConnection))
+            .thenReturn(Optional.of("https://acme.example.com/api"));
+
+        assertThat(remoteConnectionDefinitionServiceClient.executeBaseUri("keep", componentConnection))
+            .contains("https://acme.example.com/api");
+    }
+
+    @Test
+    void testExecuteBaseUriWithoutBaseUriIsEmpty() {
+        ComponentConnection componentConnection = new ComponentConnection("keep", 1, 1050L, Map.of(), null);
+
+        when(connectionDefinitionService.executeBaseUri("keep", componentConnection)).thenReturn(Optional.empty());
+
+        assertThat(remoteConnectionDefinitionServiceClient.executeBaseUri("keep", componentConnection)).isEmpty();
     }
 
     private static ComponentDefinition componentDefinition(String name, int version) {
