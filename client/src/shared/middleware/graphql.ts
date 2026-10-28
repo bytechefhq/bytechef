@@ -15,7 +15,7 @@ export type AiAgentEvalResultQueryVariables = Exact<{
 }>;
 
 
-export type AiAgentEvalResultQuery = { aiAgentEvalResult: { id: string, status: Types.AiAgentEvalResultStatus, score: number | null, errorMessage: string | null, transcriptFile: string | null, createdDate: any, scenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> }, verdicts: Array<{ id: string, judgeName: string, judgeType: Types.AiAgentJudgeType, judgeScope: Types.AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> } | null };
+export type AiAgentEvalResultQuery = { aiAgentEvalResult: { id: string, status: Types.AiAgentEvalResultStatus, score: number | null, conclusion: Types.AiAgentEvalResultConclusion | null, errorMessage: string | null, transcriptFile: string | null, createdDate: any, scenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> }, verdicts: Array<{ id: string, judgeName: string, judgeType: Types.AiAgentJudgeType, judgeScope: Types.AiAgentJudgeScope, status: Types.AiAgentJudgeVerdictStatus, reasonCode: string | null, score: number | null, explanation: string }> } | null };
 
 export type AiAgentEvalResultTranscriptQueryVariables = Exact<{
   id: string | number;
@@ -29,7 +29,7 @@ export type AiAgentEvalRunQueryVariables = Exact<{
 }>;
 
 
-export type AiAgentEvalRunQuery = { aiAgentEvalRun: { id: string, name: string, status: Types.AiAgentEvalRunStatus, averageScore: number | null, totalScenarios: number, completedScenarios: number, agentVersion: string | null, totalInputTokens: number | null, totalOutputTokens: number | null, startedDate: any, completedDate: any, createdDate: any, results: Array<{ id: string, status: Types.AiAgentEvalResultStatus, score: number | null, errorMessage: string | null, transcriptFile: string | null, inputTokens: number | null, outputTokens: number | null, runIndex: number | null, createdDate: any, scenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> }, verdicts: Array<{ id: string, judgeName: string, judgeType: Types.AiAgentJudgeType, judgeScope: Types.AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
+export type AiAgentEvalRunQuery = { aiAgentEvalRun: { id: string, name: string, status: Types.AiAgentEvalRunStatus, averageScore: number | null, totalScenarios: number, completedScenarios: number, agentVersion: string | null, totalInputTokens: number | null, totalOutputTokens: number | null, startedDate: any, completedDate: any, createdDate: any, results: Array<{ id: string, status: Types.AiAgentEvalResultStatus, score: number | null, conclusion: Types.AiAgentEvalResultConclusion | null, errorMessage: string | null, transcriptFile: string | null, inputTokens: number | null, outputTokens: number | null, runIndex: number | null, createdDate: any, scenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> }, verdicts: Array<{ id: string, judgeName: string, judgeType: Types.AiAgentJudgeType, judgeScope: Types.AiAgentJudgeScope, status: Types.AiAgentJudgeVerdictStatus, reasonCode: string | null, score: number | null, explanation: string }> }> } | null };
 
 export type AiAgentEvalRunsQueryVariables = Exact<{
   agentEvalTestId: string | number;
@@ -2167,6 +2167,7 @@ export const AiAgentEvalResultDocument = new TypedDocumentString(`
     }
     status
     score
+    conclusion
     errorMessage
     transcriptFile
     verdicts {
@@ -2174,7 +2175,8 @@ export const AiAgentEvalResultDocument = new TypedDocumentString(`
       judgeName
       judgeType
       judgeScope
-      passed
+      status
+      reasonCode
       score
       explanation
     }
@@ -2258,6 +2260,7 @@ export const AiAgentEvalRunDocument = new TypedDocumentString(`
       }
       status
       score
+      conclusion
       errorMessage
       transcriptFile
       inputTokens
@@ -2268,7 +2271,8 @@ export const AiAgentEvalRunDocument = new TypedDocumentString(`
         judgeName
         judgeType
         judgeScope
-        passed
+        status
+        reasonCode
         score
         explanation
       }

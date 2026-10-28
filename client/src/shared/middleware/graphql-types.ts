@@ -102,6 +102,7 @@ export type AdminUserPage = {
 
 export type AiAgentEvalResult = {
   __typename?: 'AiAgentEvalResult';
+  conclusion?: Maybe<AiAgentEvalResultConclusion>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   errorMessage?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -114,6 +115,13 @@ export type AiAgentEvalResult = {
   transcriptFile?: Maybe<Scalars['String']['output']>;
   verdicts: Array<AiAgentJudgeVerdict>;
 };
+
+export enum AiAgentEvalResultConclusion {
+  Fail = 'FAIL',
+  Inconclusive = 'INCONCLUSIVE',
+  NotApplicable = 'NOT_APPLICABLE',
+  Pass = 'PASS'
+}
 
 export enum AiAgentEvalResultStatus {
   Completed = 'COMPLETED',
@@ -205,9 +213,20 @@ export type AiAgentJudgeVerdict = {
   judgeName: Scalars['String']['output'];
   judgeScope: AiAgentJudgeScope;
   judgeType: AiAgentJudgeType;
+  /** @deprecated Use status */
   passed: Scalars['Boolean']['output'];
-  score: Scalars['Float']['output'];
+  reasonCode?: Maybe<Scalars['String']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
+  status: AiAgentJudgeVerdictStatus;
 };
+
+export enum AiAgentJudgeVerdictStatus {
+  Abstain = 'ABSTAIN',
+  Error = 'ERROR',
+  Fail = 'FAIL',
+  NotApplicable = 'NOT_APPLICABLE',
+  Pass = 'PASS'
+}
 
 export type AiAgentScenarioJudge = {
   __typename?: 'AiAgentScenarioJudge';
