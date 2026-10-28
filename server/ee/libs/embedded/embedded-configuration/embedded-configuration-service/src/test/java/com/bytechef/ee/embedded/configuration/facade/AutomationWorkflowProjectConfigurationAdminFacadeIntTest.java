@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -125,6 +126,9 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     @Autowired
     private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
+    @Autowired
+    private ProjectWorkflowService projectWorkflowService;
+
     @Test
     void testCreateConfigurationWithUnpublishedVersionThrows() {
         long projectId = createPublishedProject("Unpublished Version", 1);
@@ -186,6 +190,12 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         assertThat(configuration.workflows()
             .getFirst()
             .enabled()).isTrue();
+        assertThat(configuration.workflows()
+            .getFirst()
+            .workflowId()).isEqualTo(
+                projectWorkflowService.getProjectWorkflows(projectId, 1)
+                    .getFirst()
+                    .getWorkflowId());
 
         automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 2, true, true);
 

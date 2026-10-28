@@ -54,8 +54,8 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
         AutomationWorkflowProjectConfigurationDTO configuration = new AutomationWorkflowProjectConfigurationDTO(
             5L, 7L, 0L, 2, true, false,
             List.of(
-                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-one", "One", true),
-                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-two", "Two", false)),
+                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-one", "workflow-id-one", "One", true),
+                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-two", "workflow-id-two", "Two", false)),
             Instant.parse("2026-10-28T10:00:00Z"));
 
         when(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(7L))
@@ -74,6 +74,7 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
                         lastModifiedDate
                         workflows {
                             workflowUuid
+                            workflowId
                             label
                             enabled
                         }
@@ -95,7 +96,10 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
             .containsExactly(true, false)
             .path("automationWorkflowProjectConfigurations[0].workflows[1].label")
             .entity(String.class)
-            .isEqualTo("Two");
+            .isEqualTo("Two")
+            .path("automationWorkflowProjectConfigurations[0].workflows[*].workflowId")
+            .entityList(String.class)
+            .containsExactly("workflow-id-one", "workflow-id-two");
     }
 
     @Test

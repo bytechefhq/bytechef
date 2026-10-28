@@ -24,6 +24,6 @@ public record AutomationWorkflowProjectConfigurationDTO(
     /**
      * @version ee
      */
-    public record Workflow(String workflowUuid, String label, boolean enabled) {
+    public record Workflow(String workflowUuid, String workflowId, String label, boolean enabled) {
     }
 }

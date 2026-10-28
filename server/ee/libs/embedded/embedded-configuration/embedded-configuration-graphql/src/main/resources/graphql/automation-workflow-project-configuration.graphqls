@@ -11,6 +11,7 @@ type AutomationWorkflowProjectConfiguration {
 
 type AutomationWorkflowProjectConfigurationWorkflow {
     workflowUuid: ID!
+    workflowId: ID!
     label: String
     enabled: Boolean!
 }
