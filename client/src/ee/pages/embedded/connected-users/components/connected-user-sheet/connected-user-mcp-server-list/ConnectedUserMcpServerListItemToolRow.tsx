@@ -32,7 +32,7 @@ const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpSe
                 )}
             </div>
 
-            <div className="relative mr-11 flex shrink-0 items-center">
+            <div className="relative mr-3 flex shrink-0 items-center">
                 {enableConnectedUserMcpToolMutation.isPending && (
                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                 )}
