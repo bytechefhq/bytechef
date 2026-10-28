@@ -226,8 +226,8 @@ class RequestTriggerApiControllerIntTest {
             .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("uuid-3", 42L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("uuid-3"))
-            .thenReturn("automation-workflow-3");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("uuid-3")))
+            .thenReturn(Optional.of("automation-workflow-3"));
         when(workflowService.getWorkflow("automation-workflow-3"))
             .thenReturn(requestTriggerWorkflow("trigger_3"));
 
@@ -243,6 +243,51 @@ class RequestTriggerApiControllerIntTest {
         verify(connectedUserWorkflowReferenceFacade).getConnectedUserWorkflows(1L);
         verifyNoMoreInteractions(connectedUserWorkflowReferenceFacade);
         verifyNoInteractions(projectDeploymentService);
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testReferenceDispatchesAgainstItsPinnedVersionWhenTheLatestPublishDropsTheTrigger() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-30"), any()))
+            .thenReturn(Optional.empty());
+        when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of(referenceFor("uuid-30", 44L, true, false)));
+        when(projectWorkflowService.getLastPublishedWorkflowId("uuid-30"))
+            .thenReturn("automation-workflow-30-v2");
+        when(workflowService.getWorkflow("automation-workflow-30-v2"))
+            .thenReturn(new Workflow("{\"label\":\"No Trigger\",\"triggers\":[],\"tasks\":[]}", Workflow.Format.JSON));
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(44L, "uuid-30"))
+            .thenReturn(Optional.of("automation-workflow-30-v1"));
+        when(workflowService.getWorkflow("automation-workflow-30-v1"))
+            .thenReturn(requestTriggerWorkflow("trigger_30"));
+
+        expectDispatched(WORKFLOW_PATH, "uuid-30");
+
+        WorkflowExecutionId workflowExecutionId = captureDispatchedWorkflowExecutionId();
+
+        Assertions.assertEquals(PlatformType.AUTOMATION, workflowExecutionId.getType());
+        Assertions.assertEquals(44L, workflowExecutionId.getJobPrincipalId());
+        Assertions.assertEquals("uuid-30", workflowExecutionId.getWorkflowUuid());
+        Assertions.assertEquals("trigger_30", workflowExecutionId.getTriggerName());
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testReferenceWhoseWorkflowIsMissingFromItsDeploymentReturnsNotFound() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationWorkflowService.fetchLastWorkflowId(eq("uuid-31"), any()))
+            .thenReturn(Optional.empty());
+        when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of(referenceFor("uuid-31", 45L, true, false)));
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(45L, "uuid-31"))
+            .thenReturn(Optional.empty());
+
+        expectNotFoundWithoutBody("uuid-31");
+
+        verifyNoInteractions(webhookWorkflowExecutor);
     }
 
     @Test
@@ -263,7 +308,7 @@ class RequestTriggerApiControllerIntTest {
         assertIdenticalResponses(disabledResult, danglingResult);
 
         verifyNoInteractions(webhookWorkflowExecutor);
-        verify(projectWorkflowService, never()).getLastPublishedWorkflowId(anyString());
+        verify(projectWorkflowService, never()).fetchProjectWorkflowWorkflowId(anyLong(), anyString());
     }
 
     @Test
@@ -290,8 +335,8 @@ class RequestTriggerApiControllerIntTest {
             .thenReturn(List.of());
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(10L))
             .thenReturn(List.of(referenceFor("uuid-9", 42L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("uuid-9"))
-            .thenReturn("automation-workflow-9");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("uuid-9")))
+            .thenReturn(Optional.of("automation-workflow-9"));
         when(workflowService.getWorkflow("automation-workflow-9"))
             .thenReturn(requestTriggerWorkflow("trigger_9"));
 
@@ -381,7 +426,7 @@ class RequestTriggerApiControllerIntTest {
         Assertions.assertEquals(workflowUuid, workflowExecutionId.getWorkflowUuid());
         Assertions.assertEquals("trigger_own", workflowExecutionId.getTriggerName());
 
-        verify(projectWorkflowService, never()).getLastPublishedWorkflowId(anyString());
+        verify(projectWorkflowService, never()).fetchProjectWorkflowWorkflowId(eq(42L), anyString());
         verify(projectDeploymentService, never()).getProjectDeploymentId(eq(11L), any());
     }
 
@@ -402,8 +447,8 @@ class RequestTriggerApiControllerIntTest {
         when(projectWorkflowService.getProjectWorkflow(500L))
             .thenReturn(
                 new ProjectWorkflow(12L, 2, "copy-wf-5", UUID.fromString("00000000-0000-0000-0000-000000000501")));
-        when(projectWorkflowService.getLastPublishedWorkflowId("template-uuid-5"))
-            .thenReturn("automation-workflow-5");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("template-uuid-5")))
+            .thenReturn(Optional.of("automation-workflow-5"));
         when(workflowService.getWorkflow("automation-workflow-5"))
             .thenReturn(requestTriggerWorkflow("trigger_reference"));
 
@@ -456,7 +501,7 @@ class RequestTriggerApiControllerIntTest {
 
         verify(connectedUserWorkflowReferenceFacade).getConnectedUserWorkflows(1L);
         verifyNoMoreInteractions(connectedUserWorkflowReferenceFacade);
-        verify(projectWorkflowService, never()).getLastPublishedWorkflowId(anyString());
+        verify(projectWorkflowService, times(1)).fetchProjectWorkflowWorkflowId(anyLong(), anyString());
     }
 
     @Test
@@ -488,7 +533,7 @@ class RequestTriggerApiControllerIntTest {
         verify(connectedUserWorkflowReferenceFacade, times(2)).getConnectedUserWorkflows(1L);
         verifyNoMoreInteractions(connectedUserWorkflowReferenceFacade);
         verifyNoInteractions(projectDeploymentService, webhookWorkflowExecutor);
-        verify(projectWorkflowService, never()).getLastPublishedWorkflowId(anyString());
+        verify(projectWorkflowService, never()).fetchProjectWorkflowWorkflowId(anyLong(), anyString());
         verify(workflowService, never()).getWorkflow(anyString());
     }
 

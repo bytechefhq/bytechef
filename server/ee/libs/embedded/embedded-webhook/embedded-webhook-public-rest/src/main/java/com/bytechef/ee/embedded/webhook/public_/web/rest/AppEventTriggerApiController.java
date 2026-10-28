@@ -256,10 +256,20 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     private Optional<WorkflowExecutionId> resolveReferenceModeWorkflowExecutionId(
         ConnectedUserProjectWorkflow reference) {
 
-        String automationWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(
-            reference.getAutomationWorkflowUuid());
+        Long projectDeploymentId = reference.getProjectDeploymentId();
 
-        Workflow workflow = workflowService.getWorkflow(automationWorkflowId);
+        if (projectDeploymentId == null) {
+            return Optional.empty();
+        }
+
+        Optional<String> automationWorkflowIdOptional = projectWorkflowService.fetchProjectWorkflowWorkflowId(
+            projectDeploymentId, reference.getAutomationWorkflowUuid());
+
+        if (automationWorkflowIdOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Workflow workflow = workflowService.getWorkflow(automationWorkflowIdOptional.get());
 
         String appEventTriggerName = findAppEventTriggerName(workflow);
 
@@ -268,8 +278,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         }
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, reference.getProjectDeploymentId(), reference.getAutomationWorkflowUuid(),
-            appEventTriggerName);
+            PlatformType.AUTOMATION, projectDeploymentId, reference.getAutomationWorkflowUuid(), appEventTriggerName);
 
         if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
             return Optional.empty();

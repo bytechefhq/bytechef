@@ -253,8 +253,15 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
-        Workflow workflow = workflowService.getWorkflow(
-            projectWorkflowService.getLastPublishedWorkflowId(automationWorkflowUuid));
+        Optional<String> automationWorkflowIdOptional = projectWorkflowService.fetchProjectWorkflowWorkflowId(
+            projectDeploymentId, automationWorkflowUuid);
+
+        if (automationWorkflowIdOptional.isEmpty()) {
+            return ResponseEntity.notFound()
+                .build();
+        }
+
+        Workflow workflow = workflowService.getWorkflow(automationWorkflowIdOptional.get());
 
         Optional<String> requestTriggerName = findRequestTriggerName(workflow);
 
