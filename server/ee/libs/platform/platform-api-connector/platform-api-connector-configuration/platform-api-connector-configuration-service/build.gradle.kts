@@ -2,6 +2,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("com.squareup.okhttp3:okhttp")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.jsoup)
     implementation("org.springframework.ai:spring-ai-client-chat")
@@ -24,6 +25,7 @@ dependencies {
 
     implementation("org.springframework.data:spring-data-jdbc")
 
+    testImplementation("com.squareup.okhttp3:okhttp-tls")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation(project(":cli:commands:component:init:openapi"))
     testImplementation(project(":server:libs:config:liquibase-config"))
