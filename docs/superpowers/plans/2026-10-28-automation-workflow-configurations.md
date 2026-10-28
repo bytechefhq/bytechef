@@ -184,7 +184,7 @@ git commit -m "6756 Add automation workflow project configuration tables"
 **Files:**
 - Modify: `ConnectedUserReferenceDeploymentManager.java` (replace `getLastPublishedVersion(long)` with `getReleasedVersion(long projectId, Environment environment)`; `createDeployment` uses the connected user's environment), `ConnectedUserReferenceRolloutManager.java` (`rollOut(long projectId, long environmentId)`; `rollOutDeploymentIfBehind` compares `!=` so rollbacks apply), `ConnectedUserReferenceAttentionResolver.java` (`UPDATE_PENDING` when `projectDeployment.getProjectVersion() != releasedVersion`), `ConnectedUserWorkflowReferenceFacadeImpl.provisionReference` (throw when not released / template disabled)
 - Delete: `AutomationWorkflowProjectPublishedEvent.java`, `AutomationWorkflowProjectPublishedEventListener.java`; remove the `publishEvent` call in `AutomationWorkflowProjectFacadeImpl.publishProject`
-- Create: `embedded-configuration-service/.../listener/AutomationWorkflowProjectConfigurationUpdatedEventListener.java` (`@Async("workerExecutor") @TransactionalEventListener(AFTER_COMMIT, fallbackExecution = true)` → `rollOut(projectId, environmentId)` then `applyConfigurationState(projectId, environmentId)` from Task 6)
+- Create: `embedded-configuration-service/.../listener/AutomationWorkflowProjectConfigurationUpdatedEventListener.java` (`@Async("workerExecutor") @TransactionalEventListener(AFTER_COMMIT, fallbackExecution = true)` → `rollOut(projectId, environmentId)`; Task 6 adds the `applyConfigurationState` call after it)
 - Test: `ConnectedUserReferenceRolloutManagerIntTest`, `ConnectedUserReferenceAttentionResolverTest`, `ConnectedUserWorkflowReferenceFacadeIntTest`
 
 **Interfaces:**
