@@ -8,11 +8,12 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
-import com.bytechef.ee.remote.client.LoadBalancedRestClient;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.ConnectedUserWorkflowCopyResolverRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.StringsResponse;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowUuidRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,24 +26,24 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserWorkflowCopyResolverClient implements ConnectedUserWorkflowCopyResolver {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String CONNECTED_USER_WORKFLOW_COPY_RESOLVER = "/remote/connected-user-workflow-copy-resolver";
 
-    private final LoadBalancedRestClient loadBalancedRestClient;
+    private final GrpcChannels grpcChannels;
 
-    @SuppressFBWarnings("EI")
-    public RemoteConnectedUserWorkflowCopyResolverClient(LoadBalancedRestClient loadBalancedRestClient) {
-        this.loadBalancedRestClient = loadBalancedRestClient;
+    public RemoteConnectedUserWorkflowCopyResolverClient(GrpcChannels grpcChannels) {
+        this.grpcChannels = grpcChannels;
     }
 
     @Override
     public List<String> getWorkflowCopyUuids(String workflowUuid) {
-        List<String> workflowCopyUuids = loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(CONNECTED_USER_WORKFLOW_COPY_RESOLVER + "/get-workflow-copy-uuids/{workflowUuid}")
-                .build(workflowUuid),
-            new ParameterizedTypeReference<>() {});
+        ConnectedUserWorkflowCopyResolverRemoteServiceGrpc.ConnectedUserWorkflowCopyResolverRemoteServiceBlockingStub stub =
+            ConnectedUserWorkflowCopyResolverRemoteServiceGrpc.newBlockingStub(
+                grpcChannels.getChannel(CONFIGURATION_APP));
 
-        return workflowCopyUuids == null ? List.of() : workflowCopyUuids;
+        StringsResponse stringsResponse = stub.getWorkflowCopyUuids(
+            WorkflowUuidRequest.newBuilder()
+                .setWorkflowUuid(workflowUuid)
+                .build());
+
+        return stringsResponse.getValuesList();
     }
 }
