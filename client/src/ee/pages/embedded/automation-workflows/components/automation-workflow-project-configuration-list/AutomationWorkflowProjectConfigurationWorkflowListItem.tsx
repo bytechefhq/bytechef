@@ -32,25 +32,16 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
 
     const workflowLabel = workflow.label || workflow.workflowUuid;
 
-    const handleOpenExecutions = () => {
-        const workflowTemplate = project.workflowTemplates.find(
-            (template) => template.workflowUuid === workflow.workflowUuid
-        );
-
-        if (!workflowTemplate) {
-            return;
-        }
-
+    const handleOpenExecutions = () =>
         openAutomationWorkflowExecutionsSheet({
             environmentId: Number(configuration.environmentId),
             projectName: project.name,
             workflow: {
                 label: workflow.label,
-                workflowId: workflowTemplate.workflowId,
+                workflowId: workflow.workflowId,
                 workflowUuid: workflow.workflowUuid,
             },
         });
-    };
 
     return (
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
