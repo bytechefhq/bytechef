@@ -222,7 +222,6 @@ const ProjectDeploymentWorkflowListItem = ({
                     <WorkflowTriggerAndComponentsRow
                         className="hidden sm:flex"
                         filteredComponentNames={filteredComponentNames}
-                        fitToWidth
                         workflow={workflow}
                         workflowComponentDefinitions={workflowComponentDefinitions}
                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
