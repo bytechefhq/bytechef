@@ -21,6 +21,8 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +41,8 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class PrepaidJobStartedApplicationEventListener implements ApplicationEventListener {
 
+    private static final Logger log = LoggerFactory.getLogger(PrepaidJobStartedApplicationEventListener.class);
+
     private final PrepaidUnitConsumptionService prepaidUnitConsumptionService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -51,7 +55,14 @@ public class PrepaidJobStartedApplicationEventListener implements ApplicationEve
         if (applicationEvent instanceof JobStatusApplicationEvent jobStatusApplicationEvent &&
             jobStatusApplicationEvent.getStatus() == Job.Status.STARTED) {
 
-            prepaidUnitConsumptionService.consumeUnit(jobStatusApplicationEvent.getJobId());
+            long jobId = jobStatusApplicationEvent.getJobId();
+
+            try {
+                prepaidUnitConsumptionService.consumeUnit(jobId);
+            } catch (RuntimeException runtimeException) {
+                // Billing bookkeeping must never disrupt job event processing or later listeners.
+                log.error("Failed to count prepaid unit for job {}", jobId, runtimeException);
+            }
         }
     }
 }
