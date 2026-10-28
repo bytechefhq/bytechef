@@ -23,4 +23,6 @@ public interface CodeWorkflowContainerFacade {
     CodeWorkflowContainer create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
         byte[] bytes, PlatformType type);
+
+    void delete(long id);
 }
