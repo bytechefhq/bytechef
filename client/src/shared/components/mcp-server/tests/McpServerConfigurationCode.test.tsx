@@ -1,5 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpServerConfigurationCode from '../McpServerConfigurationCode';
@@ -23,6 +23,7 @@ beforeEach(() => {
 afterEach(() => {
     resetAll();
     vi.clearAllMocks();
+    vi.useRealTimers();
 });
 
 describe('McpServerConfigurationCode', () => {
@@ -59,5 +60,50 @@ describe('McpServerConfigurationCode', () => {
         renderConfigurationCode();
 
         expect(screen.getByText(SERVER_URL)).toBeInTheDocument();
+    });
+
+    describe('copy', () => {
+        const writeText = vi.fn();
+
+        beforeEach(() => {
+            Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {writeText}});
+
+            vi.useFakeTimers();
+        });
+
+        it('copies the server URL and shows the copied state for two seconds', () => {
+            const {container} = render(
+                <TooltipProvider>
+                    <McpServerConfigurationCode codeSnippet={SERVER_URL} onRefresh={vi.fn()} />
+                </TooltipProvider>
+            );
+
+            fireEvent.click(screen.getByRole('button', {name: 'Copy server URL'}));
+
+            expect(writeText).toHaveBeenCalledWith(SERVER_URL);
+            expect(container.querySelector('.lucide-check')).toBeInTheDocument();
+
+            act(() => {
+                vi.advanceTimersByTime(2000);
+            });
+
+            expect(container.querySelector('.lucide-check')).not.toBeInTheDocument();
+        });
+
+        it('clears its pending timers when it unmounts', () => {
+            const {unmount} = render(
+                <TooltipProvider>
+                    <McpServerConfigurationCode codeSnippet={SERVER_URL} onRefresh={vi.fn()} />
+                </TooltipProvider>
+            );
+
+            fireEvent.click(screen.getByRole('button', {name: 'Copy server URL'}));
+
+            expect(vi.getTimerCount()).toBeGreaterThan(0);
+
+            unmount();
+
+            expect(vi.getTimerCount()).toBe(0);
+        });
     });
 });
