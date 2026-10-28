@@ -14,6 +14,11 @@ Name | Type
 `cancelAtPeriodEnd` | boolean
 `scheduledPlanName` | string
 `jobsExecuted` | number
+`subscriptionModel` | string
+`planUnitTotal` | number
+`planUnitUsed` | number
+`extraUnitTotal` | number
+`extraUnitUsed` | number
 
 ## Example
 
@@ -29,6 +34,11 @@ const example = {
   "cancelAtPeriodEnd": null,
   "scheduledPlanName": null,
   "jobsExecuted": null,
+  "subscriptionModel": null,
+  "planUnitTotal": null,
+  "planUnitUsed": null,
+  "extraUnitTotal": null,
+  "extraUnitUsed": null,
 } satisfies BillingSubscription
 
 console.log(example)

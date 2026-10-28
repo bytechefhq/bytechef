@@ -6,6 +6,7 @@ All URIs are relative to */api/platform/internal*
 |------------- | ------------- | -------------|
 | [**cancelSubscription**](BillingApi.md#cancelsubscription) | **DELETE** /billing/subscription | Cancel the current billing subscription at period end |
 | [**createCheckoutSession**](BillingApi.md#createcheckoutsession) | **POST** /billing/checkout | Create a Stripe Checkout Session |
+| [**createJobExecutionsPackageCheckoutSession**](BillingApi.md#createjobexecutionspackagecheckoutsession) | **POST** /billing/job-executions-package/checkout | Create a Stripe Checkout Session for a job executions package |
 | [**getCurrentSubscription**](BillingApi.md#getcurrentsubscription) | **GET** /billing/subscription | Get the current billing subscription |
 | [**reactivateSubscription**](BillingApi.md#reactivatesubscription) | **POST** /billing/reactivate | Reactivate a cancelled-at-period-end billing subscription |
 | [**upgradeSubscription**](BillingApi.md#upgradesubscription) | **PUT** /billing/subscription | Upgrade or downgrade the current billing subscription |
@@ -115,6 +116,73 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **checkoutSessionRequest** | [CheckoutSessionRequest](CheckoutSessionRequest.md) |  | |
+
+### Return type
+
+[**CheckoutSession**](CheckoutSession.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## createJobExecutionsPackageCheckoutSession
+
+> CheckoutSession createJobExecutionsPackageCheckoutSession(jobExecutionsPackageCheckoutRequest)
+
+Create a Stripe Checkout Session for a job executions package
+
+Create a Stripe Checkout Session for a one-time job executions package purchase
+
+### Example
+
+```ts
+import {
+  Configuration,
+  BillingApi,
+} from '';
+import type { CreateJobExecutionsPackageCheckoutSessionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new BillingApi();
+
+  const body = {
+    // JobExecutionsPackageCheckoutRequest
+    jobExecutionsPackageCheckoutRequest: ...,
+  } satisfies CreateJobExecutionsPackageCheckoutSessionRequest;
+
+  try {
+    const data = await api.createJobExecutionsPackageCheckoutSession(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **jobExecutionsPackageCheckoutRequest** | [JobExecutionsPackageCheckoutRequest](JobExecutionsPackageCheckoutRequest.md) |  | |
 
 ### Return type
 

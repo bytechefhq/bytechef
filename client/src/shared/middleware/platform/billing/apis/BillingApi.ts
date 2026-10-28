@@ -28,12 +28,24 @@ import {
     CheckoutSessionRequestFromJSON,
     CheckoutSessionRequestToJSON,
 } from '../models/CheckoutSessionRequest';
+import {
+    type JobExecutionsPackageCheckoutRequest,
+    JobExecutionsPackageCheckoutRequestFromJSON,
+    JobExecutionsPackageCheckoutRequestToJSON,
+} from '../models/JobExecutionsPackageCheckoutRequest';
 
 export interface CreateCheckoutSessionRequest {
     /**
      * 
      */
     checkoutSessionRequest: CheckoutSessionRequest;
+}
+
+export interface CreateJobExecutionsPackageCheckoutSessionRequest {
+    /**
+     * 
+     */
+    jobExecutionsPackageCheckoutRequest: JobExecutionsPackageCheckoutRequest;
 }
 
 export interface UpgradeSubscriptionRequest {
@@ -132,6 +144,55 @@ export class BillingApi extends runtime.BaseAPI {
      */
     async createCheckoutSession(requestParameters: CreateCheckoutSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CheckoutSession> {
         const response = await this.createCheckoutSessionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for createJobExecutionsPackageCheckoutSession without sending the request
+     */
+    async createJobExecutionsPackageCheckoutSessionRequestOpts(requestParameters: CreateJobExecutionsPackageCheckoutSessionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['jobExecutionsPackageCheckoutRequest'] == null) {
+            throw new runtime.RequiredError(
+                'jobExecutionsPackageCheckoutRequest',
+                'Required parameter "jobExecutionsPackageCheckoutRequest" was null or undefined when calling createJobExecutionsPackageCheckoutSession().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/billing/job-executions-package/checkout`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: JobExecutionsPackageCheckoutRequestToJSON(requestParameters['jobExecutionsPackageCheckoutRequest']),
+        };
+    }
+
+    /**
+     * Create a Stripe Checkout Session for a one-time job executions package purchase
+     * Create a Stripe Checkout Session for a job executions package
+     */
+    async createJobExecutionsPackageCheckoutSessionRaw(requestParameters: CreateJobExecutionsPackageCheckoutSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CheckoutSession>> {
+        const requestOptions = await this.createJobExecutionsPackageCheckoutSessionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CheckoutSessionFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a Stripe Checkout Session for a one-time job executions package purchase
+     * Create a Stripe Checkout Session for a job executions package
+     */
+    async createJobExecutionsPackageCheckoutSession(requestParameters: CreateJobExecutionsPackageCheckoutSessionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CheckoutSession> {
+        const response = await this.createJobExecutionsPackageCheckoutSessionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

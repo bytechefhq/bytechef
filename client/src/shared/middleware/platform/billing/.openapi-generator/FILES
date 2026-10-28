@@ -4,9 +4,11 @@ docs/BillingApi.md
 docs/BillingSubscription.md
 docs/CheckoutSession.md
 docs/CheckoutSessionRequest.md
+docs/JobExecutionsPackageCheckoutRequest.md
 index.ts
 models/BillingSubscription.ts
 models/CheckoutSession.ts
 models/CheckoutSessionRequest.ts
+models/JobExecutionsPackageCheckoutRequest.ts
 models/index.ts
 runtime.ts
