@@ -90,6 +90,10 @@ export interface Project {
      */
     category?: Category;
     /**
+     * The number of the project's deployments in the Development environment. Only set by the workspace project list.
+     */
+    readonly developmentDeploymentCount?: number;
+    /**
      * The project workflow ids belonging to this project.
      */
     projectWorkflowIds?: Array<number>;
@@ -140,6 +144,7 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
         'uuid': json['uuid'] == null ? undefined : json['uuid'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
+        'developmentDeploymentCount': json['developmentDeploymentCount'] == null ? undefined : json['developmentDeploymentCount'],
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'workspaceId': json['workspaceId'],
@@ -151,7 +156,7 @@ export function ProjectToJSON(json: any): Project {
     return ProjectToJSONTyped(json, false);
 }
 
-export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'|'developmentDeploymentCount'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

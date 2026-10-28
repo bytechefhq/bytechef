@@ -19,6 +19,7 @@ Name | Type
 `lastProjectVersion` | number
 `uuid` | string
 `category` | [Category](Category.md)
+`developmentDeploymentCount` | number
 `projectWorkflowIds` | Array&lt;number&gt;
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `workspaceId` | number
@@ -43,6 +44,7 @@ const example = {
   "lastProjectVersion": null,
   "uuid": null,
   "category": null,
+  "developmentDeploymentCount": null,
   "projectWorkflowIds": null,
   "tags": null,
   "workspaceId": null,
