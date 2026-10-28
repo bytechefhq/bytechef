@@ -3263,7 +3263,7 @@ public class ApplicationProperties {
                 /**
                  * Check period in seconds
                  */
-                private int checkPeriod = 5;
+                private int checkPeriod;
 
                 public int getCheckPeriod() {
                     return checkPeriod;
@@ -3777,7 +3777,7 @@ public class ApplicationProperties {
         /**
          * SMTP server port
          */
-        private int port = 25;
+        private int port;
 
         /**
          * STARTTLS configuration
@@ -4691,7 +4691,7 @@ public class ApplicationProperties {
         /**
          * Whether user sign-up is enabled
          */
-        private boolean enabled = true;
+        private boolean enabled;
 
         public boolean isActivationRequired() {
             return activationRequired;
@@ -4753,7 +4753,7 @@ public class ApplicationProperties {
         /**
          * Whether database upgrades (Liquibase migrations) run at startup
          */
-        private boolean enabled = true;
+        private boolean enabled;
 
         public boolean isEnabled() {
             return enabled;
@@ -5175,7 +5175,7 @@ public class ApplicationProperties {
                 /**
                  * Whether JDBC repository is enabled
                  */
-                private boolean enabled = true;
+                private boolean enabled;
 
                 public boolean isEnabled() {
                     return enabled;
