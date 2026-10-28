@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
+import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.ee.embedded.configuration.domain.AppEvent;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -36,6 +37,7 @@ import com.bytechef.ee.embedded.configuration.remote.client.facade.RemoteIntegra
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteAppEventServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteConnectedUserProjectDeploymentResolverClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteConnectedUserProjectServiceClient;
+import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteConnectedUserWorkflowCopyResolverClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceConfigurationServiceClient;
 import com.bytechef.ee.embedded.configuration.remote.client.service.RemoteIntegrationInstanceServiceClient;
@@ -47,6 +49,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.AutomationWorkflowProj
 import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectDeploymentResolverRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectRemoteServiceGrpcServer;
+import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserWorkflowCopyResolverRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceConfigurationRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.IntegrationInstanceConfigurationWorkflowRemoteServiceGrpcServer;
@@ -112,6 +115,8 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
         mock(AutomationProjectFacade.class);
     private final ConnectedUserProjectDeploymentResolver connectedUserProjectDeploymentResolver =
         mock(ConnectedUserProjectDeploymentResolver.class);
+    private final ConnectedUserWorkflowCopyResolver connectedUserWorkflowCopyResolver =
+        mock(ConnectedUserWorkflowCopyResolver.class);
     private final ConnectedUserProjectFacade connectedUserProjectFacade = mock(ConnectedUserProjectFacade.class);
     private final ConnectedUserProjectService connectedUserProjectService = mock(ConnectedUserProjectService.class);
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService =
@@ -146,6 +151,7 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
             new ConnectedUserProjectDeploymentResolverRemoteServiceGrpcServer(connectedUserProjectDeploymentResolver),
             new ConnectedUserProjectFacadeRemoteServiceGrpcServer(connectedUserProjectFacade),
             new ConnectedUserProjectRemoteServiceGrpcServer(connectedUserProjectService),
+            new ConnectedUserWorkflowCopyResolverRemoteServiceGrpcServer(connectedUserWorkflowCopyResolver),
             new IntegrationInstanceConfigurationRemoteServiceGrpcServer(
                 integrationInstanceConfigurationService, embeddedConfigurationProtoMapper),
             new IntegrationInstanceConfigurationWorkflowRemoteServiceGrpcServer(
@@ -763,6 +769,20 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
 
         assertThat(remoteConnectedUserProjectServiceClient.fetchConnectedUserId(1051L)).contains(7L);
         assertThat(remoteConnectedUserProjectServiceClient.fetchConnectedUserId(1052L)).isEmpty();
+    }
+
+    @Test
+    void testGetWorkflowCopyUuids() {
+        when(connectedUserWorkflowCopyResolver.getWorkflowCopyUuids("template-uuid"))
+            .thenReturn(List.of("copy-uuid-1", "copy-uuid-2"));
+        when(connectedUserWorkflowCopyResolver.getWorkflowCopyUuids("uncopied-uuid")).thenReturn(List.of());
+
+        RemoteConnectedUserWorkflowCopyResolverClient remoteConnectedUserWorkflowCopyResolverClient =
+            new RemoteConnectedUserWorkflowCopyResolverClient(fixedGrpcChannels);
+
+        assertThat(remoteConnectedUserWorkflowCopyResolverClient.getWorkflowCopyUuids("template-uuid"))
+            .containsExactly("copy-uuid-1", "copy-uuid-2");
+        assertThat(remoteConnectedUserWorkflowCopyResolverClient.getWorkflowCopyUuids("uncopied-uuid")).isEmpty();
     }
 
     private static IntegrationInstance integrationInstance() {
