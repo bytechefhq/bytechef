@@ -59,6 +59,7 @@ const Sessions = () => {
             header={
                 <Header
                     centerTitle={true}
+                    description="Devices that stay signed in to your account. Each session expires 31 days after its last sign-in; invalidate any you don't recognize."
                     position="main"
                     right={<Button label="Refresh" onClick={refreshList} />}
                     title={`Active sessions for [${account?.login}]`}
@@ -76,7 +77,7 @@ const Sessions = () => {
 
                                     <TableHead>User agent</TableHead>
 
-                                    <TableHead>Date</TableHead>
+                                    <TableHead>Last sign-in</TableHead>
 
                                     <TableHead />
                                 </TableRow>
