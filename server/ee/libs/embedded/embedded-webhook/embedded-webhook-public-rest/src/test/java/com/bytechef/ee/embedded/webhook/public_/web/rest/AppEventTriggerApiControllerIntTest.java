@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.webhook.public_.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -136,8 +137,8 @@ class AppEventTriggerApiControllerIntTest {
 
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("automation-workflow-uuid-1", 77L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-1"))
-            .thenReturn("automation-workflow-1");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-1")))
+            .thenReturn(Optional.of("automation-workflow-1"));
         when(workflowService.getWorkflow("automation-workflow-1"))
             .thenReturn(appEventWorkflow("t1"));
 
@@ -188,6 +189,37 @@ class AppEventTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
+    void testReferenceDispatchesAgainstItsPinnedVersionWhenTheLatestPublishDropsTheTrigger() {
+        stubConnectedUser("user-1", 1L);
+
+        when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of(referenceFor("automation-workflow-uuid-30", 81L, true, false)));
+        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-30"))
+            .thenReturn("automation-workflow-30-v2");
+        when(workflowService.getWorkflow("automation-workflow-30-v2"))
+            .thenReturn(new Workflow("{\"label\":\"No Trigger\",\"triggers\":[],\"tasks\":[]}", Workflow.Format.JSON));
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(81L, "automation-workflow-uuid-30"))
+            .thenReturn(Optional.of("automation-workflow-30-v1"));
+        when(workflowService.getWorkflow("automation-workflow-30-v1"))
+            .thenReturn(appEventWorkflow("t_30"));
+
+        postAppEvent();
+
+        ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdCaptor =
+            ArgumentCaptor.forClass(WorkflowExecutionId.class);
+
+        verify(webhookWorkflowExecutor).executeAsync(workflowExecutionIdCaptor.capture(), any(WebhookRequest.class));
+
+        WorkflowExecutionId workflowExecutionId = workflowExecutionIdCaptor.getValue();
+
+        Assertions.assertEquals(PlatformType.AUTOMATION, workflowExecutionId.getType());
+        Assertions.assertEquals(81L, workflowExecutionId.getJobPrincipalId());
+        Assertions.assertEquals("automation-workflow-uuid-30", workflowExecutionId.getWorkflowUuid());
+        Assertions.assertEquals("t_30", workflowExecutionId.getTriggerName());
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
     void testDanglingReferenceIsSkipped() {
         stubConnectedUser("user-1", 1L);
 
@@ -219,8 +251,8 @@ class AppEventTriggerApiControllerIntTest {
 
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("automation-workflow-uuid-4", 80L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-4"))
-            .thenReturn("automation-workflow-4");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-4")))
+            .thenReturn(Optional.of("automation-workflow-4"));
         when(workflowService.getWorkflow("automation-workflow-4"))
             .thenReturn(
                 new Workflow(
@@ -243,10 +275,10 @@ class AppEventTriggerApiControllerIntTest {
                 List.of(
                     referenceFor("automation-workflow-uuid-fail", 90L, true, false),
                     referenceFor("automation-workflow-uuid-ok", 91L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-fail"))
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-fail")))
             .thenThrow(new IllegalStateException("automation workflow lookup failed"));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-ok"))
-            .thenReturn("automation-workflow-ok");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-ok")))
+            .thenReturn(Optional.of("automation-workflow-ok"));
         when(workflowService.getWorkflow("automation-workflow-ok"))
             .thenReturn(appEventWorkflow("t_ok"));
 
@@ -271,8 +303,8 @@ class AppEventTriggerApiControllerIntTest {
 
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(10L))
             .thenReturn(List.of(referenceFor("automation-workflow-uuid-a", 77L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-a"))
-            .thenReturn("automation-workflow-a");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-a")))
+            .thenReturn(Optional.of("automation-workflow-a"));
         when(workflowService.getWorkflow("automation-workflow-a"))
             .thenReturn(appEventWorkflow("t_a"));
 
@@ -294,8 +326,8 @@ class AppEventTriggerApiControllerIntTest {
 
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("automation-workflow-uuid-1", 77L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-1"))
-            .thenReturn("automation-workflow-1");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-1")))
+            .thenReturn(Optional.of("automation-workflow-1"));
         when(workflowService.getWorkflow("automation-workflow-1"))
             .thenReturn(appEventWorkflow("t_auto"));
 
@@ -380,8 +412,8 @@ class AppEventTriggerApiControllerIntTest {
             .thenReturn(Optional.of("copy-wf-2"));
         when(workflowService.getWorkflow("copy-wf-2"))
             .thenReturn(appEventWorkflow("t_copy_mixed"));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-mixed"))
-            .thenReturn("automation-workflow-mixed");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-mixed")))
+            .thenReturn(Optional.of("automation-workflow-mixed"));
         when(workflowService.getWorkflow("automation-workflow-mixed"))
             .thenReturn(appEventWorkflow("t_reference_mixed"));
 
@@ -447,8 +479,8 @@ class AppEventTriggerApiControllerIntTest {
 
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("automation-workflow-uuid-1", 77L, true, false)));
-        when(projectWorkflowService.getLastPublishedWorkflowId("automation-workflow-uuid-1"))
-            .thenReturn("automation-workflow-1");
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("automation-workflow-uuid-1")))
+            .thenReturn(Optional.of("automation-workflow-1"));
         when(workflowService.getWorkflow("automation-workflow-1"))
             .thenReturn(appEventWorkflow("t_auto"));
 
