@@ -1,4 +1,5 @@
 import ImportApp from '@/ImportApp';
+import DevelopmentIntegrationInstanceConfigurationsRedirect from '@/ee/pages/embedded/integration-instance-configurations/DevelopmentIntegrationInstanceConfigurationsRedirect';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
 import OAuth2Redirect from '@/pages/account/public/OAuth2Redirect';
@@ -948,9 +949,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
-                                                <LazyLoadWrapper>
-                                                    <IntegrationInstanceConfigurations />
-                                                </LazyLoadWrapper>
+                                                <DevelopmentIntegrationInstanceConfigurationsRedirect>
+                                                    <LazyLoadWrapper>
+                                                        <IntegrationInstanceConfigurations />
+                                                    </LazyLoadWrapper>
+                                                </DevelopmentIntegrationInstanceConfigurationsRedirect>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),

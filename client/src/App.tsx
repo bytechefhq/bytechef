@@ -215,6 +215,10 @@ function App() {
             return false;
         }
 
+        if (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/configurations') {
+            return false;
+        }
+
         return true;
     });
 
