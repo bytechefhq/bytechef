@@ -28,6 +28,8 @@ public interface ConnectedUserProjectWorkflowService {
     Optional<ConnectedUserProjectWorkflow> fetchCopiedConnectedUserProjectWorkflow(
         long connectedUserProjectId, String copiedFromWorkflowUuid);
 
+    List<ConnectedUserProjectWorkflow> getCopiedConnectedUserProjectWorkflows(String copiedFromWorkflowUuid);
+
     ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long id);
 
     ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long connectedUserProjectId, long projectWorkflowId);
