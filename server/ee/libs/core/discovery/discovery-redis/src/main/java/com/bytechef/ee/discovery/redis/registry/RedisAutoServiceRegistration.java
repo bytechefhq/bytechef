@@ -12,6 +12,8 @@ import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegis
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 
 /**
  * @version ee
@@ -30,6 +32,13 @@ public class RedisAutoServiceRegistration extends AbstractAutoServiceRegistratio
         super(applicationContext, serviceRegistry, properties);
 
         this.redisRegistration = redisRegistration;
+    }
+
+    @EventListener
+    public void onContextClosed(ContextClosedEvent contextClosedEvent) {
+        if (contextClosedEvent.getApplicationContext() == getContext()) {
+            stop();
+        }
     }
 
     @Override
