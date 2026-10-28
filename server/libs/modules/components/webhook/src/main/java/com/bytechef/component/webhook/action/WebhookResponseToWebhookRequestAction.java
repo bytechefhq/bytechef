@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -100,11 +101,20 @@ public class WebhookResponseToWebhookRequestAction {
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return OutputResponse.of(
-            Map.of(
-                BODY, inputParameters.getMap(BODY, new TypeReference<>() {}, Map.of()),
-                HEADERS, inputParameters.getMap(HEADERS, new TypeReference<>() {}, Map.of()),
-                STATUS_CODE, inputParameters.getInteger(STATUS_CODE, 200)));
+        Map<String, Object> output = new HashMap<>();
+
+        ResponseType responseType = inputParameters.get(RESPONSE_TYPE, ResponseType.class, ResponseType.JSON);
+
+        if (responseType == ResponseType.JSON) {
+            output.put(BODY, inputParameters.getOrDefault(BODY, Map.of()));
+        } else if (responseType != ResponseType.NO_DATA && inputParameters.get(BODY) != null) {
+            output.put(BODY, inputParameters.get(BODY));
+        }
+
+        output.put(HEADERS, inputParameters.getMap(HEADERS, new TypeReference<>() {}, Map.of()));
+        output.put(STATUS_CODE, inputParameters.getInteger(STATUS_CODE, 200));
+
+        return OutputResponse.of(output);
     }
 
     protected static WebhookResponse perform(
