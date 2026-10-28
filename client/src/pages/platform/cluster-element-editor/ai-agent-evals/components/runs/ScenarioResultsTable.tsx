@@ -1,19 +1,44 @@
 import Button from '@/components/Button/Button';
 import AiAgentJudgeVerdictList from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/AiAgentJudgeVerdictList';
 import TranscriptDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/runs/TranscriptDialog';
-import {AiAgentEvalResultStatus, type AiAgentEvalRunQuery, AiAgentScenarioType} from '@/shared/middleware/graphql';
+import {
+    AiAgentEvalResultConclusion,
+    AiAgentEvalResultStatus,
+    type AiAgentEvalRunQuery,
+    AiAgentJudgeVerdictStatus,
+    AiAgentScenarioType,
+} from '@/shared/middleware/graphql';
 import {
     CheckCircle2Icon,
     ChevronDownIcon,
     ChevronRightIcon,
     FileTextIcon,
     Loader2Icon,
+    TriangleAlertIcon,
     XCircleIcon,
 } from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type ResultType = NonNullable<AiAgentEvalRunQuery['aiAgentEvalRun']>['results'][number];
+
+const getJudgeSummary = (verdicts: ResultType['verdicts']) => {
+    const passedCount = verdicts.filter((verdict) => verdict.status === AiAgentJudgeVerdictStatus.Pass).length;
+    const failedCount = verdicts.filter((verdict) => verdict.status === AiAgentJudgeVerdictStatus.Fail).length;
+    const erroredCount = verdicts.filter((verdict) => verdict.status === AiAgentJudgeVerdictStatus.Error).length;
+    const undecidedCount = verdicts.length - passedCount - failedCount;
+
+    let undecidedTitle = '';
+
+    if (undecidedCount > 0) {
+        undecidedTitle =
+            erroredCount > 0
+                ? `${undecidedCount} judge(s) did not decide, ${erroredCount} errored`
+                : `${undecidedCount} judge(s) did not decide`;
+    }
+
+    return {decidedCount: passedCount + failedCount, passedCount, undecidedCount, undecidedTitle};
+};
 
 const STATUS_ICONS: Record<AiAgentEvalResultStatus, React.ReactNode> = {
     [AiAgentEvalResultStatus.Completed]: <CheckCircle2Icon className="size-4 text-green-500" />,
@@ -59,6 +84,9 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                     const isExpanded = expandedResultId === result.id;
                     const isSingleTurn = result.scenario.type === AiAgentScenarioType.SingleTurn;
                     const scorePercent = result.score != null ? Math.round(result.score * 100) : null;
+                    const isInconclusive = result.conclusion === AiAgentEvalResultConclusion.Inconclusive;
+                    const isNotApplicable = result.conclusion === AiAgentEvalResultConclusion.NotApplicable;
+                    const judgeSummary = getJudgeSummary(result.verdicts);
                     const inputTokens = result.inputTokens ?? 0;
                     const outputTokens = result.outputTokens ?? 0;
                     const hasTokens = inputTokens > 0 || outputTokens > 0;
@@ -93,7 +121,25 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                 </div>
 
                                 <div>
-                                    {scorePercent != null ? (
+                                    {isInconclusive && (
+                                        <span
+                                            className="text-xs font-medium text-amber-600 dark:text-amber-400"
+                                            title="A judge could not reach a decision, so this scenario is neither passed nor failed"
+                                        >
+                                            Inconclusive
+                                        </span>
+                                    )}
+
+                                    {isNotApplicable && (
+                                        <span
+                                            className="text-xs text-content-neutral-tertiary"
+                                            title="No judges applied"
+                                        >
+                                            N/A
+                                        </span>
+                                    )}
+
+                                    {!isInconclusive && !isNotApplicable && scorePercent != null && (
                                         <div className="flex items-center gap-1.5">
                                             <div className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-neutral-tertiary">
                                                 <div
@@ -113,7 +159,9 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                                 {scorePercent}%
                                             </span>
                                         </div>
-                                    ) : (
+                                    )}
+
+                                    {!isInconclusive && !isNotApplicable && scorePercent == null && (
                                         <span className="text-xs text-content-neutral-tertiary">--</span>
                                     )}
                                 </div>
@@ -122,10 +170,19 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                                     {hasTokens ? `${inputTokens + outputTokens}` : '\u2014'}
                                 </div>
 
-                                <div className="text-xs text-content-neutral-secondary">
+                                <div className="flex items-center gap-1 text-xs text-content-neutral-secondary">
                                     {result.verdicts.length > 0
-                                        ? `${result.verdicts.filter((verdict) => verdict.passed).length}/${result.verdicts.length} passed`
+                                        ? `${judgeSummary.passedCount}/${judgeSummary.decidedCount} passed`
                                         : '\u2014'}
+
+                                    {judgeSummary.undecidedCount > 0 && (
+                                        <TriangleAlertIcon
+                                            aria-label={judgeSummary.undecidedTitle}
+                                            className="size-3 shrink-0 text-amber-500"
+                                        >
+                                            <title>{judgeSummary.undecidedTitle}</title>
+                                        </TriangleAlertIcon>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center gap-1">
