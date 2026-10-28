@@ -852,7 +852,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .stream()
             .filter(connectedUserProjectWorkflow -> connectedUserProjectWorkflow.getAutomationWorkflowUuid() != null)
             .map(reference -> {
-                ConnectedUserWorkflowTemplateDTO template = templatesByUuid.get(reference.getAutomationWorkflowUuid());
+                ConnectedUserWorkflowTemplateDTO template = Optional
+                    .ofNullable(templatesByUuid.get(reference.getAutomationWorkflowUuid()))
+                    .or(() -> fetchReferenceDeploymentTemplate(reference))
+                    .orElse(null);
 
                 String label = template == null ? reference.getAutomationWorkflowUuid() : template.label();
                 String description = template == null ? "" : Objects.requireNonNullElse(template.description(), "");
@@ -875,6 +878,25 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                         reference.getProjectDeploymentId(), reference.getAutomationWorkflowUuid()));
             })
             .toList();
+    }
+
+    private Optional<ConnectedUserWorkflowTemplateDTO> fetchReferenceDeploymentTemplate(
+        ConnectedUserProjectWorkflow reference) {
+
+        Long projectDeploymentId = reference.getProjectDeploymentId();
+
+        if (reference.isDangling() || projectDeploymentId == null) {
+            return Optional.empty();
+        }
+
+        String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
+
+        return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, automationWorkflowUuid)
+            .map(workflowService::getWorkflow)
+            .map(workflow -> new ConnectedUserWorkflowTemplateDTO(
+                automationWorkflowUuid, workflow.getLabel(), workflow.getDescription(), null,
+                workflowComponentResolver.getTriggerComponents(workflow),
+                workflowComponentResolver.getTaskComponents(workflow), toInputs(workflow), null));
     }
 
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {
