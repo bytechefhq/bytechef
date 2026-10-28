@@ -8,8 +8,6 @@
 package com.bytechef.ee.message.broker.aws;
 
 /**
- * Publishes a CONTROL route message to every node over Redis pub/sub.
- *
  * @version ee
  *
  * @author Ivica Cardic
