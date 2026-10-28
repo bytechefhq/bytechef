@@ -62,12 +62,14 @@ Once saved, the deployment appears in the list. Use the toggle on its row to ena
 <Steps>
 <Step>
 
-Go to **Project Deployments**.
+Go to **Project Deployments**. In the Development environment that page is not in the sidebar:
+open **Projects**, expand the project and select its **Deployments** tab instead.
 
 </Step>
 <Step>
 
-Click on **New Deployment** (the button reads **Create Deployment** when no deployment exists yet).
+Click on **New Deployment** (on the Project Deployments page the button reads **Create Deployment**
+when no deployment exists yet).
 
 </Step>
 <Step>
@@ -125,24 +127,33 @@ Project is now deployed.
 
 ## View a Project's Deployments
 
-You don't have to leave a project to check on its deployments. The **Project Deployments** button
-(rocket icon) sits next to **Deploy** in the project editor header, and next to **Deploy** on each
-published project on the Projects page. It opens a side panel listing the project's deployments in
-the current environment; the panel header takes the environment's color.
+You don't have to leave a project to check on its deployments.
 
-Each row is the same as on the Project Deployments page: the enable toggle, the **⋮** menu, the
-tags, and the arrow that expands the deployment's workflows. Clicking a workflow opens its
-[workflow executions](/platform/automation/monitor/workflow-executions). The **Refresh** button in
-the header reloads the list, and **Open in Deployments** in the footer opens the Project
-Deployments page filtered to this project.
+**On the Projects page** (Development), expand a project and select its **Deployments** tab. It lists
+the project's Development deployments, each expanded to show its workflows. Each row is the same as on
+the Project Deployments page: the enable toggle, the **⋮** menu, the tags, and the arrow that expands
+the deployment's workflows. Clicking a workflow opens its
+[workflow executions](/platform/automation/monitor/workflow-executions). **New Deployment** on the
+right of the tabs opens the deployment dialog for this project; it is disabled, with the tooltip
+"Publish the project first", until the project has a published version.
 
-When the project has no deployment in the current environment, the panel shows a **Deploy** button
-instead. A project that has never been published shows "Publish the project to deploy it", since a
-deployment always runs a published version.
+In Development, the **Project Deployments** page is not in the sidebar. Links that still point to it,
+such as a link to one project's deployments, open that project's **Deployments** tab on the Projects
+page instead.
+
+**In the project editor**, the **Project Deployments** button (rocket icon) next to **Deploy** opens a
+side panel listing the project's deployments in the current environment; the panel header takes the
+environment's color. The **Refresh** button in the header reloads the list, and
+**Open in Deployments** in the footer opens the project's **Deployments** tab on the Projects page.
+
+When the project has no deployment in the current environment, the tab and the panel show a
+**Deploy** button instead. A project that has never been published shows "Publish the project to
+deploy it", since a deployment always runs a published version.
 
 Where you land after saving a deployment depends on its environment:
 
-- **Development** - you stay where you are, and the panel opens with the new deployment expanded.
+- **Development** - you stay where you are. On the Projects page the project opens on its
+  **Deployments** tab; in the editor the side panel opens. Either way the new deployment is expanded.
 - **Staging** or **Production** - ByteChef switches to that environment and opens the Project
   Deployments page with the new deployment expanded.
 
