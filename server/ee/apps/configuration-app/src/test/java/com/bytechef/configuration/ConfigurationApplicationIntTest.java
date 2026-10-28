@@ -21,9 +21,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
+import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.ee.platform.user.remote.client.service.RemoteUserServiceClient;
 import com.bytechef.ee.platform.user.remote.grpc.UserRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.interceptor.ServiceTokenServerInterceptor;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -35,6 +38,7 @@ import io.grpc.ServerInterceptors;
 import io.grpc.netty.NettyServerBuilder;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
@@ -183,6 +187,22 @@ public class ConfigurationApplicationIntTest {
         assertThat(serviceNames).doesNotContain(
             "bytechef.atlas.execution.remote.v1.JobRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerExecutionRemoteService");
+    }
+
+    @Test
+    void testCodeWorkflowFilesAreStoredWithEveryFileStorageProvider() {
+        FileStorageServiceRegistry fileStorageServiceRegistry = applicationContext.getBean(
+            FileStorageServiceRegistry.class);
+
+        assertThat(fileStorageServiceRegistry.getFileStorageService("FILESYSTEM")).isNotNull();
+        assertThat(fileStorageServiceRegistry.getFileStorageService("JDBC")).isNotNull();
+
+        CodeWorkflowFileStorage codeWorkflowFileStorage = applicationContext.getBean(CodeWorkflowFileStorage.class);
+
+        FileEntry fileEntry = codeWorkflowFileStorage.storeCodeWorkflowFile(
+            "workflows.js", "({name: 'test'})".getBytes(StandardCharsets.UTF_8));
+
+        assertThat(fileEntry.getName()).isEqualTo("workflows.js");
     }
 
     @Test
