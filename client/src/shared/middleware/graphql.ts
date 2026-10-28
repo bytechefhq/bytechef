@@ -1077,7 +1077,7 @@ export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
 }>;
 
 
-export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, workflows: Array<{ workflowUuid: string, label: string | null, enabled: boolean }> }> };
+export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean }> }> };
 
 export type AutomationWorkflowProjectTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5984,6 +5984,7 @@ export const AutomationWorkflowProjectConfigurationsDocument = new TypedDocument
     lastModifiedDate
     workflows {
       workflowUuid
+      workflowId
       label
       enabled
     }
