@@ -4,6 +4,8 @@ server:
 bytechef:
   edition: EE
   file-storage:
+    filesystem:
+      basedir: ${java.io.tmpdir}/bytechef/file-storage
     provider: jdbc
   message-broker:
     provider: memory
