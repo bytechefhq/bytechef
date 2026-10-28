@@ -12,9 +12,12 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogRetentionJob;
 import com.bytechef.message.broker.memory.MemoryMessageBroker;
+import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
+import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.grpc.BindableService;
@@ -29,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -53,6 +57,9 @@ public class ExecutionApplicationIntTest {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private ConversionService conversionService;
 
     @Autowired
     private Environment environment;
@@ -118,6 +125,28 @@ public class ExecutionApplicationIntTest {
             "bytechef.platform.component.remote.v1.ComponentDefinitionRemoteService",
             "bytechef.platform.workflow.task.dispatcher.remote.v1.TaskDispatcherDefinitionRemoteService",
             "bytechef.platform.scheduler.remote.v1.TriggerSchedulerRemoteService");
+    }
+
+    @Test
+    void testJobConvertsToTheJobRestModels() {
+        Job job = new Job(7L);
+
+        job.setStatus(Job.Status.COMPLETED);
+        job.setWorkflowId("workflow-id");
+
+        JobModel jobModel = conversionService.convert(job, JobModel.class);
+
+        assertThat(jobModel).isNotNull();
+        assertThat(jobModel.getId()).isEqualTo("7");
+        assertThat(jobModel.getStatus()).isEqualTo(JobModel.StatusEnum.COMPLETED);
+        assertThat(jobModel.getWorkflowId()).isEqualTo("workflow-id");
+
+        JobBasicModel jobBasicModel = conversionService.convert(job, JobBasicModel.class);
+
+        assertThat(jobBasicModel).isNotNull();
+        assertThat(jobBasicModel.getId()).isEqualTo("7");
+        assertThat(jobBasicModel.getStatus()).isEqualTo(JobBasicModel.StatusEnum.COMPLETED);
+        assertThat(jobBasicModel.getWorkflowId()).isEqualTo("workflow-id");
     }
 
     @Test
