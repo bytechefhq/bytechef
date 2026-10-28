@@ -1063,7 +1063,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     private long createAutomationWorkflowProject(String name) {
         return automationWorkflowProjectFacade.createProject(
-            name + " " + UUID.randomUUID(), "", null, List.of(), null, null);
+            name + " " + UUID.randomUUID(), "", null, List.of(), null);
     }
 
     private ConnectedUser createConnectedUser(Environment environment) {
@@ -1318,7 +1318,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         private long createAutomationWorkflowProject(String name) {
             return automationWorkflowProjectFacade.createProject(
-                name + " " + UUID.randomUUID(), "", null, List.of(), null, null);
+                name + " " + UUID.randomUUID(), "", null, List.of(), null);
         }
 
         private String createConnectedUser() {

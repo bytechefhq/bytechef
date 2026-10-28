@@ -905,7 +905,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     private long createAutomationWorkflowProject(String name) {
         return automationWorkflowProjectFacade.createProject(
-            name + " " + UUID.randomUUID(), "", null, List.of(), null, null);
+            name + " " + UUID.randomUUID(), "", null, List.of(), null);
     }
 
     private String createDraftWorkflow(String projectName, String definition) {

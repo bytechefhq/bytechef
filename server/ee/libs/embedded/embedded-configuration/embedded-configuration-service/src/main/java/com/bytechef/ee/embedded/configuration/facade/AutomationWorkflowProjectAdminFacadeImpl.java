@@ -37,11 +37,10 @@ public class AutomationWorkflowProjectAdminFacadeImpl implements AutomationWorkf
 
     @Override
     public long createProject(
-        String name, String description, String category, List<String> tags, String permissionExpression,
-        @Nullable Boolean automationHubVisible) {
+        String name, String description, String category, List<String> tags, String permissionExpression) {
 
         return automationWorkflowProjectFacade.createProject(
-            name, description, category, tags, permissionExpression, automationHubVisible);
+            name, description, category, tags, permissionExpression);
     }
 
     @Override
@@ -97,10 +96,10 @@ public class AutomationWorkflowProjectAdminFacadeImpl implements AutomationWorkf
     @Override
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
-        String permissionExpression, @Nullable Boolean automationHubVisible) {
+        String permissionExpression) {
 
         automationWorkflowProjectFacade.updateProject(
-            projectId, name, description, category, tags, permissionExpression, automationHubVisible);
+            projectId, name, description, category, tags, permissionExpression);
     }
 
     @Override

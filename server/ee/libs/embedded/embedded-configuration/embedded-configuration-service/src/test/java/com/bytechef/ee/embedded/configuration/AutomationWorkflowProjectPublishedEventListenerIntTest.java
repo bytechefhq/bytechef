@@ -130,7 +130,7 @@ class AutomationWorkflowProjectPublishedEventListenerIntTest {
     @Test
     void testPublishProjectHandsTheRolloutToTheListenerAfterCommit() {
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Listener " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Listener " + UUID.randomUUID(), "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, "{\"label\":\"x\",\"triggers\":[],\"tasks\":[]}", null);
@@ -143,7 +143,7 @@ class AutomationWorkflowProjectPublishedEventListenerIntTest {
     @Test
     void testRolloutWaitsForTheCommitAndRunsOffThePublishingThread() {
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Listener " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Listener " + UUID.randomUUID(), "", null, List.of(), null);
 
         automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, "{\"label\":\"x\",\"triggers\":[],\"tasks\":[]}", null);

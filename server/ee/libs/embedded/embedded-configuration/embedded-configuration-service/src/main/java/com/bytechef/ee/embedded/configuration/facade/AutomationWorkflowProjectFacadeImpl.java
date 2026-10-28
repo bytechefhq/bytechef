@@ -135,8 +135,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public long createProject(
-        String name, String description, String category, List<String> tags, String permissionExpression,
-        @Nullable Boolean automationHubVisible) {
+        String name, String description, String category, List<String> tags, String permissionExpression) {
         if (name != null && name.startsWith("__EMBEDDED")) {
             throw new IllegalArgumentException("Project name must not start with '__EMBEDDED': " + name);
         }
@@ -370,7 +369,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     @Override
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
-        String permissionExpression, @Nullable Boolean automationHubVisible) {
+        String permissionExpression) {
         Project project = getMarkedProject(projectId);
 
         project.setName(MARKER + name);

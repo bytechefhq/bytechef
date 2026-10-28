@@ -8,7 +8,6 @@ type AutomationWorkflowProject {
     version: Int!
     lastPublishedVersion: Int
     permissionExpression: String
-    automationHubVisible: Boolean!
     workflowTemplates: [AutomationWorkflowProjectWorkflowTemplate!]!
 }
 
@@ -54,8 +53,8 @@ extend type Query {
 }
 
 extend type Mutation {
-    createAutomationWorkflowProject(name: String!, description: String, category: String, tags: [String!], permissionExpression: String, automationHubVisible: Boolean): ID!
-    updateAutomationWorkflowProject(id: ID!, name: String!, description: String, category: String, tags: [String!], permissionExpression: String, automationHubVisible: Boolean): Boolean!
+    createAutomationWorkflowProject(name: String!, description: String, category: String, tags: [String!], permissionExpression: String): ID!
+    updateAutomationWorkflowProject(id: ID!, name: String!, description: String, category: String, tags: [String!], permissionExpression: String): Boolean!
     deleteAutomationWorkflowProject(id: ID!): Boolean!
     publishAutomationWorkflowProject(id: ID!, description: String): Boolean!
     createAutomationWorkflowProjectWorkflow(projectId: ID!, definition: String, permissionExpression: String): ID!

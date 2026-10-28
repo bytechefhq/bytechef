@@ -21,8 +21,7 @@ import org.jspecify.annotations.Nullable;
  */
 public interface AutomationWorkflowProjectAdminFacade {
     long createProject(
-        String name, String description, String category, List<String> tags, String permissionExpression,
-        @Nullable Boolean automationHubVisible);
+        String name, String description, String category, List<String> tags, String permissionExpression);
 
     String createProjectWorkflow(long projectId, String definition, String permissionExpression);
 
@@ -46,7 +45,7 @@ public interface AutomationWorkflowProjectAdminFacade {
 
     void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
-        String permissionExpression, @Nullable Boolean automationHubVisible);
+        String permissionExpression);
 
     void updateProjectWorkflow(String workflowUuid, String label, String description);
 
