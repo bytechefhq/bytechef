@@ -63,6 +63,13 @@ describe('ProjectDeploymentList', () => {
         expect(screen.queryByText(/Workflows of/)).not.toBeInTheDocument();
     });
 
+    it('should expand every deployment when asked to expand all', () => {
+        renderList({expandAll: true});
+
+        expect(screen.getByText('Workflows of 1 enabled=true')).toBeInTheDocument();
+        expect(screen.getByText(/Workflows of 2/)).toBeInTheDocument();
+    });
+
     it('should expand only the newly created deployment', () => {
         renderList({newlyCreatedDeploymentId: 2});
 

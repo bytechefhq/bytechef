@@ -9,6 +9,7 @@ import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 interface ProjectDeploymentListProps {
     componentDefinitions?: ComponentDefinitionBasic[];
+    expandAll?: boolean;
     hideOpenInProject?: boolean;
     newlyCreatedDeploymentId?: number;
     project: Project;
@@ -20,6 +21,7 @@ interface ProjectDeploymentListProps {
 
 const ProjectDeploymentList = ({
     componentDefinitions,
+    expandAll = false,
     hideOpenInProject,
     newlyCreatedDeploymentId,
     project,
@@ -28,7 +30,16 @@ const ProjectDeploymentList = ({
     tags,
     taskDispatcherDefinitions,
 }: ProjectDeploymentListProps) => {
-    const [openCollapsibles, setOpenCollapsibles] = useState<Set<number>>(new Set());
+    const [openCollapsibles, setOpenCollapsibles] = useState<Set<number>>(
+        () =>
+            new Set(
+                expandAll
+                    ? projectDeployments
+                          .map((projectDeployment) => projectDeployment.id)
+                          .filter((projectDeploymentId): projectDeploymentId is number => projectDeploymentId != null)
+                    : []
+            )
+    );
 
     const projectDeploymentMap = useProjectDeploymentsEnabledStore(({projectDeploymentMap}) => projectDeploymentMap);
 

@@ -107,6 +107,14 @@ describe('ProjectWorkflowList', () => {
         expect(document.querySelector('[aria-haspopup="menu"]')).not.toBeInTheDocument();
     });
 
+    it('should not repeat a Workflows heading under the Workflows tab', () => {
+        mocks.workflows = [{id: 'a', label: 'First workflow'}];
+
+        renderProjectWorkflowList();
+
+        expect(screen.queryByRole('heading', {name: 'Workflows'})).not.toBeInTheDocument();
+    });
+
     it('should render with the design-system DropdownMenu', async () => {
         await openMenu();
 

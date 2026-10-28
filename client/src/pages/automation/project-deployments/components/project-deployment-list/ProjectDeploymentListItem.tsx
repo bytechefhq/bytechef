@@ -18,6 +18,7 @@ import {
 } from '@/shared/mutations/automation/projectDeployments.mutations';
 import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
 import {useCallback, useRef, useState} from 'react';
@@ -58,6 +59,7 @@ const ProjectDeploymentListItem = ({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
             queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
