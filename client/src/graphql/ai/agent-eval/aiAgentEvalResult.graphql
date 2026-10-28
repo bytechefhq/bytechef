@@ -22,6 +22,7 @@ query aiAgentEvalResult($id: ID!) {
         }
         status
         score
+        conclusion
         errorMessage
         transcriptFile
         verdicts {
@@ -29,7 +30,8 @@ query aiAgentEvalResult($id: ID!) {
             judgeName
             judgeType
             judgeScope
-            passed
+            status
+            reasonCode
             score
             explanation
         }
