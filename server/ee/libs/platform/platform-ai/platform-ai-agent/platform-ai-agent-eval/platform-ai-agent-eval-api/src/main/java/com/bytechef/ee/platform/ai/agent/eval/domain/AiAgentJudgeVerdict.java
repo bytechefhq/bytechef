@@ -18,6 +18,7 @@ package com.bytechef.ee.platform.ai.agent.eval.domain;
 
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentJudgeScope;
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentJudgeType;
+import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentJudgeVerdictStatus;
 import java.time.Instant;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -50,6 +51,14 @@ public final class AiAgentJudgeVerdict {
     private int judgeScope;
 
     private boolean passed;
+
+    @Column("status")
+    @Nullable
+    private Integer status;
+
+    @Column("reason_code")
+    @Nullable
+    private String reasonCode;
 
     private double score;
 
@@ -114,20 +123,49 @@ public final class AiAgentJudgeVerdict {
         this.judgeScope = judgeScope.ordinal();
     }
 
+    /**
+     * @deprecated use {@link #getStatus()}; kept so a previous release can read rows written by this one
+     */
+    @Deprecated
     public boolean isPassed() {
         return passed;
     }
 
-    public void setPassed(boolean passed) {
-        this.passed = passed;
+    public AiAgentJudgeVerdictStatus getStatus() {
+        if (status == null) {
+            return passed ? AiAgentJudgeVerdictStatus.PASS : AiAgentJudgeVerdictStatus.FAIL;
+        }
+
+        return AiAgentJudgeVerdictStatus.values()[status];
     }
 
-    public double getScore() {
+    public void setStatus(AiAgentJudgeVerdictStatus status) {
+        this.status = status.ordinal();
+        this.passed = status == AiAgentJudgeVerdictStatus.PASS;
+    }
+
+    @Nullable
+    public String getReasonCode() {
+        return reasonCode;
+    }
+
+    public void setReasonCode(@Nullable String reasonCode) {
+        this.reasonCode = reasonCode;
+    }
+
+    @Nullable
+    public Double getScore() {
+        AiAgentJudgeVerdictStatus verdictStatus = getStatus();
+
+        if (verdictStatus != AiAgentJudgeVerdictStatus.PASS && verdictStatus != AiAgentJudgeVerdictStatus.FAIL) {
+            return null;
+        }
+
         return score;
     }
 
-    public void setScore(double score) {
-        this.score = score;
+    public void setScore(@Nullable Double score) {
+        this.score = score == null ? 0.0 : score;
     }
 
     @Nullable
@@ -206,6 +244,8 @@ public final class AiAgentJudgeVerdict {
             ", judgeType=" + judgeType +
             ", judgeScope=" + judgeScope +
             ", passed=" + passed +
+            ", status=" + status +
+            ", reasonCode='" + reasonCode + '\'' +
             ", score=" + score +
             ", explanation='" + explanation + '\'' +
             ", createdDate=" + createdDate +

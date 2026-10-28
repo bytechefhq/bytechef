@@ -21,6 +21,7 @@ import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentEvalResultConclusion;
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentEvalResultStatus;
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentEvalRunStatus;
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentJudgeScope;
@@ -62,9 +63,7 @@ import io.github.markpollack.judge.Judge;
 import io.github.markpollack.judge.completion.CompletionEvidence;
 import io.github.markpollack.judge.completion.CompletionStatus;
 import io.github.markpollack.judge.judgment.Judgment;
-import io.github.markpollack.judge.jury.SimpleJury;
 import io.github.markpollack.judge.verdict.Verdict;
-import io.github.markpollack.judge.voting.AverageVotingStrategy;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -74,6 +73,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalDouble;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -205,7 +205,11 @@ public class AiAgentEvalRunExecutor {
                         evalRun, scenario, evalResult, agentResponse, transcriptJson,
                         judgeChatClientBuilder, aiAgentJudgeIds);
 
-                    resultScores.add(evalResult.getScore());
+                    Double score = evalResult.getScore();
+
+                    if (score != null) {
+                        resultScores.add(score);
+                    }
                 } catch (Exception exception) {
                     log.error(
                         "Error executing scenario {} (run {}) for eval run {}",
@@ -641,54 +645,38 @@ public class AiAgentEvalRunExecutor {
             evalRun, scenario, judgeChatClientBuilder, aiAgentJudgeIds, () -> completionEvidence);
 
         if (judges.isEmpty()) {
-            evalResult.setScore(1.0);
+            evalResult.setConclusion(AiAgentEvalResultConclusion.NOT_APPLICABLE);
+            evalResult.setScore(null);
             evalResult.setStatus(AiAgentEvalResultStatus.COMPLETED);
 
             return agentEvalResultService.updateAgentEvalResult(evalResult);
         }
 
-        SimpleJury.Builder juryBuilder = SimpleJury.builder()
-            .votingStrategy(new AverageVotingStrategy())
-            .parallel(false);
+        Verdict verdict = AiAgentEvalJury.vote(judges);
 
-        for (Judge judge : judges) {
-            juryBuilder.judge(judge);
-        }
+        Map<String, Judgment> effectiveJudgments = AiAgentEvalJury.effectiveJudgments(verdict);
 
-        SimpleJury jury = juryBuilder.build();
+        for (Map.Entry<String, Judgment> entry : effectiveJudgments.entrySet()) {
+            Judgment judgment = entry.getValue();
 
-        Verdict verdict = jury.vote();
-
-        Map<String, Judgment> individualByName = verdict.individualByName();
-
-        int passedCount = 0;
-        int totalCount = individualByName.size();
-
-        for (Map.Entry<String, Judgment> entry : individualByName.entrySet()) {
             AiAgentJudgeVerdict judgeVerdict = new AiAgentJudgeVerdict();
 
             judgeVerdict.setAgentEvalResultId(evalResult.getId());
             judgeVerdict.setJudgeName(entry.getKey());
-            judgeVerdict.setPassed(entry.getValue()
-                .pass());
-            judgeVerdict.setScore(entry.getValue()
-                .pass() ? 1.0 : 0.0);
-            judgeVerdict.setExplanation(entry.getValue()
-                .reasoning());
+            judgeVerdict.setStatus(AiAgentEvalJury.toStatus(judgment));
+            judgeVerdict.setReasonCode(AiAgentEvalJury.toReasonCode(judgment));
+            judgeVerdict.setScore(AiAgentEvalJury.toScore(judgment));
+            judgeVerdict.setExplanation(judgment.reasoning());
             judgeVerdict.setJudgeType(resolveJudgeType(entry.getKey(), evalRun, scenario));
             judgeVerdict.setJudgeScope(resolveJudgeScope(entry.getKey(), evalRun, scenario));
 
             agentJudgeVerdictService.createAgentJudgeVerdict(judgeVerdict);
-
-            if (entry.getValue()
-                .pass()) {
-                passedCount++;
-            }
         }
 
-        double score = (totalCount > 0) ? ((double) passedCount / totalCount) : 1.0;
+        AiAgentEvalResultConclusion conclusion = AiAgentEvalJury.toConclusion(verdict);
 
-        evalResult.setScore(score);
+        evalResult.setConclusion(conclusion);
+        evalResult.setScore(AiAgentEvalJury.toScore(verdict, conclusion));
         evalResult.setStatus(AiAgentEvalResultStatus.COMPLETED);
 
         return agentEvalResultService.updateAgentEvalResult(evalResult);
@@ -784,14 +772,13 @@ public class AiAgentEvalRunExecutor {
     private void finalizeRun(
         long evalRunId, List<Double> resultScores, int totalInputTokens, int totalOutputTokens) {
 
-        double averageScore = resultScores.stream()
+        OptionalDouble averageScore = resultScores.stream()
             .mapToDouble(Double::doubleValue)
-            .average()
-            .orElse(0.0);
+            .average();
 
         AiAgentEvalRun evalRun = agentEvalRunService.getAgentEvalRun(evalRunId);
 
-        evalRun.setAverageScore(averageScore);
+        evalRun.setAverageScore(averageScore.isPresent() ? averageScore.getAsDouble() : null);
         evalRun.setCompletedDate(Instant.now());
         evalRun.setTotalInputTokens(totalInputTokens);
         evalRun.setTotalOutputTokens(totalOutputTokens);
