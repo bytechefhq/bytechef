@@ -14,6 +14,7 @@ import {
 } from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useQueryClient} from '@tanstack/react-query';
@@ -56,6 +57,9 @@ const IntegrationInstanceConfigurationListItem = ({
             });
             queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationTagKeys.integrationInstanceConfigurationTags,
+            });
+            queryClient.invalidateQueries({
+                queryKey: IntegrationKeys.integrations,
             });
         },
     });

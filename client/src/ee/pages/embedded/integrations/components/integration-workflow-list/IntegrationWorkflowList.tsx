@@ -66,15 +66,9 @@ const IntegrationWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="pt-3">
+        <div>
             {workflows && workflows.length > 0 ? (
                 <>
-                    <div className="mb-1 flex items-center justify-between">
-                        <h3 className="flex justify-start pl-3 text-sm font-semibold text-content-neutral-secondary uppercase">
-                            Workflows
-                        </h3>
-                    </div>
-
                     <ul className="divide-y divide-stroke-neutral-primary">
                         {workflows
                             .sort((a, b) => a.label!.localeCompare(b.label!))
