@@ -32,6 +32,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowCopyDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
@@ -241,12 +242,12 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         givenSlackAutomationWorkflowEnvironment();
 
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Admin References " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Admin References " + UUID.randomUUID(), "", null, List.of(), null);
 
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUser connectedUser = createConnectedUserWithConnection(Environment.PRODUCTION);
 
@@ -267,14 +268,21 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         givenSlackAutomationWorkflowEnvironment();
 
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Admin Copies " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Admin Copies " + UUID.randomUUID(), "", null, List.of(), null);
 
         String copiedWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
         String referencedWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectDTO automationWorkflowProject = automationWorkflowProjectFacade.getProject(
+            automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal(),
+            automationWorkflowProject.lastPublishedVersion(), true, true);
 
         ConnectedUser productionConnectedUser = createConnectedUserWithConnection(Environment.PRODUCTION);
         ConnectedUser developmentConnectedUser = createConnectedUserWithConnection(Environment.DEVELOPMENT);
