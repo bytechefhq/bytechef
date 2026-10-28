@@ -1,13 +1,12 @@
 import AlertDialog from '@/components/AlertDialog';
 import Switch from '@/components/Switch/Switch';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
 import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
-import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import WorkflowToolRowLabel from '@/shared/components/mcp-server/WorkflowToolRowLabel';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
@@ -84,38 +83,15 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
                 <PopoverAnchor asChild>
                     <div className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-                        <div className="flex min-w-0 flex-1 items-center">
-                            <div className="flex w-full max-w-80 min-w-0 shrink items-center sm:w-80 sm:shrink-0">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <button
-                                            className="min-w-0 truncate text-left text-sm font-medium disabled:cursor-default"
-                                            disabled={!canOpenExecutions}
-                                            onClick={handleWorkflowClick}
-                                            type="button"
-                                        >
-                                            {workflowLabel}
-                                        </button>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent align="start">
-                                        {canOpenExecutions ? 'Show executions' : workflowLabel}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
-
-                            {workflow && (
-                                <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
-                                    <WorkflowTriggerAndComponentsRow
-                                        className="hidden sm:flex"
-                                        filteredComponentNames={filteredComponentNames}
-                                        workflow={workflow}
-                                        workflowComponentDefinitions={workflowComponentDefinitions}
-                                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                        <WorkflowToolRowLabel
+                            canOpenExecutions={canOpenExecutions}
+                            filteredComponentNames={filteredComponentNames}
+                            label={workflowLabel}
+                            onWorkflowClick={handleWorkflowClick}
+                            workflow={workflow}
+                            workflowComponentDefinitions={workflowComponentDefinitions}
+                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                        />
 
                         <McpToolConfigureButton label={workflowLabel} onClick={() => openPopover(popoverId)} />
 

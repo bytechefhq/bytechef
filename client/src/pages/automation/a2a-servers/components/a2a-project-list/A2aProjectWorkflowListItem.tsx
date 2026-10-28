@@ -8,18 +8,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
-import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import WorkflowToolRowLabel from '@/shared/components/mcp-server/WorkflowToolRowLabel';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {A2aProjectWorkflowsByA2aProjectIdQuery} from '@/shared/middleware/graphql';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {EditIcon, EllipsisVerticalIcon, SquareArrowOutUpRightIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {useMemo} from 'react';
 
 import {A2aProjectItemType} from './hooks/useA2aProjectList';
@@ -97,63 +96,22 @@ const A2aProjectWorkflowListItem = ({
 
     return (
         <div className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-            <div className="flex min-w-0 flex-1 items-center">
-                <div className="flex w-full max-w-80 min-w-0 shrink flex-col sm:w-80 sm:shrink-0">
-                    <div className="flex min-w-0 items-center gap-2">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <button
-                                    className="min-w-0 truncate text-left text-sm font-medium disabled:cursor-default"
-                                    disabled={!canOpenExecutions}
-                                    onClick={handleWorkflowClick}
-                                    type="button"
-                                >
-                                    {workflowLabel}
-                                </button>
-                            </TooltipTrigger>
-
-                            <TooltipContent align="start">
-                                {canOpenExecutions ? 'Show executions' : workflowLabel}
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {showOpenInProject && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        aria-label="Open in project"
-                                        className="size-6 shrink-0"
-                                        icon={<SquareArrowOutUpRightIcon className="size-3.5" />}
-                                        onClick={handleOpenInProjectClick}
-                                        size="icon"
-                                        variant="ghost"
-                                    />
-                                </TooltipTrigger>
-
-                                <TooltipContent>Open in project</TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
-
-                    {a2aProjectWorkflow.skillName && a2aProjectWorkflow.skillName !== workflowLabel && (
-                        <span className="truncate text-xs text-muted-foreground">
-                            {`Skill: ${a2aProjectWorkflow.skillName}`}
-                        </span>
-                    )}
-                </div>
-
-                {workflow && (
-                    <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
-                        <WorkflowTriggerAndComponentsRow
-                            className="hidden sm:flex"
-                            filteredComponentNames={filteredComponentNames}
-                            workflow={workflow}
-                            workflowComponentDefinitions={workflowComponentDefinitions}
-                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                        />
-                    </div>
-                )}
-            </div>
+            <WorkflowToolRowLabel
+                canOpenExecutions={canOpenExecutions}
+                filteredComponentNames={filteredComponentNames}
+                label={workflowLabel}
+                onOpenInProjectClick={showOpenInProject ? handleOpenInProjectClick : undefined}
+                onWorkflowClick={handleWorkflowClick}
+                subLabel={
+                    a2aProjectWorkflow.skillName &&
+                    a2aProjectWorkflow.skillName !== workflowLabel && (
+                        <span className="truncate text-xs text-muted-foreground">{`Skill: ${a2aProjectWorkflow.skillName}`}</span>
+                    )
+                }
+                workflow={workflow}
+                workflowComponentDefinitions={workflowComponentDefinitions}
+                workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+            />
 
             <div className="flex shrink-0 items-center gap-2">
                 <McpToolConfigureButton anchorsPopover label={workflowLabel} onClick={onConfigureClick} />
