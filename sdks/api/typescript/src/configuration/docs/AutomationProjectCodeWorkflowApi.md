@@ -11,7 +11,7 @@ All URIs are relative to */api/embedded/v1*
 
 ## deployAutomationProjectCodeWorkflow
 
-> AutomationProjectCodeWorkflowDeployResult deployAutomationProjectCodeWorkflow(xEnvironment, projectFile)
+> AutomationProjectCodeWorkflowDeployResult deployAutomationProjectCodeWorkflow(xEnvironment, projectFile, release)
 
 Deploy a new automation code workflow into the embedded catalog
 
@@ -39,6 +39,8 @@ async function example() {
     xEnvironment: ...,
     // Blob | The file of a code-native automation project. (optional)
     projectFile: BINARY_DATA_HERE,
+    // boolean | Whether to also point the configuration of the request environment at the newly published version. (optional)
+    release: true,
   } satisfies DeployAutomationProjectCodeWorkflowRequest;
 
   try {
@@ -60,6 +62,7 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **xEnvironment** | `Environment` | The environment. | [Optional] [Defaults to `undefined`] [Enum: DEVELOPMENT, STAGING, PRODUCTION] |
 | **projectFile** | `Blob` | The file of a code-native automation project. | [Optional] [Defaults to `undefined`] |
+| **release** | `boolean` | Whether to also point the configuration of the request environment at the newly published version. | [Optional] [Defaults to `false`] |
 
 ### Return type
 
