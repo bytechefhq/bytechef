@@ -12,6 +12,7 @@ const IntegrationInstanceConfigurationList = ({
     expandAll = false,
     integration,
     integrationInstanceConfigurations,
+    showIntegrationIcon = true,
     tags,
     taskDispatcherDefinitions,
 }: {
@@ -19,6 +20,7 @@ const IntegrationInstanceConfigurationList = ({
     expandAll?: boolean;
     integration: Integration;
     integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
+    showIntegrationIcon?: boolean;
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
@@ -65,7 +67,7 @@ const IntegrationInstanceConfigurationList = ({
 
                         return (
                             <Collapsible
-                                className="group mb-2 rounded border border-border/50"
+                                className="group mb-2 rounded border border-border/50 last:mb-0"
                                 defaultOpen={expandAll}
                                 key={integrationInstanceConfiguration.id}
                             >
@@ -76,6 +78,7 @@ const IntegrationInstanceConfigurationList = ({
                                         integrationInstanceConfiguration.id!
                                     )}
                                     remainingTags={tags?.filter((tag) => !integrationTagIds?.includes(tag.id))}
+                                    showIntegrationIcon={showIntegrationIcon}
                                 />
 
                                 <CollapsibleContent>

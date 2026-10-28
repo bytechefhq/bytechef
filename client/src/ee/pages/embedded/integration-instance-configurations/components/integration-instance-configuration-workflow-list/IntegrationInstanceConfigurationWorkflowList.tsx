@@ -38,6 +38,17 @@ const IntegrationInstanceConfigurationWorkflowList = ({
         [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
 
+    const hasConfiguredWorkflows = !!workflows?.some((workflow) =>
+        integrationInstanceConfigurationWorkflows?.some(
+            (integrationInstanceConfigurationWorkflow) =>
+                integrationInstanceConfigurationWorkflow.workflowId === workflow.id
+        )
+    );
+
+    if (!isIntegrationWorkflowsLoading && !hasConfiguredWorkflows) {
+        return null;
+    }
+
     return !componentDefinitions || !taskDispatcherDefinitions || isIntegrationWorkflowsLoading ? (
         <div className="space-y-3 py-2">
             <Skeleton className="h-5 w-40" />
