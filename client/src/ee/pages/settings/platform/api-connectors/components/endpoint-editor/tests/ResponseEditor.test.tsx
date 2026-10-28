@@ -5,6 +5,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ResponseEditor from '../ResponseEditor';
 
+vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
+    default: () => <div data-testid="monaco-editor" />,
+}));
+
 // ResponseEditor only ever renders inside EndpointForm's <Form>, and FormLabel
 // reads that context, so the harness has to supply it too.
 const FormHarness = ({children}: {children: ReactNode}) => {
