@@ -1,13 +1,15 @@
 import {Sheet, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import EmbeddedWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionsTable';
-import EmbeddedWorkflowExecutionSheet from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import WorkflowExecutionDetail from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionDetail';
 import WorkflowExecutionsSheetLayout from '@/ee/pages/embedded/workflow-executions/components/workflow-executions-sheet/WorkflowExecutionsSheetLayout';
 import useWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {WorkflowExecutionFromJSON} from '@/ee/shared/middleware/embedded/workflow/execution';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationWorkflowExecutionsQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import ProjectDeploymentWorkflowPanel from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowPanel';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {Workflow as AutomationWorkflow} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {VisuallyHidden} from 'radix-ui';
@@ -32,6 +34,15 @@ const IntegrationInstanceConfigurationWorkflowExecutionsContent = ({
     const [pageNumber, setPageNumber] = useState(0);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
+        useWorkflowExecutionSheetStore(
+            useShallow((state) => ({
+                setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
+                workflowExecutionId: state.workflowExecutionId,
+                workflowExecutionSheetOpen: state.workflowExecutionSheetOpen,
+            }))
+        );
 
     const {
         data: workflowExecutionPage,
@@ -62,22 +73,33 @@ const IntegrationInstanceConfigurationWorkflowExecutionsContent = ({
                     ? 'This workflow has not been executed for this connected user yet.'
                     : 'This workflow has not been executed in this instance configuration yet.'
             }
-            executionSheet={<EmbeddedWorkflowExecutionSheet />}
             executionsTable={
                 <EmbeddedWorkflowExecutionsTable data={workflowExecutions} showConnectedUser={!connectedUserId} />
             }
             hasExecutions={workflowExecutions.length > 0}
+            onBackToExecutions={() => setWorkflowExecutionSheetOpen(false)}
             onPageNumberChange={setPageNumber}
             onRefresh={() => refetchWorkflowExecutions()}
             pageNumber={pageNumber}
             parentLabel={integrationInstanceConfigurationName}
             version={integrationVersion}
+            workflowExecutionDetail={
+                <WorkflowExecutionDetail
+                    enabled={workflowExecutionSheetOpen}
+                    workflowExecutionId={workflowExecutionId}
+                />
+            }
+            workflowExecutionDetailOpen={workflowExecutionSheetOpen}
             workflowExecutionPage={workflowExecutionPage}
             workflowExecutionsError={workflowExecutionsError}
             workflowExecutionsIsFetching={workflowExecutionsIsFetching}
             workflowExecutionsIsLoading={workflowExecutionsIsLoading}
             workflowLabel={workflow.label}
-            workflowPanel={<ProjectDeploymentWorkflowPanel workflow={workflow as AutomationWorkflow} />}
+            workflowPanel={
+                <WorkflowReadOnlyProvider value={{useGetComponentDefinitionsQuery}}>
+                    <ProjectDeploymentWorkflowPanel workflow={workflow as AutomationWorkflow} />
+                </WorkflowReadOnlyProvider>
+            }
         />
     );
 };

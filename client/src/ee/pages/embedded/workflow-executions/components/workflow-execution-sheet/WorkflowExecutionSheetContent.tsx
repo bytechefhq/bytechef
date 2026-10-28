@@ -2,44 +2,65 @@ import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {useGetWorkflowExecutionTaskExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
+import SubflowExecutionBreadcrumb, {
+    BreadcrumbEntryI,
+    TruncatedLabel,
+} from '@/shared/components/workflow-executions/SubflowExecutionBreadcrumb';
 import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
 import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/WorkflowExecutionsHeader';
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
-import {Job, JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
+import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
-import {useCallback, useState} from 'react';
-import {useShallow} from 'zustand/react/shallow';
+import {WorkflowIcon} from 'lucide-react';
+import {ReactNode, useCallback, useMemo} from 'react';
 
-import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
+interface WorkflowExecutionSheetContentProps {
+    activeTab: TabValueType;
+    deepestFailedExecution: {execution: TaskExecution | TriggerExecution; path: string[]} | null;
+    dialogOpen: boolean;
+    handleBreadcrumbNavigate: (index: number) => void;
+    handleSeeExecutions: (childJob: Job) => void;
+    handleTaskClick: (taskExecution: TaskExecution | TriggerExecution) => void;
+    headerActions?: ReactNode;
+    isTriggerExecution: boolean;
+    job?: Job;
+    jobFailedWithNoExecutions: boolean;
+    jobFailureError: ExecutionError;
+    rootJob?: Job;
+    selectedItem: TaskExecution | TriggerExecution | undefined;
+    setActiveTab: (tab: TabValueType) => void;
+    setDialogOpen: (open: boolean) => void;
+    subflowStack: Array<{job: Job; label: string}>;
+    taskExecutionAttempts: TaskExecutionAttemptsI<TaskExecution>[];
+    triggerExecution?: TriggerExecution;
+    workflowExecutionId: number;
+}
 
-const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
-    const workflowExecutionId = useWorkflowExecutionSheetStore(useShallow((state) => state.workflowExecutionId));
-
-    const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
-    const jobFailedWithNoExecutions = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
-    const jobFailureError = job.error ?? {
-        message: 'Workflow execution failed before any executions were created.',
-        stackTrace: [],
-    };
-
-    const [activeTab, setActiveTab] = useState<TabValueType>(jobFailedWithNoExecutions ? 'error' : 'input');
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(
-        triggerExecution || job.taskExecutions?.[0] || undefined
-    );
-
-    const taskExecutions = job?.taskExecutions || [];
-
-    const onTaskClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
-        setActiveTab(taskExecution.error ? 'error' : 'input');
-        setSelectedItem(taskExecution);
-    }, []);
-
-    const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
-
+const WorkflowExecutionSheetContent = ({
+    activeTab,
+    deepestFailedExecution,
+    dialogOpen,
+    handleBreadcrumbNavigate,
+    handleSeeExecutions,
+    handleTaskClick,
+    headerActions,
+    isTriggerExecution,
+    job,
+    jobFailedWithNoExecutions,
+    jobFailureError,
+    rootJob,
+    selectedItem,
+    setActiveTab,
+    setDialogOpen,
+    subflowStack,
+    taskExecutionAttempts,
+    triggerExecution,
+    workflowExecutionId,
+}: WorkflowExecutionSheetContentProps) => {
     const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
 
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
@@ -49,51 +70,97 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
             false
         );
 
+    const breadcrumbItems = useMemo<BreadcrumbEntryI[]>(() => {
+        if (subflowStack.length === 0) {
+            return [];
+        }
+
+        return [
+            {label: rootJob?.label ?? 'Workflow', onNavigate: () => handleBreadcrumbNavigate(0)},
+            ...subflowStack.slice(0, -1).map((entry, index) => ({
+                label: entry.label,
+                onNavigate: () => handleBreadcrumbNavigate(index + 1),
+            })),
+            {label: subflowStack[subflowStack.length - 1].label},
+        ];
+    }, [handleBreadcrumbNavigate, rootJob?.label, subflowStack]);
+
+    const handleBreadcrumbBackClick = useCallback(() => {
+        handleBreadcrumbNavigate(subflowStack.length - 1);
+    }, [handleBreadcrumbNavigate, subflowStack.length]);
+
     return (
         <div className="flex size-full flex-col">
-            <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
+            <WorkflowExecutionsHeader actions={headerActions} job={job} triggerExecution={triggerExecution} />
 
             {jobFailedWithNoExecutions ? (
                 <div className="flex-1 p-4">
                     <WorkflowExecutionContent error={jobFailureError} />
                 </div>
             ) : (
-                <ResizablePanelGroup className="px-2" orientation="horizontal">
+                <ResizablePanelGroup orientation="horizontal">
                     <ResizablePanel
                         className="flex min-h-0 flex-col overflow-hidden"
-                        defaultSize={40}
+                        defaultSize={26}
                         groupResizeBehavior="preserve-pixel-size"
                         minSize={15}
                     >
-                        <ScrollArea className="mb-4 h-full pr-4">
+                        {subflowStack.length === 0 && rootJob && (
+                            <div className="flex h-9 items-center gap-1 px-3 py-2">
+                                <WorkflowIcon className="size-3 shrink-0 text-content-neutral-primary" />
+
+                                <TruncatedLabel
+                                    className="text-xs leading-4 font-medium text-content-neutral-primary"
+                                    label={rootJob.label ?? ''}
+                                />
+                            </div>
+                        )}
+
+                        {subflowStack.length > 0 && (
+                            <SubflowExecutionBreadcrumb
+                                items={breadcrumbItems}
+                                onBackClick={handleBreadcrumbBackClick}
+                            />
+                        )}
+
+                        <ScrollArea className="min-h-0 flex-1 pr-4 pl-1">
                             <Accordion
                                 className="ml-2 space-y-2 pb-4"
                                 defaultValue={
-                                    isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || '']
+                                    deepestFailedExecution?.path ||
+                                    (isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || ''])
                                 }
                                 type="multiple"
                             >
                                 {triggerExecution && (
                                     <WorkflowExecutionsAccordionItem
+                                        defaultValue={deepestFailedExecution?.path}
                                         execution={triggerExecution}
-                                        onExecutionClick={onTaskClick}
+                                        onExecutionClick={handleTaskClick}
                                         selectedExecutionId={selectedItem?.id || ''}
                                     >
                                         <WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />
                                     </WorkflowExecutionsAccordionItem>
                                 )}
 
-                                {taskExecutions.map((taskExecution) => (
+                                {taskExecutionAttempts.map(({latestTaskExecution, previousTaskExecutions}) => (
                                     <WorkflowExecutionsAccordionItem
-                                        execution={taskExecution}
-                                        jobStatus={job.status}
-                                        key={taskExecution.id}
-                                        onExecutionClick={onTaskClick}
+                                        defaultValue={deepestFailedExecution?.path}
+                                        execution={latestTaskExecution}
+                                        jobStatus={job?.status}
+                                        key={latestTaskExecution.id}
+                                        onExecutionClick={handleTaskClick}
+                                        previousTaskExecutions={previousTaskExecutions}
                                         selectedExecutionId={selectedItem?.id || ''}
                                     >
                                         <WorkflowTaskExecutionItem
-                                            jobStatus={job.status}
-                                            taskExecution={taskExecution}
+                                            attemptLabel={
+                                                previousTaskExecutions.length > 0
+                                                    ? `Attempt ${previousTaskExecutions.length + 1}`
+                                                    : undefined
+                                            }
+                                            jobStatus={job?.status}
+                                            taskExecution={latestTaskExecution}
                                         />
                                     </WorkflowExecutionsAccordionItem>
                                 ))}
@@ -103,11 +170,12 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
 
                     <ResizableHandle />
 
-                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={60} minSize={20}>
+                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={74} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
                             dialogOpen={dialogOpen}
                             job={job}
+                            onSeeExecutionsClick={handleSeeExecutions}
                             selectedItem={selectedItem}
                             selectedItemDataLoading={isTaskSelected && selectedTaskExecutionLoading}
                             selectedItemInput={selectedTaskExecution?.input}

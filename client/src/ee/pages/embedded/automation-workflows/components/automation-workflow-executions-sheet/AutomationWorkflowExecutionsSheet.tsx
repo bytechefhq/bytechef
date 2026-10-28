@@ -7,7 +7,7 @@ import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-exec
 import WorkflowExecutionsSheetLayout from '@/ee/pages/embedded/workflow-executions/components/workflow-executions-sheet/WorkflowExecutionsSheetLayout';
 import ProjectDeploymentWorkflowPanel from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowPanel';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import WorkflowExecutionDetail from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionDetail';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {WorkflowExecutionFromJSON} from '@/shared/middleware/automation/workflow/execution';
@@ -53,6 +53,15 @@ const AutomationWorkflowExecutionsContent = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
+        useWorkflowExecutionSheetStore(
+            useShallow((state) => ({
+                setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
+                workflowExecutionId: state.workflowExecutionId,
+                workflowExecutionSheetOpen: state.workflowExecutionSheetOpen,
+            }))
+        );
+
     const {
         data: workflowExecutionPage,
         error: workflowExecutionsError,
@@ -85,13 +94,20 @@ const AutomationWorkflowExecutionsContent = ({
                     ? 'This connected user has not executed this workflow in this environment yet.'
                     : 'No connected user has executed this workflow in this environment yet.'
             }
-            executionSheet={<AutomationWorkflowExecutionSheet />}
             executionsTable={<AutomationWorkflowExecutionsTable data={workflowExecutions} />}
             hasExecutions={workflowExecutions.length > 0}
+            onBackToExecutions={() => setWorkflowExecutionSheetOpen(false)}
             onPageNumberChange={setPageNumber}
             onRefresh={() => refetchWorkflowExecutions()}
             pageNumber={pageNumber}
             parentLabel={projectName}
+            workflowExecutionDetail={
+                <WorkflowExecutionDetail
+                    enabled={workflowExecutionSheetOpen}
+                    workflowExecutionId={workflowExecutionId}
+                />
+            }
+            workflowExecutionDetailOpen={workflowExecutionSheetOpen}
             workflowExecutionPage={workflowExecutionPage}
             workflowExecutionsError={workflowExecutionsError}
             workflowExecutionsIsFetching={workflowExecutionsIsFetching}

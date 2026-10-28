@@ -1,0 +1,125 @@
+import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {PanelRightIcon} from 'lucide-react';
+import {useState} from 'react';
+
+import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
+import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflowPanel';
+import useWorkflowExecutionDetail from './hooks/useWorkflowExecutionDetail';
+
+interface WorkflowExecutionDetailProps {
+    enabled?: boolean;
+    workflowExecutionId: number;
+}
+
+const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => {
+    const [workflowPanelVisible, setWorkflowPanelVisible] = useState(false);
+
+    const {
+        activeTab,
+        deepestFailedExecution,
+        dialogOpen,
+        handleBreadcrumbNavigate,
+        handleSeeExecutions,
+        handleTaskClick,
+        isTriggerExecution,
+        job,
+        jobFailedWithNoExecutions,
+        jobFailureError,
+        rootJob,
+        selectedItem,
+        setActiveTab,
+        setDialogOpen,
+        subflowStack,
+        taskExecutionAttempts,
+        triggerExecution,
+        workflowExecution,
+        workflowExecutionLoading,
+    } = useWorkflowExecutionDetail(workflowExecutionId, enabled);
+
+    if (workflowExecutionLoading) {
+        return (
+            <div className="flex size-full items-center justify-center" data-testid="workflow-execution-detail-loading">
+                <LoadingIcon className="size-6" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex min-h-0 flex-1 p-3">
+            <ResizablePanelGroup className="h-full" orientation="horizontal">
+                <ResizablePanel
+                    className="flex min-h-0 flex-col overflow-hidden rounded-lg bg-surface-neutral-primary"
+                    defaultSize={65}
+                    minSize={35}
+                >
+                    {(job || triggerExecution) && (
+                        <WorkflowExecutionSheetContent
+                            activeTab={activeTab}
+                            deepestFailedExecution={deepestFailedExecution}
+                            dialogOpen={dialogOpen}
+                            handleBreadcrumbNavigate={handleBreadcrumbNavigate}
+                            handleSeeExecutions={handleSeeExecutions}
+                            handleTaskClick={handleTaskClick}
+                            headerActions={
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label={workflowPanelVisible ? 'Hide workflow' : 'Show workflow'}
+                                            icon={<PanelRightIcon />}
+                                            onClick={() => setWorkflowPanelVisible(!workflowPanelVisible)}
+                                            size="iconSm"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        {workflowPanelVisible ? 'Hide workflow' : 'Show workflow'}
+                                    </TooltipContent>
+                                </Tooltip>
+                            }
+                            isTriggerExecution={isTriggerExecution}
+                            job={job}
+                            jobFailedWithNoExecutions={jobFailedWithNoExecutions}
+                            jobFailureError={jobFailureError}
+                            rootJob={rootJob}
+                            selectedItem={selectedItem}
+                            setActiveTab={setActiveTab}
+                            setDialogOpen={setDialogOpen}
+                            subflowStack={subflowStack}
+                            taskExecutionAttempts={taskExecutionAttempts}
+                            triggerExecution={triggerExecution}
+                            workflowExecutionId={workflowExecutionId}
+                        />
+                    )}
+                </ResizablePanel>
+
+                {workflowPanelVisible && (
+                    <>
+                        <ResizableHandle className="w-1.5 bg-transparent" />
+
+                        <ResizablePanel
+                            className="flex min-h-0 flex-col overflow-hidden rounded-lg"
+                            defaultSize={35}
+                            minSize={15}
+                        >
+                            {workflowExecution && (
+                                <WorkflowReadOnlyProvider
+                                    value={{useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery}}
+                                >
+                                    <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />
+                                </WorkflowReadOnlyProvider>
+                            )}
+                        </ResizablePanel>
+                    </>
+                )}
+            </ResizablePanelGroup>
+        </div>
+    );
+};
+
+export default WorkflowExecutionDetail;
