@@ -5,6 +5,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -22,8 +25,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.601272+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T22:11:27.472720+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowExecutionModel {
+
+  private List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath = new ArrayList<>();
 
   private Long id;
 
@@ -34,6 +39,8 @@ public class WorkflowExecutionModel {
   private com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance;
 
   private com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
+
+  private @Nullable Long taskExecutionCount;
 
   private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
@@ -53,6 +60,35 @@ public class WorkflowExecutionModel {
     this.integrationInstance = integrationInstance;
     this.job = job;
     this.workflow = workflow;
+  }
+
+  public WorkflowExecutionModel focusPath(List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath) {
+    this.focusPath = focusPath;
+    return this;
+  }
+
+  public WorkflowExecutionModel addFocusPathItem(com.bytechef.platform.workflow.execution.web.rest.model.FocusPathElementModel focusPathItem) {
+    if (this.focusPath == null) {
+      this.focusPath = new ArrayList<>();
+    }
+    this.focusPath.add(focusPathItem);
+    return this;
+  }
+
+  /**
+   * The path from a top-level task execution to the task execution to focus, set when the execution is loaded lazily. It ends at the earliest failed leaf task execution that was not retried, under the latest attempt of its top-level task, else at the last started or last created task execution. It is empty when no such task execution can be resolved, for example when the job has no task executions. When it is set, the job's task executions are the top-level ones only and their children are loaded through the children endpoint.
+   * @return focusPath
+   */
+  
+  @Schema(name = "focusPath", description = "The path from a top-level task execution to the task execution to focus, set when the execution is loaded lazily. It ends at the earliest failed leaf task execution that was not retried, under the latest attempt of its top-level task, else at the last started or last created task execution. It is empty when no such task execution can be resolved, for example when the job has no task executions. When it is set, the job's task executions are the top-level ones only and their children are loaded through the children endpoint.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("focusPath")
+  public List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> getFocusPath() {
+    return focusPath;
+  }
+
+  @JsonProperty("focusPath")
+  public void setFocusPath(List<com.bytechef.platform.workflow.execution.web.rest.model.@Valid FocusPathElementModel> focusPath) {
+    this.focusPath = focusPath;
   }
 
   public WorkflowExecutionModel id(Long id) {
@@ -160,6 +196,27 @@ public class WorkflowExecutionModel {
     this.job = job;
   }
 
+  public WorkflowExecutionModel taskExecutionCount(@Nullable Long taskExecutionCount) {
+    this.taskExecutionCount = taskExecutionCount;
+    return this;
+  }
+
+  /**
+   * The number of task executions of this job, counting only the latest attempt of each task, including the task executions of every loop iteration and branch and excluding subflow jobs; set when the execution is loaded lazily.
+   * @return taskExecutionCount
+   */
+  
+  @Schema(name = "taskExecutionCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of task executions of this job, counting only the latest attempt of each task, including the task executions of every loop iteration and branch and excluding subflow jobs; set when the execution is loaded lazily.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("taskExecutionCount")
+  public @Nullable Long getTaskExecutionCount() {
+    return taskExecutionCount;
+  }
+
+  @JsonProperty("taskExecutionCount")
+  public void setTaskExecutionCount(@Nullable Long taskExecutionCount) {
+    this.taskExecutionCount = taskExecutionCount;
+  }
+
   public WorkflowExecutionModel triggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
     return this;
@@ -211,29 +268,33 @@ public class WorkflowExecutionModel {
       return false;
     }
     WorkflowExecutionModel workflowExecution = (WorkflowExecutionModel) o;
-    return Objects.equals(this.id, workflowExecution.id) &&
+    return Objects.equals(this.focusPath, workflowExecution.focusPath) &&
+        Objects.equals(this.id, workflowExecution.id) &&
         Objects.equals(this.integration, workflowExecution.integration) &&
         Objects.equals(this.integrationInstanceConfiguration, workflowExecution.integrationInstanceConfiguration) &&
         Objects.equals(this.integrationInstance, workflowExecution.integrationInstance) &&
         Objects.equals(this.job, workflowExecution.job) &&
+        Objects.equals(this.taskExecutionCount, workflowExecution.taskExecutionCount) &&
         Objects.equals(this.triggerExecution, workflowExecution.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecution.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, integration, integrationInstanceConfiguration, integrationInstance, job, triggerExecution, workflow);
+    return Objects.hash(focusPath, id, integration, integrationInstanceConfiguration, integrationInstance, job, taskExecutionCount, triggerExecution, workflow);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowExecutionModel {\n");
+    sb.append("    focusPath: ").append(toIndentedString(focusPath)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integration: ").append(toIndentedString(integration)).append("\n");
     sb.append("    integrationInstanceConfiguration: ").append(toIndentedString(integrationInstanceConfiguration)).append("\n");
     sb.append("    integrationInstance: ").append(toIndentedString(integrationInstance)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
+    sb.append("    taskExecutionCount: ").append(toIndentedString(taskExecutionCount)).append("\n");
     sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");
