@@ -19,6 +19,7 @@ package com.bytechef.platform.user.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -875,17 +876,31 @@ class AccountControllerIntTest {
         token.setSeries("current-sessions");
         token.setUser(user);
         token.setTokenValue("current-session-data");
-        token.setTokenDate(LocalDate.of(2017, 3, 23));
-
+        token.setTokenDate(LocalDate.now());
         token.setIpAddress("127.0.0.1");
         token.setUserAgent("Test agent");
 
         persistentTokenRepository.save(token);
 
+        PersistentToken expiredToken = new PersistentToken();
+
+        expiredToken.setNew(true);
+        expiredToken.setSeries("expired-session");
+        expiredToken.setUser(user);
+        expiredToken.setTokenValue("expired-session-data");
+        expiredToken.setTokenDate(
+            LocalDate.now()
+                .minusDays(PersistentToken.VALIDITY_DAYS + 1));
+        expiredToken.setIpAddress("127.0.0.1");
+        expiredToken.setUserAgent("Test agent");
+
+        persistentTokenRepository.save(expiredToken);
+
         restAccountMockMvc
             .perform(get("/api/account/sessions"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.[*].series").value(hasItem(token.getSeries())))
+            .andExpect(jsonPath("$.[*].series").value(not(hasItem(expiredToken.getSeries()))))
             .andExpect(jsonPath("$.[*].ipAddress").value(hasItem(token.getIpAddress())))
             .andExpect(jsonPath("$.[*].userAgent").value(hasItem(token.getUserAgent())))
             .andExpect(jsonPath("$.[*].tokenDate").value(hasItem(containsString(token.getTokenDate()
@@ -911,7 +926,7 @@ class AccountControllerIntTest {
         token.setSeries("invalidate-session");
         token.setUser(user);
         token.setTokenValue("invalidate-data");
-        token.setTokenDate(LocalDate.of(2017, 3, 23));
+        token.setTokenDate(LocalDate.now());
         token.setIpAddress("127.0.0.1");
         token.setUserAgent("Test agent");
 

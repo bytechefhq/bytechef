@@ -18,6 +18,7 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,13 @@ public class PersistentTokenServiceImpl implements PersistentTokenService {
 
     @Override
     public List<PersistentToken> getUserPersistentTokens(long userId) {
-        return persistentTokenRepository.findAllByUserId(userId);
+        LocalDate oldestValidTokenDate = LocalDate.now()
+            .minusDays(PersistentToken.VALIDITY_DAYS);
+
+        return persistentTokenRepository.findAllByUserId(userId)
+            .stream()
+            .filter(persistentToken -> !oldestValidTokenDate.isAfter(persistentToken.getTokenDate()))
+            .toList();
     }
 
     @Override

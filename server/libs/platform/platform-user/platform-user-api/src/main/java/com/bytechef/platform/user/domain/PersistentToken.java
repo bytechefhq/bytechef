@@ -31,6 +31,8 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("persistent_token")
 public class PersistentToken implements Persistable<String> {
 
+    public static final int VALIDITY_DAYS = 31;
+
     private static final int MAX_USER_AGENT_LEN = 255;
 
     @Transient

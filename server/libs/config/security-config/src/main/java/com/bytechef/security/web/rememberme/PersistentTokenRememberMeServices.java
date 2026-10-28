@@ -88,7 +88,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         PersistentTokenRememberMeServices.class.getName() + ".ISSUED_TOKEN";
     private static final ReentrantLock LOCK = new ReentrantLock();
     // Token is valid for one month
-    private static final int TOKEN_VALIDITY_DAYS = 31;
+    private static final int TOKEN_VALIDITY_DAYS = PersistentToken.VALIDITY_DAYS;
     private static final int TOKEN_VALIDITY_SECONDS = 60 * 60 * 24 * TOKEN_VALIDITY_DAYS;
     private static final long UPGRADED_TOKEN_VALIDITY_MILLIS = 5000L;
 
