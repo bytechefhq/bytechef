@@ -1,0 +1,16 @@
+query automationWorkflowProjectConfigurations($projectId: ID!) {
+    automationWorkflowProjectConfigurations(projectId: $projectId) {
+        id
+        projectId
+        environmentId
+        projectVersion
+        enabled
+        automationHubVisible
+        lastModifiedDate
+        workflows {
+            workflowUuid
+            label
+            enabled
+        }
+    }
+}
