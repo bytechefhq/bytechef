@@ -59,7 +59,7 @@ const ProjectDeploymentListItem = ({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
             queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
