@@ -300,6 +300,32 @@ class PrepaidSubscriptionModelHandlerTest {
     }
 
     @Test
+    void testSubscriptionUpdatedIgnoresNonPlanItems() throws Exception {
+        BillingSubscription subscription = prepaidSubscription("STARTER", 5000);
+
+        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        String payload = subscriptionPayload("sub_1", STARTER_PRODUCT_ID, "5000", PERIOD_START, PERIOD_END)
+            .replace(
+                "\"data\": [",
+                "\"data\": [{\"id\": \"si_metered_item\", \"object\": \"subscription_item\","
+                    + " \"current_period_start\": 1, \"current_period_end\": 2, \"price\": {\"id\": \"price_metered\","
+                    + " \"object\": \"price\", \"product\": \"prod_usage\"}},");
+
+        Subscription stripeSubscription = (Subscription) buildEvent(payload).getDataObjectDeserializer()
+            .getObject()
+            .orElseThrow();
+
+        assertThat(stripeSubscription.getItems()
+            .getData()).hasSize(2);
+
+        handler.handleSubscriptionUpdated(subscription, stripeSubscription);
+
+        assertThat(subscription.getProductId()).isEqualTo("si_flat_item");
+        assertThat(subscription.getPlanName()).isEqualTo("STARTER");
+    }
+
+    @Test
     void testSubscriptionUpdatedPlanChangeKeepsPlanUnitUsed() throws Exception {
         BillingSubscription subscription = prepaidSubscription("STARTER", 5000);
 
@@ -376,7 +402,8 @@ class PrepaidSubscriptionModelHandlerTest {
     void testPackagePurchasedGrantsUnitTotalTimesQuantity() {
         BillingSubscription currentSubscription = assignId(prepaidSubscription("STARTER", 1000));
 
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+        when(billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc())
+            .thenReturn(Optional.of(currentSubscription));
 
         BillingSubscription result = handler.handleJobExecutionsPackagePurchased(
             packageSession("paid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 3L)));
@@ -390,7 +417,8 @@ class PrepaidSubscriptionModelHandlerTest {
     void testPackagePurchasedIgnoresNonPackageLineItems() {
         BillingSubscription currentSubscription = assignId(prepaidSubscription("STARTER", 1000));
 
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+        when(billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc())
+            .thenReturn(Optional.of(currentSubscription));
 
         handler.handleJobExecutionsPackagePurchased(
             packageSession("paid"),
@@ -401,24 +429,13 @@ class PrepaidSubscriptionModelHandlerTest {
     }
 
     @Test
-    void testPackagePurchasedUnpaidGrantsNothing() {
-        BillingSubscription currentSubscription = assignId(prepaidSubscription("STARTER", 1000));
+    void testPackagePurchasedGrantsToLatestRowEvenWhenCanceled() {
+        BillingSubscription canceledSubscription = assignId(prepaidSubscription("STARTER", 5000));
 
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+        canceledSubscription.setStatus(BillingSubscription.Status.CANCELED);
 
-        BillingSubscription result = handler.handleJobExecutionsPackagePurchased(
-            packageSession("unpaid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 3L)));
-
-        verify(prepaidBillingSubscriptionRepository, never()).addExtraUnitTotal(anyLong(), anyInt());
-
-        assertThat(result).isSameAs(currentSubscription);
-    }
-
-    @Test
-    void testPackagePurchasedGrantsToCurrentRowWhenTrial() {
-        BillingSubscription trialSubscription = assignId(prepaidSubscription("TRIAL", 0));
-
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(trialSubscription));
+        when(billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc())
+            .thenReturn(Optional.of(canceledSubscription));
 
         handler.handleJobExecutionsPackagePurchased(
             packageSession("paid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 2L)));
@@ -427,8 +444,19 @@ class PrepaidSubscriptionModelHandlerTest {
     }
 
     @Test
+    void testPackagePurchasedUnpaidDoesNotLookUpRow() {
+        BillingSubscription result = handler.handleJobExecutionsPackagePurchased(
+            packageSession("unpaid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 2L)));
+
+        assertThat(result).isNull();
+
+        verify(billingSubscriptionRepository, never()).findFirstByOrderByCreatedDateDesc();
+        verify(prepaidBillingSubscriptionRepository, never()).addExtraUnitTotal(anyLong(), anyInt());
+    }
+
+    @Test
     void testPackagePurchasedWithoutCurrentRowThrows() {
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
+        when(billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc()).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> handler.handleJobExecutionsPackagePurchased(
             packageSession("paid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 2L))))
