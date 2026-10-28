@@ -3,14 +3,23 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationListItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItem';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {QueryClient} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     captureIntegrationInstanceConfigurationEnabledMock: vi.fn(),
+    deleteIntegrationInstanceConfigurationMock: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
-    useDeleteIntegrationInstanceConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useDeleteIntegrationInstanceConfigurationMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
+        isPending: false,
+        mutate: (id: number) => {
+            hoisted.deleteIntegrationInstanceConfigurationMock(id);
+
+            onSuccess?.();
+        },
+    }),
     useEnableIntegrationInstanceConfigurationMutation: ({
         onSuccess,
     }: {
@@ -132,5 +141,31 @@ describe('IntegrationInstanceConfigurationListItem enable analytics', () => {
         await userEvent.click(screen.getByRole('switch'));
 
         expect(hoisted.captureIntegrationInstanceConfigurationEnabledMock).not.toHaveBeenCalled();
+    });
+});
+
+describe('IntegrationInstanceConfigurationListItem delete', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('refreshes the integration list after deleting so the configuration count updates', async () => {
+        const invalidateQueriesSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+
+        await openMenu();
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+
+        await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+
+        expect(hoisted.deleteIntegrationInstanceConfigurationMock).toHaveBeenCalledWith(1);
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['integrations']});
+
+        invalidateQueriesSpy.mockRestore();
     });
 });

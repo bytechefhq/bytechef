@@ -1,12 +1,14 @@
 import {Collapsible} from '@/components/ui/collapsible';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationListItem from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItem';
-import {Integration} from '@/ee/shared/middleware/embedded/configuration';
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {IntegrationListItemTabType} from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
+import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
+    onTabChange: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-query', async () => {
@@ -72,24 +74,51 @@ vi.mock('@/ee/pages/embedded/integrations/components/IntegrationPublishDialog', 
     default: () => <div data-testid="integration-publish-dialog" />,
 }));
 
+vi.mock(
+    '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog',
+    () => ({
+        default: ({
+            integrationInstanceConfiguration,
+            triggerNode,
+        }: {
+            integrationInstanceConfiguration: IntegrationInstanceConfiguration;
+            triggerNode: React.ReactNode;
+        }) => (
+            <>
+                {triggerNode}
+
+                <span>{`Configuration dialog for integration ${integrationInstanceConfiguration.integrationId} in environment ${integrationInstanceConfiguration.environmentId}`}</span>
+            </>
+        ),
+    })
+);
+
 const integration = {
+    developmentConfigurationCount: 3,
     id: 1,
     integrationWorkflowIds: [10, 11],
     lastIntegrationVersion: 2,
+    lastPublishedDate: new Date(),
     name: 'Mailchimp',
 } as Integration;
 
-const renderItem = (overrides: Partial<Integration> = {}) =>
+const renderItem = (overrides: Partial<Integration> = {}, activeTab?: IntegrationListItemTabType) =>
     render(
         <TooltipProvider>
-            <Collapsible>
-                <IntegrationListItem integration={{...integration, ...overrides}} />
+            <Collapsible open={!!activeTab}>
+                <IntegrationListItem
+                    activeTab={activeTab}
+                    configurationsContent={<div>Configurations content</div>}
+                    integration={{...integration, ...overrides}}
+                    onTabChange={hoisted.onTabChange}
+                    workflowsContent={<div>Workflows content</div>}
+                />
             </Collapsible>
         </TooltipProvider>
     );
 
 const openMenu = async (triggerName?: string) => {
-    renderItem();
+    renderItem({}, triggerName ? 'workflows' : undefined);
 
     const menuTriggers = screen
         .getAllByRole('button')
@@ -188,37 +217,102 @@ describe('IntegrationListItem', () => {
     });
 
     describe('row click', () => {
-        it('should expand the workflows when the row is clicked', async () => {
+        it('should open the workflows tab when a collapsed row is clicked', async () => {
             renderItem();
 
-            await userEvent.click(screen.getByText('V2'));
+            await userEvent.click(screen.getByText('V1'));
 
-            expect(screen.getByRole('button', {hidden: true, name: /2 workflows/})).toHaveAttribute(
-                'aria-expanded',
-                'true'
-            );
+            expect(hoisted.onTabChange).toHaveBeenCalledWith('workflows');
         });
 
-        it('should keep the workflows collapsed when a menu row is clicked', async () => {
+        it('should collapse an open row when it is clicked', async () => {
+            renderItem({}, 'workflows');
+
+            fireEvent.click(screen.getByText('V1'));
+
+            expect(hoisted.onTabChange).toHaveBeenCalledWith(undefined);
+        });
+
+        it('should keep the row as it is when a menu row is clicked', async () => {
             await openMenu();
-
-            const workflowsTrigger = screen.getByRole('button', {hidden: true, name: /2 workflows/});
-
-            expect(workflowsTrigger).toHaveAttribute('aria-expanded', 'false');
 
             await userEvent.click(screen.getByRole('menuitem', {name: 'Publish'}));
 
-            expect(workflowsTrigger).toHaveAttribute('aria-expanded', 'false');
+            expect(hoisted.onTabChange).not.toHaveBeenCalled();
         });
 
-        it('should keep the workflows collapsed when the menu itself is clicked', async () => {
+        it('should keep the row as it is when the menu itself is clicked', async () => {
             await openMenu();
-
-            const workflowsTrigger = screen.getByRole('button', {hidden: true, name: /2 workflows/});
 
             await userEvent.click(screen.getByRole('menu'));
 
-            expect(workflowsTrigger).toHaveAttribute('aria-expanded', 'false');
+            expect(hoisted.onTabChange).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('tabs', () => {
+        it('summarizes workflows and configurations and hides the tabs while collapsed', () => {
+            renderItem();
+
+            expect(screen.getByText('2 workflows')).toBeInTheDocument();
+            expect(screen.getByText('3 configurations')).toBeInTheDocument();
+            expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+            expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
+        });
+
+        it('shows configurations without a number when the server did not send a count', () => {
+            renderItem({developmentConfigurationCount: undefined});
+
+            expect(screen.getByText('configurations')).toBeInTheDocument();
+            expect(screen.queryByText('0 configurations')).not.toBeInTheDocument();
+        });
+
+        it('shows one configuration in the singular', () => {
+            renderItem({developmentConfigurationCount: 1});
+
+            expect(screen.getByText('1 configuration')).toBeInTheDocument();
+        });
+
+        it('shows the tabs and the active tab content when expanded', () => {
+            renderItem({}, 'configurations');
+
+            expect(screen.getByRole('tab', {name: 'Configurations'})).toHaveAttribute('aria-selected', 'true');
+            expect(screen.getByText('Configurations content')).toBeInTheDocument();
+        });
+
+        it('switches tabs', async () => {
+            renderItem({}, 'workflows');
+
+            await userEvent.click(screen.getByRole('tab', {name: 'Configurations'}));
+
+            expect(hoisted.onTabChange).toHaveBeenCalledWith('configurations');
+        });
+
+        it('offers New Workflow on the workflows tab', () => {
+            renderItem({}, 'workflows');
+
+            expect(screen.getByLabelText('Create Workflow')).toHaveTextContent('New Workflow');
+            expect(screen.queryByLabelText('Create Configuration')).not.toBeInTheDocument();
+        });
+
+        it('offers a Development New Configuration for the integration on the configurations tab', () => {
+            renderItem({}, 'configurations');
+
+            expect(screen.getByLabelText('Create Configuration')).toBeEnabled();
+            expect(screen.getByLabelText('Create Configuration')).toHaveTextContent('New Configuration');
+            expect(screen.getByText('Configuration dialog for integration 1 in environment 0')).toBeInTheDocument();
+            expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
+        });
+
+        it('disables New Configuration until the integration is published', async () => {
+            renderItem({lastPublishedDate: undefined}, 'configurations');
+
+            expect(screen.getByLabelText('Create Configuration')).toBeDisabled();
+            expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
+
+            await userEvent.hover(screen.getByLabelText('Create Configuration').parentElement!);
+
+            expect((await screen.findAllByText('Publish the integration first'))[0]).toBeInTheDocument();
         });
     });
 });
