@@ -1516,6 +1516,7 @@ export type McpIntegrationInstanceConfigurationWorkflow = {
   __typename?: 'McpIntegrationInstanceConfigurationWorkflow';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   integrationInstanceConfigurationWorkflow?: Maybe<IntegrationInstanceConfigurationWorkflow>;
   integrationInstanceConfigurationWorkflowId: Scalars['Long']['output'];
@@ -1533,6 +1534,7 @@ export type McpIntegrationInstanceConfigurationWorkflowInput = {
 };
 
 export type McpIntegrationInstanceConfigurationWorkflowUpdateInput = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
   integrationInstanceConfigurationWorkflowId?: InputMaybe<Scalars['Long']['input']>;
   mcpIntegrationInstanceConfigurationId?: InputMaybe<Scalars['Long']['input']>;
   parameters?: InputMaybe<Scalars['Map']['input']>;
