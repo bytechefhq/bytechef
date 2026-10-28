@@ -12,11 +12,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.discovery.redis.client.RedisDiscoveryClient;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -39,6 +41,7 @@ class RedisServiceRegistryIntTest {
     private LettuceConnectionFactory lettuceConnectionFactory;
     private RedisDiscoveryClient redisDiscoveryClient;
     private RedisServiceRegistry redisServiceRegistry;
+    private RedisTemplate<String, RedisRegistration> redisTemplate;
 
     @BeforeEach
     void beforeEach() {
@@ -47,7 +50,7 @@ class RedisServiceRegistryIntTest {
         lettuceConnectionFactory.afterPropertiesSet();
         lettuceConnectionFactory.start();
 
-        RedisTemplate<String, RedisRegistration> redisTemplate = new RedisTemplate<>();
+        redisTemplate = new RedisTemplate<>();
 
         redisTemplate.setConnectionFactory(lettuceConnectionFactory);
         redisTemplate.setKeySerializer(RedisSerializer.string());
@@ -60,6 +63,12 @@ class RedisServiceRegistryIntTest {
         redisTemplate.afterPropertiesSet();
 
         redisTemplate.delete("discovery/worker-app");
+
+        Set<String> heartbeatKeys = redisTemplate.keys("discovery-heartbeat/*");
+
+        if (heartbeatKeys != null) {
+            redisTemplate.delete(heartbeatKeys);
+        }
 
         redisDiscoveryClient = new RedisDiscoveryClient(redisTemplate);
         redisServiceRegistry = new RedisServiceRegistry(redisTemplate, runnable -> {});
@@ -113,6 +122,33 @@ class RedisServiceRegistryIntTest {
         redisServiceRegistry.deregister(redisRegistration);
 
         assertThat(redisDiscoveryClient.getInstances("worker-app")).isEmpty();
+    }
+
+    @Test
+    void testRegisteringPrunesAnInstanceThatStoppedHeartbeating() {
+        RedisRegistration crashedRedisRegistration = redisRegistration("worker-app:crashed");
+
+        ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
+
+        listOperations.leftPush("discovery/worker-app", crashedRedisRegistration);
+
+        redisServiceRegistry.register(redisRegistration("worker-app:1"));
+
+        assertThat(redisDiscoveryClient.getInstances("worker-app")).extracting(ServiceInstance::getInstanceId)
+            .containsExactly("worker-app:1");
+    }
+
+    @Test
+    void testRegisteringKeepsAnotherInstanceThatIsStillHeartbeating() {
+        RedisServiceRegistry otherRedisServiceRegistry = new RedisServiceRegistry(redisTemplate, runnable -> {});
+
+        otherRedisServiceRegistry.register(redisRegistration("worker-app:2"));
+
+        redisServiceRegistry.register(redisRegistration("worker-app:1"));
+        redisServiceRegistry.register(redisRegistration("worker-app:1"));
+
+        assertThat(redisDiscoveryClient.getInstances("worker-app")).extracting(ServiceInstance::getInstanceId)
+            .containsExactlyInAnyOrder("worker-app:1", "worker-app:2");
     }
 
     private static RedisRegistration redisRegistration(String instanceId) {

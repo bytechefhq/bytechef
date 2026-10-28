@@ -16,10 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.redis.connection.RedisKeyCommands;
 import org.springframework.data.redis.connection.RedisListCommands;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
@@ -33,6 +35,8 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> {
 
     private static final Logger log = LoggerFactory.getLogger(RedisServiceRegistry.class);
+
+    private static final long HEARTBEAT_TIME_TO_LIVE_SECONDS = 30;
 
     private RedisRegistration redisRegistration;
     private final RedisTemplate<String, RedisRegistration> redisTemplate;
@@ -67,6 +71,8 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
         this.redisRegistration = null;
 
         removeRegistrations(redisRegistration);
+
+        redisTemplate.delete(getHeartbeatKey(redisRegistration));
     }
 
     @Override
@@ -113,12 +119,21 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
         }
     }
 
+    private static String getHeartbeatKey(RedisRegistration redisRegistration) {
+        return "discovery-heartbeat/" + redisRegistration.getServiceId() + "/" + redisRegistration.getInstanceId();
+    }
+
     private static String getKey(RedisRegistration redisRegistration) {
         return "discovery/" + redisRegistration.getServiceId();
     }
 
     @SuppressFBWarnings("RCN")
     private synchronized void registerService(RedisRegistration redisRegistration) {
+        ValueOperations<String, RedisRegistration> valueOperations = redisTemplate.opsForValue();
+
+        valueOperations.set(
+            getHeartbeatKey(redisRegistration), redisRegistration, HEARTBEAT_TIME_TO_LIVE_SECONDS, TimeUnit.SECONDS);
+
         String key = getKey(redisRegistration);
 
         ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
@@ -130,6 +145,8 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
 
             listOperations.leftPush(key, redisRegistration);
         }
+
+        removeRegistrationsWithoutHeartbeat(redisRegistration);
 
         redisTemplate.expire(key, 15, TimeUnit.SECONDS);
     }
@@ -155,6 +172,44 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
                 RedisRegistration registeredRedisRegistration = valueSerializer.deserialize(rawRegistration);
 
                 if (redisRegistration.equals(registeredRedisRegistration)) {
+                    redisListCommands.lRem(rawKey, 0, rawRegistration);
+                }
+            }
+
+            return null;
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private void removeRegistrationsWithoutHeartbeat(RedisRegistration redisRegistration) {
+        RedisSerializer<String> keySerializer = (RedisSerializer<String>) redisTemplate.getKeySerializer();
+        RedisSerializer<RedisRegistration> valueSerializer =
+            (RedisSerializer<RedisRegistration>) redisTemplate.getValueSerializer();
+
+        byte[] rawKey = Objects.requireNonNull(keySerializer.serialize(getKey(redisRegistration)), "rawKey");
+
+        redisTemplate.execute((RedisCallback<Void>) redisConnection -> {
+            RedisListCommands redisListCommands = redisConnection.listCommands();
+
+            List<byte[]> rawRegistrations = redisListCommands.lRange(rawKey, 0, -1);
+
+            if (rawRegistrations == null) {
+                return null;
+            }
+
+            RedisKeyCommands redisKeyCommands = redisConnection.keyCommands();
+
+            for (byte[] rawRegistration : rawRegistrations) {
+                RedisRegistration registeredRedisRegistration = valueSerializer.deserialize(rawRegistration);
+
+                if (registeredRedisRegistration == null) {
+                    continue;
+                }
+
+                byte[] rawHeartbeatKey = Objects.requireNonNull(
+                    keySerializer.serialize(getHeartbeatKey(registeredRedisRegistration)), "rawHeartbeatKey");
+
+                if (!Boolean.TRUE.equals(redisKeyCommands.exists(rawHeartbeatKey))) {
                     redisListCommands.lRem(rawKey, 0, rawRegistration);
                 }
             }
