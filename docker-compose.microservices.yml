@@ -13,6 +13,9 @@
 #     :server:ee:apps:scheduler-app:bootJar :server:ee:apps:webhook-app:bootJar :server:ee:apps:worker-app:bootJar
 #   (cd client && npm run build)
 #   docker compose -f docker-compose.microservices.yml up -d --build --wait
+#
+# coordinator-app and worker-app run 2 and 3 replicas; set BYTECHEF_COORDINATOR_REPLICAS and
+# BYTECHEF_WORKER_REPLICAS to change that.
 
 x-bytechef-environment: &bytechef-environment
   BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
@@ -168,6 +171,8 @@ services:
       target: app
       args:
         APP_NAME: coordinator-app
+    deploy:
+      replicas: ${BYTECHEF_COORDINATOR_REPLICAS:-2}
 
   execution-app:
     <<: *bytechef-app
@@ -208,6 +213,8 @@ services:
       target: app
       args:
         APP_NAME: worker-app
+    deploy:
+      replicas: ${BYTECHEF_WORKER_REPLICAS:-3}
 
 volumes:
   file-storage:
