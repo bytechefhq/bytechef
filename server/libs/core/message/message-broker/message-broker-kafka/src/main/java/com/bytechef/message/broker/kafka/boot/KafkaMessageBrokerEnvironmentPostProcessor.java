@@ -18,7 +18,6 @@ package com.bytechef.message.broker.kafka.boot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -35,7 +34,7 @@ public class KafkaMessageBrokerEnvironmentPostProcessor implements EnvironmentPo
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!Objects.equals(environment.getProperty("bytechef.message-broker.provider", String.class), "kafka")) {
+        if (!"kafka".equalsIgnoreCase(environment.getProperty("bytechef.message-broker.provider", String.class))) {
             source.put(
                 "spring.autoconfigure.exclude",
                 StringUtils.join(

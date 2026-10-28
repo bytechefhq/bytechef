@@ -9,7 +9,6 @@ package com.bytechef.ee.discovery.redis.boot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -27,7 +26,7 @@ public class RedisDiscoveryServiceProviderEnvironmentPostProcessor implements En
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.discovery-service.provider", String.class), "redis")) {
+        if ("redis".equalsIgnoreCase(environment.getProperty("bytechef.discovery-service.provider", String.class))) {
             source.put("spring.cloud.redis.enabled", true);
         } else {
             source.put("spring.cloud.redis.enabled", false);

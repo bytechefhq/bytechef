@@ -18,7 +18,6 @@ package com.bytechef.ai.chat.memory.jdbc.boot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -35,7 +34,7 @@ public class JdbcChatMemoryEnvironmentPostProcessor implements EnvironmentPostPr
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.ai.memory.provider", String.class), "jdbc")) {
+        if ("jdbc".equalsIgnoreCase(environment.getProperty("bytechef.ai.memory.provider", String.class))) {
             source.put("spring.ai.chat.memory.repository.jdbc.initialize-schema", "never");
         } else {
             source.put(
