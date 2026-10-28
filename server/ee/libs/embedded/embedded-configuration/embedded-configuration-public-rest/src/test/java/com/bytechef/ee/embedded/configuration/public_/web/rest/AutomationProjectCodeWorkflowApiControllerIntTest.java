@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -102,8 +103,9 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     void testDeployReturnsWarnings() {
-        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT)))
-            .thenReturn(List.of("Workflow 'internal-only' will not be invocable"));
+        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+            anyBoolean()))
+                .thenReturn(List.of("Workflow 'internal-only' will not be invocable"));
 
         deploy(webTestClient, "/v1/automation-project-code-workflows/deploy", null)
             .expectStatus()
@@ -112,20 +114,53 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .jsonPath("$.warnings[0]")
             .isEqualTo("Workflow 'internal-only' will not be invocable");
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT));
+        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+            anyBoolean());
     }
 
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     void testDeployAcceptsTheEnvironmentHeaderCaseInsensitively() {
-        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT)))
+        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+            anyBoolean()))
+                .thenReturn(List.of());
+
+        deploy(webTestClient, "/v1/automation-project-code-workflows/deploy", null, "staging")
+            .expectStatus()
+            .isOk();
+
+        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+            anyBoolean());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    void testDeployPassesTheReleaseFlagAndTheRequestEnvironmentToTheFacade() {
+        when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
+        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+            .thenReturn(List.of());
+
+        deploy(webTestClient, "/v1/automation-project-code-workflows/deploy", null, "staging", "true")
+            .expectStatus()
+            .isOk();
+
+        verify(automationWorkflowProjectCodeWorkflowFacade)
+            .save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(true));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    void testDeployWithoutTheReleaseFieldPassesFalseToTheFacade() {
+        when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
+        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
             .thenReturn(List.of());
 
         deploy(webTestClient, "/v1/automation-project-code-workflows/deploy", null, "staging")
             .expectStatus()
             .isOk();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT));
+        verify(automationWorkflowProjectCodeWorkflowFacade)
+            .save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(false));
     }
 
     @Test
@@ -135,7 +170,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .expectStatus()
             .isBadRequest();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade, never()).save(any(), any());
+        verify(automationWorkflowProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
     }
 
     @Test
@@ -174,6 +209,12 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     static WebTestClient.ResponseSpec deploy(
         WebTestClient webTestClient, String uri, String bearerToken, String environment) {
 
+        return deploy(webTestClient, uri, bearerToken, environment, null);
+    }
+
+    static WebTestClient.ResponseSpec deploy(
+        WebTestClient webTestClient, String uri, String bearerToken, String environment, String release) {
+
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
 
         multipartBodyBuilder.part("projectFile", new ByteArrayResource(PROJECT_BYTES) {
@@ -183,6 +224,10 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
                 return "project.js";
             }
         });
+
+        if (release != null) {
+            multipartBodyBuilder.part("release", release);
+        }
 
         WebTestClient.RequestBodySpec requestBodySpec = webTestClient
             .post()
@@ -274,13 +319,15 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
         void testTypedApiKeyReachesTheFacade() {
             stubApiKey(PlatformType.EMBEDDED);
 
-            when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any())).thenReturn(List.of());
+            when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+                .thenReturn(List.of());
 
             deploy(webTestClient, DEPLOY_PATH, SECRET_KEY)
                 .expectStatus()
                 .isOk();
 
-            verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT));
+            verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+                anyBoolean());
         }
 
         @Test
@@ -291,7 +338,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
                 .expectStatus()
                 .isUnauthorized();
 
-            verify(automationWorkflowProjectCodeWorkflowFacade, never()).save(any(), any());
+            verify(automationWorkflowProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
         }
 
         private void stubApiKey(PlatformType type) {
