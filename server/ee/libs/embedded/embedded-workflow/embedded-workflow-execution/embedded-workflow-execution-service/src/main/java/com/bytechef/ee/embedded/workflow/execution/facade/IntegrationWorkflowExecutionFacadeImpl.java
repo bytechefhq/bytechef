@@ -68,10 +68,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -174,20 +177,30 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             jobDTO = toJobDTO(job, false);
         }
 
-        long integrationInstanceId = principalJobService.getJobPrincipalId(
-            Validate.notNull(job.getId(), ""), PlatformType.EMBEDDED);
+        long rootJobId = getRootJobId(job);
+        Integration integration = integrationService.getWorkflowIntegration(jobDTO.workflowId());
+
+        long integrationInstanceId = principalJobService.getJobPrincipalId(rootJobId, PlatformType.EMBEDDED);
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
 
-        return new WorkflowExecutionDTO(
-            Validate.notNull(jobDTO.id(), "id"),
-            integrationService.getWorkflowIntegration(jobDTO.workflowId()),
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-                integrationInstance.getIntegrationInstanceConfigurationId()),
-            integrationInstance, jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
+                integrationInstance.getIntegrationInstanceConfigurationId());
+
+        if (rootJobId != id &&
+            !Objects.equals(integrationInstanceConfiguration.getIntegrationId(), integration.getId())) {
+
+            integrationInstance = null;
+            integrationInstanceConfiguration = null;
+        }
+
+        return new WorkflowExecutionDTO(
+            Validate.notNull(jobDTO.id(), "id"), integration, integrationInstanceConfiguration, integrationInstance,
+            jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
-                integrationInstanceId,
+                integrationInstance == null ? null : integrationInstanceId,
                 OptionalUtils.orElse(
                     triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
                 job),
@@ -198,7 +211,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     @PreAuthorize("isTenantAdmin()")
     @Transactional(readOnly = true)
     public TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId) {
-        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+        TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
@@ -211,17 +224,56 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     public TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
         long id, long taskExecutionId, int pageNumber, int pageSize) {
 
-        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+        TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
         return lazyTaskExecutionTreeBuilder.getChildrenPage(taskExecution, pageNumber, pageSize);
     }
 
+    private long getRootJobId(Job job) {
+        Job currentJob = job;
+        Long parentTaskExecutionId = currentJob.getParentTaskExecutionId();
+        Set<Long> visitedJobIds = new HashSet<>();
+
+        while (parentTaskExecutionId != null) {
+            if (!visitedJobIds.add(Validate.notNull(currentJob.getId(), "id"))) {
+                throw new IllegalStateException("Cyclic subflow job chain at job id=" + currentJob.getId());
+            }
+
+            Optional<Job> parentJobOptional = taskExecutionService.fetchTaskExecution(parentTaskExecutionId)
+                .map(TaskExecution::getJobId)
+                .flatMap(jobService::fetchJob);
+
+            if (parentJobOptional.isEmpty()) {
+                log.warn(
+                    "Parent job of job id={} not found through parent task execution id={}", currentJob.getId(),
+                    parentTaskExecutionId);
+
+                break;
+            }
+
+            currentJob = parentJobOptional.get();
+            parentTaskExecutionId = currentJob.getParentTaskExecutionId();
+        }
+
+        return Validate.notNull(currentJob.getId(), "id");
+    }
+
+    private TaskExecution getRequestedTaskExecution(long taskExecutionId) {
+        return taskExecutionService.fetchTaskExecution(taskExecutionId)
+            .orElseThrow(() -> new NoSuchElementException("Task execution " + taskExecutionId + " not found"));
+    }
+
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
         long currentJobId = Objects.requireNonNull(taskExecution.getJobId());
+        Set<Long> visitedJobIds = new HashSet<>();
 
         while (currentJobId != id) {
+            if (!visitedJobIds.add(currentJobId)) {
+                throw new IllegalStateException("Cyclic subflow job chain at job id=" + currentJobId);
+            }
+
             Job job = jobService.getJob(currentJobId);
 
             Long parentTaskExecutionId = job.getParentTaskExecutionId();

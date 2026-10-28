@@ -25,13 +25,15 @@ import org.jspecify.annotations.Nullable;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
-    long id, Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
-    IntegrationInstance integrationInstance, JobDTO job, Workflow workflow, TriggerExecutionDTO triggerExecution,
-    @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount) {
+    long id, Integration integration, @Nullable IntegrationInstanceConfiguration integrationInstanceConfiguration,
+    @Nullable IntegrationInstance integrationInstance, JobDTO job, Workflow workflow,
+    @Nullable TriggerExecutionDTO triggerExecution, @Nullable List<FocusPathElementDTO> focusPath,
+    @Nullable Long taskExecutionCount) {
 
     public WorkflowExecutionDTO(
-        long id, Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        IntegrationInstance integrationInstance, JobDTO job, Workflow workflow, TriggerExecutionDTO triggerExecution) {
+        long id, Integration integration, @Nullable IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        @Nullable IntegrationInstance integrationInstance, JobDTO job, Workflow workflow,
+        @Nullable TriggerExecutionDTO triggerExecution) {
 
         this(
             id, integration, integrationInstanceConfiguration, integrationInstance, job, workflow, triggerExecution,
