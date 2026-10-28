@@ -185,12 +185,25 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
     public BillingSubscription handleSubscriptionUpdated(
         BillingSubscription subscription, Subscription stripeSubscription) {
 
+        SubscriptionItem flatItem = getFlatItem(stripeSubscription);
+
+        Instant newPeriodStart = Instant.ofEpochSecond(flatItem.getCurrentPeriodStart());
+        Instant storedPeriodStart = subscription.getCurrentPeriodStart();
+
+        // Stripe does not guarantee webhook order: an event for an older period must not roll the period back, or the
+        // next current-period event would reset plan_unit_used a second time.
+        if (storedPeriodStart != null && newPeriodStart.isBefore(storedPeriodStart)) {
+            log.info(
+                "Ignoring stale subscription update for subscription {}: period start {} is before stored {}",
+                subscription.getSubscriptionId(), newPeriodStart, storedPeriodStart);
+
+            return subscription;
+        }
+
         subscription.setStatus(
             BillingSubscription.Status.fromProviderStatus(stripeSubscription.getStatus()));
 
         subscription.setCancelAtPeriodEnd(Boolean.TRUE.equals(stripeSubscription.getCancelAtPeriodEnd()));
-
-        SubscriptionItem flatItem = getFlatItem(stripeSubscription);
 
         subscription.setProductId(flatItem.getId());
 
@@ -203,9 +216,7 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
             subscription.setPlanName(newPlanName);
         }
 
-        Instant newPeriodStart = Instant.ofEpochSecond(flatItem.getCurrentPeriodStart());
-
-        boolean periodChanged = !newPeriodStart.equals(subscription.getCurrentPeriodStart());
+        boolean periodChanged = storedPeriodStart == null || newPeriodStart.isAfter(storedPeriodStart);
 
         if (periodChanged) {
             subscription.setCurrentPeriodStart(newPeriodStart);

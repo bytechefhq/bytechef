@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,6 +50,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -211,7 +213,15 @@ class PrepaidSubscriptionModelHandlerTest {
 
         handler.handleCheckoutSessionCompleted(checkoutSession());
 
-        verify(prepaidBillingSubscriptionRepository).addExtraUnitTotal(SUBSCRIPTION_ROW_ID, 1800);
+        InOrder inOrder = inOrder(
+            billingSubscriptionRepository, billingSubscriptionService, prepaidBillingSubscriptionRepository);
+
+        inOrder.verify(billingSubscriptionRepository)
+            .findFirstByOrderByCreatedDateDesc();
+        inOrder.verify(billingSubscriptionService)
+            .save(any());
+        inOrder.verify(prepaidBillingSubscriptionRepository)
+            .addExtraUnitTotal(SUBSCRIPTION_ROW_ID, 1800);
     }
 
     @Test
@@ -257,6 +267,29 @@ class PrepaidSubscriptionModelHandlerTest {
         assertThat(savedSubscription.getCurrentPeriodEnd()).isEqualTo(Instant.ofEpochSecond(NEXT_PERIOD_END));
 
         verify(prepaidBillingSubscriptionRepository).resetPlanUnitUsed(SUBSCRIPTION_ROW_ID);
+    }
+
+    @Test
+    void testSubscriptionUpdatedIgnoresStaleOlderPeriodEvent() throws Exception {
+        BillingSubscription subscription = prepaidSubscription("GROWTH", 15000);
+
+        subscription.setCancelAtPeriodEnd(true);
+
+        BillingSubscription result = handler.handleSubscriptionUpdated(
+            subscription,
+            prepaidStripeSubscription(
+                "sub_1", STARTER_PRODUCT_ID, "5000", PERIOD_START - 2678400L, PERIOD_START));
+
+        assertThat(result).isSameAs(subscription);
+        assertThat(subscription.getPlanName()).isEqualTo("GROWTH");
+        assertThat(subscription.getPlanUnitTotal()).isEqualTo(15000);
+        assertThat(subscription.isCancelAtPeriodEnd()).isTrue();
+        assertThat(subscription.getProductId()).isEqualTo("si_flat");
+        assertThat(subscription.getCurrentPeriodStart()).isEqualTo(Instant.ofEpochSecond(PERIOD_START));
+        assertThat(subscription.getCurrentPeriodEnd()).isEqualTo(Instant.ofEpochSecond(PERIOD_END));
+
+        verify(billingSubscriptionService, never()).save(any());
+        verify(prepaidBillingSubscriptionRepository, never()).resetPlanUnitUsed(anyLong());
     }
 
     @Test
