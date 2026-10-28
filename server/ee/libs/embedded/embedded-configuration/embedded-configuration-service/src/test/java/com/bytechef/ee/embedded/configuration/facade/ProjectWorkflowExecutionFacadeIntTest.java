@@ -31,7 +31,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
@@ -132,7 +132,7 @@ class ProjectWorkflowExecutionFacadeIntTest {
     private static final long TEMPLATE_REFERENCE_JOB_ID = 5L;
 
     @MockitoBean
-    private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
+    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ConnectedUserProjectService connectedUserProjectService;

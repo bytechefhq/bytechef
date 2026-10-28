@@ -25,7 +25,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacadeIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceRolloutManager;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -62,13 +62,12 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -93,7 +92,7 @@ import org.springframework.transaction.support.TransactionTemplate;
         "spring.main.allow-bean-definition-overriding=true"
     })
 @Import({
-    AutomationWorkflowProjectPublishedEventListenerIntTest.AsyncTestConfiguration.class,
+    AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest.AsyncTestConfiguration.class,
     PostgreSQLContainerConfiguration.class
 })
 @MockitoBean(types = {
@@ -116,10 +115,10 @@ import org.springframework.transaction.support.TransactionTemplate;
     WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class,
     WorkspaceConnectionFacade.class, WorkspaceFacade.class
 })
-class AutomationWorkflowProjectPublishedEventListenerIntTest {
+class AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest {
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @MockitoBean
     private ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
@@ -128,26 +127,14 @@ class AutomationWorkflowProjectPublishedEventListenerIntTest {
     private PlatformTransactionManager platformTransactionManager;
 
     @Test
-    void testPublishProjectHandsTheRolloutToTheListenerAfterCommit() {
-        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Listener " + UUID.randomUUID(), "", null, List.of(), null);
+    void testUpdatedEventHandsTheRolloutToTheListenerAfterCommit() {
+        applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4001L, 2L));
 
-        automationWorkflowProjectFacade.createProjectWorkflow(
-            automationWorkflowProjectId, "{\"label\":\"x\",\"triggers\":[],\"tasks\":[]}", null);
-
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOut(automationWorkflowProjectId);
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOut(4001L, 2L);
     }
 
     @Test
     void testRolloutWaitsForTheCommitAndRunsOffThePublishingThread() {
-        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Listener " + UUID.randomUUID(), "", null, List.of(), null);
-
-        automationWorkflowProjectFacade.createProjectWorkflow(
-            automationWorkflowProjectId, "{\"label\":\"x\",\"triggers\":[],\"tasks\":[]}", null);
-
         AtomicReference<Thread> rolloutThread = new AtomicReference<>();
 
         doAnswer(invocation -> {
@@ -155,17 +142,17 @@ class AutomationWorkflowProjectPublishedEventListenerIntTest {
 
             return null;
         }).when(connectedUserReferenceRolloutManager)
-            .rollOut(automationWorkflowProjectId);
+            .rollOut(4002L, 2L);
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
-            automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+            applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4002L, 2L));
 
-            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOut(automationWorkflowProjectId);
+            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOut(4002L, 2L);
         });
 
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOut(automationWorkflowProjectId);
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOut(4002L, 2L);
 
         assertThat(rolloutThread.get()).isNotSameAs(Thread.currentThread());
     }

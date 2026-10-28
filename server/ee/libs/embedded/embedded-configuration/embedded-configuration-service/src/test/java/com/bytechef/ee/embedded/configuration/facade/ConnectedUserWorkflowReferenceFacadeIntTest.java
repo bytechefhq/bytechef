@@ -48,9 +48,10 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflo
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTemplateNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -182,7 +183,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
+    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -395,7 +396,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         verifyNoInteractions(automationWorkflowProjectFacade, connectedUserService);
 
         verify(connectedUserReferenceDeploymentManager).getDeployment(existingReference.getProjectDeploymentId());
-        verify(connectedUserReferenceDeploymentManager).getLastPublishedVersion(automationWorkflowProjectId);
+        verify(connectedUserReferenceDeploymentManager).getReleasedVersion(automationWorkflowProjectId,
+            Environment.PRODUCTION);
         verifyNoMoreInteractions(connectedUserReferenceDeploymentManager);
     }
 
@@ -996,6 +998,77 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
             connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+    }
+
+    @Test
+    void testProvisionReferenceThrowsWhenTheProjectIsNotReleasedInTheUsersEnvironment() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Not Released");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.DEVELOPMENT);
+
+        givenOwnedConnection(connectedUser);
+
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.DEVELOPMENT))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey())
+                        .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
+                            .getErrorKey()));
+
+        assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+    }
+
+    @Test
+    void testProvisionReferenceThrowsWhenTemplateIsNotInThePinnedVersion() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Template Not Pinned");
+
+        addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        String newerWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), newerWorkflowUuid, Environment.PRODUCTION))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey())
+                        .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
+                            .getErrorKey()));
+
+        assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
+            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+    }
+
+    @Test
+    void testProvisionReferencePinsTheDeploymentToTheConfiguredVersion() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Pinned Deployment");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        assertThat(getDeployment(reference).getProjectVersion()).isEqualTo(1);
     }
 
     @Test

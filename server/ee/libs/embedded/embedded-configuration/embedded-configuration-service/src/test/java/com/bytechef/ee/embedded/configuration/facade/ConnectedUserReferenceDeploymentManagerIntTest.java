@@ -43,17 +43,20 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
+import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -186,7 +189,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
+    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -344,6 +347,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
         publishAndPinProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal(), 1, true, true);
 
         ConnectedUser developmentConnectedUser = connectedUserService.createConnectedUser(
             externalUserId, Environment.DEVELOPMENT);
@@ -515,14 +521,52 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     }
 
     @Test
-    void testGetLastPublishedVersionRejectsAnUnpublishedProject() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Unpublished");
+    void testGetReleasedVersionRejectsAProjectWithoutAConfiguration() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Unreleased");
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
         assertThatThrownBy(
-            () -> connectedUserReferenceDeploymentManager.getLastPublishedVersion(automationWorkflowProjectId))
-                .isInstanceOf(IllegalArgumentException.class);
+            () -> connectedUserReferenceDeploymentManager.getReleasedVersion(
+                automationWorkflowProjectId, Environment.PRODUCTION))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                        configurationException.getErrorKey())
+                            .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
+                                .getErrorKey()));
+    }
+
+    @Test
+    void testGetReleasedVersionRejectsADisabledConfiguration() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Disabled Release");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
+
+        assertThatThrownBy(
+            () -> connectedUserReferenceDeploymentManager.getReleasedVersion(
+                automationWorkflowProjectId, Environment.PRODUCTION))
+                    .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testGetReleasedVersionReturnsThePinnedVersionOfTheEnvironment() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Pinned Release");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        assertThat(connectedUserReferenceDeploymentManager.getReleasedVersion(
+            automationWorkflowProjectId, Environment.PRODUCTION)).isEqualTo(1);
     }
 
     @Test
