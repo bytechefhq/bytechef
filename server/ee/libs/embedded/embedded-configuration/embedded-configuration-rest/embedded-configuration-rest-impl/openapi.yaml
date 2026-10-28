@@ -2012,6 +2012,11 @@ components:
           description: "The id of a integration instance configuration workflow."
           type: "integer"
           format: "int64"
+        lastExecutionDate:
+          description: "The last execution date of the workflow for this integration instance."
+          type: "string"
+          format: "date-time"
+          readOnly: true
         lastModifiedBy:
           description: "The last modified by."
           type: "string"

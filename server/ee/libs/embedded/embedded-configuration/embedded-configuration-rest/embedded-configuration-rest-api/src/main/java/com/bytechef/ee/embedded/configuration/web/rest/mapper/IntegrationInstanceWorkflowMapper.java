@@ -27,6 +27,7 @@ public class IntegrationInstanceWorkflowMapper {
         extends Converter<IntegrationInstanceWorkflow, IntegrationInstanceWorkflowModel> {
 
         @Override
+        @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "workflowId", ignore = true)
         IntegrationInstanceWorkflowModel convert(IntegrationInstanceWorkflow integrationInstanceWorkflow);
     }
