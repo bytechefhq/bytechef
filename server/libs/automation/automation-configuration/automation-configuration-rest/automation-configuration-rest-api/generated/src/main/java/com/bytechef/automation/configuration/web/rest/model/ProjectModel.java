@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:22.372603+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T00:05:49.114234+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ProjectModel {
 
   private @Nullable String createdBy;
@@ -60,6 +60,8 @@ public class ProjectModel {
   private @Nullable String uuid;
 
   private @Nullable CategoryModel category;
+
+  private @Nullable Integer developmentDeploymentCount;
 
   private List<Long> projectWorkflowIds = new ArrayList<>();
 
@@ -333,6 +335,27 @@ public class ProjectModel {
     this.category = category;
   }
 
+  public ProjectModel developmentDeploymentCount(@Nullable Integer developmentDeploymentCount) {
+    this.developmentDeploymentCount = developmentDeploymentCount;
+    return this;
+  }
+
+  /**
+   * The number of the project's deployments in the Development environment. Only set by the workspace project list.
+   * @return developmentDeploymentCount
+   */
+  
+  @Schema(name = "developmentDeploymentCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of the project's deployments in the Development environment. Only set by the workspace project list.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("developmentDeploymentCount")
+  public @Nullable Integer getDevelopmentDeploymentCount() {
+    return developmentDeploymentCount;
+  }
+
+  @JsonProperty("developmentDeploymentCount")
+  public void setDevelopmentDeploymentCount(@Nullable Integer developmentDeploymentCount) {
+    this.developmentDeploymentCount = developmentDeploymentCount;
+  }
+
   public ProjectModel projectWorkflowIds(List<Long> projectWorkflowIds) {
     this.projectWorkflowIds = projectWorkflowIds;
     return this;
@@ -454,6 +477,7 @@ public class ProjectModel {
         Objects.equals(this.lastProjectVersion, project.lastProjectVersion) &&
         Objects.equals(this.uuid, project.uuid) &&
         Objects.equals(this.category, project.category) &&
+        Objects.equals(this.developmentDeploymentCount, project.developmentDeploymentCount) &&
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.tags, project.tags) &&
         Objects.equals(this.workspaceId, project.workspaceId) &&
@@ -462,7 +486,7 @@ public class ProjectModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, projectWorkflowIds, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, developmentDeploymentCount, projectWorkflowIds, tags, workspaceId, version);
   }
 
   @Override
@@ -481,6 +505,7 @@ public class ProjectModel {
     sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
     sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    developmentDeploymentCount: ").append(toIndentedString(developmentDeploymentCount)).append("\n");
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
