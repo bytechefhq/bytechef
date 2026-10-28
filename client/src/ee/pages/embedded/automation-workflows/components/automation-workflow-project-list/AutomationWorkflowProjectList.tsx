@@ -89,6 +89,7 @@ const AutomationWorkflowProjectList = ({
                             onCreateWorkflow={onCreateWorkflow}
                             onDeleteWorkflow={onDeleteWorkflow}
                             onEditWorkflow={onEditWorkflow}
+                            onImportWorkflow={onImportWorkflow}
                             onSelectWorkflow={onSelectWorkflow}
                             project={project}
                         />

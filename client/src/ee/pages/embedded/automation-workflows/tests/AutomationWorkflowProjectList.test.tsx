@@ -184,26 +184,64 @@ describe('AutomationWorkflowProjectList', () => {
         expect(onPublishProject).toHaveBeenCalledWith('project-7');
     });
 
-    it('calls onCreateWorkflow from the primary Workflow split-button', async () => {
+    it('calls onCreateWorkflow from the New Workflow button next to the Workflows heading', async () => {
         const user = userEvent.setup();
 
-        const projects = [makeProject({id: 'project-3', name: 'My Project'})];
+        const projects = [
+            makeProject({
+                id: 'project-3',
+                name: 'My Project',
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Sync Contacts',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-uuid-3',
+                        workflowUuid: 'wf-uuid-3',
+                    },
+                ],
+            }),
+        ];
 
         renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
 
-        await user.click(screen.getByRole('button', {name: /create workflow/i}));
+        await user.click(screen.getByText('1 workflow'));
+
+        await user.click(await screen.findByRole('button', {name: /create workflow/i}));
 
         expect(onCreateWorkflow).toHaveBeenCalledWith('project-3');
     });
 
-    it('calls onImportWorkflow from the split-button chevron dropdown', async () => {
+    it('calls onImportWorkflow from the New Workflow chevron dropdown', async () => {
         const user = userEvent.setup();
 
-        const projects = [makeProject({id: 'project-4', name: 'My Project'})];
+        const projects = [
+            makeProject({
+                id: 'project-4',
+                name: 'My Project',
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Sync Contacts',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-uuid-4',
+                        workflowUuid: 'wf-uuid-4',
+                    },
+                ],
+            }),
+        ];
 
         renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
 
-        await user.click(screen.getByRole('button', {name: /more workflow creation actions/i}));
+        await user.click(screen.getByText('1 workflow'));
+
+        await user.click(await screen.findByRole('button', {name: /more workflow creation actions/i}));
 
         await user.click(await screen.findByRole('menuitem', {name: /import workflow/i}));
 
