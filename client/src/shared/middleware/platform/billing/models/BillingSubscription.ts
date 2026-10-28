@@ -47,7 +47,38 @@ export interface BillingSubscription {
      * Number of job executions used in the current billing period.
      */
     jobsExecuted?: number;
+    /**
+     * The subscription model.
+     */
+    subscriptionModel?: BillingSubscriptionSubscriptionModelEnum;
+    /**
+     * The number of plan units granted for the current billing period (PREPAID).
+     */
+    planUnitTotal?: number;
+    /**
+     * The number of plan units consumed in the current billing period (PREPAID).
+     */
+    planUnitUsed?: number;
+    /**
+     * The number of purchased extra units (PREPAID).
+     */
+    extraUnitTotal?: number;
+    /**
+     * The number of purchased extra units consumed (PREPAID).
+     */
+    extraUnitUsed?: number;
 }
+
+
+/**
+ * @export
+ */
+export const BillingSubscriptionSubscriptionModelEnum = {
+    Metered: 'METERED',
+    Prepaid: 'PREPAID',
+} as const;
+export type BillingSubscriptionSubscriptionModelEnum = typeof BillingSubscriptionSubscriptionModelEnum[keyof typeof BillingSubscriptionSubscriptionModelEnum];
+
 
 /**
  * Check if a given object implements the BillingSubscription interface.
@@ -73,6 +104,11 @@ export function BillingSubscriptionFromJSONTyped(json: any, ignoreDiscriminator:
         'cancelAtPeriodEnd': json['cancelAtPeriodEnd'] == null ? undefined : json['cancelAtPeriodEnd'],
         'scheduledPlanName': json['scheduledPlanName'] == null ? undefined : json['scheduledPlanName'],
         'jobsExecuted': json['jobsExecuted'] == null ? undefined : json['jobsExecuted'],
+        'subscriptionModel': json['subscriptionModel'] == null ? undefined : json['subscriptionModel'],
+        'planUnitTotal': json['planUnitTotal'] == null ? undefined : json['planUnitTotal'],
+        'planUnitUsed': json['planUnitUsed'] == null ? undefined : json['planUnitUsed'],
+        'extraUnitTotal': json['extraUnitTotal'] == null ? undefined : json['extraUnitTotal'],
+        'extraUnitUsed': json['extraUnitUsed'] == null ? undefined : json['extraUnitUsed'],
     };
 }
 
@@ -94,6 +130,11 @@ export function BillingSubscriptionToJSONTyped(value?: BillingSubscription | nul
         'cancelAtPeriodEnd': value['cancelAtPeriodEnd'],
         'scheduledPlanName': value['scheduledPlanName'],
         'jobsExecuted': value['jobsExecuted'],
+        'subscriptionModel': value['subscriptionModel'],
+        'planUnitTotal': value['planUnitTotal'],
+        'planUnitUsed': value['planUnitUsed'],
+        'extraUnitTotal': value['extraUnitTotal'],
+        'extraUnitUsed': value['extraUnitUsed'],
     };
 }
 

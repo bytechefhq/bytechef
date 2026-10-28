@@ -3,3 +3,4 @@
 export * from './BillingSubscription';
 export * from './CheckoutSession';
 export * from './CheckoutSessionRequest';
+export * from './JobExecutionsPackageCheckoutRequest';
