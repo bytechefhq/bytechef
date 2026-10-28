@@ -137,7 +137,7 @@ Publishing does not release anything. Connected users keep seeing the version th
 What a version change does to connected users who already use the project:
 
 - **References** move to the configuration's version, as described under [What a configuration does to connected users](#what-a-configuration-does-to-connected-users).
-- **References to removed workflows** - a workflow that is no longer in the version the configuration points at - become dangling and disabled, with the reason "Removed from the automation workflow project on publish". This is permanent, unlike the recoverable "turned off by the administrator" state above.
+- **References to removed workflows** - a workflow that is no longer in the version the configuration points at - become dangling and disabled, with the reason "Not in the version released to this environment". This also happens on a rollback: moving a configuration back to an older version dangles references to templates that version lacks, and the configuration dialog warns about it. This is permanent, unlike the recoverable "turned off by the administrator" state above.
 - **Copies** are not changed. A connected user's copy keeps running the version they copied.
 
 If the background roll-out fails for a user, their reference catches up the next time it is enabled or provisioned, or the next time the configuration's version changes.

@@ -152,9 +152,10 @@ against a nonexistent workflow. It flips to a **dangling** state and is disabled
 
 - Invisible to both invocation endpoints - a dangling reference behaves exactly like a disabled one
   to a caller (same `404`, no existence leak).
-- Still listed for the connected user, carrying a reason: `"Removed from the automation workflow project on
-  publish"` when the version drops the workflow, or `"The automation workflow project was
-  deleted"`.
+- Still listed for the connected user, carrying a reason: `"Not in the version released to this
+  environment"` when the version drops the workflow, or `"The automation workflow project was
+  deleted"`. A rollback counts too: moving the configuration back to an older version dangles
+  references to templates that version lacks.
 - The connected user's connection configuration is preserved on the row, so nothing is lost even
   though the row itself stops being usable.
 
