@@ -266,7 +266,7 @@ const PrepaidBilling = () => {
 
                     {subscription && !isTrialSubscription && (
                         <ExtraUnitsCard
-                            disabled={subscription.cancelAtPeriodEnd ?? false}
+                            disabled={(subscription.cancelAtPeriodEnd ?? false) || subscription.status !== 'ACTIVE'}
                             extraUnitTotal={subscription.extraUnitTotal ?? 0}
                             extraUnitUsed={subscription.extraUnitUsed ?? 0}
                             onBuy={() => setBuyPackageOpen(true)}

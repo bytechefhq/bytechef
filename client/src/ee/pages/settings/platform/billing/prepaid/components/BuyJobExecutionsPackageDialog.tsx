@@ -44,7 +44,7 @@ const BuyJobExecutionsPackageDialog = ({onClose, open}: BuyJobExecutionsPackageD
             <DialogContent>
                 <DialogMain>
                     <DialogHeader
-                        description="Extra units are valid for as long as your subscription is active."
+                        description="Extra units never expire and carry over to future subscriptions."
                         title="Buy extra units"
                     />
 
