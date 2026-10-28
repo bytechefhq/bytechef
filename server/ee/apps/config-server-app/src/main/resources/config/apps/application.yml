@@ -17,7 +17,10 @@ docs:
 
 info:
   ai:
-    enabled: ${bytechef.ai.enabled:false}
+    copilot:
+      enabled: ${bytechef.ai.copilot.enabled}
+    knowledgeBase:
+      enabled: ${bytechef.ai.knowledge-base.enabled:false}
   analytics:
     enabled: ${bytechef.analytics.enabled:false}
     postHog:
@@ -30,14 +33,14 @@ info:
     communitySupportUrl: ${docs.community-support-url:}
     documentationUrl: ${docs.documentation-url:}
     reportBugUrl: ${docs.report-bug-url:}
-  featureFlags: ${bytechef.featureFlags}
+  featureFlags: ${bytechef.feature-flags}
   helpHub:
     enabled: ${bytechef.helpHub.enabled:false}
     commandBar:
       orgId: ${bytechef.helpHub.commandBar.orgId:}
   signUp:
-    activationRequired: ${bytechef.signUp.activationRequired:false}
-    enabled: ${bytechef.signUp.enabled}
+    activationRequired: ${bytechef.sign-up.activation-required}
+    enabled: ${bytechef.sign-up.enabled}
   userGuiding:
     containerId: ${bytechef.userGuiding.containerId:}
     enabled: ${bytechef.userGuiding.enabled:false}
@@ -91,16 +94,16 @@ management:
           endpoint: ${bytechef.observability.logging.endpoint}
   logging:
     export:
-      enabled: ${bytechef.observability.enabled}
+      enabled: ${bytechef.observability.logging.enabled}
   tracing:
     export:
-      enabled: ${bytechef.observability.enabled}
+      enabled: ${bytechef.observability.tracing.enabled}
     sampling:
       probability: 1.0
   otlp:
     metrics:
       export:
-        enabled: ${bytechef.observability.enabled}
+        enabled: ${bytechef.observability.metrics.enabled}
         step: 10s
         url: ${bytechef.observability.metrics.endpoint}
 
@@ -147,7 +150,13 @@ spring:
 
 bytechef:
   ai:
+    copilot:
+      enabled: false
+    firecrawl:
+      base-url: https://api.firecrawl.dev/v2
+      enabled: false
     knowledge-base:
+      enabled: false
       # Number of concurrent consumers per knowledge base message route (used by AMQP | JMS brokers)
       subscriptions:
         document-chunk-update-events: 1
@@ -211,6 +220,8 @@ bytechef:
     # Cache provider (caffeine) default: caffeine
     provider: caffeine
   coordinator:
+    # Whether this instance runs the coordinator (orchestrates job and trigger execution)
+    enabled: true
     task:
       # Number of concurrent consumers per coordinator task message route (used by AMQP | JMS brokers)
       subscriptions:
@@ -235,6 +246,9 @@ bytechef:
   data-storage:
     # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc
+  # Microservice discovery service provider (redis). Required for api-gateway routing and remote worker calls.
+  discovery-service:
+    provider: redis
   # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
   edition: EE
   # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
@@ -245,10 +259,13 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
+  # Enabled feature flags, e.g. [ff-123, ff-456]
+  feature-flags: []
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@app.bytechef.io
-    port: 25
+    # SMTP host; empty disables the mail health check and logs that mail is not configured
+    host:
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis
@@ -258,6 +275,19 @@ bytechef:
     #        clientId: 123456789
     #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
+  observability:
+    logging:
+      aws:
+        # Sign OTLP log export requests with AWS SigV4 (CloudWatch OTLP endpoint https://logs.{region}.amazonaws.com/v1/logs).
+        enabled: false
+      enabled: false
+      endpoint: http://localhost:4318/v1/logs
+    metrics:
+      enabled: false
+      endpoint: http://localhost:4318/v1/metrics
+    tracing:
+      enabled: false
+      endpoint: http://localhost:4318/v1/traces
   public-url: http://127.0.0.1:5173
   resources:
     web: file:///opt/bytechef/client/
@@ -272,8 +302,6 @@ bytechef:
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
-  upgrade:
-    enabled: true
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
@@ -282,13 +310,23 @@ bytechef:
   # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
   # bootstraps.
   worker:
+    # Whether this instance runs the worker (executes workflow tasks and triggers)
+    enabled: true
     task:
       subscriptions:
         default: 10
+      # Concurrent executions in the synchronous, interactive lane (API Platform sync path, editor Test button)
+      sync-concurrency-limit: 5
   workflow:
     output-storage:
       # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
       provider: jdbc
     repository:
+      classpath:
+        enabled: false
+      filesystem:
+        enabled: false
+      git:
+        enabled: false
       jdbc:
         enabled: true
