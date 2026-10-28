@@ -5,6 +5,7 @@ import {ReactElement, ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflows from '../AutomationWorkflows';
+import useAutomationWorkflowExecutionsSheetStore from '../stores/useAutomationWorkflowExecutionsSheetStore';
 
 const renderWithProviders = (ui: ReactElement) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
@@ -98,6 +99,25 @@ vi.mock('@/shared/middleware/graphql', () => ({
     }),
 }));
 
+vi.mock(
+    '@/ee/pages/embedded/automation-workflows/components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet',
+    async () => {
+        const {default: useAutomationWorkflowExecutionsSheetStore} =
+            await import('@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore');
+
+        const AutomationWorkflowExecutionsSheetMock = () => {
+            const {automationWorkflowExecutionsSheetOpen, projectName, workflow} =
+                useAutomationWorkflowExecutionsSheetStore();
+
+            return automationWorkflowExecutionsSheetOpen ? (
+                <div>{`Executions sheet ${projectName} ${workflow?.workflowUuid}`}</div>
+            ) : null;
+        };
+
+        return {default: AutomationWorkflowExecutionsSheetMock};
+    }
+);
+
 vi.mock('react-router-dom', () => ({
     Link: ({children}: {children: React.ReactNode}) => <a>{children}</a>,
     useNavigate: () => hoisted.navigateMock,
@@ -130,6 +150,12 @@ beforeEach(() => {
     hoisted.updateProjectMutate.mockReset();
     hoisted.updateWorkflowMutate.mockReset();
     hoisted.updateWorkflowPermissionExpressionMutate.mockReset();
+
+    useAutomationWorkflowExecutionsSheetStore.setState({
+        automationWorkflowExecutionsSheetOpen: false,
+        projectName: undefined,
+        workflow: undefined,
+    });
 });
 
 describe('AutomationWorkflows', () => {
@@ -373,6 +399,43 @@ describe('AutomationWorkflows', () => {
         const parsed = JSON.parse(definition);
 
         expect(parsed.label).toBe('My New Workflow');
+    });
+
+    it("opens a workflow's executions from its row menu without opening the editor", async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-13',
+                lastPublishedVersion: null,
+                name: 'Mail Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Mailer',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-13',
+                        workflowUuid: 'wf-uuid-13',
+                    } as unknown as {description: string | null; label: string | null; workflowUuid: string},
+                ],
+            },
+        ];
+
+        renderWithProviders(<AutomationWorkflows />);
+
+        await user.click(screen.getByText('1 workflow'));
+        await user.click(await screen.findByRole('button', {name: 'Workflow Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Workflow Executions'}));
+
+        expect(await screen.findByText('Executions sheet Mail Project wf-uuid-13')).toBeInTheDocument();
+        expect(hoisted.navigateMock).not.toHaveBeenCalled();
     });
 
     it('updates the workflow and then its permission expression when the edit dialog is saved', async () => {

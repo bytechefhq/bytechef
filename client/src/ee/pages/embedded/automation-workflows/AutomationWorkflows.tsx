@@ -26,6 +26,7 @@ import AutomationWorkflowProjectsFilterTitle from './components/AutomationWorkfl
 import AutomationWorkflowDialog, {
     AutomationWorkflowFormValuesI,
 } from './components/automation-workflow-dialog/AutomationWorkflowDialog';
+import AutomationWorkflowExecutionsSheet from './components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet';
 import AutomationWorkflowProjectDialog, {
     AutomationWorkflowProjectFormValuesI,
 } from './components/automation-workflow-project-dialog/AutomationWorkflowProjectDialog';
@@ -378,6 +379,8 @@ const AutomationWorkflows = () => {
                     }
                 />
             )}
+
+            <AutomationWorkflowExecutionsSheet />
 
             <input
                 accept=".json,.yaml,.yml"

@@ -62,6 +62,18 @@ export const useGetWorkspaceProjectWorkflowExecutionsQuery = (
         refetchInterval: (query) => getWorkflowExecutionsRefetchInterval(query.state.data),
     });
 
+export const useGetEmbeddedWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest, enabled?: boolean) =>
+    useQuery<Page, Error>({
+        queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions({...request, embedded: true}),
+        queryFn: () =>
+            new WorkflowExecutionApi().getWorkflowExecutionsPage({
+                ...request,
+                embedded: true,
+            }),
+        enabled: enabled === undefined ? true : enabled,
+        refetchInterval: (query) => getWorkflowExecutionsRefetchInterval(query.state.data),
+    });
+
 export const useGetProjectWorkflowExecutionQuery = (
     request: GetWorkflowExecutionRequest,
     enabled?: boolean,
