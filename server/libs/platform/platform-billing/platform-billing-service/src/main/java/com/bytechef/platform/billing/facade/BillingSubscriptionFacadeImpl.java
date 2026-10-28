@@ -56,7 +56,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
     @Override
     public String createCheckoutSession(String planName) {
-        return subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.METERED)
+        return subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.PREPAID)
             .createCheckoutSession(planName);
     }
 
