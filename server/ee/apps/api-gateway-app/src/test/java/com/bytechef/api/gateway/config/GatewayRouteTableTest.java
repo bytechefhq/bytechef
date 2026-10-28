@@ -90,6 +90,7 @@ class GatewayRouteTableTest {
         "/api/automation/internal/workspaces/1/projects, configuration-app",
         "/api/automation/internal/workflow-executions/5, execution-app",
         "/api/automation/internal/trigger-form/abc, execution-app",
+        "/api/automation/v1/projects/deploy, configuration-app",
         "/api/platform/internal/jobs/7, execution-app",
         "/api/platform/internal/trigger-executions, execution-app",
         "/api/platform/internal/approval-form/abc, execution-app",
