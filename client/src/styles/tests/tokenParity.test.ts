@@ -17,6 +17,7 @@ const THEME_EXEMPT_TOKENS = new Set([
     '--sidebar',
     '--sidebar-accent',
     '--sidebar-accent-foreground',
+    '--sidebar-active-foreground',
     '--sidebar-border',
     '--sidebar-foreground',
     '--sidebar-primary',
