@@ -114,6 +114,21 @@ public class JdbcJobRepositoryIntTest {
     }
 
     @Test
+    public void testFindLastJob() {
+        jobRepository.save(getJob(Job.Status.COMPLETED));
+
+        Job lastJob = jobRepository.save(getJob(Job.Status.STARTED));
+
+        Optional<Job> lastJobOptional = jobRepository.findLastJob();
+
+        Assertions.assertTrue(lastJobOptional.isPresent());
+
+        Job foundJob = lastJobOptional.get();
+
+        Assertions.assertEquals(lastJob.getId(), foundJob.getId());
+    }
+
+    @Test
     public void testFindById() {
         Job job = jobRepository.save(getJob(Job.Status.CREATED));
 
