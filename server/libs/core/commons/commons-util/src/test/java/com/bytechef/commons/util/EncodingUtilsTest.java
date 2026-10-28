@@ -16,6 +16,10 @@
 
 package com.bytechef.commons.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +41,19 @@ public class EncodingUtilsTest {
 
         Assertions.assertThat(EncodingUtils.base64DecodeToString(result))
             .isEqualTo("username:password");
+    }
+
+    @Test
+    public void testBase64EncodingOutputStream() throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        try (OutputStream outputStream = EncodingUtils.base64EncodingOutputStream(byteArrayOutputStream)) {
+            outputStream.write("Hello".getBytes(StandardCharsets.UTF_8));
+            outputStream.write(" World".getBytes(StandardCharsets.UTF_8));
+        }
+
+        Assertions.assertThat(byteArrayOutputStream.toString(StandardCharsets.UTF_8))
+            .isEqualTo("SGVsbG8gV29ybGQ=");
     }
 
 }

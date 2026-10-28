@@ -16,6 +16,7 @@
 
 package com.bytechef.commons.util;
 
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -59,6 +60,10 @@ public class EncodingUtils {
 
     public static byte[] base64Encode(final String data) {
         return ENCODER.encode(data.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static OutputStream base64EncodingOutputStream(final OutputStream outputStream) {
+        return ENCODER.wrap(outputStream);
     }
 
     public static String base64EncodeToString(final byte[] bytes) {
