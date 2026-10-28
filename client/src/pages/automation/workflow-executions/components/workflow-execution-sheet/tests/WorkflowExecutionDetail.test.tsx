@@ -8,7 +8,8 @@ const {executionQueryMock, sheetContentPropsMock, taskExecutionQueryMock} = vi.h
     taskExecutionQueryMock: vi.fn(),
 }));
 
-vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
+vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/workflowExecutions.queries')>()),
     useGetProjectWorkflowExecutionQuery: executionQueryMock,
     useGetWorkflowExecutionTaskExecutionQuery: taskExecutionQueryMock,
 }));

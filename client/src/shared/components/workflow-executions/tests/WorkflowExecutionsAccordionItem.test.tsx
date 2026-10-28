@@ -8,7 +8,8 @@ const hoisted = vi.hoisted(() => ({
     useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery: vi.fn(),
 }));
 
-vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
+vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/workflowExecutions.queries')>()),
     useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery:
         hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
 }));

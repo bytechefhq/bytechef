@@ -10,7 +10,8 @@ const {executionQueryMock, invalidateQueriesMock, taskExecutionQueryMock} = vi.h
     taskExecutionQueryMock: vi.fn(),
 }));
 
-vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
+vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/workflowExecutions.queries')>()),
     WorkflowExecutionKeys: {
         workflowExecutionTaskExecutionChildrenOfJob: (id: number) => [
             'workflowExecutions',

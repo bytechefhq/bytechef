@@ -1,4 +1,5 @@
 import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
+import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {groupTaskExecutionAttempts} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {
@@ -8,11 +9,6 @@ import {
     TaskExecution,
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
-import {
-    WorkflowExecutionKeys,
-    useGetProjectWorkflowExecutionQuery,
-    useGetWorkflowExecutionTaskExecutionQuery,
-} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
 import {buildFocusPath} from '@/shared/util/buildFocusPath';
 import {useQueryClient} from '@tanstack/react-query';
@@ -42,6 +38,12 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     const queryClient = useQueryClient();
 
+    const {
+        taskExecutionChildrenOfJobQueryKey,
+        useGetWorkflowExecutionQuery,
+        useGetWorkflowExecutionTaskExecutionQuery,
+    } = useWorkflowExecutionDetailQueries();
+
     const subflowOpen = subflowStack.length > 0;
     const activeJobId = subflowStack.at(-1)?.jobId ?? workflowExecutionId;
     const activeWorkflowExecutionKind = subflowOpen ? 'JOB' : workflowExecutionKind;
@@ -51,18 +53,13 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         isError: workflowExecutionError,
         isLoading: workflowExecutionLoading,
         refetch: refetchWorkflowExecution,
-    } = useGetProjectWorkflowExecutionQuery(
-        {id: activeJobId, lazy: true},
-        enabled,
-        undefined,
-        activeWorkflowExecutionKind
-    );
+    } = useGetWorkflowExecutionQuery({id: activeJobId, lazy: true}, enabled, undefined, activeWorkflowExecutionKind);
 
     const {
         data: rootWorkflowExecutionData,
         isError: rootWorkflowExecutionError,
         refetch: refetchRootWorkflowExecution,
-    } = useGetProjectWorkflowExecutionQuery(
+    } = useGetWorkflowExecutionQuery(
         {id: workflowExecutionId, lazy: true},
         enabled && subflowOpen,
         undefined,
@@ -77,7 +74,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         return getWorkflowStatusType(workflowExecution.job, workflowExecution.triggerExecution) === 'running';
     }, [workflowExecution]);
 
-    useGetProjectWorkflowExecutionQuery(
+    useGetWorkflowExecutionQuery(
         {id: activeJobId, lazy: true},
         enabled && isWorkflowRunning,
         POLLING_INTERVAL_MS,
@@ -197,12 +194,12 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     useEffect(() => {
         if (workflowRunningRef.current && !isWorkflowRunning) {
             void queryClient.invalidateQueries({
-                queryKey: WorkflowExecutionKeys.workflowExecutionTaskExecutionChildrenOfJob(activeJobId),
+                queryKey: taskExecutionChildrenOfJobQueryKey(activeJobId),
             });
         }
 
         workflowRunningRef.current = isWorkflowRunning;
-    }, [activeJobId, isWorkflowRunning, queryClient]);
+    }, [activeJobId, isWorkflowRunning, queryClient, taskExecutionChildrenOfJobQueryKey]);
 
     useEffect(() => {
         if (!rootJob && triggerExecution && selectedItem?.id !== triggerExecution.id) {

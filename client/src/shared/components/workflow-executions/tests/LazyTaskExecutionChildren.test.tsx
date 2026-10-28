@@ -12,7 +12,8 @@ const hoisted = vi.hoisted(() => ({
     useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery: vi.fn(),
 }));
 
-vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
+vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/workflowExecutions.queries')>()),
     TASK_EXECUTION_CHILDREN_MAX_PAGES: 10,
     TASK_EXECUTION_CHILDREN_PAGE_SIZE: 50,
     useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery:
