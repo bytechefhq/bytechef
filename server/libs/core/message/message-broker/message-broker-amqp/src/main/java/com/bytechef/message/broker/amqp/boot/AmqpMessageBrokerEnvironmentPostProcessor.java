@@ -35,7 +35,7 @@ public class AmqpMessageBrokerEnvironmentPostProcessor implements EnvironmentPos
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "amqp")) {
+        if (Objects.equals(environment.getProperty("bytechef.message-broker.provider", String.class), "amqp")) {
             source.put("management.health.rabbit.enabled", true);
         } else {
             source.put("management.health.rabbit.enabled", false);

@@ -35,7 +35,7 @@ public class JmsMessageBrokerEnvironmentPostProcessor implements EnvironmentPost
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!Objects.equals(environment.getProperty("bytechef.message.broker.provider", String.class), "jms")) {
+        if (!Objects.equals(environment.getProperty("bytechef.message-broker.provider", String.class), "jms")) {
             source.put(
                 "spring.autoconfigure.exclude",
                 StringUtils.join(
