@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -25,7 +26,9 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
 const STATIC_WEBHOOK_URL = 'https://bytechef.example.com/webhooks/abc123';
 
 const createConnectedUserProjectWorkflow = (staticWebhookUrl: string | null): ConnectedUserProjectWorkflowType => ({
+    automationWorkflowUuid: null,
     connectedUserId: '1050',
+    copiedFromWorkflowUuid: null,
     enabled: true,
     id: '1052',
     lastExecutionDate: null,
@@ -40,12 +43,15 @@ const createConnectedUserProjectWorkflow = (staticWebhookUrl: string | null): Co
     workflowVersion: 5,
 });
 
-const renderListItem = (connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType) =>
+const renderListItem = (connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType, projectName?: string) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <TooltipProvider>
                 <ul>
-                    <ConnectedUserProjectWorkflowListItem connectedUserProjectWorkflow={connectedUserProjectWorkflow} />
+                    <ConnectedUserProjectWorkflowListItem
+                        connectedUserProjectWorkflow={connectedUserProjectWorkflow}
+                        projectName={projectName}
+                    />
                 </ul>
             </TooltipProvider>
         </QueryClientProvider>
@@ -54,6 +60,30 @@ const renderListItem = (connectedUserProjectWorkflow: ConnectedUserProjectWorkfl
 describe('ConnectedUserProjectWorkflowListItem', () => {
     beforeEach(() => {
         hoisted.copyToClipboard.mockClear();
+
+        useAutomationWorkflowExecutionsSheetStore.setState({
+            automationWorkflowExecutionsSheetOpen: false,
+            connectedUserId: undefined,
+            projectName: undefined,
+            workflow: undefined,
+        });
+    });
+
+    it("opens the workflow's executions for the connected user when the workflow is clicked", async () => {
+        renderListItem(createConnectedUserProjectWorkflow(null), 'Automation Playground');
+
+        await userEvent.click(screen.getByRole('button', {name: 'WhatsApp Agent - Human reply'}));
+
+        const state = useAutomationWorkflowExecutionsSheetStore.getState();
+
+        expect(state.automationWorkflowExecutionsSheetOpen).toBe(true);
+        expect(state.connectedUserId).toBe(1050);
+        expect(state.projectName).toBe('Automation Playground');
+        expect(state.workflow).toEqual({
+            label: 'WhatsApp Agent - Human reply',
+            workflowId: 'be530417-2226-41d4-aae9-c4fc76f0791a',
+            workflowUuid: 'be530417-2226-41d4-aae9-c4fc76f0791a',
+        });
     });
 
     it('shows the static webhook url and copies it', async () => {

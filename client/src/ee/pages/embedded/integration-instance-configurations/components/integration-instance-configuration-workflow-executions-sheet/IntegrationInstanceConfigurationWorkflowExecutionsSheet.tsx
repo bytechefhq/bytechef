@@ -15,6 +15,7 @@ import {useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface IntegrationInstanceConfigurationWorkflowExecutionsContentProps {
+    connectedUserId?: number;
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationName?: string;
     integrationVersion?: number;
@@ -22,6 +23,7 @@ interface IntegrationInstanceConfigurationWorkflowExecutionsContentProps {
 }
 
 const IntegrationInstanceConfigurationWorkflowExecutionsContent = ({
+    connectedUserId,
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationName,
     integrationVersion,
@@ -38,6 +40,7 @@ const IntegrationInstanceConfigurationWorkflowExecutionsContent = ({
         isLoading: workflowExecutionsIsLoading,
         refetch: refetchWorkflowExecutions,
     } = useGetIntegrationWorkflowExecutionsQuery({
+        connectedUserId,
         environmentId: currentEnvironmentId,
         integrationInstanceConfigurationId,
         pageNumber,
@@ -54,9 +57,15 @@ const IntegrationInstanceConfigurationWorkflowExecutionsContent = ({
 
     return (
         <WorkflowExecutionsSheetLayout
-            emptyMessage="This workflow has not been executed in this instance configuration yet."
+            emptyMessage={
+                connectedUserId
+                    ? 'This workflow has not been executed for this connected user yet.'
+                    : 'This workflow has not been executed in this instance configuration yet.'
+            }
             executionSheet={<EmbeddedWorkflowExecutionSheet />}
-            executionsTable={<EmbeddedWorkflowExecutionsTable data={workflowExecutions} showConnectedUser />}
+            executionsTable={
+                <EmbeddedWorkflowExecutionsTable data={workflowExecutions} showConnectedUser={!connectedUserId} />
+            }
             hasExecutions={workflowExecutions.length > 0}
             onPageNumberChange={setPageNumber}
             onRefresh={() => refetchWorkflowExecutions()}
@@ -75,6 +84,7 @@ const IntegrationInstanceConfigurationWorkflowExecutionsContent = ({
 
 const IntegrationInstanceConfigurationWorkflowExecutionsSheet = () => {
     const {
+        connectedUserId,
         integrationInstanceConfigurationId,
         integrationInstanceConfigurationName,
         integrationInstanceConfigurationWorkflowSheetOpen,
@@ -83,6 +93,7 @@ const IntegrationInstanceConfigurationWorkflowExecutionsSheet = () => {
         workflow,
     } = useIntegrationInstanceConfigurationWorkflowSheetStore(
         useShallow((state) => ({
+            connectedUserId: state.connectedUserId,
             integrationInstanceConfigurationId: state.integrationInstanceConfigurationId,
             integrationInstanceConfigurationName: state.integrationInstanceConfigurationName,
             integrationInstanceConfigurationWorkflowSheetOpen: state.integrationInstanceConfigurationWorkflowSheetOpen,
@@ -118,10 +129,11 @@ const IntegrationInstanceConfigurationWorkflowExecutionsSheet = () => {
 
                 {integrationInstanceConfigurationId != null && workflow?.id && (
                     <IntegrationInstanceConfigurationWorkflowExecutionsContent
+                        connectedUserId={connectedUserId}
                         integrationInstanceConfigurationId={integrationInstanceConfigurationId}
                         integrationInstanceConfigurationName={integrationInstanceConfigurationName}
                         integrationVersion={integrationVersion}
-                        key={`${integrationInstanceConfigurationId}_${workflow.id}`}
+                        key={`${integrationInstanceConfigurationId}_${workflow.id}_${connectedUserId ?? ''}`}
                         workflow={workflow}
                     />
                 )}
