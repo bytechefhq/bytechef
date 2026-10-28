@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -68,6 +69,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -542,6 +544,173 @@ class JobSyncExecutorTest {
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
             .hasMessage("Job 707 did not finish within 2000 milliseconds");
+    }
+
+    @Test
+    void testEventHandlerFailureFailsTheWaitingJobWithoutWaitingForTheTimeout() throws Exception {
+        long jobId = 1001L;
+
+        stubStartedJob(jobId);
+
+        when(jobService.fetchJob(jobId)).thenThrow(new UnsupportedOperationException("fetchJob is not supported"));
+
+        AtomicReference<Throwable> awaitThrowable = new AtomicReference<>();
+        CountDownLatch awaitReturnedLatch = new CountDownLatch(1);
+
+        Thread thread = new Thread(() -> {
+            try {
+                TenantContext.runWithTenantId(TENANT, () -> jobSyncExecutor.awaitJob(jobId, true));
+            } catch (Throwable throwable) {
+                awaitThrowable.set(throwable);
+            } finally {
+                awaitReturnedLatch.countDown();
+            }
+        });
+
+        thread.start();
+
+        waitForLatchRegistration(jobSyncExecutor, TENANT + "_" + jobId, Duration.ofMillis(250));
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(jobId);
+
+        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskExecution);
+
+        taskExecutionEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        assertThatThrownBy(
+            () -> memoryMessageBroker.send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecutionEvent))
+                .isInstanceOf(RuntimeException.class);
+
+        assertThat(awaitReturnedLatch.await(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(awaitThrowable.get())
+            .hasCauseInstanceOf(ExecutionException.class)
+            .cause()
+            .hasMessageContaining("fetchJob is not supported");
+    }
+
+    @Test
+    void testEventHandlerFailureBeforeTheCallerWaitsFailsTheJobAtOnce() {
+        long jobId = 1002L;
+
+        stubStartedJob(jobId);
+
+        when(jobService.fetchJob(jobId)).thenThrow(new UnsupportedOperationException("fetchJob is not supported"));
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(jobId);
+
+        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskExecution);
+
+        taskExecutionEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        assertThatThrownBy(
+            () -> memoryMessageBroker.send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecutionEvent))
+                .isInstanceOf(RuntimeException.class);
+
+        long startNanos = System.nanoTime();
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("fetchJob is not supported");
+        assertThat(Duration.ofNanos(System.nanoTime() - startNanos)).isLessThan(Duration.ofMillis(1000));
+    }
+
+    @Test
+    void testTaskStartedHandlerFailureFailsTheJobAtOnce() {
+        long jobId = 1003L;
+        long taskExecutionId = 9003L;
+
+        stubStartedJob(jobId);
+
+        when(jobService.fetchTaskExecutionJob(taskExecutionId))
+            .thenThrow(new IllegalStateException("fetchTaskExecutionJob failed"));
+
+        TaskStartedApplicationEvent taskStartedApplicationEvent = new TaskStartedApplicationEvent(
+            jobId, taskExecutionId);
+
+        taskStartedApplicationEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        assertThatThrownBy(
+            () -> memoryMessageBroker.send(
+                TaskCoordinatorMessageRoute.APPLICATION_EVENTS, taskStartedApplicationEvent))
+                    .isInstanceOf(RuntimeException.class);
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true, event -> {}, Duration.ofSeconds(2)))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("fetchTaskExecutionJob failed");
+    }
+
+    @Test
+    void testEventHandlerFailureFailsAnAlreadyStoppedJob() {
+        long jobId = 1004L;
+
+        Job stoppedJob = new Job();
+
+        stoppedJob.setId(jobId);
+        stoppedJob.setStatus(Job.Status.STOPPED);
+
+        when(jobService.getJob(jobId)).thenReturn(stoppedJob);
+        when(jobService.fetchJob(jobId)).thenThrow(new UnsupportedOperationException("fetchJob is not supported"));
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(jobId);
+
+        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskExecution);
+
+        taskExecutionEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        assertThatThrownBy(
+            () -> memoryMessageBroker.send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecutionEvent))
+                .isInstanceOf(RuntimeException.class);
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("fetchJob is not supported");
+    }
+
+    @Test
+    void testEventHandlerFailureFailsTheCurrentJobInsteadOfTheOneLoadedBeforeWaiting() {
+        long jobId = 1005L;
+
+        Job loadedJob = new Job();
+
+        loadedJob.setId(jobId);
+        loadedJob.setStatus(Job.Status.STOPPED);
+
+        Job currentJob = new Job();
+
+        currentJob.setId(jobId);
+        currentJob.setStatus(Job.Status.STOPPED);
+
+        when(jobService.getJob(jobId)).thenReturn(loadedJob, currentJob);
+        when(jobService.fetchJob(jobId)).thenThrow(new UnsupportedOperationException("fetchJob is not supported"));
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(jobId);
+
+        TaskExecutionEvent taskExecutionEvent = new TaskExecutionEvent(taskExecution);
+
+        taskExecutionEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        assertThatThrownBy(
+            () -> memoryMessageBroker.send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecutionEvent))
+                .isInstanceOf(RuntimeException.class);
+
+        assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
+            .isInstanceOf(ExecutionException.class)
+            .hasMessageContaining("fetchJob is not supported");
+
+        verify(jobService).update(same(currentJob));
+        verify(jobService, never()).update(same(loadedJob));
     }
 
     private void stubStartedJob(long jobId) {
