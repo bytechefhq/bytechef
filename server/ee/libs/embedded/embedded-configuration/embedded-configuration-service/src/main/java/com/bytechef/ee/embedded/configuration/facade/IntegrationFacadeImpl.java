@@ -24,6 +24,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -209,6 +211,12 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     .ifPresent(componentDefinition -> componentDefinitionMap.put(componentName, componentDefinition));
             }
 
+            Map<Long, Long> developmentConfigurationCounts = integrationInstanceConfigurationService
+                .getIntegrationInstanceConfigurations(Environment.DEVELOPMENT, null, null)
+                .stream()
+                .collect(
+                    Collectors.groupingBy(IntegrationInstanceConfiguration::getIntegrationId, Collectors.counting()));
+
             return CollectionUtils.map(
                 integrations,
                 integration -> new IntegrationDTO(
@@ -218,7 +226,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
                     integration,
                     getIntegrationWorkflowIds(integration),
                     CollectionUtils.filter(
-                        tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
+                        tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId())),
+                    Math.toIntExact(developmentConfigurationCounts.getOrDefault(integration.getId(), 0L))));
         } else {
             return CollectionUtils.map(integrations, IntegrationDTO::new);
         }

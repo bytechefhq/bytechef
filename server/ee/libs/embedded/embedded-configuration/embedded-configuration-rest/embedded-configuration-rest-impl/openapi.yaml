@@ -1497,6 +1497,10 @@ components:
           properties:
             category:
               $ref: "#/components/schemas/Category"
+            developmentConfigurationCount:
+              description: "The number of the integration's instance configurations in the Development environment. Only set by the integration list."
+              type: "integer"
+              readOnly: true
             integrationWorkflowIds:
               description: "The integration workflow ids belonging to this integration."
               type: "array"
