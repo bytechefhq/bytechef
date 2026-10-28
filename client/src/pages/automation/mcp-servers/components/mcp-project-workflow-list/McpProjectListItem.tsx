@@ -1,8 +1,10 @@
 import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import {ChevronDownIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
+import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
+import {ChevronDownIcon, ChevronRightIcon, SquareArrowOutUpRightIcon, WorkflowIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import McpProjectWorkflowDialog from '../McpProjectWorkflowDialog';
@@ -28,6 +30,16 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
         showEditWorkflowsDialog,
     } = useMcpProjectListItem(mcpProject);
 
+    const {openProject} = useOpenInProject();
+
+    const projectId = mcpProject.project?.id != null ? Number(mcpProject.project.id) : undefined;
+
+    const handleOpenProjectClick = () => {
+        if (projectId != null) {
+            void openProject(projectId);
+        }
+    };
+
     return (
         <>
             <Collapsible
@@ -35,7 +47,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                 onOpenChange={setExpanded}
                 open={expanded}
             >
-                <div className="relative flex items-center gap-2.5 px-3 py-2.5">
+                <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
                     <CollapsibleTrigger asChild>
                         <button
                             aria-label={expanded ? 'Collapse project' : 'Expand project'}
@@ -53,12 +65,31 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                     <WorkflowIcon className="size-6 shrink-0 text-content-neutral-secondary" />
 
                     <CollapsibleTrigger asChild>
-                        <button className="flex min-w-0 flex-1 cursor-pointer items-center text-left" type="button">
+                        <button className="flex min-w-0 cursor-pointer items-center text-left" type="button">
                             <span className="truncate text-sm font-medium">
                                 {mcpProject.project?.name || `Project ${mcpProject.projectDeploymentId}`}
                             </span>
                         </button>
                     </CollapsibleTrigger>
+
+                    {projectId != null && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label="Open project"
+                                    className="relative z-10 size-6 shrink-0"
+                                    icon={<SquareArrowOutUpRightIcon className="size-4" />}
+                                    onClick={handleOpenProjectClick}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Open project</TooltipContent>
+                        </Tooltip>
+                    )}
+
+                    <div className="min-w-0 flex-1" />
 
                     {mcpProject.projectVersion && (
                         <Tooltip>
@@ -98,7 +129,10 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
 
                 <CollapsibleContent>
                     <div className="border-t border-border/50 px-3 py-2 pl-10">
-                        <McpProjectWorkflowList mcpProjectWorkflows={mcpProject.mcpProjectWorkflows} />
+                        <McpProjectWorkflowList
+                            mcpProject={mcpProject}
+                            mcpProjectWorkflows={mcpProject.mcpProjectWorkflows}
+                        />
                     </div>
                 </CollapsibleContent>
             </Collapsible>

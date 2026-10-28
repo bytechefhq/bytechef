@@ -2,9 +2,12 @@ import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {A2aServer} from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {NetworkIcon} from 'lucide-react';
 
 import A2aServerDialog from './components/A2aServerDialog';
@@ -30,7 +33,13 @@ const A2aServers = () => {
     let pageContent;
 
     if (filteredA2aServers.length > 0) {
-        pageContent = <A2aServerList a2aServers={filteredA2aServers as A2aServer[]} tags={tags} />;
+        pageContent = (
+            <WorkflowReadOnlyProvider value={{useGetComponentDefinitionsQuery}}>
+                <A2aServerList a2aServers={filteredA2aServers as A2aServer[]} tags={tags} />
+
+                <ProjectDeploymentWorkflowExecutionsSheet />
+            </WorkflowReadOnlyProvider>
+        );
     } else if (a2aServers.length > 0) {
         pageContent = <EmptyFilterResult entityName="A2A servers" entityTitle="A2A Servers" />;
     } else {

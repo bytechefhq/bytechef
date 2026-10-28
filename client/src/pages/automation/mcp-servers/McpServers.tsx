@@ -2,12 +2,15 @@ import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ServerIcon} from 'lucide-react';
 import {useEffect} from 'react';
@@ -105,7 +108,11 @@ const McpServers = () => {
         >
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>
                 {filteredMcpServers.length > 0 ? (
-                    <McpServerList mcpServers={filteredMcpServers as McpServer[]} tags={tags} />
+                    <WorkflowReadOnlyProvider value={{useGetComponentDefinitionsQuery}}>
+                        <McpServerList mcpServers={filteredMcpServers as McpServer[]} tags={tags} />
+
+                        <ProjectDeploymentWorkflowExecutionsSheet />
+                    </WorkflowReadOnlyProvider>
                 ) : validMcpServers.length > 0 ? (
                     <EmptyFilterResult entityName="MCP servers" entityTitle="MCP Servers" />
                 ) : (

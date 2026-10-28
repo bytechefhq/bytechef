@@ -11,6 +11,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {A2aServer, useDeleteA2aProjectMutation} from '@/shared/middleware/graphql';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
@@ -22,6 +23,7 @@ import {
     EditIcon,
     EllipsisVerticalIcon,
     RefreshCwIcon,
+    SquareArrowOutUpRightIcon,
     Trash2Icon,
     WorkflowIcon,
 } from 'lucide-react';
@@ -83,6 +85,16 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
         [a2aProject.workflowIds, projectDeployment?.projectDeploymentWorkflows]
     );
 
+    const {openProject} = useOpenInProject();
+
+    const projectId = a2aProject.projectId != null ? Number(a2aProject.projectId) : undefined;
+
+    const handleOpenProjectClick = () => {
+        if (projectId != null) {
+            void openProject(projectId);
+        }
+    };
+
     const handleProjectDeploymentDialogClose = () => {
         void queryClient
             .invalidateQueries({queryKey: ['a2aProjectsByServerId']})
@@ -96,7 +108,7 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
                 onOpenChange={setExpanded}
                 open={expanded}
             >
-                <div className="relative flex items-center gap-2.5 px-3 py-2.5">
+                <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
                     <CollapsibleTrigger asChild>
                         <button
                             aria-label={expanded ? 'Collapse project' : 'Expand project'}
@@ -113,9 +125,23 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
 
                     <WorkflowIcon className="size-6 shrink-0 text-content-neutral-secondary" />
 
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                    <span className="min-w-0 truncate text-sm font-medium">
                         {projectName || `Project #${a2aProject.projectId}`}
                     </span>
+
+                    {projectId != null && (
+                        <Button
+                            aria-label="Open project"
+                            className="relative z-10 size-6 shrink-0"
+                            icon={<SquareArrowOutUpRightIcon className="size-4" />}
+                            onClick={handleOpenProjectClick}
+                            size="icon"
+                            title="Open project"
+                            variant="ghost"
+                        />
+                    )}
+
+                    <div className="min-w-0 flex-1" />
 
                     <div className="relative z-10 mr-4 flex shrink-0 items-center gap-6">
                         {a2aProject.projectVersion && (
@@ -177,7 +203,7 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
 
                 <CollapsibleContent>
                     <div className="border-t border-border/50 px-3 py-2 pl-10">
-                        <A2aProjectWorkflowList a2aProject={a2aProject} />
+                        <A2aProjectWorkflowList a2aProject={a2aProject} projectName={projectName} />
                     </div>
                 </CollapsibleContent>
             </Collapsible>

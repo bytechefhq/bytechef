@@ -3,11 +3,15 @@ import {McpIntegrationInstanceConfigurationWorkflowItemType} from './hooks/useMc
 
 interface McpIntegrationInstanceConfigurationWorkflowListProps {
     componentName: string;
+    integrationInstanceConfigurationName?: string;
+    integrationVersion?: number;
     mcpIntegrationInstanceConfigurationWorkflows?: Array<McpIntegrationInstanceConfigurationWorkflowItemType | null> | null;
 }
 
 const McpIntegrationInstanceConfigurationWorkflowList = ({
     componentName,
+    integrationInstanceConfigurationName,
+    integrationVersion,
     mcpIntegrationInstanceConfigurationWorkflows,
 }: McpIntegrationInstanceConfigurationWorkflowListProps) => {
     const workflows =
@@ -24,6 +28,8 @@ const McpIntegrationInstanceConfigurationWorkflowList = ({
             {workflows.map((workflow) => (
                 <McpIntegrationInstanceConfigurationWorkflowListItem
                     componentName={componentName}
+                    integrationInstanceConfigurationName={integrationInstanceConfigurationName}
+                    integrationVersion={integrationVersion}
                     key={workflow.id}
                     mcpIntegrationInstanceConfigurationWorkflow={workflow}
                 />
