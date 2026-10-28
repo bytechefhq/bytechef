@@ -6,10 +6,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
+import {ActivityIcon, EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 import {useMemo} from 'react';
 
 type AutomationWorkflowProjectWorkflowTemplateType =
@@ -19,6 +20,7 @@ interface AutomationWorkflowProjectWorkflowListItemProps {
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditWorkflow: (workflow: AutomationWorkflowProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
+    projectName?: string;
     workflow: AutomationWorkflowProjectWorkflowTemplateType;
 }
 
@@ -26,8 +28,13 @@ const AutomationWorkflowProjectWorkflowListItem = ({
     onDeleteWorkflow,
     onEditWorkflow,
     onSelectWorkflow,
+    projectName,
     workflow,
 }: AutomationWorkflowProjectWorkflowListItemProps) => {
+    const openAutomationWorkflowExecutionsSheet = useAutomationWorkflowExecutionsSheetStore(
+        (state) => state.openAutomationWorkflowExecutionsSheet
+    );
+
     const filteredComponentNames = useMemo(() => {
         const componentNames = [...workflow.triggers, ...workflow.components].map((component) => component.name);
 
@@ -120,6 +127,24 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                                 event.stopPropagation();
 
                                 onEditWorkflow(workflow);
+                            }}
+                        />
+
+                        <DropdownMenuItem
+                            aria-label="Workflow Executions"
+                            icon={<ActivityIcon />}
+                            label="Executions"
+                            onClick={(event) => {
+                                event.stopPropagation();
+
+                                openAutomationWorkflowExecutionsSheet({
+                                    projectName,
+                                    workflow: {
+                                        label: workflow.label,
+                                        workflowId: workflow.workflowId,
+                                        workflowUuid: workflow.workflowUuid,
+                                    },
+                                });
                             }}
                         />
 
