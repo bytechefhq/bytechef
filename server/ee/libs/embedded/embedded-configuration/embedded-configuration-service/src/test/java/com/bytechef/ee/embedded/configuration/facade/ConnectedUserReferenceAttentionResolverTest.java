@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -142,6 +143,9 @@ class ConnectedUserReferenceAttentionResolverTest {
     void testTurnedOffByAdministratorWinsOverUpdatePending() {
         stubReference(1);
         stubAdministrativelyEnabled(false);
+
+        lenient().when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION))
+            .thenReturn(2);
 
         ReferenceState referenceState = resolver.resolve(newReference());
 
