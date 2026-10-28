@@ -151,6 +151,23 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect(mocks.enableConfigurationMutate.mock.calls[0][0]).toEqual({enable: true, id: 'configuration-1'});
     });
 
+    it('explains that deleting a configuration pauses automations until it is recreated', async () => {
+        const user = userEvent.setup();
+
+        renderItem();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Delete Configuration'}));
+
+        expect(
+            await screen.findByText(
+                "Connected users' automations from this environment are paused and come back if you recreate the configuration.",
+                {exact: false}
+            )
+        ).toBeInTheDocument();
+        expect(screen.queryByText(/cannot be undone/)).not.toBeInTheDocument();
+    });
+
     it('shows the hidden from hub badge when the configuration is not visible in the hub', () => {
         renderItem({configuration: {...configuration, automationHubVisible: false}});
 

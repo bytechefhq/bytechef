@@ -136,7 +136,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
             </CollapsibleContent>
 
             <AlertDialog
-                description="This action cannot be undone. This will permanently delete the configuration. The project and its workflows are not affected."
+                description="Connected users' automations from this environment are paused and come back if you recreate the configuration. The project and its workflows are not affected."
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() => {
                     onDelete(configuration);
