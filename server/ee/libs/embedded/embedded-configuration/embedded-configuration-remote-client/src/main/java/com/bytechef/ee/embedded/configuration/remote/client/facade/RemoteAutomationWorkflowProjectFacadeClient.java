@@ -42,8 +42,7 @@ public class RemoteAutomationWorkflowProjectFacadeClient implements AutomationWo
 
     @Override
     public long createProject(
-        String name, String description, String category, List<String> tags, String permissionExpression,
-        @Nullable Boolean automationHubVisible) {
+        String name, String description, String category, List<String> tags, String permissionExpression) {
 
         throw new UnsupportedOperationException();
     }
@@ -121,7 +120,7 @@ public class RemoteAutomationWorkflowProjectFacadeClient implements AutomationWo
     @Override
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
-        String permissionExpression, @Nullable Boolean automationHubVisible) {
+        String permissionExpression) {
 
         throw new UnsupportedOperationException();
     }

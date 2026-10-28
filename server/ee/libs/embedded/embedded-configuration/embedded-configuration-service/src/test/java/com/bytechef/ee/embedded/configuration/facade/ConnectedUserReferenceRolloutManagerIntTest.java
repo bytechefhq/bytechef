@@ -1181,8 +1181,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     private long createAutomationWorkflowProject(String name) {
-        return automationWorkflowProjectFacade.createProject(name + " " + UUID.randomUUID(), "", null, List.of(), null,
-            null);
+        return automationWorkflowProjectFacade.createProject(name + " " + UUID.randomUUID(), "", null, List.of(), null);
     }
 
     private String createConnectedUser() {

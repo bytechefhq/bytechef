@@ -111,6 +111,10 @@ public class AutomationWorkflowProjectConfiguration {
         return id;
     }
 
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
     public Long getProjectId() {
         return projectId.getId();
     }

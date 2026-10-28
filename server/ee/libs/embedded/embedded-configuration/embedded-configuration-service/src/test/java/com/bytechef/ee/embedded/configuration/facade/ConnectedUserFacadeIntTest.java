@@ -239,7 +239,7 @@ class ConnectedUserFacadeIntTest {
                 .build());
 
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Delete Connected User " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Delete Connected User " + UUID.randomUUID(), "", null, List.of(), null);
 
         String automationWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION, null);

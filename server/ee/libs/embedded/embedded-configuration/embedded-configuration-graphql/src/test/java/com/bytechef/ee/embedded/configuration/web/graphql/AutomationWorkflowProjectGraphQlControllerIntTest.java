@@ -58,7 +58,6 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
                 version
                 lastPublishedVersion
                 permissionExpression
-                automationHubVisible
                 workflowTemplates {
                     workflowUuid
                     workflowId
@@ -137,9 +136,6 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .isEqualTo(2)
             .path("automationWorkflowProjects[0].permissionExpression")
             .valueIsNull()
-            .path("automationWorkflowProjects[0].automationHubVisible")
-            .entity(Boolean.class)
-            .isEqualTo(true)
             .path("automationWorkflowProjects[0].workflowTemplates")
             .entityList(Object.class)
             .hasSize(1)
@@ -213,7 +209,7 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
 
     @Test
     void testCreateAutomationWorkflowProjectDelegatesToFacade() {
-        when(automationWorkflowProjectFacade.createProject("My Project", "desc", null, List.of(), null, null))
+        when(automationWorkflowProjectFacade.createProject("My Project", "desc", null, List.of(), null))
             .thenReturn(42L);
 
         this.graphQlTester
@@ -227,13 +223,13 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("42");
 
-        verify(automationWorkflowProjectFacade).createProject("My Project", "desc", null, List.of(), null, null);
+        verify(automationWorkflowProjectFacade).createProject("My Project", "desc", null, List.of(), null);
     }
 
     @Test
     void testCreateAutomationWorkflowProjectWithCategoryAndTags() {
         when(automationWorkflowProjectFacade.createProject(
-            "P", null, "Electronics", List.of("java", "spring"), null, null))
+            "P", null, "Electronics", List.of("java", "spring"), null))
                 .thenReturn(99L);
 
         this.graphQlTester
@@ -248,26 +244,7 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .isEqualTo("99");
 
         verify(automationWorkflowProjectFacade).createProject(
-            "P", null, "Electronics", List.of("java", "spring"), null, null);
-    }
-
-    @Test
-    void testCreateAutomationWorkflowProjectPassesAutomationHubVisibleToFacade() {
-        when(automationWorkflowProjectFacade.createProject("P", null, null, List.of(), null, false))
-            .thenReturn(7L);
-
-        this.graphQlTester
-            .document("""
-                mutation {
-                    createAutomationWorkflowProject(name: "P", automationHubVisible: false)
-                }
-                """)
-            .execute()
-            .path("createAutomationWorkflowProject")
-            .entity(String.class)
-            .isEqualTo("7");
-
-        verify(automationWorkflowProjectFacade).createProject("P", null, null, List.of(), null, false);
+            "P", null, "Electronics", List.of("java", "spring"), null);
     }
 
     @Test
@@ -285,26 +262,7 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(automationWorkflowProjectFacade).updateProject(
-            7L, "Updated", "new desc", "Finance", List.of("api"), null, null);
-    }
-
-    @Test
-    void testUpdateAutomationWorkflowProjectPassesAutomationHubVisibleToFacade() {
-        this.graphQlTester
-            .document("""
-                mutation {
-                    updateAutomationWorkflowProject(
-                        id: "7", name: "Updated", description: "new desc", category: "Finance", tags: ["api"],
-                        automationHubVisible: false)
-                }
-                """)
-            .execute()
-            .path("updateAutomationWorkflowProject")
-            .entity(Boolean.class)
-            .isEqualTo(true);
-
-        verify(automationWorkflowProjectFacade).updateProject(
-            7L, "Updated", "new desc", "Finance", List.of("api"), null, false);
+            7L, "Updated", "new desc", "Finance", List.of("api"), null);
     }
 
     @Test

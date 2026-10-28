@@ -184,7 +184,7 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         givenSlackAutomationWorkflowEnvironment();
 
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
-            "Admin References " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Admin References " + UUID.randomUUID(), "", null, List.of(), null);
 
         String firstWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);

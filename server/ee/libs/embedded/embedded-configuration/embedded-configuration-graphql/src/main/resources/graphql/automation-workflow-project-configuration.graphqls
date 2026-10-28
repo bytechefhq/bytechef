@@ -1,0 +1,28 @@
+type AutomationWorkflowProjectConfiguration {
+    id: ID!
+    projectId: ID!
+    environmentId: ID!
+    projectVersion: Int!
+    enabled: Boolean!
+    automationHubVisible: Boolean!
+    lastModifiedDate: String
+    workflows: [AutomationWorkflowProjectConfigurationWorkflow!]!
+}
+
+type AutomationWorkflowProjectConfigurationWorkflow {
+    workflowUuid: ID!
+    label: String
+    enabled: Boolean!
+}
+
+extend type Query {
+    automationWorkflowProjectConfigurations(projectId: ID!): [AutomationWorkflowProjectConfiguration!]!
+}
+
+extend type Mutation {
+    createAutomationWorkflowProjectConfiguration(projectId: ID!, environmentId: ID!, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): ID!
+    updateAutomationWorkflowProjectConfiguration(id: ID!, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): Boolean!
+    deleteAutomationWorkflowProjectConfiguration(id: ID!): Boolean!
+    enableAutomationWorkflowProjectConfiguration(id: ID!, enable: Boolean!): Boolean!
+    enableAutomationWorkflowProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, enable: Boolean!): Boolean!
+}
