@@ -23,9 +23,6 @@ import java.util.stream.Collectors;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Computes the environment properties that enable Spring Boot's Redis auto-configuration, which the default
- * configuration excludes.
- *
  * @author Ivica Cardic
  */
 public final class DataRedisAutoConfigurationEnabler {
