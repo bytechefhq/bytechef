@@ -18,12 +18,17 @@ package com.bytechef.platform.user.scheduler;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * Runs the periodic user cleanup jobs on coordinator nodes only.
+ * Runs the nightly user cleanup on coordinator nodes, once per tenant. Each cleanup opens its own transaction after the
+ * tenant is set, so it reads and deletes rows in that tenant's schema.
  *
  * @author Ivica Cardic
  */
@@ -31,26 +36,46 @@ import org.springframework.stereotype.Component;
 @ConditionalOnCoordinator
 public class UserCleanupScheduler {
 
+    private static final Logger log = LoggerFactory.getLogger(UserCleanupScheduler.class);
+
+    private final TenantService tenantService;
     private final UserService userService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public UserCleanupScheduler(UserService userService) {
+    public UserCleanupScheduler(TenantService tenantService, UserService userService) {
+        this.tenantService = tenantService;
         this.userService = userService;
     }
 
     /**
-     * Deletes expired persistent tokens. Fires every day at midnight.
-     */
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void removeOldPersistentTokens() {
-        userService.removeOldPersistentTokens();
-    }
-
-    /**
-     * Deletes users that were never activated. Fires every day at 01:00 (am).
+     * Not activated users are deleted 3 days after registration, every day at 01:00.
      */
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
-        userService.removeNotActivatedUsers();
+        runForEachTenant(userService::removeNotActivatedUsers);
+    }
+
+    /**
+     * Persistent tokens provide automatic authentication and are deleted once they expire, every day at midnight.
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void removeOldPersistentTokens() {
+        runForEachTenant(userService::removeOldPersistentTokens);
+    }
+
+    private void runForEachTenant(Runnable cleanup) {
+        if (!tenantService.isMultiTenantEnabled()) {
+            cleanup.run();
+
+            return;
+        }
+
+        for (String tenantId : tenantService.getTenantIds()) {
+            try {
+                TenantContext.runWithTenantId(tenantId, cleanup::run);
+            } catch (RuntimeException exception) {
+                log.error("User cleanup failed for tenant {}", tenantId, exception);
+            }
+        }
     }
 }
