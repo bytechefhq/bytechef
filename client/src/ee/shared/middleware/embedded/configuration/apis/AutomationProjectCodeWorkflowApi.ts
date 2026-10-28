@@ -18,9 +18,25 @@ import {
     AutomationProjectCodeWorkflowDeployResultFromJSON,
     AutomationProjectCodeWorkflowDeployResultToJSON,
 } from '../models/AutomationProjectCodeWorkflowDeployResult';
+import {
+    type Environment,
+    EnvironmentFromJSON,
+    EnvironmentToJSON,
+} from '../models/Environment';
 
 export interface DeployAutomationProjectCodeWorkflowRequest {
+    /**
+     * The environment.
+     */
+    xEnvironment?: Environment;
+    /**
+     * The file of a code-native automation project.
+     */
     projectFile?: Blob;
+    /**
+     * Whether to also point the configuration of the request environment at the newly published version.
+     */
+    release?: boolean;
 }
 
 /**
@@ -35,6 +51,10 @@ export class AutomationProjectCodeWorkflowApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xEnvironment'] != null) {
+            headerParameters['X-Environment'] = String(requestParameters['xEnvironment']);
+        }
 
         const consumes: runtime.Consume[] = [
             { contentType: 'multipart/form-data' },
@@ -54,6 +74,10 @@ export class AutomationProjectCodeWorkflowApi extends runtime.BaseAPI {
 
         if (requestParameters['projectFile'] != null) {
             formParams.append('projectFile', requestParameters['projectFile'] as any);
+        }
+
+        if (requestParameters['release'] != null) {
+            formParams.append('release', requestParameters['release'] as any);
         }
 
 
