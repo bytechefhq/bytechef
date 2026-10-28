@@ -198,7 +198,7 @@ class AutomationWorkflowProjectApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    void testGetFrontendProjectsDropsHiddenProjects() {
+    void testGetFrontendProjectsKeepsHiddenProjectsWithTheFlag() {
         AutomationWorkflowProjectDTO visibleProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
             true);
@@ -219,11 +219,15 @@ class AutomationWorkflowProjectApiControllerIntTest {
             .isOk()
             .expectBody()
             .jsonPath("$.length()")
-            .isEqualTo(1)
+            .isEqualTo(2)
             .jsonPath("$[0].id")
             .isEqualTo(PROJECT_ID)
             .jsonPath("$[0].automationHubVisible")
-            .isEqualTo(true);
+            .isEqualTo(true)
+            .jsonPath("$[1].id")
+            .isEqualTo(PROJECT_ID + 1)
+            .jsonPath("$[1].automationHubVisible")
+            .isEqualTo(false);
 
         verify(automationWorkflowProjectFacade, never()).getPublishedProjects();
     }

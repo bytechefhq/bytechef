@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
@@ -61,7 +60,6 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
         List<AutomationWorkflowProjectModel> models = automationWorkflowProjectFacade
             .getPublishedProjects(externalUserId, getEnvironment(xEnvironment))
             .stream()
-            .filter(AutomationWorkflowProjectDTO::automationHubVisible)
             .map(project -> conversionService.convert(project, AutomationWorkflowProjectModel.class))
             .toList();
 
