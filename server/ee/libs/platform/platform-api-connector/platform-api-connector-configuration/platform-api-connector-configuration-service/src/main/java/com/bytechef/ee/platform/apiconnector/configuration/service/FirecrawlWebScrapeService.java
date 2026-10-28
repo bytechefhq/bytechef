@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
+import com.bytechef.commons.util.UrlValidationException;
 import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -46,6 +47,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
     private static final int DEFAULT_TIMEOUT_SECONDS = 60;
     private static final int POLL_INTERVAL_MS = 2000;
     private static final int MAX_POLL_ATTEMPTS = 60;
+    private static final List<String> FETCHED_URL_FIELD_NAMES = List.of("sourceURL", "url");
 
     private final Set<String> allowedHosts;
     private final String apiKey;
@@ -85,8 +87,11 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
             if (response.has("success") && response.get("success")
                 .asBoolean()) {
 
-                String content = response.path("data")
-                    .path("markdown")
+                JsonNode data = response.path("data");
+
+                validateFetchedUrls(data.path("metadata"));
+
+                String content = data.path("markdown")
                     .asText("");
 
                 return ScrapeResult.success(content);
@@ -176,8 +181,19 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
 
                 if (dataArray.isArray()) {
                     for (JsonNode item : dataArray) {
-                        String pageUrl = item.path("metadata")
-                            .path("sourceURL")
+                        JsonNode metadata = item.path("metadata");
+
+                        try {
+                            validateFetchedUrls(metadata);
+                        } catch (UrlValidationException urlValidationException) {
+                            log.warn(
+                                "Dropping a Firecrawl crawl page fetched from a disallowed address: {}",
+                                urlValidationException.getMessage());
+
+                            continue;
+                        }
+
+                        String pageUrl = metadata.path("sourceURL")
                             .asText("");
                         String markdown = item.path("markdown")
                             .asText("");
@@ -207,6 +223,17 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
         }
 
         return CrawlResult.failure("Crawl timed out");
+    }
+
+    private void validateFetchedUrls(JsonNode metadata) {
+        for (String fieldName : FETCHED_URL_FIELD_NAMES) {
+            String fetchedUrl = metadata.path(fieldName)
+                .asText("");
+
+            if (!fetchedUrl.isEmpty()) {
+                UrlValidatorUtils.validate(fetchedUrl, allowedHosts);
+            }
+        }
     }
 
     private String sendRequest(String endpoint, Map<String, Object> requestBody)
