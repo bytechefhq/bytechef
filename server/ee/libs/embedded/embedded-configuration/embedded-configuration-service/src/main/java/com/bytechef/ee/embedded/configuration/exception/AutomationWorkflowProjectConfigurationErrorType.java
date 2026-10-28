@@ -20,6 +20,12 @@ public class AutomationWorkflowProjectConfigurationErrorType extends AbstractErr
     public static final AutomationWorkflowProjectConfigurationErrorType PROJECT_VERSION_NOT_PUBLISHED =
         new AutomationWorkflowProjectConfigurationErrorType(100);
 
+    public static final AutomationWorkflowProjectConfigurationErrorType UNKNOWN_ENVIRONMENT =
+        new AutomationWorkflowProjectConfigurationErrorType(101);
+
+    public static final AutomationWorkflowProjectConfigurationErrorType CONFIGURATION_ALREADY_EXISTS =
+        new AutomationWorkflowProjectConfigurationErrorType(102);
+
     private AutomationWorkflowProjectConfigurationErrorType(int errorKey) {
         super(AutomationWorkflowProjectConfiguration.class, errorKey);
     }

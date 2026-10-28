@@ -37,6 +37,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
@@ -131,6 +132,35 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         assertThatThrownBy(
             () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
                 projectId, ENVIRONMENT_ID, 2, true, true)).isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testCreateConfigurationWithAnUnknownEnvironmentIdThrows() {
+        long projectId = createPublishedProject("Unknown Environment", 1);
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+                projectId, Environment.values().length, 1, true, true))
+                    .isInstanceOf(ConfigurationException.class);
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+                projectId, -1, 1, true, true))
+                    .isInstanceOf(ConfigurationException.class);
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(projectId)).isEmpty();
+    }
+
+    @Test
+    void testCreateConfigurationTwiceForTheSameEnvironmentThrows() {
+        long projectId = createPublishedProject("Duplicate Environment", 1);
+
+        automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+                projectId, ENVIRONMENT_ID, 1, true, true))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                        configurationException.getMessage()).contains("already has a configuration"));
     }
 
     @Test
