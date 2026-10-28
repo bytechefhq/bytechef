@@ -45,12 +45,9 @@ public class AutomationWorkflowProjectServiceImpl implements AutomationWorkflowP
     }
 
     @Override
-    public AutomationWorkflowProject create(
-        long projectId, @Nullable String permissionExpression, boolean automationHubVisible) {
-
+    public AutomationWorkflowProject create(long projectId, @Nullable String permissionExpression) {
         AutomationWorkflowProject automationWorkflowProject = new AutomationWorkflowProject(projectId);
 
-        automationWorkflowProject.setAutomationHubVisible(automationHubVisible);
         automationWorkflowProject.setPermissionExpression(permissionExpression);
 
         return automationWorkflowProjectRepository.save(automationWorkflowProject);
@@ -93,15 +90,6 @@ public class AutomationWorkflowProjectServiceImpl implements AutomationWorkflowP
                 Collectors.toMap(
                     AutomationWorkflowProjectWorkflow::getWorkflowUuid,
                     AutomationWorkflowProjectWorkflow::getPermissionExpression));
-    }
-
-    @Override
-    public void updateAutomationHubVisible(long projectId, boolean automationHubVisible) {
-        AutomationWorkflowProject automationWorkflowProject = getAutomationWorkflowProject(projectId);
-
-        automationWorkflowProject.setAutomationHubVisible(automationHubVisible);
-
-        automationWorkflowProjectRepository.save(automationWorkflowProject);
     }
 
     @Override

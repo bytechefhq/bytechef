@@ -152,8 +152,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         project = projectService.create(project);
 
         automationWorkflowProjectService.create(
-            project.getId(), normalizePermissionExpression(permissionExpression),
-            automationHubVisible == null || automationHubVisible);
+            project.getId(), normalizePermissionExpression(permissionExpression));
 
         return project.getId();
     }
@@ -271,8 +270,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             automationWorkflowProjectService.getAutomationWorkflowProject(projectId);
 
         automationWorkflowProjectService.create(
-            newProject.getId(), sourceAutomationWorkflowProject.getPermissionExpression(),
-            sourceAutomationWorkflowProject.isAutomationHubVisible());
+            newProject.getId(), sourceAutomationWorkflowProject.getPermissionExpression());
 
         List<ProjectWorkflow> sourceProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             sourceProject.getId(), sourceProject.getLastProjectVersion());
@@ -385,10 +383,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         if (permissionExpression != null) {
             automationWorkflowProjectService.updatePermissionExpression(
                 projectId, normalizePermissionExpression(permissionExpression));
-        }
-
-        if (automationHubVisible != null) {
-            automationWorkflowProjectService.updateAutomationHubVisible(projectId, automationHubVisible);
         }
     }
 
@@ -598,7 +592,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.getId(), displayName, project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
-            automationWorkflowProject.getPermissionExpression(), automationWorkflowProject.isAutomationHubVisible());
+            automationWorkflowProject.getPermissionExpression(), true);
     }
 
     private AutomationWorkflowProjectDTO toPublishedDTO(
@@ -640,6 +634,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.getId(), displayName, project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
-            automationWorkflowProject.getPermissionExpression(), automationWorkflowProject.isAutomationHubVisible());
+            automationWorkflowProject.getPermissionExpression(), true);
     }
 }
