@@ -1,7 +1,8 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationInstanceConfigurationWorkflowListItem from '../IntegrationInstanceConfigurationWorkflowListItem';
@@ -24,10 +25,6 @@ vi.mock('@/ee/shared/queries/embedded/workflows.queries', () => ({
     useGetWorkflowQuery: () => ({data: undefined}),
 }));
 
-vi.mock('@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow', () => ({
-    default: () => ({openReadOnlyWorkflowSheet: vi.fn()}),
-}));
-
 vi.mock(
     '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu',
     () => ({default: () => null})
@@ -47,30 +44,39 @@ const workflow = {
 
 const workflowComponentDefinitions = {hubspot: {icon: 'hubspot.svg', name: 'hubspot', title: 'HubSpot'}};
 
+const renderItem = () =>
+    render(
+        <QueryClientProvider client={new QueryClient()}>
+            <TooltipProvider>
+                <IntegrationInstanceConfigurationWorkflowListItem
+                    componentName="hubspot"
+                    filteredComponentNames={['hubspot', 'logger']}
+                    integrationInstanceConfigurationId={1}
+                    integrationInstanceConfigurationName="HubSpot Dev"
+                    integrationInstanceConfigurationWorkflow={
+                        {enabled: true, workflowId: 'workflow1'} as IntegrationInstanceConfigurationWorkflow
+                    }
+                    integrationVersion={3}
+                    isMcpWorkflow={false}
+                    workflow={workflow}
+                    workflowComponentDefinitions={workflowComponentDefinitions as never}
+                    workflowTaskDispatcherDefinitions={{}}
+                />
+            </TooltipProvider>
+        </QueryClientProvider>
+    );
+
 describe('IntegrationInstanceConfigurationWorkflowListItem', () => {
     beforeEach(() => {
         rowPropsMock.mockClear();
+
+        useIntegrationInstanceConfigurationWorkflowSheetStore.setState({
+            integrationInstanceConfigurationWorkflowSheetOpen: false,
+        });
     });
 
     it('shows the trigger and components like the projects page', () => {
-        render(
-            <QueryClientProvider client={new QueryClient()}>
-                <TooltipProvider>
-                    <IntegrationInstanceConfigurationWorkflowListItem
-                        componentName="hubspot"
-                        filteredComponentNames={['hubspot', 'logger']}
-                        integrationInstanceConfigurationId={1}
-                        integrationInstanceConfigurationWorkflow={
-                            {enabled: true, workflowId: 'workflow1'} as IntegrationInstanceConfigurationWorkflow
-                        }
-                        isMcpWorkflow={false}
-                        workflow={workflow}
-                        workflowComponentDefinitions={workflowComponentDefinitions as never}
-                        workflowTaskDispatcherDefinitions={{}}
-                    />
-                </TooltipProvider>
-            </QueryClientProvider>
-        );
+        renderItem();
 
         expect(screen.getByText('Trigger and components')).toBeInTheDocument();
         expect(rowPropsMock).toHaveBeenLastCalledWith(
@@ -80,6 +86,22 @@ describe('IntegrationInstanceConfigurationWorkflowListItem', () => {
                 workflow,
                 workflowComponentDefinitions,
                 workflowTaskDispatcherDefinitions: {},
+            })
+        );
+    });
+
+    it("opens the workflow's executions sheet when the workflow is clicked", () => {
+        renderItem();
+
+        fireEvent.click(screen.getByText('Sync contacts'));
+
+        expect(useIntegrationInstanceConfigurationWorkflowSheetStore.getState()).toEqual(
+            expect.objectContaining({
+                integrationInstanceConfigurationId: 1,
+                integrationInstanceConfigurationName: 'HubSpot Dev',
+                integrationInstanceConfigurationWorkflowSheetOpen: true,
+                integrationVersion: 3,
+                workflow,
             })
         );
     });

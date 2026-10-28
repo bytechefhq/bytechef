@@ -9,6 +9,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     componentName,
     integrationId,
     integrationInstanceConfigurationId,
+    integrationInstanceConfigurationName,
     integrationInstanceConfigurationWorkflows,
     integrationVersion,
     mcpWorkflowIds,
@@ -18,6 +19,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     componentName: string;
     integrationId: number;
     integrationInstanceConfigurationId: number;
+    integrationInstanceConfigurationName?: string;
     integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflow>;
     integrationVersion: number;
     mcpWorkflowIds?: Set<string>;
@@ -104,7 +106,9 @@ const IntegrationInstanceConfigurationWorkflowList = ({
                                 componentName={componentName}
                                 filteredComponentNames={filteredComponentNames}
                                 integrationInstanceConfigurationId={integrationInstanceConfigurationId}
+                                integrationInstanceConfigurationName={integrationInstanceConfigurationName}
                                 integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                                integrationVersion={integrationVersion}
                                 isMcpWorkflow={mcpWorkflowIds?.has(workflow.id!) ?? false}
                                 key={workflow.id}
                                 workflow={workflow}
