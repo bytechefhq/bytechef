@@ -153,6 +153,27 @@ function closePanelIfCurrentNodeDeleted(deletedTasks: WorkflowTask[]) {
     }
 }
 
+function moveCurrentNodeToRenamedCase(
+    branchName: string,
+    previousCaseKey: string | number,
+    newCaseKey: string | number
+) {
+    useWorkflowNodeDetailsPanelStore.getState().setCurrentNode((currentNode) => {
+        const branchData = currentNode?.branchData;
+
+        if (
+            !currentNode ||
+            !branchData ||
+            branchData.branchId !== branchName ||
+            !branchCaseKeysMatch(branchData.caseKey, previousCaseKey)
+        ) {
+            return currentNode;
+        }
+
+        return {...currentNode, branchData: {...branchData, caseKey: newCaseKey}};
+    });
+}
+
 interface UseBranchCaseLabelProps {
     caseKey: string | number;
     edgeId: string;
@@ -225,7 +246,7 @@ export default function useBranchCaseLabel({
     const isDefaultCase = !branchCases?.find((branchCase) => branchCaseKeysMatch(branchCase.key, caseKey));
 
     const saveBranchChange = useCallback(
-        (branchParameters: object) => {
+        (branchParameters: object, onSuccess?: () => void) => {
             if (!workflow.definition || !parentBranchNodeData) {
                 return;
             }
@@ -276,6 +297,7 @@ export default function useBranchCaseLabel({
 
             saveWorkflowDefinition({
                 nodeData: rootNodeData,
+                onSuccess,
                 updateWorkflowMutation: updateWorkflowMutation!,
             });
         },
@@ -371,13 +393,18 @@ export default function useBranchCaseLabel({
             return branchCase;
         });
 
-        saveBranchChange({
-            ...parentBranchNodeData.parameters,
-            cases: newCases,
-        });
+        const branchName = parentBranchNodeData.name;
+
+        saveBranchChange(
+            {
+                ...parentBranchNodeData.parameters,
+                cases: newCases,
+            },
+            () => moveCurrentNodeToRenamedCase(branchName, caseKey, parsedCaseKey)
+        );
 
         setIsCaseKeyEditable(false);
-    }, [caseKey, caseKeyValue, isCaseKeyEditable, parentBranchNodeData?.parameters, saveBranchChange]);
+    }, [caseKey, caseKeyValue, isCaseKeyEditable, parentBranchNodeData, saveBranchChange]);
 
     useEffect(() => setCaseKeyValue(String(caseKey)), [caseKey]);
 

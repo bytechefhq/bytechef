@@ -67,6 +67,20 @@ function deleteCase(result: {current: ReturnType<typeof useBranchCaseLabel>}) {
     });
 }
 
+function renameCase(result: {current: ReturnType<typeof useBranchCaseLabel>}, newCaseKey: string) {
+    act(() => {
+        result.current.handleEditCaseClick();
+    });
+
+    act(() => {
+        result.current.setCaseKeyValue(newCaseKey);
+    });
+
+    act(() => {
+        result.current.handleSaveCaseClick();
+    });
+}
+
 function openPanelFor(nodeName: string, nodeData: Partial<NodeDataType> = {}) {
     useWorkflowNodeDetailsPanelStore.setState({
         currentNode: {name: nodeName, workflowNodeName: nodeName, ...nodeData} as NodeDataType,
@@ -173,6 +187,40 @@ describe('useBranchCaseLabel', () => {
         deleteCase(result);
 
         expectPanelsOpen('taskA');
+    });
+
+    it('moves the open node to the new case key once the rename is saved', () => {
+        openPanelFor('taskA', {branchData: {branchId: 'branch_1', caseKey: 'caseA', index: 0}});
+
+        const {result} = renderBranchCaseLabel('caseA', 'taskA');
+
+        renameCase(result, 'caseZ');
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode?.branchData?.caseKey).toBe('caseA');
+
+        act(() => {
+            saveWorkflowDefinitionMock.mock.calls[0][0].onSuccess();
+        });
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode?.branchData).toEqual({
+            branchId: 'branch_1',
+            caseKey: 'caseZ',
+            index: 0,
+        });
+    });
+
+    it('leaves the open node alone when another case is renamed', () => {
+        openPanelFor('taskB', {branchData: {branchId: 'branch_1', caseKey: 'caseB', index: 0}});
+
+        const {result} = renderBranchCaseLabel('caseA', 'taskA');
+
+        renameCase(result, 'caseZ');
+
+        act(() => {
+            saveWorkflowDefinitionMock.mock.calls[0][0].onSuccess();
+        });
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode?.branchData?.caseKey).toBe('caseB');
     });
 
     it('keeps the details panel open when the open node is in another case', () => {
