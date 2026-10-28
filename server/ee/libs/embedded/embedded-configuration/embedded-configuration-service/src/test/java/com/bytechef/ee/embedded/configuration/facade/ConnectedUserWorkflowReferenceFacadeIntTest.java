@@ -44,6 +44,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
@@ -396,7 +397,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         verifyNoInteractions(automationWorkflowProjectFacade, connectedUserService);
 
         verify(connectedUserReferenceDeploymentManager).getDeployment(existingReference.getProjectDeploymentId());
-        verify(connectedUserReferenceDeploymentManager).getReleasedVersion(automationWorkflowProjectId,
+        verify(connectedUserReferenceDeploymentManager).fetchReleasedVersion(automationWorkflowProjectId,
             Environment.PRODUCTION);
         verifyNoMoreInteractions(connectedUserReferenceDeploymentManager);
     }
@@ -529,6 +530,40 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                 assertThat(row.getConnections())
                     .containsExactly(new ProjectDeploymentWorkflowConnection(connectionId, "slack", "postMessage1"));
             });
+    }
+
+    @Test
+    void testEnableReferenceWhileAdministrativelyOffSavesTheIntentButKeepsTheRowOff() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Administratively Off");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            connectedUser.getExternalId(), workflowUuid, false, Environment.PRODUCTION);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION);
+
+        assertThat(getReference(reference.getId()).isEnabled()).isTrue();
+        assertThat(fetchRow(reference))
+            .get()
+            .extracting(ProjectDeploymentWorkflow::isEnabled)
+            .isEqualTo(false);
     }
 
     @Test

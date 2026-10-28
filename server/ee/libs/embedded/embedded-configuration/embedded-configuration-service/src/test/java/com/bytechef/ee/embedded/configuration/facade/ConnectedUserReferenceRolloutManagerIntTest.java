@@ -1062,7 +1062,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testRollOutLogsAndReturnsWhenTheLastPublishedVersionCannotBeRead() {
+    void testRollOutIsAQuietNoOpWhenNothingIsReleased() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Unpublished");
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -1075,15 +1075,191 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                     .doesNotThrowAnyException();
 
             assertThat(appender.list)
-                .singleElement()
-                .satisfies(event -> {
-                    assertThat(event.getLevel()).isEqualTo(Level.ERROR);
-                    assertThat(event.getFormattedMessage())
-                        .contains("automation workflow project id=" + automationWorkflowProjectId);
-                });
+                .noneSatisfy(event -> assertThat(event.getLevel()
+                    .isGreaterOrEqual(Level.WARN)).isTrue());
+            assertThat(appender.list)
+                .allSatisfy(event -> assertThat(event.getThrowableProxy()).isNull());
         } finally {
             detachAppenderFromRolloutManagerLogger(appender);
         }
+    }
+
+    @Test
+    void testRollOutWithAnUnknownEnvironmentIdDoesNotThrow() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Unknown Environment");
+
+        assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, 99L))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testEnableReferenceWhileTheConfigurationIsOffDoesNotThrow() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Configuration Off");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        setProductionConfigurationEnabled(automationWorkflowProjectId, false);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        assertThatCode(() -> connectedUserWorkflowReferenceFacade.enableReference(
+            EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION)).doesNotThrowAnyException();
+        assertThatCode(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION)).doesNotThrowAnyException();
+
+        assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(reference.getProjectDeploymentId()))
+            .isFalse();
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+    }
+
+    @Test
+    void testApplyConfigurationStateKeepsTheUsersOwnOffSwitch() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Apply Keeps User Off");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            EXTERNAL_USER_ID, workflowUuid, false, Environment.PRODUCTION);
+
+        setProductionConfigurationEnabled(automationWorkflowProjectId, false);
+
+        connectedUserReferenceRolloutManager.applyConfigurationState(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+
+        setProductionConfigurationEnabled(automationWorkflowProjectId, true);
+
+        connectedUserReferenceRolloutManager.applyConfigurationState(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId())
+            .orElseThrow()
+            .isEnabled()).isFalse();
+    }
+
+    @Test
+    void testDisablingAConfigurationStopsEveryReferenceInThatEnvironment() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Apply Disables All");
+
+        String firstUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String secondUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        String otherExternalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow first = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, firstUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow second = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow third = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            otherExternalUserId, firstUuid, Environment.PRODUCTION);
+
+        List<ConnectedUserProjectWorkflow> references = List.of(first, second, third);
+
+        for (ConnectedUserProjectWorkflow reference : references) {
+            assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+        }
+
+        setProductionConfigurationEnabled(automationWorkflowProjectId, false);
+
+        connectedUserReferenceRolloutManager.applyConfigurationState(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        for (ConnectedUserProjectWorkflow reference : references) {
+            assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+            assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId())
+                .orElseThrow()
+                .isEnabled()).isTrue();
+        }
+    }
+
+    @Test
+    void testDisablingOneWorkflowStopsOnlyThatTemplatesReferences() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Apply Disables One");
+
+        String firstUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String secondUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow first = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, firstUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow second = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
+            configuration.getId(), UUID.fromString(firstUuid), false);
+
+        connectedUserReferenceRolloutManager.applyConfigurationState(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(first).isEnabled()).isFalse();
+        assertThat(fetchDeploymentRow(second).isEnabled()).isTrue();
+    }
+
+    @Test
+    void testDeleteConfigurationKeepsReferenceDeployments() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Apply After Delete");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.delete(configuration.getId());
+
+        connectedUserReferenceRolloutManager.applyConfigurationState(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchReferenceDeployment(automationWorkflowProjectId)).isPresent();
+        assertThat(projectDeploymentService.fetchProjectDeployment(reference.getProjectDeploymentId())).isPresent();
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId())
+            .orElseThrow()
+            .isEnabled()).isTrue();
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID, 1, true, true);
+
+        connectedUserReferenceRolloutManager.applyConfigurationState(
+            automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
     }
 
     @Test
@@ -1256,6 +1432,20 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                 assertThat(storedReference.isDangling()).isTrue();
                 assertThat(storedReference.isEnabled()).isFalse();
             });
+    }
+
+    private ProjectDeploymentWorkflow fetchDeploymentRow(ConnectedUserProjectWorkflow reference) {
+        return connectedUserReferenceDeploymentManager
+            .fetchRow(reference.getProjectDeploymentId(), reference.getAutomationWorkflowUuid())
+            .orElseThrow();
+    }
+
+    private void setProductionConfigurationEnabled(long automationWorkflowProjectId, boolean enabled) {
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), enabled);
     }
 
     private long createProjectDeployment(long automationWorkflowProjectId, String name) {

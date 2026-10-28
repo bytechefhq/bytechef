@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
@@ -134,22 +135,19 @@ class ConnectedUserReferenceDeploymentManager {
             .orElse(Map.of());
     }
 
+    public Optional<Integer> fetchReleasedVersion(long automationWorkflowProjectId, Environment environment) {
+        return automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, environment.ordinal())
+            .filter(AutomationWorkflowProjectConfiguration::isEnabled)
+            .map(AutomationWorkflowProjectConfiguration::getProjectVersion);
+    }
+
     public int getReleasedVersion(long automationWorkflowProjectId, Environment environment) {
-        Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
-            automationWorkflowProjectConfigurationService.fetchConfiguration(
-                automationWorkflowProjectId, environment.ordinal());
-
-        if (configurationOptional.isEmpty() || !configurationOptional.get()
-            .isEnabled()) {
-
-            throw new ConfigurationException(
+        return fetchReleasedVersion(automationWorkflowProjectId, environment)
+            .orElseThrow(() -> new ConfigurationException(
                 "Automation workflow project id=%s is not released in the %s environment".formatted(
                     automationWorkflowProjectId, environment),
-                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED);
-        }
-
-        return configurationOptional.get()
-            .getProjectVersion();
+                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED));
     }
 
     @Transactional
@@ -161,6 +159,23 @@ class ConnectedUserReferenceDeploymentManager {
             .fetchConnectedUserReferenceDeployment(connectedUser.getId(), automationWorkflowProjectId)
             .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
             .orElseGet(() -> createDeployment(automationWorkflowProjectId, connectedUser));
+    }
+
+    public boolean isAdministrativelyEnabled(
+        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
+
+        Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
+            automationWorkflowProjectConfigurationService.fetchConfiguration(
+                automationWorkflowProjectId, environment.ordinal());
+
+        if (configurationOptional.isEmpty()) {
+            return false;
+        }
+
+        AutomationWorkflowProjectConfiguration configuration = configurationOptional.get();
+
+        return configuration.isEnabled() && automationWorkflowProjectConfigurationService.isWorkflowEnabled(
+            configuration, UUID.fromString(automationWorkflowUuid));
     }
 
     public boolean isReferenceDeployment(long projectDeploymentId) {
@@ -219,6 +234,12 @@ class ConnectedUserReferenceDeploymentManager {
         projectDeployment.setProjectVersion(projectVersion);
 
         projectDeploymentFacade.updateProjectDeployment(projectDeployment, rows, List.of());
+    }
+
+    public void setRowEnabled(long projectDeploymentId, ProjectDeploymentWorkflow row, boolean enabled) {
+        if (row.isEnabled() != enabled) {
+            projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, row.getWorkflowId(), enabled);
+        }
     }
 
     public void removeWorkflow(long projectDeploymentId, String automationWorkflowUuid) {

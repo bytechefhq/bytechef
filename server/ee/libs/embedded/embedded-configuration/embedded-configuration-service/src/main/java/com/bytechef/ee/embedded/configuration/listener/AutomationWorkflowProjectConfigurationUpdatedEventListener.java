@@ -42,5 +42,8 @@ public class AutomationWorkflowProjectConfigurationUpdatedEventListener {
         connectedUserReferenceRolloutManager.rollOut(
             automationWorkflowProjectConfigurationUpdatedEvent.projectId(),
             automationWorkflowProjectConfigurationUpdatedEvent.environmentId());
+        connectedUserReferenceRolloutManager.applyConfigurationState(
+            automationWorkflowProjectConfigurationUpdatedEvent.projectId(),
+            automationWorkflowProjectConfigurationUpdatedEvent.environmentId());
     }
 }
