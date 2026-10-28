@@ -611,7 +611,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String updateProjectWorkflow(
-        String externalUserId, String workflowUuid, String prompt, Environment environment, boolean generate) {
+        String externalUserId, String workflowUuid, String prompt, @Nullable String systemPrompt,
+        Environment environment, boolean generate) {
         if (!generate) {
             connectedUserProjectWorkflowManager.updateProjectWorkflow(externalUserId, workflowUuid, prompt,
                 environment);
@@ -637,8 +638,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
         copilotWorkflowGenerator.generateWorkflow(
-            projectWorkflow.getWorkflowId(), connectedUserProject.getProjectId(), environment.ordinal(), prompt, null,
-            allowedComponentNames);
+            projectWorkflow.getWorkflowId(), connectedUserProject.getProjectId(), environment.ordinal(), prompt,
+            systemPrompt, allowedComponentNames);
 
         return workflowUuid;
     }

@@ -163,6 +163,48 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
+    void testUpdateFrontendProjectWorkflowFromPromptForwardsTheSystemPrompt() {
+        when(connectedUserProjectFacade.updateProjectWorkflow(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq("Post new leads to Slack"), eq("Use the sales channel"),
+            any(Environment.class), eq(true)))
+                .thenReturn(WORKFLOW_UUID);
+
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflows/{workflowUuid}/generate", WORKFLOW_UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue("{\"prompt\":\"Post new leads to Slack\",\"systemPrompt\":\"Use the sales channel\"}")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .isEqualTo("\"" + WORKFLOW_UUID + "\"");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testUpdateProjectWorkflowFromPromptForwardsTheSystemPrompt() {
+        when(connectedUserProjectFacade.updateProjectWorkflow(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq("Post new leads to Slack"), eq("Use the sales channel"),
+            any(Environment.class), eq(true)))
+                .thenReturn(WORKFLOW_UUID);
+
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflows/{workflowUuid}/generate", EXTERNAL_USER_ID, WORKFLOW_UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bodyValue("{\"prompt\":\"Post new leads to Slack\",\"systemPrompt\":\"Use the sales channel\"}")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .isEqualTo("\"" + WORKFLOW_UUID + "\"");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
     void testCopyFrontendWorkflowTemplateUnknownIdReturns404() {
         when(connectedUserProjectFacade.copyWorkflowTemplate(
             eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class)))

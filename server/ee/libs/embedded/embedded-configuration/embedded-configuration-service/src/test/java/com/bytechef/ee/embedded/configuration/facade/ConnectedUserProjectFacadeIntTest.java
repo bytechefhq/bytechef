@@ -19,8 +19,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
@@ -196,6 +198,9 @@ class ConnectedUserProjectFacadeIntTest {
 
     @Autowired
     private ConnectionService connectionService;
+
+    @MockitoBean
+    private CopilotWorkflowGenerator copilotWorkflowGenerator;
 
     @Autowired
     private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
@@ -383,6 +388,20 @@ class ConnectedUserProjectFacadeIntTest {
         assertThat(copilotChatContextDTO.allowedComponentNames())
             .contains(enabledComponentName, "logger")
             .doesNotContain(disabledComponentName, "httpClient");
+    }
+
+    @Test
+    void testUpdateProjectWorkflowFromPromptPassesTheSystemPromptToTheGenerator() {
+        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION, Environment.PRODUCTION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, "Post new leads to Slack", "Use the sales channel", Environment.PRODUCTION,
+            true);
+
+        verify(copilotWorkflowGenerator).generateWorkflow(
+            eq(projectWorkflowService.getLastWorkflowId(workflowUuid)), anyLong(), anyLong(),
+            eq("Post new leads to Slack"), eq("Use the sales channel"), any());
     }
 
     @Test

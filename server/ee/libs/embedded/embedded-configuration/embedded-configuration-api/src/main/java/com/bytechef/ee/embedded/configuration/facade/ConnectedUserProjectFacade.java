@@ -64,7 +64,8 @@ public interface ConnectedUserProjectFacade {
         String externalUserId, String workflowUuid, Map<String, ?> inputs, Long environmentId);
 
     String updateProjectWorkflow(
-        String externalUserId, String workflowUuid, String prompt, Environment environment, boolean generate);
+        String externalUserId, String workflowUuid, String prompt, @Nullable String systemPrompt,
+        Environment environment, boolean generate);
 
     void updateWorkflowConfigurationConnection(
         String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,
