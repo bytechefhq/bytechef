@@ -85,6 +85,9 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
     const isPending = createConfigurationMutation.isPending || updateConfigurationMutation.isPending;
 
+    const movesToOlderVersion =
+        !!configuration && projectVersion !== '' && Number(projectVersion) < configuration.projectVersion;
+
     const handleSubmit = () => {
         if (configuration) {
             updateConfigurationMutation.mutate(
@@ -176,6 +179,13 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                                         ))}
                                     </SelectContent>
                                 </Select>
+
+                                {movesToOlderVersion && (
+                                    <p className="text-sm text-content-warning-primary">
+                                        Connected users whose automations are not in this version will be disconnected
+                                        from them.
+                                    </p>
+                                )}
                             </fieldset>
 
                             <Switch checked={enabled} label="Enabled" onCheckedChange={setEnabled} />
