@@ -46,9 +46,12 @@ vi.mock('@/ee/pages/embedded/integrations/components/integration-workflow-list/I
     default: ({integration}: {integration: Integration}) => <div>{`${integration.name} workflow list`}</div>,
 }));
 
-vi.mock('@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet', () => ({
-    default: () => <div>Read-only workflow sheet</div>,
-}));
+vi.mock(
+    '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet',
+    () => ({
+        default: () => <div>Workflow executions sheet</div>,
+    })
+);
 
 const integrations = [
     {componentName: 'accelo', id: 1, multipleInstances: false, name: 'Accelo', tags: []},
@@ -113,17 +116,17 @@ describe('IntegrationList', () => {
         expect(screen.getByText('Accelo tab none')).toBeInTheDocument();
     });
 
-    it('shows the configurations panel and the read-only workflow sheet once on the configurations tab', () => {
+    it('shows the configurations panel and the workflow executions sheet once on the configurations tab', () => {
         renderList();
 
-        expect(screen.queryByText('Read-only workflow sheet')).not.toBeInTheDocument();
+        expect(screen.queryByText('Workflow executions sheet')).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByText('Open Accelo configurations'));
         fireEvent.click(screen.getByText('Open Asana configurations'));
 
         expect(screen.getByText('Accelo configurations panel')).toBeInTheDocument();
         expect(screen.getByText('Asana configurations panel')).toBeInTheDocument();
-        expect(screen.getAllByText('Read-only workflow sheet')).toHaveLength(1);
+        expect(screen.getAllByText('Workflow executions sheet')).toHaveLength(1);
     });
 
     it('opens the configurations tab of the integration named in the URL, scrolls to it and drops the one-off params', () => {

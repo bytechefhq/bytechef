@@ -1,3 +1,4 @@
+import EmbeddedWorkflowExecutionConnectedUser from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionConnectedUser';
 import EmbeddedWorkflowExecutionsTableContent from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionsTableContent';
 import {getWorkflowExecutionColumns} from '@/ee/pages/embedded/workflow-executions/components/getWorkflowExecutionColumns';
 import {WorkflowExecution} from '@/ee/shared/middleware/embedded/workflow/execution';
@@ -9,7 +10,12 @@ import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetS
 
 const columnHelper = createColumnHelper<typeof coreTableFeatures, WorkflowExecution>();
 
-const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
+interface EmbeddedWorkflowExecutionsTableProps {
+    data: WorkflowExecution[];
+    showConnectedUser?: boolean;
+}
+
+const EmbeddedWorkflowExecutionsTable = ({data, showConnectedUser = false}: EmbeddedWorkflowExecutionsTableProps) => {
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore(
         useShallow((state) => ({
             setWorkflowExecutionId: state.setWorkflowExecutionId,
@@ -39,6 +45,19 @@ const EmbeddedWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) =>
                 cell: (info) => `V${info.getValue()?.integrationVersion}`,
                 header: 'Version',
             }),
+            ...(showConnectedUser
+                ? [
+                      columnHelper.accessor('integrationInstance', {
+                          cell: (info) => (
+                              <EmbeddedWorkflowExecutionConnectedUser
+                                  connectedUserId={info.getValue()?.connectedUserId}
+                              />
+                          ),
+                          header: 'Connected user',
+                          id: 'connectedUser',
+                      }),
+                  ]
+                : []),
         ],
         onView: handleRowClick,
     });

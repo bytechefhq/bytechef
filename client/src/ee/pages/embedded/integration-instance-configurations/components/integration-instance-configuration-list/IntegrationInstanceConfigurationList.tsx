@@ -84,6 +84,7 @@ const IntegrationInstanceConfigurationList = ({
                                         componentName={integration.componentName}
                                         integrationId={integration.id}
                                         integrationInstanceConfigurationId={integrationInstanceConfiguration.id!}
+                                        integrationInstanceConfigurationName={integrationInstanceConfiguration.name}
                                         integrationInstanceConfigurationWorkflows={
                                             integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows
                                         }

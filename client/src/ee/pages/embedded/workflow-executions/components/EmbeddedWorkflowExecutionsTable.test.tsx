@@ -9,8 +9,15 @@ vi.mock('./EmbeddedWorkflowExecutionsDropdownMenu', () => ({
 }));
 
 const hoisted = vi.hoisted(() => ({
+    connectedUserQueryMock: vi.fn((id: number, enabled?: boolean) => ({
+        data: enabled ? {externalId: `external-${id}`, id} : undefined,
+    })),
     setWorkflowExecutionId: vi.fn(),
     setWorkflowExecutionSheetOpen: vi.fn(),
+}));
+
+vi.mock('@/ee/shared/queries/embedded/connectedUsers.queries', () => ({
+    useGetConnectedUserQuery: hoisted.connectedUserQueryMock,
 }));
 
 vi.mock('../stores/useWorkflowExecutionSheetStore', () => ({
@@ -24,6 +31,7 @@ const data = [
     {
         id: 1,
         integration: {componentName: 'googleMail'},
+        integrationInstance: {connectedUserId: 9, connectionId: 1},
         integrationInstanceConfiguration: {integrationVersion: 5, name: 'Gmail Code'},
         job: {
             endDate: new Date('2026-10-20T10:00:05Z'),
@@ -67,5 +75,19 @@ describe('EmbeddedWorkflowExecutionsTable', () => {
 
         expect(hoisted.setWorkflowExecutionId).toHaveBeenCalledWith(1);
         expect(hoisted.setWorkflowExecutionSheetOpen).toHaveBeenCalledWith(true);
+    });
+
+    it('does not show the connected user column unless asked to', () => {
+        render(<EmbeddedWorkflowExecutionsTable data={data} />);
+
+        expect(screen.queryByText('Connected user')).not.toBeInTheDocument();
+        expect(hoisted.connectedUserQueryMock).not.toHaveBeenCalledWith(9, true);
+    });
+
+    it('shows the external id of the connected user each execution ran for when asked to', () => {
+        render(<EmbeddedWorkflowExecutionsTable data={data} showConnectedUser />);
+
+        expect(screen.getByText('Connected user')).toBeInTheDocument();
+        expect(screen.getByText('external-9')).toBeInTheDocument();
     });
 });

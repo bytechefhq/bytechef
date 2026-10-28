@@ -4,13 +4,13 @@ import PageLoader from '@/components/PageLoader';
 import IntegrationInstanceConfigurationsFilterTitle from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsFilterTitle';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
+import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
@@ -254,7 +254,7 @@ const IntegrationInstanceConfigurations = () => {
                                     )
                             )}
 
-                            <ReadOnlyWorkflowSheet />
+                            <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
                         </WorkflowReadOnlyProvider>
                     </div>
                 ) : (

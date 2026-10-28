@@ -4,11 +4,11 @@ import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import IntegrationInstanceConfigurationWorkflowListItemDropDownMenu from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
+import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
-import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
@@ -19,7 +19,9 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     componentName,
     filteredComponentNames,
     integrationInstanceConfigurationId,
+    integrationInstanceConfigurationName,
     integrationInstanceConfigurationWorkflow,
+    integrationVersion,
     isMcpWorkflow,
     workflow,
     workflowComponentDefinitions,
@@ -28,7 +30,9 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     componentName: string;
     filteredComponentNames?: string[];
     integrationInstanceConfigurationId: number;
+    integrationInstanceConfigurationName?: string;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
+    integrationVersion?: number;
     isMcpWorkflow: boolean;
     workflow: Workflow;
     workflowComponentDefinitions: {
@@ -42,7 +46,9 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
     const {data: fetchedWorkflow} = useGetWorkflowQuery(workflow.id!, showEditWorkflowDialog);
 
-    const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
+    const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
+        (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
+    );
 
     const queryClient = useQueryClient();
 
@@ -73,7 +79,12 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
     const handleWorkflowClick = () => {
         if (workflow) {
-            openReadOnlyWorkflowSheet(workflow);
+            openIntegrationInstanceConfigurationWorkflowSheet({
+                integrationInstanceConfigurationId,
+                integrationInstanceConfigurationName,
+                integrationVersion,
+                workflow,
+            });
         }
     };
 
