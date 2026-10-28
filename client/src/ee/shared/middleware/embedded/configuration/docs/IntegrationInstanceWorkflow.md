@@ -13,6 +13,7 @@ Name | Type
 `enabled` | boolean
 `id` | number
 `integrationInstanceConfigurationWorkflowId` | number
+`lastExecutionDate` | Date
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
 `workflowId` | string
@@ -30,6 +31,7 @@ const example = {
   "enabled": null,
   "id": null,
   "integrationInstanceConfigurationWorkflowId": null,
+  "lastExecutionDate": null,
   "lastModifiedBy": null,
   "lastModifiedDate": null,
   "workflowId": null,
