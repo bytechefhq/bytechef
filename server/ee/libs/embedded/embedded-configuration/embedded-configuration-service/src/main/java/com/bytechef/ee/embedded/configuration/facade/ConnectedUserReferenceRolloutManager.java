@@ -119,14 +119,7 @@ public class ConnectedUserReferenceRolloutManager {
                 continue;
             }
 
-            try {
-                requiresNewTransactionTemplate.executeWithoutResult(
-                    status -> applyConfigurationState(projectDeployment));
-            } catch (RuntimeException exception) {
-                log.error(
-                    "Applying the configuration state of automation workflow project id={} to deployment id={} failed",
-                    automationWorkflowProjectId, projectDeployment.getId(), exception);
-            }
+            applyConfigurationState(projectDeployment);
         }
     }
 
@@ -189,26 +182,48 @@ public class ConnectedUserReferenceRolloutManager {
     private void applyConfigurationState(ProjectDeployment projectDeployment) {
         long projectDeploymentId = projectDeployment.getId();
 
-        for (ConnectedUserProjectWorkflow reference : getReferences(projectDeploymentId)) {
+        List<ConnectedUserProjectWorkflow> references;
+
+        try {
+            references = getReferences(projectDeploymentId);
+        } catch (RuntimeException exception) {
+            log.error(
+                "Applying the configuration state to deployment id={} failed", projectDeploymentId, exception);
+
+            return;
+        }
+
+        for (ConnectedUserProjectWorkflow reference : references) {
             if (reference.isDangling()) {
                 continue;
             }
 
-            String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
-
-            Optional<ProjectDeploymentWorkflow> row = connectedUserReferenceDeploymentManager.fetchRow(
-                projectDeploymentId, automationWorkflowUuid);
-
-            if (row.isEmpty()) {
-                continue;
+            try {
+                requiresNewTransactionTemplate.executeWithoutResult(
+                    status -> applyConfigurationState(projectDeployment, reference));
+            } catch (RuntimeException exception) {
+                log.error(
+                    "Applying the configuration state to reference id={} of deployment id={} failed",
+                    reference.getId(), projectDeploymentId, exception);
             }
-
-            boolean enabled =
-                reference.isEnabled() && connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-                    projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
-
-            connectedUserReferenceDeploymentManager.setRowEnabled(projectDeploymentId, row.get(), enabled);
         }
+    }
+
+    private void applyConfigurationState(ProjectDeployment projectDeployment, ConnectedUserProjectWorkflow reference) {
+        long projectDeploymentId = projectDeployment.getId();
+        String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
+
+        Optional<ProjectDeploymentWorkflow> row = connectedUserReferenceDeploymentManager.fetchRow(
+            projectDeploymentId, automationWorkflowUuid);
+
+        if (row.isEmpty()) {
+            return;
+        }
+
+        boolean enabled = reference.isEnabled() && connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
+            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
+
+        connectedUserReferenceDeploymentManager.setRowEnabled(projectDeploymentId, row.get(), enabled);
     }
 
     private List<ConnectedUserProjectWorkflow> getReferences(long projectDeploymentId) {

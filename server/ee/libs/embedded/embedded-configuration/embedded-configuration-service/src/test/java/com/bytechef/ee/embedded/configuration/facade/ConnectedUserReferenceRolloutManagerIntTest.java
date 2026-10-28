@@ -176,6 +176,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         """;
 
     @Autowired
+    private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
+
+    @Autowired
     private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
     @Autowired
@@ -1241,7 +1244,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.delete(configuration.getId());
+        automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(configuration.getId());
 
         connectedUserReferenceRolloutManager.applyConfigurationState(
             automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
