@@ -1,8 +1,10 @@
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import AutomationWorkflowExecutionsSheet from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet';
 import ConnectedUserSheetActions from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetActions';
 import ConnectedUserSheetPanel from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanel';
 import ConnectedUserSheetTitle from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
+import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
 import {useGetConnectedUserQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {VisuallyHidden} from 'radix-ui';
 import {useShallow} from 'zustand/react/shallow';
@@ -51,6 +53,10 @@ const ConnectedUserSheet = () => {
                         connectedUser && <ConnectedUserSheetPanel connectedUser={connectedUser} />
                     )}
                 </div>
+
+                <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
+
+                <AutomationWorkflowExecutionsSheet />
             </SheetContent>
         </Sheet>
     );

@@ -40,6 +40,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowList = ({
                                 <ConnectedUserSheetPanelIntegrationWorkflowListItem
                                     componentDefinitions={componentDefinitions}
                                     integrationInstance={integrationInstance}
+                                    integrationInstanceConfiguration={integrationInstanceConfiguration}
                                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                                     integrationInstanceWorkflow={integrationInstanceWorkflow}
                                     key={workflow.id}

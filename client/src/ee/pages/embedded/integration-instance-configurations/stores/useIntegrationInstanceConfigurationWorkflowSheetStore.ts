@@ -3,6 +3,7 @@ import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {create} from 'zustand';
 
 interface OpenIntegrationInstanceConfigurationWorkflowSheetPropsI {
+    connectedUserId?: number;
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationName?: string;
     integrationVersion?: number;
@@ -10,6 +11,7 @@ interface OpenIntegrationInstanceConfigurationWorkflowSheetPropsI {
 }
 
 interface IntegrationInstanceConfigurationWorkflowSheetStateI {
+    connectedUserId: number | undefined;
     integrationInstanceConfigurationId: number | undefined;
     integrationInstanceConfigurationName: string | undefined;
     integrationVersion: number | undefined;
@@ -26,11 +28,13 @@ interface IntegrationInstanceConfigurationWorkflowSheetStateI {
 
 export const useIntegrationInstanceConfigurationWorkflowSheetStore =
     create<IntegrationInstanceConfigurationWorkflowSheetStateI>()((set) => ({
+        connectedUserId: undefined,
         integrationInstanceConfigurationId: undefined,
         integrationInstanceConfigurationName: undefined,
         integrationVersion: undefined,
         workflow: undefined,
         openIntegrationInstanceConfigurationWorkflowSheet: ({
+            connectedUserId,
             integrationInstanceConfigurationId,
             integrationInstanceConfigurationName,
             integrationVersion,
@@ -38,6 +42,7 @@ export const useIntegrationInstanceConfigurationWorkflowSheetStore =
         }) =>
             set((state) => ({
                 ...state,
+                connectedUserId,
                 integrationInstanceConfigurationId,
                 integrationInstanceConfigurationName,
                 integrationInstanceConfigurationWorkflowSheetOpen: true,

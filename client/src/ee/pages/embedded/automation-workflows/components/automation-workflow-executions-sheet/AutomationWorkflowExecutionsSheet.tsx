@@ -38,11 +38,16 @@ const AutomationWorkflowTemplatePanel = ({workflowId}: AutomationWorkflowTemplat
 };
 
 interface AutomationWorkflowExecutionsContentProps {
+    connectedUserId?: number;
     projectName?: string;
     workflow: AutomationWorkflowExecutionsSheetWorkflowI;
 }
 
-const AutomationWorkflowExecutionsContent = ({projectName, workflow}: AutomationWorkflowExecutionsContentProps) => {
+const AutomationWorkflowExecutionsContent = ({
+    connectedUserId,
+    projectName,
+    workflow,
+}: AutomationWorkflowExecutionsContentProps) => {
     const [pageNumber, setPageNumber] = useState(0);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -56,6 +61,7 @@ const AutomationWorkflowExecutionsContent = ({projectName, workflow}: Automation
         refetch: refetchWorkflowExecutions,
     } = useGetEmbeddedWorkflowExecutionsQuery(
         {
+            connectedUserId,
             environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
             pageNumber,
@@ -74,7 +80,11 @@ const AutomationWorkflowExecutionsContent = ({projectName, workflow}: Automation
 
     return (
         <WorkflowExecutionsSheetLayout
-            emptyMessage="No connected user has executed this workflow in this environment yet."
+            emptyMessage={
+                connectedUserId
+                    ? 'This connected user has not executed this workflow in this environment yet.'
+                    : 'No connected user has executed this workflow in this environment yet.'
+            }
             executionSheet={<AutomationWorkflowExecutionSheet />}
             executionsTable={<AutomationWorkflowExecutionsTable data={workflowExecutions} />}
             hasExecutions={workflowExecutions.length > 0}
@@ -93,15 +103,21 @@ const AutomationWorkflowExecutionsContent = ({projectName, workflow}: Automation
 };
 
 const AutomationWorkflowExecutionsSheet = () => {
-    const {automationWorkflowExecutionsSheetOpen, projectName, setAutomationWorkflowExecutionsSheetOpen, workflow} =
-        useAutomationWorkflowExecutionsSheetStore(
-            useShallow((state) => ({
-                automationWorkflowExecutionsSheetOpen: state.automationWorkflowExecutionsSheetOpen,
-                projectName: state.projectName,
-                setAutomationWorkflowExecutionsSheetOpen: state.setAutomationWorkflowExecutionsSheetOpen,
-                workflow: state.workflow,
-            }))
-        );
+    const {
+        automationWorkflowExecutionsSheetOpen,
+        connectedUserId,
+        projectName,
+        setAutomationWorkflowExecutionsSheetOpen,
+        workflow,
+    } = useAutomationWorkflowExecutionsSheetStore(
+        useShallow((state) => ({
+            automationWorkflowExecutionsSheetOpen: state.automationWorkflowExecutionsSheetOpen,
+            connectedUserId: state.connectedUserId,
+            projectName: state.projectName,
+            setAutomationWorkflowExecutionsSheetOpen: state.setAutomationWorkflowExecutionsSheetOpen,
+            workflow: state.workflow,
+        }))
+    );
 
     const setWorkflowExecutionSheetOpen = useWorkflowExecutionSheetStore(
         (state) => state.setWorkflowExecutionSheetOpen
@@ -128,7 +144,8 @@ const AutomationWorkflowExecutionsSheet = () => {
 
                 {workflow && (
                     <AutomationWorkflowExecutionsContent
-                        key={workflow.workflowUuid}
+                        connectedUserId={connectedUserId}
+                        key={`${workflow.workflowUuid}_${connectedUserId ?? ''}`}
                         projectName={projectName}
                         workflow={workflow}
                     />

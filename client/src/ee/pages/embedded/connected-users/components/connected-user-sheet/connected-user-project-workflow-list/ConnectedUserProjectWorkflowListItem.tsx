@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import {
     ConnectedUserProjectsQuery,
@@ -21,10 +22,16 @@ export type ConnectedUserProjectWorkflowType =
 
 const ConnectedUserProjectWorkflowListItem = ({
     connectedUserProjectWorkflow,
+    projectName,
 }: {
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
+    projectName?: string;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const openAutomationWorkflowExecutionsSheet = useAutomationWorkflowExecutionsSheetStore(
+        (state) => state.openAutomationWorkflowExecutionsSheet
+    );
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -52,6 +59,18 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const {staticWebhookUrl} = connectedUserProjectWorkflow;
 
+    const handleWorkflowClick = () => {
+        openAutomationWorkflowExecutionsSheet({
+            connectedUserId: Number(connectedUserProjectWorkflow.connectedUserId),
+            projectName,
+            workflow: {
+                label: connectedUserProjectWorkflow.workflow.label,
+                workflowId: connectedUserProjectWorkflow.workflow.id,
+                workflowUuid: connectedUserProjectWorkflow.workflowUuid,
+            },
+        });
+    };
+
     const handleCopyStaticWebhookUrlClick = async () => {
         if (staticWebhookUrl) {
             await copyToClipboard(staticWebhookUrl);
@@ -64,9 +83,13 @@ const ConnectedUserProjectWorkflowListItem = ({
         <>
             <li className="mb-2 flex items-center justify-between rounded border border-border/50 px-3 py-4 hover:bg-surface-neutral-primary-hover">
                 <div className="flex min-h-8 min-w-0 flex-1 flex-col justify-center gap-y-1">
-                    <span className="truncate text-sm font-semibold">
+                    <button
+                        className="cursor-pointer truncate text-left text-sm font-semibold"
+                        onClick={handleWorkflowClick}
+                        type="button"
+                    >
                         {connectedUserProjectWorkflow.workflow.label}
-                    </span>
+                    </button>
 
                     {staticWebhookUrl && (
                         <div className="flex min-w-0 items-center gap-x-1">
