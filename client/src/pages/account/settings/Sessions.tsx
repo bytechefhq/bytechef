@@ -93,7 +93,7 @@ const Sessions = () => {
 
                                         <TableCell>{s.tokenDate}</TableCell>
 
-                                        <TableCell className="flex justify-end">
+                                        <TableCell className="pr-0 text-right">
                                             <Button label="Invalidate" onClick={doSessionInvalidation(s.series)} />
                                         </TableCell>
                                     </TableRow>
