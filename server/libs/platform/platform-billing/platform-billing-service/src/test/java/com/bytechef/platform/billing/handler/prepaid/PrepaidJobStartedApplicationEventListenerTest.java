@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.billing.handler.prepaid;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -56,5 +58,15 @@ class PrepaidJobStartedApplicationEventListenerTest {
         }
 
         verify(prepaidUnitConsumptionService, never()).consumeUnit(anyLong());
+    }
+
+    @Test
+    void testConsumeUnitFailureDoesNotPropagate() {
+        doThrow(new IllegalStateException("db down")).when(prepaidUnitConsumptionService)
+            .consumeUnit(5L);
+
+        assertThatCode(
+            () -> prepaidJobStartedApplicationEventListener.onApplicationEvent(
+                new JobStatusApplicationEvent(5L, Status.STARTED))).doesNotThrowAnyException();
     }
 }
