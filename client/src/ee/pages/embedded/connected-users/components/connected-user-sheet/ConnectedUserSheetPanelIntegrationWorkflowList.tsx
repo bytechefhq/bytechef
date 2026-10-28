@@ -4,15 +4,12 @@ import {
     IntegrationInstanceConfiguration,
     Workflow,
 } from '@/ee/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
 const ConnectedUserSheetPanelIntegrationWorkflowList = ({
-    componentDefinitions,
     integrationInstance,
     integrationInstanceConfiguration,
     workflows,
 }: {
-    componentDefinitions: ComponentDefinitionBasic[];
     integrationInstance: IntegrationInstance;
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     workflows: Workflow[];
@@ -38,7 +35,6 @@ const ConnectedUserSheetPanelIntegrationWorkflowList = ({
                             integrationInstance &&
                             integrationInstanceConfigurationWorkflow && (
                                 <ConnectedUserSheetPanelIntegrationWorkflowListItem
-                                    componentDefinitions={componentDefinitions}
                                     integrationInstance={integrationInstance}
                                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}

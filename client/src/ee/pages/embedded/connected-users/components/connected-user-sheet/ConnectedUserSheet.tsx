@@ -30,7 +30,7 @@ const ConnectedUserSheet = () => {
             </VisuallyHidden.Root>
 
             <SheetContent
-                className="top-3 right-4 bottom-4 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-(--breakpoint-md)"
+                className="top-3 right-4 bottom-4 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-(--breakpoint-lg)"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >

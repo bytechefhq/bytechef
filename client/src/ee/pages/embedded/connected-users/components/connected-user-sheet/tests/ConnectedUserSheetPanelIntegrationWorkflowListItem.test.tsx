@@ -1,9 +1,11 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectedUserSheetPanelIntegrationWorkflowListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowListItem';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {
     IntegrationInstance,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationWorkflow,
+    IntegrationInstanceWorkflow,
     Workflow,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
@@ -11,6 +13,11 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations', () => ({
     useEnableIntegrationInstanceWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
+}));
+
+vi.mock('@/shared/hooks/useWorkflowComponentDefinitions', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useWorkflowComponentDefinitions')>()),
+    default: () => ({workflowComponentDefinitions: {}, workflowTaskDispatcherDefinitions: {}}),
 }));
 
 const integrationInstance = {
@@ -54,15 +61,16 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
 
     it("should open the workflow's executions for the connected user when the workflow is clicked", async () => {
         render(
-            <ul>
-                <ConnectedUserSheetPanelIntegrationWorkflowListItem
-                    componentDefinitions={[]}
-                    integrationInstance={integrationInstance}
-                    integrationInstanceConfiguration={integrationInstanceConfiguration}
-                    integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
-                    workflow={workflow}
-                />
-            </ul>
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
         );
 
         await userEvent.click(screen.getByRole('button', {name: 'Notify Slack on New Email'}));
@@ -75,5 +83,46 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         expect(state.integrationInstanceConfigurationName).toBe('Gmail Code');
         expect(state.integrationVersion).toBe(5);
         expect(state.workflow).toBe(workflow);
+    });
+
+    it('shows when the workflow last ran for this integration instance', () => {
+        const lastExecutionDate = new Date('2026-10-28T12:00:00Z');
+
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        integrationInstanceWorkflow={{enabled: true, lastExecutionDate} as IntegrationInstanceWorkflow}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        expect(
+            screen.getByText(
+                `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+            )
+        ).toBeInTheDocument();
+    });
+
+    it('shows no executions for a workflow that never ran for this integration instance', () => {
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        expect(screen.getByText('No executions')).toBeInTheDocument();
     });
 });

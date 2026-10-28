@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {ConnectedUserMcpServer} from '@/shared/middleware/graphql';
@@ -49,6 +50,38 @@ vi.mock('@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations',
 
         return {isPending: false, mutate: hoisted.enableWorkflowMutate};
     },
+}));
+
+vi.mock('@/ee/shared/queries/embedded/integrationInstances.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/ee/shared/queries/embedded/integrationInstances.queries')>()),
+    useGetIntegrationInstanceQuery: (id: number) => ({
+        data: {
+            id,
+            integrationInstanceConfiguration: {integrationVersion: 6, name: 'Gmail Code'},
+            integrationInstanceConfigurationId: 77,
+        },
+    }),
+}));
+
+vi.mock('@/shared/hooks/useWorkflowComponentDefinitions', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useWorkflowComponentDefinitions')>()),
+    default: () => ({workflowComponentDefinitions: {}, workflowTaskDispatcherDefinitions: {}}),
+}));
+
+vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
+    default: ({filteredComponentNames}: {filteredComponentNames?: string[]}) => (
+        <div data-testid="trigger-and-components-row">{filteredComponentNames?.join(',')}</div>
+    ),
+}));
+
+vi.mock('@/ee/shared/queries/embedded/workflows.queries', () => ({
+    useGetWorkflowQuery: (id: string) => ({
+        data: {
+            id,
+            label: id === 'workflow-1' ? 'Send Email' : 'Archive Email',
+            workflowTaskComponentNames: id === 'workflow-1' ? ['gmail'] : [],
+        },
+    }),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
@@ -149,6 +182,15 @@ const expandGroups = async () => {
 describe('ConnectedUserMcpServerListItem', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        useIntegrationInstanceConfigurationWorkflowSheetStore.setState({
+            connectedUserId: undefined,
+            integrationInstanceConfigurationId: undefined,
+            integrationInstanceConfigurationName: undefined,
+            integrationInstanceConfigurationWorkflowSheetOpen: false,
+            integrationVersion: undefined,
+            workflow: undefined,
+        });
     });
 
     it('counts component and workflow tools in the card header', () => {
@@ -156,6 +198,38 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         expect(screen.getByText('2 component tools')).toBeInTheDocument();
         expect(screen.getByText('2 workflow tools')).toBeInTheDocument();
+    });
+
+    it('shows the latest workflow execution in the card header', () => {
+        renderListItem(mixedMcpServer);
+
+        const lastExecutionDate = new Date('2026-10-05T10:00:00Z');
+
+        expect(
+            screen.getByText(
+                `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+            )
+        ).toBeInTheDocument();
+    });
+
+    it('shows no executions in the card header of a server whose workflows never ran', () => {
+        renderListItem(toolsOnlyMcpServer);
+
+        expect(screen.getByText('No executions')).toBeInTheDocument();
+    });
+
+    it('shows the latest execution of a workflow tool group and none for component tool groups', async () => {
+        renderListItem(mixedMcpServer);
+
+        await expandCard();
+
+        const workflowGroup = screen.getByText('v6').closest('[data-slot="collapsible"]')!;
+        const componentGroup = screen.getByText('v1').closest('[data-slot="collapsible"]')!;
+
+        expect(within(workflowGroup as HTMLElement).getByText(/^Executed at /)).toBeInTheDocument();
+        expect(
+            within(componentGroup as HTMLElement).queryByText(/^Executed at |No executions/)
+        ).not.toBeInTheDocument();
     });
 
     it('groups tools by component, collapsed, with version badges and credential status', async () => {
@@ -169,6 +243,29 @@ describe('ConnectedUserMcpServerListItem', () => {
         expect(screen.getByText('v6')).toBeInTheDocument();
         expect(screen.getAllByText('Account Connected')).toHaveLength(2);
         expect(screen.queryByText('Search Email')).not.toBeInTheDocument();
+    });
+
+    it("opens a workflow's executions for the connected user when the workflow is clicked", async () => {
+        renderListItem(mixedMcpServer);
+
+        await expandCard();
+        await expandGroups();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Send Email'}));
+
+        const state = useIntegrationInstanceConfigurationWorkflowSheetStore.getState();
+
+        expect(state.integrationInstanceConfigurationWorkflowSheetOpen).toBe(true);
+        expect(state.connectedUserId).toBe(5);
+        expect(state.integrationInstanceConfigurationId).toBe(77);
+        expect(state.integrationInstanceConfigurationName).toBe('Gmail Code');
+        expect(state.integrationVersion).toBe(6);
+        expect(state.workflow).toEqual({
+            id: 'workflow-1',
+            label: 'Send Email',
+            workflowTaskComponentNames: ['gmail'],
+        });
+        expect(screen.getAllByTestId('trigger-and-components-row')[0]).toHaveTextContent('gmail');
     });
 
     it('shows tool titles and descriptions and toggles a tool for the user', async () => {
@@ -188,14 +285,14 @@ describe('ConnectedUserMcpServerListItem', () => {
         expect(hoisted.enableToolMutate).toHaveBeenCalledWith({enable: true, id: '101'});
     });
 
-    it('shows workflow descriptions and last executions and toggles a workflow through the integration instance', async () => {
+    it('shows last executions and toggles a workflow through the integration instance', async () => {
         renderListItem(mixedMcpServer);
 
         await expandCard();
         await expandGroups();
 
-        expect(screen.getByText('Sends an email')).toBeInTheDocument();
-        expect(screen.getByText(/^Executed at /)).toBeInTheDocument();
+        expect(screen.queryByText('Sends an email')).not.toBeInTheDocument();
+        expect(screen.getAllByText(/^Executed at /)).toHaveLength(3);
         expect(screen.getByText('No executions')).toBeInTheDocument();
 
         const archiveEmailRow = screen.getByText('Archive Email').closest('li')!;

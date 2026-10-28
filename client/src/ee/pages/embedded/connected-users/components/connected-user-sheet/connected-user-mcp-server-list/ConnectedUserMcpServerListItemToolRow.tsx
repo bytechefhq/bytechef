@@ -23,7 +23,7 @@ const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpSe
     });
 
     return (
-        <li className="flex items-center gap-2 py-0.5">
+        <li className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
             <div className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-sm font-medium">{toolDefinition?.title || tool.name}</span>
 
@@ -32,7 +32,7 @@ const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpSe
                 )}
             </div>
 
-            <div className="relative mr-3 flex shrink-0 items-center">
+            <div className="relative mr-11 flex shrink-0 items-center">
                 {enableConnectedUserMcpToolMutation.isPending && (
                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                 )}

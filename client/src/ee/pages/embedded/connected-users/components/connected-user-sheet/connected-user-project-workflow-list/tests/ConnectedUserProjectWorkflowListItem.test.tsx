@@ -25,7 +25,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
 
 const STATIC_WEBHOOK_URL = 'https://bytechef.example.com/webhooks/abc123';
 
-const createConnectedUserProjectWorkflow = (staticWebhookUrl: string | null): ConnectedUserProjectWorkflowType => ({
+const createConnectedUserProjectWorkflow = (
+    staticWebhookUrl: string | null,
+    overrides: Partial<ConnectedUserProjectWorkflowType> = {}
+): ConnectedUserProjectWorkflowType => ({
     automationWorkflowUuid: null,
     connectedUserId: '1050',
     copiedFromWorkflowUuid: null,
@@ -41,6 +44,7 @@ const createConnectedUserProjectWorkflow = (staticWebhookUrl: string | null): Co
     },
     workflowUuid: 'be530417-2226-41d4-aae9-c4fc76f0791a',
     workflowVersion: 5,
+    ...overrides,
 });
 
 const renderListItem = (connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType, projectName?: string) =>
@@ -101,5 +105,18 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
 
         expect(screen.getByText('WhatsApp Agent - Human reply')).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Copy webhook URL'})).not.toBeInTheDocument();
+    });
+
+    it('does not let an unpublished draft be enabled', () => {
+        renderListItem(createConnectedUserProjectWorkflow(null, {enabled: false, workflowVersion: null}));
+
+        expect(screen.getByText('V1 DRAFT')).toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeDisabled();
+    });
+
+    it('lets a running workflow that is flagged as a draft be disabled', () => {
+        renderListItem(createConnectedUserProjectWorkflow(null, {enabled: true, workflowVersion: null}));
+
+        expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
     });
 });

@@ -1,11 +1,22 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {useEnableIntegrationInstanceWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
-import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
+import {
+    IntegrationInstanceKeys,
+    useGetIntegrationInstanceQuery,
+} from '@/ee/shared/queries/embedded/integrationInstances.queries';
+import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import useWorkflowComponentDefinitions, {
+    getWorkflowComponentNames,
+} from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {ConnectedUserMcpServerWorkflow} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import {useMemo} from 'react';
 
 const ConnectedUserMcpServerListItemWorkflowRow = ({
     connectedUserId,
@@ -16,7 +27,21 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
 }) => {
     const lastExecutionDate = workflow.lastExecutionDate ? new Date(Date.parse(workflow.lastExecutionDate)) : undefined;
 
+    const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
+        (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
+    );
+
     const queryClient = useQueryClient();
+
+    const {data: integrationInstance} = useGetIntegrationInstanceQuery(Number(workflow.integrationInstanceId));
+
+    const {data: integrationWorkflow} = useGetWorkflowQuery(workflow.workflowId);
+
+    const {workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useWorkflowComponentDefinitions(
+        useGetComponentDefinitionsQuery
+    );
+
+    const filteredComponentNames = useMemo(() => getWorkflowComponentNames(integrationWorkflow), [integrationWorkflow]);
 
     const enableIntegrationInstanceWorkflowMutation = useEnableIntegrationInstanceWorkflowMutation({
         onSuccess: () => {
@@ -28,13 +53,54 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
         },
     });
 
-    return (
-        <li className="flex items-center gap-2 py-0.5">
-            <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-medium">{workflow.name}</span>
+    const integrationInstanceConfigurationId = integrationInstance?.integrationInstanceConfigurationId;
 
-                {workflow.description && (
-                    <span className="truncate text-xs text-muted-foreground">{workflow.description}</span>
+    const canOpenExecutions = integrationWorkflow != null && integrationInstanceConfigurationId != null;
+
+    const handleWorkflowClick = () => {
+        if (integrationWorkflow && integrationInstanceConfigurationId != null) {
+            openIntegrationInstanceConfigurationWorkflowSheet({
+                connectedUserId,
+                integrationInstanceConfigurationId,
+                integrationInstanceConfigurationName: integrationInstance?.integrationInstanceConfiguration?.name,
+                integrationVersion: integrationInstance?.integrationInstanceConfiguration?.integrationVersion,
+                workflow: integrationWorkflow,
+            });
+        }
+    };
+
+    return (
+        <li className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+            <div className="flex min-w-0 flex-1 items-center">
+                <div className="flex w-full max-w-80 min-w-0 shrink flex-col items-start sm:w-80 sm:shrink-0">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                className="max-w-full truncate text-left text-sm font-medium disabled:cursor-default"
+                                disabled={!canOpenExecutions}
+                                onClick={handleWorkflowClick}
+                                type="button"
+                            >
+                                {workflow.name}
+                            </button>
+                        </TooltipTrigger>
+
+                        <TooltipContent align="start">
+                            {canOpenExecutions ? 'Show executions' : workflow.name}
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+
+                {integrationWorkflow && (
+                    <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
+                        <WorkflowTriggerAndComponentsRow
+                            className="hidden sm:flex"
+                            filteredComponentNames={filteredComponentNames}
+                            workflow={integrationWorkflow}
+                            workflowComponentDefinitions={workflowComponentDefinitions}
+                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                        />
+                    </div>
                 )}
             </div>
 
@@ -48,7 +114,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
                 <TooltipContent side="left">Last Execution Date</TooltipContent>
             </Tooltip>
 
-            <div className="relative mr-3 flex shrink-0 items-center">
+            <div className="relative mr-11 flex shrink-0 items-center">
                 {enableIntegrationInstanceWorkflowMutation.isPending && (
                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                 )}

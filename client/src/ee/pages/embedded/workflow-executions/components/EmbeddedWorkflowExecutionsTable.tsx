@@ -1,4 +1,5 @@
 import EmbeddedWorkflowExecutionConnectedUser from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionConnectedUser';
+import EmbeddedWorkflowExecutionIntegration from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionIntegration';
 import EmbeddedWorkflowExecutionsTableContent from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionsTableContent';
 import {getWorkflowExecutionColumns} from '@/ee/pages/embedded/workflow-executions/components/getWorkflowExecutionColumns';
 import {WorkflowExecution} from '@/ee/shared/middleware/embedded/workflow/execution';
@@ -34,7 +35,7 @@ const EmbeddedWorkflowExecutionsTable = ({data, showConnectedUser = false}: Embe
     const columns = getWorkflowExecutionColumns<WorkflowExecution>({
         middleColumns: [
             columnHelper.accessor('integration', {
-                cell: (info) => info.getValue()?.componentName,
+                cell: (info) => <EmbeddedWorkflowExecutionIntegration componentName={info.getValue()?.componentName} />,
                 header: 'Integration',
             }),
             columnHelper.accessor('integrationInstanceConfiguration', {
