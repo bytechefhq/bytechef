@@ -62,7 +62,7 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                         {enable, id: configuration.id, workflowUuid: workflow.workflowUuid},
                         {
                             onSuccess: () =>
-                                queryClient.invalidateQueries({
+                                void queryClient.invalidateQueries({
                                     queryKey: ['automationWorkflowProjectConfigurations'],
                                 }),
                         }

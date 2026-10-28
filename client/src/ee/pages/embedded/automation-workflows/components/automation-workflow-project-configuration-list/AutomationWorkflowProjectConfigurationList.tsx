@@ -31,8 +31,8 @@ const AutomationWorkflowProjectConfigurationList = ({
 
     const deleteConfigurationMutation = useDeleteAutomationWorkflowProjectConfigurationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurations']});
-            queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+            void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurations']});
+            void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
         },
     });
 
