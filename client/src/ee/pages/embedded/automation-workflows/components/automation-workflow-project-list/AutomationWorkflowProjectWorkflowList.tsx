@@ -47,6 +47,7 @@ const AutomationWorkflowProjectWorkflowList = ({
                                 onDeleteWorkflow={setWorkflowUuidToDelete}
                                 onEditWorkflow={onEditWorkflow}
                                 onSelectWorkflow={onSelectWorkflow}
+                                projectName={project.name}
                                 workflow={workflow}
                             />
                         ))}
