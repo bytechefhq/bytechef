@@ -21,44 +21,67 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 
 /**
  * @author Ivica Cardic
  */
 class AmqpMessageBrokerEnvironmentPostProcessorTest {
 
+    private static final String RABBIT_AUTO_CONFIGURATION =
+        "org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration";
+
     private final AmqpMessageBrokerEnvironmentPostProcessor amqpMessageBrokerEnvironmentPostProcessor =
         new AmqpMessageBrokerEnvironmentPostProcessor();
 
     @Test
-    void testPostProcessEnvironmentKeepsRabbitAutoConfigurationForAmqpProvider() {
-        StandardEnvironment environment = createEnvironment("amqp");
+    void testPostProcessEnvironmentKeepsRabbitAutoConfigurationForAmqpProviderFromApplicationYaml() {
+        StandardEnvironment environment = createEnvironment(
+            new MapPropertySource("application", Map.of("bytechef.message-broker.provider", "amqp")));
 
         amqpMessageBrokerEnvironmentPostProcessor.postProcessEnvironment(environment, new SpringApplication());
 
-        assertThat(environment.getProperty("spring.autoconfigure.exclude", ""))
-            .doesNotContain("RabbitAutoConfiguration");
         assertThat(environment.getProperty("management.health.rabbit.enabled", Boolean.class)).isTrue();
+        assertThat(environment.getProperty("spring.autoconfigure.exclude")).isNull();
     }
 
     @Test
-    void testPostProcessEnvironmentExcludesRabbitAutoConfigurationForRedisProvider() {
-        StandardEnvironment environment = createEnvironment("redis");
+    void testPostProcessEnvironmentKeepsRabbitAutoConfigurationForAmqpProviderFromEnvironmentVariable() {
+        StandardEnvironment environment = createEnvironment(
+            new SystemEnvironmentPropertySource(
+                StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                Map.of("BYTECHEF_MESSAGE_BROKER_PROVIDER", "amqp")));
 
         amqpMessageBrokerEnvironmentPostProcessor.postProcessEnvironment(environment, new SpringApplication());
 
-        assertThat(environment.getProperty("spring.autoconfigure.exclude")).contains("RabbitAutoConfiguration");
-        assertThat(environment.getProperty("management.health.rabbit.enabled", Boolean.class)).isFalse();
+        assertThat(environment.getProperty("management.health.rabbit.enabled", Boolean.class)).isTrue();
+        assertThat(environment.getProperty("spring.autoconfigure.exclude")).isNull();
     }
 
-    private static StandardEnvironment createEnvironment(String messageBrokerProvider) {
+    @Test
+    void testPostProcessEnvironmentExcludesRabbitAutoConfigurationForOtherProvider() {
+        StandardEnvironment environment = createEnvironment(
+            new MapPropertySource("application", Map.of("bytechef.message-broker.provider", "redis")));
+
+        amqpMessageBrokerEnvironmentPostProcessor.postProcessEnvironment(environment, new SpringApplication());
+
+        assertThat(environment.getProperty("management.health.rabbit.enabled", Boolean.class)).isFalse();
+        assertThat(environment.getProperty("spring.autoconfigure.exclude")).contains(RABBIT_AUTO_CONFIGURATION);
+    }
+
+    private static StandardEnvironment createEnvironment(PropertySource<?> propertySource) {
         StandardEnvironment environment = new StandardEnvironment();
 
         environment.getPropertySources()
-            .addLast(new MapPropertySource(
-                "application", Map.of("bytechef.message-broker.provider", messageBrokerProvider)));
+            .remove(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
+        environment.getPropertySources()
+            .addLast(propertySource);
+
+        ConfigurationPropertySources.attach(environment);
 
         return environment;
     }
