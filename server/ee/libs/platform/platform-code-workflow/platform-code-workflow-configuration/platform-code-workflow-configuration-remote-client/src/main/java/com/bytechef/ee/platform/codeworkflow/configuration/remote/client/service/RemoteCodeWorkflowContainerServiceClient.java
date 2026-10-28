@@ -41,12 +41,27 @@ public class RemoteCodeWorkflowContainerServiceClient implements CodeWorkflowCon
     }
 
     @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CodeWorkflowContainer getCodeWorkflowContainer(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerUuid) {
         return codeWorkflowContainerProtoMapper.toCodeWorkflowContainer(
             getStub().getCodeWorkflowContainer(
                 GetCodeWorkflowContainerRequest.newBuilder()
                     .setCodeWorkflowContainerUuid(codeWorkflowContainerUuid)
                     .build()));
+    }
+
+    @Override
+    public CodeWorkflowContainer update(CodeWorkflowContainer codeWorkflowContainer) {
+        throw new UnsupportedOperationException();
     }
 
     private CodeWorkflowContainerRemoteServiceGrpc.CodeWorkflowContainerRemoteServiceBlockingStub getStub() {
