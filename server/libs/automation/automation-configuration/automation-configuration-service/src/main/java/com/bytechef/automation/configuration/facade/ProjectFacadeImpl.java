@@ -45,6 +45,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
@@ -66,6 +67,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -703,6 +705,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     .filter(Objects::nonNull)
                     .toList());
 
+            Map<Long, Long> developmentDeploymentCounts = workspaceId == null
+                ? null
+                : projectDeploymentService
+                    .getProjectDeployments(false, Environment.DEVELOPMENT, null, null, workspaceId)
+                    .stream()
+                    .collect(Collectors.groupingBy(ProjectDeployment::getProjectId, Collectors.counting()));
+
             return CollectionUtils.map(
                 projects,
                 project -> new ProjectDTO(
@@ -718,7 +727,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
                         .toList(),
                     CollectionUtils.filter(
                         allTags,
-                        tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
+                        tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
+                    developmentDeploymentCounts == null
+                        ? null
+                        : Math.toIntExact(developmentDeploymentCounts.getOrDefault(project.getId(), 0L))));
         } else {
             return CollectionUtils.map(projects, ProjectDTO::new);
         }

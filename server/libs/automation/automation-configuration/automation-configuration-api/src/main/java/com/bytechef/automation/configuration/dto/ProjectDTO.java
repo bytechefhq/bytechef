@@ -30,14 +30,23 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectDTO(
-    Category category, String createdBy, Instant createdDate, String description, Long id, String name,
-    String lastModifiedBy, Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus,
+    Category category, String createdBy, Instant createdDate, String description,
+    Integer developmentDeploymentCount, Long id, String name, String lastModifiedBy, Instant lastModifiedDate,
+    Instant lastPublishedDate, Status lastStatus,
     int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds, List<Tag> tags,
     String uuid, int version, Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
+        this(category, project, projectWorkflowIds, tags, null);
+    }
+
+    public ProjectDTO(
+        Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags,
+        Integer developmentDeploymentCount) {
+
         this(
-            category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
+            category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(),
+            developmentDeploymentCount, project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
             project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
             project.getProjectVersions(), projectWorkflowIds, tags, project.getUuid(), project.getVersion(),
@@ -47,7 +56,7 @@ public record ProjectDTO(
     public ProjectDTO(Project project) {
         this(
             project.getCategoryId() == null ? null : new Category(project.getCategoryId()), project.getCreatedBy(),
-            project.getCreatedDate(), project.getDescription(), project.getId(), project.getName(),
+            project.getCreatedDate(), project.getDescription(), null, project.getId(), project.getName(),
             project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
             project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(), List.of(),
             List.of(), project.getUuid(), project.getVersion(), project.getWorkspaceId());
@@ -199,7 +208,7 @@ public record ProjectDTO(
 
         public ProjectDTO build() {
             return new ProjectDTO(
-                category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
+                category, createdBy, createdDate, description, null, id, name, lastModifiedBy, lastModifiedDate,
                 lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, uuid,
                 version, workspaceId);
         }
