@@ -193,7 +193,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                         ) : (
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700">
+                                    <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-content-neutral-primary">
                                         <ZapIcon className="size-4" />
 
                                         <span>Actions ({actions.length})</span>
@@ -228,7 +228,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                 </div>
 
                                 <div>
-                                    <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-gray-700">
+                                    <h4 className="mb-2 flex items-center gap-1 text-sm font-semibold text-content-neutral-primary">
                                         <ZapIcon className="size-4" />
 
                                         <span>Triggers ({triggers.length})</span>

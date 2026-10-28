@@ -58,7 +58,7 @@ const useApiConnectorEndpointListItem = ({
             default:
                 return {
                     icon: createElement(InfoIcon, {className: iconClassName}),
-                    textColor: 'text-gray-700',
+                    textColor: 'text-content-neutral-primary',
                 };
         }
     }, [method]);

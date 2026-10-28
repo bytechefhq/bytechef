@@ -48,7 +48,7 @@ const ApiConnectorWizardEndpointSelectionStep = () => {
                 <div className="space-y-6">
                     {resourceNames.map((resource) => (
                         <div key={resource}>
-                            <h4 className="mb-2 font-semibold text-gray-700">{resource}</h4>
+                            <h4 className="mb-2 font-semibold text-content-neutral-primary">{resource}</h4>
 
                             <div className="space-y-2">
                                 {endpointsByResource[resource].map((endpoint) => {

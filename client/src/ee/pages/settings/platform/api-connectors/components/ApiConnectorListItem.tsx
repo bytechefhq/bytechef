@@ -66,7 +66,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                     <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
-                            <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
+                            <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-content-neutral-primary">
                                 <span className="mr-1">
                                     {apiConnector.endpoints?.length === 1
                                         ? `1 endpoint`
