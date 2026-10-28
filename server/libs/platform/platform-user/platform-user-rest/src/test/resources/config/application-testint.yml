@@ -18,3 +18,4 @@ bytechef:
       key: rememberMe
   sign-up:
     activation-required: true
+    enabled: true
