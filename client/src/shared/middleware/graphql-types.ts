@@ -538,6 +538,7 @@ export type AutomationWorkflowProjectConfigurationWorkflow = {
   __typename?: 'AutomationWorkflowProjectConfigurationWorkflow';
   enabled: Scalars['Boolean']['output'];
   label?: Maybe<Scalars['String']['output']>;
+  workflowId: Scalars['ID']['output'];
   workflowUuid: Scalars['ID']['output'];
 };
 
