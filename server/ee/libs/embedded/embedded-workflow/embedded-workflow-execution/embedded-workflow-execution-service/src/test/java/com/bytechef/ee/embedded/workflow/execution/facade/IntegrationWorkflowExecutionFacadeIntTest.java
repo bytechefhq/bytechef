@@ -103,8 +103,13 @@ class IntegrationWorkflowExecutionFacadeIntTest {
 
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L))
             .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecution(1L, true))
+            .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> integrationWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(1L, 2L))
             .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(
+            () -> integrationWorkflowExecutionFacade.getWorkflowExecutionTaskExecutionChildren(1L, 2L, 0, 50))
+                .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> integrationWorkflowExecutionFacade.getWorkflowExecutions(
                 null, null, null, null, null, null, null, null, 0))

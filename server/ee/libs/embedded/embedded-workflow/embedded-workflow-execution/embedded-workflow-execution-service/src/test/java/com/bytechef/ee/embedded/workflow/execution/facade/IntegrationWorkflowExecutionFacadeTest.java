@@ -9,7 +9,9 @@ package com.bytechef.ee.embedded.workflow.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -50,12 +52,18 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
+import com.bytechef.platform.workflow.execution.dto.JobDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -330,8 +338,8 @@ class IntegrationWorkflowExecutionFacadeTest {
 
     @Test
     void testGetWorkflowExecutionTaskExecutionLoadsTaskData() {
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         doReturn(Map.of("context", true))
             .when(taskFileStorage)
             .readContextValue(any());
@@ -357,8 +365,8 @@ class IntegrationWorkflowExecutionFacadeTest {
             .jobId(5L)
             .build();
 
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         when(jobService.getJob(10L))
             .thenReturn(childJob);
         when(taskExecutionService.getTaskExecution(99L))
@@ -377,13 +385,269 @@ class IntegrationWorkflowExecutionFacadeTest {
 
     @Test
     void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(taskExecution);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
         when(jobService.getJob(10L))
             .thenReturn(new Job(10L));
 
         assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(999L, 1L))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testGetWorkflowExecutionTaskExecutionReportsMissingTaskExecution() {
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(10L, 1L))
+            .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void testGetWorkflowExecutionTaskExecutionAttachesShallowChildJob() {
+        Job childJob = new Job(20L);
+
+        childJob.setInputs(Map.of("input", "value"));
+        childJob.setLabel("Subflow");
+        childJob.setParentTaskExecutionId(1L);
+        childJob.setStatus(Job.Status.COMPLETED);
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(jobService.getChildJobs(List.of(1L)))
+            .thenReturn(List.of(childJob));
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        JobDTO childJobDTO = Objects.requireNonNull(taskExecutionDTO.childJob());
+
+        assertThat(childJobDTO.id()).isEqualTo(20L);
+        assertThat(childJobDTO.label()).isEqualTo("Subflow");
+        assertThat(childJobDTO.status()).isEqualTo(Job.Status.COMPLETED);
+        assertThat(childJobDTO.inputs()).isEmpty();
+        assertThat(childJobDTO.taskExecutions()).isEmpty();
+
+        verify(jobService, never()).getChildJobIds(anyLong());
+    }
+
+    @Test
+    void testGetWorkflowExecutionTaskExecutionChildrenAcceptsTaskInDescendantJob() {
+        Job childJob = new Job(10L);
+
+        childJob.setParentTaskExecutionId(99L);
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(jobService.getJob(10L))
+            .thenReturn(childJob);
+        when(taskExecutionService.getTaskExecution(99L))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(99L)
+                    .jobId(5L)
+                    .build());
+
+        TaskExecutionChildrenPageDTO taskExecutionChildrenPageDTO = facade.getWorkflowExecutionTaskExecutionChildren(
+            5L, 1L, 0, 50);
+
+        assertThat(taskExecutionChildrenPageDTO.number()).isZero();
+        assertThat(taskExecutionChildrenPageDTO.size()).isEqualTo(50);
+    }
+
+    @Test
+    void testGetWorkflowExecutionTaskExecutionChildrenRejectsTaskFromAnotherWorkflowExecution() {
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(jobService.getJob(10L))
+            .thenReturn(new Job(10L));
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecutionChildren(999L, 1L, 0, 50))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        verify(taskExecutionService, never()).getParentTaskExecutions(anyLong(), anyInt(), anyInt());
+    }
+
+    @Test
+    void testGetWorkflowExecutionLazyReturnsTopLevelTaskExecutionsWithFocusPathAndCount() {
+        Job job = new Job(10L);
+
+        job.setWorkflowId("workflow");
+
+        IntegrationInstance integrationInstance = stubIntegrationInstance(10L, 2L, "workflow", 2L);
+
+        when(jobService.getJob(10L))
+            .thenReturn(job);
+        when(taskExecutionService.getJobTopLevelTaskExecutions(10L))
+            .thenReturn(List.of(taskExecution));
+        when(taskExecutionService.fetchLastJobTaskExecution(10L))
+            .thenReturn(Optional.of(taskExecution));
+        when(taskExecutionService.countJobTaskExecutions(10L, List.of()))
+            .thenReturn(3L);
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(10L, true);
+
+        assertThat(workflowExecutionDTO.integrationInstance()).isSameAs(integrationInstance);
+        assertThat(workflowExecutionDTO.focusPath()).containsExactly(new FocusPathElementDTO(1L, null, null));
+        assertThat(workflowExecutionDTO.taskExecutionCount()).isEqualTo(3L);
+        assertThat(workflowExecutionDTO.job()
+            .taskExecutions())
+                .extracting(TaskExecutionDTO::id, TaskExecutionDTO::childCount)
+                .containsExactly(tuple(1L, 0));
+
+        verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
+    }
+
+    @Test
+    void testGetWorkflowExecutionIsNotLazyByDefault() {
+        Job job = new Job(10L);
+
+        job.setWorkflowId("workflow");
+
+        stubIntegrationInstance(10L, 2L, "workflow", 2L);
+
+        when(jobService.getJob(10L))
+            .thenReturn(job);
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(10L);
+
+        assertThat(workflowExecutionDTO.focusPath()).isNull();
+        assertThat(workflowExecutionDTO.taskExecutionCount()).isNull();
+
+        verify(taskExecutionService).getJobTaskExecutions(10L);
+        verify(taskExecutionService, never()).getJobTopLevelTaskExecutions(anyLong());
+    }
+
+    @Test
+    void testGetWorkflowExecutionResolvesSubflowIntegrationInstanceThroughTheRootJob() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        IntegrationInstance integrationInstance = stubIntegrationInstance(20L, 2L, "subflow-workflow", 2L);
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(20L)
+                        .build()));
+        when(jobService.fetchJob(20L))
+            .thenReturn(Optional.of(new Job(20L)));
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, true);
+
+        assertThat(workflowExecutionDTO.integrationInstance()).isSameAs(integrationInstance);
+        assertThat(workflowExecutionDTO.integrationInstanceConfiguration()).isNotNull();
+        assertThat(workflowExecutionDTO.triggerExecution()).isNull();
+
+        verify(principalJobService, never()).getJobPrincipalId(30L, PlatformType.EMBEDDED);
+    }
+
+    @Test
+    void testGetWorkflowExecutionOmitsTheRootInstanceOfASubflowFromAnotherIntegration() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        stubIntegrationInstance(20L, 2L, "subflow-workflow", 4L);
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(20L)
+                        .build()));
+        when(jobService.fetchJob(20L))
+            .thenReturn(Optional.of(new Job(20L)));
+
+        WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkflowExecution(30L, true);
+
+        assertThat(workflowExecutionDTO.integration()
+            .getId()).isEqualTo(4L);
+        assertThat(workflowExecutionDTO.integrationInstance()).isNull();
+        assertThat(workflowExecutionDTO.integrationInstanceConfiguration()).isNull();
+    }
+
+    @Test
+    void testGetWorkflowExecutionFailsOnACyclicSubflowJobChain() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+        childJob.setWorkflowId("subflow-workflow");
+
+        Job parentJob = new Job(31L);
+
+        parentJob.setParentTaskExecutionId(98L);
+
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.fetchTaskExecution(99L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(99L)
+                        .jobId(31L)
+                        .build()));
+        when(jobService.fetchJob(31L))
+            .thenReturn(Optional.of(parentJob));
+        when(taskExecutionService.fetchTaskExecution(98L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(98L)
+                        .jobId(30L)
+                        .build()));
+        when(jobService.fetchJob(30L))
+            .thenReturn(Optional.of(childJob));
+
+        assertThatThrownBy(() -> facade.getWorkflowExecution(30L, true))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void testGetWorkflowExecutionTaskExecutionFailsOnACyclicSubflowJobChain() {
+        Job childJob = new Job(30L);
+
+        childJob.setParentTaskExecutionId(99L);
+
+        Job parentJob = new Job(31L);
+
+        parentJob.setParentTaskExecutionId(98L);
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(
+                Optional.of(
+                    TaskExecution.builder()
+                        .id(1L)
+                        .jobId(30L)
+                        .build()));
+        when(jobService.getJob(30L))
+            .thenReturn(childJob);
+        when(taskExecutionService.getTaskExecution(99L))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(99L)
+                    .jobId(31L)
+                    .build());
+        when(jobService.getJob(31L))
+            .thenReturn(parentJob);
+        when(taskExecutionService.getTaskExecution(98L))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(98L)
+                    .jobId(30L)
+                    .build());
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(20L, 1L))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -397,6 +661,35 @@ class IntegrationWorkflowExecutionFacadeTest {
         verify(taskFileStorage, never()).readContextValue(any());
         verify(taskFileStorage, never()).readTaskExecutionOutput(any());
         verifyNoInteractions(evaluator);
+    }
+
+    private IntegrationInstance stubIntegrationInstance(
+        long rootJobId, long rootIntegrationId, String workflowId, long workflowIntegrationId) {
+
+        Integration integration = new Integration();
+
+        integration.setId(workflowIntegrationId);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setId(5L);
+        integrationInstanceConfiguration.setIntegrationId(rootIntegrationId);
+
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setId(7L);
+        integrationInstance.setIntegrationInstanceConfigurationId(5L);
+
+        when(integrationService.getWorkflowIntegration(workflowId))
+            .thenReturn(integration);
+        when(principalJobService.getJobPrincipalId(rootJobId, PlatformType.EMBEDDED))
+            .thenReturn(7L);
+        when(integrationInstanceService.getIntegrationInstance(7L))
+            .thenReturn(integrationInstance);
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(5L))
+            .thenReturn(integrationInstanceConfiguration);
+
+        return integrationInstance;
     }
 
     private static IntegrationWorkflow integrationWorkflow(long integrationId, String workflowId) {
