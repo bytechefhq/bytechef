@@ -238,9 +238,6 @@ class ConnectedUserProjectFacadeIntTest {
     @Autowired
     private ConnectionService connectionService;
 
-    @MockitoBean
-    private CopilotWorkflowGenerator copilotWorkflowGenerator;
-
     @Autowired
     private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
 
@@ -255,9 +252,6 @@ class ConnectedUserProjectFacadeIntTest {
 
     @Autowired
     private PrincipalJobService principalJobService;
-
-    @Autowired
-    private WorkflowService workflowService;
 
     @Autowired
     private ProjectDeploymentService projectDeploymentService;
@@ -409,7 +403,7 @@ class ConnectedUserProjectFacadeIntTest {
             externalUserId, NEW_WORKFLOW_DEFINITION, Environment.PRODUCTION);
 
         connectedUserProjectFacade.updateProjectWorkflow(
-            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am",
+            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am", null,
             Environment.PRODUCTION, true);
 
         assertThat(getLastWorkflowLabel(workflowUuid))
@@ -422,7 +416,7 @@ class ConnectedUserProjectFacadeIntTest {
             externalUserId, NEW_WORKFLOW_DEFINITION.replace("New Workflow", "Standup"), Environment.PRODUCTION);
 
         connectedUserProjectFacade.updateProjectWorkflow(
-            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am",
+            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am", null,
             Environment.PRODUCTION, true);
 
         assertThat(getLastWorkflowLabel(workflowUuid)).isEqualTo("Standup");
