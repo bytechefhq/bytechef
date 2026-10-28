@@ -91,6 +91,8 @@ dependencies {
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:core:rest:rest-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
