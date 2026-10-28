@@ -127,12 +127,12 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(rowPropsMock).toHaveBeenLastCalledWith(
             expect.objectContaining({
                 className: 'hidden sm:flex',
-                fitToWidth: true,
                 workflow,
                 workflowComponentDefinitions: {},
                 workflowTaskDispatcherDefinitions: {},
             })
         );
+        expect(rowPropsMock.mock.lastCall?.[0]).not.toHaveProperty('fitToWidth');
     });
 
     it('keeps the name column one width so every row starts its icons at the same position', () => {
