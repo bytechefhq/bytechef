@@ -250,9 +250,19 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
-        copilotWorkflowGenerator.generateWorkflow(
-            workflowId, projectWorkflow.getProjectId(), environment.ordinal(), prompt, systemPrompt,
-            allowedComponentNames);
+        try {
+            copilotWorkflowGenerator.generateWorkflow(
+                workflowId, projectWorkflow.getProjectId(), environment.ordinal(), prompt, systemPrompt,
+                allowedComponentNames);
+        } catch (RuntimeException runtimeException) {
+            try {
+                deleteProjectWorkflow(externalUserId, workflowUuid, environment);
+            } catch (RuntimeException deleteException) {
+                runtimeException.addSuppressed(deleteException);
+            }
+
+            throw runtimeException;
+        }
 
         return workflowUuid;
     }
