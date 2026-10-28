@@ -64,7 +64,7 @@ public interface JdbcJobRepository
     int countRunningJobs();
 
     @Override
-    @Query("SELECT * FROM job ORDER BY create_date DESC LIMIT 1")
+    @Query("SELECT * FROM job ORDER BY created_date DESC, id DESC LIMIT 1")
     Optional<Job> findLastJob();
 
     @Override
