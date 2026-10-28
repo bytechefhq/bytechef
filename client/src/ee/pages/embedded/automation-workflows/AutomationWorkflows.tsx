@@ -106,6 +106,10 @@ const AutomationWorkflows = () => {
 
     const hasProjects = projects.length > 0;
 
+    const hasActiveFilter = !!categoryId || !!tagId;
+
+    const isFirstRun = !projectsIsLoading && !hasActiveFilter && !hasProjects;
+
     const createCodeWorkflowMutation = useCreateAutomationWorkflowProjectCodeWorkflowMutation();
     const createProjectMutation = useCreateAutomationWorkflowProjectMutation();
     const createWorkflowMutation = useCreateAutomationWorkflowProjectWorkflowMutation();
@@ -424,36 +428,6 @@ const AutomationWorkflows = () => {
                     />
                 ) : hasActiveFilter ? (
                     <EmptyList
-                        button={
-                            <ButtonGroup className="mx-auto">
-                                <Button aria-label="Create Project" label="Create Project" onClick={handleNewProject} />
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button aria-label="More project options">
-                                            <ChevronDownIcon />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={handleNewProject}>
-                                            <PlusIcon className="mr-2 size-4" />
-                                            New Project
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem onClick={() => setShowCodeProjectDialog(true)}>
-                                            <CodeIcon className="mr-2 size-4" />
-                                            New Code Project
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem onClick={() => setShowImportCodeWorkflowDialog(true)}>
-                                            <FileUpIcon className="mr-2 size-4" />
-                                            Import Code Project
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </ButtonGroup>
-                        }
                         icon={<FolderIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="No projects match the selected filter."
                         title="No Matching Projects"
@@ -461,7 +435,40 @@ const AutomationWorkflows = () => {
                 ) : (
                     <EmptyState
                         actions={
-                            canCreateProject ? <Button label="Create Project" onClick={handleNewProject} /> : undefined
+                            canCreateProject ? (
+                                <ButtonGroup className="mx-auto">
+                                    <Button
+                                        aria-label="Create Project"
+                                        label="Create Project"
+                                        onClick={handleNewProject}
+                                    />
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button aria-label="More project options">
+                                                <ChevronDownIcon />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={handleNewProject}>
+                                                <PlusIcon className="mr-2 size-4" />
+                                                New Project
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuItem onClick={() => setShowCodeProjectDialog(true)}>
+                                                <CodeIcon className="mr-2 size-4" />
+                                                New Code Project
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuItem onClick={() => setShowImportCodeWorkflowDialog(true)}>
+                                                <FileUpIcon className="mr-2 size-4" />
+                                                Import Code Project
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
+                            ) : undefined
                         }
                         description="A project groups the workflow templates that ship with your product. Your connected users start from these templates and adjust their own copies in the embedded workflow builder."
                         icon={<FolderIcon />}
@@ -473,7 +480,7 @@ const AutomationWorkflows = () => {
             {showImportCodeWorkflowDialog && (
                 <ImportCodeWorkflowDialog
                     deployUrl="/api/embedded/internal/automation/projects/deploy"
-                    description="Upload a built code project. If a project with the same name exists, it is redeployed and every connected user referencing it gets the new version. Unpublished edits made in the editor are replaced."
+                    description="Upload a built code project. If a project with the same name exists, it is redeployed as a new published version; connected users get it once an environment configuration points at it. Unpublished edits made in the editor are replaced."
                     fileFieldName="projectFile"
                     onClose={() => setShowImportCodeWorkflowDialog(false)}
                     onImported={invalidateProjects}
