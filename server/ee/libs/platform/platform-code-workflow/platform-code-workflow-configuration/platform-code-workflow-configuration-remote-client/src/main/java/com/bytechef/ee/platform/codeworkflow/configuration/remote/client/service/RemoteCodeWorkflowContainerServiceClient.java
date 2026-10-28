@@ -41,6 +41,16 @@ public class RemoteCodeWorkflowContainerServiceClient implements CodeWorkflowCon
     }
 
     @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CodeWorkflowContainer getCodeWorkflowContainer(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerUuid) {
         return codeWorkflowContainerProtoMapper.toCodeWorkflowContainer(
             getStub().getCodeWorkflowContainer(
