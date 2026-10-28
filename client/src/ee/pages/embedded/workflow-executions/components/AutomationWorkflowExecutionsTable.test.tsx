@@ -39,7 +39,7 @@ const data = [
             startDate: new Date('2026-10-20T10:00:00Z'),
             status: 'COMPLETED',
         },
-        projectDeployment: {name: 'Load Test (acme-user-42)'},
+        projectDeployment: {name: 'Load Test (acme-user-42)', projectVersion: 4},
         workflow: {label: 'Heavy orders load test'},
     },
 ] as unknown as WorkflowExecution[];
@@ -57,6 +57,13 @@ describe('AutomationWorkflowExecutionsTable', () => {
         expect(screen.getByText('Connected user')).toBeInTheDocument();
         expect(screen.getByText('2000ms')).toBeInTheDocument();
         expect(screen.getByText('Actions').closest('th')).toHaveClass('sticky', 'right-0');
+    });
+
+    it("renders each run's version from its deployment", () => {
+        render(<AutomationWorkflowExecutionsTable data={data} />);
+
+        expect(screen.getByText('Version')).toBeInTheDocument();
+        expect(screen.getByText('V4')).toBeInTheDocument();
     });
 
     it('opens the execution sheet when a row is clicked', async () => {
