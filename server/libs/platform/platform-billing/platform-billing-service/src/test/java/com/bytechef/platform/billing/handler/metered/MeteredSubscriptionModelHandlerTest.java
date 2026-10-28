@@ -29,6 +29,7 @@ import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
+import com.bytechef.platform.billing.repository.PrepaidBillingSubscriptionRepository;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.stripe.model.Event;
@@ -90,6 +91,9 @@ class MeteredSubscriptionModelHandlerTest {
     private BillingUsageService billingUsageService;
 
     @Mock
+    private PrepaidBillingSubscriptionRepository prepaidBillingSubscriptionRepository;
+
+    @Mock
     private StripeClient stripeClient;
 
     @Mock
@@ -105,7 +109,8 @@ class MeteredSubscriptionModelHandlerTest {
                 null, null, null, null));
 
         handler = new MeteredSubscriptionModelHandler(
-            billingProperties, billingSubscriptionService, billingUsageService, stripeClient);
+            billingProperties, billingSubscriptionService, billingUsageService, prepaidBillingSubscriptionRepository,
+            stripeClient);
     }
 
     @Test
@@ -330,6 +335,95 @@ class MeteredSubscriptionModelHandlerTest {
 
         assertThat(newSubscription.getPlanName()).isEqualTo("STARTER");
         assertThat(newSubscription.getSubscriptionModel()).isEqualTo(BillingSubscription.SubscriptionModel.METERED);
+    }
+
+    @Test
+    void testSwitchToPrepaidWhenMeteredItemMissing() throws Exception {
+        BillingSubscription subscription = titleCaseStarterSubscription();
+
+        subscription.setId(11L);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
+        subscription.setCurrentPeriodStart(Instant.ofEpochSecond(1780272000L));
+
+        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        handler.switchToPrepaidIfNotMetered(
+            subscription, stripeSubscription(subscriptionUpdatedPayloadWithFlatItemOnly(SUBSCRIPTION_ID, "5000")));
+
+        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
+
+        verify(billingSubscriptionService).save(captor.capture());
+
+        BillingSubscription savedSubscription = captor.getValue();
+
+        assertThat(savedSubscription.getSubscriptionModel()).isEqualTo(BillingSubscription.SubscriptionModel.PREPAID);
+        assertThat(savedSubscription.getPlanUnitTotal()).isEqualTo(5000);
+        assertThat(savedSubscription.getCurrentPeriodStart()).isEqualTo(Instant.ofEpochSecond(1780272000L));
+
+        verify(prepaidBillingSubscriptionRepository).resetPlanUnitUsed(11L);
+    }
+
+    @Test
+    void testSwitchDoesNothingWhileMetered() throws Exception {
+        BillingSubscription subscription = titleCaseStarterSubscription();
+
+        subscription.setId(11L);
+        subscription.setSubscriptionId(SUBSCRIPTION_ID);
+        subscription.setSubscriptionModel(BillingSubscription.SubscriptionModel.METERED);
+
+        handler.switchToPrepaidIfNotMetered(
+            subscription,
+            stripeSubscription(subscriptionUpdatedPayloadWithProduct(SUBSCRIPTION_ID, PRODUCT_STARTER_ID)));
+
+        assertThat(subscription.getSubscriptionModel()).isEqualTo(BillingSubscription.SubscriptionModel.METERED);
+
+        verify(billingSubscriptionService, never()).save(any());
+        verify(prepaidBillingSubscriptionRepository, never()).resetPlanUnitUsed(anyLong());
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String subscriptionUpdatedPayloadWithFlatItemOnly(String subscriptionId, String unitTotal) {
+        return """
+            {
+              "id": "evt_sub_updated_flat_only",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "customer.subscription.updated",
+              "data": {
+                "object": {
+                  "id": "%s",
+                  "object": "subscription",
+                  "status": "active",
+                  "cancel_at_period_end": false,
+                  "metadata": { "tenantId": "public" },
+                  "items": {
+                    "object": "list",
+                    "has_more": false,
+                    "url": "/v1/subscription_items",
+                    "data": [
+                      {
+                        "id": "si_flat_item",
+                        "object": "subscription_item",
+                        "current_period_start": 1780272000,
+                        "current_period_end": 1782864000,
+                        "price": {
+                          "id": "price_flat",
+                          "object": "price",
+                          "product": "prod_starter_test",
+                          "metadata": { "unit_total": "%s" },
+                          "recurring": {
+                            "interval": "month",
+                            "usage_type": "licensed"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+            """.formatted(subscriptionId, unitTotal);
     }
 
     private Subscription stripeSubscription(String payload) throws Exception {
