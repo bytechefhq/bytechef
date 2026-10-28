@@ -87,7 +87,7 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
       RABBITMQ_DEFAULT_USER: bytechef
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
       interval: 5s
       timeout: 10s
       retries: 20
