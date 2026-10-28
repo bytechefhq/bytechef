@@ -40,7 +40,7 @@ Each project row displays:
 
 - **Name** -- clicking it opens the project's first template in the editor (or expands the template list if the project has none yet).
 - **Template count** -- a collapsible trigger; click to expand the template list.
-- **Tabs** -- once expanded, the row shows **Workflows** and **Configurations** tabs. The **New Workflow** button group (with **Import Workflow** in its chevron menu) sits in the Workflows tab; **New Configuration** sits in the Configurations tab.
+- **Tabs** -- once expanded, the row shows **Workflows** and **Configurations** tabs. The **+ Workflow** button group (with **Import Workflow** in its chevron menu) sits in the Workflows tab; **New Configuration** sits in the Configurations tab.
 - **Tags** -- inline editable; add or remove tags directly from the row.
 - **Status badge** -- `DRAFT` while unpublished, `V<n> PUBLISHED` once a version has been cut.
 - **Actions menu** (⋮) -- Publish, New Workflow, Import Workflow, Edit, Delete.
@@ -116,8 +116,8 @@ If no projects exist yet, the empty state shows a **Create Project** button that
 
 Expand a project row and, on the **Workflows** tab, you can:
 
-- Click **New Workflow** to open the new-template dialog. Provide a label and description; the template is created with empty `inputs`, `tasks`, and `triggers`, then opened in the editor.
-- Click the chevron next to **New Workflow** and pick **Import Workflow** to upload a `.json`, `.yaml`, or `.yml` file. The file's contents become the template definition and the template opens in the editor.
+- Click **+ Workflow** in the Workflows tab (or **New Workflow** in the project's ⋮ menu) to open the new-template dialog. Provide a label and description; the template is created with empty `inputs`, `tasks`, and `triggers`, then opened in the editor.
+- Click the chevron next to **+ Workflow** and pick **Import Workflow** to upload a `.json`, `.yaml`, or `.yml` file. The file's contents become the template definition and the template opens in the editor.
 - Use the project's ⋮ menu for the same two actions plus **Edit** and **Delete**.
 
 The buttons are there whenever the project is expanded, including when it has no templates yet.
