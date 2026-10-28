@@ -8,6 +8,7 @@ import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
 import Register from '@/pages/account/public/Register';
 import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
+import DevelopmentProjectDeploymentsRedirect from '@/pages/automation/project-deployments/DevelopmentProjectDeploymentsRedirect';
 import loadProject from '@/pages/automation/project/loadProject';
 import ResumeForm from '@/pages/automation/resume-form/ResumeForm';
 import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
@@ -657,9 +658,11 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <ProjectDeployments />
-                                            </LazyLoadWrapper>
+                                            <DevelopmentProjectDeploymentsRedirect>
+                                                <LazyLoadWrapper hasLeftSidebar>
+                                                    <ProjectDeployments />
+                                                </LazyLoadWrapper>
+                                            </DevelopmentProjectDeploymentsRedirect>
                                         </PrivateRoute>
                                     ),
                                     path: 'deployments',

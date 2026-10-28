@@ -195,6 +195,10 @@ function App() {
             return false;
         }
 
+        if (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && navItem.href === '/automation/deployments') {
+            return false;
+        }
+
         if (navItem.href === '/automation/api-platform') {
             return ff_1023;
         }
