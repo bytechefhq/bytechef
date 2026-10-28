@@ -6,6 +6,8 @@ bytechef:
   message-broker:
     provider: memory
   file-storage:
+    filesystem:
+      basedir: ${java.io.tmpdir}/bytechef/file-storage
     provider: jdbc
   oauth2:
     redirect-uri:
