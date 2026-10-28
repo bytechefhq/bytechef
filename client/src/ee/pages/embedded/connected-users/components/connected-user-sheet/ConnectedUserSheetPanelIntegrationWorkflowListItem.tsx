@@ -1,7 +1,9 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
+import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {
     IntegrationInstance,
+    IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationWorkflow,
     IntegrationInstanceWorkflow,
     Workflow,
@@ -16,12 +18,14 @@ import InlineSVG from 'react-inlinesvg';
 const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     componentDefinitions,
     integrationInstance,
+    integrationInstanceConfiguration,
     integrationInstanceConfigurationWorkflow,
     integrationInstanceWorkflow,
     workflow,
 }: {
     componentDefinitions: ComponentDefinitionBasic[];
     integrationInstance: IntegrationInstance;
+    integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
     workflow: Workflow;
@@ -32,6 +36,10 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     ].map((componentName) => {
         return componentDefinitions?.find((componentDefinition) => componentDefinition.name === componentName);
     });
+
+    const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
+        (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
+    );
 
     const queryClient = useQueryClient();
 
@@ -46,12 +54,24 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
         },
     });
 
+    const handleWorkflowClick = () => {
+        openIntegrationInstanceConfigurationWorkflowSheet({
+            connectedUserId: integrationInstance.connectedUserId,
+            integrationInstanceConfigurationId: integrationInstanceConfiguration.id!,
+            integrationInstanceConfigurationName: integrationInstanceConfiguration.name,
+            integrationVersion: integrationInstanceConfiguration.integrationVersion,
+            workflow,
+        });
+    };
+
     return (
         <li
             className="flex h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
-            <div className="text-sm font-semibold">{workflow.label}</div>
+            <button className="flex-1 cursor-pointer text-left text-sm font-semibold" onClick={handleWorkflowClick}>
+                {workflow.label}
+            </button>
 
             <div className="flex items-center space-x-1">
                 {filteredComponentDefinitions?.map((componentDefinition) => {
