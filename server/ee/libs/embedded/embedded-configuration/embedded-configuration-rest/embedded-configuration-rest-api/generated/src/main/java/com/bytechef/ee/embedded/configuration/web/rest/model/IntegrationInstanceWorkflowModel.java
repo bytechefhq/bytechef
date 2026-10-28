@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T19:54:03.050481+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable String createdBy;
@@ -41,6 +41,9 @@ public class IntegrationInstanceWorkflowModel {
   private @Nullable Long id;
 
   private Long integrationInstanceConfigurationWorkflowId;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastExecutionDate;
 
   private @Nullable String lastModifiedBy;
 
@@ -196,6 +199,27 @@ public class IntegrationInstanceWorkflowModel {
     this.integrationInstanceConfigurationWorkflowId = integrationInstanceConfigurationWorkflowId;
   }
 
+  public IntegrationInstanceWorkflowModel lastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
+    this.lastExecutionDate = lastExecutionDate;
+    return this;
+  }
+
+  /**
+   * The last execution date of the workflow for this integration instance.
+   * @return lastExecutionDate
+   */
+  @Valid 
+  @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date of the workflow for this integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastExecutionDate")
+  public @Nullable OffsetDateTime getLastExecutionDate() {
+    return lastExecutionDate;
+  }
+
+  @JsonProperty("lastExecutionDate")
+  public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
+    this.lastExecutionDate = lastExecutionDate;
+  }
+
   public IntegrationInstanceWorkflowModel lastModifiedBy(@Nullable String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
@@ -274,6 +298,7 @@ public class IntegrationInstanceWorkflowModel {
         Objects.equals(this.enabled, integrationInstanceWorkflow.enabled) &&
         Objects.equals(this.id, integrationInstanceWorkflow.id) &&
         Objects.equals(this.integrationInstanceConfigurationWorkflowId, integrationInstanceWorkflow.integrationInstanceConfigurationWorkflowId) &&
+        Objects.equals(this.lastExecutionDate, integrationInstanceWorkflow.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceWorkflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceWorkflow.lastModifiedDate) &&
         Objects.equals(this.workflowId, integrationInstanceWorkflow.workflowId);
@@ -281,7 +306,7 @@ public class IntegrationInstanceWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, enabled, id, integrationInstanceConfigurationWorkflowId, lastModifiedBy, lastModifiedDate, workflowId);
+    return Objects.hash(createdBy, createdDate, inputs, enabled, id, integrationInstanceConfigurationWorkflowId, lastExecutionDate, lastModifiedBy, lastModifiedDate, workflowId);
   }
 
   @Override
@@ -294,6 +319,7 @@ public class IntegrationInstanceWorkflowModel {
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationInstanceConfigurationWorkflowId: ").append(toIndentedString(integrationInstanceConfigurationWorkflowId)).append("\n");
+    sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");

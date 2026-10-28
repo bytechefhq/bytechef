@@ -44,6 +44,10 @@ export interface IntegrationInstanceWorkflow {
      */
     integrationInstanceConfigurationWorkflowId: number;
     /**
+     * The last execution date of the workflow for this integration instance.
+     */
+    readonly lastExecutionDate?: Date;
+    /**
      * The last modified by.
      */
     readonly lastModifiedBy?: string;
@@ -83,6 +87,7 @@ export function IntegrationInstanceWorkflowFromJSONTyped(json: any, ignoreDiscri
         'enabled': json['enabled'],
         'id': json['id'] == null ? undefined : json['id'],
         'integrationInstanceConfigurationWorkflowId': json['integrationInstanceConfigurationWorkflowId'],
+        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'workflowId': json['workflowId'],
@@ -93,7 +98,7 @@ export function IntegrationInstanceWorkflowToJSON(json: any): IntegrationInstanc
     return IntegrationInstanceWorkflowToJSONTyped(json, false);
 }
 
-export function IntegrationInstanceWorkflowToJSONTyped(value?: Omit<IntegrationInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceWorkflowToJSONTyped(value?: Omit<IntegrationInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
