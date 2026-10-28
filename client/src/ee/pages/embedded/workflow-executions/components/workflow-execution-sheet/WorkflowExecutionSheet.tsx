@@ -1,21 +1,13 @@
-import LoadingIcon from '@/components/LoadingIcon';
-import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Skeleton} from '@/components/ui/skeleton';
-import WorkflowExecutionSheetWorkflowPanel from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetWorkflowPanel';
-import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationWorkflowExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
-import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
-import {useCallback, useMemo} from 'react';
+import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
-import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
-
-const POLLING_INTERVAL_MS = 2000;
+import WorkflowExecutionDetail from './WorkflowExecutionDetail';
 
 const WorkflowExecutionSheet = () => {
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
@@ -32,20 +24,6 @@ const WorkflowExecutionSheet = () => {
             id: workflowExecutionId,
         },
         workflowExecutionSheetOpen
-    );
-
-    const isWorkflowRunning = useMemo(() => {
-        if (!workflowExecution?.job) {
-            return false;
-        }
-
-        return getWorkflowStatusType(workflowExecution.job, workflowExecution.triggerExecution) === 'running';
-    }, [workflowExecution]);
-
-    useGetIntegrationWorkflowExecutionQuery(
-        {id: workflowExecutionId},
-        workflowExecutionSheetOpen && isWorkflowRunning,
-        POLLING_INTERVAL_MS
     );
 
     const integrationVersion = workflowExecution?.integrationInstanceConfiguration?.integrationVersion;
@@ -87,46 +65,10 @@ const WorkflowExecutionSheet = () => {
                     <SheetCloseButton />
                 </header>
 
-                {workflowExecutionLoading ? (
-                    <div className="flex size-full items-center justify-center">
-                        <LoadingIcon className="size-6" />
-                    </div>
-                ) : (
-                    <div className="flex min-h-0 flex-1 p-3">
-                        <ResizablePanelGroup className="h-full" orientation="horizontal">
-                            <ResizablePanel
-                                className="flex min-h-0 flex-col overflow-hidden rounded-lg bg-surface-neutral-primary"
-                                defaultSize={65}
-                                minSize={35}
-                            >
-                                {workflowExecution?.job && (
-                                    <WorkflowExecutionSheetContent
-                                        job={workflowExecution.job}
-                                        triggerExecution={workflowExecution?.triggerExecution}
-                                    />
-                                )}
-                            </ResizablePanel>
-
-                            <ResizableHandle className="w-1.5 bg-transparent" />
-
-                            <ResizablePanel
-                                className="flex min-h-0 flex-col overflow-hidden rounded-lg"
-                                defaultSize={35}
-                                minSize={15}
-                            >
-                                {workflowExecution && (
-                                    <WorkflowReadOnlyProvider
-                                        value={{
-                                            useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                        }}
-                                    >
-                                        <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />
-                                    </WorkflowReadOnlyProvider>
-                                )}
-                            </ResizablePanel>
-                        </ResizablePanelGroup>
-                    </div>
-                )}
+                <WorkflowExecutionDetail
+                    enabled={workflowExecutionSheetOpen}
+                    workflowExecutionId={workflowExecutionId}
+                />
             </SheetContent>
         </Sheet>
     );

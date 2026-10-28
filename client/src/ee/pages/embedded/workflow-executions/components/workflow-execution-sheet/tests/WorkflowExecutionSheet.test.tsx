@@ -1,5 +1,4 @@
 import {render} from '@testing-library/react';
-import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecutionSheetStore';
@@ -13,24 +12,11 @@ vi.mock('@/ee/shared/queries/embedded/workflowExecutions.queries', () => ({
     useGetIntegrationWorkflowExecutionQuery: () => ({data: queryState.workflowExecution, isLoading: false}),
 }));
 
-vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
-    useGetComponentDefinitionsQuery: vi.fn(),
+vi.mock('../WorkflowExecutionDetail', () => ({
+    default: ({workflowExecutionId}: {workflowExecutionId: number}) => (
+        <div>{`Execution details ${workflowExecutionId}`}</div>
+    ),
 }));
-
-vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
-    WorkflowReadOnlyProvider: ({children}: {children: ReactNode}) => <>{children}</>,
-}));
-
-vi.mock('@/shared/components/workflow-executions/util/workflowExecution-utils', () => ({
-    getWorkflowStatusType: () => 'completed',
-}));
-
-vi.mock('../WorkflowExecutionSheetContent', () => ({default: () => <div>Execution content</div>}));
-
-vi.mock(
-    '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetWorkflowPanel',
-    () => ({default: () => <div>Workflow panel</div>})
-);
 
 const renderSheet = (workflowExecution: object) => {
     queryState.workflowExecution = workflowExecution;
@@ -55,6 +41,7 @@ describe('embedded WorkflowExecutionSheet', () => {
         });
 
         expect(document.querySelector('header')).toHaveTextContent('HubSpot /Sync contacts/ V2');
+        expect(document.body).toHaveTextContent('Execution details 1');
     });
 
     it('shows no version when the instance configuration has none', () => {

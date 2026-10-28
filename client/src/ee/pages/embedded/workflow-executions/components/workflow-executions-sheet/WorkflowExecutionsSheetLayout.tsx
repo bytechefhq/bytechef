@@ -5,7 +5,7 @@ import TablePagination from '@/components/TablePagination';
 import {SheetCloseButton} from '@/components/ui/sheet';
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ActivityIcon, RefreshCwIcon, WorkflowIcon} from 'lucide-react';
+import {ActivityIcon, ArrowLeftIcon, RefreshCwIcon, WorkflowIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -19,9 +19,9 @@ interface WorkflowExecutionPageI {
 
 interface WorkflowExecutionsSheetLayoutProps {
     emptyMessage: string;
-    executionSheet: ReactNode;
     executionsTable: ReactNode;
     hasExecutions: boolean;
+    onBackToExecutions: () => void;
     onPageNumberChange: (pageNumber: number) => void;
     onRefresh: () => void;
     pageNumber: number;
@@ -30,6 +30,8 @@ interface WorkflowExecutionsSheetLayoutProps {
     workflowExecutionPage?: WorkflowExecutionPageI;
     workflowExecutionsError: Error | null;
     workflowExecutionsIsFetching: boolean;
+    workflowExecutionDetail: ReactNode;
+    workflowExecutionDetailOpen: boolean;
     workflowExecutionsIsLoading: boolean;
     workflowLabel?: string | null;
     workflowPanel: ReactNode;
@@ -37,14 +39,16 @@ interface WorkflowExecutionsSheetLayoutProps {
 
 const WorkflowExecutionsSheetLayout = ({
     emptyMessage,
-    executionSheet,
     executionsTable,
     hasExecutions,
+    onBackToExecutions,
     onPageNumberChange,
     onRefresh,
     pageNumber,
     parentLabel,
     version,
+    workflowExecutionDetail,
+    workflowExecutionDetailOpen,
     workflowExecutionPage,
     workflowExecutionsError,
     workflowExecutionsIsFetching,
@@ -55,11 +59,28 @@ const WorkflowExecutionsSheetLayout = ({
     const [activeTab, setActiveTab] = useState<WorkflowExecutionsSheetTabType>('executions');
 
     const executionsTabActive = activeTab === 'executions';
+    const detailOpen = executionsTabActive && workflowExecutionDetailOpen;
 
     return (
         <>
             <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                 <div className="flex items-center gap-x-2">
+                    {detailOpen && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label="Back to executions"
+                                    icon={<ArrowLeftIcon />}
+                                    onClick={onBackToExecutions}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Back to executions</TooltipContent>
+                        </Tooltip>
+                    )}
+
                     <WorkflowIcon />
 
                     <span className="flex gap-x-1 text-base text-content-neutral-secondary">
@@ -70,21 +91,23 @@ const WorkflowExecutionsSheetLayout = ({
                         {version != null && <span>{`/ V${version}`}</span>}
                     </span>
 
-                    <Tabs
-                        className="ml-4"
-                        onValueChange={(value) => setActiveTab(value as WorkflowExecutionsSheetTabType)}
-                        value={activeTab}
-                    >
-                        <TabsList>
-                            <TabsTrigger value="executions">Executions</TabsTrigger>
+                    {!detailOpen && (
+                        <Tabs
+                            className="ml-4"
+                            onValueChange={(value) => setActiveTab(value as WorkflowExecutionsSheetTabType)}
+                            value={activeTab}
+                        >
+                            <TabsList>
+                                <TabsTrigger value="executions">Executions</TabsTrigger>
 
-                            <TabsTrigger value="workflow">Workflow</TabsTrigger>
-                        </TabsList>
-                    </Tabs>
+                                <TabsTrigger value="workflow">Workflow</TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-1">
-                    {executionsTabActive && (
+                    {executionsTabActive && !detailOpen && (
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
@@ -109,7 +132,7 @@ const WorkflowExecutionsSheetLayout = ({
                 </div>
             </header>
 
-            <div className={twMerge('flex min-h-0 flex-1 flex-col', !executionsTabActive && 'hidden')}>
+            <div className={twMerge('flex min-h-0 flex-1 flex-col', (!executionsTabActive || detailOpen) && 'hidden')}>
                 <div className="m-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-surface-neutral-primary">
                     <div className="flex min-h-0 flex-1 overflow-y-auto">
                         <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
@@ -139,9 +162,9 @@ const WorkflowExecutionsSheetLayout = ({
                 </div>
             </div>
 
-            {!executionsTabActive && workflowPanel}
+            {detailOpen && workflowExecutionDetail}
 
-            {executionSheet}
+            {!executionsTabActive && workflowPanel}
         </>
     );
 };

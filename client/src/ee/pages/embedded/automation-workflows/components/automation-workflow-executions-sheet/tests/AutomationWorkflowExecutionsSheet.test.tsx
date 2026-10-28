@@ -31,8 +31,10 @@ vi.mock('@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowEx
     ),
 }));
 
-vi.mock('@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet', () => ({
-    default: () => <div>Execution details sheet</div>,
+vi.mock('@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionDetail', () => ({
+    default: ({workflowExecutionId}: {workflowExecutionId: number}) => (
+        <div>{`Execution details ${workflowExecutionId}`}</div>
+    ),
 }));
 
 vi.mock(
@@ -123,7 +125,7 @@ describe('AutomationWorkflowExecutionsSheet', () => {
             true
         );
         expect(screen.getByText('Executions table 5')).toBeInTheDocument();
-        expect(screen.getByText('Execution details sheet')).toBeInTheDocument();
+        expect(screen.queryByText(/^Execution details/)).not.toBeInTheDocument();
     });
 
     it('shows an empty state when the workflow has not run yet', () => {
@@ -174,6 +176,29 @@ describe('AutomationWorkflowExecutionsSheet', () => {
         expect(hoisted.workflowQueryMock).toHaveBeenLastCalledWith('draft-wf-1');
         expect(screen.getByText('Workflow panel draft-wf-1')).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Refresh workflow executions'})).not.toBeInTheDocument();
+    });
+
+    it('shows the chosen execution inside the sheet and goes back to the list', async () => {
+        mockExecutionsQueryResult([execution]);
+
+        renderSheet();
+
+        openSheet();
+
+        act(() => {
+            useWorkflowExecutionSheetStore.getState().setWorkflowExecutionId(5);
+            useWorkflowExecutionSheetStore.getState().setWorkflowExecutionSheetOpen(true);
+        });
+
+        expect(screen.getByText('Execution details 5')).toBeInTheDocument();
+        expect(screen.queryByRole('tab', {name: 'Executions'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Refresh workflow executions'})).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Back to executions'}));
+
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+        expect(screen.queryByText('Execution details 5')).not.toBeInTheDocument();
+        expect(screen.getByRole('tab', {name: 'Executions'})).toBeInTheDocument();
     });
 
     it('closes the execution details together with the sheet', async () => {
