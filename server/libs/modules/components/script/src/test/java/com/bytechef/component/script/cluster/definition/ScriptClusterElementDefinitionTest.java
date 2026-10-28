@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
+import com.bytechef.platform.component.definition.datastream.ItemProcessor;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,14 @@ class ScriptClusterElementDefinitionTest {
 
         scriptClusterElementDefinition = new ScriptClusterElementDefinition(
             clusterElementDefinition, "js", polyglotEngine);
+    }
+
+    @Test
+    void testGetElementReturnsDefinitionAsItemProcessor() {
+        Object element = scriptClusterElementDefinition.getElement();
+
+        assertThat(element).isInstanceOf(ItemProcessor.class);
+        assertThat(element).isSameAs(scriptClusterElementDefinition);
     }
 
     @Test
