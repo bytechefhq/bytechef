@@ -219,6 +219,10 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         for (McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow : mcpIntegrationInstanceConfigurationWorkflowService
             .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                 mcpIntegrationInstanceConfiguration.getId())) {
+            if (!mcpIntegrationInstanceConfigurationWorkflow.isEnabled()) {
+                continue;
+            }
+
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                 integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                     mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());

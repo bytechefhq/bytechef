@@ -155,6 +155,20 @@ public class McpIntegrationInstanceConfigurationWorkflowServiceImpl
     }
 
     @Override
+    public McpIntegrationInstanceConfigurationWorkflow updateEnabled(long id, boolean enabled) {
+        McpIntegrationInstanceConfigurationWorkflow existingMcpIntegrationInstanceConfigurationWorkflow =
+            fetchMcpIntegrationInstanceConfigurationWorkflow(id)
+                .orElseThrow(
+                    () -> new IllegalArgumentException(
+                        "McpIntegrationInstanceConfigurationWorkflow not found with id: " + id));
+
+        existingMcpIntegrationInstanceConfigurationWorkflow.setEnabled(enabled);
+
+        return mcpIntegrationInstanceConfigurationWorkflowRepository
+            .save(existingMcpIntegrationInstanceConfigurationWorkflow);
+    }
+
+    @Override
     public void deleteByIntegrationInstanceConfigurationWorkflowId(
         long integrationInstanceConfigurationWorkflowId) {
 

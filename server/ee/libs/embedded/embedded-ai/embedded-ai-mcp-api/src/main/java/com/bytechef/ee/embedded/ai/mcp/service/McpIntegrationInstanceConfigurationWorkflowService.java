@@ -129,4 +129,13 @@ public interface McpIntegrationInstanceConfigurationWorkflowService {
      * @return the updated MCP integration workflow
      */
     McpIntegrationInstanceConfigurationWorkflow updateParameters(long id, Map<String, ?> parameters);
+
+    /**
+     * Switches an MCP integration workflow tool on or off for the whole MCP server.
+     *
+     * @param id      the ID of the MCP integration workflow to update
+     * @param enabled whether the workflow is exposed as a tool
+     * @return the updated MCP integration workflow
+     */
+    McpIntegrationInstanceConfigurationWorkflow updateEnabled(long id, boolean enabled);
 }

@@ -18,6 +18,7 @@ type McpIntegrationInstanceConfigurationWorkflow {
     mcpIntegrationInstanceConfigurationId: Long!
     integrationInstanceConfigurationWorkflowId: Long!
     parameters: Map
+    enabled: Boolean!
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow
     workflow: Workflow
     createdBy: String
@@ -36,4 +37,5 @@ input McpIntegrationInstanceConfigurationWorkflowUpdateInput {
     mcpIntegrationInstanceConfigurationId: Long
     integrationInstanceConfigurationWorkflowId: Long
     parameters: Map
+    enabled: Boolean
 }
