@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.workflow.execution.facade;
 
-import static com.bytechef.automation.workflow.execution.facade.LazyTaskExecutionTreeBuilder.FOCUS_CANDIDATE_PAGE_SIZE;
+import static com.bytechef.platform.workflow.execution.facade.LazyTaskExecutionTreeBuilder.FOCUS_CANDIDATE_PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -38,6 +38,7 @@ import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.platform.workflow.execution.facade.LazyTaskExecutionTreeBuilder;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;

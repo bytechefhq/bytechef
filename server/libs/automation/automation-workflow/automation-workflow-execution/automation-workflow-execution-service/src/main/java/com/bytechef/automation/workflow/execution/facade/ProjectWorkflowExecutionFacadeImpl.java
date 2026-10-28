@@ -60,6 +60,7 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
+import com.bytechef.platform.workflow.execution.facade.LazyTaskExecutionTreeBuilder;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowService;
