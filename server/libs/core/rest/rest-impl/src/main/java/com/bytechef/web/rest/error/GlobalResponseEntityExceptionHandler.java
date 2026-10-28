@@ -18,8 +18,11 @@ package com.bytechef.web.rest.error;
 
 import com.bytechef.exception.AbstractException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -28,6 +31,12 @@ import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -46,6 +55,15 @@ import org.springframework.web.util.DisconnectedClientHelper;
 public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntityExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalResponseEntityExceptionHandler.class);
+
+    private static final String ACCESS_DENIED_DETAIL = "Access denied";
+
+    private static final String ACCESS_DENIED_ERROR_CODE = "ACCESS_DENIED";
+
+    private static final String ERROR_CODE_PROPERTY = "errorCode";
+
+    private static final AuthenticationTrustResolver AUTHENTICATION_TRUST_RESOLVER =
+        new AuthenticationTrustResolverImpl();
 
     /**
      * Request-scoped marker signalling that this handler has already produced (or attempted to produce) an error
@@ -66,6 +84,38 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
                     exception, HttpStatus.BAD_REQUEST, Map.of("inputParameters", exception.getInputParameters()),
                     request))
             .build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ProblemDetail> handleAccessDeniedException(
+        final AccessDeniedException exception, final WebRequest request) {
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (AUTHENTICATION_TRUST_RESOLVER.isAnonymous(authentication) ||
+            AUTHENTICATION_TRUST_RESOLVER.isRememberMe(authentication)) {
+
+            throw exception;
+        }
+
+        if (authentication == null) {
+            log.warn("Access denied on {}: {}", request.getDescription(false), exception.getMessage());
+        } else {
+            log.warn(
+                "Access denied for {} on {}: {}", authentication.getName(), request.getDescription(false),
+                exception.getMessage());
+        }
+
+        ProblemDetail problemDetail = createProblemDetail(
+            exception, HttpStatus.FORBIDDEN, ACCESS_DENIED_DETAIL, null, null, request);
+
+        problemDetail.setProperty(ERROR_CODE_PROPERTY, ACCESS_DENIED_ERROR_CODE);
+
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(problemDetail);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -101,7 +151,7 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     @ExceptionHandler(Throwable.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<ProblemDetail> handleAnyException(final Throwable throwable, final WebRequest request) {
-        if (DisconnectedClientHelper.isClientDisconnectedException(throwable)) {
+        if (!hasCyclicCause(throwable) && DisconnectedClientHelper.isClientDisconnectedException(throwable)) {
             log.debug("Client disconnected before the response was written: {}", throwable.getMessage());
 
             return null;
@@ -116,6 +166,12 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
         }
 
         markErrorHandled(request);
+
+        AccessDeniedException accessDeniedException = findAccessDeniedException(throwable);
+
+        if (accessDeniedException != null) {
+            return handleAccessDeniedException(accessDeniedException, request);
+        }
 
         Exception exception = getCauseException((Exception) throwable);
 
@@ -156,10 +212,43 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
             .build();
     }
 
+    private static boolean hasCyclicCause(Throwable throwable) {
+        Set<Throwable> visitedThrowables = Collections.newSetFromMap(new IdentityHashMap<>());
+        Throwable currentThrowable = throwable;
+
+        while (currentThrowable != null) {
+            if (!visitedThrowables.add(currentThrowable)) {
+                return true;
+            }
+
+            currentThrowable = currentThrowable.getCause();
+        }
+
+        return false;
+    }
+
+    private static AccessDeniedException findAccessDeniedException(Throwable throwable) {
+        Set<Throwable> visitedThrowables = Collections.newSetFromMap(new IdentityHashMap<>());
+        Throwable currentThrowable = throwable;
+
+        while (currentThrowable != null && visitedThrowables.add(currentThrowable)) {
+            if (currentThrowable instanceof AccessDeniedException accessDeniedException) {
+                return accessDeniedException;
+            }
+
+            currentThrowable = currentThrowable.getCause();
+        }
+
+        return null;
+    }
+
     private static Exception getCauseException(Exception throwable) {
+        Set<Throwable> visitedThrowables = Collections.newSetFromMap(new IdentityHashMap<>());
         Exception exception = throwable;
 
-        while (exception.getCause() != null && exception.getCause() instanceof Exception cause) {
+        visitedThrowables.add(exception);
+
+        while (exception.getCause() instanceof Exception cause && visitedThrowables.add(cause)) {
             exception = cause;
         }
 
