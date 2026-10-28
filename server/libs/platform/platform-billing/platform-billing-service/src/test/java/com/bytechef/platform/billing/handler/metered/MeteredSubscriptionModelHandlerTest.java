@@ -525,32 +525,6 @@ class MeteredSubscriptionModelHandlerTest {
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private String subscriptionDeletedPayload(String subscriptionId) {
-        return """
-            {
-              "id": "evt_sub_deleted",
-              "object": "event",
-              "api_version": "2026-04-22.dahlia",
-              "type": "customer.subscription.deleted",
-              "data": {
-                "object": {
-                  "id": "%s",
-                  "object": "subscription",
-                  "status": "canceled",
-                  "metadata": { "tenantId": "public" },
-                  "items": {
-                    "object": "list",
-                    "data": [],
-                    "has_more": false,
-                    "url": "/v1/subscription_items"
-                  }
-                }
-              }
-            }
-            """.formatted(subscriptionId);
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     private String subscriptionUpdatedPayloadWithProduct(String subscriptionId, String productId) {
         return """
             {
