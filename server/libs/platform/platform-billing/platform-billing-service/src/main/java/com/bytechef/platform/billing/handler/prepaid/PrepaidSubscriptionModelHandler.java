@@ -117,21 +117,22 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
     }
 
     /**
-     * Grants the purchased units to the tenant's current row, whatever its state: the checkout may have been started
-     * before the row became TRIAL or CANCELED. With no current row it throws so that Stripe retries the event.
+     * Grants the purchased units to the tenant's latest subscription row of any status (the same row the re-subscribe
+     * transfer reads), so a package paid after a cancellation is carried over to the next subscription. An unpaid
+     * session grants nothing and returns {@code null}. With no row at all it throws so that Stripe retries the event.
      */
     public BillingSubscription handleJobExecutionsPackagePurchased(Session session, List<LineItem> lineItems) {
-        BillingSubscription currentSubscription = billingSubscriptionService.fetchCurrentSubscription()
-            .orElseThrow(() -> new IllegalStateException(
-                "No subscription found to grant the job executions package of checkout session " + session.getId()));
-
         if (!"paid".equals(session.getPaymentStatus())) {
             log.warn(
                 "Checkout session {} has payment status {}, not granting job executions package units",
                 session.getId(), session.getPaymentStatus());
 
-            return currentSubscription;
+            return null;
         }
+
+        BillingSubscription currentSubscription = billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc()
+            .orElseThrow(() -> new IllegalStateException(
+                "No subscription found to grant the job executions package of checkout session " + session.getId()));
 
         String packageProductId = billingProperties.stripe()
             .productJobExecutionsPackageId();
@@ -317,13 +318,22 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
     }
 
     private SubscriptionItem getFlatItem(Subscription stripeSubscription) {
-        List<SubscriptionItem> items = stripeSubscription.getItems()
-            .getData();
+        BillingProperties.Stripe stripe = billingProperties.stripe();
 
-        return items.stream()
+        // A delayed event during the metered to prepaid migration can still carry the metered item.
+        return stripeSubscription.getItems()
+            .getData()
+            .stream()
+            .filter(item -> {
+                String productId = item.getPrice()
+                    .getProduct();
+
+                return Objects.equals(stripe.productStarterId(), productId)
+                    || Objects.equals(stripe.productGrowthId(), productId);
+            })
             .findFirst()
             .orElseThrow(() -> new IllegalStateException(
-                "Subscription " + stripeSubscription.getId() + " has no subscription item"));
+                "Subscription " + stripeSubscription.getId() + " has no STARTER or GROWTH plan item"));
     }
 
     private String resolvePlanName(String productId) {

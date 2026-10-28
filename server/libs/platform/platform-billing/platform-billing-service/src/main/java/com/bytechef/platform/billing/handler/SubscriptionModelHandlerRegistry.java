@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.handler;
 
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +33,15 @@ public class SubscriptionModelHandlerRegistry {
 
     private final Map<SubscriptionModel, SubscriptionModelHandler> handlers = new EnumMap<>(SubscriptionModel.class);
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public SubscriptionModelHandlerRegistry(List<SubscriptionModelHandler> handlers) {
         for (SubscriptionModelHandler handler : handlers) {
-            this.handlers.put(handler.getSubscriptionModel(), handler);
+            SubscriptionModelHandler previousHandler = this.handlers.put(handler.getSubscriptionModel(), handler);
+
+            if (previousHandler != null) {
+                throw new IllegalStateException(
+                    "Duplicate handler registered for subscription model: " + handler.getSubscriptionModel());
+            }
         }
     }
 
