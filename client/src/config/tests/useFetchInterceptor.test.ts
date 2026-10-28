@@ -1,5 +1,5 @@
 import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useFetchInterceptor, {clearActiveToasts} from '../useFetchInterceptor';
@@ -214,6 +214,36 @@ describe('useFetchInterceptor', () => {
             hoisted.registeredHandlers!.response(response);
 
             expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('response interceptor - access denied', () => {
+        it('toasts an access-denied 403 on a csrf-protected url without clearing auth', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Access denied', errorCode: 'ACCESS_DENIED', status: 403, title: 'Forbidden'},
+                status: 403,
+                url: 'http://localhost/api/automation/internal/workflow-executions',
+            });
+
+            const result = hoisted.registeredHandlers!.response(response);
+
+            await waitFor(
+                () => {
+                    expect(hoisted.toastError).toHaveBeenCalledWith('Forbidden', {
+                        description: 'Access denied',
+                        id: 'fetch-error-403',
+                        onAutoClose: expect.any(Function),
+                        onDismiss: expect.any(Function),
+                    });
+                },
+                {interval: 5, timeout: 5000}
+            );
+
+            expect(result).toBe(response);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
             expect(hoisted.navigate).not.toHaveBeenCalled();
         });
     });
@@ -801,6 +831,86 @@ describe('useFetchInterceptor', () => {
 
             expect((result as Response).status).toBe(200);
             expect(innerFetch).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('csrf-aware fetch wrapper - access denied', () => {
+        let originalFetch: typeof window.fetch;
+
+        beforeEach(() => {
+            originalFetch = window.fetch;
+        });
+
+        afterEach(() => {
+            window.fetch = originalFetch;
+        });
+
+        it('neither replays nor logs out on an access-denied 403', async () => {
+            const accessDeniedResponse = createMockResponse({
+                jsonData: {detail: 'Access denied', errorCode: 'ACCESS_DENIED', status: 403, title: 'Forbidden'},
+                status: 403,
+                url: 'http://localhost/api/automation/internal/workflow-executions',
+            });
+
+            const innerFetch = vi.fn().mockResolvedValue(accessDeniedResponse);
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/automation/internal/workflow-executions', {method: 'GET'});
+
+            expect(result).toBe(accessDeniedResponse);
+            expect(innerFetch).toHaveBeenCalledTimes(1);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('still replays a csrf 403 whose body is not an access-denied problem detail', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce(
+                    createMockResponse({jsonRejects: true, status: 403, url: 'http://localhost/internal/api/test'})
+                )
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/internal/api/test'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/internal/api/test', {method: 'POST'});
+
+            expect((result as Response).status).toBe(200);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+        });
+
+        it('does not log out when the replay of a csrf 403 is an access-denied 403', async () => {
+            const accessDeniedResponse = createMockResponse({
+                jsonData: {detail: 'Access denied', errorCode: 'ACCESS_DENIED', status: 403, title: 'Forbidden'},
+                status: 403,
+                url: 'http://localhost/internal/api/test',
+            });
+
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/internal/api/test'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce(accessDeniedResponse);
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/internal/api/test', {method: 'POST'});
+
+            expect(result).toBe(accessDeniedResponse);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
         });
     });
 

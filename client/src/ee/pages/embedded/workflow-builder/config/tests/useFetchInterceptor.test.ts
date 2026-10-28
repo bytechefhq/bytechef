@@ -1,6 +1,6 @@
 import {resetEmbedCredentials, setEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useFetchInterceptor, {clearActiveToasts} from '../useFetchInterceptor';
@@ -195,16 +195,67 @@ describe('useFetchInterceptor (embedded)', () => {
             expect(hoisted.clearCurrentWorkspaceId).toHaveBeenCalled();
         });
 
-        it('clears auth state on 403', () => {
+        it('clears auth state on 403', async () => {
             renderHook(() => useFetchInterceptor());
 
             const response = createMockResponse({status: 403});
 
             hoisted.registeredHandlers!.response(response);
 
-            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            await waitFor(
+                () => {
+                    expect(hoisted.clearAuthentication).toHaveBeenCalled();
+                },
+                {interval: 5, timeout: 5000}
+            );
+
             expect(hoisted.clearCurrentEnvironmentId).toHaveBeenCalled();
             expect(hoisted.clearCurrentWorkspaceId).toHaveBeenCalled();
+        });
+
+        it('clears auth state on a 403 whose body is not JSON', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({jsonRejects: true, status: 403});
+
+            hoisted.registeredHandlers!.response(response);
+
+            await waitFor(
+                () => {
+                    expect(hoisted.clearAuthentication).toHaveBeenCalled();
+                },
+                {interval: 5, timeout: 5000}
+            );
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('toasts an access-denied 403 instead of clearing auth state', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Access denied', errorCode: 'ACCESS_DENIED', status: 403, title: 'Forbidden'},
+                status: 403,
+            });
+
+            const result = hoisted.registeredHandlers!.response(response);
+
+            await waitFor(
+                () => {
+                    expect(hoisted.toastError).toHaveBeenCalledWith('Forbidden', {
+                        description: 'Access denied',
+                        id: 'fetch-error-403',
+                        onAutoClose: expect.any(Function),
+                        onDismiss: expect.any(Function),
+                    });
+                },
+                {interval: 5, timeout: 5000}
+            );
+
+            expect(result).toBe(response);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentEnvironmentId).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
         });
     });
 

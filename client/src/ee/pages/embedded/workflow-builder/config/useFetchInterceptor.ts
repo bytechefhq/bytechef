@@ -2,6 +2,7 @@ import {getEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {isAccessDeniedProblemDetail, readProblemDetail} from '@/shared/util/problem-detail-utils';
 import recordWorkflowNodeLookupResult from '@/shared/util/recordWorkflowNodeLookupResult';
 import {isInlineTestOutputGraphQlError, isInlineTestOutputUrl} from '@/shared/util/testOutputInlineErrors';
 import fetchIntercept from 'fetch-intercept';
@@ -78,10 +79,30 @@ export default function useFetchInterceptor() {
             response: function (response: any) {
                 const {clearAuthentication, clearCurrentEnvironmentId, clearCurrentWorkspaceId} = callbacksRef.current;
 
-                if (response.status === 403 || response.status === 401) {
+                if (response.status === 401) {
                     clearAuthentication();
                     clearCurrentEnvironmentId();
                     clearCurrentWorkspaceId();
+
+                    return response;
+                }
+
+                if (response.status === 403) {
+                    readProblemDetail(response)
+                        .then((problemDetail) => {
+                            if (isAccessDeniedProblemDetail(problemDetail)) {
+                                showErrorToast(`fetch-error-${response.status}`, problemDetail.title || 'Error', {
+                                    description: problemDetail.detail,
+                                });
+
+                                return;
+                            }
+
+                            clearAuthentication();
+                            clearCurrentEnvironmentId();
+                            clearCurrentWorkspaceId();
+                        })
+                        .catch(() => undefined);
 
                     return response;
                 }
