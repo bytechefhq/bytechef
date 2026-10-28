@@ -22,6 +22,8 @@ billing:
     webhook-secret:
     success-url: ${bytechef.public-url}/automation/settings/billing?checkout=success
     cancel-url: ${bytechef.public-url}/automation/settings/billing
+    product-job-executions-package-id: prod_VWDpTTcwJTsej8
+    job-executions-package-success-url: ${bytechef.public-url}/automation/settings/billing?package=success
 
 docs:
   changelog-url: https://github.com/bytechefhq/bytechef/releases

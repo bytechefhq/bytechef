@@ -96,7 +96,7 @@ class BillingWebhookEventHandlerTest {
         BillingProperties billingProperties = new BillingProperties(
             new BillingProperties.Stripe(
                 "sk_test_abc123", null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null,
-                WEBHOOK_SECRET, null, null));
+                WEBHOOK_SECRET, null, null, null, null));
 
         handler = new BillingWebhookEventHandler(
             billingProperties, billingSubscriptionService, billingWebhookEventService, stripeClient);
