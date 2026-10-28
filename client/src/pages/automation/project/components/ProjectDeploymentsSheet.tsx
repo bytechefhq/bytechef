@@ -47,7 +47,7 @@ const ProjectDeploymentsSheet = ({
             sheetOpen && !!currentWorkspaceId && !!project.id
         );
 
-    const handleOpenInDeploymentsClick = () => {
+    const handleOpenInProjectsClick = () => {
         onSheetOpenChange(false);
 
         void navigate(`/automation/projects?projectId=${project.id}&tab=deployments`);
@@ -107,11 +107,7 @@ const ProjectDeploymentsSheet = ({
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
                     <Button label="Close" onClick={() => onSheetOpenChange(false)} variant="outline" />
 
-                    <Button
-                        icon={<ExternalLinkIcon />}
-                        label="Open in Deployments"
-                        onClick={handleOpenInDeploymentsClick}
-                    />
+                    <Button icon={<ExternalLinkIcon />} label="Open in Projects" onClick={handleOpenInProjectsClick} />
                 </footer>
             </SheetContent>
         </Sheet>

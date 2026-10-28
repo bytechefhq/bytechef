@@ -161,7 +161,7 @@ describe('ProjectDeploymentsSheet', () => {
     it('opens the project deployments tab without changing the current environment', () => {
         renderProjectDeploymentsSheet();
 
-        fireEvent.click(screen.getByText('Open in Deployments'));
+        fireEvent.click(screen.getByRole('button', {name: 'Open in Projects'}));
 
         expect(environmentStore.getState().currentEnvironmentId).toBe(0);
         expect(onSheetOpenChange).toHaveBeenCalledWith(false);
