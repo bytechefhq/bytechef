@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.listener;
 
-import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectPublishedEvent;
+import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceRolloutManager;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -23,12 +23,12 @@ import org.springframework.transaction.event.TransactionalEventListener;
  */
 @Component
 @ConditionalOnEEVersion
-public class AutomationWorkflowProjectPublishedEventListener {
+public class AutomationWorkflowProjectConfigurationUpdatedEventListener {
 
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectPublishedEventListener(
+    public AutomationWorkflowProjectConfigurationUpdatedEventListener(
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager) {
 
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
@@ -36,8 +36,11 @@ public class AutomationWorkflowProjectPublishedEventListener {
 
     @Async("workerExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
-    public void onAutomationWorkflowProjectPublished(
-        AutomationWorkflowProjectPublishedEvent automationWorkflowProjectPublishedEvent) {
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectPublishedEvent.projectId());
+    public void onAutomationWorkflowProjectConfigurationUpdated(
+        AutomationWorkflowProjectConfigurationUpdatedEvent automationWorkflowProjectConfigurationUpdatedEvent) {
+
+        connectedUserReferenceRolloutManager.rollOut(
+            automationWorkflowProjectConfigurationUpdatedEvent.projectId(),
+            automationWorkflowProjectConfigurationUpdatedEvent.environmentId());
     }
 }

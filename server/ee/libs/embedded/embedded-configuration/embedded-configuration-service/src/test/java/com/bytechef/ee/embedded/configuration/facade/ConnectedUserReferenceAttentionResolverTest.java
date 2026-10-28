@@ -13,7 +13,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,6 +55,7 @@ class ConnectedUserReferenceAttentionResolverTest {
     void testUnresolvableAutomationWorkflowProjectYieldsNoAttentionReasonButKeepsTheInputs() {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
+        projectDeployment.setEnvironment(Environment.PRODUCTION);
         projectDeployment.setId(900L);
         projectDeployment.setProjectId(500L);
         projectDeployment.setProjectVersion(1);
@@ -66,8 +70,9 @@ class ConnectedUserReferenceAttentionResolverTest {
             .thenReturn(Optional.of("automation-workflow-1"));
         when(connectedUserReferenceDeploymentManager.fetchWorkflowRow(900L, "automation-workflow-1"))
             .thenReturn(Optional.of(row));
-        when(connectedUserReferenceDeploymentManager.getLastPublishedVersion(500L))
-            .thenThrow(new IllegalArgumentException("not published"));
+        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION))
+            .thenThrow(new ConfigurationException("not released",
+                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED));
 
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
@@ -80,5 +85,65 @@ class ConnectedUserReferenceAttentionResolverTest {
 
         assertThat(referenceState.attentionReason()).isNull();
         assertThat(referenceState.inputs()).isEqualTo(Map.of("channel", "#a"));
+    }
+
+    @Test
+    void testUpdatePendingWhenDeploymentVersionDiffersFromThePinnedVersion() {
+        ProjectDeployment projectDeployment = stubReference(1);
+
+        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(2);
+
+        ReferenceState referenceState = resolver.resolve(newReference());
+
+        assertThat(referenceState.attentionReason()).isEqualTo(ConnectedUserReferenceAttentionResolver.UPDATE_PENDING);
+        assertThat(projectDeployment.getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testUpdatePendingWhenTheDeploymentIsAheadOfAnOlderPinnedVersion() {
+        stubReference(2);
+
+        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(1);
+
+        ReferenceState referenceState = resolver.resolve(newReference());
+
+        assertThat(referenceState.attentionReason()).isEqualTo(ConnectedUserReferenceAttentionResolver.UPDATE_PENDING);
+    }
+
+    @Test
+    void testNoUpdatePendingWhenLastPublishedIsNewerButNotPinned() {
+        stubReference(1);
+
+        when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(1);
+
+        ReferenceState referenceState = resolver.resolve(newReference());
+
+        assertThat(referenceState.attentionReason()).isNull();
+    }
+
+    private ProjectDeployment stubReference(int projectVersion) {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.PRODUCTION);
+        projectDeployment.setId(900L);
+        projectDeployment.setProjectId(500L);
+        projectDeployment.setProjectVersion(projectVersion);
+
+        when(connectedUserReferenceDeploymentManager.fetchDeployment(900L)).thenReturn(Optional.of(projectDeployment));
+        when(connectedUserReferenceDeploymentManager.fetchWorkflowId(500L, projectVersion, "automation-workflow-uuid"))
+            .thenReturn(Optional.empty());
+
+        return projectDeployment;
+    }
+
+    private static ConnectedUserProjectWorkflow newReference() {
+        ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
+
+        reference.setId(1L);
+        reference.setConnectedUserProjectId(10L);
+        reference.setAutomationWorkflowUuid("automation-workflow-uuid");
+        reference.setProjectDeploymentId(900L);
+
+        return reference;
     }
 }

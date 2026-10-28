@@ -49,12 +49,12 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
@@ -152,6 +152,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 class ConnectedUserReferenceRolloutManagerIntTest {
 
+    private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String EXTERNAL_USER_ID = "rollout-user-1";
     private static final long RUNNING_FIRST_TEMPLATE_JOB_ID = 4242L;
 
@@ -179,9 +180,6 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
-
-    @MockitoBean
-    private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -601,7 +599,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         long projectDeploymentId = first.getProjectDeploymentId();
 
@@ -614,6 +612,115 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .get()
             .extracting(ConnectedUserProjectWorkflow::isEnabled)
             .isEqualTo(true);
+    }
+
+    @Test
+    void testPublishingDoesNotMoveReferences() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Publish Keeps Pin");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testUpdatingTheConfigurationVersionRollsReferencesForward() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Pin Forward");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+    }
+
+    @Test
+    void testRollOutMovesReferencesToAnOlderPinnedVersion() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Pin Back");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 1);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testRollOutOnlyTouchesTheConfiguredEnvironment() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Pin Per Environment");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        automationWorkflowProjectConfigurationService.create(
+            automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal(), 1, true, true);
+
+        String developmentExternalUserId = "rollout-user-" + UUID.randomUUID();
+
+        connectedUserService.createConnectedUser(developmentExternalUserId, Environment.DEVELOPMENT);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow productionReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow developmentReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            developmentExternalUserId, workflowUuid, Environment.DEVELOPMENT);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
+
+        AutomationWorkflowProjectConfiguration developmentConfiguration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, Environment.DEVELOPMENT.ordinal())
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.update(developmentConfiguration.getId(), 2, true, true);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(productionReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+        assertThat(projectDeploymentService.getProjectDeployment(developmentReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
     }
 
     @Test
@@ -648,7 +755,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         assertThat(connectedUserProjectWorkflowRepository.findById(slackReference.getId()))
             .get()
@@ -679,7 +786,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         automationWorkflowProjectFacade.deleteProjectWorkflow(removedUuid);
         publishAndPinProject(automationWorkflowProjectId);
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         assertThat(connectedUserProjectWorkflowRepository.findById(removedReference.getId()))
             .get()
@@ -709,7 +816,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         automationWorkflowProjectFacade.deleteProjectWorkflow(onlyReferencedUuid);
         publishAndPinProject(automationWorkflowProjectId);
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId()))
             .get()
@@ -846,8 +953,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
-        assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId))
-            .doesNotThrowAnyException();
+        assertThatCode(
+            () -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID))
+                .doesNotThrowAnyException();
 
         assertThat(projectDeploymentService.getProjectDeployment(failingReference.getProjectDeploymentId())
             .getProjectVersion()).isEqualTo(1);
@@ -902,7 +1010,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
 
         try {
-            connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+            connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
             assertThat(appender.list)
                 .extracting(ILoggingEvent::getLevel, ILoggingEvent::getFormattedMessage)
@@ -942,7 +1050,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 2, workflowUuid))
             .isPresent();
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         assertThat(projectDeploymentService.fetchProjectDeployment(reference.getProjectDeploymentId())).isEmpty();
         assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId()))
@@ -962,8 +1070,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
 
         try {
-            assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId))
-                .doesNotThrowAnyException();
+            assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId,
+                PRODUCTION_ENVIRONMENT_ID))
+                    .doesNotThrowAnyException();
 
             assertThat(appender.list)
                 .singleElement()
@@ -999,7 +1108,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         assertThat(projectDeploymentService.fetchProjectDeployment(emptyProjectDeploymentId)).isEmpty();
         assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
@@ -1030,7 +1139,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         assertThat(projectDeploymentService.fetchProjectDeployment(vendorProjectDeploymentId))
             .get()
@@ -1051,7 +1160,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         publishAndPinProject(automationWorkflowProjectId);
 
-        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
         assertThat(projectDeploymentService.fetchProjectDeployment(markerProjectDeploymentId))
             .get()
@@ -1241,6 +1350,14 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         storedReference.setEnabled(false);
 
         connectedUserProjectWorkflowRepository.save(storedReference);
+    }
+
+    private void updateProductionConfigurationVersion(long automationWorkflowProjectId, int projectVersion) {
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.update(configuration.getId(), projectVersion, true, true);
     }
 
     private void publishAndPinProject(long projectId) {

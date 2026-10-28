@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -97,10 +98,9 @@ class ConnectedUserReferenceAttentionResolver {
     @Nullable
     private String resolveAttentionReason(
         ProjectDeployment projectDeployment, Optional<String> workflowId, Optional<ProjectDeploymentWorkflow> row) {
-        int lastPublishedVersion = connectedUserReferenceDeploymentManager.getLastPublishedVersion(
-            projectDeployment.getProjectId());
+        Optional<Integer> releasedVersion = fetchReleasedVersion(projectDeployment);
 
-        if (projectDeployment.getProjectVersion() < lastPublishedVersion) {
+        if (releasedVersion.isPresent() && projectDeployment.getProjectVersion() != releasedVersion.get()) {
             return UPDATE_PENDING;
         }
 
@@ -131,6 +131,16 @@ class ConnectedUserReferenceAttentionResolver {
         }
 
         return connectedUserWorkflowValidator.getAttentionReason(workflowId.get(), projectDeployment.getEnvironment());
+    }
+
+    private Optional<Integer> fetchReleasedVersion(ProjectDeployment projectDeployment) {
+        try {
+            return Optional.of(
+                connectedUserReferenceDeploymentManager.getReleasedVersion(
+                    projectDeployment.getProjectId(), projectDeployment.getEnvironment()));
+        } catch (ConfigurationException configurationException) {
+            return Optional.empty();
+        }
     }
 
     @SuppressFBWarnings("EI")

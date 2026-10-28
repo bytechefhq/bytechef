@@ -9,23 +9,24 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
-import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
+import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -53,6 +54,7 @@ class ConnectedUserReferenceDeploymentManager {
 
     private static final String MARKER = "__EMBEDDED__";
 
+    private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver;
@@ -60,20 +62,21 @@ class ConnectedUserReferenceDeploymentManager {
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceDeploymentManager(
+        AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserService connectedUserService,
         ConnectedUserWorkflowConnectionResolver connectedUserWorkflowConnectionResolver,
         ConnectedUserWorkflowValidator connectedUserWorkflowValidator, ProjectDeploymentFacade projectDeploymentFacade,
         ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
+        this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowConnectionResolver = connectedUserWorkflowConnectionResolver;
@@ -81,7 +84,6 @@ class ConnectedUserReferenceDeploymentManager {
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
-        this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
     }
@@ -132,17 +134,22 @@ class ConnectedUserReferenceDeploymentManager {
             .orElse(Map.of());
     }
 
-    public int getLastPublishedVersion(long automationWorkflowProjectId) {
-        Project project = projectService.getProject(automationWorkflowProjectId);
+    public int getReleasedVersion(long automationWorkflowProjectId, Environment environment) {
+        Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
+            automationWorkflowProjectConfigurationService.fetchConfiguration(
+                automationWorkflowProjectId, environment.ordinal());
 
-        ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
+        if (configurationOptional.isEmpty() || !configurationOptional.get()
+            .isEnabled()) {
 
-        if (lastPublishedProjectVersion == null) {
-            throw new IllegalArgumentException(
-                "Automation workflow project id=%s is not published".formatted(automationWorkflowProjectId));
+            throw new ConfigurationException(
+                "Automation workflow project id=%s is not released in the %s environment".formatted(
+                    automationWorkflowProjectId, environment),
+                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED);
         }
 
-        return lastPublishedProjectVersion.getVersion();
+        return configurationOptional.get()
+            .getProjectVersion();
     }
 
     @Transactional
@@ -292,7 +299,7 @@ class ConnectedUserReferenceDeploymentManager {
         projectDeployment.setEnvironment(environment);
         projectDeployment.setName(getDeploymentName(connectedUser.getExternalId(), environment));
         projectDeployment.setProjectId(automationWorkflowProjectId);
-        projectDeployment.setProjectVersion(getLastPublishedVersion(automationWorkflowProjectId));
+        projectDeployment.setProjectVersion(getReleasedVersion(automationWorkflowProjectId, environment));
 
         long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(
             projectDeployment, List.of(), List.of());
