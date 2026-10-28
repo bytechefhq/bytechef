@@ -200,12 +200,9 @@ public class ConnectionServiceImpl implements ConnectionService {
         Connection connection = getConnection(connectionId);
 
         connection.setCredentialStatus(status);
+        connection.setCredentialsStatusUpdated();
 
-        Connection updatedConnection = connectionRepository.save(connection);
-
-        updatedConnection.setCredentialsStatusUpdated();
-
-        return updatedConnection;
+        return connectionRepository.save(connection);
     }
 
     @Override

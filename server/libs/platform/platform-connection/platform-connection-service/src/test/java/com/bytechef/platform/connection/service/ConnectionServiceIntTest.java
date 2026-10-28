@@ -29,6 +29,8 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -36,7 +38,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
+import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.security.test.context.support.WithMockUser;
 
 /**
@@ -44,9 +50,14 @@ import org.springframework.security.test.context.support.WithMockUser;
  */
 @WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    PostgreSQLContainerConfiguration.class, ConnectionServiceIntTest.AfterSaveListenerConfiguration.class
+})
 @ConnectionIntTestConfigurationSharedMocks
 class ConnectionServiceIntTest {
+
+    @Autowired
+    private AfterSaveRecordingListener afterSaveRecordingListener;
 
     @Autowired
     private ConnectionService connectionService;
@@ -61,6 +72,8 @@ class ConnectionServiceIntTest {
     void afterEach() {
         connectionRepository.deleteAll();
         tagRepository.deleteAll();
+
+        afterSaveRecordingListener.clear();
     }
 
     @Test
@@ -149,6 +162,18 @@ class ConnectionServiceIntTest {
     }
 
     @Test
+    void testUpdateConnectionCredentialStatusMarksCredentialsStatusUpdatedForAfterSaveListeners() {
+        Connection connection = connectionRepository.save(getConnection());
+
+        afterSaveRecordingListener.clear();
+
+        connectionService.updateConnectionCredentialStatus(
+            Validate.notNull(connection.getId(), "id"), Connection.CredentialStatus.INVALID);
+
+        assertThat(afterSaveRecordingListener.getCredentialsStatusUpdatedFlags()).containsExactly(true);
+    }
+
+    @Test
     void getGetConnections() {
         connectionRepository.save(getConnection());
 
@@ -163,5 +188,34 @@ class ConnectionServiceIntTest {
             .parameters(Map.of("key1", "value1"))
             .type(PlatformType.AUTOMATION)
             .build();
+    }
+
+    @TestConfiguration
+    static class AfterSaveListenerConfiguration {
+
+        @Bean
+        AfterSaveRecordingListener afterSaveRecordingListener() {
+            return new AfterSaveRecordingListener();
+        }
+    }
+
+    static class AfterSaveRecordingListener extends AbstractRelationalEventListener<Connection> {
+
+        private final List<Boolean> credentialsStatusUpdatedFlags = Collections.synchronizedList(new ArrayList<>());
+
+        @Override
+        protected void onAfterSave(AfterSaveEvent<Connection> afterSaveEvent) {
+            Connection connection = afterSaveEvent.getEntity();
+
+            credentialsStatusUpdatedFlags.add(connection.isCredentialsStatusUpdated());
+        }
+
+        void clear() {
+            credentialsStatusUpdatedFlags.clear();
+        }
+
+        List<Boolean> getCredentialsStatusUpdatedFlags() {
+            return List.copyOf(credentialsStatusUpdatedFlags);
+        }
     }
 }
