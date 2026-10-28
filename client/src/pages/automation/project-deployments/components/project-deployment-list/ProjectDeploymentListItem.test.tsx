@@ -1,5 +1,6 @@
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {render, screen} from '@/shared/util/test-utils';
+import {QueryClient} from '@tanstack/react-query';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -19,7 +20,14 @@ vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => (
 }));
 
 vi.mock('@/shared/mutations/automation/projectDeployments.mutations', () => ({
-    useDeleteProjectDeploymentMutation: () => ({isPending: false, mutate: hoisted.deleteProjectDeploymentMock}),
+    useDeleteProjectDeploymentMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
+        isPending: false,
+        mutate: (id: number) => {
+            hoisted.deleteProjectDeploymentMock(id);
+
+            onSuccess?.();
+        },
+    }),
     useEnableProjectDeploymentMutation: ({
         onSuccess,
     }: {
@@ -115,6 +123,21 @@ describe('ProjectDeploymentListItem', () => {
         await user.click(screen.getByRole('button', {name: 'Delete'}));
 
         expect(hoisted.deleteProjectDeploymentMock).toHaveBeenCalledWith(42);
+    });
+
+    it('refreshes the project list after deleting so the deployment count updates', async () => {
+        const invalidateQueriesSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+        const user = userEvent.setup();
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        await user.click(screen.getByText('Delete'));
+
+        await user.click(screen.getByRole('button', {name: 'Delete'}));
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['projects']});
+
+        invalidateQueriesSpy.mockRestore();
     });
 
     it('opens the project from the icon beside the name and from the menu', async () => {

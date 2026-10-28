@@ -9,23 +9,23 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {ButtonGroup} from '@/components/ui/button-group';
-import {CollapsibleTrigger} from '@/components/ui/collapsible';
+import {CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
-import ProjectDeploymentsSheet, {
-    ProjectDeploymentsSheetStateI,
-} from '@/pages/automation/project/components/ProjectDeploymentsSheet';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
-import ProjectDeploymentsButton from '@/pages/automation/project/components/project-header/components/ProjectDeploymentsButton';
 import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
 import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import ProjectListItemDeployButton from '@/pages/automation/projects/components/project-list/ProjectListItemDeployButton';
 import ProjectListItemPublishMenuItem from '@/pages/automation/projects/components/project-list/ProjectListItemPublishMenuItem';
+import ProjectListItemTabs, {
+    ProjectListItemTabType,
+} from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
 import {ProjectGitConfigurationI, getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -58,7 +58,7 @@ import {
     UploadIcon,
     WorkflowIcon,
 } from 'lucide-react';
-import {MouseEvent, Suspense, lazy, useCallback, useRef, useState} from 'react';
+import {MouseEvent, ReactNode, Suspense, lazy, useCallback, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
@@ -66,19 +66,28 @@ import TagList from '../../../../../shared/components/TagList';
 import ProjectDialog from '../ProjectDialog';
 
 interface ProjectItemProps {
+    activeTab?: ProjectListItemTabType;
+    deploymentsContent: ReactNode;
+    onTabChange: (tab?: ProjectListItemTabType, expandedProjectDeploymentId?: number) => void;
     project: Project;
     projectGitConfiguration?: ProjectGitConfigurationI;
     remainingTags?: Tag[];
+    workflowsContent: ReactNode;
 }
 
 const ProjectGitConfigurationDialog = lazy(
     () => import('@/ee/pages/automation/project/components/ProjectGitConfigurationDialog')
 );
 
-const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: ProjectItemProps) => {
-    const [projectDeploymentsSheetState, setProjectDeploymentsSheetState] = useState<
-        ProjectDeploymentsSheetStateI | undefined
-    >();
+const ProjectListItem = ({
+    activeTab,
+    deploymentsContent,
+    onTabChange,
+    project,
+    projectGitConfiguration,
+    remainingTags,
+    workflowsContent,
+}: ProjectItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
@@ -88,7 +97,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
     const converterHiddenFileInputRef = useRef<HTMLInputElement>(null);
-    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
@@ -96,8 +104,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const navigate = useNavigate();
 
     const openSavedProjectDeployment = useOpenSavedProjectDeployment({
-        onDevelopmentDeploymentSaved: (projectDeploymentId) =>
-            setProjectDeploymentsSheetState({expandedProjectDeploymentId: projectDeploymentId}),
+        onDevelopmentDeploymentSaved: (projectDeploymentId) => onTabChange('deployments', projectDeploymentId),
         projectId: project.id,
     });
     const [searchParams] = useSearchParams();
@@ -120,7 +127,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const {hasEnabledAiProvider, isPending: isAiProviderCheckPending} = useHasEnabledAiProvider();
 
     const importN8nWorkflowDisabled = !isAiProviderCheckPending && !hasEnabledAiProvider;
-    const hasWorkflows = (project.projectWorkflowIds?.length ?? 0) > 0;
+    const deploymentCount = project.developmentDeploymentCount;
+    const workflowCount = project.projectWorkflowIds?.length ?? 0;
+    const hasWorkflows = workflowCount > 0;
+    const isPublished = !!(project.lastPublishedDate && project.lastProjectVersion);
     const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
@@ -171,8 +181,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
             toast('Workflow is imported.');
 
-            if (workflowsCollapsibleTriggerRef.current?.getAttribute('data-state') === 'closed') {
-                workflowsCollapsibleTriggerRef.current.click();
+            if (!activeTab) {
+                onTabChange('workflows');
             }
         },
     });
@@ -246,13 +256,13 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 '[data-radix-collapsible-trigger]',
             ].join(', ');
 
-            if (target.closest(interactiveSelectors) || workflowsCollapsibleTriggerRef.current?.contains(target)) {
+            if (target.closest(interactiveSelectors)) {
                 return;
             }
 
-            workflowsCollapsibleTriggerRef.current?.click();
+            onTabChange(activeTab ? undefined : 'workflows');
         },
-        [isProjectDeploymentDialogOpen]
+        [activeTab, isProjectDeploymentDialogOpen, onTabChange]
     );
 
     return (
@@ -262,7 +272,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectListItemClick(event)}
             >
-                <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
+                <div className="flex flex-1 items-center py-3 group-data-[state='open']/project:border-none">
                     <div
                         aria-label={project.id?.toString() ?? project.name}
                         className="flex-1"
@@ -295,111 +305,29 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <TooltipContent>{project.description}</TooltipContent>
                                 </Tooltip>
                             ) : (
-                                <CollapsibleTrigger className="text-base font-semibold">
-                                    {project.name}
-                                </CollapsibleTrigger>
+                                <span className="text-base font-semibold">{project.name}</span>
                             )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center gap-2">
-                                <CollapsibleTrigger
-                                    className="group flex min-w-28 items-center text-xs font-semibold text-muted-foreground"
-                                    ref={workflowsCollapsibleTriggerRef}
-                                >
-                                    <div className="mr-1">
-                                        {project.projectWorkflowIds?.length === 1
-                                            ? `${project.projectWorkflowIds?.length} workflow`
-                                            : `${project.projectWorkflowIds?.length} workflows`}
-                                    </div>
+                                <CollapsibleTrigger className="group mr-2 flex items-center text-xs font-semibold text-muted-foreground">
+                                    <span className="mr-1">
+                                        {workflowCount === 1 ? '1 workflow' : `${workflowCount} workflows`}
+                                    </span>
+
+                                    <span className="mx-1">-</span>
+
+                                    <span className="mr-1">
+                                        {deploymentCount === undefined
+                                            ? 'deployments'
+                                            : deploymentCount === 1
+                                              ? '1 deployment'
+                                              : `${deploymentCount} deployments`}
+                                    </span>
 
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
-
-                                <ButtonGroup aria-label="Workflow Creation Actions">
-                                    <Button
-                                        aria-label="Create Workflow"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-
-                                            setShowWorkflowDialog(true);
-                                        }}
-                                        size="xs"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon />
-                                        Workflow
-                                    </Button>
-
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label="More Workflow Creation Actions"
-                                                icon={
-                                                    isImportingN8nWorkflow ? (
-                                                        <LoaderCircleIcon className="animate-spin text-primary" />
-                                                    ) : (
-                                                        <ChevronDownIcon />
-                                                    )
-                                                }
-                                                size="xs"
-                                                variant="outline"
-                                            >
-                                                <> </>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
-                                                aria-label="Create Workflow from Template"
-                                                icon={<LayoutTemplateIcon />}
-                                                label="From Template"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    navigate(`./${project.id}/templates`);
-                                                }}
-                                            />
-
-                                            <DropdownMenuItem
-                                                aria-label="Import Workflow"
-                                                icon={<UploadIcon />}
-                                                label="Import Workflow"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    if (hiddenFileInputRef.current) {
-                                                        hiddenFileInputRef.current.click();
-                                                    }
-                                                }}
-                                            />
-
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span className="block">
-                                                        <DropdownMenuItem
-                                                            aria-label="Import n8n Workflow"
-                                                            disabled={importN8nWorkflowDisabled}
-                                                            icon={<UploadIcon />}
-                                                            label="Import n8n Workflow"
-                                                            onClick={() => {
-                                                                if (converterHiddenFileInputRef.current) {
-                                                                    converterHiddenFileInputRef.current.click();
-                                                                }
-                                                            }}
-                                                        />
-                                                    </span>
-                                                </TooltipTrigger>
-
-                                                {importN8nWorkflowDisabled && (
-                                                    <TooltipContent>
-                                                        Enable an AI provider to import n8n workflows.
-                                                    </TooltipContent>
-                                                )}
-                                            </Tooltip>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
 
                                 <div onClick={(event) => event.stopPropagation()}>
                                     {project.tags && (
@@ -455,15 +383,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                                         onClick={handleProjectDeploymentDialogOpen}
                                                     />
                                                 }
-                                            />
-
-                                            <ProjectDeploymentsButton
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    setProjectDeploymentsSheetState({});
-                                                }}
-                                                size="iconSm"
                                             />
                                         </ButtonGroup>
                                     </>
@@ -604,6 +523,139 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 </div>
             </div>
 
+            <CollapsibleContent className="mx-3 mt-1 mb-3">
+                <ProjectListItemTabs
+                    actions={
+                        activeTab === 'workflows' ? (
+                            <ButtonGroup aria-label="Workflow Creation Actions">
+                                <Button
+                                    aria-label="Create Workflow"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+
+                                        setShowWorkflowDialog(true);
+                                    }}
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    <PlusIcon />
+                                    New Workflow
+                                </Button>
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            aria-label="More Workflow Creation Actions"
+                                            icon={
+                                                isImportingN8nWorkflow ? (
+                                                    <LoaderCircleIcon className="animate-spin text-primary" />
+                                                ) : (
+                                                    <ChevronDownIcon />
+                                                )
+                                            }
+                                            size="sm"
+                                            variant="secondary"
+                                        >
+                                            <> </>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem
+                                            aria-label="Create Workflow from Template"
+                                            icon={<LayoutTemplateIcon />}
+                                            label="From Template"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+
+                                                navigate(`./${project.id}/templates`);
+                                            }}
+                                        />
+
+                                        <DropdownMenuItem
+                                            aria-label="Import Workflow"
+                                            icon={<UploadIcon />}
+                                            label="Import Workflow"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+
+                                                if (hiddenFileInputRef.current) {
+                                                    hiddenFileInputRef.current.click();
+                                                }
+                                            }}
+                                        />
+
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className="block">
+                                                    <DropdownMenuItem
+                                                        aria-label="Import n8n Workflow"
+                                                        disabled={importN8nWorkflowDisabled}
+                                                        icon={<UploadIcon />}
+                                                        label="Import n8n Workflow"
+                                                        onClick={() => {
+                                                            if (converterHiddenFileInputRef.current) {
+                                                                converterHiddenFileInputRef.current.click();
+                                                            }
+                                                        }}
+                                                    />
+                                                </span>
+                                            </TooltipTrigger>
+
+                                            {importN8nWorkflowDisabled && (
+                                                <TooltipContent>
+                                                    Enable an AI provider to import n8n workflows.
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
+                        ) : activeTab === 'deployments' ? (
+                            isPublished ? (
+                                <ProjectDeploymentDialog
+                                    onSuccess={(projectDeploymentId) => onTabChange('deployments', projectDeploymentId)}
+                                    projectDeployment={{
+                                        environmentId: DEVELOPMENT_ENVIRONMENT,
+                                        name: project.name,
+                                        projectId: project.id,
+                                    }}
+                                    redirectOnSubmit={false}
+                                    triggerNode={
+                                        <Button aria-label="Create Deployment" size="sm" variant="secondary">
+                                            <PlusIcon />
+                                            New Deployment
+                                        </Button>
+                                    }
+                                />
+                            ) : (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="inline-block">
+                                            <Button
+                                                aria-label="Create Deployment"
+                                                disabled
+                                                size="sm"
+                                                variant="secondary"
+                                            >
+                                                <PlusIcon />
+                                                New Deployment
+                                            </Button>
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Publish the project first</TooltipContent>
+                                </Tooltip>
+                            )
+                        ) : undefined
+                    }
+                    activeTab={activeTab ?? 'workflows'}
+                    deploymentsContent={deploymentsContent}
+                    onTabChange={(tab) => onTabChange(tab)}
+                    workflowsContent={workflowsContent}
+                />
+            </CollapsibleContent>
+
             <AlertDialog
                 ariaLabel="Confirm Project Deletion"
                 description="This action cannot be undone. This will permanently delete the project and workflows it contains."
@@ -618,15 +670,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
             />
 
             {showEditDialog && <ProjectDialog onClose={() => setShowEditDialog(false)} project={project} />}
-
-            {projectDeploymentsSheetState && (
-                <ProjectDeploymentsSheet
-                    expandedProjectDeploymentId={projectDeploymentsSheetState.expandedProjectDeploymentId}
-                    onSheetOpenChange={(open) => !open && setProjectDeploymentsSheetState(undefined)}
-                    project={project}
-                    sheetOpen
-                />
-            )}
 
             {showProjectGitConfigurationDialog && (
                 <EEVersion hidden={true}>

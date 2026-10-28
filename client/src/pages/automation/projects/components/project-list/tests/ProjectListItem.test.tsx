@@ -1,11 +1,13 @@
 import {Collapsible} from '@/components/ui/collapsible';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectListItem from '@/pages/automation/projects/components/project-list/ProjectListItem';
+import {ProjectListItemTabType} from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
-import {expect, it, vi} from 'vitest';
+import {beforeEach, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
@@ -36,23 +38,8 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
     ),
 }));
 
-vi.mock('@/pages/automation/project/components/ProjectDeploymentsSheet', () => ({
-    default: ({
-        expandedProjectDeploymentId,
-        onSheetOpenChange,
-    }: {
-        expandedProjectDeploymentId?: number;
-        onSheetOpenChange: (open: boolean) => void;
-    }) => (
-        <div>
-            <span>{`Deployments sheet ${expandedProjectDeploymentId ?? 'none'}`}</span>
-
-            <button onClick={() => onSheetOpenChange(false)}>Close sheet</button>
-        </div>
-    ),
-}));
-
 const project = {
+    developmentDeploymentCount: 2,
     id: 7,
     lastProjectVersion: 2,
     lastPublishedDate: new Date(),
@@ -60,35 +47,106 @@ const project = {
     projectWorkflowIds: [1],
 } as Project;
 
-const renderProjectListItem = () =>
+const onTabChange = vi.fn();
+
+const renderProjectListItem = (activeTab?: ProjectListItemTabType, projectOverrides: Partial<Project> = {}) =>
     render(
         <MemoryRouter>
             <TooltipProvider>
-                <Collapsible>
-                    <ProjectListItem project={project} remainingTags={[]} />
+                <Collapsible open={!!activeTab}>
+                    <ProjectListItem
+                        activeTab={activeTab}
+                        deploymentsContent={<div>Deployments content</div>}
+                        onTabChange={onTabChange}
+                        project={{...project, ...projectOverrides}}
+                        remainingTags={[]}
+                        workflowsContent={<div>Workflows content</div>}
+                    />
                 </Collapsible>
             </TooltipProvider>
         </MemoryRouter>
     );
 
-it('opens the project deployments sheet from the deployments button', () => {
-    renderProjectListItem();
-
-    fireEvent.click(screen.getByLabelText('Project Deployments'));
-
-    expect(screen.getByText('Deployments sheet none')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Close sheet'));
-
-    expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+beforeEach(() => {
+    onTabChange.mockReset();
 });
 
-it('opens the project deployments sheet on a saved development deployment', () => {
+it('summarizes workflows and deployments and hides the tabs while collapsed', () => {
+    renderProjectListItem();
+
+    expect(screen.getByText('1 workflow')).toBeInTheDocument();
+    expect(screen.getByText('2 deployments')).toBeInTheDocument();
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Project Deployments')).not.toBeInTheDocument();
+});
+
+it('shows deployments without a number when the server did not send a count', () => {
+    renderProjectListItem(undefined, {developmentDeploymentCount: undefined});
+
+    expect(screen.getByText('deployments')).toBeInTheDocument();
+    expect(screen.queryByText('0 deployments')).not.toBeInTheDocument();
+});
+
+it('shows the tabs and the active tab content when expanded', () => {
+    renderProjectListItem('deployments');
+
+    expect(screen.getByRole('tab', {name: 'Deployments'})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('Deployments content')).toBeInTheDocument();
+});
+
+it('switches tabs', async () => {
+    renderProjectListItem('workflows');
+
+    await userEvent.click(screen.getByRole('tab', {name: 'Deployments'}));
+
+    expect(onTabChange).toHaveBeenCalledWith('deployments');
+});
+
+it('opens the workflows tab when a collapsed row is clicked', () => {
+    renderProjectListItem();
+
+    fireEvent.click(screen.getByLabelText('Orders_container'));
+
+    expect(onTabChange).toHaveBeenCalledWith('workflows');
+});
+
+it('collapses an open row when it is clicked', () => {
+    renderProjectListItem('workflows');
+
+    fireEvent.click(screen.getByLabelText('Orders_container'));
+
+    expect(onTabChange).toHaveBeenCalledWith(undefined);
+});
+
+it('offers New Workflow on the workflows tab', () => {
+    renderProjectListItem('workflows');
+
+    expect(screen.getByLabelText('Create Workflow')).toHaveTextContent('New Workflow');
+    expect(screen.queryByLabelText('Create Deployment')).not.toBeInTheDocument();
+});
+
+it('offers New Deployment on the deployments tab and opens the saved deployment', () => {
+    renderProjectListItem('deployments');
+
+    expect(screen.getByLabelText('Create Deployment')).toBeEnabled();
+
+    fireEvent.click(screen.getAllByText('Save deployment false')[1]);
+
+    expect(onTabChange).toHaveBeenCalledWith('deployments', 42);
+});
+
+it('disables New Deployment until the project is published', () => {
+    renderProjectListItem('deployments', {lastPublishedDate: undefined});
+
+    expect(screen.getByLabelText('Create Deployment')).toBeDisabled();
+});
+
+it('opens the deployments tab on a saved development deployment', () => {
     renderProjectListItem();
 
     fireEvent.click(screen.getByText('Save deployment false'));
 
-    expect(screen.getByText('Deployments sheet 42')).toBeInTheDocument();
+    expect(onTabChange).toHaveBeenCalledWith('deployments', 42);
 });
 
 it('opens the deployments page in production after deploying to production', () => {
@@ -103,5 +161,5 @@ it('opens the deployments page in production after deploying to production', () 
     expect(hoisted.navigate).toHaveBeenCalledWith('/automation/deployments?projectId=7', {
         state: {projectDeploymentId: 43},
     });
-    expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+    expect(onTabChange).not.toHaveBeenCalledWith('deployments', 43);
 });

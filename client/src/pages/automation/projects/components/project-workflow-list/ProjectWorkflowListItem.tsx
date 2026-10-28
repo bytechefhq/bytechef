@@ -93,7 +93,7 @@ const ProjectWorkflowListItem = ({
 
     return (
         <li
-            className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+            className="flex items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
             <Link
