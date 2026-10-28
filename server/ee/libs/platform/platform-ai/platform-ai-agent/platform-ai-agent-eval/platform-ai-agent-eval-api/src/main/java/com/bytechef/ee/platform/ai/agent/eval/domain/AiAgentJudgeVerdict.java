@@ -50,17 +50,15 @@ public final class AiAgentJudgeVerdict {
     @Column("judge_scope")
     private int judgeScope;
 
-    private boolean passed;
-
     @Column("status")
-    @Nullable
-    private Integer status;
+    private int status;
 
     @Column("reason_code")
     @Nullable
     private String reasonCode;
 
-    private double score;
+    @Nullable
+    private Double score;
 
     @Nullable
     private String explanation;
@@ -123,25 +121,12 @@ public final class AiAgentJudgeVerdict {
         this.judgeScope = judgeScope.ordinal();
     }
 
-    /**
-     * @deprecated use {@link #getStatus()}; kept so a previous release can read rows written by this one
-     */
-    @Deprecated
-    public boolean isPassed() {
-        return passed;
-    }
-
     public AiAgentJudgeVerdictStatus getStatus() {
-        if (status == null) {
-            return passed ? AiAgentJudgeVerdictStatus.PASS : AiAgentJudgeVerdictStatus.FAIL;
-        }
-
         return AiAgentJudgeVerdictStatus.values()[status];
     }
 
     public void setStatus(AiAgentJudgeVerdictStatus status) {
         this.status = status.ordinal();
-        this.passed = status == AiAgentJudgeVerdictStatus.PASS;
     }
 
     @Nullable
@@ -155,17 +140,11 @@ public final class AiAgentJudgeVerdict {
 
     @Nullable
     public Double getScore() {
-        AiAgentJudgeVerdictStatus verdictStatus = getStatus();
-
-        if (verdictStatus != AiAgentJudgeVerdictStatus.PASS && verdictStatus != AiAgentJudgeVerdictStatus.FAIL) {
-            return null;
-        }
-
         return score;
     }
 
     public void setScore(@Nullable Double score) {
-        this.score = score == null ? 0.0 : score;
+        this.score = score;
     }
 
     @Nullable
@@ -243,7 +222,6 @@ public final class AiAgentJudgeVerdict {
             ", judgeName='" + judgeName + '\'' +
             ", judgeType=" + judgeType +
             ", judgeScope=" + judgeScope +
-            ", passed=" + passed +
             ", status=" + status +
             ", reasonCode='" + reasonCode + '\'' +
             ", score=" + score +
