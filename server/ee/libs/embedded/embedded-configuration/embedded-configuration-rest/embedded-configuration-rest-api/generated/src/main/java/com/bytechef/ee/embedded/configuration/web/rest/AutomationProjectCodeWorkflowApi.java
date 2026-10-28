@@ -6,6 +6,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.ee.embedded.configuration.web.rest.model.AutomationProjectCodeWorkflowDeployResultModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +49,9 @@ public interface AutomationProjectCodeWorkflowApi {
      * POST /automation/projects/deploy : Deploy a new automation code workflow into the embedded catalog
      * Deploy a new automation code workflow into the embedded catalog.
      *
+     * @param xEnvironment The environment. (optional)
      * @param projectFile The file of a code-native automation project. (optional)
+     * @param release Whether to also point the configuration of the request environment at the newly published version. (optional, default to false)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -69,7 +72,9 @@ public interface AutomationProjectCodeWorkflowApi {
         consumes = { "multipart/form-data" }
     )
     default ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
-        @Parameter(name = "projectFile", description = "The file of a code-native automation project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
+        @Parameter(name = "projectFile", description = "The file of a code-native automation project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile,
+        @Parameter(name = "release", description = "Whether to also point the configuration of the request environment at the newly published version.") @Valid @RequestParam(value = "release", required = false) Boolean release
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

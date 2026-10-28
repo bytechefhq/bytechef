@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -29,7 +30,7 @@ public interface AutomationProjectCodeWorkflowFacade {
 
     Optional<AutomationProjectCodeWorkflowStateDTO> getCodeWorkflowState(long automationProjectId);
 
-    List<String> save(byte[] bytes, Language language);
+    List<String> save(byte[] bytes, Language language, Environment environment, boolean release);
 
     void updateCodeWorkflowSource(long automationProjectId, String content);
 }
