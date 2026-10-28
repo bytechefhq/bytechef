@@ -72,7 +72,7 @@ The `workflowUuid` is resolved against the connected user in this order:
 
 1. **An integration workflow.** If the uuid belongs to an integration workflow, the call runs it through the connected user's instance of that integration.
 2. **The connected user's own automation copy.** A uuid of a workflow the user copied from an [automation](/platform/embedded/build/automations) template runs that copy.
-3. **A catalog reference.** A catalog workflow uuid the user holds a reference to runs the catalog project's last published version of that workflow, with the user's own connections.
+3. **A catalog reference.** A catalog workflow uuid the user holds a reference to runs that workflow in the version the environment's configuration points at, with the user's own connections.
 4. **A copy of a catalog template.** A catalog template uuid the user has already copied runs the user's copy.
 
 The call never adds a workflow for the user. A catalog uuid the user has no reference to and no copy of returns `404`. Add the workflow first, through the [Automation Hub](/platform/embedded/build/automation-hub) or the copy and provision endpoints described in [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows).
