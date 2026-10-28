@@ -17,7 +17,7 @@ description: Create and manage integrations that connect your product to third-p
 | Tags | Assign tags to integrations for flexible grouping and filtering. |
 | Unified API *(feature-flagged)* | When the Unified API feature flag is enabled in your deployment, filter integrations by Unified API category (Accounting, Commerce, CRM). |
 | Versioning | Each integration tracks versions with a status of DRAFT or PUBLISHED. |
-| Workflow count | The integration card shows how many workflows belong to that integration. |
+| Workflow and configuration counts | The integration card shows how many workflows belong to the integration and how many Development instance configurations use it. |
 | Publish date | Displays when the integration was last published, or "Not yet published" for drafts. |
 | Permission expression | An optional SpEL expression that restricts which connected users can see the integration (and, per workflow, which workflows). |
 
@@ -26,7 +26,7 @@ description: Create and manage integrations that connect your product to third-p
 Each integration in the list displays:
 
 - **Icon and name** -- the component icon and integration name, linking to the workflow editor.
-- **Workflow count** -- the number of workflows contained in the integration, expandable to view the list.
+- **Summary** -- for example **2 workflows - 1 configuration**. Click it, or the empty space on the card, to expand the integration (see [Workflows and Configurations](#workflows-and-configurations)). The configuration count covers all of the integration's Development instance configurations, enabled or not.
 - **Tags** -- assigned tags shown as badges; click to add or remove tags.
 - **Version badge** -- shows the current version number and status (e.g., `V1 PUBLISHED` or `V2 DRAFT`).
 - **Last published date** -- timestamp of the most recent publish, or a "Not yet published" notice.
@@ -50,10 +50,20 @@ Use the three-dot menu on each integration card to:
 |---|---|
 | Edit | Update the integration name, category, or tags. |
 | View Workflows | Open the workflow editor for this integration. |
-| New Workflow | Add another workflow to the integration. |
 | Publish | Publish the current draft version, making it available to connected users. |
-| Import Workflow | Import a workflow from a JSON or YAML file. |
 | Delete | Permanently delete the integration and all its workflows. |
+
+### Workflows and Configurations
+
+An expanded integration has two tabs:
+
+- **Workflows** - the integration's workflows, with **New Workflow** on the right. Its dropdown arrow
+  offers **Import Workflow**, which imports a workflow from a JSON or YAML file. The card always opens
+  on this tab.
+- **Configurations** - the integration's [instance configurations](/platform/embedded/configure/instance-configurations)
+  in the Development environment, each expanded to show its workflows, with **New Configuration** on
+  the right. **New Configuration** is disabled, with the tooltip "Publish the integration first", until
+  the integration has a published version. Clicking a configuration workflow opens its executions.
 
 ### Filtering Integrations
 
