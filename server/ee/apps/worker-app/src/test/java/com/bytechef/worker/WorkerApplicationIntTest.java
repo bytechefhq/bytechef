@@ -52,7 +52,7 @@ public class WorkerApplicationIntTest {
             .map(ComponentDefinition::getName)
             .toList();
 
-        assertThat(componentNames).contains("apiPlatform", "appEvent", "fieldMapping", "request");
+        assertThat(componentNames).contains("apiPlatform", "appEvent", "codeWorkflow", "fieldMapping", "request");
     }
 
     @Test
@@ -99,7 +99,8 @@ public class WorkerApplicationIntTest {
             "bytechef.atlas.execution.remote.v1.JobRemoteService",
             "bytechef.platform.connection.remote.v1.ConnectionRemoteService",
             "bytechef.platform.workflow.task.dispatcher.remote.v1.TaskDispatcherDefinitionRemoteService",
-            "bytechef.platform.scheduler.remote.v1.TriggerSchedulerRemoteService");
+            "bytechef.platform.scheduler.remote.v1.TriggerSchedulerRemoteService",
+            "bytechef.platform.codeworkflow.configuration.remote.v1.CodeWorkflowContainerRemoteService");
     }
 
     @Test

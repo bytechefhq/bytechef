@@ -76,6 +76,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-runner-aws-batch"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-runner-kubernetes"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-client"))
@@ -86,6 +88,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:modules:components:api-platform"))
     implementation(project(":server:ee:libs:modules:components:app-event"))
+    implementation(project(":server:ee:libs:modules:components:code-workflow"))
     implementation(project(":server:ee:libs:modules:components:field-mapping"))
     implementation(project(":server:ee:libs:modules:components:request"))
 
