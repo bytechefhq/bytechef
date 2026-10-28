@@ -10,6 +10,13 @@ bytechef:
       enabled: false
     knowledge-base:
       enabled: false
+      ocr:
+        # OCR provider used when extracting text from knowledge base documents (AZURE | MISTRAL | NONE)
+        provider: NONE
+      # Number of concurrent consumers per knowledge base message route (used by AMQP | JMS brokers)
+      subscriptions:
+        document-chunk-update-events: 1
+        document-process-events: 1
     memory:
       aws:
         bucket-prefix: bytechef-chat-memory
@@ -77,11 +84,33 @@ bytechef:
   cache:
     # Cache provider (CAFFEINE) default: CAFFEINE
     provider: CAFFEINE
+  cloud:
+    # Cloud provider (AWS(ee) | NONE)
+    provider: NONE
   coordinator:
+    # Whether this instance runs the coordinator (orchestrates job and trigger execution)
+    enabled: true
+    task:
+      # Number of concurrent consumers per coordinator task message route (used by AMQP | JMS brokers)
+      subscriptions:
+        application-events: 1
+        resume-job-events: 1
+        start-job-events: 1
+        stop-job-events: 1
+        task-execution-complete-events: 1
+        task-execution-error-events: 1
     trigger:
       polling:
         # Trigger polling interval in minutes (default: 5)
         check-period: 5
+      # Number of concurrent consumers per coordinator trigger message route (used by AMQP | JMS brokers)
+      subscriptions:
+        application-events: 1
+        trigger-execution-complete-events: 1
+        trigger-execution-error-events: 1
+        trigger-listener-events: 1
+        trigger-poll-events: 1
+        trigger-webhook-events: 1
   data-storage:
     # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc
@@ -101,6 +130,8 @@ bytechef:
   # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
   encryption:
     provider: filesystem
+  # Enabled feature flags, e.g. [ff-123, ff-456]
+  feature-flags: []
   file-storage:
     # File storage provider (aws(ee) | filesystem | jdbc) default: filesystem
     provider: filesystem
@@ -222,6 +253,8 @@ bytechef:
   # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
   # bootstraps.
   worker:
+    # Whether this instance runs the worker (executes workflow tasks and triggers)
+    enabled: true
     task:
       # Per-route consumer concurrency for the AMQP/Kafka/Redis/JMS/SQS brokers; the memory broker ignores it.
       # `default` additionally caps concurrent task execution process-wide, so on a monolith this is simply
