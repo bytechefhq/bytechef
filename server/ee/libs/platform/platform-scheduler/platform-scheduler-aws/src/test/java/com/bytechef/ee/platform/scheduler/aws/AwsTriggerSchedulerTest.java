@@ -94,6 +94,8 @@ class AwsTriggerSchedulerTest {
         ApplicationProperties.Coordinator.Trigger.Polling polling =
             new ApplicationProperties.Coordinator.Trigger.Polling();
 
+        polling.setCheckPeriod(5);
+
         mockSchedulerClient = mock(SchedulerClient.class);
 
         awsTriggerScheduler = new AwsTriggerScheduler(awsProperties, polling, mockSchedulerClient);

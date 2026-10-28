@@ -200,6 +200,8 @@ public class QuartzH2IntTest {
                 .getTrigger()
                 .getPolling();
 
+            polling.setCheckPeriod(5);
+
             return new QuartzTriggerScheduler(polling, scheduler);
         }
     }
