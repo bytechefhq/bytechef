@@ -2,6 +2,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {buildLoginPath} from '@/shared/auth/login-redirect-utils';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
+import {isAccessDeniedProblemDetail, readProblemDetail} from '@/shared/util/problem-detail-utils';
 import recordWorkflowNodeLookupResult from '@/shared/util/recordWorkflowNodeLookupResult';
 import {isInlineTestOutputGraphQlError, isInlineTestOutputUrl} from '@/shared/util/testOutputInlineErrors';
 import fetchIntercept from 'fetch-intercept';
@@ -162,6 +163,16 @@ export default function useFetchInterceptor() {
                 // csrf-aware fetch wrapper below (refresh + replay, then escalate). Don't toast or
                 // log out here, otherwise the recovered request would still flash an error.
                 if (response.status === 403 && isCsrfProtectedUrl(response.url)) {
+                    readProblemDetail(response)
+                        .then((problemDetail) => {
+                            if (isAccessDeniedProblemDetail(problemDetail)) {
+                                showErrorToast(`fetch-error-${response.status}`, problemDetail.title || 'Error', {
+                                    description: problemDetail.detail,
+                                });
+                            }
+                        })
+                        .catch(() => undefined);
+
                     return response;
                 }
 
@@ -249,13 +260,20 @@ export default function useFetchInterceptor() {
                 return response;
             }
 
+            if (isAccessDeniedProblemDetail(await readProblemDetail(response))) {
+                return response;
+            }
+
             const {apiBasePath, clearAuthentication, clearCurrentWorkspaceId, navigate} = callbacksRef.current;
 
             await refreshCsrfToken(nativeFetch, apiBasePath);
 
             const retriedResponse = await interceptedFetch(input, init);
 
-            if (retriedResponse.status === 403) {
+            if (
+                retriedResponse.status === 403 &&
+                !isAccessDeniedProblemDetail(await readProblemDetail(retriedResponse))
+            ) {
                 clearAuthentication();
                 clearCurrentWorkspaceId();
 
