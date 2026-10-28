@@ -385,6 +385,8 @@ public class QuartzTriggerSchedulerIntTest {
                 .getTrigger()
                 .getPolling();
 
+            polling.setCheckPeriod(5);
+
             return new QuartzTriggerScheduler(polling, scheduler);
         }
     }
