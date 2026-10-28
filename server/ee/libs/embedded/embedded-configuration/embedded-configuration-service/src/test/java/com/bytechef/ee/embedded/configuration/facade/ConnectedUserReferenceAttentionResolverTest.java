@@ -70,6 +70,8 @@ class ConnectedUserReferenceAttentionResolverTest {
             .thenReturn(Optional.of("automation-workflow-1"));
         when(connectedUserReferenceDeploymentManager.fetchWorkflowRow(900L, "automation-workflow-1"))
             .thenReturn(Optional.of(row));
+        stubAdministrativelyEnabled(true);
+
         when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION))
             .thenThrow(new ConfigurationException("not released",
                 ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED));
@@ -91,6 +93,8 @@ class ConnectedUserReferenceAttentionResolverTest {
     void testUpdatePendingWhenDeploymentVersionDiffersFromThePinnedVersion() {
         ProjectDeployment projectDeployment = stubReference(1);
 
+        stubAdministrativelyEnabled(true);
+
         when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(2);
 
         ReferenceState referenceState = resolver.resolve(newReference());
@@ -102,6 +106,7 @@ class ConnectedUserReferenceAttentionResolverTest {
     @Test
     void testUpdatePendingWhenTheDeploymentIsAheadOfAnOlderPinnedVersion() {
         stubReference(2);
+        stubAdministrativelyEnabled(true);
 
         when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(1);
 
@@ -113,12 +118,40 @@ class ConnectedUserReferenceAttentionResolverTest {
     @Test
     void testNoUpdatePendingWhenLastPublishedIsNewerButNotPinned() {
         stubReference(1);
+        stubAdministrativelyEnabled(true);
 
         when(connectedUserReferenceDeploymentManager.getReleasedVersion(500L, Environment.PRODUCTION)).thenReturn(1);
 
         ReferenceState referenceState = resolver.resolve(newReference());
 
         assertThat(referenceState.attentionReason()).isNull();
+    }
+
+    @Test
+    void testTurnedOffByAdministratorWhenConfigurationIsDisabled() {
+        stubReference(1);
+        stubAdministrativelyEnabled(false);
+
+        ReferenceState referenceState = resolver.resolve(newReference());
+
+        assertThat(referenceState.attentionReason())
+            .isEqualTo(ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR);
+    }
+
+    @Test
+    void testTurnedOffByAdministratorWinsOverUpdatePending() {
+        stubReference(1);
+        stubAdministrativelyEnabled(false);
+
+        ReferenceState referenceState = resolver.resolve(newReference());
+
+        assertThat(referenceState.attentionReason())
+            .isEqualTo(ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR);
+    }
+
+    private void stubAdministrativelyEnabled(boolean administrativelyEnabled) {
+        when(connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
+            500L, Environment.PRODUCTION, "automation-workflow-uuid")).thenReturn(administrativelyEnabled);
     }
 
     private ProjectDeployment stubReference(int projectVersion) {

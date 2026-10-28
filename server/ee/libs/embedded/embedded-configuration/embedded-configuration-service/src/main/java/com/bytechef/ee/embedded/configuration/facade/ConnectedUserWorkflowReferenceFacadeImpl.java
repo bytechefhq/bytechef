@@ -249,13 +249,18 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
         RowSpec resolvedRowSpec = resolution.rowSpec();
 
-        RowSpec rowSpec = inputs == null
-            ? resolvedRowSpec : new RowSpec(resolvedRowSpec.resolved(), resolvedRowSpec.enabled(), inputs);
+        boolean requestedEnabled = resolvedRowSpec.enabled();
+        boolean rowEnabled = requestedEnabled &&
+            connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
+                projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
+
+        RowSpec rowSpec = new RowSpec(
+            resolvedRowSpec.resolved(), rowEnabled, inputs == null ? resolvedRowSpec.inputs() : inputs);
 
         connectedUserReferenceDeploymentManager.putWorkflows(
             reference.getProjectDeploymentId(), projectVersion, Map.of(automationWorkflowUuid, rowSpec));
 
-        reference.setEnabled(rowSpec.enabled());
+        reference.setEnabled(requestedEnabled);
 
         ConnectedUserProjectWorkflow savedReference = connectedUserProjectWorkflowRepository.save(reference);
 
