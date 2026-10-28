@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -464,6 +467,25 @@ class ConnectedUserIntegrationFacadeIntTest {
                 .containsExactly(mcpIntegrationWorkflow.getUuidAsString());
 
             assertThat(getVisibleWorkflowUuids(externalUserId, integrationId)).containsExactly(visibleWorkflowUuid);
+        }
+
+        @Test
+        void testConnectedUserIntegrationOfAComponentWithoutAuthorizationHasNoConnectionConfig() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+
+            createIntegrationInstanceConfiguration(integrationId);
+
+            when(componentDefinitionService.getComponentDefinition(anyString(), any()))
+                .thenReturn(new ComponentDefinition(component("email").connection(connection().properties(
+                    string("host")))));
+
+            ConnectedUserIntegrationDTO connectedUserIntegrationDTO =
+                connectedUserIntegrationFacade.getConnectedUserIntegration(
+                    externalUserId, integrationId, true, Environment.PRODUCTION);
+
+            assertThat(connectedUserIntegrationDTO.connectionConfig()).isNull();
         }
 
         @Test

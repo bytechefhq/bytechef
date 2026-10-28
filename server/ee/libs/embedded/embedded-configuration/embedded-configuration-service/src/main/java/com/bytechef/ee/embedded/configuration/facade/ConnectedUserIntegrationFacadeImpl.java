@@ -69,6 +69,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -248,18 +249,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectionDefinition connectionDefinition = Objects.requireNonNull(componentDefinition.getConnection());
 
-        Authorization authorization = Objects.requireNonNull(connectionDefinition)
-            .getAuthorizations()
-            .stream()
-            .filter(curAuthorization -> curAuthorization.getType() == integrationInstanceConfigurationDTO
-                .authorizationType())
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException(
-                ("Integration instance configuration id=%s has authorization type %s, which the %s connection " +
-                    "does not define").formatted(
-                        integrationInstanceConfigurationDTO.id(),
-                        integrationInstanceConfigurationDTO.authorizationType(),
-                        integrationDTO.componentName())));
+        Authorization authorization = getAuthorization(
+            connectionDefinition, integrationInstanceConfigurationDTO, integrationDTO.componentName());
 
         List<Connection> connections = connectionService.getConnections(
             integrationInstances.stream()
@@ -274,9 +265,9 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         OAuth2AuthorizationParameters oAuth2AuthorizationParameters = null;
 
-        AuthorizationType type = authorization.getType();
+        AuthorizationType authorizationType = authorization == null ? null : authorization.getType();
 
-        if (StringUtils.startsWith(type.name(), "OAUTH2")) {
+        if (authorizationType != null && StringUtils.startsWith(authorizationType.name(), "OAUTH2")) {
             oAuth2AuthorizationParameters = oAuth2ParametersFacade
                 .getOAuth2AuthorizationParameters(integrationDTO.componentName(), connectionDefinition.getVersion(),
                     integrationInstanceConfigurationDTO.connectionParameters(),
@@ -645,5 +636,25 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                     integrationInstance.workflows(), mcpInstanceTools, mcpInstanceWorkflows);
             })
             .toList();
+    }
+
+    private static @Nullable Authorization getAuthorization(
+        ConnectionDefinition connectionDefinition,
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO, String componentName) {
+
+        AuthorizationType authorizationType = integrationInstanceConfigurationDTO.authorizationType();
+
+        if (authorizationType == null) {
+            return null;
+        }
+
+        return connectionDefinition.getAuthorizations()
+            .stream()
+            .filter(curAuthorization -> curAuthorization.getType() == authorizationType)
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                ("Integration instance configuration id=%s has authorization type %s, which the %s connection " +
+                    "does not define").formatted(
+                        integrationInstanceConfigurationDTO.id(), authorizationType, componentName)));
     }
 }
