@@ -66,6 +66,9 @@ const configuration: AutomationWorkflowProjectConfigurationType = {
 
 const project = {
     categoryId: null,
+    codeWorkflowDraftPublishable: null,
+    codeWorkflowLanguage: null,
+    codeWorkflowProject: false,
     configurationCount: 0,
     description: null,
     id: 'project-1',

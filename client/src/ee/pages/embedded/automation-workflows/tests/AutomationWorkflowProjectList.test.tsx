@@ -453,6 +453,10 @@ describe('AutomationWorkflowProjectList', () => {
 
             renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
 
+            await user.click(screen.getByText('1 workflow'));
+
+            await screen.findByText(workflowTemplate.label);
+
             expect(screen.queryByRole('button', {name: /create workflow/i})).not.toBeInTheDocument();
             expect(screen.queryByRole('button', {name: /more workflow creation actions/i})).not.toBeInTheDocument();
 
@@ -498,7 +502,9 @@ describe('AutomationWorkflowProjectList', () => {
 
             renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
 
-            expect(screen.getByRole('button', {name: /create workflow/i})).toBeInTheDocument();
+            await user.click(screen.getByText('1 workflow'));
+
+            expect(await screen.findByRole('button', {name: /create workflow/i})).toBeInTheDocument();
 
             await user.click(screen.getByTestId('project-12-moreProjectActionsButton'));
 
