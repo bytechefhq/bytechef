@@ -755,7 +755,9 @@ export type ConnectedUserProject = {
 
 export type ConnectedUserProjectWorkflow = {
   __typename?: 'ConnectedUserProjectWorkflow';
+  automationWorkflowUuid?: Maybe<Scalars['ID']['output']>;
   connectedUserId: Scalars['ID']['output'];
+  copiedFromWorkflowUuid?: Maybe<Scalars['ID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
