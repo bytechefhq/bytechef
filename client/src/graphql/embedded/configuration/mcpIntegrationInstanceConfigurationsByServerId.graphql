@@ -12,6 +12,7 @@ query mcpIntegrationInstanceConfigurationsByServerId($mcpServerId: ID) {
         lastModifiedDate
         mcpIntegrationInstanceConfigurationWorkflows {
             id
+            enabled
             integrationInstanceConfigurationWorkflowId
             integrationInstanceConfigurationWorkflow {
                 id
