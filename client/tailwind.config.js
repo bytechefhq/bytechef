@@ -105,6 +105,7 @@ module.exports = {
                 sidebar: {
                     DEFAULT: 'hsl(var(--sidebar))',
                     accent: 'hsl(var(--sidebar-accent))',
+                    'active-foreground': 'hsl(var(--sidebar-active-foreground))',
                     'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
                     border: 'hsl(var(--sidebar-border))',
                     foreground: 'hsl(var(--sidebar-foreground))',
