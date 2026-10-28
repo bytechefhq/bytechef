@@ -17,9 +17,11 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
 import io.github.markpollack.judge.llm.LLMJudge;
-import io.github.markpollack.judge.result.Judgment;
+import java.util.Objects;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -36,7 +38,7 @@ import tools.jackson.databind.node.ArrayNode;
  * behavior satisfies the rule.
  * </p>
  */
-public class LlmRuleJudge extends LLMJudge {
+public class LlmRuleJudge extends LLMJudge<CompletionEvidence> {
 
     private static final Logger log = LoggerFactory.getLogger(LlmRuleJudge.class);
 
@@ -47,10 +49,11 @@ public class LlmRuleJudge extends LLMJudge {
     private final String rule;
     private final boolean truncateLongConversations;
 
-    public LlmRuleJudge(String name, ChatClient.Builder chatClientBuilder, String rule,
+    public LlmRuleJudge(
+        Supplier<CompletionEvidence> evidence, String name, ChatClient.Builder chatClientBuilder, String rule,
         boolean truncateLongConversations) {
 
-        super(name, "Evaluates against: " + rule, chatClientBuilder);
+        super(evidence, name, "Evaluates against: " + rule, chatClientBuilder);
 
         this.rule = rule;
         this.truncateLongConversations = truncateLongConversations;
@@ -58,16 +61,15 @@ public class LlmRuleJudge extends LLMJudge {
 
     @Override
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    protected String buildPrompt(JudgmentContext context) {
-        String transcript = (String) context.metadata()
+    protected String buildPrompt(CompletionEvidence evidence) {
+        String transcript = (String) evidence.metadata()
             .getOrDefault("transcript", "");
 
         if (truncateLongConversations && transcript.length() > MAX_TRANSCRIPT_LENGTH) {
             transcript = truncateTranscript(transcript);
         }
 
-        String agentOutput = context.agentOutput()
-            .orElse("");
+        String agentOutput = Objects.requireNonNullElse(evidence.response(), "");
 
         return """
             You are an evaluation judge. Your task is to determine whether an AI agent's behavior \
@@ -91,7 +93,7 @@ public class LlmRuleJudge extends LLMJudge {
     }
 
     @Override
-    protected Judgment parseResponse(String response, JudgmentContext context) {
+    protected Judgment parseResponse(String response, CompletionEvidence evidence) {
         try {
             JsonNode jsonNode = OBJECT_MAPPER.readTree(response.strip());
 

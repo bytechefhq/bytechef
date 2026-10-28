@@ -17,28 +17,30 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import io.github.markpollack.judge.DeterministicJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * A deterministic judge that checks whether the agent output length is within the specified min/max character bounds.
  */
-public class ResponseLengthJudge extends DeterministicJudge {
+public class ResponseLengthJudge extends DeterministicJudge<CompletionEvidence> {
 
     private final Integer maxLength;
     private final Integer minLength;
 
-    public ResponseLengthJudge(Integer maxLength, Integer minLength) {
-        super("ResponseLength", "Checks if agent output length is within the specified min/max character bounds");
+    public ResponseLengthJudge(Supplier<CompletionEvidence> evidence, Integer maxLength, Integer minLength) {
+        super(evidence, "ResponseLength",
+            "Checks if agent output length is within the specified min/max character bounds");
 
         this.maxLength = maxLength;
         this.minLength = minLength;
     }
 
     @Override
-    public Judgment judge(JudgmentContext context) {
-        String output = context.agentOutput()
-            .orElse("");
+    protected Judgment evaluate(CompletionEvidence evidence) {
+        String output = Objects.requireNonNullElse(evidence.response(), "");
         int length = output.length();
 
         if ((minLength != null) && (length < minLength)) {

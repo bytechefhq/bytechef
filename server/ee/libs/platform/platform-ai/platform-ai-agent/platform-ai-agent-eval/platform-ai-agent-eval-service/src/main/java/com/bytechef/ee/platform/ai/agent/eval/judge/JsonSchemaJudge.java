@@ -17,12 +17,14 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import io.github.markpollack.judge.DeterministicJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -30,22 +32,22 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * A deterministic judge that validates the agent output is valid JSON and contains all required fields from a schema.
  */
-public class JsonSchemaJudge extends DeterministicJudge {
+public class JsonSchemaJudge extends DeterministicJudge<CompletionEvidence> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final Map<String, Object> schema;
 
-    public JsonSchemaJudge(Map<String, Object> schema) {
-        super("JsonSchema", "Validates that agent output is valid JSON and contains all required fields from a schema");
+    public JsonSchemaJudge(Supplier<CompletionEvidence> evidence, Map<String, Object> schema) {
+        super(evidence, "JsonSchema",
+            "Validates that agent output is valid JSON and contains all required fields from a schema");
 
         this.schema = Collections.unmodifiableMap(schema);
     }
 
     @Override
-    public Judgment judge(JudgmentContext context) {
-        String output = context.agentOutput()
-            .orElse("");
+    protected Judgment evaluate(CompletionEvidence evidence) {
+        String output = Objects.requireNonNullElse(evidence.response(), "");
 
         Map<String, Object> parsedOutput;
 

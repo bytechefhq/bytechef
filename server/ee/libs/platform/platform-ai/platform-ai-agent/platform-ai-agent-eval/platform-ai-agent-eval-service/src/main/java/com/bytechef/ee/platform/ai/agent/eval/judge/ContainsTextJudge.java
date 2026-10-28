@@ -17,28 +17,29 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import io.github.markpollack.judge.DeterministicJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * A deterministic judge that checks whether the agent output contains (or does not contain) a specified text.
  */
-public class ContainsTextJudge extends DeterministicJudge {
+public class ContainsTextJudge extends DeterministicJudge<CompletionEvidence> {
 
     private final String mode;
     private final String text;
 
-    public ContainsTextJudge(String text, String mode) {
-        super("ContainsText", "Checks if agent output contains or does not contain the specified text");
+    public ContainsTextJudge(Supplier<CompletionEvidence> evidence, String text, String mode) {
+        super(evidence, "ContainsText", "Checks if agent output contains or does not contain the specified text");
 
         this.text = text;
         this.mode = mode;
     }
 
     @Override
-    public Judgment judge(JudgmentContext context) {
-        String output = context.agentOutput()
-            .orElse("");
+    protected Judgment evaluate(CompletionEvidence evidence) {
+        String output = Objects.requireNonNullElse(evidence.response(), "");
         boolean containsText = output.toLowerCase()
             .contains(text.toLowerCase());
 

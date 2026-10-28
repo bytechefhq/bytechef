@@ -59,12 +59,12 @@ import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import io.github.markpollack.judge.Judge;
-import io.github.markpollack.judge.context.ExecutionStatus;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.jury.AverageVotingStrategy;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.completion.CompletionStatus;
+import io.github.markpollack.judge.judgment.Judgment;
 import io.github.markpollack.judge.jury.SimpleJury;
-import io.github.markpollack.judge.jury.Verdict;
-import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.verdict.Verdict;
+import io.github.markpollack.judge.voting.AverageVotingStrategy;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -75,6 +75,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -396,7 +397,7 @@ public class AiAgentEvalRunExecutor {
 
     private List<Judge> collectJudges(
         AiAgentEvalRun evalRun, AiAgentEvalScenario scenario, @Nullable ChatClient.Builder defaultChatClientBuilder,
-        List<Long> aiAgentJudgeIds) {
+        List<Long> aiAgentJudgeIds, Supplier<CompletionEvidence> evidence) {
 
         List<Judge> judges = new ArrayList<>();
 
@@ -419,7 +420,8 @@ public class AiAgentEvalRunExecutor {
 
             judges.add(
                 agentJudgeFactory.createJudge(
-                    agentJudge.getName(), agentJudge.getType(), agentJudge.getConfiguration(), chatClientBuilder));
+                    agentJudge.getName(), agentJudge.getType(), agentJudge.getConfiguration(), chatClientBuilder,
+                    evidence));
         }
 
         List<AiAgentScenarioJudge> scenarioJudges = agentScenarioJudgeService.getAgentScenarioJudges(scenario.getId());
@@ -437,7 +439,7 @@ public class AiAgentEvalRunExecutor {
             judges.add(
                 agentJudgeFactory.createJudge(
                     scenarioJudge.getName(), scenarioJudge.getType(), scenarioJudge.getConfiguration(),
-                    chatClientBuilder));
+                    chatClientBuilder, evidence));
         }
 
         return judges;
@@ -624,18 +626,19 @@ public class AiAgentEvalRunExecutor {
         AiAgentEvalRun evalRun, AiAgentEvalScenario scenario, AiAgentEvalResult evalResult, String agentResponse,
         String transcriptJson, @Nullable ChatClient.Builder judgeChatClientBuilder, List<Long> aiAgentJudgeIds) {
 
-        JudgmentContext judgmentContext = JudgmentContext.builder()
-            .agentOutput(agentResponse)
-            .status(ExecutionStatus.SUCCESS)
-            .goal(scenario.getName())
+        CompletionEvidence completionEvidence = CompletionEvidence.builder()
+            .request(scenario.getName())
+            .response(agentResponse)
+            .status(CompletionStatus.SUCCESS)
             .startedAt(Instant.now())
-            .executionTime(Duration.ZERO)
+            .elapsedTime(Duration.ZERO)
             .metadata("transcript", transcriptJson)
             .metadata("expectedOutput",
                 scenario.getExpectedOutput() != null ? scenario.getExpectedOutput() : "")
             .build();
 
-        List<Judge> judges = collectJudges(evalRun, scenario, judgeChatClientBuilder, aiAgentJudgeIds);
+        List<Judge> judges = collectJudges(
+            evalRun, scenario, judgeChatClientBuilder, aiAgentJudgeIds, () -> completionEvidence);
 
         if (judges.isEmpty()) {
             evalResult.setScore(1.0);
@@ -654,7 +657,7 @@ public class AiAgentEvalRunExecutor {
 
         SimpleJury jury = juryBuilder.build();
 
-        Verdict verdict = jury.vote(judgmentContext);
+        Verdict verdict = jury.vote();
 
         Map<String, Judgment> individualByName = verdict.individualByName();
 

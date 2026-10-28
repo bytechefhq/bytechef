@@ -18,9 +18,9 @@ package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -57,17 +57,16 @@ class ToolUsageJudgeTest {
 
     @Test
     void testToolUsedAnywhereAtLeastOncePass() {
-        ToolUsageJudge judge = new ToolUsageJudge("searchOrders", "ANYWHERE", "AT_LEAST", 1);
+        ToolUsageJudge judge = new ToolUsageJudge(() -> buildEvidence(TRANSCRIPT_WITH_ONE_SEARCH_ORDERS),
+            "searchOrders", "ANYWHERE", "AT_LEAST", 1);
 
-        Judgment judgment = judge.judge(buildContext(TRANSCRIPT_WITH_ONE_SEARCH_ORDERS));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testToolNotUsedFail() {
-        ToolUsageJudge judge = new ToolUsageJudge("searchOrders", "ANYWHERE", "AT_LEAST", 1);
-
         String transcriptWithoutTool = """
             {"messages":[
                 {"role":"user","content":"Hello"},
@@ -75,56 +74,62 @@ class ToolUsageJudgeTest {
             ]}
             """;
 
-        Judgment judgment = judge.judge(buildContext(transcriptWithoutTool));
+        ToolUsageJudge judge =
+            new ToolUsageJudge(() -> buildEvidence(transcriptWithoutTool), "searchOrders", "ANYWHERE", "AT_LEAST", 1);
+
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testToolUsedExactlyTwoPass() {
-        ToolUsageJudge judge = new ToolUsageJudge("searchOrders", "ANYWHERE", "EXACTLY", 2);
+        ToolUsageJudge judge = new ToolUsageJudge(() -> buildEvidence(TRANSCRIPT_WITH_TWO_SEARCH_ORDERS),
+            "searchOrders", "ANYWHERE", "EXACTLY", 2);
 
-        Judgment judgment = judge.judge(buildContext(TRANSCRIPT_WITH_TWO_SEARCH_ORDERS));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testToolUsedAtMostOneWhenUsedTwoFail() {
-        ToolUsageJudge judge = new ToolUsageJudge("searchOrders", "ANYWHERE", "AT_MOST", 1);
+        ToolUsageJudge judge = new ToolUsageJudge(() -> buildEvidence(TRANSCRIPT_WITH_TWO_SEARCH_ORDERS),
+            "searchOrders", "ANYWHERE", "AT_MOST", 1);
 
-        Judgment judgment = judge.judge(buildContext(TRANSCRIPT_WITH_TWO_SEARCH_ORDERS));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testToolUsedFirstPositionPass() {
-        ToolUsageJudge judge = new ToolUsageJudge("searchOrders", "FIRST", "AT_LEAST", 1);
+        ToolUsageJudge judge = new ToolUsageJudge(() -> buildEvidence(TRANSCRIPT_WITH_SEARCH_FIRST_THEN_FORMAT),
+            "searchOrders", "FIRST", "AT_LEAST", 1);
 
-        Judgment judgment = judge.judge(buildContext(TRANSCRIPT_WITH_SEARCH_FIRST_THEN_FORMAT));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testMissingTranscriptFail() {
-        ToolUsageJudge judge = new ToolUsageJudge("searchOrders", "ANYWHERE", "AT_LEAST", 1);
-
-        JudgmentContext context = JudgmentContext.builder()
-            .goal("test")
-            .agentOutput("some output")
+        CompletionEvidence evidence = CompletionEvidence.builder()
+            .request("test")
+            .response("some output")
             .build();
 
-        Judgment judgment = judge.judge(context);
+        ToolUsageJudge judge = new ToolUsageJudge(() -> evidence, "searchOrders", "ANYWHERE", "AT_LEAST", 1);
+
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
-    private JudgmentContext buildContext(String transcript) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput("some output")
+    private CompletionEvidence buildEvidence(String transcript) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response("some output")
             .metadata("transcript", transcript)
             .build();
     }

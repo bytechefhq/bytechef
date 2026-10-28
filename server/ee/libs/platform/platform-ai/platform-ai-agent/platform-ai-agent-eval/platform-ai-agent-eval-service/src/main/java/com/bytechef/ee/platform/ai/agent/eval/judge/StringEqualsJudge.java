@@ -17,31 +17,31 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import io.github.markpollack.judge.DeterministicJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * A deterministic judge that checks whether the agent output exactly matches a specified expected value.
  *
  * @author Ivica Cardic
  */
-final class StringEqualsJudge extends DeterministicJudge {
+final class StringEqualsJudge extends DeterministicJudge<CompletionEvidence> {
 
     private final boolean caseSensitive;
     private final String expectedValue;
 
-    StringEqualsJudge(String expectedValue, boolean caseSensitive) {
-        super("StringEquals", "Checks exact match against: " + expectedValue);
+    StringEqualsJudge(Supplier<CompletionEvidence> evidence, String expectedValue, boolean caseSensitive) {
+        super(evidence, "StringEquals", "Checks exact match against: " + expectedValue);
 
         this.expectedValue = Objects.requireNonNull(expectedValue, "expectedValue");
         this.caseSensitive = caseSensitive;
     }
 
     @Override
-    public Judgment judge(JudgmentContext context) {
-        String output = context.agentOutput()
-            .orElse("");
+    protected Judgment evaluate(CompletionEvidence evidence) {
+        String output = Objects.requireNonNullElse(evidence.response(), "");
 
         boolean matches;
 
