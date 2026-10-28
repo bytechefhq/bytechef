@@ -31,6 +31,7 @@ interface ProjectDeploymentListItemProps {
     projectDeployment: ProjectDeployment;
     remainingTags?: Tag[];
     showEnvironment?: boolean;
+    showTags?: boolean;
 }
 
 const ProjectDeploymentListItem = ({
@@ -38,6 +39,7 @@ const ProjectDeploymentListItem = ({
     projectDeployment,
     remainingTags,
     showEnvironment,
+    showTags = true,
 }: ProjectDeploymentListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -205,7 +207,7 @@ const ProjectDeploymentListItem = ({
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.stopPropagation()}>
-                                    {projectDeployment.tags && (
+                                    {showTags && projectDeployment.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,

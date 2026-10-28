@@ -13,6 +13,7 @@ const IntegrationInstanceConfigurationList = ({
     integration,
     integrationInstanceConfigurations,
     showIntegrationIcon = true,
+    showTags = true,
     tags,
     taskDispatcherDefinitions,
 }: {
@@ -21,6 +22,7 @@ const IntegrationInstanceConfigurationList = ({
     integration: Integration;
     integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
     showIntegrationIcon?: boolean;
+    showTags?: boolean;
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
@@ -79,6 +81,7 @@ const IntegrationInstanceConfigurationList = ({
                                     )}
                                     remainingTags={tags?.filter((tag) => !integrationTagIds?.includes(tag.id))}
                                     showIntegrationIcon={showIntegrationIcon}
+                                    showTags={showTags}
                                 />
 
                                 <CollapsibleContent>

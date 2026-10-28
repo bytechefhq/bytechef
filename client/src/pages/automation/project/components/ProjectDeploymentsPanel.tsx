@@ -144,6 +144,7 @@ const ProjectDeploymentsPanel = ({
                         project={project}
                         projectDeployments={environmentProjectDeployments}
                         showEnvironment={showEnvironment}
+                        showTags={false}
                         tags={tags ?? []}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
