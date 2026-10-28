@@ -549,7 +549,7 @@ export const WorkflowExecutions = () => {
             footer={
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
-                    <Footer centerTitle position="main">
+                    <Footer centerTitle className="3xl:w-full" position="main">
                         <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={filterPageNumber ? filterPageNumber : 0}
@@ -563,6 +563,7 @@ export const WorkflowExecutions = () => {
             header={
                 <Header
                     centerTitle
+                    className="3xl:w-full"
                     position="main"
                     right={
                         <Tooltip>
