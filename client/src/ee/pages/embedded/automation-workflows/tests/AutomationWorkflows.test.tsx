@@ -340,7 +340,7 @@ describe('AutomationWorkflows', () => {
         expect(hoisted.publishProjectMutate.mock.calls[0][0]).toMatchObject({id: 'project-9'});
     });
 
-    it('opens the Create Workflow dialog when + Workflow is clicked', async () => {
+    it('opens the Create Workflow dialog when New Workflow is picked from the project menu', async () => {
         const user = userEvent.setup();
 
         hoisted.projects = [
@@ -358,9 +358,11 @@ describe('AutomationWorkflows', () => {
 
         renderWithProviders(<AutomationWorkflows />);
 
-        await user.click(screen.getByRole('button', {name: /create workflow/i}));
+        await user.click(screen.getByRole('button', {name: 'More Project Actions'}));
 
-        expect(await screen.findByText('Create Workflow')).toBeInTheDocument();
+        await user.click(await screen.findByRole('menuitem', {name: 'New Workflow'}));
+
+        expect(await screen.findByRole('heading', {name: 'Create Workflow'})).toBeInTheDocument();
         expect(screen.getByText('Create a new workflow by filling out the form below.')).toBeInTheDocument();
     });
 
@@ -382,7 +384,9 @@ describe('AutomationWorkflows', () => {
 
         renderWithProviders(<AutomationWorkflows />);
 
-        await user.click(screen.getByRole('button', {name: /create workflow/i}));
+        await user.click(screen.getByRole('button', {name: 'More Project Actions'}));
+
+        await user.click(await screen.findByRole('menuitem', {name: 'New Workflow'}));
 
         const labelInput = await screen.findByRole('textbox', {name: /label/i});
 

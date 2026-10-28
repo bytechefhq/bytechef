@@ -144,23 +144,6 @@ describe('AutomationWorkflowProjectListItem', () => {
         });
     });
 
-    describe('workflow creation menu', () => {
-        it('should render an Import Workflow row', async () => {
-            await openMenu('More Workflow Creation Actions');
-
-            expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
-            expect(screen.getByRole('menuitem', {name: 'Import Workflow'})).toHaveClass('text-content-neutral-primary');
-        });
-
-        it('should import a workflow when Import Workflow is clicked', async () => {
-            await openMenu('More Workflow Creation Actions');
-
-            await userEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
-
-            expect(handlers.onImportWorkflow).toHaveBeenCalledWith('project-1');
-        });
-    });
-
     describe('row click', () => {
         it('should expand the workflows when the row is clicked', async () => {
             renderItem();
@@ -182,14 +165,6 @@ describe('AutomationWorkflowProjectListItem', () => {
 
         it('should keep the workflows collapsed when the menu itself is clicked', async () => {
             await openMenu();
-
-            await userEvent.click(screen.getByRole('menu'));
-
-            expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
-        });
-
-        it('should keep the workflows collapsed when the workflow creation menu itself is clicked', async () => {
-            await openMenu('More Workflow Creation Actions');
 
             await userEvent.click(screen.getByRole('menu'));
 
