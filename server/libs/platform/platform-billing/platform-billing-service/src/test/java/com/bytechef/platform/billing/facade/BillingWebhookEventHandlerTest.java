@@ -18,6 +18,7 @@ package com.bytechef.platform.billing.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
@@ -25,15 +26,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandler;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandlerRegistry;
 import com.bytechef.platform.billing.handler.metered.MeteredSubscriptionModelHandler;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidStripeClient;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidSubscriptionModelHandler;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
 import com.stripe.model.Event;
+import com.stripe.model.LineItem;
+import com.stripe.model.Price;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -41,6 +47,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -72,6 +79,12 @@ class BillingWebhookEventHandlerTest {
     private MeteredSubscriptionModelHandler meteredSubscriptionModelHandler;
 
     @Mock
+    private PrepaidStripeClient prepaidStripeClient;
+
+    @Mock
+    private PrepaidSubscriptionModelHandler packageSubscriptionModelHandler;
+
+    @Mock
     private SubscriptionModelHandler prepaidSubscriptionModelHandler;
 
     @Mock
@@ -82,10 +95,16 @@ class BillingWebhookEventHandlerTest {
 
     private BillingWebhookEventHandler handler;
 
+    private final BillingProperties billingProperties = new BillingProperties(
+        new BillingProperties.Stripe(
+            "sk_test", null, "prod_starter", "prod_growth", "prod_usage", null, "whsec", "https://app/success",
+            "https://app/cancel", "prod_package", "https://app/package-success"));
+
     @BeforeEach
     void setUp() {
         handler = new BillingWebhookEventHandler(
-            billingSubscriptionService, billingWebhookEventService, meteredSubscriptionModelHandler,
+            billingProperties, billingSubscriptionService, billingWebhookEventService,
+            meteredSubscriptionModelHandler, packageSubscriptionModelHandler, prepaidStripeClient,
             subscriptionModelHandlerRegistry);
     }
 
@@ -276,6 +295,54 @@ class BillingWebhookEventHandlerTest {
 
         verify(meteredSubscriptionModelHandler, never()).switchToPrepaidIfNotMetered(any(), any());
         verify(prepaidSubscriptionModelHandler).handleSubscriptionUpdated(same(subscription), any(Subscription.class));
+    }
+
+    @Test
+    void testCheckoutWithPackageLineItemRoutesToPackageGrant() throws Exception {
+        Price price = new Price();
+
+        price.setProduct("prod_package");
+
+        LineItem lineItem = new LineItem();
+
+        lineItem.setPrice(price);
+
+        BillingSubscription savedSubscription = starterSubscription();
+
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(prepaidStripeClient.retrieveCheckoutSessionLineItems("cs_test_package")).thenReturn(List.of(lineItem));
+        when(packageSubscriptionModelHandler.handleJobExecutionsPackagePurchased(any(Session.class), any()))
+            .thenReturn(savedSubscription);
+
+        handler.handle(buildEvent(packageCheckoutSessionCompletedPayload()));
+
+        verify(packageSubscriptionModelHandler).handleJobExecutionsPackagePurchased(
+            any(Session.class), eq(List.of(lineItem)));
+        verify(billingSubscriptionService, never()).fetchCurrentSubscription();
+        verify(billingSubscriptionService, never()).save(any());
+        verify(subscriptionModelHandlerRegistry, never()).getSubscriptionModelHandler(any());
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String packageCheckoutSessionCompletedPayload() {
+        return """
+            {
+              "id": "evt_checkout_completed_package",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "checkout.session.completed",
+              "data": {
+                "object": {
+                  "id": "cs_test_package",
+                  "object": "checkout.session",
+                  "customer": "cus_1",
+                  "mode": "payment",
+                  "payment_status": "paid",
+                  "metadata": { "purchaseType": "JOB_EXECUTIONS_PACKAGE", "tenantId": "public" }
+                }
+              }
+            }
+            """;
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
