@@ -16,7 +16,7 @@ It renders in an iframe and has two tabs:
 ## Before you start
 
 - A Signing Key and a backend that mints end-user JWTs - see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk).
-- At least one **published** automation project. The hub lists the templates from each project's last published version; a project that was never published shows no templates. See [Automations](/platform/embedded/build/automations#publishing).
+- At least one **published** automation project with an **enabled configuration** in the environment the hub shows. The hub lists the templates from the version that configuration points at; a project that was never published, or has no enabled configuration there, shows no templates. See [Automations](/platform/embedded/build/automations#configurations).
 - In production, your app's origin in `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` on the ByteChef server - see [the embed handshake](/platform/embedded/build/automations/automation-workflows#the-embed-handshake).
 
 ## Add the hub to your app
@@ -113,15 +113,15 @@ Automations created from a template that is no longer published, or that need ac
 
 ## Copies and references
 
-An automation a user activates in the hub is a **reference**: it points at your catalog workflow rather than duplicating it, and holds only the user's connections and inputs. References follow your catalog: when you publish a new project version they move to it, and when you remove the workflow from the project or delete the project they are disabled and marked as needing attention. Outside the hub, create references with the provision operation in the [API reference](/openapi/frontend/embedded-configuration-connected-user-project-workflow).
+An automation a user activates in the hub is a **reference**: it points at your catalog workflow rather than duplicating it, and holds only the user's connections and inputs. References follow your environment's configuration, not the latest publish: when you point the configuration at another version they move to it, and when you remove the workflow from that version or delete the project they are disabled and marked as needing attention. If an administrator turns off the configuration or the workflow, or deletes the configuration, the reference is switched off and marked as needing attention with the reason "turned off by the administrator". Turning it back on restores what the user had chosen. Outside the hub, create references with the provision operation in the [API reference](/openapi/frontend/embedded-configuration-connected-user-project-workflow).
 
-**Edit workflow** makes a **copy** instead: the user's own editable workflow, made from the last published version of your template. Publishing a new version of the catalog project does not change existing copies. Turn `editWorkflowAllowed` off to keep users on references only.
+**Edit workflow** makes a **copy** instead: the user's own editable workflow, made from the version of your template that the environment's configuration points at. Moving the configuration to another version does not change existing copies, and copies keep working if the project or workflow is later turned off; only new activations and new copies are blocked, with an error. Turn `editWorkflowAllowed` off to keep users on references only.
 
 ## Controlling what appears in the hub
 
-- **Show in Automation Hub.** Each automation project has this switch, on by default. Turn it off for flows you only activate through the API; the project list then shows a **Hidden from hub** badge. The project can still be activated through the API, and `GET /api/embedded/v1/automation/projects` still lists it with `automationHubVisible: false`.
+- **Enabled configuration.** A project appears in the hub for an environment only when it has an enabled configuration there. The hub shows the templates of the version the configuration points at, minus workflows switched off in it. Publishing alone changes nothing. See [Automations](/platform/embedded/build/automations#configurations).
 - **Permission expressions.** A project's expression decides which connected users see the project, and a workflow's expression decides which of its templates they see. A user cannot activate a template their expression hides. See [Permission Expressions](/platform/embedded/build/permission-expressions).
-- **Publishing.** Only the last published version of a project is in the catalog.
+- **Show in Automation Hub.** Each configuration has this switch, on by default. Turn it off for flows you only activate through the API; the configuration row then shows a **Hidden from hub** badge. The hub leaves the project out, but it can still be activated through the API, and `GET /api/embedded/v1/automation/projects` still lists it with `automationHubVisible: false`.
 
 ## Theming
 

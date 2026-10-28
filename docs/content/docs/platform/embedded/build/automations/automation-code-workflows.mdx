@@ -31,9 +31,14 @@ Practically:
 - The catalog project is resolved (or created, on first deploy) by name, hidden behind the same
   `__EMBEDDED_AUTOMATION__` marker convention the visual bridge uses to keep the underlying
   automation `Project` out of view.
-- Redeploying the same artifact **upgrades every referencing user's workflow at once** - there is no
-  per-user version pinning and no per-user bespoke deploy. If you need to stage a change, stage it in
-  a separate environment before deploying to the one your customers use.
+- Redeploying the same artifact **publishes a new version**. It reaches an environment's connected
+  users when that environment's [configuration](/platform/embedded/build/automations#configurations)
+  is moved to it, which then upgrades every referencing user's workflow in that environment at once -
+  there is no per-user version pinning and no per-user bespoke deploy. To deploy and release in one
+  call, pass the optional `release` flag: the deploy then also points the request environment's
+  configuration at the new version, creating an enabled configuration if there is none. It never turns
+  a disabled environment back on. Without the flag, nothing is exposed or upgraded until an
+  administrator releases the version. To stage a change, release it to a separate environment first.
 - A workflow keeps the same identity (its `ProjectWorkflow` uuid) across redeploys as long as its name
   doesn't change, so existing references keep pointing at the right workflow after an upgrade.
 
@@ -104,7 +109,7 @@ reference is enabled, so a workflow with required inputs comes out enabled in on
   workflow the connected user can't see returns `404`.
 
 Calling provision again for an existing reference doesn't re-run auto-wiring. It only catches the
-reference up to the last published version and, if the body names connections or inputs, applies
+reference up to the version its environment's configuration points at and, if the body names connections or inputs, applies
 them. It keeps the reference's enabled state.
 
 De-provisioning removes the reference (and its per-node connection wiring) outright:
@@ -120,7 +125,7 @@ A reference is addressed by its catalog workflow uuid on the same workflow endpo
 - `DELETE /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable` disables the
   reference and keeps it, with its connections and input values.
 - `POST /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable` enables it. The
-  reference first catches up to the catalog project's last published version, then its connections
+  reference first catches up to the version its environment's configuration points at, then its connections
   are resolved again against the connected user's current connections - so a connection created
   after provisioning is picked up here. A missing connection returns `409`
   `{"missingConnectionComponentName": ...}`, a required input without a value returns `409`
@@ -159,7 +164,7 @@ redeploy of one catalog project never dangles a reference into a different catal
 
 ## Limits
 
-- **No per-user version pinning.** A redeploy upgrades every referencing user at once; there's no way
+- **No per-user version pinning.** Releasing a version upgrades every referencing user in that environment at once; there's no way
   to keep one connected user on an older version of the workflow while others move to a new one.
 - **No per-user editing.** A reference has no definition of its own - the workflow update/edit APIs
   reject reference rows outright. If a connected user needs their own customized copy, that's what
@@ -169,10 +174,10 @@ redeploy of one catalog project never dangles a reference into a different catal
   interleave containers into the same deploy history the bridge's one-deploy-back uuid carry-forward
   reads, minting new workflow uuids on the next redeploy and permanently dangling connected-user
   references. The only write path for a catalog project is the deploy endpoint itself.
-- **Resolution differs by kind.** A code-workflow reference always resolves to the catalog project's
-  **last published** workflow. A visual copy resolves to **its own, independently deployed**
+- **Resolution differs by kind.** A code-workflow reference always resolves to the workflow in the version its
+  environment's configuration points at. A visual copy resolves to **its own, independently deployed**
   workflow - the connected user's copy, not the template it was copied from. Two connected users
-  calling the same catalog uuid on a code workflow always run the same (latest) logic; two connected
+  calling the same catalog uuid on a code workflow in the same environment always run the same logic; two connected
   users who each copied the same template can be running different versions if one of them edited
   their copy since.
 
