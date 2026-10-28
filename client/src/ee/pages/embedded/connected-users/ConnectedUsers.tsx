@@ -13,8 +13,9 @@ import ConnectedUserImportDialog from '@/ee/pages/embedded/connected-users/compo
 import ConnectedUserTable from '@/ee/pages/embedded/connected-users/components/ConnectedUserTable';
 import ConnectedUsersFilterTitle from '@/ee/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
 import ConnectedUserSheet from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
-import {Integration} from '@/ee/shared/middleware/embedded/configuration';
+import {ComponentDefinitionBasic, Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserFromJSON, type CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetConnectedUsersQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import Footer from '@/shared/layout/Footer';
@@ -28,6 +29,7 @@ import {CalendarIcon, PlusIcon, UploadIcon, UsersIcon} from 'lucide-react';
 import {HTMLAttributes, useState} from 'react';
 import {DateRange} from 'react-day-picker';
 import {useForm} from 'react-hook-form';
+import InlineSVG from 'react-inlinesvg';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
 
@@ -92,9 +94,17 @@ export function DatePickerWithRange({
     );
 }
 
-const IntegrationLabel = ({integration}: {integration: Integration}) => (
-    <div className="flex items-center">
-        <span className="mr-1">{integration.componentName}</span>
+const IntegrationLabel = ({
+    componentDefinition,
+    integration,
+}: {
+    componentDefinition?: ComponentDefinitionBasic;
+    integration: Integration;
+}) => (
+    <div className="flex items-center gap-x-1">
+        {componentDefinition?.icon && <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />}
+
+        <span className="mr-1">{componentDefinition?.title || integration.componentName}</span>
 
         <span className="text-xs text-content-neutral-secondary">
             {integration?.tags?.map((tag) => tag.name).join(', ')}
@@ -152,6 +162,8 @@ const ConnectedUsers = () => {
     );
 
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
     function filter(
         search?: string,
@@ -294,7 +306,16 @@ const ConnectedUsers = () => {
                                             items={
                                                 integrations?.length
                                                     ? integrations?.map((integration) => ({
-                                                          label: <IntegrationLabel integration={integration} />,
+                                                          label: (
+                                                              <IntegrationLabel
+                                                                  componentDefinition={componentDefinitions?.find(
+                                                                      (componentDefinition) =>
+                                                                          componentDefinition.name ===
+                                                                          integration.componentName
+                                                                  )}
+                                                                  integration={integration}
+                                                              />
+                                                          ),
                                                           value: integration.id,
                                                       }))
                                                     : []

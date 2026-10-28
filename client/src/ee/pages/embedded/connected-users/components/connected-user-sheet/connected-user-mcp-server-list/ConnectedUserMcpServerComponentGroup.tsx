@@ -12,12 +12,14 @@ const ConnectedUserMcpServerComponentGroup = ({
     children,
     componentName,
     credentialStatus,
+    lastExecutionDate,
     version,
     versionKind,
 }: {
     children: ReactNode;
     componentName: string;
     credentialStatus?: CredentialStatus;
+    lastExecutionDate?: Date;
     version: number;
     versionKind: 'component' | 'integration';
 }) => {
@@ -29,49 +31,73 @@ const ConnectedUserMcpServerComponentGroup = ({
 
     return (
         <Collapsible className="rounded-md border border-border/50" onOpenChange={setExpanded} open={expanded}>
-            <div className="flex items-center gap-2.5 pr-3">
+            <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
                 <CollapsibleTrigger asChild>
                     <button
                         aria-label={expanded ? 'Hide tools' : 'Show tools'}
-                        className="flex min-w-0 flex-1 items-center gap-2.5 py-2.5 pl-3 text-left"
+                        className="flex min-w-0 flex-1 flex-col items-start gap-y-1 py-2 text-left"
                         type="button"
                     >
-                        {expanded ? (
-                            <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
-                        ) : (
-                            <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" />
-                        )}
+                        <span className="flex min-w-0 items-center gap-2.5">
+                            {expanded ? (
+                                <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
+                            ) : (
+                                <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground" />
+                            )}
 
-                        {componentDefinition?.icon ? (
-                            <InlineSVG className="size-6 shrink-0" src={componentDefinition.icon} />
-                        ) : (
-                            <ComponentIcon className="size-6 shrink-0 text-content-neutral-secondary" />
-                        )}
+                            {componentDefinition?.icon ? (
+                                <InlineSVG className="size-5 shrink-0" src={componentDefinition.icon} />
+                            ) : (
+                                <ComponentIcon className="size-5 shrink-0 text-content-neutral-secondary" />
+                            )}
 
-                        <span className="truncate text-sm font-medium">
-                            {componentDefinition?.title || componentName}
+                            <span className="truncate text-sm font-semibold">
+                                {componentDefinition?.title || componentName}
+                            </span>
+                        </span>
+
+                        <span className="flex items-center pl-6.5 text-xs">
+                            <ConnectedUserCredentialStatus
+                                componentTitle={componentDefinition?.title || componentName}
+                                credentialStatus={credentialStatus}
+                            />
                         </span>
                     </button>
                 </CollapsibleTrigger>
 
-                <ConnectedUserCredentialStatus
-                    componentTitle={componentDefinition?.title || componentName}
-                    credentialStatus={credentialStatus}
-                />
+                <div className="flex items-center gap-x-2">
+                    <div className="flex items-center gap-x-4">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge
+                                    label={`v${version}`}
+                                    styleType={versionKind === 'component' ? 'outline-outline' : 'secondary-filled'}
+                                    weight="semibold"
+                                />
+                            </TooltipTrigger>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Badge
-                            label={`v${version}`}
-                            styleType={versionKind === 'component' ? 'outline-outline' : 'secondary-filled'}
-                            weight="semibold"
-                        />
-                    </TooltipTrigger>
+                            <TooltipContent>
+                                {versionKind === 'component' ? 'Component Version' : 'Integration Version'}
+                            </TooltipContent>
+                        </Tooltip>
 
-                    <TooltipContent>
-                        {versionKind === 'component' ? 'Component Version' : 'Integration Version'}
-                    </TooltipContent>
-                </Tooltip>
+                        <div className="flex min-w-52 items-center justify-end">
+                            {versionKind === 'integration' && (
+                                <Tooltip>
+                                    <TooltipTrigger className="text-xs text-content-neutral-secondary">
+                                        {lastExecutionDate
+                                            ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+                                            : 'No executions'}
+                                    </TooltipTrigger>
+
+                                    <TooltipContent side="left">Last Execution Date</TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
+                    </div>
+
+                    <div aria-hidden="true" className="size-9 shrink-0" />
+                </div>
             </div>
 
             <CollapsibleContent>

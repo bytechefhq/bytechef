@@ -64,12 +64,12 @@ const ConnectedUserMcpServerListItem = ({
             (integrationInstance) => String(integrationInstance.id) === integrationInstanceId
         )?.credentialStatus;
 
-    const lastModifiedDate = mcpServer.lastModifiedDate ? new Date(Date.parse(mcpServer.lastModifiedDate)) : undefined;
+    const lastExecutionDate = useMemo(() => getLastExecutionDate(mcpServer.workflows), [mcpServer.workflows]);
 
     return (
         <>
             <Collapsible className="mb-2 rounded border border-border/50" key={mcpServer.id}>
-                <div className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+                <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
                             <div
@@ -81,9 +81,15 @@ const ConnectedUserMcpServerListItem = ({
                                 {mcpServer.name}
                             </div>
 
-                            <div className="flex min-h-7 items-center gap-4 text-xs font-semibold text-muted-foreground">
+                            <div className="flex min-h-7 items-center text-xs font-semibold text-muted-foreground">
                                 {toolCount > 0 && (
                                     <span>{toolCount === 1 ? '1 component tool' : `${toolCount} component tools`}</span>
+                                )}
+
+                                {toolCount > 0 && workflowCount > 0 && (
+                                    <span aria-hidden="true" className="mx-2">
+                                        -
+                                    </span>
                                 )}
 
                                 {workflowCount > 0 && (
@@ -114,15 +120,15 @@ const ConnectedUserMcpServerListItem = ({
                                 />
                             </div>
 
-                            {lastModifiedDate && (
-                                <Tooltip>
-                                    <TooltipTrigger className="flex min-h-7 items-center text-xs text-muted-foreground">
-                                        {`Updated ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger className="flex min-h-7 items-center text-xs text-content-neutral-secondary">
+                                    {lastExecutionDate
+                                        ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+                                        : 'No executions'}
+                                </TooltipTrigger>
 
-                                    <TooltipContent>Last Modified Date</TooltipContent>
-                                </Tooltip>
-                            )}
+                                <TooltipContent side="left">Last Execution Date</TooltipContent>
+                            </Tooltip>
                         </div>
 
                         {workflowCount > 0 ? (
@@ -170,6 +176,7 @@ const ConnectedUserMcpServerListItem = ({
                                         componentName={group.componentName}
                                         credentialStatus={getCredentialStatus(group.items[0].integrationInstanceId)}
                                         key={`${group.componentName}_${group.version}`}
+                                        lastExecutionDate={getLastExecutionDate(group.items)}
                                         version={group.version}
                                         versionKind="integration"
                                     >
@@ -206,6 +213,15 @@ const ConnectedUserMcpServerListItem = ({
         </>
     );
 };
+
+function getLastExecutionDate(workflows: Array<{lastExecutionDate?: string | null}>): Date | undefined {
+    const executionTimes = workflows
+        .map((workflow) => workflow.lastExecutionDate)
+        .filter((executionDate): executionDate is string => executionDate != null)
+        .map((executionDate) => Date.parse(executionDate));
+
+    return executionTimes.length > 0 ? new Date(Math.max(...executionTimes)) : undefined;
+}
 
 interface ComponentGroupI<T> {
     componentName: string;

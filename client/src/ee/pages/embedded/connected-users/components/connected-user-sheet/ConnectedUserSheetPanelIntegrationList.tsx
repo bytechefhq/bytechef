@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import ConnectedUserSheetPanelIntegrationListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationListItem';
 import ProvisionIntegrationDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-integration-dialog/ProvisionIntegrationDialog';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useState} from 'react';
 
 import type {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
@@ -13,7 +12,6 @@ const ConnectedUserSheetPanelIntegrationList = ({
 }: {
     connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[];
     connectedUserId: number;
-    componentDefinitions?: ComponentDefinitionBasic[];
 }) => {
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -47,7 +45,6 @@ const ConnectedUserSheetPanelIntegrationList = ({
                             componentDefinitions && (
                                 <ConnectedUserSheetPanelIntegrationListItem
                                     componentDefinition={componentDefinition}
-                                    componentDefinitions={componentDefinitions}
                                     connectedUserId={connectedUserId}
                                     connectedUserIntegrationInstance={connectedUserIntegrationInstance}
                                     key={connectedUserIntegrationInstance.id}

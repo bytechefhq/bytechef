@@ -1,5 +1,6 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {
     IntegrationInstance,
@@ -9,33 +10,34 @@ import {
     Workflow,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useEnableIntegrationInstanceWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import useWorkflowComponentDefinitions, {
+    getWorkflowComponentNames,
+} from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {useQueryClient} from '@tanstack/react-query';
-import InlineSVG from 'react-inlinesvg';
+import {useMemo} from 'react';
 
 const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
-    componentDefinitions,
     integrationInstance,
     integrationInstanceConfiguration,
     integrationInstanceConfigurationWorkflow,
     integrationInstanceWorkflow,
     workflow,
 }: {
-    componentDefinitions: ComponentDefinitionBasic[];
     integrationInstance: IntegrationInstance;
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
     workflow: Workflow;
 }) => {
-    const filteredComponentDefinitions = [
-        ...(workflow.workflowTaskComponentNames ?? []),
-        ...(workflow.workflowTriggerComponentNames ?? []),
-    ].map((componentName) => {
-        return componentDefinitions?.find((componentDefinition) => componentDefinition.name === componentName);
-    });
+    const {workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useWorkflowComponentDefinitions(
+        useGetComponentDefinitionsQuery
+    );
+
+    const filteredComponentNames = useMemo(() => getWorkflowComponentNames(workflow), [workflow]);
 
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
         (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
@@ -54,6 +56,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
         },
     });
 
+    const lastExecutionDate = integrationInstanceWorkflow?.lastExecutionDate;
+
     const handleWorkflowClick = () => {
         openIntegrationInstanceConfigurationWorkflowSheet({
             connectedUserId: integrationInstance.connectedUserId,
@@ -66,44 +70,55 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
     return (
         <li
-            className="flex h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+            className="flex min-h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
-            <button className="flex-1 cursor-pointer text-left text-sm font-semibold" onClick={handleWorkflowClick}>
-                {workflow.label}
-            </button>
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+                <button
+                    className="w-80 shrink-0 cursor-pointer truncate pr-1 text-left text-sm font-semibold"
+                    onClick={handleWorkflowClick}
+                    type="button"
+                >
+                    {workflow.label}
+                </button>
 
-            <div className="flex items-center space-x-1">
-                {filteredComponentDefinitions?.map((componentDefinition) => {
-                    return (
-                        componentDefinition && (
-                            <div
-                                className="flex items-center justify-center rounded-full border p-1"
-                                key={componentDefinition.name!}
-                            >
-                                <InlineSVG className="size-5 flex-none" src={componentDefinition.icon!} />
-                            </div>
-                        )
-                    );
-                })}
+                <WorkflowTriggerAndComponentsRow
+                    className="hidden sm:flex"
+                    filteredComponentNames={filteredComponentNames}
+                    workflow={workflow}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                />
             </div>
 
-            <div className="relative mr-11 flex items-center">
-                {enableIntegrationInstanceWorkflowMutation.isPending && (
-                    <LoadingIcon className="absolute top-[3px] left-[-15px]" />
-                )}
+            <div className="flex shrink-0 items-center gap-x-4">
+                <Tooltip>
+                    <TooltipTrigger className="text-xs text-content-neutral-secondary">
+                        {lastExecutionDate
+                            ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+                            : 'No executions'}
+                    </TooltipTrigger>
 
-                <Switch
-                    checked={integrationInstanceWorkflow?.enabled}
-                    disabled={!integrationInstanceConfigurationWorkflow?.enabled}
-                    onCheckedChange={(value) => {
-                        enableIntegrationInstanceWorkflowMutation.mutate({
-                            enable: value,
-                            id: integrationInstance.id!,
-                            workflowId: workflow.id!,
-                        });
-                    }}
-                />
+                    <TooltipContent side="left">Last Execution Date</TooltipContent>
+                </Tooltip>
+
+                <div className="relative mr-11 flex items-center">
+                    {enableIntegrationInstanceWorkflowMutation.isPending && (
+                        <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                    )}
+
+                    <Switch
+                        checked={integrationInstanceWorkflow?.enabled}
+                        disabled={!integrationInstanceConfigurationWorkflow?.enabled}
+                        onCheckedChange={(value) => {
+                            enableIntegrationInstanceWorkflowMutation.mutate({
+                                enable: value,
+                                id: integrationInstance.id!,
+                                workflowId: workflow.id!,
+                            });
+                        }}
+                    />
+                </div>
             </div>
         </li>
     );

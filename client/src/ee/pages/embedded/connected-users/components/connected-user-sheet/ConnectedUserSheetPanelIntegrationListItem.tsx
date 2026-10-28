@@ -27,14 +27,12 @@ import {twMerge} from 'tailwind-merge';
 
 const ConnectedUserSheetPanelIntegrationListItem = ({
     componentDefinition,
-    componentDefinitions,
     connectedUserId,
     connectedUserIntegrationInstance,
 }: {
     componentDefinition: ComponentDefinitionBasic;
     connectedUserIntegrationInstance: ConnectedUserIntegrationInstance;
     connectedUserId: number;
-    componentDefinitions: ComponentDefinitionBasic[];
 }) => {
     const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
         connectedUserIntegrationInstance.integrationId!,
@@ -75,7 +73,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     return (
         <Collapsible className="mb-2 rounded border border-border/50" key={connectedUserIntegrationInstance.id}>
             {componentDefinition && (
-                <div className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+                <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
                             <div className="flex min-h-8 flex-1 items-center gap-1">
@@ -101,21 +99,25 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
                             </div>
 
-                            <div className="flex min-h-7 items-center gap-4">
+                            <div className="flex min-h-7 items-center text-xs font-semibold text-muted-foreground">
                                 <ConnectedUserCredentialStatus
                                     componentTitle={componentDefinition.title!}
                                     credentialStatus={connectedUserIntegrationInstance.credentialStatus}
                                 />
 
-                                <div className="flex items-center space-x-1">
-                                    {integrationInstance && (
-                                        <div className="group flex text-xs font-semibold text-muted-foreground">
+                                {integrationInstance && (
+                                    <>
+                                        <span aria-hidden="true" className="mx-2">
+                                            -
+                                        </span>
+
+                                        <span>
                                             {workflows?.length === 1
                                                 ? `${workflows?.length} workflow`
                                                 : `${workflows?.length} workflows`}
-                                        </div>
-                                    )}
-                                </div>
+                                        </span>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </CollapsibleTrigger>
@@ -178,7 +180,6 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
             <CollapsibleContent>
                 {workflows && integrationInstance && integrationInstanceConfiguration && (
                     <ConnectedUserSheetPanelIntegrationWorkflowList
-                        componentDefinitions={componentDefinitions}
                         integrationInstance={integrationInstance}
                         integrationInstanceConfiguration={integrationInstanceConfiguration}
                         workflows={workflows}

@@ -10,14 +10,12 @@ const ConnectedUsersFilterTitle = ({
         <div className="space-x-1">
             <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
-            {filterData.status && (
-                <Badge
-                    className="border-transparent"
-                    label={`Status: ${filterData.status}`}
-                    styleType="primary-outline"
-                    weight="semibold"
-                />
-            )}
+            <Badge
+                className="border-transparent"
+                label={`Status: ${filterData.status || 'All Statuses'}`}
+                styleType="primary-outline"
+                weight="semibold"
+            />
         </div>
     );
 };

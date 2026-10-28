@@ -1,4 +1,5 @@
 import ConnectedUserProjectWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowList';
+import {ConnectedUserWorkflowTemplateSourceI} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowListItem';
 import {useAutomationWorkflowProjectsQuery, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
@@ -14,14 +15,17 @@ const ConnectedUserSheetPanelWorkflowList = ({connectedUserId}: {connectedUserId
     const {data: automationWorkflowProjectsData, isLoading: automationWorkflowProjectsIsLoading} =
         useAutomationWorkflowProjectsQuery();
 
-    const projectNamesByWorkflowUuid = useMemo(
+    const workflowTemplateSourcesByWorkflowUuid = useMemo(
         () =>
-            new Map(
+            new Map<string, ConnectedUserWorkflowTemplateSourceI>(
                 (automationWorkflowProjectsData?.automationWorkflowProjects ?? []).flatMap(
                     (automationWorkflowProject) =>
                         automationWorkflowProject.workflowTemplates.map(
                             (workflowTemplate) =>
-                                [workflowTemplate.workflowUuid, automationWorkflowProject.name] as const
+                                [
+                                    workflowTemplate.workflowUuid,
+                                    {projectName: automationWorkflowProject.name, workflowTemplate},
+                                ] as const
                         )
                 )
             ),
@@ -39,7 +43,7 @@ const ConnectedUserSheetPanelWorkflowList = ({connectedUserId}: {connectedUserId
     return connectedUserProjectWorkflows.length > 0 ? (
         <ConnectedUserProjectWorkflowList
             connectedUserProjectWorkflows={connectedUserProjectWorkflows}
-            projectNamesByWorkflowUuid={projectNamesByWorkflowUuid}
+            workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
         />
     ) : (
         <div className="py-4 text-sm">No automation workflows.</div>

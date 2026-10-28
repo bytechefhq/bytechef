@@ -6,7 +6,10 @@ import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
+import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {
+    AutomationWorkflowProjectsQuery,
     ConnectedUserProjectsQuery,
     useDeleteConnectedUserProjectWorkflowMutation,
     useEnableConnectedUserProjectWorkflowMutation,
@@ -14,18 +17,28 @@ import {
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
 export type ConnectedUserProjectWorkflowType =
     ConnectedUserProjectsQuery['connectedUserProjects'][number]['connectedUserProjectWorkflows'][number];
 
+export type ConnectedUserWorkflowTemplateType =
+    AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
+
+export interface ConnectedUserWorkflowTemplateSourceI {
+    projectName: string;
+    workflowTemplate: ConnectedUserWorkflowTemplateType;
+}
+
 const ConnectedUserProjectWorkflowListItem = ({
     connectedUserProjectWorkflow,
     projectName,
+    workflowTemplate,
 }: {
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
     projectName?: string;
+    workflowTemplate?: ConnectedUserWorkflowTemplateType;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -51,11 +64,46 @@ const ConnectedUserProjectWorkflowListItem = ({
         },
     });
 
+    const filteredComponentNames = useMemo(() => {
+        const componentNames = [...(workflowTemplate?.triggers ?? []), ...(workflowTemplate?.components ?? [])].map(
+            (component) => component.name
+        );
+
+        return componentNames.filter((componentName, index) => componentNames.indexOf(componentName) === index);
+    }, [workflowTemplate]);
+
+    const workflowComponentDefinitions = useMemo(
+        () =>
+            Object.fromEntries(
+                [...(workflowTemplate?.triggers ?? []), ...(workflowTemplate?.components ?? [])].map((component) => [
+                    component.name,
+                    {icon: component.icon ?? undefined, name: component.name, title: component.title ?? undefined},
+                ])
+            ) as Record<string, WorkflowComponentIconDefinitionType>,
+        [workflowTemplate]
+    );
+
+    const triggerSource = useMemo(
+        () => ({
+            triggers: connectedUserProjectWorkflow.workflow.triggers.map((trigger) => ({
+                label:
+                    workflowTemplate?.triggers.find((templateTrigger) => templateTrigger.name === trigger.name)
+                        ?.title ?? undefined,
+                type: trigger.type,
+            })),
+            workflowTriggerComponentNames: (workflowTemplate?.triggers ?? []).map((trigger) => trigger.name),
+        }),
+        [connectedUserProjectWorkflow.workflow.triggers, workflowTemplate]
+    );
+
     const lastExecutionDate = connectedUserProjectWorkflow.lastExecutionDate
         ? new Date(Date.parse(connectedUserProjectWorkflow.lastExecutionDate))
         : undefined;
 
     const isDraft = connectedUserProjectWorkflow.workflowVersion == null;
+
+    // An unpublished copy has no deployment to switch on; the server rejects enabling it until it is published
+    const enableDisabled = isDraft && !connectedUserProjectWorkflow.enabled;
 
     const {staticWebhookUrl} = connectedUserProjectWorkflow;
 
@@ -81,44 +129,56 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     return (
         <>
-            <li className="mb-2 flex items-center justify-between rounded border border-border/50 px-3 py-4 hover:bg-surface-neutral-primary-hover">
-                <div className="flex min-h-8 min-w-0 flex-1 flex-col justify-center gap-y-1">
-                    <button
-                        className="cursor-pointer truncate text-left text-sm font-semibold"
-                        onClick={handleWorkflowClick}
-                        type="button"
-                    >
-                        {connectedUserProjectWorkflow.workflow.label}
-                    </button>
+            <li className="flex min-h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <div className="flex w-80 min-w-0 shrink-0 flex-col gap-y-1 pr-1">
+                        <button
+                            className="cursor-pointer truncate text-left text-sm font-semibold"
+                            onClick={handleWorkflowClick}
+                            type="button"
+                        >
+                            {connectedUserProjectWorkflow.workflow.label}
+                        </button>
 
-                    {staticWebhookUrl && (
-                        <div className="flex min-w-0 items-center gap-x-1">
-                            <span
-                                className="truncate font-mono text-xs text-content-neutral-secondary"
-                                title={staticWebhookUrl}
-                            >
-                                {staticWebhookUrl}
-                            </span>
+                        {staticWebhookUrl && (
+                            <div className="flex min-w-0 items-center gap-x-1">
+                                <span
+                                    className="truncate font-mono text-xs text-content-neutral-secondary"
+                                    title={staticWebhookUrl}
+                                >
+                                    {staticWebhookUrl}
+                                </span>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        aria-label="Copy webhook URL"
-                                        icon={<ClipboardIcon />}
-                                        onClick={handleCopyStaticWebhookUrlClick}
-                                        size="iconXs"
-                                        variant="ghost"
-                                    />
-                                </TooltipTrigger>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label="Copy webhook URL"
+                                            icon={<ClipboardIcon />}
+                                            onClick={handleCopyStaticWebhookUrlClick}
+                                            size="iconXs"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
 
-                                <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
-                            </Tooltip>
-                        </div>
+                                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                                </Tooltip>
+                            </div>
+                        )}
+                    </div>
+
+                    {workflowTemplate && (
+                        <WorkflowTriggerAndComponentsRow
+                            className="hidden sm:flex"
+                            filteredComponentNames={filteredComponentNames}
+                            workflow={triggerSource}
+                            workflowComponentDefinitions={workflowComponentDefinitions}
+                            workflowTaskDispatcherDefinitions={workflowComponentDefinitions}
+                        />
                     )}
                 </div>
 
                 <div className="flex items-center gap-x-2">
-                    <div className="flex items-center gap-x-4 text-content-neutral-secondary">
+                    <div className="flex items-center gap-x-4">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Badge
@@ -131,35 +191,41 @@ const ConnectedUserProjectWorkflowListItem = ({
                             <TooltipContent>The workflow version</TooltipContent>
                         </Tooltip>
 
-                        <div className="flex min-w-52 flex-col items-end gap-y-2">
-                            <div className="relative flex min-h-8 items-center">
-                                {enableConnectedUserProjectWorkflowMutation.isPending && (
-                                    <LoadingIcon className="absolute top-[3px] left-[-15px]" />
-                                )}
-
-                                <Switch
-                                    checked={connectedUserProjectWorkflow.enabled}
-                                    onCheckedChange={(value) => {
-                                        enableConnectedUserProjectWorkflowMutation.mutate({
-                                            enable: value,
-                                            id: connectedUserProjectWorkflow.id,
-                                        });
-                                    }}
-                                />
-                            </div>
-
+                        <div className="flex min-w-52 items-center justify-end gap-x-4">
                             <Tooltip>
-                                <TooltipTrigger className="flex min-h-7 items-center text-sm">
-                                    {lastExecutionDate ? (
-                                        <span className="text-xs">
-                                            {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}
-                                        </span>
-                                    ) : (
-                                        <span className="text-xs">No executions</span>
-                                    )}
+                                <TooltipTrigger className="text-xs text-content-neutral-secondary">
+                                    {lastExecutionDate
+                                        ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+                                        : 'No executions'}
                                 </TooltipTrigger>
 
                                 <TooltipContent side="left">Last Execution Date</TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span className="relative flex items-center">
+                                        {enableConnectedUserProjectWorkflowMutation.isPending && (
+                                            <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                                        )}
+
+                                        <Switch
+                                            aria-label={`Enable ${connectedUserProjectWorkflow.workflow.label}`}
+                                            checked={connectedUserProjectWorkflow.enabled}
+                                            disabled={enableDisabled}
+                                            onCheckedChange={(value) => {
+                                                enableConnectedUserProjectWorkflowMutation.mutate({
+                                                    enable: value,
+                                                    id: connectedUserProjectWorkflow.id,
+                                                });
+                                            }}
+                                        />
+                                    </span>
+                                </TooltipTrigger>
+
+                                {enableDisabled && (
+                                    <TooltipContent side="left">Publish the workflow before enabling it</TooltipContent>
+                                )}
                             </Tooltip>
                         </div>
                     </div>
