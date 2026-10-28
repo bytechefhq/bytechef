@@ -28,20 +28,24 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -77,6 +81,9 @@ public class IntegrationFacadeIntTest {
     private IntegrationFacade integrationFacade;
 
     @Autowired
+    private IntegrationInstanceConfigurationRepository integrationInstanceConfigurationRepository;
+
+    @Autowired
     private IntegrationRepository integrationRepository;
 
     @Autowired
@@ -105,6 +112,7 @@ public class IntegrationFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
+        integrationInstanceConfigurationRepository.deleteAll();
         integrationRepository.deleteAll();
 
         categoryRepository.deleteAll();
@@ -238,9 +246,43 @@ public class IntegrationFacadeIntTest {
         IntegrationDTO integrationDTO = integrationDTOs.getFirst();
 
         assertThat(integrationFacade.getIntegration(integrationDTO.id()))
-            .isEqualTo(integrationDTO)
+            .usingRecursiveComparison()
+            .ignoringFields("developmentConfigurationCount")
+            .isEqualTo(integrationDTO);
+        assertThat(integrationFacade.getIntegration(integrationDTO.id()))
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
+    }
+
+    @Test
+    public void testGetIntegrationsDevelopmentConfigurationCount() {
+        Integration developmentIntegration = createIntegration("development");
+
+        createIntegrationInstanceConfiguration(developmentIntegration.getId(), Environment.DEVELOPMENT);
+        createIntegrationInstanceConfiguration(developmentIntegration.getId(), Environment.DEVELOPMENT);
+
+        Integration productionIntegration = createIntegration("production");
+
+        createIntegrationInstanceConfiguration(productionIntegration.getId(), Environment.PRODUCTION);
+
+        List<IntegrationDTO> integrationDTOs = integrationFacade.getIntegrations(null, false, null, null, true);
+
+        assertThat(integrationDTOs)
+            .filteredOn(integrationDTO -> integrationDTO.id()
+                .equals(developmentIntegration.getId()))
+            .singleElement()
+            .extracting(IntegrationDTO::developmentConfigurationCount)
+            .isEqualTo(2);
+        assertThat(integrationDTOs)
+            .filteredOn(integrationDTO -> integrationDTO.id()
+                .equals(productionIntegration.getId()))
+            .singleElement()
+            .extracting(IntegrationDTO::developmentConfigurationCount)
+            .isEqualTo(0);
+
+        IntegrationDTO developmentIntegrationDTO = integrationFacade.getIntegration(developmentIntegration.getId());
+
+        assertThat(developmentIntegrationDTO.developmentConfigurationCount()).isNull();
     }
 
     @Test
@@ -350,6 +392,27 @@ public class IntegrationFacadeIntTest {
         integrationDTO = integrationFacade.getIntegration(integrationDTO.id());
 
         assertThat(integrationDTO.tags()).hasSize(1);
+    }
+
+    private Integration createIntegration(String name) {
+        Integration integration = new Integration();
+
+        integration.setComponentName("componentName-" + name);
+        integration.setName(name);
+
+        return integrationRepository.save(integration);
+    }
+
+    private void createIntegrationInstanceConfiguration(long integrationId, Environment environment) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setConnectionParameters(Map.of());
+        integrationInstanceConfiguration.setEnvironment(environment);
+        integrationInstanceConfiguration.setIntegrationId(integrationId);
+        integrationInstanceConfiguration.setIntegrationVersion(1);
+        integrationInstanceConfiguration.setName("instance-configuration-" + UUID.randomUUID());
+
+        integrationInstanceConfigurationRepository.save(integrationInstanceConfiguration);
     }
 
     @TestConfiguration

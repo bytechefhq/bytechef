@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 @SuppressFBWarnings("EI")
 public record IntegrationDTO(
     Category category, String componentName, int componentVersion, String createdBy, Instant createdDate,
-    String description, String icon, Long id,
+    String description, Integer developmentConfigurationCount, String icon, Long id,
     List<IntegrationVersion> integrationVersions, List<Long> integrationWorkflowIds, String lastModifiedBy,
     Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion,
     boolean multipleInstances, String name, String permissionExpression, List<Tag> tags, String title, int version) {
@@ -36,7 +36,7 @@ public record IntegrationDTO(
         this(
             integration.getCategoryId() == null ? null : new Category(integration.getCategoryId()),
             integration.getComponentName(), integration.getComponentVersion(), integration.getCreatedBy(),
-            integration.getCreatedDate(), integration.getDescription(), null, integration.getId(),
+            integration.getCreatedDate(), integration.getDescription(), null, null, integration.getId(),
             integration.getIntegrationVersions(), List.of(), integration.getLastModifiedBy(),
             integration.getLastModifiedDate(), integration.getLastPublishedDate(), integration.getLastStatus(),
             integration.getLastIntegrationVersion(), integration.isMultipleInstances(), integration.getName(),
@@ -47,10 +47,18 @@ public record IntegrationDTO(
     public IntegrationDTO(
         Category category, @Nullable ComponentDefinition componentDefinition, Integration integration,
         List<Long> integrationWorkflowIds, List<Tag> tags) {
+
+        this(category, componentDefinition, integration, integrationWorkflowIds, tags, null);
+    }
+
+    public IntegrationDTO(
+        Category category, @Nullable ComponentDefinition componentDefinition, Integration integration,
+        List<Long> integrationWorkflowIds, List<Tag> tags, Integer developmentConfigurationCount) {
+
         this(
             category, integration.getComponentName(),
             integration.getComponentVersion(), integration.getCreatedBy(), integration.getCreatedDate(),
-            getDescription(componentDefinition, integration),
+            getDescription(componentDefinition, integration), developmentConfigurationCount,
             componentDefinition == null ? null : componentDefinition.getIcon(), integration.getId(),
             integration.getIntegrationVersions(), integrationWorkflowIds, integration.getLastModifiedBy(),
             integration.getLastModifiedDate(), integration.getLastPublishedDate(), integration.getLastStatus(),
@@ -224,7 +232,7 @@ public record IntegrationDTO(
         public IntegrationDTO build() {
             return new IntegrationDTO(
                 category, componentName, componentVersion, createdBy,
-                createdDate, description, null, id, integrationVersions, integrationWorkflowIds, lastModifiedBy,
+                createdDate, description, null, null, id, integrationVersions, integrationWorkflowIds, lastModifiedBy,
                 lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name,
                 permissionExpression, tags, null, version);
         }
