@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T07:55:59.220524+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -66,6 +66,8 @@ public class IntegrationModel {
   private @Nullable String permissionExpression;
 
   private @Nullable CategoryModel category;
+
+  private @Nullable Integer developmentConfigurationCount;
 
   private List<Long> integrationWorkflowIds = new ArrayList<>();
 
@@ -400,6 +402,27 @@ public class IntegrationModel {
     this.category = category;
   }
 
+  public IntegrationModel developmentConfigurationCount(@Nullable Integer developmentConfigurationCount) {
+    this.developmentConfigurationCount = developmentConfigurationCount;
+    return this;
+  }
+
+  /**
+   * The number of the integration's instance configurations in the Development environment. Only set by the integration list.
+   * @return developmentConfigurationCount
+   */
+  
+  @Schema(name = "developmentConfigurationCount", accessMode = Schema.AccessMode.READ_ONLY, description = "The number of the integration's instance configurations in the Development environment. Only set by the integration list.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("developmentConfigurationCount")
+  public @Nullable Integer getDevelopmentConfigurationCount() {
+    return developmentConfigurationCount;
+  }
+
+  @JsonProperty("developmentConfigurationCount")
+  public void setDevelopmentConfigurationCount(@Nullable Integer developmentConfigurationCount) {
+    this.developmentConfigurationCount = developmentConfigurationCount;
+  }
+
   public IntegrationModel integrationWorkflowIds(List<Long> integrationWorkflowIds) {
     this.integrationWorkflowIds = integrationWorkflowIds;
     return this;
@@ -503,6 +526,7 @@ public class IntegrationModel {
         Objects.equals(this.name, integration.name) &&
         Objects.equals(this.permissionExpression, integration.permissionExpression) &&
         Objects.equals(this.category, integration.category) &&
+        Objects.equals(this.developmentConfigurationCount, integration.developmentConfigurationCount) &&
         Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.tags, integration.tags) &&
         Objects.equals(this.version, integration.version);
@@ -510,7 +534,7 @@ public class IntegrationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, category, integrationWorkflowIds, tags, version);
+    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, category, developmentConfigurationCount, integrationWorkflowIds, tags, version);
   }
 
   @Override
@@ -532,6 +556,7 @@ public class IntegrationModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    permissionExpression: ").append(toIndentedString(permissionExpression)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    developmentConfigurationCount: ").append(toIndentedString(developmentConfigurationCount)).append("\n");
     sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
