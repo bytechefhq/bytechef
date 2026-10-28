@@ -22,6 +22,7 @@ Name | Type
 `name` | string
 `permissionExpression` | string
 `category` | [Category](Category.md)
+`developmentConfigurationCount` | number
 `integrationWorkflowIds` | Array&lt;number&gt;
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `version` | number
@@ -48,6 +49,7 @@ const example = {
   "name": null,
   "permissionExpression": null,
   "category": null,
+  "developmentConfigurationCount": null,
   "integrationWorkflowIds": null,
   "tags": null,
   "version": null,
