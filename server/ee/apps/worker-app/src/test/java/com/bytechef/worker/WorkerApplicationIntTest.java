@@ -52,7 +52,7 @@ public class WorkerApplicationIntTest {
             .map(ComponentDefinition::getName)
             .toList();
 
-        assertThat(componentNames).contains("apiPlatform", "appEvent", "request");
+        assertThat(componentNames).contains("apiPlatform", "appEvent", "fieldMapping", "request");
     }
 
     @Test
