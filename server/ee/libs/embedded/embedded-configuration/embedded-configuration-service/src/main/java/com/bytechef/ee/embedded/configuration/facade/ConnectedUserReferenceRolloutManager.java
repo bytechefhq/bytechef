@@ -49,7 +49,8 @@ public class ConnectedUserReferenceRolloutManager {
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserReferenceRolloutManager.class);
 
     private static final String DELETED_DANGLING_REASON = "The automation workflow project was deleted";
-    private static final String REMOVED_DANGLING_REASON = "Removed from the automation workflow project on publish";
+    private static final String NOT_IN_RELEASED_VERSION_DANGLING_REASON =
+        "Not in the version released to this environment";
 
     private final ConnectedUserProjectService connectedUserProjectService;
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
@@ -299,7 +300,7 @@ public class ConnectedUserReferenceRolloutManager {
             String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
             if (reference.isDangling() || !publishedAutomationWorkflowUuids.contains(automationWorkflowUuid)) {
-                markDangling(reference, REMOVED_DANGLING_REASON);
+                markDangling(reference, NOT_IN_RELEASED_VERSION_DANGLING_REASON);
 
                 continue;
             }

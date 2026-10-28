@@ -687,6 +687,42 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testRollOutToAVersionLackingATemplateDanglesItsReferencesWithTheReleasedVersionReason() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Roll Back Without Template");
+
+        String keptUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        String addedUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow keptReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, keptUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow addedReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, addedUuid, Environment.PRODUCTION);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 1);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(connectedUserProjectWorkflowRepository.findById(addedReference.getId()))
+            .get()
+            .satisfies(reference -> {
+                assertThat(reference.isDangling()).isTrue();
+                assertThat(reference.isEnabled()).isFalse();
+                assertThat(reference.getDanglingReason())
+                    .isEqualTo("Not in the version released to this environment");
+            });
+        assertThat(connectedUserProjectWorkflowRepository.findById(keptReference.getId()))
+            .get()
+            .satisfies(reference -> assertThat(reference.isDangling()).isFalse());
+    }
+
+    @Test
     void testRollOutOnlyTouchesTheConfiguredEnvironment() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Pin Per Environment");
 
