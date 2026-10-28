@@ -1,0 +1,298 @@
+import AlertDialog from '@/components/AlertDialog';
+import Header from '@/shared/layout/Header';
+import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {
+    useCancelSubscriptionMutation,
+    useReactivateSubscriptionMutation,
+} from '@/shared/mutations/platform/billing.mutations';
+import {useGetCurrentSubscriptionQuery} from '@/shared/queries/platform/billing.queries';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useEffect, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
+import {toast} from 'sonner';
+
+import ManageBillingCard from './components/ManageBillingCard';
+import PlanCard from './components/PlanCard';
+import SelectPlanDialog from './components/SelectPlanDialog';
+
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 5;
+
+const MeteredBilling = () => {
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+    const [pendingUpgradePlanName, setPendingUpgradePlanName] = useState<string | null>(null);
+    const [pollAttempts, setPollAttempts] = useState(0);
+    const [reactivateDialogOpen, setReactivateDialogOpen] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [selectPlanOpen, setSelectPlanOpen] = useState(false);
+
+    const customerPortalUrl = useApplicationInfoStore((state) => state.billing.customerPortalUrl);
+
+    const {isPending: isCancelPending, mutate: cancelSubscription} = useCancelSubscriptionMutation();
+    const {isPending: isReactivateMutationPending, mutate: reactivateSubscription} =
+        useReactivateSubscriptionMutation();
+
+    const isCheckoutSuccess = searchParams.get('checkout') === 'success';
+    const isCancelPolling = searchParams.get('cancel') === 'pending';
+    const isReactivatePending = searchParams.get('reactivate') === 'pending';
+    const isUpgradePending = searchParams.get('upgrade') === 'pending';
+    const isPolling =
+        (isCheckoutSuccess || isCancelPolling || isReactivatePending || isUpgradePending) &&
+        pollAttempts < MAX_POLL_ATTEMPTS;
+
+    const {data: subscription, error: subscriptionError} = useGetCurrentSubscriptionQuery({
+        refetchInterval: isPolling ? POLL_INTERVAL_MS : false,
+    });
+
+    const isTrialSubscription = subscription?.planName?.toUpperCase() === 'TRIAL';
+
+    useEffect(() => {
+        if (!isCheckoutSuccess) {
+            return;
+        }
+
+        if (subscription && !isTrialSubscription) {
+            setSearchParams({}, {replace: true});
+
+            return;
+        }
+
+        if (pollAttempts >= MAX_POLL_ATTEMPTS) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setPollAttempts((prev) => prev + 1);
+        }, POLL_INTERVAL_MS);
+
+        return () => clearTimeout(timer);
+    }, [isCheckoutSuccess, isTrialSubscription, pollAttempts, searchParams, setSearchParams, subscription]);
+
+    useEffect(() => {
+        if (!isCancelPolling) {
+            return;
+        }
+
+        if (subscription?.cancelAtPeriodEnd === true) {
+            setSearchParams({}, {replace: true});
+
+            return;
+        }
+
+        if (pollAttempts >= MAX_POLL_ATTEMPTS) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setPollAttempts((prev) => prev + 1);
+        }, POLL_INTERVAL_MS);
+
+        return () => clearTimeout(timer);
+    }, [isCancelPolling, pollAttempts, setSearchParams, subscription]);
+
+    useEffect(() => {
+        if (!isReactivatePending) {
+            return;
+        }
+
+        if (subscription?.cancelAtPeriodEnd === false) {
+            setSearchParams({}, {replace: true});
+
+            return;
+        }
+
+        if (pollAttempts >= MAX_POLL_ATTEMPTS) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setPollAttempts((prev) => prev + 1);
+        }, POLL_INTERVAL_MS);
+
+        return () => clearTimeout(timer);
+    }, [isReactivatePending, pollAttempts, setSearchParams, subscription]);
+
+    useEffect(() => {
+        if (!isUpgradePending) {
+            return;
+        }
+
+        if (
+            pendingUpgradePlanName !== null &&
+            subscription?.planName?.toUpperCase() === pendingUpgradePlanName.toUpperCase()
+        ) {
+            setPendingUpgradePlanName(null);
+            setSearchParams({}, {replace: true});
+
+            return;
+        }
+
+        if (pollAttempts >= MAX_POLL_ATTEMPTS) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setPollAttempts((prev) => prev + 1);
+        }, POLL_INTERVAL_MS);
+
+        return () => clearTimeout(timer);
+    }, [isUpgradePending, pendingUpgradePlanName, pollAttempts, setSearchParams, subscription]);
+
+    const renewalDate = subscription?.currentPeriodEnd
+        ? subscription.currentPeriodEnd.toLocaleDateString('en-US', {day: 'numeric', month: 'long', year: 'numeric'})
+        : undefined;
+
+    const trialDaysRemaining =
+        isTrialSubscription && subscription?.currentPeriodEnd
+            ? Math.max(0, Math.ceil((subscription.currentPeriodEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+            : undefined;
+
+    const isTrialExpired = isTrialSubscription && subscription?.status === 'CANCELED';
+
+    const planCardProps =
+        subscription && !isTrialSubscription
+            ? {
+                  cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
+                  jobsExecuted: subscription.jobsExecuted ?? 0,
+                  planName: subscription.planName ?? 'Active',
+                  productUnitLimit: subscription.productUnitLimit ?? 0,
+                  renewalDate,
+                  scheduledPlanName: subscription.scheduledPlanName,
+                  trialDaysRemaining: undefined,
+                  trialExpired: undefined,
+              }
+            : {
+                  cancelAtPeriodEnd: false,
+                  jobsExecuted: subscription?.jobsExecuted ?? 0,
+                  planName: 'Trial',
+                  productUnitLimit: subscription?.productUnitLimit ?? 0,
+                  renewalDate: undefined,
+                  scheduledPlanName: undefined,
+                  trialDaysRemaining,
+                  trialExpired: isTrialExpired,
+              };
+
+    return (
+        <LayoutContainer
+            header={
+                <Header centerTitle description="Manage your subscription and usage." position="main" title="Billing" />
+            }
+            leftSidebarOpen={false}
+        >
+            {subscriptionError ? (
+                <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+                    <div className="rounded-lg border border-stroke-destructive-secondary bg-surface-destructive-secondary px-4 py-3 text-sm text-content-destructive">
+                        Unable to load subscription. Please refresh the page or contact support if the problem persists.
+                    </div>
+                </div>
+            ) : (
+                <div className="w-full space-y-4 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+                    {isCheckoutSuccess && (!subscription || isTrialSubscription) && (
+                        <div className="rounded-lg border border-stroke-brand-secondary bg-surface-brand-secondary px-4 py-3 text-sm text-content-brand-primary">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Activating your subscription, please wait…'}
+                        </div>
+                    )}
+
+                    {isCancelPolling && (
+                        <div className="rounded-lg border border-stroke-warning-secondary bg-surface-warning-secondary px-4 py-3 text-sm text-content-warning-primary">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Scheduling cancellation, please wait…'}
+                        </div>
+                    )}
+
+                    {isReactivatePending && (
+                        <div className="rounded-lg border border-stroke-success-secondary bg-surface-success-secondary px-4 py-3 text-sm text-content-success-primary">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Reactivating your subscription, please wait…'}
+                        </div>
+                    )}
+
+                    {isUpgradePending && (
+                        <div className="rounded-lg border border-stroke-brand-secondary bg-surface-brand-secondary px-4 py-3 text-sm text-content-brand-primary">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Upgrading your plan, please wait…'}
+                        </div>
+                    )}
+
+                    <PlanCard
+                        {...planCardProps}
+                        onCancelPlan={
+                            subscription && !isTrialSubscription && !subscription.cancelAtPeriodEnd
+                                ? () => setCancelDialogOpen(true)
+                                : undefined
+                        }
+                        onChangePlan={() => setSelectPlanOpen(true)}
+                        onReactivatePlan={
+                            subscription?.cancelAtPeriodEnd ? () => setReactivateDialogOpen(true) : undefined
+                        }
+                    />
+
+                    {customerPortalUrl && <ManageBillingCard customerPortalUrl={customerPortalUrl} />}
+
+                    <AlertDialog
+                        cancelLabel="Keep plan"
+                        confirmLabel={isCancelPending ? 'Cancelling…' : 'Cancel subscription'}
+                        description="Your subscription will be cancelled at the end of the current billing period. You will retain access until then and will not be charged again."
+                        isPending={isCancelPending}
+                        onCancel={() => setCancelDialogOpen(false)}
+                        onConfirm={() =>
+                            cancelSubscription(undefined, {
+                                onSuccess: () => {
+                                    setCancelDialogOpen(false);
+                                    setPollAttempts(0);
+                                    setSearchParams({cancel: 'pending'}, {replace: true});
+                                },
+                            })
+                        }
+                        open={cancelDialogOpen}
+                        title="Cancel subscription?"
+                    />
+
+                    <AlertDialog
+                        cancelLabel="Keep cancelled"
+                        confirmButtonVariant="default"
+                        confirmLabel={isReactivateMutationPending ? 'Reactivating…' : 'Reactivate subscription'}
+                        description="Your subscription will continue and you will be charged at the next billing cycle. Your plan will no longer be cancelled."
+                        isPending={isReactivateMutationPending}
+                        onCancel={() => setReactivateDialogOpen(false)}
+                        onConfirm={() =>
+                            reactivateSubscription(undefined, {
+                                onSuccess: () => {
+                                    setReactivateDialogOpen(false);
+                                    setPollAttempts(0);
+                                    setSearchParams({reactivate: 'pending'}, {replace: true});
+                                },
+                            })
+                        }
+                        open={reactivateDialogOpen}
+                        title="Reactivate subscription?"
+                    />
+
+                    <SelectPlanDialog
+                        currentPlanName={subscription?.planName ?? undefined}
+                        hasActiveSubscription={!!subscription && !isTrialSubscription}
+                        onClose={() => setSelectPlanOpen(false)}
+                        onUpgradeSuccess={(isUpgrade, newPlanName) => {
+                            setPollAttempts(0);
+
+                            if (isUpgrade) {
+                                setPendingUpgradePlanName(newPlanName);
+                                setSearchParams({upgrade: 'pending'}, {replace: true});
+                            } else {
+                                toast('Your plan will be downgraded at the end of the current billing period.');
+                            }
+                        }}
+                        open={selectPlanOpen}
+                    />
+                </div>
+            )}
+        </LayoutContainer>
+    );
+};
+
+export default MeteredBilling;
