@@ -20,6 +20,7 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandlerRegistry;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidSubscriptionModelHandler;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
@@ -33,15 +34,21 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade {
 
+    private static final int MAX_PACKAGE_QUANTITY = 100;
+    private static final int MIN_PACKAGE_QUANTITY = 1;
+
     private final BillingSubscriptionService billingSubscriptionService;
+    private final PrepaidSubscriptionModelHandler prepaidSubscriptionModelHandler;
     private final SubscriptionModelHandlerRegistry subscriptionModelHandlerRegistry;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public BillingSubscriptionFacadeImpl(
         BillingSubscriptionService billingSubscriptionService,
+        PrepaidSubscriptionModelHandler prepaidSubscriptionModelHandler,
         SubscriptionModelHandlerRegistry subscriptionModelHandlerRegistry) {
 
         this.billingSubscriptionService = billingSubscriptionService;
+        this.prepaidSubscriptionModelHandler = prepaidSubscriptionModelHandler;
         this.subscriptionModelHandlerRegistry = subscriptionModelHandlerRegistry;
     }
 
@@ -58,6 +65,28 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     public String createCheckoutSession(String planName) {
         return subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.PREPAID)
             .createCheckoutSession(planName);
+    }
+
+    @Override
+    public String createJobExecutionsPackageCheckoutSession(int quantity) {
+        if (quantity < MIN_PACKAGE_QUANTITY || quantity > MAX_PACKAGE_QUANTITY) {
+            throw new IllegalArgumentException(
+                "Package quantity must be between " + MIN_PACKAGE_QUANTITY + " and " + MAX_PACKAGE_QUANTITY);
+        }
+
+        BillingSubscription subscription = billingSubscriptionService.fetchCurrentSubscription()
+            .orElseThrow(() -> new IllegalStateException("No active subscription found"));
+
+        if (subscription.getSubscriptionModel() != SubscriptionModel.PREPAID
+            || "TRIAL".equals(subscription.getPlanName())
+            || subscription.getStatus() != BillingSubscription.Status.ACTIVE
+            || subscription.isCancelAtPeriodEnd()) {
+
+            throw new IllegalStateException(
+                "Job executions packages can only be purchased with an active, non-canceling paid subscription");
+        }
+
+        return prepaidSubscriptionModelHandler.createJobExecutionsPackageCheckoutSession(quantity);
     }
 
     @Override

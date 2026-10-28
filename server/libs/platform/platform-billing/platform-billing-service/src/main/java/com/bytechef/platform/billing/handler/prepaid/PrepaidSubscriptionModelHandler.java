@@ -27,6 +27,7 @@ import com.bytechef.platform.billing.repository.PrepaidBillingSubscriptionReposi
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.tenant.TenantContext;
+import com.stripe.model.LineItem;
 import com.stripe.model.Subscription;
 import com.stripe.model.SubscriptionItem;
 import com.stripe.model.checkout.Session;
@@ -96,6 +97,59 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
             TenantContext.getCurrentTenantId());
 
         return session.getUrl();
+    }
+
+    public String createJobExecutionsPackageCheckoutSession(int quantity) {
+        String packagePriceId = stripeClient.fetchProductDefaultPriceId(
+            billingProperties.stripe()
+                .productJobExecutionsPackageId());
+
+        String customerId = getCustomerId();
+
+        Session session = prepaidStripeClient.createJobExecutionsPackageCheckoutSession(
+            customerId, packagePriceId, quantity, billingProperties.stripe()
+                .jobExecutionsPackageSuccessUrl(),
+            billingProperties.stripe()
+                .cancelUrl(),
+            TenantContext.getCurrentTenantId());
+
+        return session.getUrl();
+    }
+
+    /**
+     * Grants the purchased units to the tenant's current row, whatever its state: the checkout may have been started
+     * before the row became TRIAL or CANCELED. With no current row it throws so that Stripe retries the event.
+     */
+    public BillingSubscription handleJobExecutionsPackagePurchased(Session session, List<LineItem> lineItems) {
+        BillingSubscription currentSubscription = billingSubscriptionService.fetchCurrentSubscription()
+            .orElseThrow(() -> new IllegalStateException(
+                "No subscription found to grant the job executions package of checkout session " + session.getId()));
+
+        if (!"paid".equals(session.getPaymentStatus())) {
+            log.warn(
+                "Checkout session {} has payment status {}, not granting job executions package units",
+                session.getId(), session.getPaymentStatus());
+
+            return currentSubscription;
+        }
+
+        String packageProductId = billingProperties.stripe()
+            .productJobExecutionsPackageId();
+
+        int unitTotal = 0;
+
+        for (LineItem lineItem : lineItems) {
+            if (Objects.equals(packageProductId, lineItem.getPrice()
+                .getProduct())) {
+
+                unitTotal += PrepaidPriceUtils.getUnitTotal(lineItem.getPrice())
+                    * Math.toIntExact(lineItem.getQuantity());
+            }
+        }
+
+        prepaidBillingSubscriptionRepository.addExtraUnitTotal(currentSubscription.getId(), unitTotal);
+
+        return currentSubscription;
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.handler.prepaid;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -35,6 +36,8 @@ import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.tenant.TenantContext;
 import com.stripe.model.Event;
+import com.stripe.model.LineItem;
+import com.stripe.model.Price;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -42,6 +45,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -67,6 +72,8 @@ class PrepaidSubscriptionModelHandlerTest {
     private static final String GROWTH_PRODUCT_ID = "prod_growth";
     private static final String SUCCESS_URL = "https://app/success";
     private static final String CANCEL_URL = "https://app/cancel";
+    private static final String PACKAGE_PRODUCT_ID = "prod_package";
+    private static final String PACKAGE_SUCCESS_URL = "https://app/package-success";
     private static final String WEBHOOK_SECRET = "whsec_test_webhook_secret";
     private static final String CHECKOUT_SUBSCRIPTION_ID = "sub_checkout_test";
     private static final long PERIOD_START = 1780272000L;
@@ -100,7 +107,7 @@ class PrepaidSubscriptionModelHandlerTest {
         BillingProperties billingProperties = new BillingProperties(
             new BillingProperties.Stripe(
                 "sk_test", null, STARTER_PRODUCT_ID, GROWTH_PRODUCT_ID, "prod_usage", null, "whsec", SUCCESS_URL,
-                CANCEL_URL, null, null));
+                CANCEL_URL, PACKAGE_PRODUCT_ID, PACKAGE_SUCCESS_URL));
 
         handler = new PrepaidSubscriptionModelHandler(
             billingProperties, billingSubscriptionRepository, billingSubscriptionService, billingUsageService,
@@ -346,6 +353,112 @@ class PrepaidSubscriptionModelHandlerTest {
         assertThat(subscription.getStatus()).isEqualTo(BillingSubscription.Status.CANCELED);
 
         verify(billingSubscriptionService).save(subscription);
+    }
+
+    @Test
+    void testCreateJobExecutionsPackageCheckoutSessionUsesPackagePrice() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new TestingAuthenticationToken("user@test.com", "pw"));
+
+        Session session = new Session();
+
+        session.setUrl("https://package-checkout");
+
+        when(stripeClient.fetchProductDefaultPriceId(PACKAGE_PRODUCT_ID)).thenReturn("price_package");
+        when(stripeClient.fetchCustomerId("user@test.com", TENANT_ID)).thenReturn(Optional.of("cus_1"));
+        when(prepaidStripeClient.createJobExecutionsPackageCheckoutSession(
+            "cus_1", "price_package", 3L, PACKAGE_SUCCESS_URL, CANCEL_URL, TENANT_ID)).thenReturn(session);
+
+        assertThat(handler.createJobExecutionsPackageCheckoutSession(3)).isEqualTo("https://package-checkout");
+    }
+
+    @Test
+    void testPackagePurchasedGrantsUnitTotalTimesQuantity() {
+        BillingSubscription currentSubscription = assignId(prepaidSubscription("STARTER", 1000));
+
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+
+        BillingSubscription result = handler.handleJobExecutionsPackagePurchased(
+            packageSession("paid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 3L)));
+
+        verify(prepaidBillingSubscriptionRepository).addExtraUnitTotal(SUBSCRIPTION_ROW_ID, 3000);
+
+        assertThat(result).isSameAs(currentSubscription);
+    }
+
+    @Test
+    void testPackagePurchasedIgnoresNonPackageLineItems() {
+        BillingSubscription currentSubscription = assignId(prepaidSubscription("STARTER", 1000));
+
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+
+        handler.handleJobExecutionsPackagePurchased(
+            packageSession("paid"),
+            List.of(packageLineItem(PACKAGE_PRODUCT_ID, "500", 2L), packageLineItem("prod_other", "999", 5L),
+                packageLineItem(PACKAGE_PRODUCT_ID, "500", 1L)));
+
+        verify(prepaidBillingSubscriptionRepository).addExtraUnitTotal(SUBSCRIPTION_ROW_ID, 1500);
+    }
+
+    @Test
+    void testPackagePurchasedUnpaidGrantsNothing() {
+        BillingSubscription currentSubscription = assignId(prepaidSubscription("STARTER", 1000));
+
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
+
+        BillingSubscription result = handler.handleJobExecutionsPackagePurchased(
+            packageSession("unpaid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 3L)));
+
+        verify(prepaidBillingSubscriptionRepository, never()).addExtraUnitTotal(anyLong(), anyInt());
+
+        assertThat(result).isSameAs(currentSubscription);
+    }
+
+    @Test
+    void testPackagePurchasedGrantsToCurrentRowWhenTrial() {
+        BillingSubscription trialSubscription = assignId(prepaidSubscription("TRIAL", 0));
+
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(trialSubscription));
+
+        handler.handleJobExecutionsPackagePurchased(
+            packageSession("paid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 2L)));
+
+        verify(prepaidBillingSubscriptionRepository).addExtraUnitTotal(SUBSCRIPTION_ROW_ID, 2000);
+    }
+
+    @Test
+    void testPackagePurchasedWithoutCurrentRowThrows() {
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> handler.handleJobExecutionsPackagePurchased(
+            packageSession("paid"), List.of(packageLineItem(PACKAGE_PRODUCT_ID, "1000", 2L))))
+                .isInstanceOf(IllegalStateException.class);
+
+        verify(prepaidBillingSubscriptionRepository, never()).addExtraUnitTotal(anyLong(), anyInt());
+    }
+
+    private Session packageSession(String paymentStatus) {
+        Session session = new Session();
+
+        session.setId("cs_package");
+        session.setPaymentStatus(paymentStatus);
+
+        return session;
+    }
+
+    private LineItem packageLineItem(String productId, String unitTotal, long quantity) {
+        Price price = new Price();
+
+        price.setId("price_" + productId);
+        price.setProduct(productId);
+        price.setMetadata(Map.of("unit_total", unitTotal));
+
+        LineItem lineItem = new LineItem();
+
+        lineItem.setPrice(price);
+        lineItem.setQuantity(quantity);
+
+        return lineItem;
     }
 
     private BillingSubscription assignId(BillingSubscription subscription) {

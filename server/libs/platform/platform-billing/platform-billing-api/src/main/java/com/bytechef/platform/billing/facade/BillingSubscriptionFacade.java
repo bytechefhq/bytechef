@@ -28,6 +28,8 @@ public interface BillingSubscriptionFacade {
 
     String createCheckoutSession(String planName);
 
+    String createJobExecutionsPackageCheckoutSession(int quantity);
+
     void reactivateSubscription();
 
     void updateSubscription(String planName);

@@ -16,16 +16,21 @@
 
 package com.bytechef.platform.billing.facade;
 
+import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandlerRegistry;
 import com.bytechef.platform.billing.handler.metered.MeteredSubscriptionModelHandler;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidStripeClient;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidSubscriptionModelHandler;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
 import com.stripe.model.Event;
+import com.stripe.model.LineItem;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,19 +54,27 @@ class BillingWebhookEventHandler {
 
     private static final Logger log = LoggerFactory.getLogger(BillingWebhookEventHandler.class);
 
+    private final BillingProperties billingProperties;
     private final BillingSubscriptionService billingSubscriptionService;
     private final BillingWebhookEventService billingWebhookEventService;
     private final MeteredSubscriptionModelHandler meteredSubscriptionModelHandler;
+    private final PrepaidStripeClient prepaidStripeClient;
+    private final PrepaidSubscriptionModelHandler prepaidSubscriptionModelHandler;
     private final SubscriptionModelHandlerRegistry subscriptionModelHandlerRegistry;
 
     BillingWebhookEventHandler(
-        BillingSubscriptionService billingSubscriptionService, BillingWebhookEventService billingWebhookEventService,
+        BillingProperties billingProperties, BillingSubscriptionService billingSubscriptionService,
+        BillingWebhookEventService billingWebhookEventService,
         MeteredSubscriptionModelHandler meteredSubscriptionModelHandler,
+        PrepaidSubscriptionModelHandler prepaidSubscriptionModelHandler, PrepaidStripeClient prepaidStripeClient,
         SubscriptionModelHandlerRegistry subscriptionModelHandlerRegistry) {
 
+        this.billingProperties = billingProperties;
         this.billingSubscriptionService = billingSubscriptionService;
         this.billingWebhookEventService = billingWebhookEventService;
         this.meteredSubscriptionModelHandler = meteredSubscriptionModelHandler;
+        this.prepaidStripeClient = prepaidStripeClient;
+        this.prepaidSubscriptionModelHandler = prepaidSubscriptionModelHandler;
         this.subscriptionModelHandlerRegistry = subscriptionModelHandlerRegistry;
     }
 
@@ -128,11 +141,25 @@ class BillingWebhookEventHandler {
     }
 
     private BillingSubscription handleCheckoutSessionCompleted(Event event) {
-        cancelTrialSubscription();
-
         Session session = (Session) event.getDataObjectDeserializer()
             .getObject()
             .orElseThrow(() -> new RuntimeException("Failed to deserialize checkout session"));
+
+        List<LineItem> lineItems = prepaidStripeClient.retrieveCheckoutSessionLineItems(session.getId());
+
+        String packageProductId = billingProperties.stripe()
+            .productJobExecutionsPackageId();
+
+        boolean packagePurchase = lineItems.stream()
+            .anyMatch(lineItem -> Objects.equals(packageProductId, lineItem.getPrice()
+                .getProduct()));
+
+        // A package purchase is a one-off payment: it neither replaces a trial nor creates a subscription row.
+        if (packagePurchase) {
+            return prepaidSubscriptionModelHandler.handleJobExecutionsPackagePurchased(session, lineItems);
+        }
+
+        cancelTrialSubscription();
 
         Map<String, String> metadata = session.getMetadata();
 
