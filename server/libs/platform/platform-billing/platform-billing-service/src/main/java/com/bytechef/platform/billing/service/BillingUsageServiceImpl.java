@@ -79,6 +79,10 @@ public class BillingUsageServiceImpl implements BillingUsageService {
             return;
         }
 
+        if (subscription.getSubscriptionModel() != BillingSubscription.SubscriptionModel.METERED) {
+            return;
+        }
+
         Instant lowerBound = subscription.getLastReportedAt() != null
             ? subscription.getLastReportedAt()
             : subscription.getCurrentPeriodStart();
