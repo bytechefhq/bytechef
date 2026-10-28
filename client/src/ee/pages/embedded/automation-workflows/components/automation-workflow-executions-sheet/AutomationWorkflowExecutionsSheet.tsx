@@ -14,7 +14,6 @@ import {WorkflowExecutionFromJSON} from '@/shared/middleware/automation/workflow
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetEmbeddedWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {VisuallyHidden} from 'radix-ui';
 import {useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -39,18 +38,19 @@ const AutomationWorkflowTemplatePanel = ({workflowId}: AutomationWorkflowTemplat
 
 interface AutomationWorkflowExecutionsContentProps {
     connectedUserId?: number;
+    environmentId: number;
     projectName?: string;
     workflow: AutomationWorkflowExecutionsSheetWorkflowI;
 }
 
 const AutomationWorkflowExecutionsContent = ({
     connectedUserId,
+    environmentId,
     projectName,
     workflow,
 }: AutomationWorkflowExecutionsContentProps) => {
     const [pageNumber, setPageNumber] = useState(0);
 
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
@@ -71,7 +71,7 @@ const AutomationWorkflowExecutionsContent = ({
     } = useGetEmbeddedWorkflowExecutionsQuery(
         {
             connectedUserId,
-            environmentId: currentEnvironmentId,
+            environmentId,
             id: currentWorkspaceId!,
             pageNumber,
             workflowId: workflow.workflowUuid,
@@ -122,6 +122,7 @@ const AutomationWorkflowExecutionsSheet = () => {
     const {
         automationWorkflowExecutionsSheetOpen,
         connectedUserId,
+        environmentId,
         projectName,
         setAutomationWorkflowExecutionsSheetOpen,
         workflow,
@@ -129,6 +130,7 @@ const AutomationWorkflowExecutionsSheet = () => {
         useShallow((state) => ({
             automationWorkflowExecutionsSheetOpen: state.automationWorkflowExecutionsSheetOpen,
             connectedUserId: state.connectedUserId,
+            environmentId: state.environmentId,
             projectName: state.projectName,
             setAutomationWorkflowExecutionsSheetOpen: state.setAutomationWorkflowExecutionsSheetOpen,
             workflow: state.workflow,
@@ -158,10 +160,11 @@ const AutomationWorkflowExecutionsSheet = () => {
                     <SheetTitle>{workflow?.label || workflow?.workflowUuid}</SheetTitle>
                 </VisuallyHidden.Root>
 
-                {workflow && (
+                {workflow && environmentId != null && (
                     <AutomationWorkflowExecutionsContent
                         connectedUserId={connectedUserId}
-                        key={`${workflow.workflowUuid}_${connectedUserId ?? ''}`}
+                        environmentId={environmentId}
+                        key={`${environmentId}-${workflow.workflowUuid}-${connectedUserId ?? ''}`}
                         projectName={projectName}
                         workflow={workflow}
                     />

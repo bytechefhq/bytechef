@@ -102,7 +102,6 @@ vi.mock('@/shared/components/copilot/hooks/useCopilotLayoutShifted', () => ({
 }));
 
 const mockProject = {
-    automationHubVisible: true,
     id: 'project-1',
     lastPublishedVersion: null,
     name: 'Mailing',
@@ -275,7 +274,7 @@ it('opens the workflow file picker from the Import Workflow settings menu entry'
     expect(hoisted.workflowFileInputClick).toHaveBeenCalledTimes(1);
 });
 
-it('saves the Automation Hub visibility and permission expression from the Edit Project dialog', async () => {
+it('saves the permission expression from the Edit Project dialog', async () => {
     renderAutomationWorkflowEditorHeader();
 
     await userEvent.click(screen.getByLabelText('Settings'));
@@ -287,7 +286,6 @@ it('saves the Automation Hub visibility and permission expression from the Edit 
 
     expect(permissionExpressionInput).toHaveValue('plan == basic');
 
-    await userEvent.click(within(projectDialog).getByLabelText('Show in Automation Hub'));
     await userEvent.clear(permissionExpressionInput);
     await userEvent.type(permissionExpressionInput, 'plan == enterprise');
     await userEvent.click(within(projectDialog).getByRole('button', {name: 'Save'}));
@@ -295,7 +293,6 @@ it('saves the Automation Hub visibility and permission expression from the Edit 
     await waitFor(() => {
         expect(hoisted.updateProjectMutate).toHaveBeenCalledWith(
             expect.objectContaining({
-                automationHubVisible: false,
                 id: 'project-1',
                 name: 'Mailing',
                 permissionExpression: 'plan == enterprise',

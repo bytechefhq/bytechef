@@ -26,6 +26,16 @@ const renderWithProviders = (ui: ReactElement) => {
 const hoisted = vi.hoisted(() => {
     return {
         categories: [] as Array<{id: string; name: string}>,
+        configurations: [] as Array<{
+            automationHubVisible: boolean;
+            enabled: boolean;
+            environmentId: string;
+            id: string;
+            lastModifiedDate: string | null;
+            projectId: string;
+            projectVersion: number;
+            workflows: Array<{enabled: boolean; label: string | null; workflowUuid: string}>;
+        }>,
         createProjectMutate: vi.fn(),
         createWorkflowMutate: vi.fn(),
         deleteProjectMutate: vi.fn(),
@@ -49,11 +59,18 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+vi.mock('@/shared/queries/platform/environments.queries', () => ({
+    useGetEnvironmentsQuery: () => ({data: [{id: 2, name: 'Staging'}]}),
+}));
+
 vi.mock('@/shared/middleware/graphql', () => ({
     useAutomationWorkflowProjectCategoriesQuery: () => ({
         data: {automationWorkflowProjectCategories: hoisted.categories},
         error: null,
         isLoading: false,
+    }),
+    useAutomationWorkflowProjectConfigurationsQuery: () => ({
+        data: {automationWorkflowProjectConfigurations: hoisted.configurations},
     }),
     useAutomationWorkflowProjectTagsQuery: () => ({
         data: {automationWorkflowProjectTags: hoisted.tags},
@@ -73,6 +90,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isPending: false,
         mutate: hoisted.createWorkflowMutate,
     }),
+    useDeleteAutomationWorkflowProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
     useDeleteAutomationWorkflowProjectMutation: () => ({
         isPending: false,
         mutate: hoisted.deleteProjectMutate,
@@ -81,6 +99,8 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isPending: false,
         mutate: hoisted.deleteWorkflowMutate,
     }),
+    useEnableAutomationWorkflowProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnableAutomationWorkflowProjectConfigurationWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
     usePublishAutomationWorkflowProjectMutation: () => ({
         isPending: false,
         mutate: hoisted.publishProjectMutate,
@@ -139,6 +159,7 @@ vi.mock(import('@tanstack/react-query'), async (importOriginal) => {
 
 beforeEach(() => {
     hoisted.categories = [];
+    hoisted.configurations = [];
     hoisted.createProjectMutate.mockReset();
     hoisted.createWorkflowMutate.mockReset();
     hoisted.deleteProjectMutate.mockReset();
@@ -153,6 +174,7 @@ beforeEach(() => {
 
     useAutomationWorkflowExecutionsSheetStore.setState({
         automationWorkflowExecutionsSheetOpen: false,
+        environmentId: undefined,
         projectName: undefined,
         workflow: undefined,
     });
@@ -405,17 +427,30 @@ describe('AutomationWorkflows', () => {
         expect(parsed.label).toBe('My New Workflow');
     });
 
-    it("opens a workflow's executions from its row menu without opening the editor", async () => {
+    it("opens a workflow's executions from its configuration without opening the editor", async () => {
         const user = userEvent.setup();
+
+        hoisted.configurations = [
+            {
+                automationHubVisible: true,
+                enabled: true,
+                environmentId: '2',
+                id: 'configuration-13',
+                lastModifiedDate: null,
+                projectId: 'project-13',
+                projectVersion: 1,
+                workflows: [{enabled: true, label: 'Mailer', workflowUuid: 'wf-uuid-13'}],
+            },
+        ];
 
         hoisted.projects = [
             {
                 categoryId: null,
                 description: null,
                 id: 'project-13',
-                lastPublishedVersion: null,
+                lastPublishedVersion: 1,
                 name: 'Mail Project',
-                published: false,
+                published: true,
                 tagIds: [],
                 workflowTemplates: [
                     {
@@ -435,8 +470,12 @@ describe('AutomationWorkflows', () => {
         renderWithProviders(<AutomationWorkflows />);
 
         await user.click(screen.getByText('1 workflow'));
-        await user.click(await screen.findByRole('button', {name: 'Workflow Actions'}));
-        await user.click(await screen.findByRole('menuitem', {name: 'Workflow Executions'}));
+        await user.click(screen.getByRole('tab', {name: 'Configurations'}));
+
+        const workflowCountTriggers = await screen.findAllByText('1 workflow');
+
+        await user.click(workflowCountTriggers[workflowCountTriggers.length - 1]);
+        await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         expect(await screen.findByText('Executions sheet Mail Project wf-uuid-13')).toBeInTheDocument();
         expect(hoisted.navigateMock).not.toHaveBeenCalled();

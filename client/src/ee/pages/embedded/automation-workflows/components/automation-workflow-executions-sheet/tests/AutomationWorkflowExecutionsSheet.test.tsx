@@ -4,7 +4,6 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
-import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {act, render, screen} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -71,6 +70,7 @@ const renderSheet = () =>
 const openSheet = () =>
     act(() =>
         useAutomationWorkflowExecutionsSheetStore.getState().openAutomationWorkflowExecutionsSheet({
+            environmentId: 2,
             projectName: 'Mail Project',
             workflow: {label: 'Mailer', workflowId: 'draft-wf-1', workflowUuid: 'wf-1'},
         })
@@ -88,12 +88,11 @@ describe('AutomationWorkflowExecutionsSheet', () => {
             isLoading: false,
         });
 
-        environmentStore.setState({currentEnvironmentId: 1});
-
         useWorkspaceStore.setState({currentWorkspaceId: 4});
 
         useAutomationWorkflowExecutionsSheetStore.setState({
             automationWorkflowExecutionsSheetOpen: false,
+            environmentId: undefined,
             projectName: undefined,
             workflow: undefined,
         });
@@ -110,7 +109,7 @@ describe('AutomationWorkflowExecutionsSheet', () => {
         expect(hoisted.executionsQueryMock).not.toHaveBeenCalled();
     });
 
-    it("shows the template workflow's executions in the current environment by default", () => {
+    it("shows the template workflow's executions in the environment it was opened for", () => {
         mockExecutionsQueryResult([execution]);
 
         renderSheet();
@@ -121,7 +120,7 @@ describe('AutomationWorkflowExecutionsSheet', () => {
         expect(screen.getByText('Mailer', {selector: 'strong'})).toBeInTheDocument();
         expect(screen.getByRole('tab', {name: 'Executions'})).toHaveAttribute('aria-selected', 'true');
         expect(hoisted.executionsQueryMock).toHaveBeenLastCalledWith(
-            {environmentId: 1, id: 4, pageNumber: 0, workflowId: 'wf-1'},
+            {environmentId: 2, id: 4, pageNumber: 0, workflowId: 'wf-1'},
             true
         );
         expect(screen.getByText('Executions table 5')).toBeInTheDocument();

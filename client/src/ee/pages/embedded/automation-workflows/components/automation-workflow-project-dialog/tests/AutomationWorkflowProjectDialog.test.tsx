@@ -4,7 +4,6 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import AutomationWorkflowProjectDialog from '../AutomationWorkflowProjectDialog';
 
 const existingProject = {
-    automationHubVisible: true,
     categoryId: null,
     description: null,
     id: '1',
@@ -121,31 +120,6 @@ describe('AutomationWorkflowProjectDialog', () => {
             await user.click(screen.getByRole('button', {name: 'Save'}));
 
             expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({name: 'New project'}));
-        });
-    });
-
-    describe('automation hub visibility', () => {
-        it('should show new projects in the Automation Hub by default', async () => {
-            const user = userEvent.setup();
-
-            render(<AutomationWorkflowProjectDialog {...defaultProps} />);
-
-            await user.type(screen.getByLabelText('Name'), 'New project');
-            await user.click(screen.getByRole('button', {name: 'Save'}));
-
-            expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({automationHubVisible: true}));
-        });
-
-        it('should submit a project hidden from the Automation Hub', async () => {
-            const user = userEvent.setup();
-
-            render(<AutomationWorkflowProjectDialog {...defaultProps} />);
-
-            await user.type(screen.getByLabelText('Name'), 'API only');
-            await user.click(screen.getByLabelText('Show in Automation Hub'));
-            await user.click(screen.getByRole('button', {name: 'Save'}));
-
-            expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({automationHubVisible: false}));
         });
     });
 });

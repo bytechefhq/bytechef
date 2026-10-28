@@ -1,11 +1,32 @@
+import Button from '@/components/Button/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
+import {ButtonGroup} from '@/components/ui/button-group';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {
+    AutomationWorkflowProjectConfigurationsQuery,
+    AutomationWorkflowProjectTagsQuery,
+    AutomationWorkflowProjectsQuery,
+} from '@/shared/middleware/graphql';
+import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 
+import AutomationWorkflowProjectConfigurationDialog from '../automation-workflow-project-configuration-dialog/AutomationWorkflowProjectConfigurationDialog';
+import AutomationWorkflowProjectConfigurationList from '../automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationList';
 import AutomationWorkflowProjectListItem from './AutomationWorkflowProjectListItem';
+import AutomationWorkflowProjectListItemTabs, {
+    AutomationWorkflowProjectListItemTabType,
+} from './AutomationWorkflowProjectListItemTabs';
 import AutomationWorkflowProjectWorkflowList from './AutomationWorkflowProjectWorkflowList';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
+type AutomationWorkflowProjectConfigurationType =
+    AutomationWorkflowProjectConfigurationsQuery['automationWorkflowProjectConfigurations'][number];
 type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowProjectTags'][number];
 
 interface AutomationWorkflowProjectListProps {
@@ -37,6 +58,10 @@ const AutomationWorkflowProjectList = ({
     projects,
     tags,
 }: AutomationWorkflowProjectListProps) => {
+    const [activeTabs, setActiveTabs] = useState<Record<string, AutomationWorkflowProjectListItemTabType>>({});
+    const [configurationDialog, setConfigurationDialog] = useState<
+        {configuration?: AutomationWorkflowProjectConfigurationType; project: AutomationWorkflowProjectType} | undefined
+    >();
     const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(new Set());
 
     useEffect(() => {
@@ -85,17 +110,95 @@ const AutomationWorkflowProjectList = ({
                     />
 
                     <CollapsibleContent>
-                        <AutomationWorkflowProjectWorkflowList
-                            onCreateWorkflow={onCreateWorkflow}
-                            onDeleteWorkflow={onDeleteWorkflow}
-                            onEditWorkflow={onEditWorkflow}
-                            onImportWorkflow={onImportWorkflow}
-                            onSelectWorkflow={onSelectWorkflow}
-                            project={project}
+                        <AutomationWorkflowProjectListItemTabs
+                            actions={
+                                (activeTabs[project.id] || 'workflows') === 'workflows' ? (
+                                    <ButtonGroup aria-label="Workflow Creation Actions">
+                                        <Button
+                                            aria-label="Create Workflow"
+                                            onClick={() => onCreateWorkflow(project.id)}
+                                            size="xs"
+                                            variant="outline"
+                                        >
+                                            <PlusIcon />
+                                            Workflow
+                                        </Button>
+
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-label="More Workflow Creation Actions"
+                                                    icon={<ChevronDownIcon />}
+                                                    size="xs"
+                                                    variant="outline"
+                                                >
+                                                    <> </>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    aria-label="Import Workflow"
+                                                    icon={<UploadIcon />}
+                                                    label="Import Workflow"
+                                                    onClick={() => onImportWorkflow(project.id)}
+                                                />
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </ButtonGroup>
+                                ) : (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <span>
+                                                <Button
+                                                    aria-label="New Configuration"
+                                                    disabled={!project.published}
+                                                    onClick={() => setConfigurationDialog({project})}
+                                                    size="xs"
+                                                    variant="outline"
+                                                >
+                                                    <PlusIcon />
+                                                    Configuration
+                                                </Button>
+                                            </span>
+                                        </TooltipTrigger>
+
+                                        {!project.published && (
+                                            <TooltipContent>Publish the project first</TooltipContent>
+                                        )}
+                                    </Tooltip>
+                                )
+                            }
+                            activeTab={activeTabs[project.id] || 'workflows'}
+                            configurationsContent={
+                                <AutomationWorkflowProjectConfigurationList
+                                    onEdit={(configuration) => setConfigurationDialog({configuration, project})}
+                                    project={project}
+                                />
+                            }
+                            onTabChange={(tab) =>
+                                setActiveTabs((previousActiveTabs) => ({...previousActiveTabs, [project.id]: tab}))
+                            }
+                            workflowsContent={
+                                <AutomationWorkflowProjectWorkflowList
+                                    onDeleteWorkflow={onDeleteWorkflow}
+                                    onEditWorkflow={onEditWorkflow}
+                                    onSelectWorkflow={onSelectWorkflow}
+                                    project={project}
+                                />
+                            }
                         />
                     </CollapsibleContent>
                 </Collapsible>
             ))}
+
+            {configurationDialog && (
+                <AutomationWorkflowProjectConfigurationDialog
+                    configuration={configurationDialog.configuration}
+                    onClose={() => setConfigurationDialog(undefined)}
+                    project={configurationDialog.project}
+                />
+            )}
         </div>
     );
 };

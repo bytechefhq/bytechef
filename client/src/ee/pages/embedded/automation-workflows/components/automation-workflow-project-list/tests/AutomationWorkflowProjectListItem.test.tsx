@@ -18,7 +18,6 @@ const handlers = {
 };
 
 const project: AutomationWorkflowProjectType = {
-    automationHubVisible: true,
     categoryId: null,
     description: null,
     id: 'project-1',

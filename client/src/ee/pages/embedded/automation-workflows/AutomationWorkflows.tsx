@@ -121,7 +121,6 @@ const AutomationWorkflows = () => {
         if (editProject) {
             updateProjectMutation.mutate(
                 {
-                    automationHubVisible: values.automationHubVisible,
                     category: values.category || undefined,
                     description: values.description || undefined,
                     id: editProject.id,
@@ -140,7 +139,6 @@ const AutomationWorkflows = () => {
         } else {
             createProjectMutation.mutate(
                 {
-                    automationHubVisible: values.automationHubVisible,
                     category: values.category || undefined,
                     description: values.description || undefined,
                     name: values.name,
