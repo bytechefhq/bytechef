@@ -258,6 +258,14 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
             task: parentTaskDispatcherTask,
         });
 
+        if (!subtasks.some((subtask) => subtask.name === currentNode.name)) {
+            console.error(`Task ${currentNode.name} not found under ${taskDispatcherContext.taskDispatcherId}`);
+
+            onError?.();
+
+            return;
+        }
+
         const updatedSubtasks = subtasks.map((subtask) => {
             if (subtask.name === currentNode.name) {
                 switch (fieldUpdate.field) {

@@ -54,7 +54,15 @@ describe('saveTaskDispatcherSubtaskFieldChange', () => {
         };
 
         workflowDataState.workflow = {
-            definition: JSON.stringify({tasks: [{name: 'condition_1', type: 'condition/v1'}]}),
+            definition: JSON.stringify({
+                tasks: [
+                    {
+                        name: 'condition_1',
+                        parameters: {caseFalse: [], caseTrue: [{name: 'logger_1', type: 'logger/v1/info'}]},
+                        type: 'condition/v1',
+                    },
+                ],
+            }),
             id: 'workflow-1',
         };
     });
@@ -126,6 +134,67 @@ describe('saveTaskDispatcherSubtaskFieldChange', () => {
 
         expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
         expect(onError).toHaveBeenCalledOnce();
+    });
+
+    describe('in a branch case', () => {
+        beforeEach(() => {
+            workflowDataState.workflow = {
+                definition: JSON.stringify({
+                    tasks: [
+                        {
+                            name: 'branch_1',
+                            parameters: {
+                                cases: [
+                                    {key: 'ON', tasks: [{label: 'First', name: 'logger_1', type: 'logger/v1/info'}]},
+                                    {key: 'OFF', tasks: [{label: 'Second', name: 'logger_2', type: 'logger/v1/info'}]},
+                                ],
+                                default: [],
+                            },
+                            type: 'branch/v1',
+                        },
+                    ],
+                }),
+                id: 'workflow-1',
+            };
+        });
+
+        it('saves the new label into the case that holds the node', () => {
+            panelState.currentNode = {
+                branchData: {branchId: 'branch_1', caseKey: 'OFF', index: 0},
+                componentName: 'logger',
+                name: 'logger_2',
+                workflowNodeName: 'logger_2',
+            };
+
+            callSave();
+
+            expect(saveWorkflowDefinitionMock).toHaveBeenCalledOnce();
+
+            const [branchTask] = saveWorkflowDefinitionMock.mock.calls[0][0].updatedWorkflowTasks;
+
+            expect(branchTask.parameters.cases).toEqual([
+                {key: 'ON', tasks: [{label: 'First', name: 'logger_1', type: 'logger/v1/info'}]},
+                {key: 'OFF', tasks: [{label: 'Renamed', name: 'logger_2', type: 'logger/v1/info'}]},
+            ]);
+        });
+
+        it('saves nothing when the case key it holds no longer names the case that holds the node', () => {
+            // A case renamed on the canvas while the node's panel stayed open used to make this save append an
+            // empty case under the old key and drop the label edit.
+            const onError = vi.fn();
+
+            panelState.currentNode = {
+                branchData: {branchId: 'branch_1', caseKey: 'RENAMED_AWAY', index: 0},
+                componentName: 'logger',
+                name: 'logger_2',
+                workflowNodeName: 'logger_2',
+            };
+
+            callSave(onError);
+
+            expect(saveWorkflowDefinitionMock).not.toHaveBeenCalled();
+            expect(onError).toHaveBeenCalledOnce();
+        });
     });
 
     it('does not report a save queued behind another save as failed', () => {
