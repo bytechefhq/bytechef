@@ -220,6 +220,45 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     @Test
+    void testEnableConfigurationTogglesTheFlag() {
+        long projectId = createPublishedProject("Configuration Switch", 1);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        applicationEvents.clear();
+
+        automationWorkflowProjectConfigurationAdminFacade.enableConfiguration(configurationId, false);
+
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .isEnabled()).isFalse();
+
+        automationWorkflowProjectConfigurationAdminFacade.enableConfiguration(configurationId, true);
+
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .isEnabled()).isTrue();
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
+            .toList())
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID),
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testUpdateConfigurationWithUnpublishedVersionThrows() {
+        long projectId = createPublishedProject("Update Unpublished Version", 1);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+                configurationId, 2, true, true)).isInstanceOf(ConfigurationException.class);
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
     void testUpdateConfigurationPublishesUpdatedEvent() {
         long projectId = createPublishedProject("Updated Event", 2);
 
