@@ -72,10 +72,16 @@ public class WebhookUtils {
         Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
         WebhookMethod method, TriggerContext context) {
 
-        if (Objects.equals(getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN))) {
-            return WebhookValidateResponse.ok(); // OK
+        String csrfToken = inputParameters.getString(CSRF_TOKEN);
+
+        if (csrfToken == null || csrfToken.isBlank()) {
+            return WebhookValidateResponse.badRequest();
+        }
+
+        if (Objects.equals(getCsrfToken(headers), csrfToken)) {
+            return WebhookValidateResponse.ok();
         } else {
-            return WebhookValidateResponse.badRequest(); // Bad Request
+            return WebhookValidateResponse.badRequest();
         }
     }
 
