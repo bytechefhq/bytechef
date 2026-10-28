@@ -101,7 +101,7 @@ public class ApplicationProperties {
     /**
      * Application edition (CE or EE)
      */
-    private Edition edition = Edition.EE;
+    private Edition edition;
 
     private Embedded embedded = new Embedded();
 
@@ -875,7 +875,7 @@ public class ApplicationProperties {
             /**
              * Memory storage provider
              */
-            private Provider provider = Provider.JDBC;
+            private Provider provider;
 
             private Redis redis = new Redis();
 
@@ -1179,7 +1179,7 @@ public class ApplicationProperties {
             /**
              * Firecrawl API base URL
              */
-            private String baseUrl = "https://api.firecrawl.dev/v2";
+            private String baseUrl;
 
             /**
              * Whether Firecrawl is enabled
@@ -2924,7 +2924,7 @@ public class ApplicationProperties {
         /**
          * Cache provider
          */
-        private Provider provider = Provider.CAFFEINE;
+        private Provider provider;
 
         public Provider getProvider() {
             return provider;
@@ -3474,7 +3474,7 @@ public class ApplicationProperties {
         /**
          * Service discovery provider
          */
-        private Provider provider = Provider.REDIS;
+        private Provider provider;
 
         public Provider getProvider() {
             return provider;
@@ -3587,7 +3587,7 @@ public class ApplicationProperties {
             /**
              * Base directory for file storage
              */
-            private String basedir = "";
+            private String basedir;
 
             public String getBasedir() {
                 return basedir;
@@ -3977,7 +3977,7 @@ public class ApplicationProperties {
         /**
          * Message broker provider
          */
-        private Provider provider = Provider.JMS;
+        private Provider provider;
 
         public Aws getAws() {
             return aws;
@@ -4599,7 +4599,7 @@ public class ApplicationProperties {
         /**
          * Scheduler provider
          */
-        private Provider provider = Provider.QUARTZ;
+        private Provider provider;
 
         /**
          * Quartz scheduler configuration
@@ -4732,7 +4732,7 @@ public class ApplicationProperties {
         /**
          * Tenancy mode
          */
-        private Mode mode = Mode.SINGLE;
+        private Mode mode;
 
         public Mode getMode() {
             return mode;
@@ -4951,7 +4951,7 @@ public class ApplicationProperties {
             /**
              * Output storage provider
              */
-            private Provider provider = Provider.JDBC;
+            private Provider provider;
 
             public Provider getProvider() {
                 return provider;
