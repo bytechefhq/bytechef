@@ -47,6 +47,7 @@ export const useGetClusterElementOutputQuery = (request: GetClusterElementOutput
         queryKey: WorkflowNodeOutputKeys.clusterElementOutput(request),
         queryFn: () => new WorkflowNodeOutputApi().getClusterElementOutput(request),
         enabled: enabled ?? true,
+        retry: false,
         staleTime: DEFINITION_STALE_TIME,
     });
 
@@ -55,6 +56,7 @@ export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequ
         queryKey: WorkflowNodeOutputKeys.workflowNodeOutput(request),
         queryFn: () => new WorkflowNodeOutputApi().getWorkflowNodeOutput(request),
         enabled: enabled ?? true,
+        retry: false,
         staleTime: DEFINITION_STALE_TIME,
     });
 
