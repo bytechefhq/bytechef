@@ -37,5 +37,10 @@ public interface BillingMapper extends Converter<BillingSubscriptionDTO, Billing
     @Mapping(source = "subscription.cancelAtPeriodEnd", target = "cancelAtPeriodEnd")
     @Mapping(source = "scheduledPlanName", target = "scheduledPlanName")
     @Mapping(source = "jobsExecuted", target = "jobsExecuted")
+    @Mapping(source = "subscription.subscriptionModel", target = "subscriptionModel")
+    @Mapping(source = "subscription.planUnitTotal", target = "planUnitTotal")
+    @Mapping(source = "subscription.planUnitUsed", target = "planUnitUsed")
+    @Mapping(source = "subscription.extraUnitTotal", target = "extraUnitTotal")
+    @Mapping(source = "subscription.extraUnitUsed", target = "extraUnitUsed")
     BillingSubscriptionModel convert(BillingSubscriptionDTO dto);
 }

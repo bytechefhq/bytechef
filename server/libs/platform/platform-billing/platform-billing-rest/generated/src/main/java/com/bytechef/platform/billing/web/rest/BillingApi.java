@@ -8,6 +8,7 @@ package com.bytechef.platform.billing.web.rest;
 import com.bytechef.platform.billing.web.rest.model.BillingSubscriptionModel;
 import com.bytechef.platform.billing.web.rest.model.CheckoutSessionModel;
 import com.bytechef.platform.billing.web.rest.model.CheckoutSessionRequestModel;
+import com.bytechef.platform.billing.web.rest.model.JobExecutionsPackageCheckoutRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:20.602783+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T13:52:37.197604+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "billing", description = "The Platform Billing Internal API")
 public interface BillingApi {
@@ -114,6 +115,48 @@ public interface BillingApi {
     }
 
 
+    String PATH_CREATE_JOB_EXECUTIONS_PACKAGE_CHECKOUT_SESSION = "/billing/job-executions-package/checkout";
+    /**
+     * POST /billing/job-executions-package/checkout : Create a Stripe Checkout Session for a job executions package
+     * Create a Stripe Checkout Session for a one-time job executions package purchase
+     *
+     * @param jobExecutionsPackageCheckoutRequestModel  (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "createJobExecutionsPackageCheckoutSession",
+        summary = "Create a Stripe Checkout Session for a job executions package",
+        description = "Create a Stripe Checkout Session for a one-time job executions package purchase",
+        tags = { "billing" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CheckoutSessionModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = BillingApi.PATH_CREATE_JOB_EXECUTIONS_PACKAGE_CHECKOUT_SESSION,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<CheckoutSessionModel> createJobExecutionsPackageCheckoutSession(
+        @Parameter(name = "JobExecutionsPackageCheckoutRequestModel", description = "", required = true) @Valid @RequestBody JobExecutionsPackageCheckoutRequestModel jobExecutionsPackageCheckoutRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"checkoutUrl\" : \"checkoutUrl\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     String PATH_GET_CURRENT_SUBSCRIPTION = "/billing/subscription";
     /**
      * GET /billing/subscription : Get the current billing subscription
@@ -145,7 +188,7 @@ public interface BillingApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"planName\" : \"planName\", \"status\" : \"status\", \"productUnitLimit\" : 0, \"currentPeriodEnd\" : \"2000-01-23T04:56:07.000+00:00\", \"cancelAtPeriodEnd\" : true, \"scheduledPlanName\" : \"scheduledPlanName\", \"jobsExecuted\" : 6 }";
+                    String exampleString = "{ \"planName\" : \"planName\", \"status\" : \"status\", \"productUnitLimit\" : 0, \"currentPeriodEnd\" : \"2000-01-23T04:56:07.000+00:00\", \"cancelAtPeriodEnd\" : true, \"scheduledPlanName\" : \"scheduledPlanName\", \"jobsExecuted\" : 6, \"subscriptionModel\" : \"METERED\", \"planUnitTotal\" : 1, \"planUnitUsed\" : 5, \"extraUnitTotal\" : 5, \"extraUnitUsed\" : 2 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
