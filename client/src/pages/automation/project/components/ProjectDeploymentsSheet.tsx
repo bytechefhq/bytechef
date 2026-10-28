@@ -1,23 +1,14 @@
 import Button from '@/components/Button/Button';
-import EmptyState from '@/components/EmptyState/EmptyState';
-import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import ProjectDeploymentList from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList';
-import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
-import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
+import ProjectDeploymentsPanel from '@/pages/automation/project/components/ProjectDeploymentsPanel';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {Project} from '@/shared/middleware/automation/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {AlertTriangleIcon, ExternalLinkIcon, Layers3Icon, RefreshCwIcon, RocketIcon, SendIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {ExternalLinkIcon, RefreshCwIcon, RocketIcon} from 'lucide-react';
+import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -47,53 +38,19 @@ const ProjectDeploymentsSheet = ({
 
     const navigate = useNavigate();
 
-    const openSavedProjectDeployment = useOpenSavedProjectDeployment({
-        onDevelopmentDeploymentSaved: setExpandedProjectDeploymentId,
-        projectId: project.id,
-    });
-
-    const {
-        data: projectDeployments,
-        error: projectDeploymentsError,
-        isFetching: projectDeploymentsIsFetching,
-        isLoading: projectDeploymentsIsLoading,
-        refetch: refetchProjectDeployments,
-    } = useGetWorkspaceProjectDeploymentsQuery(
-        {
-            id: currentWorkspaceId ?? 0,
-            projectId: project.id ?? 0,
-        },
-        sheetOpen && !!currentWorkspaceId && !!project.id
-    );
-
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery(
-        {
-            actionDefinitions: true,
-            triggerDefinitions: true,
-        },
-        sheetOpen
-    );
-
-    const {data: tags} = useGetProjectDeploymentTagsQuery();
-
-    const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
-
-    const environmentProjectDeployments = useMemo(
-        () =>
-            (projectDeployments ?? [])
-                .filter((projectDeployment) => projectDeployment.environmentId === currentEnvironmentId)
-                .sort((deployment, otherDeployment) => deployment.name.localeCompare(otherDeployment.name)),
-        [currentEnvironmentId, projectDeployments]
-    );
-
-    const isPublished = !!(project.lastPublishedDate && project.lastProjectVersion);
-
-    const projectDeploymentsLoadFailed = !!projectDeploymentsError && projectDeployments === undefined;
+    const {isFetching: projectDeploymentsIsFetching, refetch: refetchProjectDeployments} =
+        useGetWorkspaceProjectDeploymentsQuery(
+            {
+                id: currentWorkspaceId ?? 0,
+                projectId: project.id ?? 0,
+            },
+            sheetOpen && !!currentWorkspaceId && !!project.id
+        );
 
     const handleOpenInDeploymentsClick = () => {
         onSheetOpenChange(false);
 
-        void navigate(`/automation/deployments?projectId=${project.id}`);
+        void navigate(`/automation/projects?projectId=${project.id}&tab=deployments`);
     };
 
     return (
@@ -138,79 +95,13 @@ const ProjectDeploymentsSheet = ({
                 </header>
 
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-surface-neutral-primary p-3">
-                    {projectDeploymentsIsLoading && (
-                        <div className="flex items-center justify-center py-6">
-                            <LoadingIcon />
-                        </div>
-                    )}
-
-                    {projectDeploymentsLoadFailed && (
-                        <EmptyState
-                            actions={
-                                <Button
-                                    label="Retry"
-                                    onClick={() => void refetchProjectDeployments()}
-                                    variant="outline"
-                                />
-                            }
-                            description="The deployments of this project could not be loaded. Please try again."
-                            icon={<AlertTriangleIcon />}
-                            title="Failed to load deployments"
-                        />
-                    )}
-
-                    {!projectDeploymentsIsLoading &&
-                        !projectDeploymentsLoadFailed &&
-                        environmentProjectDeployments.length === 0 &&
-                        (isPublished ? (
-                            <EmptyState
-                                actions={
-                                    <ProjectDeploymentDialog
-                                        environmentEditable
-                                        onSuccess={openSavedProjectDeployment}
-                                        projectDeployment={{
-                                            environmentId: currentEnvironmentId,
-                                            name: project.name,
-                                            projectId: project.id,
-                                        }}
-                                        projectDeployments={projectDeployments}
-                                        redirectOnSubmit={false}
-                                        showTabs
-                                        triggerNode={<Button icon={<RocketIcon />} label="Deploy" />}
-                                    />
-                                }
-                                description="Deploy this project to run its workflows here."
-                                icon={<Layers3Icon />}
-                                title={`No deployments in ${ENVIRONMENT_CONFIGS[currentEnvironmentId]?.label ?? 'this environment'}`}
-                            />
-                        ) : (
-                            <EmptyState
-                                description="Deployments run a published, read-only version of a project. Publish this project to create its first version."
-                                icon={<SendIcon />}
-                                title="Publish the project to deploy it"
-                            />
-                        ))}
-
-                    {environmentProjectDeployments.length > 0 && (
-                        <WorkflowReadOnlyProvider
-                            value={{
-                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                            }}
-                        >
-                            <ProjectDeploymentList
-                                componentDefinitions={componentDefinitions}
-                                hideOpenInProject
-                                newlyCreatedDeploymentId={expandedProjectDeploymentId}
-                                project={project}
-                                projectDeployments={environmentProjectDeployments}
-                                showEnvironment
-                                tags={tags ?? []}
-                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                            />
-
-                            <ProjectDeploymentWorkflowExecutionsSheet />
-                        </WorkflowReadOnlyProvider>
-                    )}
+                    <ProjectDeploymentsPanel
+                        enabled={sheetOpen}
+                        expandedProjectDeploymentId={expandedProjectDeploymentId}
+                        onProjectDeploymentSaved={setExpandedProjectDeploymentId}
+                        project={project}
+                        showEnvironment
+                    />
                 </div>
 
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
