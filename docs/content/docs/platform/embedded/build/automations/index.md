@@ -53,9 +53,16 @@ Inside an expanded project, each template row shows:
 - **Trigger** -- the first trigger's icon plus a badge with its title.
 - **Components** -- icons of the components the template uses.
 - **Last modified date**.
-- **Actions menu** (⋮) -- Delete.
+- **Actions menu** (⋮) -- Edit, Executions, Delete.
 
 Clicking a template row opens it in the embedded workflow editor.
+
+### Template executions
+
+Pick **Executions** in a template's ⋮ menu to open a side panel with two tabs:
+
+- **Executions** - the template's executions in the current environment, a page at a time, with a **Connected user** column that names whose run it was. The list covers connected users' references to the template and the copies they made of it, so runs of a copy show up even though the copy is its own workflow. Click an execution to see its step-by-step results; the refresh button reloads the list.
+- **Workflow** - a read-only view of the template.
 
 ---
 
