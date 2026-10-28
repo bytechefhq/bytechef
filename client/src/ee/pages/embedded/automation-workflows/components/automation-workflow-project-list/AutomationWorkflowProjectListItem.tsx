@@ -8,7 +8,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import TagList from '@/shared/components/TagList';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
@@ -129,48 +128,6 @@ const AutomationWorkflowProjectListItem = ({
 
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
-
-                                <ButtonGroup aria-label="Workflow Creation Actions">
-                                    <Button
-                                        aria-label="Create Workflow"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-
-                                            onCreateWorkflow(project.id);
-                                        }}
-                                        size="xs"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon />
-                                        Workflow
-                                    </Button>
-
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label="More Workflow Creation Actions"
-                                                icon={<ChevronDownIcon />}
-                                                size="xs"
-                                                variant="outline"
-                                            >
-                                                <> </>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
-                                                aria-label="Import Workflow"
-                                                icon={<UploadIcon />}
-                                                label="Import Workflow"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    onImportWorkflow(project.id);
-                                                }}
-                                            />
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
 
                                 <div onClick={(event) => event.stopPropagation()}>
                                     <TagList
