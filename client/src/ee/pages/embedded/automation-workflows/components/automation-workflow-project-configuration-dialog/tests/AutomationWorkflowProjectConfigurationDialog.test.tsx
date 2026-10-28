@@ -48,6 +48,17 @@ const project = {
     workflowTemplates: [],
 };
 
+const existingConfiguration = {
+    automationHubVisible: true,
+    enabled: true,
+    environmentId: '2',
+    id: 'configuration-1',
+    lastModifiedDate: null,
+    projectId: 'project-1',
+    projectVersion: 3,
+    workflows: [],
+};
+
 describe('AutomationWorkflowProjectConfigurationDialog', () => {
     beforeEach(() => {
         windowResizeObserver();
@@ -96,6 +107,49 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         expect(await screen.findByRole('option', {name: 'V1'})).toBeInTheDocument();
         expect(screen.getByRole('option', {name: 'V3'})).toBeInTheDocument();
         expect(screen.queryByRole('option', {name: 'V2'})).not.toBeInTheDocument();
+    });
+
+    it('edits an existing configuration with the environment fixed', async () => {
+        const user = userEvent.setup();
+
+        const onClose = vi.fn();
+
+        mocks.updateMutate.mockImplementation((_variables, options: {onSuccess: () => void}) => options.onSuccess());
+
+        render(
+            <AutomationWorkflowProjectConfigurationDialog
+                configuration={existingConfiguration}
+                onClose={onClose}
+                project={project}
+            />
+        );
+
+        expect(screen.getByText('Edit Configuration')).toBeInTheDocument();
+
+        const environmentSelect = screen.getByRole('combobox', {name: 'Environment'});
+
+        expect(environmentSelect).toBeDisabled();
+        expect(environmentSelect).toHaveTextContent('Staging');
+
+        await user.click(screen.getByRole('combobox', {name: 'Version'}));
+        await user.click(await screen.findByRole('option', {name: 'V1'}));
+
+        await user.click(screen.getByRole('switch', {name: 'Enabled'}));
+        await user.click(screen.getByRole('switch', {name: 'Show in Automation Hub'}));
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(mocks.updateMutate).toHaveBeenCalledTimes(1));
+
+        expect(mocks.updateMutate.mock.calls[0][0]).toEqual({
+            automationHubVisible: false,
+            enabled: false,
+            id: 'configuration-1',
+            projectVersion: 1,
+        });
+        expect(mocks.createMutate).not.toHaveBeenCalled();
+
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     });
 
     it('warns that moving to an older version disconnects automations it lacks', async () => {

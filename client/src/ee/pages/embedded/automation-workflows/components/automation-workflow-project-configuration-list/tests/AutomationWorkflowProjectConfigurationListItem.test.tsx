@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
-import {resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -9,6 +9,7 @@ import AutomationWorkflowProjectConfigurationListItem from '../AutomationWorkflo
 const mocks = vi.hoisted(() => ({
     enableConfigurationMutate: vi.fn(),
     enableWorkflowMutate: vi.fn(),
+    invalidateQueries: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -25,7 +26,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
 
 vi.mock('@tanstack/react-query', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@tanstack/react-query')>()),
-    useQueryClient: () => ({invalidateQueries: vi.fn()}),
+    useQueryClient: () => ({invalidateQueries: mocks.invalidateQueries}),
 }));
 
 const environments = [
@@ -68,13 +69,15 @@ const project = {
     ],
 };
 
-const renderItem = (overrides: {configuration?: typeof configuration; project?: typeof project} = {}) =>
+const renderItem = (
+    overrides: {configuration?: typeof configuration; onDelete?: () => void; project?: typeof project} = {}
+) =>
     render(
         <TooltipProvider>
             <AutomationWorkflowProjectConfigurationListItem
                 configuration={overrides.configuration ?? configuration}
                 environments={environments}
-                onDelete={vi.fn()}
+                onDelete={overrides.onDelete ?? vi.fn()}
                 onEdit={vi.fn()}
                 project={overrides.project ?? project}
             />
@@ -146,9 +149,15 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         renderItem();
 
+        mocks.enableConfigurationMutate.mockImplementation((_variables, options: {onSuccess: () => void}) =>
+            options.onSuccess()
+        );
+
         await user.click(screen.getByRole('switch', {name: 'Enable Configuration'}));
 
         expect(mocks.enableConfigurationMutate.mock.calls[0][0]).toEqual({enable: true, id: 'configuration-1'});
+        expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationWorkflowProjectConfigurations']});
+        expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationWorkflowProjects']});
     });
 
     it('explains that deleting a configuration pauses automations until it is recreated', async () => {
@@ -172,5 +181,51 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         renderItem({configuration: {...configuration, automationHubVisible: false}});
 
         expect(screen.getByText('Hidden from hub')).toBeInTheDocument();
+    });
+
+    it('does not show the hidden from hub badge when the configuration is visible in the hub', () => {
+        renderItem();
+
+        expect(screen.queryByText('Hidden from hub')).not.toBeInTheDocument();
+    });
+
+    it('deletes the configuration after confirming', async () => {
+        const user = userEvent.setup();
+
+        const onDelete = vi.fn();
+
+        renderItem({onDelete});
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Delete Configuration'}));
+
+        expect(onDelete).not.toHaveBeenCalled();
+
+        const alertDialog = await screen.findByRole('alertdialog');
+
+        await user.click(within(alertDialog).getByRole('button', {name: 'Delete'}));
+
+        await waitFor(() => expect(onDelete).toHaveBeenCalledWith(configuration));
+        await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    });
+
+    it('toggles a workflow of the configuration', async () => {
+        const user = userEvent.setup();
+
+        renderItem();
+
+        mocks.enableWorkflowMutate.mockImplementation((_variables, options: {onSuccess: () => void}) =>
+            options.onSuccess()
+        );
+
+        await user.click(screen.getByText('1 workflow'));
+        await user.click(await screen.findByRole('switch', {name: 'Enable Mailer'}));
+
+        expect(mocks.enableWorkflowMutate.mock.calls[0][0]).toEqual({
+            enable: false,
+            id: 'configuration-1',
+            workflowUuid: 'wf-1',
+        });
+        expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationWorkflowProjectConfigurations']});
     });
 });
