@@ -49,6 +49,7 @@ import org.springframework.data.jdbc.core.convert.JdbcCustomConversions;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * @author Ivica Cardic
@@ -182,6 +183,21 @@ public class ConfigurationApplicationIntTest {
         assertThat(serviceNames).doesNotContain(
             "bytechef.atlas.execution.remote.v1.JobRemoteService",
             "bytechef.platform.workflow.execution.remote.v1.TriggerExecutionRemoteService");
+    }
+
+    @Test
+    void testCodeWorkflowProjectDeployEndpointIsServed() {
+        RequestMappingHandlerMapping requestMappingHandlerMapping = applicationContext.getBean(
+            "requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
+
+        List<String> patterns = requestMappingHandlerMapping.getHandlerMethods()
+            .keySet()
+            .stream()
+            .flatMap(requestMappingInfo -> requestMappingInfo.getPatternValues()
+                .stream())
+            .toList();
+
+        assertThat(patterns).contains("/api/automation/v1/projects/deploy");
     }
 
     @Test
