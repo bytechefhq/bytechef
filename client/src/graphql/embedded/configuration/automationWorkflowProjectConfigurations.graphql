@@ -9,6 +9,7 @@ query automationWorkflowProjectConfigurations($projectId: ID!) {
         lastModifiedDate
         workflows {
             workflowUuid
+            workflowId
             label
             enabled
         }
