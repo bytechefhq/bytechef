@@ -159,6 +159,35 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    public OutputStream getOutputStream(String directory, FileEntry fileEntry, boolean append)
+        throws FileStorageException {
+
+        if (!append) {
+            return getOutputStream(directory, fileEntry);
+        }
+
+        S3Resource s3Resource = resolveResource(fileEntry);
+
+        try {
+            byte[] existingContent;
+
+            try (InputStream inputStream = s3Resource.getInputStream()) {
+                existingContent = inputStream.readAllBytes();
+            }
+
+            OutputStream outputStream = s3Resource.getOutputStream();
+
+            outputStream.write(existingContent);
+
+            return outputStream;
+        } catch (IOException | SdkException exception) {
+            throw new FileStorageException(
+                "Unable to get output stream for file %s in directory %s".formatted(fileEntry.getName(), directory),
+                exception);
+        }
+    }
+
+    @Override
     public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
         S3Resource s3Resource = resolveResource(fileEntry);
 

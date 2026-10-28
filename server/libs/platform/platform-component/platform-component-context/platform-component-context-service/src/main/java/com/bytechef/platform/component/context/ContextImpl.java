@@ -465,6 +465,11 @@ class ContextImpl implements Context, LogEntryBufferAware {
         }
 
         @Override
+        public OutputStream getOutputStream(FileEntry fileEntry, boolean append) {
+            return tempFileStorage.getOutputStream(((FileEntryImpl) fileEntry).getFileEntry(), append);
+        }
+
+        @Override
         public String readToString(FileEntry fileEntry) {
             return tempFileStorage.readFileToString(((FileEntryImpl) fileEntry).getFileEntry());
         }

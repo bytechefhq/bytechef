@@ -46,6 +46,11 @@ public interface FileStorageService {
 
     OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException;
 
+    /**
+     * Opens an output stream to the file. When {@code append} is {@code false} the file's existing content is replaced.
+     */
+    OutputStream getOutputStream(String directory, FileEntry fileEntry, boolean append) throws FileStorageException;
+
     byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException;
 
     String readFileToString(String directory, FileEntry fileEntry) throws FileStorageException;

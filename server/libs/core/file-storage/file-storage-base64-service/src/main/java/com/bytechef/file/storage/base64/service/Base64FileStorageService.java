@@ -89,6 +89,13 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
+    public OutputStream getOutputStream(String directory, FileEntry fileEntry, boolean append)
+        throws FileStorageException {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
         return EncodingUtils.base64Decode(stripUrlPrefix(fileEntry.getUrl()));
     }

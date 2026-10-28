@@ -21,6 +21,7 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_T
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +32,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.datastream.FieldDefinition;
 import com.bytechef.component.json.file.constant.FileType;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -38,6 +40,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -178,6 +181,68 @@ class JsonFileItemWriterTest {
         assertThat(fields).isEmpty();
     }
 
+    @Test
+    void testWriteJsonReplacesExistingFileContent() throws Exception {
+        ByteArrayOutputStream existingContentOutputStream = new ByteArrayOutputStream();
+
+        existingContentOutputStream.write("[]\n".getBytes(StandardCharsets.UTF_8));
+
+        setupWriteMocks(FileType.JSON.name(), existingContentOutputStream);
+
+        jsonFileItemWriter.open(inputParameters, connectionParameters, context, null);
+        jsonFileItemWriter.write(List.of(Map.of("id", 1), Map.of("id", 2)));
+        jsonFileItemWriter.close();
+
+        String content = writtenContent(existingContentOutputStream);
+
+        assertThat(parseJsonArray(content))
+            .as("file content was: %s", content)
+            .containsExactly(Map.of("id", 1), Map.of("id", 2));
+    }
+
+    @Test
+    void testWriteJsonlAppendsToExistingFileContent() throws Exception {
+        ByteArrayOutputStream existingContentOutputStream = new ByteArrayOutputStream();
+
+        existingContentOutputStream.write("{\"id\":0}\n".getBytes(StandardCharsets.UTF_8));
+
+        setupWriteMocks(FileType.JSONL.name(), existingContentOutputStream);
+
+        jsonFileItemWriter.open(inputParameters, connectionParameters, context, null);
+        jsonFileItemWriter.write(List.of(Map.of("id", 1)));
+        jsonFileItemWriter.close();
+
+        assertThat(writtenContent(existingContentOutputStream)).isEqualTo("{\"id\":0}\n{\"id\":1}\n");
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setupWriteMocks(String fileType, ByteArrayOutputStream appendingOutputStream) {
+        Context.File file = mock(Context.File.class);
+        Context.Json json = mock(Context.Json.class);
+
+        when(inputParameters.getString(FILE_TYPE, FileType.JSON.name())).thenReturn(fileType);
+        when(inputParameters.getString(PATH)).thenReturn(null);
+        when(file.getOutputStream(any(FileEntry.class))).thenReturn(appendingOutputStream);
+        when(file.getOutputStream(any(FileEntry.class), eq(true))).thenReturn(appendingOutputStream);
+        when(file.getOutputStream(any(FileEntry.class), eq(false))).thenAnswer(invocation -> {
+            appendingOutputStream.reset();
+
+            return appendingOutputStream;
+        });
+        when(json.write(any())).thenAnswer(
+            invocation -> JsonMapper.builder()
+                .build()
+                .writeValueAsString(invocation.getArgument(0)));
+        when(context.file(any())).thenAnswer(
+            invocation -> ((Context.ContextFunction<Context.File, ?>) invocation.getArgument(0)).apply(file));
+        when(context.json(any())).thenAnswer(
+            invocation -> ((Context.ContextFunction<Context.Json, ?>) invocation.getArgument(0)).apply(json));
+    }
+
+    private String writtenContent(ByteArrayOutputStream outputStream) {
+        return outputStream.toString(StandardCharsets.UTF_8);
+    }
+
     @SuppressWarnings("unchecked")
     private void setupMocks(String jsonContent, String fileType, String path, long contentLength) {
         when(inputParameters.getString(FILE_TYPE, FileType.JSON.name())).thenReturn(fileType);
@@ -275,7 +340,7 @@ class JsonFileItemWriterTest {
 
     private List<Map<String, Object>> parseJsonArray(String content) {
         try {
-            return tools.jackson.databind.json.JsonMapper.builder()
+            return JsonMapper.builder()
                 .build()
                 .readValue(
                     content, new tools.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
@@ -286,7 +351,7 @@ class JsonFileItemWriterTest {
 
     private Map<String, Object> parseJsonObject(String content) {
         try {
-            return tools.jackson.databind.json.JsonMapper.builder()
+            return JsonMapper.builder()
                 .build()
                 .readValue(
                     content, new tools.jackson.core.type.TypeReference<Map<String, Object>>() {});
