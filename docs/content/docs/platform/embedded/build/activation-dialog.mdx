@@ -8,7 +8,7 @@ The **activation dialog** is the same flow the [Automation Hub](/platform/embedd
 ## Before you start
 
 - A Signing Key and a backend that mints end-user JWTs - see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk).
-- A **published** automation project with the template. See [Automations](/platform/embedded/build/automations#publishing).
+- An automation project with the template and an **enabled configuration** in the environment, pointing at a published version that contains the template. See [Automations](/platform/embedded/build/automations#configurations).
 - For each component in the template that needs a connection, an integration that is set up, has an enabled configuration in the environment, and is visible to the connected user (its permission expression). See [Adding an Integration](/platform/embedded/get-started/initial-setup/adding-an-integration). A component without one shows `<App> isn't set up yet — ask your administrator`, and activation cannot continue.
 
 ## Open the dialog
