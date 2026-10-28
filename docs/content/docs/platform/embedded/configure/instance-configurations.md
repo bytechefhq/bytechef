@@ -7,6 +7,8 @@ description: Deploy and manage integration instances assigned to specific enviro
 
 ---
 
+> **In Development, configurations live on the integration.** While the **Development** environment is selected, the **Integration Configurations** entry is not in the Embedded sidebar. Open **Integrations**, expand an integration and select its **Configurations** tab, which lists the integration's Development configurations with the same rows, switches and menus described below. Links to this page open the integration list instead, on the right integration's **Configurations** tab when the link names one. See [Workflows and Configurations](/platform/embedded/build/integrations#workflows-and-configurations).
+
 ## Key Features
 
 | Feature | Description |
@@ -69,6 +71,11 @@ Each configuration row carries an **Enabled** switch and an ellipsis (⋮) menu:
 - **Delete** -- remove the configuration entirely (confirmed via an alert dialog).
 
 Expand a configuration row to see its workflows. Each workflow has its own enable/disable switch and an **Edit** action that opens the **Edit Workflow** dialog, where you set that workflow's per-configuration input values and connections.
+
+Click a configuration workflow to open a side panel with two tabs:
+
+- **Executions** - the workflow's executions in this configuration, a page at a time, with a **Connected user** column that names whose instance ran. Click an execution to see its step-by-step results; the refresh button reloads the list.
+- **Workflow** - a read-only view of the workflow.
 
 ### Filtering Configurations
 
