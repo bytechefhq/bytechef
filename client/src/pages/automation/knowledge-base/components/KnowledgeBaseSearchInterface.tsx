@@ -78,7 +78,7 @@ const KnowledgeBaseSearchInterface = ({knowledgeBaseId}: KnowledgeBaseSearchInte
                     </div>
                 </div>
 
-                <p className="text-sm leading-relaxed text-gray-700">{result.content}</p>
+                <p className="text-sm leading-relaxed text-content-neutral-primary">{result.content}</p>
 
                 {result.metadata && (
                     <div className="mt-3 rounded-md bg-surface-neutral-primary p-2 text-xs text-content-neutral-secondary">

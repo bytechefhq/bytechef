@@ -77,7 +77,7 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
                                                 <div className="mb-1.5 flex items-center gap-1.5">
                                                     <BotIcon className="size-3.5 text-gray-600" />
 
-                                                    <span className="text-xs font-semibold text-gray-700">
+                                                    <span className="text-xs font-semibold text-content-neutral-primary">
                                                         Assistant
                                                     </span>
                                                 </div>
@@ -111,7 +111,7 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
                                                                                         Input
                                                                                     </div>
 
-                                                                                    <pre className="mt-0.5 overflow-x-auto rounded bg-gray-100 p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-gray-700">
+                                                                                    <pre className="mt-0.5 overflow-x-auto rounded bg-surface-neutral-secondary p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-content-neutral-primary">
                                                                                         {toolCall.input}
                                                                                     </pre>
                                                                                 </div>
@@ -123,7 +123,7 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
                                                                                         Output
                                                                                     </div>
 
-                                                                                    <pre className="mt-0.5 overflow-x-auto rounded bg-gray-100 p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-gray-700">
+                                                                                    <pre className="mt-0.5 overflow-x-auto rounded bg-surface-neutral-secondary p-1.5 font-mono text-xs break-all whitespace-pre-wrap text-content-neutral-primary">
                                                                                         {toolCall.output}
                                                                                     </pre>
                                                                                 </div>
@@ -143,7 +143,7 @@ const TranscriptDialog = ({onClose, resultId, scenarioName}: TranscriptDialogPro
                                     <div className="rounded-lg border border-amber-200 bg-amber-50/50 px-3 py-2.5">
                                         <div className="mb-1 text-xs font-semibold text-amber-700">Expected Output</div>
 
-                                        <div className="text-sm whitespace-pre-wrap text-gray-700">
+                                        <div className="text-sm whitespace-pre-wrap text-content-neutral-primary">
                                             {transcriptData.expectedOutput}
                                         </div>
                                     </div>
