@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Card, CardContent, CardHeader} from '@/components/ui/card';
+import {useMemo} from 'react';
 
 interface PrepaidPlanCardPropsI {
     cancelAtPeriodEnd: boolean;
@@ -34,8 +35,22 @@ const PrepaidPlanCard = ({
 }: PrepaidPlanCardPropsI) => {
     const isTrial = trialDaysRemaining !== undefined;
     const jobExecutionsAvailable = productUnitLimit - jobsExecuted;
-    const trialFill = productUnitLimit > 0 ? Math.min(jobsExecuted / productUnitLimit, 1) * 100 : 0;
     const planUnitFill = planUnitTotal > 0 ? Math.min(planUnitUsed / planUnitTotal, 1) * 100 : 0;
+
+    const {blueFill, blueZoneWidth, orangeFill, orangeZoneWidth} = useMemo(() => {
+        const totalRange = Math.max(jobsExecuted, productUnitLimit);
+
+        if (totalRange <= 0) {
+            return {blueFill: 0, blueZoneWidth: 100, orangeFill: 0, orangeZoneWidth: 0};
+        }
+
+        return {
+            blueFill: productUnitLimit > 0 ? Math.min(jobsExecuted / productUnitLimit, 1) * 100 : 0,
+            blueZoneWidth: (productUnitLimit / totalRange) * 100,
+            orangeFill: jobsExecuted > productUnitLimit ? 100 : 0,
+            orangeZoneWidth: (Math.max(0, jobsExecuted - productUnitLimit) / totalRange) * 100,
+        };
+    }, [productUnitLimit, jobsExecuted]);
 
     return (
         <Card className="w-full max-w-3xl">
@@ -144,10 +159,21 @@ const PrepaidPlanCard = ({
                         </div>
 
                         <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
-                            <div
-                                className="h-full bg-blue-500"
-                                style={{width: `${isTrial ? trialFill : planUnitFill}%`}}
-                            />
+                            {isTrial ? (
+                                <>
+                                    <div className="h-full bg-muted" style={{width: `${blueZoneWidth}%`}}>
+                                        <div className="h-full bg-blue-500" style={{width: `${blueFill}%`}} />
+                                    </div>
+
+                                    {orangeZoneWidth > 0 && (
+                                        <div className="h-full bg-muted" style={{width: `${orangeZoneWidth}%`}}>
+                                            <div className="h-full bg-orange-500" style={{width: `${orangeFill}%`}} />
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="h-full bg-blue-500" style={{width: `${planUnitFill}%`}} />
+                            )}
                         </div>
                     </div>
                 </CardContent>

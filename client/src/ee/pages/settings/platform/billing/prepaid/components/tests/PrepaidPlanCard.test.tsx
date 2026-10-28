@@ -47,4 +47,28 @@ describe('PrepaidPlanCard', () => {
         expect(screen.getByText('Spent 100')).toBeInTheDocument();
         expect(screen.getByText('Limit 1,000')).toBeInTheDocument();
     });
+
+    it('renders orange overflow when trial executions exceed the limit', () => {
+        const {container} = render(
+            <PrepaidPlanCard
+                {...defaultProps}
+                jobsExecuted={1500}
+                planName="Trial"
+                productUnitLimit={1000}
+                trialDaysRemaining={5}
+            />
+        );
+
+        expect(container.querySelector('.bg-orange-500')).toHaveStyle({width: '100%'});
+        expect(container.querySelector('.bg-blue-500')).toHaveStyle({width: '100%'});
+    });
+
+    it('renders an empty trial bar without dividing by zero when the limit is zero', () => {
+        const {container} = render(
+            <PrepaidPlanCard {...defaultProps} planName="Trial" productUnitLimit={0} trialDaysRemaining={5} />
+        );
+
+        expect(container.querySelector('.bg-orange-500')).toBeNull();
+        expect(container.querySelector('.bg-blue-500')).toHaveStyle({width: '0%'});
+    });
 });

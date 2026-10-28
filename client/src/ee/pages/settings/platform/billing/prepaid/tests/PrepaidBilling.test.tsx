@@ -40,6 +40,7 @@ const activeSubscription = {
     planName: 'STARTER',
     planUnitTotal: 5000,
     planUnitUsed: 10,
+    status: 'ACTIVE',
     subscriptionModel: 'PREPAID',
 };
 
@@ -71,6 +72,17 @@ describe('PrepaidBilling', () => {
         render(<PrepaidBilling />);
 
         expect(screen.getByRole('button', {name: 'Buy extra units'})).toBeEnabled();
+    });
+
+    it('disables the buy button when the subscription is not active', () => {
+        hoisted.useGetCurrentSubscriptionQuery.mockReturnValue({
+            data: {...activeSubscription, status: 'PAST_DUE'},
+            error: null,
+        });
+
+        render(<PrepaidBilling />);
+
+        expect(screen.getByRole('button', {name: 'Buy extra units'})).toBeDisabled();
     });
 
     it('shows the package banner and refetches after package success, then clears it', async () => {
