@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package bytechef.platform.codeworkflow.configuration.remote.v1;
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.codeworkflow.configuration.remote.grpc.proto";
+
+service CodeWorkflowContainerRemoteService {
+  rpc GetCodeWorkflowContainer(GetCodeWorkflowContainerRequest) returns (RemoteCodeWorkflowContainer);
+}
+
+message GetCodeWorkflowContainerRequest {
+  string code_workflow_container_uuid = 1;
+}
+
+message RemoteCodeWorkflowContainer {
+  optional int64 id = 1;
+  string uuid = 2;
+  optional string name = 3;
+  optional string external_version = 4;
+  string language = 5;
+  optional RemoteFileEntry workflows = 6;
+  repeated RemoteCodeWorkflow code_workflows = 7;
+}
+
+message RemoteCodeWorkflow {
+  string id = 1;
+  string name = 2;
+}
+
+message RemoteFileEntry {
+  optional string extension = 1;
+  optional string mime_type = 2;
+  optional string name = 3;
+  optional string url = 4;
+}

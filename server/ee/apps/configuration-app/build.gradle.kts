@@ -118,6 +118,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-swagger"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-remote-grpc"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-grpc"))
