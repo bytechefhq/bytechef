@@ -19,6 +19,8 @@ package com.bytechef.platform.configuration.facade;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -28,24 +30,34 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class WorkflowNodeScriptFacadeTest {
 
     @Mock
@@ -198,5 +210,57 @@ class WorkflowNodeScriptFacadeTest {
         assertNotNull(result);
         assertNull(result.error());
         assertNull(result.output());
+    }
+
+    @Test
+    void testGetClusterElementScriptInputUsesTheSourceConnectionOfTheRootTask() {
+        CodeEditorScriptInputProvider codeEditorScriptInputProvider = mock(CodeEditorScriptInputProvider.class);
+        Connection connection = mock(Connection.class);
+        Workflow workflow = new Workflow("workflow-1", """
+            {
+                "tasks": [
+                    {
+                        "name": "dataStream_1",
+                        "type": "dataStream/v1",
+                        "parameters": {},
+                        "clusterElements": {
+                            "source": {"name": "postgresql_1", "type": "postgresql/v1/read", "parameters": {}}
+                        }
+                    }
+                ]
+            }
+            """, Format.JSON);
+
+        WorkflowNodeScriptFacadeImpl workflowNodeScriptFacadeWithProvider = new WorkflowNodeScriptFacadeImpl(
+            List.of(codeEditorScriptInputProvider), connectionService, evaluator, workflowNodeOutputFacade,
+            workflowNodeTestOutputFacade, workflowService, workflowTestConfigurationService);
+
+        when(workflowService.getWorkflow("workflow-1")).thenReturn(workflow);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            "workflow-1", "dataStream_1", 1L))
+                .thenReturn(
+                    List.of(
+                        new WorkflowTestConfigurationConnection(10L, "script_1", "dataStream_1"),
+                        new WorkflowTestConfigurationConnection(20L, "postgresql_1", "dataStream_1")));
+        when(connectionService.getConnection(20L)).thenReturn(connection);
+        when(connection.getId()).thenReturn(20L);
+        when(codeEditorScriptInputProvider.getRootComponentName()).thenReturn("dataStream");
+        when(codeEditorScriptInputProvider.getScriptInputParameters(
+            anyInt(), anyString(), anyInt(), anyString(), any(), any())).thenReturn(Map.of("key", "value"));
+
+        Map<String, Object> scriptInput = workflowNodeScriptFacadeWithProvider.getClusterElementScriptInput(
+            "workflow-1", "dataStream_1", "processor", "script_1", 1L);
+
+        ArgumentCaptor<ComponentConnection> componentConnectionCaptor =
+            ArgumentCaptor.forClass(ComponentConnection.class);
+
+        verify(codeEditorScriptInputProvider).getScriptInputParameters(
+            eq(1), eq("postgresql"), eq(1), eq("read"), any(), componentConnectionCaptor.capture());
+
+        ComponentConnection componentConnection = componentConnectionCaptor.getValue();
+
+        assertNotNull(componentConnection);
+        assertEquals(20L, componentConnection.connectionId());
+        assertEquals(Map.of("key", "value"), scriptInput);
     }
 }

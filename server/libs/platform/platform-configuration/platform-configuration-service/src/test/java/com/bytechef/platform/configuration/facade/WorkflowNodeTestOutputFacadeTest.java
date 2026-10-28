@@ -20,9 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,16 +33,21 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.script.CodeEditorScriptInputProvider;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -237,5 +245,70 @@ class WorkflowNodeTestOutputFacadeTest {
             eq(WORKFLOW_ID), eq("trigger_2"), any(WorkflowNodeType.class), any(), eq(ENVIRONMENT_ID));
         verify(webhookTriggerTestFacade).disableTrigger(
             WORKFLOW_ID, "trigger_2", ENVIRONMENT_ID, PlatformType.AUTOMATION);
+    }
+
+    @Test
+    void testSaveClusterElementTestOutputPassesTheSourceConnectionOfTheRootTaskToTheScriptInputProvider() {
+        CodeEditorScriptInputProvider codeEditorScriptInputProvider = mock(CodeEditorScriptInputProvider.class);
+        Connection connection = mock(Connection.class);
+        Workflow workflow = new Workflow(WORKFLOW_ID, """
+            {
+                "tasks": [
+                    {
+                        "name": "dataStream_1",
+                        "type": "dataStream/v1",
+                        "parameters": {},
+                        "clusterElements": {
+                            "source": {"name": "postgresql_1", "type": "postgresql/v1/read", "parameters": {}},
+                            "processor": {"name": "script_1", "type": "script/v1/javascript", "parameters": {}}
+                        }
+                    }
+                ]
+            }
+            """, Format.JSON);
+
+        WorkflowNodeTestOutputFacadeImpl workflowNodeTestOutputFacadeWithProvider =
+            new WorkflowNodeTestOutputFacadeImpl(
+                actionDefinitionFacade, clusterElementDefinitionService, List.of(codeEditorScriptInputProvider),
+                connectionService, editorTempFileStorage, evaluator, jobPrincipalAccessorRegistry,
+                triggerDefinitionFacade, workflowNodeTestOutputService, workflowNodeOutputFacade,
+                webhookTriggerTestFacade, workflowService, workflowTestConfigurationService);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(clusterElementDefinitionService.getClusterElementType("dataStream", 1, "PROCESSOR"))
+            .thenReturn(new ClusterElementType("PROCESSOR", "processor", "Processor"));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            WORKFLOW_ID, "dataStream_1", ENVIRONMENT_ID))
+                .thenReturn(
+                    List.of(
+                        new WorkflowTestConfigurationConnection(10L, "script_1", "dataStream_1"),
+                        new WorkflowTestConfigurationConnection(20L, "postgresql_1", "dataStream_1")));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenAnswer(invocation -> Map.of());
+        when(workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(WORKFLOW_ID, "dataStream_1", ENVIRONMENT_ID))
+            .thenAnswer(invocation -> Map.of());
+        lenient().when(evaluator.evaluate(anyMap(), anyMap()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(evaluator.evaluate(anyMap(), anyMap(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(connectionService.getConnection(20L)).thenReturn(connection);
+        when(connection.getId()).thenReturn(20L);
+        when(codeEditorScriptInputProvider.getRootComponentName()).thenReturn("dataStream");
+        when(codeEditorScriptInputProvider.getScriptInputParameters(
+            anyInt(), anyString(), anyInt(), anyString(), any(), any())).thenReturn(Map.of());
+
+        workflowNodeTestOutputFacadeWithProvider.saveClusterElementTestOutput(
+            WORKFLOW_ID, "dataStream_1", "PROCESSOR", "script_1", ENVIRONMENT_ID);
+
+        ArgumentCaptor<ComponentConnection> componentConnectionCaptor =
+            ArgumentCaptor.forClass(ComponentConnection.class);
+
+        verify(codeEditorScriptInputProvider).getScriptInputParameters(
+            eq(1), eq("postgresql"), eq(1), eq("read"), any(), componentConnectionCaptor.capture());
+
+        ComponentConnection componentConnection = componentConnectionCaptor.getValue();
+
+        assertThat(componentConnection).isNotNull();
+        assertThat(componentConnection.connectionId()).isEqualTo(20L);
     }
 }
