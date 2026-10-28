@@ -376,7 +376,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         return workflowUuidResponse(
             connectedUserProjectFacade.updateProjectWorkflow(
                 OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid,
-                requestModel.getPrompt(), getEnvironment(xEnvironment), true));
+                requestModel.getPrompt(), requestModel.getSystemPrompt(), getEnvironment(xEnvironment), true));
     }
 
     @Override
@@ -385,7 +385,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         EnvironmentModel xEnvironment) {
         return workflowUuidResponse(
             connectedUserProjectFacade.updateProjectWorkflow(
-                externalUserId, workflowUuid, requestModel.getPrompt(), getEnvironment(xEnvironment), true));
+                externalUserId, workflowUuid, requestModel.getPrompt(), requestModel.getSystemPrompt(),
+                getEnvironment(xEnvironment), true));
     }
 
     @Override
