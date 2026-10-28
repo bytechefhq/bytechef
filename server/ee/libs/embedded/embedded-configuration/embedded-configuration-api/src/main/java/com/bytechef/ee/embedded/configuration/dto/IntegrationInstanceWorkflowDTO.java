@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -20,14 +21,18 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceWorkflowDTO(
     String createdBy, Instant createdDate, Long id, long integrationInstanceConfigurationWorkflowId,
-    Map<String, ?> inputs, String lastModifiedBy, Instant lastModifiedDate, boolean enabled, String workflowId) {
+    Map<String, ?> inputs, @Nullable Instant lastExecutionDate, String lastModifiedBy, Instant lastModifiedDate,
+    boolean enabled, String workflowId) {
 
-    public IntegrationInstanceWorkflowDTO(IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowId) {
+    public IntegrationInstanceWorkflowDTO(
+        IntegrationInstanceWorkflow integrationInstanceWorkflow, @Nullable Instant lastExecutionDate,
+        String workflowId) {
+
         this(
             integrationInstanceWorkflow.getCreatedBy(), integrationInstanceWorkflow.getCreatedDate(),
             integrationInstanceWorkflow.getId(),
             integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId(),
-            integrationInstanceWorkflow.getInputs(), integrationInstanceWorkflow.getLastModifiedBy(),
+            integrationInstanceWorkflow.getInputs(), lastExecutionDate, integrationInstanceWorkflow.getLastModifiedBy(),
             integrationInstanceWorkflow.getLastModifiedDate(), integrationInstanceWorkflow.isEnabled(), workflowId);
     }
 }

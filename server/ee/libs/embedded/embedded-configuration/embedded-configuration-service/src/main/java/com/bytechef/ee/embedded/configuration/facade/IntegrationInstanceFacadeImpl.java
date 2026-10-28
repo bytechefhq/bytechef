@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -222,14 +223,18 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             integrationInstance, integrationInstanceConfiguration,
             integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(id)
                 .stream()
-                .map(integrationInstanceWorkflow -> new IntegrationInstanceWorkflowDTO(
-                    integrationInstanceWorkflow,
-                    CollectionUtils.getFirstFilter(
+                .map(integrationInstanceWorkflow -> {
+                    String workflowId = CollectionUtils.getFirstFilter(
                         integrationInstanceConfigurationWorkflows,
                         integrationInstanceConfigurationWorkflow -> Objects.equals(
                             integrationInstanceConfigurationWorkflow.getId(),
                             integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()),
-                        IntegrationInstanceConfigurationWorkflow::getWorkflowId)))
+                        IntegrationInstanceConfigurationWorkflow::getWorkflowId);
+
+                    return new IntegrationInstanceWorkflowDTO(
+                        integrationInstanceWorkflow, getIntegrationInstanceWorkflowLastExecutionDate(id, workflowId),
+                        workflowId);
+                })
                 .collect(Collectors.toSet()),
             getIntegrationInstanceLastExecutionDate(integrationInstance.getId()));
     }
@@ -421,6 +426,19 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         return OptionalUtils.mapOrElse(
             principalJobService.fetchLastJobId(integrationInstanceId, PlatformType.EMBEDDED), this::getJobEndDate,
             null);
+    }
+
+    private @Nullable Instant getIntegrationInstanceWorkflowLastExecutionDate(
+        long integrationInstanceId, @Nullable String workflowId) {
+
+        if (workflowId == null) {
+            return null;
+        }
+
+        return OptionalUtils.mapOrElse(
+            principalJobService.fetchLastWorkflowJobId(integrationInstanceId, List.of(workflowId),
+                PlatformType.EMBEDDED),
+            this::getJobEndDate, null);
     }
 
     private Instant getJobEndDate(Long jobId) {
