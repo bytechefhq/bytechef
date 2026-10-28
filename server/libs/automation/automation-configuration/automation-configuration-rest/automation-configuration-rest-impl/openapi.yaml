@@ -1347,6 +1347,10 @@ components:
           properties:
             category:
               $ref: "#/components/schemas/Category"
+            developmentDeploymentCount:
+              description: "The number of the project's deployments in the Development environment. Only set by the workspace project list."
+              type: "integer"
+              readOnly: true
             projectWorkflowIds:
               description: "The project workflow ids belonging to this project."
               type: "array"

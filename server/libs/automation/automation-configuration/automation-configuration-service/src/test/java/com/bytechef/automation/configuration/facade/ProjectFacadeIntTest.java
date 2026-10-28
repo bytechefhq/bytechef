@@ -50,6 +50,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.FileItem;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -519,6 +520,46 @@ public class ProjectFacadeIntTest {
             .isEqualTo(projectDTO)
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", projectDTO.tags());
+    }
+
+    @Test
+    public void testGetWorkspaceProjectsDevelopmentDeploymentCount() {
+        ProjectDTO developmentProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.createProjectDeployment(workspace.getId(), developmentProjectDTO);
+        projectFacadeInstanceHelper.createProjectDeploymentForEnvironment(
+            workspace.getId(), developmentProjectDTO, Environment.DEVELOPMENT);
+
+        ProjectDTO productionProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(productionProjectDTO);
+
+        projectFacade.publishProject(productionProjectDTO.id(), "Published for test", false);
+
+        projectFacadeInstanceHelper.createProjectDeploymentForEnvironment(
+            workspace.getId(), productionProjectDTO, Environment.PRODUCTION);
+
+        List<ProjectDTO> projectDTOs = projectFacade.getWorkspaceProjects(
+            null, null, true, null, null, null, workspace.getId());
+
+        assertThat(projectDTOs)
+            .filteredOn(projectDTO -> projectDTO.id()
+                .equals(developmentProjectDTO.id()))
+            .singleElement()
+            .extracting(ProjectDTO::developmentDeploymentCount)
+            .isEqualTo(2);
+        assertThat(projectDTOs)
+            .filteredOn(projectDTO -> projectDTO.id()
+                .equals(productionProjectDTO.id()))
+            .singleElement()
+            .extracting(ProjectDTO::developmentDeploymentCount)
+            .isEqualTo(0);
+
+        assertThat(projectFacade.getProject(developmentProjectDTO.id())
+            .developmentDeploymentCount()).isNull();
+
+        projectFacade.deleteProject(developmentProjectDTO.id());
+        projectFacade.deleteProject(productionProjectDTO.id());
     }
 
     @Test
