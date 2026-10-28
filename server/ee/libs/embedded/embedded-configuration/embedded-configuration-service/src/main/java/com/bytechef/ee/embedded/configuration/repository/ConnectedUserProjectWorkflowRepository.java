@@ -33,6 +33,8 @@ public interface ConnectedUserProjectWorkflowRepository extends ListCrudReposito
     Optional<ConnectedUserProjectWorkflow> findByConnectedUserProjectIdAndCopiedFromWorkflowUuid(
         long connectedUserProjectId, String copiedFromWorkflowUuid);
 
+    List<ConnectedUserProjectWorkflow> findAllByCopiedFromWorkflowUuid(String copiedFromWorkflowUuid);
+
     @Query("""
         SELECT cupw.*
         FROM connected_user_project_workflow cupw
