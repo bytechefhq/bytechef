@@ -10,10 +10,10 @@ package com.bytechef.ee.platform.apiconnector.configuration.service;
 import com.bytechef.commons.util.UrlValidatorUtils;
 import com.bytechef.commons.util.UrlValidatorUtils.HostResolver;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.apiconnector.configuration.service.PinnedAddressHttpClient.Response;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Proxy;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -24,11 +24,16 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.net.ssl.SSLSocketFactory;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,27 +58,28 @@ public class JsoupWebScrapeService implements WebScrapeService {
     private static final int DEFAULT_MAX_CRAWL_PAGES = 20;
     private static final int MAX_REDIRECTS = 5;
     private static final int MAX_RESPONSE_BODY_BYTES = 10 * 1024 * 1024;
-    private static final Map<String, String> REQUEST_HEADERS = Map.of(
+    private static final Headers REQUEST_HEADERS = Headers.of(Map.of(
         "User-Agent", "ByteChef Web Scraper",
-        "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"));
 
     private final Set<String> allowedHosts;
     private final HostResolver hostResolver;
-    private final PinnedAddressHttpClient pinnedAddressHttpClient;
+    private final OkHttpClient okHttpClient;
 
     @Autowired
     public JsoupWebScrapeService(ApplicationProperties applicationProperties) {
-        this(
-            getAllowedHosts(applicationProperties), InetAddress::getAllByName,
-            Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS));
+        this(getAllowedHosts(applicationProperties), InetAddress::getAllByName, new OkHttpClient());
     }
 
-    JsoupWebScrapeService(Set<String> allowedHosts, HostResolver hostResolver, Duration connectTimeout) {
+    JsoupWebScrapeService(Set<String> allowedHosts, HostResolver hostResolver, OkHttpClient okHttpClient) {
         this.allowedHosts = Set.copyOf(allowedHosts);
         this.hostResolver = hostResolver;
-        this.pinnedAddressHttpClient = new PinnedAddressHttpClient(
-            connectTimeout, Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS), MAX_RESPONSE_BODY_BYTES,
-            (SSLSocketFactory) SSLSocketFactory.getDefault());
+        this.okHttpClient = okHttpClient.newBuilder()
+            .callTimeout(Duration.ofSeconds(DEFAULT_TIMEOUT_SECONDS))
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .proxy(Proxy.NO_PROXY)
+            .build();
     }
 
     @Override
@@ -281,29 +287,55 @@ public class JsoupWebScrapeService implements WebScrapeService {
         for (int redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
             ResolvedTarget resolvedTarget = resolveTarget(currentUrl);
 
-            Response response = pinnedAddressHttpClient.get(
-                resolvedTarget.uri(), resolvedTarget.addresses(), REQUEST_HEADERS);
+            OkHttpClient pinnedOkHttpClient = okHttpClient.newBuilder()
+                .dns(hostname -> resolvedTarget.addresses())
+                .build();
 
-            int statusCode = response.statusCode();
+            Request request = new Request.Builder()
+                .url(currentUrl)
+                .headers(REQUEST_HEADERS)
+                .get()
+                .build();
 
-            if (!isRedirect(statusCode)) {
-                if (statusCode != 200) {
-                    throw new IOException("HTTP " + statusCode);
+            try (Response response = pinnedOkHttpClient.newCall(request)
+                .execute()) {
+
+                int statusCode = response.code();
+
+                if (!isRedirect(statusCode)) {
+                    if (statusCode != 200) {
+                        throw new IOException("HTTP " + statusCode);
+                    }
+
+                    return new FetchedPage(currentUrl, readBody(response.body()));
                 }
 
-                return new FetchedPage(currentUrl, response.body());
+                String location = response.header("Location");
+
+                if (location == null) {
+                    throw new IOException("HTTP " + statusCode + " without a Location header");
+                }
+
+                currentUrl = resolveRedirectTarget(resolvedTarget.uri(), location);
             }
-
-            String location = response.location();
-
-            if (location == null) {
-                throw new IOException("HTTP " + statusCode + " without a Location header");
-            }
-
-            currentUrl = resolveRedirectTarget(resolvedTarget.uri(), location);
         }
 
         throw new IOException("Too many redirects while fetching " + url);
+    }
+
+    private static String readBody(@Nullable ResponseBody responseBody) throws IOException {
+        if (responseBody == null) {
+            return "";
+        }
+
+        if (responseBody.contentLength() > MAX_RESPONSE_BODY_BYTES ||
+            responseBody.source()
+                .request(MAX_RESPONSE_BODY_BYTES + 1L)) {
+
+            throw new IOException("Response body exceeds " + MAX_RESPONSE_BODY_BYTES + " bytes");
+        }
+
+        return responseBody.string();
     }
 
     private static boolean isRedirect(int statusCode) {

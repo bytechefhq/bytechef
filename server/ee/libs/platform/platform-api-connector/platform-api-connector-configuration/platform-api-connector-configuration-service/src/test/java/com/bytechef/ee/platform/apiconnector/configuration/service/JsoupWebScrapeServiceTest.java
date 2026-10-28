@@ -17,6 +17,8 @@ import com.bytechef.ee.platform.apiconnector.configuration.service.JsoupWebScrap
 import com.bytechef.ee.platform.apiconnector.configuration.service.WebScrapeService.CrawlResult;
 import com.bytechef.ee.platform.apiconnector.configuration.service.WebScrapeService.ScrapeResult;
 import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -27,6 +29,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import okhttp3.OkHttpClient;
+import okhttp3.tls.HandshakeCertificates;
+import okhttp3.tls.HeldCertificate;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -156,7 +161,7 @@ class JsoupWebScrapeServiceTest {
                     };
 
                 JsoupWebScrapeService rebindingJsoupWebScrapeService = new JsoupWebScrapeService(
-                    Set.of(), rebindingHostResolver, Duration.ofMillis(500));
+                    Set.of(), rebindingHostResolver, createOkHttpClient(Duration.ofMillis(500)));
 
                 InetSocketAddress serverAddress = httpServer.getAddress();
 
@@ -206,7 +211,7 @@ class JsoupWebScrapeServiceTest {
 
             try {
                 JsoupWebScrapeService allowlistJsoupWebScrapeService = new JsoupWebScrapeService(
-                    Set.of("docs.internal"), loopbackHostResolver, Duration.ofSeconds(5));
+                    Set.of("docs.internal"), loopbackHostResolver, createOkHttpClient(Duration.ofSeconds(5)));
 
                 ScrapeResult scrapeResult = allowlistJsoupWebScrapeService.scrape(
                     "http://docs.internal:" + getPort(httpServer) + "/docs");
@@ -225,7 +230,7 @@ class JsoupWebScrapeServiceTest {
 
             try {
                 JsoupWebScrapeService allowlistJsoupWebScrapeService = new JsoupWebScrapeService(
-                    Set.of("other.internal"), loopbackHostResolver, Duration.ofSeconds(5));
+                    Set.of("other.internal"), loopbackHostResolver, createOkHttpClient(Duration.ofSeconds(5)));
 
                 ScrapeResult scrapeResult = allowlistJsoupWebScrapeService.scrape(
                     "http://docs.internal:" + getPort(httpServer) + "/docs");
@@ -249,7 +254,7 @@ class JsoupWebScrapeServiceTest {
                             InetAddress.getLoopbackAddress()
                         }
                         : InetAddress.getAllByName(host),
-                    Duration.ofSeconds(5));
+                    createOkHttpClient(Duration.ofSeconds(5)));
 
                 ScrapeResult scrapeResult = allowlistJsoupWebScrapeService.scrape(
                     "http://docs.internal:" + getPort(httpServer) + "/redirect");
@@ -257,6 +262,24 @@ class JsoupWebScrapeServiceTest {
                 assertThat(scrapeResult.success()).isFalse();
                 assertThat(scrapeResult.error()).contains("link-local address");
                 assertThat(requestCount.get()).isEqualTo(1);
+            } finally {
+                httpServer.stop(0);
+            }
+        }
+
+        @Test
+        void testScrapeRejectsBodyLargerThanTheLimit() throws IOException {
+            HttpServer httpServer = startServer();
+
+            try {
+                JsoupWebScrapeService allowlistJsoupWebScrapeService = new JsoupWebScrapeService(
+                    Set.of("docs.internal"), loopbackHostResolver, createOkHttpClient(Duration.ofSeconds(5)));
+
+                ScrapeResult scrapeResult = allowlistJsoupWebScrapeService.scrape(
+                    "http://docs.internal:" + getPort(httpServer) + "/large");
+
+                assertThat(scrapeResult.success()).isFalse();
+                assertThat(scrapeResult.error()).contains("Response body exceeds");
             } finally {
                 httpServer.stop(0);
             }
@@ -295,6 +318,17 @@ class JsoupWebScrapeServiceTest {
                     outputStream.write(body);
                 }
             });
+            httpServer.createContext("/large", exchange -> {
+                byte[] chunk = new byte[1024 * 1024];
+
+                exchange.sendResponseHeaders(200, 0);
+
+                try (OutputStream outputStream = exchange.getResponseBody()) {
+                    for (int index = 0; index < 11; index++) {
+                        outputStream.write(chunk);
+                    }
+                }
+            });
             httpServer.createContext("/redirect", exchange -> {
                 requestCount.incrementAndGet();
 
@@ -316,5 +350,107 @@ class JsoupWebScrapeServiceTest {
 
             return serverAddress.getPort();
         }
+    }
+
+    @Nested
+    class Https {
+
+        private final HostResolver loopbackHostResolver = host -> new InetAddress[] {
+            InetAddress.getLoopbackAddress()
+        };
+
+        @Test
+        void testScrapeFetchesOverHttpsWhenTheCertificateMatchesTheHost() throws IOException {
+            HeldCertificate heldCertificate = createHeldCertificate("docs.internal");
+
+            HttpsServer httpsServer = startHttpsServer(heldCertificate);
+
+            try {
+                JsoupWebScrapeService httpsJsoupWebScrapeService = new JsoupWebScrapeService(
+                    Set.of("docs.internal"), loopbackHostResolver, createTrustingOkHttpClient(heldCertificate));
+
+                ScrapeResult scrapeResult = httpsJsoupWebScrapeService.scrape(
+                    "https://docs.internal:" + getPort(httpsServer) + "/docs");
+
+                assertThat(scrapeResult.success()).isTrue();
+                assertThat(scrapeResult.content()).isEqualTo("secure docs");
+            } finally {
+                httpsServer.stop(0);
+            }
+        }
+
+        @Test
+        void testScrapeRejectsACertificateIssuedForAnotherHost() throws IOException {
+            HeldCertificate heldCertificate = createHeldCertificate("other.internal");
+
+            HttpsServer httpsServer = startHttpsServer(heldCertificate);
+
+            try {
+                JsoupWebScrapeService httpsJsoupWebScrapeService = new JsoupWebScrapeService(
+                    Set.of("docs.internal"), loopbackHostResolver, createTrustingOkHttpClient(heldCertificate));
+
+                ScrapeResult scrapeResult = httpsJsoupWebScrapeService.scrape(
+                    "https://docs.internal:" + getPort(httpsServer) + "/docs");
+
+                assertThat(scrapeResult.success()).isFalse();
+                assertThat(scrapeResult.error()).contains("docs.internal");
+            } finally {
+                httpsServer.stop(0);
+            }
+        }
+
+        private HeldCertificate createHeldCertificate(String host) {
+            return new HeldCertificate.Builder()
+                .addSubjectAlternativeName(host)
+                .build();
+        }
+
+        private OkHttpClient createTrustingOkHttpClient(HeldCertificate heldCertificate) {
+            HandshakeCertificates clientHandshakeCertificates = new HandshakeCertificates.Builder()
+                .addTrustedCertificate(heldCertificate.certificate())
+                .build();
+
+            return new OkHttpClient.Builder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .sslSocketFactory(
+                    clientHandshakeCertificates.sslSocketFactory(), clientHandshakeCertificates.trustManager())
+                .build();
+        }
+
+        private HttpsServer startHttpsServer(HeldCertificate heldCertificate) throws IOException {
+            HandshakeCertificates serverHandshakeCertificates = new HandshakeCertificates.Builder()
+                .heldCertificate(heldCertificate)
+                .build();
+
+            HttpsServer httpsServer = HttpsServer.create(
+                new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+
+            httpsServer.setHttpsConfigurator(new HttpsConfigurator(serverHandshakeCertificates.sslContext()));
+            httpsServer.createContext("/docs", exchange -> {
+                byte[] body = "<html><body><p>secure docs</p></body></html>".getBytes(StandardCharsets.UTF_8);
+
+                exchange.sendResponseHeaders(200, body.length);
+
+                try (OutputStream outputStream = exchange.getResponseBody()) {
+                    outputStream.write(body);
+                }
+            });
+
+            httpsServer.start();
+
+            return httpsServer;
+        }
+
+        private int getPort(HttpsServer httpsServer) {
+            InetSocketAddress serverAddress = httpsServer.getAddress();
+
+            return serverAddress.getPort();
+        }
+    }
+
+    private static OkHttpClient createOkHttpClient(Duration connectTimeout) {
+        return new OkHttpClient.Builder()
+            .connectTimeout(connectTimeout)
+            .build();
     }
 }
