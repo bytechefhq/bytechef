@@ -29,6 +29,9 @@ public interface PersistentTokenService {
 
     Optional<PersistentToken> fetchPersistentToken(String id);
 
+    /**
+     * Returns the user's tokens that have not expired yet.
+     */
     List<PersistentToken> getUserPersistentTokens(long userId);
 
     PersistentToken save(PersistentToken token);

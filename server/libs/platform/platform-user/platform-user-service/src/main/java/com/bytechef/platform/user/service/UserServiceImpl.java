@@ -22,6 +22,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.Authority;
+import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
@@ -402,15 +403,11 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    /**
-     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after one
-     * month.
-     */
     @Override
     public void removeOldPersistentTokens() {
         LocalDate now = LocalDate.now();
 
-        persistentTokenRepository.findAllByTokenDateBefore(now.minusMonths(1))
+        persistentTokenRepository.findAllByTokenDateBefore(now.minusDays(PersistentToken.VALIDITY_DAYS))
             .forEach(token -> {
                 log.debug("Deleting token {}", token.getSeries());
 
@@ -638,9 +635,6 @@ public class UserServiceImpl implements UserService {
             .orElse(false);
     }
 
-    /**
-     * Not activated users should be automatically deleted after 3 days.
-     */
     @Override
     public void removeNotActivatedUsers() {
         userRepository
