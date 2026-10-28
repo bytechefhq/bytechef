@@ -35,6 +35,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReference
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -139,6 +140,9 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         """;
 
     @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+
+    @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @MockitoBean
@@ -191,7 +195,7 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         String secondWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUser firstConnectedUser = createConnectedUserWithConnection();
         ConnectedUser secondConnectedUser = createConnectedUserWithConnection();
@@ -309,5 +313,10 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         storedReference.setEnabled(false);
 
         connectedUserProjectWorkflowRepository.save(storedReference);
+    }
+
+    private void publishAndPinProject(long projectId) {
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
     }
 }

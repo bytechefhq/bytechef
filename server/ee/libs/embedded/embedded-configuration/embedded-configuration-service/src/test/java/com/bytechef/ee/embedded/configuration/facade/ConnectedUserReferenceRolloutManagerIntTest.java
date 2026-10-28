@@ -57,6 +57,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -174,6 +175,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         """;
 
     @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+
+    @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @MockitoBean
@@ -270,8 +274,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String firstUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
         String secondUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -298,7 +302,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -308,7 +312,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, false, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         String versionTwoWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
 
@@ -335,7 +339,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -356,7 +360,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String firstUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
         String secondUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -395,7 +399,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -428,7 +432,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -450,7 +454,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -479,7 +483,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -507,7 +511,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -540,7 +544,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -579,7 +583,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String firstUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
         String secondUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -595,7 +599,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, firstUuid, true, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
 
@@ -619,7 +623,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String slackUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
         String otherUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -642,7 +646,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             });
         when(connectedUserConnectionFacade.getConnections(anyLong(), eq("jira"), eq(List.of()))).thenReturn(List.of());
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
 
@@ -663,7 +667,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         String keptUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
         String removedUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -673,7 +677,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             EXTERNAL_USER_ID, removedUuid, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(removedUuid);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
 
@@ -695,7 +699,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String onlyReferencedUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -703,7 +707,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             EXTERNAL_USER_ID, onlyReferencedUuid, Environment.PRODUCTION);
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(onlyReferencedUuid);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
 
@@ -720,14 +724,14 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION);
@@ -744,11 +748,11 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String removedUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         automationWorkflowProjectFacade.deleteProjectWorkflow(removedUuid);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 1, removedUuid))
             .isPresent();
@@ -761,7 +765,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -788,7 +792,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String firstUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -797,7 +801,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String secondUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow second = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, secondUuid, Environment.PRODUCTION);
@@ -820,7 +824,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -834,7 +838,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(otherReference.getProjectDeploymentId()).isNotEqualTo(failingReference.getProjectDeploymentId());
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
             failingExternalUserId, Environment.PRODUCTION);
@@ -870,7 +874,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -882,7 +886,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow failingReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             failingExternalUserId, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUser concurrentConnectedUser = connectedUserService.getConnectedUser(
             concurrentExternalUserId, Environment.PRODUCTION);
@@ -924,7 +928,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -933,7 +937,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         markDangling(reference);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 2, workflowUuid))
             .isPresent();
@@ -979,7 +983,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -993,7 +997,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
 
@@ -1012,7 +1016,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ProjectDeployment vendorProjectDeployment = new ProjectDeployment();
 
@@ -1024,7 +1028,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         long vendorProjectDeploymentId = projectDeploymentFacade.createProjectDeployment(
             vendorProjectDeployment, List.of(), List.of());
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
 
@@ -1040,12 +1044,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long markerProjectDeploymentId = createProjectDeployment(
             automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION");
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
 
@@ -1061,7 +1065,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long markerProjectDeploymentId = createProjectDeployment(
             automationWorkflowProjectId, "__EMBEDDED__other-user__PRODUCTION");
@@ -1079,7 +1083,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         String emptyExternalUserId = "rollout-lazy-empty-user-" + UUID.randomUUID();
 
@@ -1088,7 +1092,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationWorkflowProjectId, emptyExternalUserId, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(projectDeploymentId)).isTrue();
         assertThat(projectDeploymentService.fetchProjectDeployment(projectDeploymentId)).isEmpty();
@@ -1100,12 +1104,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long markerProjectDeploymentId = createProjectDeployment(
             automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION");
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(markerProjectDeploymentId))
             .isFalse();
@@ -1119,7 +1123,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         stubEntitledSlackConnection(777L);
 
@@ -1237,5 +1241,10 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         storedReference.setEnabled(false);
 
         connectedUserProjectWorkflowRepository.save(storedReference);
+    }
+
+    private void publishAndPinProject(long projectId) {
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
     }
 }

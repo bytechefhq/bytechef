@@ -20,6 +20,9 @@ public class ConnectedUserProjectWorkflowErrorType extends AbstractErrorType {
     public static final ConnectedUserProjectWorkflowErrorType WORKFLOW_TEMPLATE_ALREADY_COPIED =
         new ConnectedUserProjectWorkflowErrorType(100);
 
+    public static final ConnectedUserProjectWorkflowErrorType WORKFLOW_TEMPLATE_NOT_RELEASED =
+        new ConnectedUserProjectWorkflowErrorType(101);
+
     private ConnectedUserProjectWorkflowErrorType(int errorKey) {
         super(ConnectedUserProjectWorkflow.class, errorKey);
     }

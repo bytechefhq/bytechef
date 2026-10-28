@@ -198,7 +198,7 @@ class AutomationWorkflowProjectApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    void testFrontendProjectsKeepHiddenProjectsAndUseThePermissionFilter() {
+    void testGetFrontendProjectsDropsHiddenProjects() {
         AutomationWorkflowProjectDTO visibleProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
             true);
@@ -219,22 +219,18 @@ class AutomationWorkflowProjectApiControllerIntTest {
             .isOk()
             .expectBody()
             .jsonPath("$.length()")
-            .isEqualTo(2)
+            .isEqualTo(1)
             .jsonPath("$[0].id")
             .isEqualTo(PROJECT_ID)
             .jsonPath("$[0].automationHubVisible")
-            .isEqualTo(true)
-            .jsonPath("$[1].id")
-            .isEqualTo(PROJECT_ID + 1)
-            .jsonPath("$[1].automationHubVisible")
-            .isEqualTo(false);
+            .isEqualTo(true);
 
         verify(automationWorkflowProjectFacade, never()).getPublishedProjects();
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    void testApiKeyProjectsKeepHiddenProjects() {
+    void testGetProjectsKeepsHiddenProjects() {
         AutomationWorkflowProjectDTO visibleProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
             true);

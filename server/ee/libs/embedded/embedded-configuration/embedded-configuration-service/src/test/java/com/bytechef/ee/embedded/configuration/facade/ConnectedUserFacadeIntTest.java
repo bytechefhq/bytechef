@@ -42,6 +42,7 @@ import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnection
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacade;
@@ -145,6 +146,9 @@ class ConnectedUserFacadeIntTest {
         """;
 
     @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+
+    @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @MockitoBean
@@ -244,7 +248,7 @@ class ConnectedUserFacadeIntTest {
         String automationWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -364,5 +368,10 @@ class ConnectedUserFacadeIntTest {
         "com.bytechef.ee.embedded.connected.user.facade", "com.bytechef.ee.embedded.connected.user.service"
     })
     static class ConnectedUserConfiguration {
+    }
+
+    private void publishAndPinProject(long projectId) {
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
     }
 }
