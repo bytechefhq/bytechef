@@ -41,6 +41,8 @@ class ConnectedUserWorkflowWebhookUrlResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserWorkflowWebhookUrlResolver.class);
 
+    private static final String REQUEST_COMPONENT_NAME = "request";
+
     private final ProjectWorkflowService projectWorkflowService;
     private final TriggerDefinitionService triggerDefinitionService;
     private final String webhookUrl;
@@ -97,6 +99,12 @@ class ConnectedUserWorkflowWebhookUrlResolver {
         String operation = workflowNodeType.operation();
 
         if (operation == null || Objects.equals(operation, "manual")) {
+            return false;
+        }
+
+        // The request component's triggers are static webhooks for the engine, but connected users start them through
+        // the embedded public API with their own token, not through the shared webhook url
+        if (Objects.equals(workflowNodeType.name(), REQUEST_COMPONENT_NAME)) {
             return false;
         }
 
