@@ -1,5 +1,11 @@
-import {type AiAgentEvalRunQuery, AiAgentJudgeScope, AiAgentJudgeType} from '@/shared/middleware/graphql';
-import {CheckCircle2Icon, XCircleIcon} from 'lucide-react';
+import {
+    type AiAgentEvalRunQuery,
+    AiAgentJudgeScope,
+    AiAgentJudgeType,
+    AiAgentJudgeVerdictStatus,
+} from '@/shared/middleware/graphql';
+import {CheckCircle2Icon, CircleMinusIcon, CircleSlashIcon, TriangleAlertIcon, XCircleIcon} from 'lucide-react';
+import {type ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type VerdictType = NonNullable<AiAgentEvalRunQuery['aiAgentEvalRun']>['results'][number]['verdicts'][number];
@@ -46,6 +52,39 @@ const SCOPE_COLORS: Record<AiAgentJudgeScope, string> = {
         'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300',
 };
 
+const VERDICT_STATUS_ICONS: Record<AiAgentJudgeVerdictStatus, ReactNode> = {
+    [AiAgentJudgeVerdictStatus.Abstain]: (
+        <CircleMinusIcon aria-label="Abstained" className="mt-0.5 size-4 shrink-0 text-content-neutral-tertiary" />
+    ),
+    [AiAgentJudgeVerdictStatus.Error]: (
+        <TriangleAlertIcon aria-label="Judge error" className="mt-0.5 size-4 shrink-0 text-amber-500" />
+    ),
+    [AiAgentJudgeVerdictStatus.Fail]: (
+        <XCircleIcon aria-label="Failed" className="mt-0.5 size-4 shrink-0 text-red-500" />
+    ),
+    [AiAgentJudgeVerdictStatus.NotApplicable]: (
+        <CircleSlashIcon aria-label="Not applicable" className="mt-0.5 size-4 shrink-0 text-content-neutral-tertiary" />
+    ),
+    [AiAgentJudgeVerdictStatus.Pass]: (
+        <CheckCircle2Icon aria-label="Passed" className="mt-0.5 size-4 shrink-0 text-green-500" />
+    ),
+};
+
+const UNDECIDED_STATUS_LABELS: Partial<Record<AiAgentJudgeVerdictStatus, string>> = {
+    [AiAgentJudgeVerdictStatus.Abstain]: 'Abstained',
+    [AiAgentJudgeVerdictStatus.Error]: 'Judge error',
+    [AiAgentJudgeVerdictStatus.NotApplicable]: 'Not applicable',
+};
+
+const UNDECIDED_STATUS_COLORS: Partial<Record<AiAgentJudgeVerdictStatus, string>> = {
+    [AiAgentJudgeVerdictStatus.Abstain]:
+        'border-stroke-neutral-secondary bg-surface-neutral-secondary text-content-neutral-secondary',
+    [AiAgentJudgeVerdictStatus.Error]:
+        'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300',
+    [AiAgentJudgeVerdictStatus.NotApplicable]:
+        'border-stroke-neutral-secondary bg-surface-neutral-secondary text-content-neutral-secondary',
+};
+
 interface AiAgentJudgeVerdictListProps {
     verdicts: VerdictType[];
 }
@@ -62,11 +101,7 @@ const AiAgentJudgeVerdictList = ({verdicts}: AiAgentJudgeVerdictListProps) => {
                     className="flex items-start gap-2 rounded-md bg-surface-neutral-secondary/50 px-3 py-2"
                     key={verdict.id}
                 >
-                    {verdict.passed ? (
-                        <CheckCircle2Icon className="mt-0.5 size-4 shrink-0 text-green-500" />
-                    ) : (
-                        <XCircleIcon className="mt-0.5 size-4 shrink-0 text-red-500" />
-                    )}
+                    {VERDICT_STATUS_ICONS[verdict.status]}
 
                     <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
@@ -89,6 +124,18 @@ const AiAgentJudgeVerdictList = ({verdicts}: AiAgentJudgeVerdictListProps) => {
                             >
                                 {SCOPE_LABELS[verdict.judgeScope]}
                             </span>
+
+                            {UNDECIDED_STATUS_LABELS[verdict.status] && (
+                                <span
+                                    className={twMerge(
+                                        'rounded-full border px-1.5 py-0.5 text-[10px] font-medium',
+                                        UNDECIDED_STATUS_COLORS[verdict.status]
+                                    )}
+                                    title={verdict.reasonCode || undefined}
+                                >
+                                    {UNDECIDED_STATUS_LABELS[verdict.status]}
+                                </span>
+                            )}
                         </div>
 
                         {verdict.explanation && (

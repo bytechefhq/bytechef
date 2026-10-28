@@ -1,5 +1,7 @@
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import {
+    AiAgentEvalResultConclusion,
+    AiAgentEvalResultStatus,
     useAiAgentEvalRunQuery,
     useAiAgentEvalRunsQuery,
     useCancelAiAgentEvalRunMutation,
@@ -95,21 +97,28 @@ export default function useAiAgentEvalsRunsTab(agentEvalTestId: string | null) {
 
         const results = selectedRun.results;
 
-        const passedCount = results.filter(
-            (result) => result.status === 'COMPLETED' && (result.score ?? 0) >= 1.0
+        const completedResults = results.filter((result) => result.status === AiAgentEvalResultStatus.Completed);
+
+        const passedCount = completedResults.filter(
+            (result) => result.conclusion === AiAgentEvalResultConclusion.Pass
         ).length;
 
-        const failedCount = results.filter(
-            (result) => result.status === 'COMPLETED' && (result.score ?? 0) < 1.0
+        const failedCount = completedResults.filter(
+            (result) => result.conclusion === AiAgentEvalResultConclusion.Fail
         ).length;
 
-        const errorCount = results.filter((result) => result.status === 'FAILED').length;
+        const inconclusiveCount = completedResults.filter(
+            (result) => result.conclusion === AiAgentEvalResultConclusion.Inconclusive
+        ).length;
+
+        const errorCount = results.filter((result) => result.status === AiAgentEvalResultStatus.Failed).length;
 
         return {
             agentVersion: selectedRun.agentVersion,
             averageScore: selectedRun.averageScore,
             errorCount,
             failedCount,
+            inconclusiveCount,
             passedCount,
             totalInputTokens: selectedRun.totalInputTokens,
             totalOutputTokens: selectedRun.totalOutputTokens,
