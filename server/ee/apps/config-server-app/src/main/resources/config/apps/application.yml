@@ -147,6 +147,11 @@ spring:
 
 bytechef:
   ai:
+    knowledge-base:
+      # Number of concurrent consumers per knowledge base message route (used by AMQP | JMS brokers)
+      subscriptions:
+        document-chunk-update-events: 1
+        document-process-events: 1
     memory:
       aws:
         bucket-prefix: bytechef-chat-memory
@@ -168,6 +173,25 @@ bytechef:
   cache:
     # Cache provider (caffeine) default: caffeine
     provider: caffeine
+  coordinator:
+    task:
+      # Number of concurrent consumers per coordinator task message route (used by AMQP | JMS brokers)
+      subscriptions:
+        application-events: 1
+        resume-job-events: 1
+        start-job-events: 1
+        stop-job-events: 1
+        task-execution-complete-events: 1
+        task-execution-error-events: 1
+    trigger:
+      # Number of concurrent consumers per coordinator trigger message route (used by AMQP | JMS brokers)
+      subscriptions:
+        application-events: 1
+        trigger-execution-complete-events: 1
+        trigger-execution-error-events: 1
+        trigger-listener-events: 1
+        trigger-poll-events: 1
+        trigger-webhook-events: 1
   data-storage:
     # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc

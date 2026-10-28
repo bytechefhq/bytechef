@@ -118,7 +118,7 @@ public class ApplicationProperties {
     /**
      * List of enabled feature flags
      */
-    private List<String> featureFlags = List.of();
+    private List<String> featureFlags;
 
     /**
      * File storage provider configuration
@@ -1281,7 +1281,7 @@ public class ApplicationProperties {
                 /**
                  * OCR provider
                  */
-                private Provider provider = Provider.NONE;
+                private Provider provider;
 
                 /**
                  * Mistral OCR configuration
@@ -1332,12 +1332,12 @@ public class ApplicationProperties {
                 /**
                  * Number of subscribers for document process events
                  */
-                private int documentProcessEvents = 1;
+                private int documentProcessEvents;
 
                 /**
                  * Number of subscribers for document chunk update events
                  */
-                private int documentChunkUpdateEvents = 1;
+                private int documentChunkUpdateEvents;
 
                 public int getDocumentProcessEvents() {
                     return documentProcessEvents;
@@ -2962,7 +2962,7 @@ public class ApplicationProperties {
         /**
          * Cloud provider
          */
-        private Provider provider = Provider.NONE;
+        private Provider provider;
 
         public Aws getAws() {
             return aws;
@@ -3085,7 +3085,7 @@ public class ApplicationProperties {
         /**
          * Whether coordinator is enabled
          */
-        private boolean enabled = true;
+        private boolean enabled;
 
         /**
          * Task coordination configuration
@@ -3147,32 +3147,32 @@ public class ApplicationProperties {
                 /**
                  * Number of subscribers for application events
                  */
-                private int applicationEvents = 1;
+                private int applicationEvents;
 
                 /**
                  * Number of subscribers for resume job events
                  */
-                private int resumeJobEvents = 1;
+                private int resumeJobEvents;
 
                 /**
                  * Number of subscribers for start job events
                  */
-                private int startJobEvents = 1;
+                private int startJobEvents;
 
                 /**
                  * Number of subscribers for stop job events
                  */
-                private int stopJobEvents = 1;
+                private int stopJobEvents;
 
                 /**
                  * Number of subscribers for task execution complete events
                  */
-                private int taskExecutionCompleteEvents = 1;
+                private int taskExecutionCompleteEvents;
 
                 /**
                  * Number of subscribers for task execution error events
                  */
-                private int taskExecutionErrorEvents = 1;
+                private int taskExecutionErrorEvents;
 
                 public int getApplicationEvents() {
                     return applicationEvents;
@@ -3282,32 +3282,32 @@ public class ApplicationProperties {
                 /**
                  * Number of subscribers for application events
                  */
-                private int applicationEvents = 1;
+                private int applicationEvents;
 
                 /**
                  * Number of subscribers for trigger execution complete events
                  */
-                private int triggerExecutionCompleteEvents = 1;
+                private int triggerExecutionCompleteEvents;
 
                 /**
                  * Number of subscribers for trigger execution error events
                  */
-                private int triggerExecutionErrorEvents = 1;
+                private int triggerExecutionErrorEvents;
 
                 /**
                  * Number of subscribers for trigger listener events
                  */
-                private int triggerListenerEvents = 1;
+                private int triggerListenerEvents;
 
                 /**
                  * Number of subscribers for trigger poll events
                  */
-                private int triggerPollEvents = 1;
+                private int triggerPollEvents;
 
                 /**
                  * Number of subscribers for trigger webhook events
                  */
-                private int triggerWebhookEvents = 1;
+                private int triggerWebhookEvents;
 
                 public int getApplicationEvents() {
                     return applicationEvents;
@@ -4197,7 +4197,7 @@ public class ApplicationProperties {
         /**
          * RabbitMQ server port
          */
-        private int port = 5672;
+        private int port;
 
         /**
          * RabbitMQ server username
@@ -4260,7 +4260,7 @@ public class ApplicationProperties {
         /**
          * Redis server port
          */
-        private int port = 6379;
+        private int port;
 
         /**
          * Connection timeout in milliseconds
@@ -4823,7 +4823,7 @@ public class ApplicationProperties {
         /**
          * Whether worker is enabled
          */
-        private boolean enabled = true;
+        private boolean enabled;
 
         /**
          * Task execution configuration
