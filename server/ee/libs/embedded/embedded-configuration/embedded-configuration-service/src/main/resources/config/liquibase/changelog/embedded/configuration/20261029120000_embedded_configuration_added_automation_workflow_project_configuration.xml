@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261029120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="automation_workflow_project_configuration"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="automation_workflow_project_configuration">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_version" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="automation_hub_visible" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="automation_workflow_project_configuration" baseColumnNames="project_id"
+                                 constraintName="fk_automation_workflow_project_configuration_project"
+                                 referencedTableName="project" referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="automation_workflow_project_configuration"
+                             columnNames="project_id, environment_id"
+                             constraintName="uk_automation_workflow_project_configuration_project_environment"/>
+
+        <rollback>
+            <dropTable tableName="automation_workflow_project_configuration"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261029120000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="automation_workflow_project_configuration_workflow"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="automation_workflow_project_configuration_workflow">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="automation_workflow_project_configuration_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_uuid" type="${uuid_type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="automation_workflow_project_configuration_workflow"
+                                 baseColumnNames="automation_workflow_project_configuration_id"
+                                 constraintName="fk_automation_workflow_project_configuration_workflow_configuration"
+                                 referencedTableName="automation_workflow_project_configuration"
+                                 referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="automation_workflow_project_configuration_workflow"
+                             columnNames="automation_workflow_project_configuration_id, workflow_uuid"
+                             constraintName="uk_automation_workflow_project_configuration_workflow_uuid"/>
+
+        <rollback>
+            <dropTable tableName="automation_workflow_project_configuration_workflow"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
