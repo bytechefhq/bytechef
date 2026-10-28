@@ -459,18 +459,18 @@
 
     .dark [data-environment='staging'],
     .dark[data-environment='staging'] {
-        --sidebar: 43 50% 18%;
-        --sidebar-accent: 43 50% 26%;
-        --sidebar-border: 43 45% 32%;
+        --sidebar: 43 60% 22%;
+        --sidebar-accent: 43 60% 30%;
+        --sidebar-border: 43 55% 36%;
         --sidebar-ring: 43 80% 50%;
         --sidebar-active-foreground: 45 93% 65%;
     }
 
     .dark [data-environment='production'],
     .dark[data-environment='production'] {
-        --sidebar: 0 45% 18%;
-        --sidebar-accent: 0 48% 26%;
-        --sidebar-border: 0 42% 32%;
+        --sidebar: 0 55% 23%;
+        --sidebar-accent: 0 55% 31%;
+        --sidebar-border: 0 50% 37%;
         --sidebar-ring: 0 65% 55%;
         --sidebar-active-foreground: 0 85% 72%;
     }
