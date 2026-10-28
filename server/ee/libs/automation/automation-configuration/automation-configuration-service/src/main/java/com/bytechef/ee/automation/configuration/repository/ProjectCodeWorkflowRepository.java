@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.repository;
 
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -20,4 +21,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnEEVersion
 public interface ProjectCodeWorkflowRepository extends ListCrudRepository<ProjectCodeWorkflow, Long> {
+
+    List<ProjectCodeWorkflow> findAllByProjectId(long projectId);
 }

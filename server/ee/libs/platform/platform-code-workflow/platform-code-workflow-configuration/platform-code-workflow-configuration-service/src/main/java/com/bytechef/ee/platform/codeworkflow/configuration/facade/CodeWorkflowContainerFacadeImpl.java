@@ -89,6 +89,15 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
         }
     }
 
+    @Override
+    public void delete(long id) {
+        CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(id);
+
+        codeWorkflowContainerService.delete(id);
+
+        codeWorkflowFileStorage.deleteCodeWorkflowFile(codeWorkflowContainer.getWorkflows());
+    }
+
     private ArrayNode toArrayNode(
         String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, List<? extends TaskDefinition> tasks,
         PlatformType type) {

@@ -42,6 +42,17 @@ public class CodeWorkflowContainerServiceImpl implements CodeWorkflowContainerSe
     }
 
     @Override
+    public void delete(long id) {
+        codeWorkflowContainerRepository.deleteById(id);
+    }
+
+    @Override
+    public CodeWorkflowContainer getCodeWorkflowContainer(long id) {
+        return codeWorkflowContainerRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("CodeWorkflowContainer not found"));
+    }
+
+    @Override
     public CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerUuid) {
         return codeWorkflowContainerRepository.findByUuid(UUID.fromString(codeWorkflowContainerUuid))
             .orElseThrow(() -> new IllegalArgumentException("CodeWorkflowContainer not found"));
