@@ -181,7 +181,7 @@ const ConnectedUsers = () => {
             footer={
                 connectedUsersPage?.content &&
                 connectedUsersPage.content.length > 0 && (
-                    <Footer position="main">
+                    <Footer centerTitle position="main">
                         <TablePagination
                             onClick={handlePaginationClick}
                             pageNumber={pageNumber ? pageNumber : 0}
@@ -194,6 +194,7 @@ const ConnectedUsers = () => {
             }
             header={
                 <Header
+                    centerTitle
                     position="main"
                     title={
                         <ConnectedUsersFilterTitle
