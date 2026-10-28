@@ -89,6 +89,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-graphql"))
+    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-grpc"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-task:automation-task-remote-rest"))
