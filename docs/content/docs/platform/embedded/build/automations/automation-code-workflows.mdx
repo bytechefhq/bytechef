@@ -97,7 +97,7 @@ Practically:
   connected users when that environment's [configuration](/platform/embedded/build/automations#configurations)
   is moved to it, which then upgrades every referencing user's workflow in that environment at once -
   there is no per-user version pinning and no per-user bespoke deploy. To deploy and release in one
-  call, pass the optional `release` flag: the deploy then also points the request environment's
+  call, send the optional multipart form field `release=true` beside `projectFile` in the deploy request (`X-Environment` picks the environment): the deploy then also points the request environment's
   configuration at the new version, creating an enabled configuration if there is none. It never turns
   a disabled environment back on. Without the flag, nothing is exposed or upgraded until an
   administrator releases the version. To stage a change, release it to a separate environment first.
