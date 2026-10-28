@@ -48,6 +48,10 @@ public class EditorTempFileStorageImpl implements EditorTempFileStorage {
         return fileStorageService.getOutputStream(EDITOR_TEMP_DIR, fileEntry);
     }
 
+    public OutputStream getOutputStream(FileEntry fileEntry, boolean append) {
+        return fileStorageService.getOutputStream(EDITOR_TEMP_DIR, fileEntry, append);
+    }
+
     public String readFileToString(FileEntry fileEntry) {
         return fileStorageService.readFileToString(EDITOR_TEMP_DIR, fileEntry);
     }

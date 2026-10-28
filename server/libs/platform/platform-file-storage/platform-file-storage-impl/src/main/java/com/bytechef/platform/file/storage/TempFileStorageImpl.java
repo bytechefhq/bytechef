@@ -52,6 +52,11 @@ public class TempFileStorageImpl implements TempFileStorage {
     }
 
     @Override
+    public OutputStream getOutputStream(FileEntry fileEntry, boolean append) {
+        return fileStorageService.getOutputStream(TEMP_DIR, fileEntry, append);
+    }
+
+    @Override
     public String readFileToString(FileEntry fileEntry) {
         return fileStorageService.readFileToString(TEMP_DIR, fileEntry);
     }

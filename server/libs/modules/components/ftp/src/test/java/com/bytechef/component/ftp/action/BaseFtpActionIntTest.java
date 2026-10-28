@@ -712,6 +712,11 @@ public class BaseFtpActionIntTest {
         }
 
         @Override
+        public OutputStream getOutputStream(FileEntry fileEntry, boolean append) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
         public String readToString(FileEntry fileEntry) {
             throw new UnsupportedOperationException("Disabled in test mode");
         }

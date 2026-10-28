@@ -194,11 +194,23 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException {
+        return getOutputStream(directory, fileEntry, true);
+    }
+
+    @Override
+    public OutputStream getOutputStream(String directory, FileEntry fileEntry, boolean append)
+        throws FileStorageException {
+
         Path directoryPath = resolveDirectoryPath(directory);
         Path filePath = resolveFilePath(directoryPath, directory, fileEntry.getUrl());
 
         try {
-            return Files.newOutputStream(filePath, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            if (append) {
+                return Files.newOutputStream(filePath, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            }
+
+            return Files.newOutputStream(
+                filePath, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to open file " + fileEntry.getUrl(), ioe);
         }

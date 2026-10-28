@@ -272,6 +272,16 @@ public interface Context {
         OutputStream getOutputStream(FileEntry fileEntry);
 
         /**
+         * Opens an output stream to the file. When {@code append} is {@code false} the file's existing content is
+         * replaced; otherwise written bytes are added after it.
+         *
+         * @param fileEntry
+         * @param append
+         * @return
+         */
+        OutputStream getOutputStream(FileEntry fileEntry, boolean append);
+
+        /**
          *
          * @param fileEntry
          * @return

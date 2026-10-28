@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -140,6 +141,39 @@ public class FilesystemFileStorageServiceTest {
                 Files.contentOf(
                     new File("/tmp/test/bytechef/files/public" + url.replace("file:", "")), StandardCharsets.UTF_8))
             .isEqualTo(TEST_STRING);
+    }
+
+    @Test
+    public void testGetOutputStreamAppendsToExistingContent() throws IOException {
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+            "data", "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
+
+        try (OutputStream outputStream = fileStorageService.getOutputStream("data", fileEntry)) {
+            outputStream.write(" appended".getBytes(StandardCharsets.UTF_8));
+        }
+
+        Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
+            .isEqualTo(TEST_STRING + " appended");
+
+        try (OutputStream outputStream = fileStorageService.getOutputStream("data", fileEntry, true)) {
+            outputStream.write(" again".getBytes(StandardCharsets.UTF_8));
+        }
+
+        Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
+            .isEqualTo(TEST_STRING + " appended again");
+    }
+
+    @Test
+    public void testGetOutputStreamReplacesExistingContentWhenNotAppending() throws IOException {
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+            "data", "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8)));
+
+        try (OutputStream outputStream = fileStorageService.getOutputStream("data", fileEntry, false)) {
+            outputStream.write("new".getBytes(StandardCharsets.UTF_8));
+        }
+
+        Assertions.assertThat(fileStorageService.readFileToString("data", fileEntry))
+            .isEqualTo("new");
     }
 
     @Test

@@ -31,6 +31,8 @@ public interface TempFileStorage {
 
     OutputStream getOutputStream(FileEntry fileEntry);
 
+    OutputStream getOutputStream(FileEntry fileEntry, boolean append);
+
     String readFileToString(FileEntry fileEntry);
 
     FileEntry storeFileContent(String filename, String data);

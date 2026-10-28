@@ -122,7 +122,12 @@ public class JsonFileItemWriter implements ItemWriter {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
-        this.outputStream = context.file(file -> file.getOutputStream(fileEntry));
+        if (fileType == FileType.JSON) {
+            this.outputStream = context.file(file -> file.getOutputStream(fileEntry, false));
+        } else {
+            this.outputStream = context.file(file -> file.getOutputStream(fileEntry));
+        }
+
         this.printWriter = new PrintWriter(outputStream, false, StandardCharsets.UTF_8);
         this.firstItemWritten = false;
 
