@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
@@ -178,9 +179,12 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private AutomationWorkflowProjectConfigurationDTO.Workflow toWorkflowDTO(
         AutomationWorkflowProjectConfiguration configuration, ProjectWorkflow projectWorkflow) {
 
+        String workflowId = projectWorkflow.getWorkflowId();
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
         return new AutomationWorkflowProjectConfigurationDTO.Workflow(
-            projectWorkflow.getUuidAsString(), workflowService.getWorkflow(projectWorkflow.getWorkflowId())
-                .getLabel(),
+            projectWorkflow.getUuidAsString(), workflowId, workflow.getLabel(),
             automationWorkflowProjectConfigurationService.isWorkflowEnabled(configuration, projectWorkflow.getUuid()));
     }
 
