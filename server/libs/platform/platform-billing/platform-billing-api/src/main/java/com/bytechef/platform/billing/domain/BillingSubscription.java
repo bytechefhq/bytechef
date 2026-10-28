@@ -101,12 +101,13 @@ public class BillingSubscription {
     @Column("plan_unit_total")
     private int planUnitTotal;
 
+    @ReadOnlyProperty
     @Column("extra_unit_total")
     private int extraUnitTotal;
 
-    // Usage counters are @ReadOnlyProperty: save() never writes them, so a whole-row save from a webhook handler cannot
-    // overwrite a concurrent job's increment. They change only through the atomic repository queries; the setters
-    // exist for test fixtures only and are ignored by save().
+    // Usage counters and extraUnitTotal (granted atomically) are @ReadOnlyProperty: save() never writes them, so a
+    // whole-row save from a webhook handler cannot overwrite a concurrent job's increment or grant. They change only
+    // through the atomic repository queries; the setters exist for test fixtures only and are ignored by save().
     @ReadOnlyProperty
     @Column("plan_unit_used")
     private int planUnitUsed;

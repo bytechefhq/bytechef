@@ -33,6 +33,8 @@ public record BillingProperties(Stripe stripe) {
         String meterEventName,
         String webhookSecret,
         String successUrl,
-        String cancelUrl) {
+        String cancelUrl,
+        String productJobExecutionsPackageId,
+        String jobExecutionsPackageSuccessUrl) {
     }
 }
