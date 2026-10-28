@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -388,6 +389,26 @@ class ConnectedUserProjectFacadeIntTest {
         assertThat(copilotChatContextDTO.allowedComponentNames())
             .contains(enabledComponentName, "logger")
             .doesNotContain(disabledComponentName, "httpClient");
+    }
+
+    @Test
+    void testCreateProjectWorkflowFromPromptDeletesTheDraftWhenGenerationFails() {
+        IllegalStateException generationFailure = new IllegalStateException(
+            "Workflow generation failed: Your credit balance is too low");
+
+        doThrow(generationFailure)
+            .when(copilotWorkflowGenerator)
+            .generateWorkflow(anyString(), anyLong(), anyLong(), anyString(), any(), any());
+
+        assertThatThrownBy(() -> connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, "Post new leads to Slack", null, Environment.PRODUCTION, true))
+                .isSameAs(generationFailure);
+
+        long projectId = connectedUserProjectWorkflowManager
+            .getOrCreateConnectedUserProject(externalUserId, Environment.PRODUCTION)
+            .getProjectId();
+
+        assertThat(projectWorkflowService.getProjectWorkflows(projectId)).isEmpty();
     }
 
     @Test
