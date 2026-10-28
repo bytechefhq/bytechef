@@ -41,7 +41,7 @@ const configuration = {
     lastModifiedDate: null,
     projectId: 'project-1',
     projectVersion: 2,
-    workflows: [{enabled: true, label: 'Mailer', workflowUuid: 'wf-1'}],
+    workflows: [{enabled: true, label: 'Mailer', workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'}],
 };
 
 const project = {
@@ -111,7 +111,21 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
         expect(state.automationWorkflowExecutionsSheetOpen).toBe(true);
         expect(state.environmentId).toBe(2);
         expect(state.projectName).toBe('Mail Project');
-        expect(state.workflow).toEqual({label: 'Mailer', workflowId: 'draft-wf-1', workflowUuid: 'wf-1'});
+        expect(state.workflow).toEqual({label: 'Mailer', workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'});
+    });
+
+    it('opens the executions of a pinned workflow the latest draft no longer has', async () => {
+        const user = userEvent.setup();
+
+        renderItem({project: {...project, workflowTemplates: []}});
+
+        await user.click(screen.getByText('1 workflow'));
+        await user.click(await screen.findByRole('button', {name: 'Mailer'}));
+
+        const state = useAutomationWorkflowExecutionsSheetStore.getState();
+
+        expect(state.automationWorkflowExecutionsSheetOpen).toBe(true);
+        expect(state.workflow).toEqual({label: 'Mailer', workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'});
     });
 
     it('shows the newer version hint when the project published a later version', () => {
