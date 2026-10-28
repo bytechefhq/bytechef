@@ -26,6 +26,9 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
 
 const project: AutomationProjectType = {
     categoryId: null,
+    codeWorkflowDraftPublishable: null,
+    codeWorkflowLanguage: null,
+    codeWorkflowProject: false,
     configurationCount: 0,
     description: null,
     id: 'project-1',
@@ -49,6 +52,7 @@ const renderList = (projectOverrides: Partial<AutomationProjectType> = {}) =>
                     onDeleteProject={vi.fn()}
                     onDeleteWorkflow={vi.fn()}
                     onEditProject={vi.fn()}
+                    onEditProjectSource={vi.fn()}
                     onEditWorkflow={vi.fn()}
                     onImportWorkflow={vi.fn()}
                     onPublishProject={vi.fn()}

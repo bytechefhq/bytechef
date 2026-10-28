@@ -101,6 +101,10 @@ const Automations = () => {
 
     const hasProjects = projects.length > 0;
 
+    const hasActiveFilter = !!categoryId || !!tagId;
+
+    const isFirstRun = !projectsIsLoading && !hasActiveFilter && !hasProjects;
+
     const createCodeWorkflowMutation = useCreateAutomationWorkflowProjectCodeWorkflowMutation();
     const createProjectMutation = useCreateAutomationProjectMutation();
     const createWorkflowMutation = useCreateAutomationProjectWorkflowMutation();
@@ -402,7 +406,13 @@ const Automations = () => {
                     />
                 ) : hasActiveFilter ? (
                     <EmptyList
-                        button={
+                        icon={<FolderIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="No projects match the selected filter."
+                        title="No Matching Projects"
+                    />
+                ) : (
+                    <EmptyState
+                        actions={
                             <ButtonGroup className="mx-auto">
                                 <Button aria-label="Create Project" label="Create Project" onClick={handleNewProject} />
 
@@ -432,13 +442,6 @@ const Automations = () => {
                                 </DropdownMenu>
                             </ButtonGroup>
                         }
-                        icon={<FolderIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="No projects match the selected filter."
-                        title="No Matching Projects"
-                    />
-                ) : (
-                    <EmptyState
-                        actions={<Button label="Create Project" onClick={handleNewProject} />}
                         description="A project groups the workflow templates that ship with your product. Your connected users start from these templates and adjust their own copies in the embedded workflow builder."
                         icon={<FolderIcon />}
                         title="Create your first project"
@@ -449,7 +452,7 @@ const Automations = () => {
             {showImportCodeWorkflowDialog && (
                 <ImportCodeWorkflowDialog
                     deployUrl="/api/embedded/internal/automation/projects/deploy"
-                    description="Upload a built code project. If a project with the same name exists, it is redeployed and every connected user referencing it gets the new version. Unpublished edits made in the editor are replaced."
+                    description="Upload a built code project. If a project with the same name exists, it is redeployed as a new published version; connected users get it once an environment configuration points at it. Unpublished edits made in the editor are replaced."
                     fileFieldName="projectFile"
                     onClose={() => setShowImportCodeWorkflowDialog(false)}
                     onImported={invalidateProjects}
