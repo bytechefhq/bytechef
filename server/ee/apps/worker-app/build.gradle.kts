@@ -84,6 +84,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:modules:components:api-platform"))
     implementation(project(":server:ee:libs:modules:components:app-event"))
+    implementation(project(":server:ee:libs:modules:components:field-mapping"))
     implementation(project(":server:ee:libs:modules:components:request"))
 
     runtimeOnly("org.postgresql:postgresql")
