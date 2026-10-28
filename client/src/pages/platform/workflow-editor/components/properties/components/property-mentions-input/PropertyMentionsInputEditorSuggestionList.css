@@ -14,6 +14,14 @@
     @apply text-sm;
 
     /*
+     * The popper is absolutely positioned at the caret, so without a definite width it shrinks to
+     * the space left between the caret and the viewport edge, and popper's overflow check then sees
+     * nothing to shift. Sizing to content makes it overflow, so popper slides it back into view.
+     */
+    @apply w-max;
+    max-width: min(28rem, calc(100vw - 1rem));
+
+    /*
      * Inside a Radix modal dialog (the cluster elements canvas), DismissableLayer sets
      * document.body pointer-events to "none", and the tippy popup is portaled to the body.
      * The popup cannot re-enable pointer events on its own root: tippy's handleStyles() resets
@@ -31,6 +39,7 @@
 
     button {
         @apply items-center;
+        @apply break-all;
         @apply flex;
         @apply p-1;
         @apply rounded-md;

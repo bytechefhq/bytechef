@@ -106,6 +106,7 @@ export function createSuggestionPopupRenderer<ItemType>(
                     content: component.element,
                     getReferenceClientRect: () => lastValidRect,
                     interactive: true,
+                    maxWidth: 'none',
                     placement: 'bottom-start',
                     showOnCreate: true,
                     trigger: 'manual',
