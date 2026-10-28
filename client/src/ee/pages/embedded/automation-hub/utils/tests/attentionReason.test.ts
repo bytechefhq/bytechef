@@ -39,6 +39,12 @@ describe('describeAttentionReason', () => {
         expect(describeAttentionReason('UPDATE_PENDING')).toBe('Turn it on again to apply the latest update');
     });
 
+    it('describes a project or workflow turned off by the administrator', () => {
+        expect(describeAttentionReason('TURNED_OFF_BY_ADMINISTRATOR')).toBe(
+            'Turned off by your administrator; it comes back when they turn it on again'
+        );
+    });
+
     it('returns undefined when healthy', () => {
         expect(describeAttentionReason(undefined)).toBeUndefined();
     });
