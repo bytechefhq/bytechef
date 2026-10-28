@@ -95,7 +95,6 @@ The **New Configuration** button is disabled, with the tooltip "Publish the proj
 Click a workflow in an expanded configuration row to open a side panel with two tabs:
 
 - **Executions** - the template's executions in the configuration's environment, a page at a time, with a **Connected user** column that names whose run it was and the version of each run. The list covers connected users' references to the template, the copies they made of it, and runs of earlier versions, so runs of a copy show up even though the copy is its own workflow. Click an execution to see its step-by-step results; the refresh button reloads the list.
- a page at a time, with a **Connected user** column that names whose run it was. The list covers connected users' references to the template and the copies they made of it, so runs of a copy show up even though the copy is its own workflow. Click an execution to see its step-by-step results; the refresh button reloads the list.
 - **Workflow** - a read-only view of the template.
 
 ---
@@ -127,7 +126,7 @@ The buttons are there whenever the project is expanded, including when it has no
 
 Open the project's ⋮ menu and pick **Edit** (reopens the project dialog with current values) or **Delete** (confirms via dialog, then removes the project and its templates).
 
-Deleting a project marks every connected user's reference to its workflows as dangling and disabled, with the reason "The catalog project was deleted". See [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references).
+Deleting a project marks every connected user's reference to its workflows as dangling and disabled, with the reason "The automation workflow project was deleted". See [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references).
 
 ### Publishing
 
@@ -138,7 +137,7 @@ Publishing does not release anything. Connected users keep seeing the version th
 What a version change does to connected users who already use the project:
 
 - **References** move to the configuration's version, as described under [What a configuration does to connected users](#what-a-configuration-does-to-connected-users).
-- **References to removed workflows** - a workflow that is no longer in the version the configuration points at - become dangling and disabled, with the reason "Removed from the catalog project on publish".
+- **References to removed workflows** - a workflow that is no longer in the version the configuration points at - become dangling and disabled, with the reason "Removed from the automation workflow project on publish". This is permanent, unlike the recoverable "turned off by the administrator" state above.
 - **Copies** are not changed. A connected user's copy keeps running the version they copied.
 
 If the background roll-out fails for a user, their reference catches up the next time it is enabled or provisioned, or the next time the configuration's version changes.

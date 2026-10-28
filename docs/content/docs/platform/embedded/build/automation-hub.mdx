@@ -5,7 +5,7 @@ description: Embed a ready-made catalog where your end users browse your automat
 
 ![Automation Hub illustration](automation-hub/automation-hub-overview.png)
 
-The **Automation Hub** is an end-user surface you drop into your product with one React component. Your connected users see the [automation templates](/platform/embedded/build/automations) you published, activate one in the [activation dialog](/platform/embedded/build/activation-dialog), and turn their automations on and off. They do all of this without leaving your app or seeing ByteChef.
+The **Automation Hub** is an end-user surface you drop into your product with one React component. Your connected users see the [automation templates](/platform/embedded/build/automations) you released to their environment through a configuration, activate one in the [activation dialog](/platform/embedded/build/activation-dialog), and turn their automations on and off. They do all of this without leaving your app or seeing ByteChef.
 
 It renders in an iframe and has two tabs:
 
@@ -73,7 +73,7 @@ The tab bar appears only when both `automations` and `connections` are on. If a 
 
 ### The catalog
 
-Each published template appears as a card with its label, description, and the icons of the components it uses. Users can search by label and filter by **All**, **Active** (they have an automation for the template), or **Enabled**.
+Each template released to the environment through a configuration appears as a card with its label, description, and the icons of the components it uses. Users can search by label and filter by **All**, **Active** (they have an automation for the template), or **Enabled**.
 
 A template the user has not activated shows **Use**, which opens the activation dialog. Once activated, the card shows the automation's version, an **Enable** / **Disable** button, and a menu:
 
@@ -109,7 +109,7 @@ New connections are created from the activation dialog or the builder, not from 
 
 ### Needs attention
 
-Automations created from a template that is no longer published, or that need action from the user, appear under **My Automations** with a **Needs attention** badge and a reason, such as a connection to reconnect or an input to fill in.
+Automations created from a template that is no longer available, or that need action from the user, appear under **My Automations** with a **Needs attention** badge and a reason, such as a connection to reconnect or an input to fill in. An automation also needs attention, with the reason "turned off by the administrator", when its configuration or its workflow is disabled or the configuration is deleted. It comes back as the user left it once the administrator turns it on again or recreates the configuration.
 
 ## Copies and references
 
