@@ -162,6 +162,18 @@ describe('ProjectDeploymentListItem', () => {
         expect(screen.queryByText('Open Project')).not.toBeInTheDocument();
     });
 
+    it('shows the tags by default', () => {
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        expect(screen.getByText('Tags:')).toBeInTheDocument();
+    });
+
+    it('hides the tags when showTags is false', () => {
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} showTags={false} />);
+
+        expect(screen.queryByText('Tags:')).not.toBeInTheDocument();
+    });
+
     it('captures the deployment enabled event when the deployment is turned on', async () => {
         const user = userEvent.setup();
 

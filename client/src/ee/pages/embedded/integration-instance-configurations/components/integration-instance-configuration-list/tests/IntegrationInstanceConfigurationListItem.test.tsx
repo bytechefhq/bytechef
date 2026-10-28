@@ -57,13 +57,18 @@ const integrationInstanceConfiguration = {
     tags: [],
 } as unknown as IntegrationInstanceConfiguration;
 
-const renderItem = (overrides: Partial<IntegrationInstanceConfiguration> = {}, showIntegrationIcon?: boolean) =>
+const renderItem = (
+    overrides: Partial<IntegrationInstanceConfiguration> = {},
+    showIntegrationIcon?: boolean,
+    showTags?: boolean
+) =>
     render(
         <TooltipProvider>
             <Collapsible>
                 <IntegrationInstanceConfigurationListItem
                     integrationInstanceConfiguration={{...integrationInstanceConfiguration, ...overrides}}
                     showIntegrationIcon={showIntegrationIcon}
+                    showTags={showTags}
                 />
             </Collapsible>
         </TooltipProvider>
@@ -144,6 +149,29 @@ describe('IntegrationInstanceConfigurationListItem integration icon', () => {
         renderItem({integration}, false);
 
         expect(screen.queryByTestId('integration-icon')).not.toBeInTheDocument();
+    });
+});
+
+describe('IntegrationInstanceConfigurationListItem tags', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('should show the tags by default', () => {
+        renderItem();
+
+        expect(screen.getByText('Tags:')).toBeInTheDocument();
+    });
+
+    it('should hide the tags when showTags is false', () => {
+        renderItem({}, undefined, false);
+
+        expect(screen.queryByText('Tags:')).not.toBeInTheDocument();
     });
 });
 
