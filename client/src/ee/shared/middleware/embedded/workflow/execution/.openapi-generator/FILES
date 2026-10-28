@@ -3,6 +3,7 @@ apis/index.ts
 docs/AuthorizationType.md
 docs/ComponentConnection.md
 docs/ExecutionError.md
+docs/FocusPathElement.md
 docs/IntegrationBasic.md
 docs/IntegrationInstanceBasic.md
 docs/IntegrationInstanceConfiguration.md
@@ -15,6 +16,7 @@ docs/JobBasic.md
 docs/Page.md
 docs/Tag.md
 docs/TaskExecution.md
+docs/TaskExecutionChildrenPage.md
 docs/TriggerExecution.md
 docs/Webhook.md
 docs/WebhookRetry.md
@@ -29,6 +31,7 @@ index.ts
 models/AuthorizationType.ts
 models/ComponentConnection.ts
 models/ExecutionError.ts
+models/FocusPathElement.ts
 models/IntegrationBasic.ts
 models/IntegrationInstanceBasic.ts
 models/IntegrationInstanceConfiguration.ts
@@ -41,6 +44,7 @@ models/JobBasic.ts
 models/Page.ts
 models/Tag.ts
 models/TaskExecution.ts
+models/TaskExecutionChildrenPage.ts
 models/TriggerExecution.ts
 models/Webhook.ts
 models/WebhookRetry.ts

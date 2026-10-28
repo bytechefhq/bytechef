@@ -7,11 +7,13 @@ Contains information about execution of a Integration workflow.
 
 Name | Type
 ------------ | -------------
+`focusPath` | [Array&lt;FocusPathElement&gt;](FocusPathElement.md)
 `id` | number
 `integration` | [IntegrationBasic](IntegrationBasic.md)
 `integrationInstanceConfiguration` | [IntegrationInstanceConfiguration](IntegrationInstanceConfiguration.md)
 `integrationInstance` | [IntegrationInstanceBasic](IntegrationInstanceBasic.md)
 `job` | [Job](Job.md)
+`taskExecutionCount` | number
 `triggerExecution` | [TriggerExecution](TriggerExecution.md)
 `workflow` | [WorkflowBasic](WorkflowBasic.md)
 
@@ -22,11 +24,13 @@ import type { WorkflowExecution } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "focusPath": null,
   "id": null,
   "integration": null,
   "integrationInstanceConfiguration": null,
   "integrationInstance": null,
   "job": null,
+  "taskExecutionCount": null,
   "triggerExecution": null,
   "workflow": null,
 } satisfies WorkflowExecution

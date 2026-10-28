@@ -3,6 +3,7 @@
 export * from './AuthorizationType';
 export * from './ComponentConnection';
 export * from './ExecutionError';
+export * from './FocusPathElement';
 export * from './IntegrationBasic';
 export * from './IntegrationInstanceBasic';
 export * from './IntegrationInstanceConfiguration';
@@ -15,6 +16,7 @@ export * from './JobBasic';
 export * from './Page';
 export * from './Tag';
 export * from './TaskExecution';
+export * from './TaskExecutionChildrenPage';
 export * from './TriggerExecution';
 export * from './Webhook';
 export * from './WebhookRetry';

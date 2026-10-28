@@ -6,13 +6,14 @@ All URIs are relative to */api/embedded/internal*
 |------------- | ------------- | -------------|
 | [**getWorkflowExecution**](WorkflowExecutionApi.md#getworkflowexecution) | **GET** /workflow-executions/{id} | Get workflow executions by id |
 | [**getWorkflowExecutionTaskExecution**](WorkflowExecutionApi.md#getworkflowexecutiontaskexecution) | **GET** /workflow-executions/{id}/task-executions/{taskExecutionId} | Get a task execution by id |
+| [**getWorkflowExecutionTaskExecutionChildren**](WorkflowExecutionApi.md#getworkflowexecutiontaskexecutionchildren) | **GET** /workflow-executions/{id}/task-executions/{taskExecutionId}/children | Get a page of task execution children |
 | [**getWorkflowExecutionsPage**](WorkflowExecutionApi.md#getworkflowexecutionspage) | **GET** /workflow-executions | Get Integration workflow executions |
 
 
 
 ## getWorkflowExecution
 
-> WorkflowExecution getWorkflowExecution(id)
+> WorkflowExecution getWorkflowExecution(id, lazy)
 
 Get workflow executions by id
 
@@ -34,6 +35,8 @@ async function example() {
   const body = {
     // number | The id of an execution.
     id: 789,
+    // boolean | Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. (optional)
+    lazy: true,
   } satisfies GetWorkflowExecutionRequest;
 
   try {
@@ -54,6 +57,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an execution. | [Defaults to `undefined`] |
+| **lazy** | `boolean` | Whether to return only the top-level task executions, with their child counts, the focus path and the latest-attempt task execution count. Child jobs of subflow tasks are returned without their task executions. | [Optional] [Defaults to `false`] |
 
 ### Return type
 
@@ -143,6 +147,82 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The task execution object. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getWorkflowExecutionTaskExecutionChildren
+
+> TaskExecutionChildrenPage getWorkflowExecutionTaskExecutionChildren(id, taskExecutionId, pageNumber, pageSize)
+
+Get a page of task execution children
+
+Get a page of the children of a task execution of the execution or of one of its subflow jobs. A loop returns whole iterations, an on-error task returns its two branches on a single page.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowExecutionApi,
+} from '';
+import type { GetWorkflowExecutionTaskExecutionChildrenRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowExecutionApi();
+
+  const body = {
+    // number | The id of an execution.
+    id: 789,
+    // number | The id of a task execution.
+    taskExecutionId: 789,
+    // number | The zero-based number of the page to return. (optional)
+    pageNumber: 56,
+    // number | The number of children or loop iterations per page, from 1 to 200. An on-error task returns both of its branches on page 0 whatever the page size. (optional)
+    pageSize: 56,
+  } satisfies GetWorkflowExecutionTaskExecutionChildrenRequest;
+
+  try {
+    const data = await api.getWorkflowExecutionTaskExecutionChildren(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an execution. | [Defaults to `undefined`] |
+| **taskExecutionId** | `number` | The id of a task execution. | [Defaults to `undefined`] |
+| **pageNumber** | `number` | The zero-based number of the page to return. | [Optional] [Defaults to `0`] |
+| **pageSize** | `number` | The number of children or loop iterations per page, from 1 to 200. An on-error task returns both of its branches on page 0 whatever the page size. | [Optional] [Defaults to `50`] |
+
+### Return type
+
+[**TaskExecutionChildrenPage**](TaskExecutionChildrenPage.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The page of task execution children. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
