@@ -66,8 +66,8 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
 
     @Test
     void testResolveReturnsTheWebhookUrlOfAStaticWebhookTrigger() {
-        mockDeployedWorkflow("request/v1/awaitWorkflowAndRespond");
-        mockTriggerDefinition("request", "awaitWorkflowAndRespond", TriggerType.STATIC_WEBHOOK);
+        mockDeployedWorkflow("webhook/v1/awaitWorkflowAndRespond");
+        mockTriggerDefinition("webhook", "awaitWorkflowAndRespond", TriggerType.STATIC_WEBHOOK);
 
         String staticWebhookUrl = resolver.resolve(PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID);
 
@@ -75,6 +75,15 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
             PlatformType.AUTOMATION, PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID, "trigger_1");
 
         assertThat(staticWebhookUrl).isEqualTo("https://bytechef.example.com/webhooks/" + workflowExecutionId);
+    }
+
+    @Test
+    void testResolveReturnsNullForARequestTrigger() {
+        mockDeployedWorkflow("request/v1/awaitWorkflowAndRespond");
+
+        assertThat(resolver.resolve(PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID)).isNull();
+
+        verifyNoInteractions(triggerDefinitionService);
     }
 
     @Test
@@ -87,9 +96,9 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
 
     @Test
     void testResolveReturnsNullWhenTheTriggerDefinitionCannotBeLoaded() {
-        mockDeployedWorkflow("request/v1/awaitWorkflowAndRespond");
+        mockDeployedWorkflow("webhook/v1/awaitWorkflowAndRespond");
 
-        when(triggerDefinitionService.getTriggerDefinition("request", 1, "awaitWorkflowAndRespond"))
+        when(triggerDefinitionService.getTriggerDefinition("webhook", 1, "awaitWorkflowAndRespond"))
             .thenThrow(new IllegalArgumentException("unknown trigger"));
 
         assertThat(resolver.resolve(PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID)).isNull();
