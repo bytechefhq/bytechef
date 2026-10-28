@@ -8,6 +8,9 @@ bytechef:
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
+    hub:
+      # Whether the AI Hub is enabled
+      enabled: false
     knowledge-base:
       enabled: false
       ocr:
@@ -17,6 +20,10 @@ bytechef:
       subscriptions:
         document-chunk-update-events: 1
         document-process-events: 1
+    mcp:
+      server:
+        # Whether the management MCP server is enabled
+        enabled: true
     memory:
       aws:
         bucket-prefix: bytechef-chat-memory
@@ -269,5 +276,12 @@ bytechef:
       # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
       provider: jdbc
     repository:
+      # Workflow definition repositories (classpath | filesystem | git | jdbc); more than one may be enabled
+      classpath:
+        enabled: false
+      filesystem:
+        enabled: false
+      git:
+        enabled: false
       jdbc:
         enabled: true
