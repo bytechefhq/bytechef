@@ -8,13 +8,25 @@
 package com.bytechef.ee.remote.grpc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.ModelAndView;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -30,20 +42,57 @@ class GrpcStatusHandlerExceptionResolverTest {
     private final GrpcStatusHandlerExceptionResolver grpcStatusHandlerExceptionResolver =
         new GrpcStatusHandlerExceptionResolver(JSON_MAPPER);
 
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
-    void testPermissionDeniedKeepsItsReasonLikeALocalDenial() throws Exception {
+    void testPermissionDeniedAnswersAccessDeniedLikeALocalDenial() throws Exception {
+        setAuthentication(UsernamePasswordAuthenticationToken.authenticated("user", null, List.of()));
+
         MockHttpServletResponse mockHttpServletResponse = resolve(
             Status.PERMISSION_DENIED
                 .withDescription("Only the connection creator or an admin can modify connection 7"));
 
         JsonNode problemDetail = JSON_MAPPER.readTree(mockHttpServletResponse.getContentAsString());
 
-        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(500);
+        assertThat(mockHttpServletResponse.getStatus()).isEqualTo(403);
         assertThat(mockHttpServletResponse.getContentType()).isEqualTo("application/problem+json");
         assertThat(problemDetail.get("detail")
-            .asString()).isEqualTo("Only the connection creator or an admin can modify connection 7");
+            .asString()).isEqualTo("Access denied");
+        assertThat(problemDetail.get("errorCode")
+            .asString()).isEqualTo("ACCESS_DENIED");
         assertThat(problemDetail.get("status")
-            .asInt()).isEqualTo(500);
+            .asInt()).isEqualTo(403);
+        assertThat(problemDetail.get("title")
+            .asString()).isEqualTo("Forbidden");
+    }
+
+    @Test
+    void testPermissionDeniedWithoutAuthenticationAnswersAccessDenied() {
+        assertThat(resolve(Status.PERMISSION_DENIED).getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    void testPermissionDeniedForAnAnonymousCallerIsRethrownAsAccessDenied() {
+        setAuthentication(
+            new AnonymousAuthenticationToken(
+                "key", "anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS")));
+
+        assertThatThrownBy(() -> resolve(Status.PERMISSION_DENIED.withDescription("denied")))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessage("denied")
+            .hasCauseInstanceOf(StatusRuntimeException.class);
+    }
+
+    @Test
+    void testPermissionDeniedForARememberedCallerIsRethrownAsAccessDenied() {
+        setAuthentication(
+            new RememberMeAuthenticationToken("key", "user", AuthorityUtils.createAuthorityList("ROLE_USER")));
+
+        assertThatThrownBy(() -> resolve(Status.PERMISSION_DENIED))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -128,5 +177,13 @@ class GrpcStatusHandlerExceptionResolverTest {
         assertThat(modelAndView).isNotNull();
 
         return mockHttpServletResponse;
+    }
+
+    private static void setAuthentication(Authentication authentication) {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
     }
 }
