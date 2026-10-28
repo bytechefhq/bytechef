@@ -58,7 +58,7 @@ const IntegrationInstanceConfigurationListItem = ({
             queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationTagKeys.integrationInstanceConfigurationTags,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });
         },
