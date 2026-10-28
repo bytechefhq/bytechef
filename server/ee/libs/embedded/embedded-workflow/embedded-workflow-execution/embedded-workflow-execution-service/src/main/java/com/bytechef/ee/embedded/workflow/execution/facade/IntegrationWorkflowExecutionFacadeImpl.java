@@ -54,9 +54,12 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
+import com.bytechef.platform.workflow.execution.facade.LazyTaskExecutionTreeBuilder;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -69,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -107,6 +111,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
     private final WorkflowService workflowService;
+    private final LazyTaskExecutionTreeBuilder lazyTaskExecutionTreeBuilder;
 
     @SuppressFBWarnings("EI")
     public IntegrationWorkflowExecutionFacadeImpl(
@@ -137,15 +142,38 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.workflowService = workflowService;
+
+        this.lazyTaskExecutionTreeBuilder = new LazyTaskExecutionTreeBuilder(
+            taskExecutionService, jobService, this::createListTaskExecutionDTOConverter);
     }
 
     @Override
     @PreAuthorize("isTenantAdmin()")
     @Transactional(readOnly = true)
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
+        return getWorkflowExecution(id, false);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public WorkflowExecutionDTO getWorkflowExecution(long id, boolean lazy) {
         Job job = jobService.getJob(id);
 
-        JobDTO jobDTO = toJobDTO(job, false);
+        JobDTO jobDTO;
+        List<FocusPathElementDTO> focusPath = null;
+        Long taskExecutionCount = null;
+
+        if (lazy) {
+            List<TaskExecution> topLevelTaskExecutions = lazyTaskExecutionTreeBuilder.getTopLevelTaskExecutionRows(id);
+
+            jobDTO = new JobDTO(job, null, lazyTaskExecutionTreeBuilder.decorate(topLevelTaskExecutions));
+            focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(id, topLevelTaskExecutions);
+            taskExecutionCount = lazyTaskExecutionTreeBuilder.countTaskExecutions(id, topLevelTaskExecutions);
+        } else {
+            jobDTO = toJobDTO(job, false);
+        }
+
         long integrationInstanceId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.EMBEDDED);
 
@@ -162,7 +190,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 integrationInstanceId,
                 OptionalUtils.orElse(
                     triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
-                job));
+                job),
+            focusPath, taskExecutionCount);
     }
 
     @Override
@@ -173,7 +202,20 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
-        return toTaskExecutionDTO(taskExecution, null, true);
+        return toTaskExecutionDTO(taskExecution, lazyTaskExecutionTreeBuilder.getChildJob(taskExecutionId), true);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
+        long id, long taskExecutionId, int pageNumber, int pageSize) {
+
+        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+
+        validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
+
+        return lazyTaskExecutionTreeBuilder.getChildrenPage(taskExecution, pageNumber, pageSize);
     }
 
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
@@ -531,6 +573,12 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         }
 
         return triggerExecutionDTO;
+    }
+
+    private BiFunction<TaskExecution, JobDTO, TaskExecutionDTO> createListTaskExecutionDTOConverter() {
+        Map<String, DefinitionResult> definitionResultCache = new HashMap<>();
+
+        return (taskExecution, childJob) -> toTaskExecutionDTO(taskExecution, childJob, false, definitionResultCache);
     }
 
     private JobDTO toJobDTO(Job job, boolean includeTaskData) {

@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExe
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionChildrenPageModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
@@ -45,10 +46,22 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
+    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id, Boolean lazy) {
         return ResponseEntity.ok(
             conversionService.convert(
-                integrationWorkflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
+                integrationWorkflowExecutionFacade.getWorkflowExecution(id, Boolean.TRUE.equals(lazy)),
+                WorkflowExecutionModel.class));
+    }
+
+    @Override
+    public ResponseEntity<TaskExecutionChildrenPageModel> getWorkflowExecutionTaskExecutionChildren(
+        Long id, Long taskExecutionId, Integer pageNumber, Integer pageSize) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationWorkflowExecutionFacade.getWorkflowExecutionTaskExecutionChildren(
+                    id, taskExecutionId, pageNumber, pageSize),
+                TaskExecutionChildrenPageModel.class));
     }
 
     @Override

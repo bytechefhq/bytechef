@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import java.time.Instant;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,16 @@ import org.springframework.data.domain.Page;
 public interface IntegrationWorkflowExecutionFacade {
 
     WorkflowExecutionDTO getWorkflowExecution(long id);
+
+    /**
+     * @param lazy when {@code true}, the job carries only its top-level task executions with their child counts, the
+     *             focus path and the latest-attempt task execution count; children are loaded through
+     *             {@link #getWorkflowExecutionTaskExecutionChildren(long, long, int, int)}
+     */
+    WorkflowExecutionDTO getWorkflowExecution(long id, boolean lazy);
+
+    TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
+        long id, long taskExecutionId, int pageNumber, int pageSize);
 
     TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId);
 

@@ -11,9 +11,12 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -23,5 +26,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
     long id, Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
-    IntegrationInstance integrationInstance, JobDTO job, Workflow workflow, TriggerExecutionDTO triggerExecution) {
+    IntegrationInstance integrationInstance, JobDTO job, Workflow workflow, TriggerExecutionDTO triggerExecution,
+    @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount) {
+
+    public WorkflowExecutionDTO(
+        long id, Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        IntegrationInstance integrationInstance, JobDTO job, Workflow workflow, TriggerExecutionDTO triggerExecution) {
+
+        this(
+            id, integration, integrationInstanceConfiguration, integrationInstance, job, workflow, triggerExecution,
+            null, null);
+    }
 }
