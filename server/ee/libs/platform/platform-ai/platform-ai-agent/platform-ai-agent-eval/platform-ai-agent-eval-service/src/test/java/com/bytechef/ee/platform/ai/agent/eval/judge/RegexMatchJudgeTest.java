@@ -18,9 +18,9 @@ package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,62 +30,67 @@ class RegexMatchJudgeTest {
 
     @Test
     void testMustMatchWhenPatternMatches() {
-        RegexMatchJudge judge = new RegexMatchJudge("\\d{3}-\\d{4}", "MUST_MATCH");
+        RegexMatchJudge judge =
+            new RegexMatchJudge(() -> buildEvidence("Call 555-1234 now"), "\\d{3}-\\d{4}", "MUST_MATCH");
 
-        Judgment judgment = judge.judge(buildContext("Call 555-1234 now"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testMustMatchWhenPatternDoesNotMatch() {
-        RegexMatchJudge judge = new RegexMatchJudge("\\d{3}-\\d{4}", "MUST_MATCH");
+        RegexMatchJudge judge =
+            new RegexMatchJudge(() -> buildEvidence("No phone number here"), "\\d{3}-\\d{4}", "MUST_MATCH");
 
-        Judgment judgment = judge.judge(buildContext("No phone number here"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testMustNotMatchWhenPatternDoesNotMatch() {
-        RegexMatchJudge judge = new RegexMatchJudge("\\d{3}-\\d{4}", "MUST_NOT_MATCH");
+        RegexMatchJudge judge =
+            new RegexMatchJudge(() -> buildEvidence("No phone number here"), "\\d{3}-\\d{4}", "MUST_NOT_MATCH");
 
-        Judgment judgment = judge.judge(buildContext("No phone number here"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testMustNotMatchWhenPatternMatches() {
-        RegexMatchJudge judge = new RegexMatchJudge("\\d{3}-\\d{4}", "MUST_NOT_MATCH");
+        RegexMatchJudge judge =
+            new RegexMatchJudge(() -> buildEvidence("Call 555-1234 now"), "\\d{3}-\\d{4}", "MUST_NOT_MATCH");
 
-        Judgment judgment = judge.judge(buildContext("Call 555-1234 now"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testInvalidRegexReturnsError() {
-        RegexMatchJudge judge = new RegexMatchJudge("[invalid", "MUST_MATCH");
+        RegexMatchJudge judge = new RegexMatchJudge(() -> buildEvidence("some output"), "[invalid", "MUST_MATCH");
 
-        Judgment judgment = judge.judge(buildContext("some output"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.ERROR, judgment.status());
     }
 
     @Test
     void testEmailPatternMatch() {
-        RegexMatchJudge judge = new RegexMatchJudge("[a-zA-Z0-9.]+@[a-zA-Z0-9.]+", "MUST_MATCH");
+        RegexMatchJudge judge = new RegexMatchJudge(() -> buildEvidence("Contact us at support@example.com"),
+            "[a-zA-Z0-9.]+@[a-zA-Z0-9.]+", "MUST_MATCH");
 
-        Judgment judgment = judge.judge(buildContext("Contact us at support@example.com"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
-    private JudgmentContext buildContext(String agentOutput) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput(agentOutput)
+    private CompletionEvidence buildEvidence(String agentOutput) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response(agentOutput)
             .build();
     }
 

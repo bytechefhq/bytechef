@@ -20,8 +20,10 @@ import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentJudgeType;
 import io.github.markpollack.judge.Judge;
 import io.github.markpollack.judge.JudgeType;
 import io.github.markpollack.judge.Judges;
+import io.github.markpollack.judge.completion.CompletionEvidence;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 
@@ -36,40 +38,40 @@ public class AiAgentJudgeFactory {
 
     @SuppressWarnings("unchecked")
     public Judge createJudge(
-        String name, AiAgentJudgeType type, Map<String, Object> configuration,
-        ChatClient.Builder chatClientBuilder) {
+        String name, AiAgentJudgeType type, Map<String, Object> configuration, ChatClient.Builder chatClientBuilder,
+        Supplier<CompletionEvidence> evidence) {
 
         Judge judge = switch (type) {
             case LLM_RULE -> new LlmRuleJudge(
-                name, chatClientBuilder, (String) configuration.get("rule"),
+                evidence, name, chatClientBuilder, (String) configuration.get("rule"),
                 Boolean.TRUE.equals(configuration.get("truncateLongConversations")));
             case CONTAINS_TEXT -> new ContainsTextJudge(
-                (String) configuration.get("text"),
+                evidence, (String) configuration.get("text"),
                 (String) configuration.get("mode"));
             case REGEX_MATCH -> new RegexMatchJudge(
-                (String) configuration.get("pattern"),
+                evidence, (String) configuration.get("pattern"),
                 (String) configuration.get("mode"));
             case RESPONSE_LENGTH -> {
                 Number maxLengthValue = (Number) configuration.get("maxLength");
                 Number minLengthValue = (Number) configuration.get("minLength");
 
                 yield new ResponseLengthJudge(
-                    maxLengthValue != null ? maxLengthValue.intValue() : null,
+                    evidence, maxLengthValue != null ? maxLengthValue.intValue() : null,
                     minLengthValue != null ? minLengthValue.intValue() : null);
             }
             case JSON_SCHEMA -> new JsonSchemaJudge(
-                (Map<String, Object>) configuration.get("schema"));
+                evidence, (Map<String, Object>) configuration.get("schema"));
             case SIMILARITY -> new SimilarityJudge(
-                (String) configuration.get("expectedOutput"),
+                evidence, (String) configuration.get("expectedOutput"),
                 ((Number) configuration.get("threshold")).doubleValue(),
                 (String) configuration.get("algorithm"));
             case STRING_EQUALS -> new StringEqualsJudge(
-                Objects.requireNonNull(
+                evidence, Objects.requireNonNull(
                     (String) configuration.get("expectedValue"),
                     "STRING_EQUALS judge requires 'expectedValue' in configuration"),
                 Boolean.TRUE.equals(configuration.getOrDefault("caseSensitive", true)));
             case TOOL_USAGE -> new ToolUsageJudge(
-                Objects.requireNonNull(
+                evidence, Objects.requireNonNull(
                     (String) configuration.get("toolName"),
                     "TOOL_USAGE judge requires 'toolName' in configuration"),
                 (String) configuration.getOrDefault("position", "ANYWHERE"),

@@ -18,9 +18,9 @@ package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,71 +30,74 @@ class ContainsTextJudgeTest {
 
     @Test
     void testMustContainWhenTextIsPresent() {
-        ContainsTextJudge judge = new ContainsTextJudge("hello", "MUST_CONTAIN");
+        ContainsTextJudge judge = new ContainsTextJudge(() -> buildEvidence("hello world"), "hello", "MUST_CONTAIN");
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testMustContainWhenTextIsAbsent() {
-        ContainsTextJudge judge = new ContainsTextJudge("goodbye", "MUST_CONTAIN");
+        ContainsTextJudge judge = new ContainsTextJudge(() -> buildEvidence("hello world"), "goodbye", "MUST_CONTAIN");
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testMustNotContainWhenTextIsAbsent() {
-        ContainsTextJudge judge = new ContainsTextJudge("goodbye", "MUST_NOT_CONTAIN");
+        ContainsTextJudge judge =
+            new ContainsTextJudge(() -> buildEvidence("hello world"), "goodbye", "MUST_NOT_CONTAIN");
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testMustNotContainWhenTextIsPresent() {
-        ContainsTextJudge judge = new ContainsTextJudge("hello", "MUST_NOT_CONTAIN");
+        ContainsTextJudge judge =
+            new ContainsTextJudge(() -> buildEvidence("hello world"), "hello", "MUST_NOT_CONTAIN");
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testCaseInsensitiveMatch() {
-        ContainsTextJudge judge = new ContainsTextJudge("HELLO", "MUST_CONTAIN");
+        ContainsTextJudge judge = new ContainsTextJudge(() -> buildEvidence("hello world"), "HELLO", "MUST_CONTAIN");
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testCaseInsensitiveMustNotContain() {
-        ContainsTextJudge judge = new ContainsTextJudge("HELLO", "MUST_NOT_CONTAIN");
+        ContainsTextJudge judge =
+            new ContainsTextJudge(() -> buildEvidence("Hello World"), "HELLO", "MUST_NOT_CONTAIN");
 
-        Judgment judgment = judge.judge(buildContext("Hello World"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testEmptyOutput() {
-        ContainsTextJudge judge = new ContainsTextJudge("hello", "MUST_CONTAIN");
+        ContainsTextJudge judge = new ContainsTextJudge(() -> buildEvidence(""), "hello", "MUST_CONTAIN");
 
-        Judgment judgment = judge.judge(buildContext(""));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
-    private JudgmentContext buildContext(String agentOutput) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput(agentOutput)
+    private CompletionEvidence buildEvidence(String agentOutput) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response(agentOutput)
             .build();
     }
 

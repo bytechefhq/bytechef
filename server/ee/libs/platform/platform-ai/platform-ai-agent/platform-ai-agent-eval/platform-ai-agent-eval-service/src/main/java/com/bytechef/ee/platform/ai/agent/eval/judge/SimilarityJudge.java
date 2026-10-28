@@ -17,24 +17,27 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import io.github.markpollack.judge.DeterministicJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * A deterministic judge that measures text similarity between the agent output and an expected output using either edit
  * distance or cosine similarity.
  */
-public class SimilarityJudge extends DeterministicJudge {
+public class SimilarityJudge extends DeterministicJudge<CompletionEvidence> {
 
     private final String algorithm;
     private final String expectedOutput;
     private final double threshold;
 
-    public SimilarityJudge(String expectedOutput, double threshold, String algorithm) {
-        super("Similarity", "Measures text similarity between agent output and expected output");
+    public SimilarityJudge(Supplier<CompletionEvidence> evidence, String expectedOutput, double threshold,
+        String algorithm) {
+        super(evidence, "Similarity", "Measures text similarity between agent output and expected output");
 
         this.expectedOutput = expectedOutput;
         this.threshold = threshold;
@@ -42,14 +45,13 @@ public class SimilarityJudge extends DeterministicJudge {
     }
 
     @Override
-    public Judgment judge(JudgmentContext context) {
-        String output = context.agentOutput()
-            .orElse("");
+    protected Judgment evaluate(CompletionEvidence evidence) {
+        String output = Objects.requireNonNullElse(evidence.response(), "");
 
         String resolvedExpectedOutput = expectedOutput;
 
         if (resolvedExpectedOutput == null) {
-            Object metadataExpectedOutput = context.metadata()
+            Object metadataExpectedOutput = evidence.metadata()
                 .get("expectedOutput");
 
             if (metadataExpectedOutput instanceof String metadataExpectedOutputString) {

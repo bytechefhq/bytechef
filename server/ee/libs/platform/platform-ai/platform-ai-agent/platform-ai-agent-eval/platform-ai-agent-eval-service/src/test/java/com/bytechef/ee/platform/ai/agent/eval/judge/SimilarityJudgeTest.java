@@ -19,9 +19,9 @@ package com.bytechef.ee.platform.ai.agent.eval.judge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +32,10 @@ class SimilarityJudgeTest {
 
     @Test
     void testEditDistanceIdenticalText() {
-        SimilarityJudge judge = new SimilarityJudge("hello world", 0.8, "EDIT_DISTANCE");
+        SimilarityJudge judge =
+            new SimilarityJudge(() -> buildEvidence("hello world"), "hello world", 0.8, "EDIT_DISTANCE");
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
@@ -43,9 +44,10 @@ class SimilarityJudgeTest {
 
     @Test
     void testEditDistanceSimilarText() {
-        SimilarityJudge judge = new SimilarityJudge("hello world", 0.5, "EDIT_DISTANCE");
+        SimilarityJudge judge =
+            new SimilarityJudge(() -> buildEvidence("hello worl"), "hello world", 0.5, "EDIT_DISTANCE");
 
-        Judgment judgment = judge.judge(buildContext("hello worl"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
@@ -54,18 +56,20 @@ class SimilarityJudgeTest {
 
     @Test
     void testEditDistanceDifferentTextBelowThreshold() {
-        SimilarityJudge judge = new SimilarityJudge("hello world", 0.9, "EDIT_DISTANCE");
+        SimilarityJudge judge =
+            new SimilarityJudge(() -> buildEvidence("completely different text"), "hello world", 0.9, "EDIT_DISTANCE");
 
-        Judgment judgment = judge.judge(buildContext("completely different text"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testCosineSimilarityIdenticalText() {
-        SimilarityJudge judge = new SimilarityJudge("the quick brown fox", 0.8, "COSINE");
+        SimilarityJudge judge =
+            new SimilarityJudge(() -> buildEvidence("the quick brown fox"), "the quick brown fox", 0.8, "COSINE");
 
-        Judgment judgment = judge.judge(buildContext("the quick brown fox"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
@@ -74,9 +78,10 @@ class SimilarityJudgeTest {
 
     @Test
     void testCosineSimilarityOverlappingWords() {
-        SimilarityJudge judge = new SimilarityJudge("the quick brown fox", 0.3, "COSINE");
+        SimilarityJudge judge =
+            new SimilarityJudge(() -> buildEvidence("the quick red dog"), "the quick brown fox", 0.3, "COSINE");
 
-        Judgment judgment = judge.judge(buildContext("the quick red dog"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
@@ -85,9 +90,10 @@ class SimilarityJudgeTest {
 
     @Test
     void testCosineSimilarityCompletelyDifferent() {
-        SimilarityJudge judge = new SimilarityJudge("hello world", 0.5, "COSINE");
+        SimilarityJudge judge =
+            new SimilarityJudge(() -> buildEvidence("completely different text"), "hello world", 0.5, "COSINE");
 
-        Judgment judgment = judge.judge(buildContext("completely different text"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
 
@@ -96,43 +102,43 @@ class SimilarityJudgeTest {
 
     @Test
     void testNullExpectedOutputWithMetadataFallback() {
-        SimilarityJudge judge = new SimilarityJudge(null, 0.8, "EDIT_DISTANCE");
-
-        JudgmentContext context = JudgmentContext.builder()
-            .goal("test")
-            .agentOutput("hello world")
+        CompletionEvidence evidence = CompletionEvidence.builder()
+            .request("test")
+            .response("hello world")
             .metadata(Map.of("expectedOutput", "hello world"))
             .build();
 
-        Judgment judgment = judge.judge(context);
+        SimilarityJudge judge = new SimilarityJudge(() -> evidence, null, 0.8, "EDIT_DISTANCE");
+
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testNullExpectedOutputWithoutMetadataReturnsError() {
-        SimilarityJudge judge = new SimilarityJudge(null, 0.8, "EDIT_DISTANCE");
+        SimilarityJudge judge = new SimilarityJudge(() -> buildEvidence("hello world"), null, 0.8, "EDIT_DISTANCE");
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.ERROR, judgment.status());
     }
 
     @Test
     void testEditDistanceEmptyStrings() {
-        SimilarityJudge judge = new SimilarityJudge("", 0.5, "EDIT_DISTANCE");
+        SimilarityJudge judge = new SimilarityJudge(() -> buildEvidence(""), "", 0.5, "EDIT_DISTANCE");
 
-        Judgment judgment = judge.judge(buildContext(""));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
 
         assertEquals(1.0, judgment.score(), 0.001);
     }
 
-    private JudgmentContext buildContext(String agentOutput) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput(agentOutput)
+    private CompletionEvidence buildEvidence(String agentOutput) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response(agentOutput)
             .build();
     }
 

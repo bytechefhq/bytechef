@@ -26,9 +26,9 @@ import io.github.markpollack.judge.JudgeMetadata;
 import io.github.markpollack.judge.JudgeType;
 import io.github.markpollack.judge.Judges;
 import io.github.markpollack.judge.NamedJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,8 @@ class AgentJudgeFactoryTest {
     void testCreateLlmRuleJudge() {
         Map<String, Object> configuration = Map.of("rule", "The response must be polite");
 
-        Judge judge = agentJudgeFactory.createJudge("politeness", AiAgentJudgeType.LLM_RULE, configuration, null);
+        Judge judge = agentJudgeFactory.createJudge("politeness", AiAgentJudgeType.LLM_RULE, configuration, null,
+            () -> buildEvidence(""));
 
         assertNotNull(judge);
         assertInstanceOf(NamedJudge.class, judge);
@@ -61,7 +62,7 @@ class AgentJudgeFactoryTest {
         Map<String, Object> configuration = Map.of("text", "hello", "mode", "MUST_CONTAIN");
 
         Judge judge = agentJudgeFactory.createJudge(
-            "containsHello", AiAgentJudgeType.CONTAINS_TEXT, configuration, null);
+            "containsHello", AiAgentJudgeType.CONTAINS_TEXT, configuration, null, () -> buildEvidence("hello world"));
 
         assertNotNull(judge);
 
@@ -71,7 +72,7 @@ class AgentJudgeFactoryTest {
         assertEquals("containsHello", metadata.name());
         assertEquals(JudgeType.DETERMINISTIC, metadata.type());
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
@@ -81,9 +82,9 @@ class AgentJudgeFactoryTest {
         Map<String, Object> configuration = Map.of("text", "goodbye", "mode", "MUST_CONTAIN");
 
         Judge judge = agentJudgeFactory.createJudge(
-            "containsGoodbye", AiAgentJudgeType.CONTAINS_TEXT, configuration, null);
+            "containsGoodbye", AiAgentJudgeType.CONTAINS_TEXT, configuration, null, () -> buildEvidence("hello world"));
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
@@ -92,7 +93,8 @@ class AgentJudgeFactoryTest {
     void testCreateRegexMatchJudge() {
         Map<String, Object> configuration = Map.of("pattern", "\\d{3}-\\d{4}", "mode", "MUST_MATCH");
 
-        Judge judge = agentJudgeFactory.createJudge("phonePattern", AiAgentJudgeType.REGEX_MATCH, configuration, null);
+        Judge judge = agentJudgeFactory.createJudge("phonePattern", AiAgentJudgeType.REGEX_MATCH, configuration, null,
+            () -> buildEvidence("Call 555-1234 for info"));
 
         assertNotNull(judge);
 
@@ -102,7 +104,7 @@ class AgentJudgeFactoryTest {
         assertEquals("phonePattern", metadata.name());
         assertEquals(JudgeType.DETERMINISTIC, metadata.type());
 
-        Judgment judgment = judge.judge(buildContext("Call 555-1234 for info"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
@@ -112,7 +114,8 @@ class AgentJudgeFactoryTest {
         Map<String, Object> configuration = Map.of("maxLength", 100, "minLength", 5);
 
         Judge judge = agentJudgeFactory.createJudge(
-            "lengthCheck", AiAgentJudgeType.RESPONSE_LENGTH, configuration, null);
+            "lengthCheck", AiAgentJudgeType.RESPONSE_LENGTH, configuration, null,
+            () -> buildEvidence("This is a valid response"));
 
         assertNotNull(judge);
 
@@ -122,7 +125,7 @@ class AgentJudgeFactoryTest {
         assertEquals("lengthCheck", metadata.name());
         assertEquals(JudgeType.DETERMINISTIC, metadata.type());
 
-        Judgment judgment = judge.judge(buildContext("This is a valid response"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
@@ -132,9 +135,9 @@ class AgentJudgeFactoryTest {
         Map<String, Object> configuration = Map.of("maxLength", 100, "minLength", 50);
 
         Judge judge = agentJudgeFactory.createJudge(
-            "lengthCheck", AiAgentJudgeType.RESPONSE_LENGTH, configuration, null);
+            "lengthCheck", AiAgentJudgeType.RESPONSE_LENGTH, configuration, null, () -> buildEvidence("Short"));
 
-        Judgment judgment = judge.judge(buildContext("Short"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
@@ -144,7 +147,8 @@ class AgentJudgeFactoryTest {
         Map<String, Object> configuration = Map.of(
             "schema", Map.of("required", List.of("name", "age")));
 
-        Judge judge = agentJudgeFactory.createJudge("jsonCheck", AiAgentJudgeType.JSON_SCHEMA, configuration, null);
+        Judge judge = agentJudgeFactory.createJudge("jsonCheck", AiAgentJudgeType.JSON_SCHEMA, configuration, null,
+            () -> buildEvidence("{\"name\": \"John\", \"age\": 30}"));
 
         assertNotNull(judge);
 
@@ -154,7 +158,7 @@ class AgentJudgeFactoryTest {
         assertEquals("jsonCheck", metadata.name());
         assertEquals(JudgeType.DETERMINISTIC, metadata.type());
 
-        Judgment judgment = judge.judge(buildContext("{\"name\": \"John\", \"age\": 30}"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
@@ -167,7 +171,7 @@ class AgentJudgeFactoryTest {
             "algorithm", "EDIT_DISTANCE");
 
         Judge judge = agentJudgeFactory.createJudge(
-            "similarityCheck", AiAgentJudgeType.SIMILARITY, configuration, null);
+            "similarityCheck", AiAgentJudgeType.SIMILARITY, configuration, null, () -> buildEvidence("hello world"));
 
         assertNotNull(judge);
 
@@ -177,15 +181,15 @@ class AgentJudgeFactoryTest {
         assertEquals("similarityCheck", metadata.name());
         assertEquals(JudgeType.DETERMINISTIC, metadata.type());
 
-        Judgment judgment = judge.judge(buildContext("hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
-    private JudgmentContext buildContext(String agentOutput) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput(agentOutput)
+    private CompletionEvidence buildEvidence(String agentOutput) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response(agentOutput)
             .build();
     }
 

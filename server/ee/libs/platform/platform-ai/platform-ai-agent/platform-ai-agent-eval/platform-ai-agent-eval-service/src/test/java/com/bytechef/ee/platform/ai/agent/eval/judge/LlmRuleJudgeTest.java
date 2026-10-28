@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -33,13 +33,14 @@ class LlmRuleJudgeTest {
 
     private static final String RULE = "The agent must respond politely";
 
-    private final LlmRuleJudge judge = new LlmRuleJudge("PolitenessJudge", null, RULE, false);
+    private final LlmRuleJudge judge =
+        new LlmRuleJudge(() -> buildEvidence("", ""), "PolitenessJudge", null, RULE, false);
 
     @Test
     void testBuildPromptContainsRule() {
-        JudgmentContext context = buildContext("Hello!", "User: Hi\nAgent: Hello!");
+        CompletionEvidence evidence = buildEvidence("Hello!", "User: Hi\nAgent: Hello!");
 
-        String prompt = judge.buildPrompt(context);
+        String prompt = judge.buildPrompt(evidence);
 
         assertTrue(prompt.contains(RULE));
     }
@@ -48,9 +49,9 @@ class LlmRuleJudgeTest {
     void testBuildPromptContainsTranscript() {
         String transcript = "User: Hi\nAgent: Hello!";
 
-        JudgmentContext context = buildContext("Hello!", transcript);
+        CompletionEvidence evidence = buildEvidence("Hello!", transcript);
 
-        String prompt = judge.buildPrompt(context);
+        String prompt = judge.buildPrompt(evidence);
 
         assertTrue(prompt.contains(transcript));
     }
@@ -59,21 +60,21 @@ class LlmRuleJudgeTest {
     void testBuildPromptContainsAgentOutput() {
         String agentOutput = "Hello, how can I help you?";
 
-        JudgmentContext context = buildContext(agentOutput, "User: Hi\nAgent: Hello!");
+        CompletionEvidence evidence = buildEvidence(agentOutput, "User: Hi\nAgent: Hello!");
 
-        String prompt = judge.buildPrompt(context);
+        String prompt = judge.buildPrompt(evidence);
 
         assertTrue(prompt.contains(agentOutput));
     }
 
     @Test
     void testBuildPromptWithNoTranscript() {
-        JudgmentContext context = JudgmentContext.builder()
-            .goal("test")
-            .agentOutput("output")
+        CompletionEvidence evidence = CompletionEvidence.builder()
+            .request("test")
+            .response("output")
             .build();
 
-        String prompt = judge.buildPrompt(context);
+        String prompt = judge.buildPrompt(evidence);
 
         assertTrue(prompt.contains(RULE));
         assertTrue(prompt.contains("output"));
@@ -83,9 +84,9 @@ class LlmRuleJudgeTest {
     void testParseResponsePassedTrue() {
         String response = "{\"passed\": true, \"explanation\": \"The agent was polite\"}";
 
-        JudgmentContext context = buildContext("Hello!", "transcript");
+        CompletionEvidence evidence = buildEvidence("Hello!", "transcript");
 
-        Judgment judgment = judge.parseResponse(response, context);
+        Judgment judgment = judge.parseResponse(response, evidence);
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
         assertEquals("The agent was polite", judgment.reasoning());
@@ -95,9 +96,9 @@ class LlmRuleJudgeTest {
     void testParseResponsePassedFalse() {
         String response = "{\"passed\": false, \"explanation\": \"The agent was rude\"}";
 
-        JudgmentContext context = buildContext("Go away!", "transcript");
+        CompletionEvidence evidence = buildEvidence("Go away!", "transcript");
 
-        Judgment judgment = judge.parseResponse(response, context);
+        Judgment judgment = judge.parseResponse(response, evidence);
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
         assertEquals("The agent was rude", judgment.reasoning());
@@ -107,9 +108,9 @@ class LlmRuleJudgeTest {
     void testParseResponseMalformedJson() {
         String response = "This is not JSON at all";
 
-        JudgmentContext context = buildContext("output", "transcript");
+        CompletionEvidence evidence = buildEvidence("output", "transcript");
 
-        Judgment judgment = judge.parseResponse(response, context);
+        Judgment judgment = judge.parseResponse(response, evidence);
 
         assertEquals(JudgmentStatus.ERROR, judgment.status());
         assertNotNull(judgment.reasoning());
@@ -120,9 +121,9 @@ class LlmRuleJudgeTest {
         String response =
             "{\"passed\": true, \"explanation\": \"Looks good\", \"confidence\": 0.95, \"details\": \"extra\"}";
 
-        JudgmentContext context = buildContext("output", "transcript");
+        CompletionEvidence evidence = buildEvidence("output", "transcript");
 
-        Judgment judgment = judge.parseResponse(response, context);
+        Judgment judgment = judge.parseResponse(response, evidence);
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
         assertEquals("Looks good", judgment.reasoning());
@@ -132,9 +133,9 @@ class LlmRuleJudgeTest {
     void testParseResponseWithWhitespace() {
         String response = "  \n  {\"passed\": true, \"explanation\": \"ok\"}  \n  ";
 
-        JudgmentContext context = buildContext("output", "transcript");
+        CompletionEvidence evidence = buildEvidence("output", "transcript");
 
-        Judgment judgment = judge.parseResponse(response, context);
+        Judgment judgment = judge.parseResponse(response, evidence);
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
         assertEquals("ok", judgment.reasoning());
@@ -142,17 +143,17 @@ class LlmRuleJudgeTest {
 
     @Test
     void testParseResponseEmptyString() {
-        JudgmentContext context = buildContext("output", "transcript");
+        CompletionEvidence evidence = buildEvidence("output", "transcript");
 
-        Judgment judgment = judge.parseResponse("", context);
+        Judgment judgment = judge.parseResponse("", evidence);
 
         assertEquals(JudgmentStatus.ERROR, judgment.status());
     }
 
-    private JudgmentContext buildContext(String agentOutput, String transcript) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput(agentOutput)
+    private CompletionEvidence buildEvidence(String agentOutput, String transcript) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response(agentOutput)
             .metadata(Map.of("transcript", transcript))
             .build();
     }

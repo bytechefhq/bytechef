@@ -18,9 +18,9 @@ package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,89 +30,89 @@ class ResponseLengthJudgeTest {
 
     @Test
     void testWithinRange() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(100, 5);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("Hello world"), 100, 5);
 
-        Judgment judgment = judge.judge(buildContext("Hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testTooShort() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(100, 20);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("Hi"), 100, 20);
 
-        Judgment judgment = judge.judge(buildContext("Hi"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testTooLong() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(5, null);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("This is a long response"), 5, null);
 
-        Judgment judgment = judge.judge(buildContext("This is a long response"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testNullMinLength() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(100, null);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("Hi"), 100, null);
 
-        Judgment judgment = judge.judge(buildContext("Hi"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testNullMaxLength() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(null, 2);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("Hello world"), null, 2);
 
-        Judgment judgment = judge.judge(buildContext("Hello world"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testBothThresholdsNull() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(null, null);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("Any output"), null, null);
 
-        Judgment judgment = judge.judge(buildContext("Any output"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testEmptyOutputWithMinLength() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(null, 1);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence(""), null, 1);
 
-        Judgment judgment = judge.judge(buildContext(""));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
     @Test
     void testExactMinLength() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(null, 5);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("12345"), null, 5);
 
-        Judgment judgment = judge.judge(buildContext("12345"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
     @Test
     void testExactMaxLength() {
-        ResponseLengthJudge judge = new ResponseLengthJudge(5, null);
+        ResponseLengthJudge judge = new ResponseLengthJudge(() -> buildEvidence("12345"), 5, null);
 
-        Judgment judgment = judge.judge(buildContext("12345"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
 
-    private JudgmentContext buildContext(String agentOutput) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput(agentOutput)
+    private CompletionEvidence buildEvidence(String agentOutput) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response(agentOutput)
             .build();
     }
 

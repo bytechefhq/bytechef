@@ -19,9 +19,9 @@ package com.bytechef.ee.platform.ai.agent.eval.judge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
-import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import io.github.markpollack.judge.judgment.JudgmentStatus;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -35,9 +35,9 @@ class JsonSchemaJudgeTest {
     void testValidJsonWithAllRequiredFields() {
         Map<String, Object> schema = Map.of("required", List.of("name", "age"));
 
-        JsonSchemaJudge judge = new JsonSchemaJudge(schema);
+        JsonSchemaJudge judge = new JsonSchemaJudge(() -> buildEvidence("{\"name\": \"John\", \"age\": 30}"), schema);
 
-        Judgment judgment = judge.judge(buildContext("{\"name\": \"John\", \"age\": 30}"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
@@ -46,9 +46,9 @@ class JsonSchemaJudgeTest {
     void testValidJsonMissingRequiredField() {
         Map<String, Object> schema = Map.of("required", List.of("name", "age", "email"));
 
-        JsonSchemaJudge judge = new JsonSchemaJudge(schema);
+        JsonSchemaJudge judge = new JsonSchemaJudge(() -> buildEvidence("{\"name\": \"John\", \"age\": 30}"), schema);
 
-        Judgment judgment = judge.judge(buildContext("{\"name\": \"John\", \"age\": 30}"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
 
@@ -60,9 +60,9 @@ class JsonSchemaJudgeTest {
     void testInvalidJson() {
         Map<String, Object> schema = Map.of("required", List.of("name"));
 
-        JsonSchemaJudge judge = new JsonSchemaJudge(schema);
+        JsonSchemaJudge judge = new JsonSchemaJudge(() -> buildEvidence("not valid json"), schema);
 
-        Judgment judgment = judge.judge(buildContext("not valid json"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
 
@@ -74,9 +74,9 @@ class JsonSchemaJudgeTest {
     void testNoRequiredFields() {
         Map<String, Object> schema = Map.of("type", "object");
 
-        JsonSchemaJudge judge = new JsonSchemaJudge(schema);
+        JsonSchemaJudge judge = new JsonSchemaJudge(() -> buildEvidence("{\"anything\": \"goes\"}"), schema);
 
-        Judgment judgment = judge.judge(buildContext("{\"anything\": \"goes\"}"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
@@ -85,10 +85,10 @@ class JsonSchemaJudgeTest {
     void testValidJsonWithExtraFields() {
         Map<String, Object> schema = Map.of("required", List.of("name"));
 
-        JsonSchemaJudge judge = new JsonSchemaJudge(schema);
+        JsonSchemaJudge judge =
+            new JsonSchemaJudge(() -> buildEvidence("{\"name\": \"John\", \"age\": 30, \"extra\": true}"), schema);
 
-        Judgment judgment = judge.judge(
-            buildContext("{\"name\": \"John\", \"age\": 30, \"extra\": true}"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.PASS, judgment.status());
     }
@@ -97,17 +97,17 @@ class JsonSchemaJudgeTest {
     void testEmptyJsonObject() {
         Map<String, Object> schema = Map.of("required", List.of("name"));
 
-        JsonSchemaJudge judge = new JsonSchemaJudge(schema);
+        JsonSchemaJudge judge = new JsonSchemaJudge(() -> buildEvidence("{}"), schema);
 
-        Judgment judgment = judge.judge(buildContext("{}"));
+        Judgment judgment = judge.judge();
 
         assertEquals(JudgmentStatus.FAIL, judgment.status());
     }
 
-    private JudgmentContext buildContext(String agentOutput) {
-        return JudgmentContext.builder()
-            .goal("test")
-            .agentOutput(agentOutput)
+    private CompletionEvidence buildEvidence(String agentOutput) {
+        return CompletionEvidence.builder()
+            .request("test")
+            .response(agentOutput)
             .build();
     }
 

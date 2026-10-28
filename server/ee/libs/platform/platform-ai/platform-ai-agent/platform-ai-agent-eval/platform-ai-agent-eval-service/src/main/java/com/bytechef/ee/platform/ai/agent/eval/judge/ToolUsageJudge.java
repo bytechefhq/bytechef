@@ -17,12 +17,13 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import io.github.markpollack.judge.DeterministicJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -33,7 +34,7 @@ import tools.jackson.databind.ObjectMapper;
  *
  * @author Ivica Cardic
  */
-final class ToolUsageJudge extends DeterministicJudge {
+final class ToolUsageJudge extends DeterministicJudge<CompletionEvidence> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -42,8 +43,9 @@ final class ToolUsageJudge extends DeterministicJudge {
     private final String position;
     private final String toolName;
 
-    ToolUsageJudge(String toolName, String position, String comparison, int count) {
-        super("ToolUsage", "Checks usage of tool: " + toolName);
+    ToolUsageJudge(Supplier<CompletionEvidence> evidence, String toolName, String position, String comparison,
+        int count) {
+        super(evidence, "ToolUsage", "Checks usage of tool: " + toolName);
 
         this.toolName = Objects.requireNonNull(toolName, "toolName");
         this.position = Objects.requireNonNull(position, "position");
@@ -52,8 +54,8 @@ final class ToolUsageJudge extends DeterministicJudge {
     }
 
     @Override
-    public Judgment judge(JudgmentContext context) {
-        Map<String, Object> metadata = context.metadata();
+    protected Judgment evaluate(CompletionEvidence evidence) {
+        Map<String, Object> metadata = evidence.metadata();
         Object transcriptValue = metadata.get("transcript");
 
         if (transcriptValue == null) {

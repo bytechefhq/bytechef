@@ -17,8 +17,10 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import io.github.markpollack.judge.DeterministicJudge;
-import io.github.markpollack.judge.context.JudgmentContext;
-import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.completion.CompletionEvidence;
+import io.github.markpollack.judge.judgment.Judgment;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -26,22 +28,21 @@ import java.util.regex.PatternSyntaxException;
 /**
  * A deterministic judge that checks whether the agent output matches (or does not match) a regular expression pattern.
  */
-public class RegexMatchJudge extends DeterministicJudge {
+public class RegexMatchJudge extends DeterministicJudge<CompletionEvidence> {
 
     private final String mode;
     private final String pattern;
 
-    public RegexMatchJudge(String pattern, String mode) {
-        super("RegexMatch", "Checks if agent output matches or does not match a regular expression pattern");
+    public RegexMatchJudge(Supplier<CompletionEvidence> evidence, String pattern, String mode) {
+        super(evidence, "RegexMatch", "Checks if agent output matches or does not match a regular expression pattern");
 
         this.pattern = pattern;
         this.mode = mode;
     }
 
     @Override
-    public Judgment judge(JudgmentContext context) {
-        String output = context.agentOutput()
-            .orElse("");
+    protected Judgment evaluate(CompletionEvidence evidence) {
+        String output = Objects.requireNonNullElse(evidence.response(), "");
 
         Pattern compiledPattern;
 
