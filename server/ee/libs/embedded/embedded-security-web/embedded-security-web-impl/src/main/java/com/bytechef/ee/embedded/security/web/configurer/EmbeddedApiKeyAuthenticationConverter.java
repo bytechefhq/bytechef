@@ -21,6 +21,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwsHeader;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -152,10 +153,14 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
     }
 
     private Jws<Claims> getJws(String secretKey, long environmentId) {
-        return Jwts.parser()
-            .keyLocator(new SigningKeyLocator(environmentId, jwtTokenService, signingKeyService))
-            .build()
-            .parseSignedClaims(secretKey);
+        try {
+            return Jwts.parser()
+                .keyLocator(new SigningKeyLocator(environmentId, jwtTokenService, signingKeyService))
+                .build()
+                .parseSignedClaims(secretKey);
+        } catch (JwtException jwtException) {
+            throw new BadCredentialsException("Invalid token", jwtException);
+        }
     }
 
     private record SigningKeyLocator(
@@ -166,16 +171,30 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
         public Key locate(Header header) {
             String keyId = (String) header.get("kid");
 
+            if (keyId == null) {
+                throw new BadCredentialsException("Token has no key id");
+            }
+
             PublicKey publicKey = jwtTokenService.getPublicKey(keyId);
 
             if (publicKey != null) {
                 return publicKey;
             }
 
-            TenantKey tenantKey = TenantKey.parse(keyId);
+            try {
+                TenantKey tenantKey = TenantKey.parse(keyId);
 
-            return TenantContext.callWithTenantId(
-                tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId, environmentId));
+                return TenantContext.callWithTenantId(
+                    tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId, environmentId));
+            } catch (IllegalArgumentException illegalArgumentException) {
+                throw new BadCredentialsException("Unknown key id", illegalArgumentException);
+            } catch (RuntimeException runtimeException) {
+                if (runtimeException.getCause() instanceof IllegalArgumentException illegalArgumentException) {
+                    throw new BadCredentialsException("Unknown key id", illegalArgumentException);
+                }
+
+                throw runtimeException;
+            }
         }
     }
 }

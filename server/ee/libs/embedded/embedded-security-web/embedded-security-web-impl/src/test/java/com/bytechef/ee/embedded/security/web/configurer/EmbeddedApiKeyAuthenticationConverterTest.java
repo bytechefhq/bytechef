@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -298,6 +299,97 @@ class EmbeddedApiKeyAuthenticationConverterTest {
             jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT");
 
         assertThat(token.getEnvironmentId()).isEqualTo(Environment.DEVELOPMENT.ordinal());
+    }
+
+    @Test
+    void testConvertWithJwtTokenWithWrongSignatureThrowsBadCredentialsException() throws NoSuchAlgorithmException {
+        KeyPair keyPair = generateKeyPair();
+
+        String jwtToken = Jwts.builder()
+            .header()
+            .keyId(EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":keyId"))
+            .and()
+            .subject("user-a")
+            .signWith(keyPair.getPrivate())
+            .compact();
+
+        when(signingKeyService.getPublicKey(anyString(), anyLong())).thenReturn(generateKeyPair().getPublic());
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT"))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithJwtTokenWithUnknownKeyIdThrowsBadCredentialsException() throws NoSuchAlgorithmException {
+        KeyPair keyPair = generateKeyPair();
+
+        String jwtToken = Jwts.builder()
+            .header()
+            .keyId(EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":unknown"))
+            .and()
+            .subject("user-a")
+            .signWith(keyPair.getPrivate())
+            .compact();
+
+        when(signingKeyService.getPublicKey(anyString(), anyLong())).thenThrow(
+            new IllegalArgumentException("Signing key not found for keyId: unknown"));
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT"))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithJwtTokenWhenSigningKeyLookupFailsRethrowsTheError() throws NoSuchAlgorithmException {
+        KeyPair keyPair = generateKeyPair();
+
+        String jwtToken = Jwts.builder()
+            .header()
+            .keyId(EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":keyId"))
+            .and()
+            .subject("user-a")
+            .signWith(keyPair.getPrivate())
+            .compact();
+
+        when(signingKeyService.getPublicKey(anyString(), anyLong())).thenThrow(
+            new IllegalStateException("Database unavailable"));
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT"))
+            .isNotInstanceOf(BadCredentialsException.class)
+            .hasRootCauseInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void testConvertWithExpiredJwtTokenThrowsBadCredentialsException() throws NoSuchAlgorithmException {
+        KeyPair keyPair = generateKeyPair();
+
+        String jwtToken = Jwts.builder()
+            .header()
+            .keyId(EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":keyId"))
+            .and()
+            .subject("user-a")
+            .expiration(new Date(System.currentTimeMillis() - 60_000))
+            .signWith(keyPair.getPrivate())
+            .compact();
+
+        when(signingKeyService.getPublicKey(anyString(), anyLong())).thenReturn(keyPair.getPublic());
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT"))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithJwtTokenWithoutKeyIdThrowsBadCredentialsException() throws NoSuchAlgorithmException {
+        KeyPair keyPair = generateKeyPair();
+
+        String jwtToken = Jwts.builder()
+            .subject("user-a")
+            .signWith(keyPair.getPrivate())
+            .compact();
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT"))
+            .isInstanceOf(BadCredentialsException.class);
+
+        verifyNoInteractions(jwtTokenService, signingKeyService);
     }
 
     @Test
