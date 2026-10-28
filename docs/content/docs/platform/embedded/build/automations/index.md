@@ -39,7 +39,6 @@ Each project row displays:
 
 - **Name** -- clicking it opens the project's first template in the editor (or expands the template list if the project has none yet).
 - **Template count** -- a collapsible trigger; click to expand the template list.
-- **Create-template button group** -- a primary "Workflow" button (new from scratch) with a chevron menu containing **Import Workflow**.
 - **Tags** -- inline editable; add or remove tags directly from the row.
 - **Status badge** -- `DRAFT` while unpublished, `V<n> PUBLISHED` once a version has been cut.
 - **Hidden from hub badge** -- shown when the project's **Show in Automation Hub** switch is off.
@@ -47,7 +46,7 @@ Each project row displays:
 
 ### Template row
 
-Inside an expanded project, each template row shows:
+Inside an expanded project, the **Workflows** heading carries the create-template button group: a **New Workflow** button (new from scratch) with a chevron menu containing **Import Workflow**. Each template row below it shows:
 
 - **Label** (or workflow UUID as fallback).
 - **Trigger** -- the first trigger's icon plus a badge with its title.
@@ -80,11 +79,12 @@ If no projects exist yet, the empty state shows a **Create Project** button that
 
 ### Adding templates
 
-From any project row you can:
+From an expanded project's **Workflows** heading you can:
 
-- Click **+ Workflow** to open the new-template dialog. Provide a label and description; the template is created with empty `inputs`, `tasks`, and `triggers`, then opened in the editor.
-- Click the chevron next to **+ Workflow** and pick **Import Workflow** to upload a `.json`, `.yaml`, or `.yml` file. The file's contents become the template definition and the template opens in the editor.
-- Use the project's ⋮ menu for the same two actions plus **Edit** and **Delete**.
+- Click **New Workflow** to open the new-template dialog. Provide a label and description; the template is created with empty `inputs`, `tasks`, and `triggers`, then opened in the editor.
+- Click the chevron next to **New Workflow** and pick **Import Workflow** to upload a `.json`, `.yaml`, or `.yml` file. The file's contents become the template definition and the template opens in the editor.
+
+The project's ⋮ menu offers the same two actions plus **Edit** and **Delete**, and is the way to add the first template to a project that has none (an empty project shows a **Create Workflow** button instead of the heading).
 
 ### Editing or deleting a project
 
