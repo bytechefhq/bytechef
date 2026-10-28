@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.file.storage.aws.service;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
@@ -147,37 +148,23 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException {
-        S3Resource s3Resource = resolveResource(fileEntry);
-
-        try {
-            return s3Resource.getOutputStream();
-        } catch (IOException e) {
-            throw new RuntimeException(
-                "Unable to get output stream for file %s in directory %s".formatted(fileEntry.getName(), directory),
-                e);
-        }
+        return getOutputStream(directory, fileEntry, false);
     }
 
     @Override
     public OutputStream getOutputStream(String directory, FileEntry fileEntry, boolean append)
         throws FileStorageException {
 
-        if (!append) {
-            return getOutputStream(directory, fileEntry);
-        }
+        byte[] existingContent = append ? readFileToBytes(directory, fileEntry) : null;
 
         S3Resource s3Resource = resolveResource(fileEntry);
 
         try {
-            byte[] existingContent;
+            OutputStream outputStream = EncodingUtils.base64EncodingOutputStream(s3Resource.getOutputStream());
 
-            try (InputStream inputStream = s3Resource.getInputStream()) {
-                existingContent = inputStream.readAllBytes();
+            if (existingContent != null) {
+                outputStream.write(existingContent);
             }
-
-            OutputStream outputStream = s3Resource.getOutputStream();
-
-            outputStream.write(existingContent);
 
             return outputStream;
         } catch (IOException | SdkException exception) {

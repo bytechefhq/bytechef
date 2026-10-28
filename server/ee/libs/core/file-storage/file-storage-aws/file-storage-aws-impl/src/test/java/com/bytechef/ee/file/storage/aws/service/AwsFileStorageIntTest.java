@@ -20,6 +20,7 @@ import com.bytechef.tenant.TenantContext;
 import io.awspring.cloud.s3.S3Template;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -379,6 +380,43 @@ class AwsFileStorageIntTest {
             .untilAsserted(() -> {
                 assertThat(storageService.readFileToString(DIR_PATH, newFileEntry)).isEqualTo("Updated content");
             });
+    }
+
+    @Test
+    void getOutputStreamReplacesTheContentReadBack() throws IOException {
+        FileEntry fileEntry = storageService.storeFileContent("ReplaceDirectory", KEY, "Hello");
+
+        try (OutputStream outputStream = storageService.getOutputStream("ReplaceDirectory", fileEntry, false)) {
+            outputStream.write("Bye".getBytes(StandardCharsets.UTF_8));
+        }
+
+        assertThat(storageService.readFileToString("ReplaceDirectory", fileEntry)).isEqualTo("Bye");
+    }
+
+    @Test
+    void getOutputStreamWithAppendKeepsTheExistingContent() throws IOException {
+        FileEntry fileEntry = storageService.storeFileContent("AppendDirectory", KEY, "Hello");
+
+        try (OutputStream outputStream = storageService.getOutputStream("AppendDirectory", fileEntry, true)) {
+            outputStream.write(" World".getBytes(StandardCharsets.UTF_8));
+        }
+
+        assertThat(storageService.readFileToString("AppendDirectory", fileEntry)).isEqualTo("Hello World");
+    }
+
+    @Test
+    void getOutputStreamWithAppendAppendsToContentWrittenThroughAnOutputStream() throws IOException {
+        FileEntry fileEntry = storageService.storeFileContent("StreamAppendDirectory", KEY, "");
+
+        try (OutputStream outputStream = storageService.getOutputStream("StreamAppendDirectory", fileEntry, false)) {
+            outputStream.write("Hello".getBytes(StandardCharsets.UTF_8));
+        }
+
+        try (OutputStream outputStream = storageService.getOutputStream("StreamAppendDirectory", fileEntry, true)) {
+            outputStream.write(" World".getBytes(StandardCharsets.UTF_8));
+        }
+
+        assertThat(storageService.readFileToString("StreamAppendDirectory", fileEntry)).isEqualTo("Hello World");
     }
 
     private void putRawObject(String path, String content) {
