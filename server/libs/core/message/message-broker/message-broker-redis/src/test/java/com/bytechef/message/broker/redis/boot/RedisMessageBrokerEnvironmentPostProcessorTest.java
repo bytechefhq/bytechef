@@ -51,6 +51,17 @@ class RedisMessageBrokerEnvironmentPostProcessorTest {
     }
 
     @Test
+    void testPostProcessEnvironmentRemovesDataRedisAutoConfigurationExclusionForUppercaseRedisProvider() {
+        StandardEnvironment environment = createEnvironment("REDIS");
+
+        redisMessageBrokerEnvironmentPostProcessor.postProcessEnvironment(environment, new SpringApplication());
+
+        assertThat(environment.getProperty("spring.autoconfigure.exclude"))
+            .doesNotContain("DataRedisAutoConfiguration");
+        assertThat(environment.getProperty("management.health.redis.enabled", Boolean.class)).isTrue();
+    }
+
+    @Test
     void testPostProcessEnvironmentKeepsDataRedisAutoConfigurationExclusionForAmqpProvider() {
         StandardEnvironment environment = createEnvironment("amqp");
 
