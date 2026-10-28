@@ -59,7 +59,7 @@ public class PlatformCoordinatorConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "bytechef.observability.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "bytechef.observability.metrics.enabled", havingValue = "true")
     JobExecutionCounter jobExecutionCounter(MeterRegistry meterRegistry) {
         return new JobExecutionCounter(meterRegistry);
     }
