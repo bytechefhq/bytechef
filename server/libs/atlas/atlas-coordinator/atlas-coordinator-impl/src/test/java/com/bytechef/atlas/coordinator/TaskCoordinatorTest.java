@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -35,6 +36,9 @@ import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -94,6 +98,51 @@ class TaskCoordinatorTest {
         taskCoordinator.onTaskExecutionCompleteEvent(new TaskExecutionCompleteEvent(completedTaskExecution));
 
         verify(taskCompletionHandler).handle(completedTaskExecution);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testApplicationEventReachesRemainingListenersWhenOneListenerThrows() {
+        ApplicationEventListener failingApplicationEventListener = mock(ApplicationEventListener.class);
+        ApplicationEventListener applicationEventListener = mock(ApplicationEventListener.class);
+        JobStatusApplicationEvent jobStatusApplicationEvent = new JobStatusApplicationEvent(4567L, Job.Status.FAILED);
+
+        doThrow(new IllegalStateException("No notification sender available"))
+            .when(failingApplicationEventListener)
+            .onApplicationEvent(jobStatusApplicationEvent);
+
+        TaskCoordinator listeningTaskCoordinator = new TaskCoordinator(
+            List.of(failingApplicationEventListener, applicationEventListener), List.of(),
+            mock(ApplicationEventPublisher.class), mock(JobExecutor.class), mock(JobService.class),
+            taskCompletionHandler, (TaskDispatcher<? super Task>) mock(TaskDispatcher.class), taskExecutionService);
+
+        listeningTaskCoordinator.onApplicationEvent(jobStatusApplicationEvent);
+
+        verify(failingApplicationEventListener).onApplicationEvent(jobStatusApplicationEvent);
+        verify(applicationEventListener).onApplicationEvent(jobStatusApplicationEvent);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testErrorEventReachesRemainingListenersWhenOneListenerThrows() {
+        ErrorEventListener failingErrorEventListener = mock(ErrorEventListener.class);
+        ErrorEventListener errorEventListener = mock(ErrorEventListener.class);
+        TaskExecutionErrorEvent taskExecutionErrorEvent = new TaskExecutionErrorEvent(
+            createTaskExecution(TaskExecution.Status.FAILED));
+
+        doThrow(new IllegalStateException("Error listener failed"))
+            .when(failingErrorEventListener)
+            .onErrorEvent(taskExecutionErrorEvent);
+
+        TaskCoordinator listeningTaskCoordinator = new TaskCoordinator(
+            List.of(), List.of(failingErrorEventListener, errorEventListener), mock(ApplicationEventPublisher.class),
+            mock(JobExecutor.class), mock(JobService.class), taskCompletionHandler,
+            (TaskDispatcher<? super Task>) mock(TaskDispatcher.class), taskExecutionService);
+
+        listeningTaskCoordinator.onErrorEvent(taskExecutionErrorEvent);
+
+        verify(failingErrorEventListener).onErrorEvent(taskExecutionErrorEvent);
+        verify(errorEventListener).onErrorEvent(taskExecutionErrorEvent);
     }
 
     @Test

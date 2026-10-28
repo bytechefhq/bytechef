@@ -102,7 +102,16 @@ public class TaskCoordinator {
         }
 
         for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
-            applicationEventListener.onApplicationEvent(applicationEvent);
+            try {
+                applicationEventListener.onApplicationEvent(applicationEvent);
+            } catch (Exception exception) {
+                Class<? extends ApplicationEventListener> applicationEventListenerClass =
+                    applicationEventListener.getClass();
+
+                log.error(
+                    "Application event listener {} failed to handle {}", applicationEventListenerClass.getName(),
+                    applicationEvent, exception);
+            }
         }
     }
 
@@ -112,7 +121,15 @@ public class TaskCoordinator {
         }
 
         for (ErrorEventListener errorEventListener : errorEventListeners) {
-            errorEventListener.onErrorEvent(errorEvent);
+            try {
+                errorEventListener.onErrorEvent(errorEvent);
+            } catch (Exception exception) {
+                Class<? extends ErrorEventListener> errorEventListenerClass = errorEventListener.getClass();
+
+                log.error(
+                    "Error event listener {} failed to handle {}", errorEventListenerClass.getName(), errorEvent,
+                    exception);
+            }
         }
     }
 
