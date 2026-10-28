@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.remote.grpc;
 
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
+import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
@@ -63,6 +64,13 @@ public class EmbeddedConfigurationGrpcServerConfiguration {
         ConnectedUserProjectFacade connectedUserProjectFacade) {
 
         return new ConnectedUserProjectFacadeRemoteServiceGrpcServer(connectedUserProjectFacade);
+    }
+
+    @Bean
+    ConnectedUserWorkflowCopyResolverRemoteServiceGrpcServer connectedUserWorkflowCopyResolverRemoteServiceGrpcServer(
+        ConnectedUserWorkflowCopyResolver connectedUserWorkflowCopyResolver) {
+
+        return new ConnectedUserWorkflowCopyResolverRemoteServiceGrpcServer(connectedUserWorkflowCopyResolver);
     }
 
     @Bean

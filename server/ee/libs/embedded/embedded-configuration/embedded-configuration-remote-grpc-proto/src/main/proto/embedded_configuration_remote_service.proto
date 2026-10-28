@@ -91,6 +91,10 @@ service ConnectedUserProjectFacadeRemoteService {
   rpc CopyWorkflowTemplate(CopyWorkflowTemplateRequest) returns (StringResponse);
 }
 
+service ConnectedUserWorkflowCopyResolverRemoteService {
+  rpc GetWorkflowCopyUuids(WorkflowUuidRequest) returns (StringsResponse);
+}
+
 message IdRequest {
   int64 id = 1;
 }
@@ -155,6 +159,10 @@ message StringResponse {
 
 message OptionalStringResponse {
   optional string value = 1;
+}
+
+message StringsResponse {
+  repeated string values = 1;
 }
 
 message RemoteIntegration {
