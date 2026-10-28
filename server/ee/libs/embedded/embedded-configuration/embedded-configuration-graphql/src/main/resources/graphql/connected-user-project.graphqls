@@ -24,7 +24,9 @@ type ConnectedUserProject {
 
 type ConnectedUserProjectWorkflow {
     id: ID!
+    automationWorkflowUuid: ID
     connectedUserId: ID!
+    copiedFromWorkflowUuid: ID
     enabled: Boolean!
     lastExecutionDate: String
     projectId: ID!
