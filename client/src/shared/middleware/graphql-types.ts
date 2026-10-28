@@ -497,7 +497,6 @@ export enum AuthorizationType {
 
 export type AutomationWorkflowProject = {
   __typename?: 'AutomationWorkflowProject';
-  automationHubVisible: Scalars['Boolean']['output'];
   categoryId?: Maybe<Scalars['ID']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -521,6 +520,25 @@ export type AutomationWorkflowProjectComponent = {
   icon?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   title?: Maybe<Scalars['String']['output']>;
+};
+
+export type AutomationWorkflowProjectConfiguration = {
+  __typename?: 'AutomationWorkflowProjectConfiguration';
+  automationHubVisible: Scalars['Boolean']['output'];
+  enabled: Scalars['Boolean']['output'];
+  environmentId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  projectId: Scalars['ID']['output'];
+  projectVersion: Scalars['Int']['output'];
+  workflows: Array<AutomationWorkflowProjectConfigurationWorkflow>;
+};
+
+export type AutomationWorkflowProjectConfigurationWorkflow = {
+  __typename?: 'AutomationWorkflowProjectConfigurationWorkflow';
+  enabled: Scalars['Boolean']['output'];
+  label?: Maybe<Scalars['String']['output']>;
+  workflowUuid: Scalars['ID']['output'];
 };
 
 export type AutomationWorkflowProjectTag = {
@@ -1657,6 +1675,7 @@ export type Mutation = {
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
   createAutomationWorkflowProject: Scalars['ID']['output'];
+  createAutomationWorkflowProjectConfiguration: Scalars['ID']['output'];
   createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   createDataTable: Scalars['Boolean']['output'];
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -1691,6 +1710,7 @@ export type Mutation = {
   deleteApiKey: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
   deleteAutomationWorkflowProject: Scalars['Boolean']['output'];
+  deleteAutomationWorkflowProjectConfiguration: Scalars['Boolean']['output'];
   deleteAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   deleteConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -1722,6 +1742,8 @@ export type Mutation = {
   duplicateAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
   enableApiConnector: Scalars['Boolean']['output'];
+  enableAutomationWorkflowProjectConfiguration: Scalars['Boolean']['output'];
+  enableAutomationWorkflowProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   enableConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -1776,6 +1798,7 @@ export type Mutation = {
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
   updateAutomationWorkflowProject: Scalars['Boolean']['output'];
+  updateAutomationWorkflowProjectConfiguration: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
@@ -1919,12 +1942,20 @@ export type MutationCreateApprovalTaskArgs = {
 
 
 export type MutationCreateAutomationWorkflowProjectArgs = {
-  automationHubVisible?: InputMaybe<Scalars['Boolean']['input']>;
   category?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationCreateAutomationWorkflowProjectConfigurationArgs = {
+  automationHubVisible: Scalars['Boolean']['input'];
+  enabled: Scalars['Boolean']['input'];
+  environmentId: Scalars['ID']['input'];
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
 };
 
 
@@ -2073,6 +2104,11 @@ export type MutationDeleteApprovalTaskArgs = {
 
 
 export type MutationDeleteAutomationWorkflowProjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAutomationWorkflowProjectConfigurationArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2231,6 +2267,19 @@ export type MutationDuplicateDataTableArgs = {
 export type MutationEnableApiConnectorArgs = {
   enable: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableAutomationWorkflowProjectConfigurationArgs = {
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableAutomationWorkflowProjectConfigurationWorkflowArgs = {
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+  workflowUuid: Scalars['ID']['input'];
 };
 
 
@@ -2529,13 +2578,20 @@ export type MutationUpdateApprovalTaskArgs = {
 
 
 export type MutationUpdateAutomationWorkflowProjectArgs = {
-  automationHubVisible?: InputMaybe<Scalars['Boolean']['input']>;
   category?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationUpdateAutomationWorkflowProjectConfigurationArgs = {
+  automationHubVisible: Scalars['Boolean']['input'];
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
 };
 
 
@@ -3024,6 +3080,7 @@ export type Query = {
   authorities: Array<Scalars['String']['output']>;
   automationSearch: Array<SearchResult>;
   automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
+  automationWorkflowProjectConfigurations: Array<AutomationWorkflowProjectConfiguration>;
   automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
   automationWorkflowProjectVersions: Array<AutomationWorkflowProjectVersion>;
   automationWorkflowProjects: Array<AutomationWorkflowProject>;
@@ -3300,6 +3357,11 @@ export type QueryApprovalTasksByIdsArgs = {
 export type QueryAutomationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationsArgs = {
+  projectId: Scalars['ID']['input'];
 };
 
 
