@@ -8,6 +8,7 @@ An **automation code workflow** lets you author a [code workflow](/platform/auto
 - a `ProjectHandler` artifact, the same contract a standalone automation project uses - and make it
 invocable by your connected users, without hand-authoring it in the visual [Automation Workflow
 editor](/platform/embedded/build/automations) and without giving every connected user their own private copy.
+A deployed workflow reaches connected users only through an enabled configuration in their environment.
 
 The artifact itself says nothing about being "embedded". What makes it embedded-servable is **which
 endpoint you deploy it through**:
@@ -25,6 +26,10 @@ Unlike the visual bridge - where each connected user gets their own **copy** of 
 - a code workflow is deployed **once** into a shared catalog project, and every connected user holds
 a **reference** to it. Code is not something a connected user can edit per-user, so a copy would only
 duplicate the same container for no benefit.
+
+Nothing is exposed to connected users until the environment has an enabled
+[configuration](/platform/embedded/build/automations#configurations) pointing at a published version,
+or the deploy passes the `release` flag (below).
 
 Practically:
 
@@ -109,8 +114,8 @@ reference is enabled, so a workflow with required inputs comes out enabled in on
   workflow the connected user can't see returns `404`.
 
 Calling provision again for an existing reference doesn't re-run auto-wiring. It only catches the
-reference up to the version its environment's configuration points at and, if the body names connections or inputs, applies
-them. It keeps the reference's enabled state.
+reference up to the version its environment's configuration points at and, if the body names
+connections or inputs, applies them. It keeps the reference's enabled state.
 
 De-provisioning removes the reference (and its per-node connection wiring) outright:
 
@@ -125,8 +130,8 @@ A reference is addressed by its catalog workflow uuid on the same workflow endpo
 - `DELETE /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable` disables the
   reference and keeps it, with its connections and input values.
 - `POST /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable` enables it. The
-  reference first catches up to the version its environment's configuration points at, then its connections
-  are resolved again against the connected user's current connections - so a connection created
+  reference first catches up to the version its environment's configuration points at, then its
+  connections are resolved again against the connected user's current connections - so a connection created
   after provisioning is picked up here. A missing connection returns `409`
   `{"missingConnectionComponentName": ...}`, a required input without a value returns `409`
   `{"missingInputName": ...}`, and the reference stays disabled.
@@ -140,19 +145,26 @@ dangling. The frontend routes (without `{externalUserId}`, with the end user's J
 
 ## Dangling references
 
-If a published version no longer contains a workflow a connected user is referencing, or the catalog
-project is deleted, their reference doesn't silently disappear and doesn't silently keep running
+If the version an environment's configuration points at no longer contains a workflow a connected
+user is referencing (for example after the configuration is moved to a version that dropped it), or
+the catalog project is deleted, their reference doesn't silently disappear and doesn't silently keep running
 against a nonexistent workflow. It flips to a **dangling** state and is disabled:
 
 - Invisible to both invocation endpoints - a dangling reference behaves exactly like a disabled one
   to a caller (same `404`, no existence leak).
-- Still listed for the connected user, carrying a reason: `"Removed from the catalog project on
-  publish"` when a published version drops the workflow, or `"The catalog project was deleted"`.
+- Still listed for the connected user, carrying a reason: `"Removed from the automation workflow project on
+  publish"` when the version drops the workflow, or `"The automation workflow project was
+  deleted"`.
 - The connected user's connection configuration is preserved on the row, so nothing is lost even
   though the row itself stops being usable.
 
 Dangling is permanent for that reference row - nothing currently clears the flag, and enabling it
-fails. Disabling a dangling reference removes its deployment entry but keeps the row. Uuid carry-forward
+fails. It is different from the recoverable **turned off by the administrator** state: when an
+administrator disables the environment's configuration or one of its workflows, or deletes the
+configuration, the reference is switched off and marked as needing attention with that reason. Its
+connections and inputs are kept, the user's own enabled choice is untouched, and turning the
+configuration or workflow back on, or recreating the configuration, restores the reference exactly as
+the user had it. Disabling a dangling reference removes its deployment entry but keeps the row. Uuid carry-forward
 only spans one deploy of history: if you restore a same-named workflow in a *later* deploy (after an
 intervening deploy that dropped it), the restored workflow gets a **new** uuid, not the one the
 dangling reference still points at. Recovering means de-provisioning the dangling reference and
@@ -164,7 +176,8 @@ redeploy of one catalog project never dangles a reference into a different catal
 
 ## Limits
 
-- **No per-user version pinning.** Releasing a version upgrades every referencing user in that environment at once; there's no way
+- **No per-user version pinning.** Releasing a version upgrades every referencing user in that environment at once; there's no
+  way
   to keep one connected user on an older version of the workflow while others move to a new one.
 - **No per-user editing.** A reference has no definition of its own - the workflow update/edit APIs
   reject reference rows outright. If a connected user needs their own customized copy, that's what
