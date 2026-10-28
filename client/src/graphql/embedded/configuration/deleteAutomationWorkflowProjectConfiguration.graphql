@@ -1,0 +1,3 @@
+mutation deleteAutomationWorkflowProjectConfiguration($id: ID!) {
+    deleteAutomationWorkflowProjectConfiguration(id: $id)
+}

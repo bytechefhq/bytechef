@@ -1,0 +1,3 @@
+mutation createAutomationWorkflowProjectConfiguration($projectId: ID!, $environmentId: ID!, $projectVersion: Int!, $enabled: Boolean!, $automationHubVisible: Boolean!) {
+    createAutomationWorkflowProjectConfiguration(projectId: $projectId, environmentId: $environmentId, projectVersion: $projectVersion, enabled: $enabled, automationHubVisible: $automationHubVisible)
+}
