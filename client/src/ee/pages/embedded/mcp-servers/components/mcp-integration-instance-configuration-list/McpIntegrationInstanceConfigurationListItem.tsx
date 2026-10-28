@@ -47,7 +47,7 @@ const McpIntegrationInstanceConfigurationListItem = ({
                 onOpenChange={setExpanded}
                 open={expanded}
             >
-                <div className="relative flex items-center gap-2.5 px-3 py-2.5">
+                <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
                     <CollapsibleTrigger asChild>
                         <button
                             aria-label={expanded ? 'Collapse integration' : 'Expand integration'}
@@ -113,6 +113,10 @@ const McpIntegrationInstanceConfigurationListItem = ({
                     <div className="border-t border-border/50 px-3 py-2 pl-10">
                         <McpIntegrationInstanceConfigurationWorkflowList
                             componentName={mcpIntegrationInstanceConfiguration.integration?.componentName || ''}
+                            integrationInstanceConfigurationName={
+                                mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationName ?? undefined
+                            }
+                            integrationVersion={mcpIntegrationInstanceConfiguration.integrationVersion ?? undefined}
                             mcpIntegrationInstanceConfigurationWorkflows={
                                 mcpIntegrationInstanceConfiguration.mcpIntegrationInstanceConfigurationWorkflows
                             }

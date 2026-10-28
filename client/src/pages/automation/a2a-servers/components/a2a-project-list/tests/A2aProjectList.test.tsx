@@ -1,3 +1,5 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import {A2aServer} from '@/shared/middleware/graphql';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -12,6 +14,8 @@ const hoisted = vi.hoisted(() => ({
     invalidateQueries: vi.fn(),
     isError: false,
     isLoading: false,
+    openProject: vi.fn(),
+    openProjectWorkflow: vi.fn(),
     updateEnabledMutate: vi.fn(),
     updateMutate: vi.fn(),
     updateParametersMutate: vi.fn(),
@@ -112,6 +116,36 @@ vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
     }),
 }));
 
+vi.mock('@/shared/queries/automation/workflows.queries', () => ({
+    useGetWorkflowQuery: (workflowId: string, enabled: boolean) => ({
+        data:
+            enabled && workflowId === 'workflow-a'
+                ? {
+                      id: 'workflow-a',
+                      label: 'Lead intake',
+                      workflowTaskComponentNames: ['slack'],
+                      workflowTriggerComponentNames: ['webhook'],
+                      workflowUuid: 'uuid-a',
+                  }
+                : undefined,
+    }),
+}));
+
+vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
+    default: () => ({openProject: hoisted.openProject, openProjectWorkflow: hoisted.openProjectWorkflow}),
+}));
+
+vi.mock('@/shared/hooks/useWorkflowComponentDefinitions', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useWorkflowComponentDefinitions')>()),
+    default: () => ({workflowComponentDefinitions: {}, workflowTaskDispatcherDefinitions: {}}),
+}));
+
+vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
+    default: ({filteredComponentNames}: {filteredComponentNames?: string[]}) => (
+        <div data-testid="trigger-and-components-row">{filteredComponentNames?.join(',')}</div>
+    ),
+}));
+
 vi.mock('@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog', () => ({
     default: ({
         filterWorkflowUuids,
@@ -167,12 +201,60 @@ describe('A2aProjectList', () => {
         hoisted.invalidateQueries.mockReset();
         hoisted.isError = false;
         hoisted.isLoading = false;
+        hoisted.openProject.mockReset();
+        hoisted.openProjectWorkflow.mockReset();
         hoisted.updateEnabledMutate.mockReset();
         hoisted.updateMutate.mockReset();
+
+        useProjectDeploymentWorkflowSheetStore.setState({
+            projectDeploymentId: undefined,
+            projectDeploymentWorkflowSheetOpen: false,
+            projectId: undefined,
+            projectName: undefined,
+            projectVersion: undefined,
+            workflow: undefined,
+        });
+    });
+
+    it('opens the project of a server entry in the project editor', async () => {
+        const user = userEvent.setup();
+
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
+
+        await user.click(screen.getAllByRole('button', {name: 'Open project'})[0]);
+
+        expect(hoisted.openProject).toHaveBeenCalledWith(5);
+    });
+
+    it("opens a workflow's executions in the deployment sheet and the workflow in its project", async () => {
+        const user = userEvent.setup();
+
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
+
+        await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
+
+        expect(screen.getByTestId('trigger-and-components-row')).toHaveTextContent('webhook,slack');
+
+        await user.click(screen.getByRole('button', {name: 'Lead intake'}));
+
+        const state = useProjectDeploymentWorkflowSheetStore.getState();
+
+        expect(state.projectDeploymentWorkflowSheetOpen).toBe(true);
+        expect(state.projectDeploymentId).toBe(31);
+        expect(state.projectId).toBe(5);
+        expect(state.projectName).toBe('Sales project');
+        expect(state.projectVersion).toBe(2);
+        expect(state.workflow?.id).toBe('workflow-a');
+
+        await user.click(screen.getByRole('button', {name: 'Open in project'}));
+
+        expect(hoisted.openProjectWorkflow).toHaveBeenCalledWith(5, 'uuid-a');
+
+        expect(screen.getByRole('button', {name: 'Follow up'})).toBeDisabled();
     });
 
     it('lists every project of the server', () => {
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         expect(screen.getByText('Sales project')).toBeInTheDocument();
         expect(screen.getByText('Support project')).toBeInTheDocument();
@@ -183,7 +265,7 @@ describe('A2aProjectList', () => {
     it('shows a loading state', () => {
         hoisted.isLoading = true;
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         expect(screen.getByText('Loading projects...')).toBeInTheDocument();
     });
@@ -191,7 +273,7 @@ describe('A2aProjectList', () => {
     it('shows an error state', () => {
         hoisted.isError = true;
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         expect(screen.getByText('The projects of this server could not be loaded.')).toBeInTheDocument();
     });
@@ -199,7 +281,7 @@ describe('A2aProjectList', () => {
     it('shows when a project was last modified', () => {
         hoisted.a2aProjects = [salesA2aProject, supportA2aProject];
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         const lastModifiedDate = new Date(Date.UTC(2026, 8, 7, 19, 20, 7));
 
@@ -214,7 +296,7 @@ describe('A2aProjectList', () => {
     it('renders nothing when the server has no projects', () => {
         hoisted.a2aProjects = [];
 
-        const {container} = render(<A2aProjectList a2aServer={a2aServer} />);
+        const {container} = render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         expect(container).toBeEmptyDOMElement();
     });
@@ -222,7 +304,7 @@ describe('A2aProjectList', () => {
     it('opens the workflows dialog for the chosen project', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Project actions'})[1]);
         await user.click(await screen.findByRole('menuitem', {name: 'Edit Workflows'}));
@@ -233,7 +315,7 @@ describe('A2aProjectList', () => {
     it('deletes the chosen project only after confirmation', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Project actions'})[0]);
         await user.click(await screen.findByRole('menuitem', {name: 'Delete'}));
@@ -251,7 +333,7 @@ describe('A2aProjectList', () => {
     it('lists the workflows of a project once it is expanded', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         expect(screen.queryByText('Lead intake')).not.toBeInTheDocument();
 
@@ -266,7 +348,7 @@ describe('A2aProjectList', () => {
     it('removes one workflow and keeps the rest of the project', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
         await user.click(screen.getByRole('button', {name: 'Lead intake actions'}));
@@ -286,7 +368,7 @@ describe('A2aProjectList', () => {
     it('deletes the project when its last workflow is removed', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[1]);
         await user.click(screen.getByRole('button', {name: 'Triage actions'}));
@@ -301,7 +383,7 @@ describe('A2aProjectList', () => {
     it('changes the project version of the chosen project through its deployment', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Project actions'})[0]);
         await user.click(await screen.findByRole('menuitem', {name: 'Change Project Version'}));
@@ -312,7 +394,7 @@ describe('A2aProjectList', () => {
     it('enables and disables a workflow from its toggle', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
 
@@ -327,7 +409,7 @@ describe('A2aProjectList', () => {
     it('edits only the chosen workflow from its actions menu', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
         await user.click(screen.getByRole('button', {name: 'Lead intake actions'}));
@@ -340,7 +422,7 @@ describe('A2aProjectList', () => {
     it('configures the skill of a workflow from the Configure button before its toggle', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
 
@@ -371,7 +453,7 @@ describe('A2aProjectList', () => {
     it('closes the skill popover without saving', async () => {
         const user = userEvent.setup();
 
-        render(<A2aProjectList a2aServer={a2aServer} />);
+        render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
 

@@ -1,6 +1,9 @@
 import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
-import {useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/middleware/graphql';
+import {
+    useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation,
+    useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
 
@@ -51,6 +54,22 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowListItem(
             },
         });
 
+    const updateMcpIntegrationInstanceConfigurationWorkflowMutation =
+        useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation({
+            onSuccess: () => {
+                void queryClient.invalidateQueries({
+                    queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
+                });
+            },
+        });
+
+    const handleEnabledChange = (enabled: boolean) => {
+        updateMcpIntegrationInstanceConfigurationWorkflowMutation.mutate({
+            id: mcpIntegrationInstanceConfigurationWorkflow.id,
+            input: {enabled},
+        });
+    };
+
     const handleCloseEditDialog = () => {
         setShowEditWorkflowDialog(false);
 
@@ -68,8 +87,10 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowListItem(
     return {
         handleCloseEditDialog,
         handleConfirmDelete,
+        handleEnabledChange,
         integrationInstanceConfigurationWorkflow,
         isDeletePending: deleteMcpIntegrationInstanceConfigurationWorkflowMutation.isPending,
+        isEnablePending: updateMcpIntegrationInstanceConfigurationWorkflowMutation.isPending,
         setShowDeleteDialog,
         setShowEditWorkflowDialog,
         showDeleteDialog,

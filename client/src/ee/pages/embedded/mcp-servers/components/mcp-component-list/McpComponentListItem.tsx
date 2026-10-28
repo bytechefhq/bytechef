@@ -21,7 +21,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
 
     return (
         <Collapsible className="group rounded-md border border-border/50" onOpenChange={setExpanded} open={expanded}>
-            <div className="relative flex items-center gap-2.5 px-3 py-2.5">
+            <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
                 <CollapsibleTrigger asChild>
                     <button
                         aria-label={expanded ? 'Hide tools' : 'Show tools'}

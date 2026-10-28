@@ -1,6 +1,9 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -71,7 +74,11 @@ const McpServers = () => {
         >
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>
                 {filteredMcpServers.length > 0 ? (
-                    <McpServerList mcpServers={filteredMcpServers as McpServer[]} tags={tags} />
+                    <WorkflowReadOnlyProvider value={{useGetComponentDefinitionsQuery}}>
+                        <McpServerList mcpServers={filteredMcpServers as McpServer[]} tags={tags} />
+
+                        <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
+                    </WorkflowReadOnlyProvider>
                 ) : (
                     <EmptyList
                         button={
