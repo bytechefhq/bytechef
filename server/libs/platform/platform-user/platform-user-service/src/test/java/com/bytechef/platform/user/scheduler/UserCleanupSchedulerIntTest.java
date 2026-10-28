@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.job;
+package com.bytechef.platform.user.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,7 +41,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,13 +53,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest(classes = UserIntTestConfiguration.class)
 @Transactional
-class UserCleanupJobIntTest {
+class UserCleanupSchedulerIntTest {
 
     @Autowired
     private PersistentTokenRepository persistentTokenRepository;
 
     @Autowired
-    private UserCleanupJob userCleanupJob;
+    private UserCleanupScheduler userCleanupScheduler;
 
     @Autowired
     private UserRepository userRepository;
@@ -95,7 +98,7 @@ class UserCleanupJobIntTest {
 
         when(tenantService.isMultiTenantEnabled()).thenReturn(false);
 
-        userCleanupJob.removeOldPersistentTokens();
+        userCleanupScheduler.removeOldPersistentTokens();
 
         assertThat(persistentTokenRepository.findAllByUserId(user.getId()))
             .extracting(PersistentToken::getSeries)
@@ -115,7 +118,7 @@ class UserCleanupJobIntTest {
             .when(userService)
             .removeOldPersistentTokens();
 
-        userCleanupJob.removeOldPersistentTokens();
+        userCleanupScheduler.removeOldPersistentTokens();
 
         assertThat(cleanedTenantIds).containsExactly("000001", "000002");
     }
@@ -141,9 +144,35 @@ class UserCleanupJobIntTest {
             .when(userService)
             .removeNotActivatedUsers();
 
-        userCleanupJob.removeNotActivatedUsers();
+        userCleanupScheduler.removeNotActivatedUsers();
 
         assertThat(cleanedTenantIds).containsExactly("000002");
+    }
+
+    @Test
+    void testCronExpressionsAreUnchanged() throws NoSuchMethodException {
+        Scheduled removeOldPersistentTokens = UserCleanupScheduler.class
+            .getMethod("removeOldPersistentTokens")
+            .getAnnotation(Scheduled.class);
+        Scheduled removeNotActivatedUsers = UserCleanupScheduler.class
+            .getMethod("removeNotActivatedUsers")
+            .getAnnotation(Scheduled.class);
+
+        assertThat(removeOldPersistentTokens.cron()).isEqualTo("0 0 0 * * ?");
+        assertThat(removeNotActivatedUsers.cron()).isEqualTo("0 0 1 * * ?");
+    }
+
+    @Test
+    void testRegisteredOnCoordinatorOnly() {
+        ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
+            .withUserConfiguration(UserCleanupScheduler.class)
+            .withBean(TenantService.class, () -> mock(TenantService.class))
+            .withBean(UserService.class, () -> mock(UserService.class));
+
+        applicationContextRunner.run(context -> assertThat(context).hasSingleBean(UserCleanupScheduler.class));
+
+        applicationContextRunner.withPropertyValues("bytechef.coordinator.enabled=false")
+            .run(context -> assertThat(context).doesNotHaveBean(UserCleanupScheduler.class));
     }
 
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
