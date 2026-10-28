@@ -97,4 +97,36 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         expect(screen.getByRole('option', {name: 'V3'})).toBeInTheDocument();
         expect(screen.queryByRole('option', {name: 'V2'})).not.toBeInTheDocument();
     });
+
+    it('warns that moving to an older version disconnects automations it lacks', async () => {
+        const user = userEvent.setup();
+
+        const configuration = {
+            automationHubVisible: true,
+            enabled: true,
+            environmentId: '2',
+            id: 'configuration-1',
+            lastModifiedDate: null,
+            projectId: 'project-1',
+            projectVersion: 3,
+            workflows: [],
+        };
+
+        render(
+            <AutomationWorkflowProjectConfigurationDialog
+                configuration={configuration}
+                onClose={vi.fn()}
+                project={project}
+            />
+        );
+
+        const warningText = 'Connected users whose automations are not in this version will be disconnected from them.';
+
+        expect(screen.queryByText(warningText)).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('combobox', {name: 'Version'}));
+        await user.click(await screen.findByRole('option', {name: 'V1'}));
+
+        expect(await screen.findByText(warningText)).toBeInTheDocument();
+    });
 });
