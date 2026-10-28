@@ -21,8 +21,7 @@ import org.jspecify.annotations.Nullable;
  */
 public interface AutomationWorkflowProjectService {
 
-    AutomationWorkflowProject create(
-        long projectId, @Nullable String permissionExpression, boolean automationHubVisible);
+    AutomationWorkflowProject create(long projectId, @Nullable String permissionExpression);
 
     void delete(long projectId);
 
@@ -33,8 +32,6 @@ public interface AutomationWorkflowProjectService {
     List<AutomationWorkflowProject> getAutomationWorkflowProjects();
 
     Map<UUID, String> getWorkflowPermissionExpressions(long projectId);
-
-    void updateAutomationHubVisible(long projectId, boolean automationHubVisible);
 
     void updatePermissionExpression(long projectId, @Nullable String permissionExpression);
 

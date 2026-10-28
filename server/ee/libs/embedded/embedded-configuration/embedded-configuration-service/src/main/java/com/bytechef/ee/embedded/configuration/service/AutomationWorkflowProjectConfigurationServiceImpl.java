@@ -1,0 +1,128 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.configuration.service;
+
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectConfigurationRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Service
+@Transactional
+@ConditionalOnEEVersion
+public class AutomationWorkflowProjectConfigurationServiceImpl
+    implements AutomationWorkflowProjectConfigurationService {
+
+    private final AutomationWorkflowProjectConfigurationRepository automationWorkflowProjectConfigurationRepository;
+
+    @SuppressFBWarnings("EI")
+    public AutomationWorkflowProjectConfigurationServiceImpl(
+        AutomationWorkflowProjectConfigurationRepository automationWorkflowProjectConfigurationRepository) {
+
+        this.automationWorkflowProjectConfigurationRepository = automationWorkflowProjectConfigurationRepository;
+    }
+
+    @Override
+    public AutomationWorkflowProjectConfiguration create(
+        long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
+
+        return automationWorkflowProjectConfigurationRepository.save(
+            new AutomationWorkflowProjectConfiguration(
+                projectId, environmentId, projectVersion, enabled, automationHubVisible));
+    }
+
+    @Override
+    public void delete(long id) {
+        automationWorkflowProjectConfigurationRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AutomationWorkflowProjectConfiguration> fetchConfiguration(long projectId, long environmentId) {
+        return automationWorkflowProjectConfigurationRepository.findByProjectIdAndEnvironmentId(
+            projectId, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AutomationWorkflowProjectConfiguration getConfiguration(long id) {
+        return automationWorkflowProjectConfigurationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Automation workflow project configuration with id " + id + " does not exist"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId) {
+        return automationWorkflowProjectConfigurationRepository.findAllByProjectId(projectId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isWorkflowEnabled(AutomationWorkflowProjectConfiguration configuration, UUID workflowUuid) {
+        return configuration.isWorkflowEnabled(workflowUuid);
+    }
+
+    @Override
+    public AutomationWorkflowProjectConfiguration update(
+        long id, int projectVersion, boolean enabled, boolean automationHubVisible) {
+
+        AutomationWorkflowProjectConfiguration configuration = getConfiguration(id);
+
+        configuration.setProjectVersion(projectVersion);
+        configuration.setEnabled(enabled);
+        configuration.setAutomationHubVisible(automationHubVisible);
+
+        return automationWorkflowProjectConfigurationRepository.save(configuration);
+    }
+
+    @Override
+    public AutomationWorkflowProjectConfiguration updateEnabled(long id, boolean enabled) {
+        AutomationWorkflowProjectConfiguration configuration = getConfiguration(id);
+
+        configuration.setEnabled(enabled);
+
+        return automationWorkflowProjectConfigurationRepository.save(configuration);
+    }
+
+    @Override
+    public AutomationWorkflowProjectConfiguration updateWorkflowEnabled(long id, UUID workflowUuid, boolean enabled) {
+        AutomationWorkflowProjectConfiguration configuration = getConfiguration(id);
+
+        Set<AutomationWorkflowProjectConfigurationWorkflow> workflows = new HashSet<>(configuration.getWorkflows());
+
+        Optional<AutomationWorkflowProjectConfigurationWorkflow> existingWorkflowOptional = workflows.stream()
+            .filter(workflow -> Objects.equals(workflow.getWorkflowUuid(), workflowUuid))
+            .findFirst();
+
+        if (existingWorkflowOptional.isPresent()) {
+            existingWorkflowOptional.get()
+                .setEnabled(enabled);
+        } else {
+            workflows.add(new AutomationWorkflowProjectConfigurationWorkflow(workflowUuid, enabled));
+        }
+
+        configuration.setWorkflows(workflows);
+
+        return automationWorkflowProjectConfigurationRepository.save(configuration);
+    }
+}

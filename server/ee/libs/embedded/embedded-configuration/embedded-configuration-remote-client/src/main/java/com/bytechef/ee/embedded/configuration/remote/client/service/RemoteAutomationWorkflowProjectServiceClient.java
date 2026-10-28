@@ -27,9 +27,7 @@ import org.springframework.stereotype.Component;
 public class RemoteAutomationWorkflowProjectServiceClient implements AutomationWorkflowProjectService {
 
     @Override
-    public AutomationWorkflowProject create(
-        long projectId, @Nullable String permissionExpression, boolean automationHubVisible) {
-
+    public AutomationWorkflowProject create(long projectId, @Nullable String permissionExpression) {
         throw new UnsupportedOperationException();
     }
 
@@ -55,11 +53,6 @@ public class RemoteAutomationWorkflowProjectServiceClient implements AutomationW
 
     @Override
     public Map<UUID, String> getWorkflowPermissionExpressions(long projectId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateAutomationHubVisible(long projectId, boolean automationHubVisible) {
         throw new UnsupportedOperationException();
     }
 

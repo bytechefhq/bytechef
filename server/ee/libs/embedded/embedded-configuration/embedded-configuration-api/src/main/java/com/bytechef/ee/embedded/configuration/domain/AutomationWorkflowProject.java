@@ -31,9 +31,6 @@ public class AutomationWorkflowProject {
     @Id
     private Long id;
 
-    @Column("automation_hub_visible")
-    private boolean automationHubVisible = true;
-
     @Column("permission_expression")
     private String permissionExpression;
 
@@ -100,14 +97,6 @@ public class AutomationWorkflowProject {
         return version;
     }
 
-    public boolean isAutomationHubVisible() {
-        return automationHubVisible;
-    }
-
-    public void setAutomationHubVisible(boolean automationHubVisible) {
-        this.automationHubVisible = automationHubVisible;
-    }
-
     public void setPermissionExpression(String permissionExpression) {
         this.permissionExpression = permissionExpression;
     }
@@ -117,7 +106,6 @@ public class AutomationWorkflowProject {
         return "AutomationWorkflowProject{" +
             "id=" + id +
             ", projectId=" + projectId +
-            ", automationHubVisible=" + automationHubVisible +
             ", permissionExpression='" + permissionExpression + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
