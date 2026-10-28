@@ -19,7 +19,6 @@ package com.bytechef.message.broker.redis.boot;
 import com.bytechef.message.broker.redis.control.DataRedisAutoConfigurationEnabler;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -35,7 +34,7 @@ public class RedisMessageBrokerEnvironmentPostProcessor implements EnvironmentPo
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.message-broker.provider", String.class), "redis")) {
+        if ("redis".equalsIgnoreCase(environment.getProperty("bytechef.message-broker.provider", String.class))) {
             source.putAll(DataRedisAutoConfigurationEnabler.getProperties(environment));
         }
 

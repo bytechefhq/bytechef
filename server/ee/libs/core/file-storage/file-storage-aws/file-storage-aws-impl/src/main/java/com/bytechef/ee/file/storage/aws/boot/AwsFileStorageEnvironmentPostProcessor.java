@@ -18,7 +18,6 @@ package com.bytechef.ee.file.storage.aws.boot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -34,7 +33,7 @@ public class AwsFileStorageEnvironmentPostProcessor implements EnvironmentPostPr
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.file-storage.provider", String.class), "aws")) {
+        if ("aws".equalsIgnoreCase(environment.getProperty("bytechef.file-storage.provider", String.class))) {
             source.put("spring.cloud.aws.s3.enabled", true);
         }
 

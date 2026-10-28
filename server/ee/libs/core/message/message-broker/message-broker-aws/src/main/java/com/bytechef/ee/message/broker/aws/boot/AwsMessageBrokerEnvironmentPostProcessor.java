@@ -19,7 +19,6 @@ package com.bytechef.ee.message.broker.aws.boot;
 import com.bytechef.message.broker.redis.control.DataRedisAutoConfigurationEnabler;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -35,7 +34,7 @@ public class AwsMessageBrokerEnvironmentPostProcessor implements EnvironmentPost
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.message-broker.provider", String.class), "aws")) {
+        if ("aws".equalsIgnoreCase(environment.getProperty("bytechef.message-broker.provider", String.class))) {
             source.put("spring.cloud.aws.sqs.enabled", true);
 
             String controlProvider = environment.getProperty("bytechef.message-broker.aws.control-provider");
