@@ -83,7 +83,7 @@ public class IntegrationInstanceConfiguration {
     private Instant lastModifiedDate;
 
     @Column("authorization_type")
-    private int authorizationType;
+    private Integer authorizationType;
 
     @Version
     private int version;
@@ -167,7 +167,7 @@ public class IntegrationInstanceConfiguration {
     }
 
     public AuthorizationType getAuthorizationType() {
-        return AuthorizationType.values()[authorizationType];
+        return authorizationType == null ? null : AuthorizationType.values()[authorizationType];
     }
 
     public int getVersion() {
@@ -233,7 +233,7 @@ public class IntegrationInstanceConfiguration {
     }
 
     public void setAuthorizationType(AuthorizationType authorizationType) {
-        this.authorizationType = authorizationType.ordinal();
+        this.authorizationType = authorizationType == null ? null : authorizationType.ordinal();
     }
 
     public void setVersion(int version) {
