@@ -29,6 +29,7 @@ interface IntegrationInstanceConfigurationListItemProps {
     mcpWorkflowIds?: Set<string>;
     remainingTags?: Tag[];
     showIntegrationIcon?: boolean;
+    showTags?: boolean;
 }
 
 const IntegrationInstanceConfigurationListItem = ({
@@ -36,6 +37,7 @@ const IntegrationInstanceConfigurationListItem = ({
     mcpWorkflowIds,
     remainingTags,
     showIntegrationIcon = true,
+    showTags = true,
 }: IntegrationInstanceConfigurationListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -176,7 +178,7 @@ const IntegrationInstanceConfigurationListItem = ({
                                 )}
 
                                 <div onClick={(event) => event.preventDefault()}>
-                                    {integrationInstanceConfiguration.tags && (
+                                    {showTags && integrationInstanceConfiguration.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,

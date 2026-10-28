@@ -15,6 +15,7 @@ interface ProjectDeploymentListProps {
     project: Project;
     projectDeployments: ProjectDeployment[];
     showEnvironment?: boolean;
+    showTags?: boolean;
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }
@@ -27,6 +28,7 @@ const ProjectDeploymentList = ({
     project,
     projectDeployments,
     showEnvironment,
+    showTags,
     tags,
     taskDispatcherDefinitions,
 }: ProjectDeploymentListProps) => {
@@ -84,6 +86,7 @@ const ProjectDeploymentList = ({
                             projectDeployment={projectDeployment}
                             remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
                             showEnvironment={showEnvironment}
+                            showTags={showTags}
                         />
 
                         {!!projectDeployment.projectDeploymentWorkflows?.length && (
