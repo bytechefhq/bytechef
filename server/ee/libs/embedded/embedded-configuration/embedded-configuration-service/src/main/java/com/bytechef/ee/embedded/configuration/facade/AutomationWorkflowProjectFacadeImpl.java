@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProject;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
@@ -29,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersi
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectPublishedEvent;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -44,6 +46,7 @@ import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +56,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -84,6 +88,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         """;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectService automationWorkflowProjectService;
     private final CategoryService categoryService;
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
@@ -104,6 +109,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
+        AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         AutomationWorkflowProjectService automationWorkflowProjectService, CategoryService categoryService,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
@@ -115,6 +121,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         WorkflowTestConfigurationService workflowTestConfigurationService,
         List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
         this.applicationEventPublisher = applicationEventPublisher;
+        this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.automationWorkflowProjectService = automationWorkflowProjectService;
         this.categoryService = categoryService;
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
@@ -331,10 +338,35 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
 
-        return getPublishedProjects().stream()
-            .filter(project -> embeddedPermissionEvaluator.evaluate(project.permissionExpression(), connectedUser))
-            .map(project -> filterWorkflowTemplates(project, connectedUser, integrationIdsByComponentName))
-            .toList();
+        Map<Long, AutomationWorkflowProject> automationWorkflowProjects = getAutomationWorkflowProjects();
+
+        List<AutomationWorkflowProjectDTO> projects = new ArrayList<>();
+
+        for (Project project : getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())) {
+            Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
+                automationWorkflowProjectConfigurationService.fetchConfiguration(
+                    project.getId(), environment.ordinal());
+
+            if (configurationOptional.isEmpty() || !configurationOptional.get()
+                .isEnabled()) {
+
+                continue;
+            }
+
+            AutomationWorkflowProjectConfiguration configuration = configurationOptional.get();
+
+            AutomationWorkflowProjectDTO projectDTO = toPublishedDTO(
+                project, automationWorkflowProjects.get(project.getId()), configuration.getProjectVersion(),
+                configuration.isAutomationHubVisible(),
+                projectWorkflow -> automationWorkflowProjectConfigurationService.isWorkflowEnabled(
+                    configuration, projectWorkflow.getUuid()));
+
+            if (embeddedPermissionEvaluator.evaluate(projectDTO.permissionExpression(), connectedUser)) {
+                projects.add(filterWorkflowTemplates(projectDTO, connectedUser, integrationIdsByComponentName));
+            }
+        }
+
+        return projects;
     }
 
     @Override
@@ -596,20 +628,32 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     private AutomationWorkflowProjectDTO toPublishedDTO(
         Project project, AutomationWorkflowProject automationWorkflowProject) {
+
         ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
+
+        return toPublishedDTO(
+            project, automationWorkflowProject,
+            lastPublishedProjectVersion == null ? null : lastPublishedProjectVersion.getVersion(), true,
+            projectWorkflow -> true);
+    }
+
+    private AutomationWorkflowProjectDTO toPublishedDTO(
+        Project project, AutomationWorkflowProject automationWorkflowProject, @Nullable Integer publishedVersion,
+        boolean automationHubVisible, Predicate<ProjectWorkflow> projectWorkflowFilter) {
 
         List<ConnectedUserWorkflowTemplateDTO> workflowTemplates;
 
-        if (lastPublishedProjectVersion == null) {
+        if (publishedVersion == null) {
             workflowTemplates = List.of();
         } else {
             List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-                project.getId(), lastPublishedProjectVersion.getVersion());
+                project.getId(), publishedVersion);
 
             Map<UUID, String> workflowPermissionExpressions =
                 automationWorkflowProjectService.getWorkflowPermissionExpressions(project.getId());
 
             workflowTemplates = projectWorkflows.stream()
+                .filter(projectWorkflowFilter)
                 .map(projectWorkflow -> {
                     Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
@@ -627,12 +671,9 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         String markedName = project.getName();
         String displayName = markedName.substring(MARKER.length());
 
-        boolean published = lastPublishedProjectVersion != null;
-        Integer lastPublishedVersion = published ? lastPublishedProjectVersion.getVersion() : null;
-
         return new AutomationWorkflowProjectDTO(
             project.getId(), displayName, project.getDescription(), project.getCategoryId(),
-            project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
-            automationWorkflowProject.getPermissionExpression(), true);
+            project.getTagIds(), publishedVersion != null, project.getLastProjectVersion(), publishedVersion,
+            workflowTemplates, automationWorkflowProject.getPermissionExpression(), automationHubVisible);
     }
 }

@@ -35,6 +35,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAtten
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -134,6 +135,9 @@ class ConnectedUserReferenceAttentionResolverIntTest {
         """;
 
     @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+
+    @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @MockitoBean
@@ -200,7 +204,7 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
@@ -224,11 +228,11 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ReferenceState referenceState = connectedUserReferenceAttentionResolver.resolve(reload(reference));
 
@@ -242,7 +246,7 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
@@ -262,7 +266,7 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, workflowUuid, Environment.PRODUCTION);
@@ -282,7 +286,7 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
@@ -300,7 +304,7 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
@@ -376,5 +380,10 @@ class ConnectedUserReferenceAttentionResolverIntTest {
         storedReference.setEnabled(false);
 
         connectedUserProjectWorkflowRepository.save(storedReference);
+    }
+
+    private void publishAndPinProject(long projectId) {
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
     }
 }

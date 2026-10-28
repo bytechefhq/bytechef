@@ -48,6 +48,7 @@ import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -166,6 +167,9 @@ class ConnectedUserProjectFacadeIntTest {
         {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
+
+    @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -304,7 +308,7 @@ class ConnectedUserProjectFacadeIntTest {
         String automationWorkflowUuid = addAutomationWorkflow(
             automationWorkflowProjectId, BROKEN_SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -329,7 +333,7 @@ class ConnectedUserProjectFacadeIntTest {
         String automationWorkflowUuid = addAutomationWorkflow(
             automationWorkflowProjectId, BROKEN_SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -471,7 +475,7 @@ class ConnectedUserProjectFacadeIntTest {
         String automationWorkflowUuid =
             addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -492,7 +496,7 @@ class ConnectedUserProjectFacadeIntTest {
         String automationWorkflowUuid =
             addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -510,7 +514,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -539,7 +543,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -570,7 +574,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -591,7 +595,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -643,7 +647,7 @@ class ConnectedUserProjectFacadeIntTest {
         String copiedTemplateUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
         String referencedTemplateUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserProjectFacade.copyWorkflowTemplate(externalUserId, copiedTemplateUuid, Environment.PRODUCTION);
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -670,7 +674,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String workflowTemplateUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         String copiedWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
             externalUserId, workflowTemplateUuid, Environment.PRODUCTION);
@@ -692,7 +696,7 @@ class ConnectedUserProjectFacadeIntTest {
         String automationWorkflowUuid =
             addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -700,7 +704,7 @@ class ConnectedUserProjectFacadeIntTest {
         connectedUserProjectFacade.updateProjectWorkflowInputs(
             externalUserId, automationWorkflowUuid, Map.of("channel", "#alerts"), null);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs =
             connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION);
@@ -720,7 +724,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -758,7 +762,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -774,7 +778,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
@@ -793,7 +797,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         addHiddenAutomationWorkflow(automationWorkflowProjectId);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         String copyWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
             externalUserId, visibleWorkflowUuid, Environment.PRODUCTION);
@@ -815,7 +819,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String hiddenWorkflowUuid = addHiddenAutomationWorkflow(automationWorkflowProjectId);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         assertThatThrownBy(() -> connectedUserProjectFacade.copyWorkflowTemplate(
             externalUserId, hiddenWorkflowUuid, Environment.PRODUCTION))
@@ -831,7 +835,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         String hiddenWorkflowUuid = addHiddenAutomationWorkflow(automationWorkflowProjectId);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         String unknownWorkflowUuid = UUID.randomUUID()
             .toString();
@@ -956,5 +960,10 @@ class ConnectedUserProjectFacadeIntTest {
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     static class ConnectedUserServiceConfiguration {
+    }
+
+    private void publishAndPinProject(long projectId) {
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
     }
 }

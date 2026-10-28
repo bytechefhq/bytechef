@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -35,19 +36,23 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -142,6 +147,9 @@ class AutomationWorkflowProjectFacadeIntTest {
     private final List<Long> createdIntegrationIds = new ArrayList<>();
 
     @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+
+    @Autowired
     private AutomationWorkflowProjectService automationWorkflowProjectService;
 
     @Autowired
@@ -181,6 +189,9 @@ class AutomationWorkflowProjectFacadeIntTest {
     private TagService tagService;
 
     @Autowired
+    private WorkflowService workflowService;
+
+    @Autowired
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @BeforeEach
@@ -210,6 +221,8 @@ class AutomationWorkflowProjectFacadeIntTest {
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
         automationWorkflowProjectFacade.publishProject(projectId);
 
+        createEnabledConfiguration(projectId, 1);
+
         String publishedWorkflowUuid = automationWorkflowProjectFacade.getPublishedProjects()
             .stream()
             .filter(project -> project.id() == projectId)
@@ -231,6 +244,8 @@ class AutomationWorkflowProjectFacadeIntTest {
         long projectId = automationWorkflowProjectFacade.createProject("Onboarding", "", null, List.of(), null);
         automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
         automationWorkflowProjectFacade.publishProject(projectId);
+
+        createEnabledConfiguration(projectId, 1);
 
         String publishedWorkflowUuid = automationWorkflowProjectFacade.getPublishedProjects()
             .stream()
@@ -749,6 +764,182 @@ class AutomationWorkflowProjectFacadeIntTest {
             .doesNotContain(projectId);
     }
 
+    @Test
+    void testGetPublishedProjectsSkipsProjectsWithoutAnEnabledConfiguration() {
+        long projectId = createPublishedProject("No Configuration");
+
+        assertThat(getEnvironmentProjectIds()).doesNotContain(projectId);
+
+        AutomationWorkflowProjectConfiguration configuration = createConfiguration(projectId, 1, false, true);
+
+        assertThat(getEnvironmentProjectIds()).doesNotContain(projectId);
+
+        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), true);
+
+        assertThat(getEnvironmentProjectIds()).contains(projectId);
+    }
+
+    @Test
+    void testGetPublishedProjectsUsesThePinnedVersion() {
+        long projectId = createPublishedProject("Pinned");
+
+        String firstWorkflowUuid = getPublishedTemplate(projectId).workflowUuid();
+
+        String secondWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        createConfiguration(projectId, 1, true, true);
+
+        assertThat(getEnvironmentTemplateUuids(projectId)).containsExactly(firstWorkflowUuid);
+        assertThat(getPublishedTemplateUuids(projectId)).containsExactlyInAnyOrder(
+            firstWorkflowUuid, secondWorkflowUuid);
+
+        AutomationWorkflowProjectDTO environmentProject = getEnvironmentProject(projectId);
+
+        assertThat(environmentProject.published()).isTrue();
+        assertThat(environmentProject.lastPublishedVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testGetPublishedProjectsDropsDisabledWorkflows() {
+        long projectId = createPublishedProject("Disabled Workflow");
+
+        String firstWorkflowUuid = getPublishedTemplate(projectId).workflowUuid();
+
+        String secondWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        AutomationWorkflowProjectConfiguration configuration = createConfiguration(projectId, 2, true, true);
+
+        assertThat(getEnvironmentTemplateUuids(projectId)).containsExactlyInAnyOrder(
+            firstWorkflowUuid, secondWorkflowUuid);
+
+        automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
+            configuration.getId(), UUID.fromString(secondWorkflowUuid), false);
+
+        assertThat(getEnvironmentTemplateUuids(projectId)).containsExactly(firstWorkflowUuid);
+    }
+
+    @Test
+    void testGetPublishedProjectsCarriesTheConfigurationsHubVisibility() {
+        long visibleProjectId = createPublishedProject("Hub Visible");
+        long hiddenProjectId = createPublishedProject("Hub Hidden");
+
+        createConfiguration(visibleProjectId, 1, true, true);
+        createConfiguration(hiddenProjectId, 1, true, false);
+
+        assertThat(getEnvironmentProject(visibleProjectId).automationHubVisible()).isTrue();
+        assertThat(getEnvironmentProject(hiddenProjectId).automationHubVisible()).isFalse();
+    }
+
+    @Test
+    void testCopyWorkflowTemplateNotReleasedThrows() {
+        long projectId = createPublishedProject("Not Released");
+
+        String workflowUuid = getPublishedTemplate(projectId).workflowUuid();
+
+        assertThatThrownBy(
+            () -> connectedUserProjectFacade.copyWorkflowTemplate(
+                TEST_EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                        configurationException.getErrorKey())
+                            .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
+                                .getErrorKey()));
+
+        AutomationWorkflowProjectConfiguration configuration = createConfiguration(projectId, 1, true, true);
+
+        automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
+            configuration.getId(), UUID.fromString(workflowUuid), false);
+
+        assertThatThrownBy(
+            () -> connectedUserProjectFacade.copyWorkflowTemplate(
+                TEST_EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                        configurationException.getErrorKey())
+                            .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
+                                .getErrorKey()));
+    }
+
+    @Test
+    void testCopyWorkflowTemplateCopiesThePinnedVersion() {
+        long projectId = automationWorkflowProjectFacade.createProject("Pinned Copy", "", null, List.of(), null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            projectId, "{\"label\":\"Original\",\"tasks\":[]}", null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        automationWorkflowProjectFacade.updateProjectWorkflow(workflowUuid, "Renamed", "");
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        createConfiguration(projectId, 1, true, true);
+
+        String copiedWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
+            TEST_EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        String copiedWorkflowId = projectWorkflowService.getLastWorkflowId(copiedWorkflowUuid);
+
+        assertThat(workflowService.getWorkflow(copiedWorkflowId)
+            .getLabel()).isEqualTo("Original");
+        assertThat(getPublishedTemplate(projectId, workflowUuid).label()).isEqualTo("Renamed");
+    }
+
+    private AutomationWorkflowProjectConfiguration createConfiguration(
+        long projectId, int projectVersion, boolean enabled, boolean automationHubVisible) {
+
+        return automationWorkflowProjectConfigurationService.create(
+            projectId, Environment.PRODUCTION.ordinal(), projectVersion, enabled, automationHubVisible);
+    }
+
+    private void createEnabledConfiguration(long projectId, int projectVersion) {
+        createConfiguration(projectId, projectVersion, true, true);
+    }
+
+    private long createPublishedProject(String name) {
+        long projectId = automationWorkflowProjectFacade.createProject(
+            name + " " + UUID.randomUUID(), "", null, List.of(), null);
+
+        automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        return projectId;
+    }
+
+    private AutomationWorkflowProjectDTO getEnvironmentProject(long projectId) {
+        return automationWorkflowProjectFacade.getPublishedProjects(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
+            .stream()
+            .filter(project -> project.id() == projectId)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private List<Long> getEnvironmentProjectIds() {
+        return automationWorkflowProjectFacade.getPublishedProjects(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
+            .stream()
+            .map(AutomationWorkflowProjectDTO::id)
+            .toList();
+    }
+
+    private List<String> getEnvironmentTemplateUuids(long projectId) {
+        return getEnvironmentProject(projectId).workflowTemplates()
+            .stream()
+            .map(ConnectedUserWorkflowTemplateDTO::workflowUuid)
+            .toList();
+    }
+
+    private List<String> getPublishedTemplateUuids(long projectId) {
+        return automationWorkflowProjectFacade.getPublishedProjects()
+            .stream()
+            .filter(project -> project.id() == projectId)
+            .flatMap(project -> project.workflowTemplates()
+                .stream())
+            .map(ConnectedUserWorkflowTemplateDTO::workflowUuid)
+            .toList();
+    }
+
     private ConnectedUserWorkflowTemplateDTO getPublishedTemplate(long projectId, String workflowUuid) {
         return automationWorkflowProjectFacade.getPublishedProjects()
             .stream()
@@ -857,6 +1048,8 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         automationWorkflowProjectFacade.publishProject(projectId);
 
+        createEnabledConfiguration(projectId, 1);
+
         ConnectedUserWorkflowTemplateDTO.Component hubspotTrigger = automationWorkflowProjectFacade
             .getPublishedProjects(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
             .stream()
@@ -928,6 +1121,8 @@ class AutomationWorkflowProjectFacadeIntTest {
             null);
 
         automationWorkflowProjectFacade.publishProject(projectId);
+
+        createEnabledConfiguration(projectId, 1);
 
         return workflowUuid;
     }

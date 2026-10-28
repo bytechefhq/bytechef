@@ -30,10 +30,12 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
@@ -42,6 +44,7 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWork
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -96,6 +99,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     private static final String MARKER = "__EMBEDDED__";
 
+    private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserProjectService connectUserProjectService;
@@ -129,6 +133,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectFacadeImpl(
+        AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         ComponentDefinitionService componentDefinitionService,
         ConnectedUserProjectService connectUserProjectService,
@@ -150,6 +155,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         WorkflowFacade workflowFacade, WorkflowService workflowService,
         WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
+        this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectUserProjectService = connectUserProjectService;
@@ -189,15 +195,20 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment) {
-        boolean automationWorkflowTemplate = automationWorkflowProjectFacade
+        Optional<AutomationWorkflowProjectDTO> releasedProjectOptional = automationWorkflowProjectFacade
             .getPublishedProjects(externalUserId, environment)
             .stream()
-            .anyMatch(project -> CollectionUtils.stream(project.workflowTemplates())
-                .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid)));
+            .filter(project -> CollectionUtils.stream(project.workflowTemplates())
+                .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid)))
+            .findFirst();
 
-        if (!automationWorkflowTemplate) {
+        if (releasedProjectOptional.isEmpty()) {
+            checkWorkflowTemplateReleased(workflowUuid, environment);
+
             throw new IllegalArgumentException("Not a published automation workflow template: " + workflowUuid);
         }
+
+        AutomationWorkflowProjectDTO releasedProject = releasedProjectOptional.get();
 
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
@@ -214,7 +225,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                     ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_ALREADY_COPIED);
             });
 
-        String publishedWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
+        String publishedWorkflowId = getPinnedWorkflowId(releasedProject, workflowUuid);
 
         Workflow workflow = workflowService.getWorkflow(publishedWorkflowId);
 
@@ -738,6 +749,65 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid)
             .map(workflowId -> connectedUserWorkflowValidator.getAttentionReason(workflowId, environment))
             .orElse(null);
+    }
+
+    private void checkWorkflowTemplateReleased(String workflowUuid, Environment environment) {
+        Optional<AutomationWorkflowProjectDTO> publishedProjectOptional = automationWorkflowProjectFacade
+            .getPublishedProjects()
+            .stream()
+            .filter(project -> CollectionUtils.stream(project.workflowTemplates())
+                .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid)))
+            .findFirst();
+
+        if (publishedProjectOptional.isEmpty()) {
+            return;
+        }
+
+        long projectId = publishedProjectOptional.get()
+            .id();
+
+        Optional<AutomationWorkflowProjectConfiguration> configurationOptional =
+            automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, environment.ordinal());
+
+        boolean released = false;
+
+        if (configurationOptional.isPresent() && configurationOptional.get()
+            .isEnabled()) {
+
+            AutomationWorkflowProjectConfiguration configuration = configurationOptional.get();
+
+            UUID uuid = UUID.fromString(workflowUuid);
+
+            released = automationWorkflowProjectConfigurationService.isWorkflowEnabled(configuration, uuid) &&
+                projectWorkflowService.getProjectWorkflows(projectId, configuration.getProjectVersion())
+                    .stream()
+                    .anyMatch(projectWorkflow -> uuid.equals(projectWorkflow.getUuid()));
+        }
+
+        if (!released) {
+            throw new ConfigurationException(
+                "Automation workflow template %s is not released".formatted(workflowUuid),
+                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED);
+        }
+    }
+
+    private String getPinnedWorkflowId(AutomationWorkflowProjectDTO releasedProject, String workflowUuid) {
+        Integer pinnedVersion = releasedProject.lastPublishedVersion();
+
+        if (pinnedVersion == null) {
+            throw new ConfigurationException(
+                "Automation workflow template %s is not released".formatted(workflowUuid),
+                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED);
+        }
+
+        return projectWorkflowService.getProjectWorkflows(releasedProject.id(), pinnedVersion)
+            .stream()
+            .filter(projectWorkflow -> Objects.equals(projectWorkflow.getUuidAsString(), workflowUuid))
+            .findFirst()
+            .map(ProjectWorkflow::getWorkflowId)
+            .orElseThrow(() -> new ConfigurationException(
+                "Automation workflow template %s is not released".formatted(workflowUuid),
+                ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED));
     }
 
     private Map<UUID, Workflow> getPublishedWorkflows(Project project) {

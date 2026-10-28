@@ -50,6 +50,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeplo
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -177,6 +178,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
          {"name":"channel","label":"Channel","type":"string","required":true}],
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
+
+    @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -339,7 +343,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUser developmentConnectedUser = connectedUserService.createConnectedUser(
             externalUserId, Environment.DEVELOPMENT);
@@ -376,7 +380,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
@@ -403,7 +407,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
@@ -428,7 +432,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ProjectDeployment nameOnlyProjectDeployment = new ProjectDeployment();
 
@@ -456,7 +460,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
@@ -475,9 +479,9 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
@@ -497,7 +501,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
             automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
@@ -529,7 +533,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowUuid =
             addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         provision(siblingUuid);
 
@@ -573,7 +577,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowUuid =
             addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         provision(siblingUuid);
 
@@ -617,7 +621,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowUuid = addWorkflow(
             automationWorkflowProjectId, SLACK_AND_JIRA_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long projectDeploymentId = provisionEnabled(workflowUuid, Map.of("channel", "general"));
 
@@ -658,7 +662,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow siblingReference = provision(siblingUuid);
 
@@ -698,7 +702,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String otherUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         provision(otherUuid);
 
@@ -706,7 +710,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId)).hasSize(2);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         RowSpec rowSpec = new RowSpec(new ResolvedWorkflowConnections(List.of(), List.of()), false, null);
 
@@ -731,7 +735,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowUuid =
             addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         long projectDeploymentId = provisionEnabled(workflowUuid, Map.of("channel", "general"));
 
@@ -764,7 +768,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowUuid =
             addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = provision(workflowUuid);
 
@@ -791,7 +795,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         provision(siblingUuid);
 
@@ -825,7 +829,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         provision(siblingUuid);
 
@@ -856,7 +860,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = provision(workflowUuid);
 
@@ -880,7 +884,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        publishAndPinProject(automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = provision(workflowUuid);
 
@@ -1018,5 +1022,10 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     private static ProjectDeploymentWorkflowConnection slackConnection(long connectionId) {
         return new ProjectDeploymentWorkflowConnection(connectionId, "slack", "postMessage1");
+    }
+
+    private void publishAndPinProject(long projectId) {
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
     }
 }
