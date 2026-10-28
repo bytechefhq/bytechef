@@ -18,14 +18,19 @@ package com.bytechef.platform.billing.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
+import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandler;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandlerRegistry;
+import com.bytechef.platform.billing.handler.metered.MeteredSubscriptionModelHandler;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
 import com.stripe.model.Event;
@@ -43,6 +48,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -63,6 +69,12 @@ class BillingWebhookEventHandlerTest {
     private BillingWebhookEventService billingWebhookEventService;
 
     @Mock
+    private MeteredSubscriptionModelHandler meteredSubscriptionModelHandler;
+
+    @Mock
+    private SubscriptionModelHandler prepaidSubscriptionModelHandler;
+
+    @Mock
     private SubscriptionModelHandler subscriptionModelHandler;
 
     @Mock
@@ -73,7 +85,8 @@ class BillingWebhookEventHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new BillingWebhookEventHandler(
-            billingSubscriptionService, billingWebhookEventService, subscriptionModelHandlerRegistry);
+            billingSubscriptionService, billingWebhookEventService, meteredSubscriptionModelHandler,
+            subscriptionModelHandlerRegistry);
     }
 
     @Test
@@ -166,6 +179,146 @@ class BillingWebhookEventHandlerTest {
             .handle(buildEvent(checkoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout", "STARTER")));
 
         verify(billingSubscriptionService, never()).save(any(BillingSubscription.class));
+    }
+
+    @Test
+    void testCheckoutWithPrepaidMetadataRoutesToPrepaid() throws Exception {
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
+        when(subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.PREPAID))
+            .thenReturn(prepaidSubscriptionModelHandler);
+
+        handler.handle(buildEvent(prepaidCheckoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout")));
+
+        verify(prepaidSubscriptionModelHandler).handleCheckoutSessionCompleted(any(Session.class));
+        verify(subscriptionModelHandlerRegistry, never()).getSubscriptionModelHandler(SubscriptionModel.METERED);
+    }
+
+    @Test
+    void testCheckoutWithoutMetadataRoutesToMetered() throws Exception {
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
+        when(subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.METERED))
+            .thenReturn(subscriptionModelHandler);
+
+        handler.handle(
+            buildEvent(checkoutSessionCompletedPayloadWithoutMetadata(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout")));
+
+        verify(subscriptionModelHandler).handleCheckoutSessionCompleted(any(Session.class));
+        verify(subscriptionModelHandlerRegistry, never()).getSubscriptionModelHandler(SubscriptionModel.PREPAID);
+    }
+
+    @Test
+    void testSubscriptionUpdatedForUnknownSubscriptionReturnsNull() throws Exception {
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
+            .thenReturn(Optional.empty());
+
+        handler.handle(buildEvent(subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER")));
+
+        ArgumentCaptor<BillingSubscriptionWebhookEvent> captor =
+            ArgumentCaptor.forClass(BillingSubscriptionWebhookEvent.class);
+
+        verify(billingWebhookEventService).save(captor.capture());
+
+        BillingSubscriptionWebhookEvent webhookEvent = captor.getValue();
+
+        assertThat(webhookEvent.getEventId()).isEqualTo("evt_sub_updated");
+        assertThat(webhookEvent.getSubscriptionId()).isNull();
+
+        verify(meteredSubscriptionModelHandler, never()).switchToPrepaidIfNotMetered(any(), any());
+        verify(subscriptionModelHandlerRegistry, never()).getSubscriptionModelHandler(any());
+    }
+
+    @Test
+    void testSubscriptionUpdatedSwitchesThenRoutesToPrepaid() throws Exception {
+        BillingSubscription subscription = meteredSubscription();
+
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
+            .thenReturn(Optional.of(subscription));
+        doAnswer(invocation -> {
+            BillingSubscription switchedSubscription = invocation.getArgument(0);
+
+            switchedSubscription.setSubscriptionModel(SubscriptionModel.PREPAID);
+
+            return null;
+        }).when(meteredSubscriptionModelHandler)
+            .switchToPrepaidIfNotMetered(same(subscription), any(Subscription.class));
+        when(subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.PREPAID))
+            .thenReturn(prepaidSubscriptionModelHandler);
+
+        handler.handle(buildEvent(subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER")));
+
+        InOrder inOrder = inOrder(meteredSubscriptionModelHandler, prepaidSubscriptionModelHandler);
+
+        inOrder.verify(meteredSubscriptionModelHandler)
+            .switchToPrepaidIfNotMetered(same(subscription), any(Subscription.class));
+        inOrder.verify(prepaidSubscriptionModelHandler)
+            .handleSubscriptionUpdated(same(subscription), any(Subscription.class));
+
+        verify(subscriptionModelHandlerRegistry, never()).getSubscriptionModelHandler(SubscriptionModel.METERED);
+    }
+
+    @Test
+    void testSubscriptionUpdatedForPrepaidRowSkipsSwitch() throws Exception {
+        BillingSubscription subscription = starterSubscription();
+
+        subscription.setSubscriptionModel(SubscriptionModel.PREPAID);
+
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchSubscriptionBySubscriptionId(SUBSCRIPTION_ID))
+            .thenReturn(Optional.of(subscription));
+        when(subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.PREPAID))
+            .thenReturn(prepaidSubscriptionModelHandler);
+
+        handler.handle(buildEvent(subscriptionUpdatedPayload(SUBSCRIPTION_ID, "STARTER")));
+
+        verify(meteredSubscriptionModelHandler, never()).switchToPrepaidIfNotMetered(any(), any());
+        verify(prepaidSubscriptionModelHandler).handleSubscriptionUpdated(same(subscription), any(Subscription.class));
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String prepaidCheckoutSessionCompletedPayload(String subscriptionId, String customerId) {
+        return """
+            {
+              "id": "evt_checkout_completed_prepaid",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "checkout.session.completed",
+              "data": {
+                "object": {
+                  "id": "cs_test_checkout_prepaid",
+                  "object": "checkout.session",
+                  "client_reference_id": "public",
+                  "customer": "%s",
+                  "subscription": "%s",
+                  "metadata": { "planName": "STARTER", "subscriptionModel": "PREPAID", "tenantId": "public" }
+                }
+              }
+            }
+            """.formatted(customerId, subscriptionId);
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String checkoutSessionCompletedPayloadWithoutMetadata(String subscriptionId, String customerId) {
+        return """
+            {
+              "id": "evt_checkout_completed_legacy",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "checkout.session.completed",
+              "data": {
+                "object": {
+                  "id": "cs_test_checkout_legacy",
+                  "object": "checkout.session",
+                  "client_reference_id": "public",
+                  "customer": "%s",
+                  "subscription": "%s"
+                }
+              }
+            }
+            """.formatted(customerId, subscriptionId);
     }
 
     private BillingSubscription meteredSubscription() {

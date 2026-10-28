@@ -22,13 +22,19 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandler;
+import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
+import com.bytechef.platform.billing.repository.PrepaidBillingSubscriptionRepository;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.tenant.TenantContext;
 import com.stripe.model.Subscription;
+import com.stripe.model.SubscriptionItem;
 import com.stripe.model.checkout.Session;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -48,20 +54,25 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
     private static final Logger log = LoggerFactory.getLogger(PrepaidSubscriptionModelHandler.class);
 
     private final BillingProperties billingProperties;
+    private final BillingSubscriptionRepository billingSubscriptionRepository;
     private final BillingSubscriptionService billingSubscriptionService;
     private final BillingUsageService billingUsageService;
+    private final PrepaidBillingSubscriptionRepository prepaidBillingSubscriptionRepository;
     private final PrepaidStripeClient prepaidStripeClient;
     private final StripeClient stripeClient;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PrepaidSubscriptionModelHandler(
-        BillingProperties billingProperties, BillingSubscriptionService billingSubscriptionService,
-        BillingUsageService billingUsageService, PrepaidStripeClient prepaidStripeClient,
-        StripeClient stripeClient) {
+        BillingProperties billingProperties, BillingSubscriptionRepository billingSubscriptionRepository,
+        BillingSubscriptionService billingSubscriptionService, BillingUsageService billingUsageService,
+        PrepaidBillingSubscriptionRepository prepaidBillingSubscriptionRepository,
+        PrepaidStripeClient prepaidStripeClient, StripeClient stripeClient) {
 
         this.billingProperties = billingProperties;
+        this.billingSubscriptionRepository = billingSubscriptionRepository;
         this.billingSubscriptionService = billingSubscriptionService;
         this.billingUsageService = billingUsageService;
+        this.prepaidBillingSubscriptionRepository = prepaidBillingSubscriptionRepository;
         this.prepaidStripeClient = prepaidStripeClient;
         this.stripeClient = stripeClient;
     }
@@ -132,14 +143,86 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
 
     @Override
     public BillingSubscription handleCheckoutSessionCompleted(Session session) {
-        throw new IllegalStateException("Prepaid webhook handling not implemented yet");
+        Subscription stripeSubscription = stripeClient.retrieveSubscription(session.getSubscription());
+
+        SubscriptionItem flatItem = getFlatItem(stripeSubscription);
+
+        Map<String, String> metadata = session.getMetadata();
+
+        String planName = metadata != null ? metadata.getOrDefault("planName", "Starter") : "Starter";
+
+        // Read before the insert below, otherwise the latest row would be the one being created.
+        int unusedExtraUnits = billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc()
+            .map(previousSubscription -> Math.max(
+                0, previousSubscription.getExtraUnitTotal() - previousSubscription.getExtraUnitUsed()))
+            .orElse(0);
+
+        BillingSubscription billingSubscription = new BillingSubscription();
+
+        billingSubscription.setCustomerId(session.getCustomer());
+        billingSubscription.setSubscriptionId(stripeSubscription.getId());
+        billingSubscription.setProductId(flatItem.getId());
+        billingSubscription.setPlanName(planName);
+        billingSubscription.setStatus(
+            BillingSubscription.Status.fromProviderStatus(stripeSubscription.getStatus()));
+        billingSubscription.setPlanUnitTotal(PrepaidPriceUtils.getUnitTotal(flatItem.getPrice()));
+        billingSubscription.setCurrentPeriodStart(Instant.ofEpochSecond(flatItem.getCurrentPeriodStart()));
+        billingSubscription.setCurrentPeriodEnd(Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
+        billingSubscription.setCancelAtPeriodEnd(Boolean.TRUE.equals(stripeSubscription.getCancelAtPeriodEnd()));
+        billingSubscription.setSubscriptionModel(SubscriptionModel.PREPAID);
+
+        BillingSubscription savedSubscription = billingSubscriptionService.save(billingSubscription);
+
+        // extraUnitTotal is read-only on the entity, so the transfer is a separate atomic update after the insert.
+        if (unusedExtraUnits > 0) {
+            prepaidBillingSubscriptionRepository.addExtraUnitTotal(savedSubscription.getId(), unusedExtraUnits);
+        }
+
+        return savedSubscription;
     }
 
     @Override
     public BillingSubscription handleSubscriptionUpdated(
         BillingSubscription subscription, Subscription stripeSubscription) {
 
-        throw new IllegalStateException("Prepaid webhook handling not implemented yet");
+        subscription.setStatus(
+            BillingSubscription.Status.fromProviderStatus(stripeSubscription.getStatus()));
+
+        subscription.setCancelAtPeriodEnd(Boolean.TRUE.equals(stripeSubscription.getCancelAtPeriodEnd()));
+
+        SubscriptionItem flatItem = getFlatItem(stripeSubscription);
+
+        subscription.setProductId(flatItem.getId());
+
+        String newPlanName = resolvePlanName(flatItem.getPrice()
+            .getProduct());
+
+        boolean planChanged = newPlanName != null && !newPlanName.equalsIgnoreCase(subscription.getPlanName());
+
+        if (newPlanName != null) {
+            subscription.setPlanName(newPlanName);
+        }
+
+        Instant newPeriodStart = Instant.ofEpochSecond(flatItem.getCurrentPeriodStart());
+
+        boolean periodChanged = !newPeriodStart.equals(subscription.getCurrentPeriodStart());
+
+        if (periodChanged) {
+            subscription.setCurrentPeriodStart(newPeriodStart);
+            subscription.setCurrentPeriodEnd(Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
+        }
+
+        if (planChanged || periodChanged) {
+            subscription.setPlanUnitTotal(PrepaidPriceUtils.getUnitTotal(flatItem.getPrice()));
+        }
+
+        BillingSubscription savedSubscription = billingSubscriptionService.save(subscription);
+
+        if (periodChanged) {
+            prepaidBillingSubscriptionRepository.resetPlanUnitUsed(savedSubscription.getId());
+        }
+
+        return savedSubscription;
     }
 
     @Override
@@ -166,6 +249,28 @@ public class PrepaidSubscriptionModelHandler implements SubscriptionModelHandler
 
                 return stripeClient.createCustomer(userEmail, tenantId);
             });
+    }
+
+    private SubscriptionItem getFlatItem(Subscription stripeSubscription) {
+        List<SubscriptionItem> items = stripeSubscription.getItems()
+            .getData();
+
+        return items.stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "Subscription " + stripeSubscription.getId() + " has no subscription item"));
+    }
+
+    private String resolvePlanName(String productId) {
+        BillingProperties.Stripe stripe = billingProperties.stripe();
+
+        if (Objects.equals(stripe.productStarterId(), productId)) {
+            return "STARTER";
+        } else if (Objects.equals(stripe.productGrowthId(), productId)) {
+            return "GROWTH";
+        }
+
+        return null;
     }
 
     private boolean isUpgrade(String currentPlanName, String newPlanName) {

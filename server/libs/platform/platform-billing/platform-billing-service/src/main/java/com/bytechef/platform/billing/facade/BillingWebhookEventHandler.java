@@ -20,11 +20,13 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandlerRegistry;
+import com.bytechef.platform.billing.handler.metered.MeteredSubscriptionModelHandler;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
 import com.stripe.model.Event;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -49,14 +51,17 @@ class BillingWebhookEventHandler {
 
     private final BillingSubscriptionService billingSubscriptionService;
     private final BillingWebhookEventService billingWebhookEventService;
+    private final MeteredSubscriptionModelHandler meteredSubscriptionModelHandler;
     private final SubscriptionModelHandlerRegistry subscriptionModelHandlerRegistry;
 
     BillingWebhookEventHandler(
         BillingSubscriptionService billingSubscriptionService, BillingWebhookEventService billingWebhookEventService,
+        MeteredSubscriptionModelHandler meteredSubscriptionModelHandler,
         SubscriptionModelHandlerRegistry subscriptionModelHandlerRegistry) {
 
         this.billingSubscriptionService = billingSubscriptionService;
         this.billingWebhookEventService = billingWebhookEventService;
+        this.meteredSubscriptionModelHandler = meteredSubscriptionModelHandler;
         this.subscriptionModelHandlerRegistry = subscriptionModelHandlerRegistry;
     }
 
@@ -98,9 +103,15 @@ class BillingWebhookEventHandler {
             .orElseThrow(() -> new RuntimeException("Failed to deserialize subscription"));
 
         return billingSubscriptionService.fetchSubscriptionBySubscriptionId(stripeSubscription.getId())
-            .map(subscription -> subscriptionModelHandlerRegistry
-                .getSubscriptionModelHandler(subscription.getSubscriptionModel())
-                .handleSubscriptionUpdated(subscription, stripeSubscription))
+            .map(subscription -> {
+                if (subscription.getSubscriptionModel() == SubscriptionModel.METERED) {
+                    meteredSubscriptionModelHandler.switchToPrepaidIfNotMetered(subscription, stripeSubscription);
+                }
+
+                return subscriptionModelHandlerRegistry
+                    .getSubscriptionModelHandler(subscription.getSubscriptionModel())
+                    .handleSubscriptionUpdated(subscription, stripeSubscription);
+            })
             .orElse(null);
     }
 
@@ -123,7 +134,15 @@ class BillingWebhookEventHandler {
             .getObject()
             .orElseThrow(() -> new RuntimeException("Failed to deserialize checkout session"));
 
-        return subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.METERED)
+        Map<String, String> metadata = session.getMetadata();
+
+        String subscriptionModelName = metadata == null ? null : metadata.get("subscriptionModel");
+
+        // Only sessions created before the PREPAID deploy lack the metadata; they are METERED.
+        SubscriptionModel subscriptionModel = Objects.equals(SubscriptionModel.PREPAID.name(), subscriptionModelName)
+            ? SubscriptionModel.PREPAID : SubscriptionModel.METERED;
+
+        return subscriptionModelHandlerRegistry.getSubscriptionModelHandler(subscriptionModel)
             .handleCheckoutSessionCompleted(session);
     }
 

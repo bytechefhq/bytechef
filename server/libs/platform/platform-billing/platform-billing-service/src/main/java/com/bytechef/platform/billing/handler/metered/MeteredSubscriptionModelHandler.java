@@ -22,6 +22,8 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandler;
+import com.bytechef.platform.billing.handler.prepaid.PrepaidPriceUtils;
+import com.bytechef.platform.billing.repository.PrepaidBillingSubscriptionRepository;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.tenant.TenantContext;
@@ -54,6 +56,7 @@ public class MeteredSubscriptionModelHandler implements SubscriptionModelHandler
     private final BillingProperties billingProperties;
     private final BillingSubscriptionService billingSubscriptionService;
     private final BillingUsageService billingUsageService;
+    private final PrepaidBillingSubscriptionRepository prepaidBillingSubscriptionRepository;
     private final StripeClient stripeClient;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -61,11 +64,13 @@ public class MeteredSubscriptionModelHandler implements SubscriptionModelHandler
         BillingProperties billingProperties,
         BillingSubscriptionService billingSubscriptionService,
         BillingUsageService billingUsageService,
+        PrepaidBillingSubscriptionRepository prepaidBillingSubscriptionRepository,
         StripeClient stripeClient) {
 
         this.billingProperties = billingProperties;
         this.billingSubscriptionService = billingSubscriptionService;
         this.billingUsageService = billingUsageService;
+        this.prepaidBillingSubscriptionRepository = prepaidBillingSubscriptionRepository;
         this.stripeClient = stripeClient;
     }
 
@@ -305,6 +310,35 @@ public class MeteredSubscriptionModelHandler implements SubscriptionModelHandler
         billingSubscription.setSubscriptionModel(SubscriptionModel.METERED);
 
         return billingSubscriptionService.save(billingSubscription);
+    }
+
+    /**
+     * Moves a METERED row to {@link SubscriptionModel#PREPAID} once its Stripe subscription no longer has a metered
+     * item. The plan grant is set here as well, so the row ends PREPAID with a {@code planUnitTotal} even when the
+     * switching event does not change the billing period.
+     */
+    public void switchToPrepaidIfNotMetered(BillingSubscription subscription, Subscription stripeSubscription) {
+        List<SubscriptionItem> items = stripeSubscription.getItems()
+            .getData();
+
+        boolean hasMeteredItem = items.stream()
+            .anyMatch(this::isMeteredItem);
+
+        if (hasMeteredItem) {
+            return;
+        }
+
+        SubscriptionItem flatItem = items.stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "Subscription " + stripeSubscription.getId() + " has no subscription item"));
+
+        subscription.setSubscriptionModel(SubscriptionModel.PREPAID);
+        subscription.setPlanUnitTotal(PrepaidPriceUtils.getUnitTotal(flatItem.getPrice()));
+
+        BillingSubscription savedSubscription = billingSubscriptionService.save(subscription);
+
+        prepaidBillingSubscriptionRepository.resetPlanUnitUsed(savedSubscription.getId());
     }
 
     private int getProductUnitLimit(SubscriptionItem usageItem) {
