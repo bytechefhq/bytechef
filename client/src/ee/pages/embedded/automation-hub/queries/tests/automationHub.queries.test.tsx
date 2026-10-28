@@ -71,14 +71,16 @@ describe('automationHub.queries', () => {
         expect(automationWorkflowProjectApiMock.getFrontendProjects).toHaveBeenCalledWith({});
     });
 
-    it('lists the template projects exactly as the server returned them', async () => {
-        const projects = [{id: 1, name: 'First'}, {id: 2}];
-
-        automationWorkflowProjectApiMock.getFrontendProjects.mockResolvedValue(projects);
+    it('leaves projects hidden from the hub out of the template projects', async () => {
+        automationWorkflowProjectApiMock.getFrontendProjects.mockResolvedValue([
+            {automationHubVisible: true, id: 1},
+            {automationHubVisible: false, id: 2},
+            {id: 3},
+        ]);
 
         const {result} = renderQueryHook(useGetTemplateProjectsQuery);
 
-        await waitFor(() => expect(result.current.data).toEqual(projects));
+        await waitFor(() => expect(result.current.data).toEqual([{automationHubVisible: true, id: 1}, {id: 3}]));
     });
 
     it('loads the automations', async () => {
