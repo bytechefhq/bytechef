@@ -16,18 +16,40 @@
 
 package com.bytechef.platform.workflow.execution.web.rest.mapper;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
+import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
-public interface JobMapper extends Converter<JobDTO, JobModel> {
+public class JobMapper {
 
-    @Override
-    JobModel convert(JobDTO jobDTO);
+    @Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
+    public interface JobDTOToJobModelMapper extends Converter<JobDTO, JobModel> {
+
+        @Override
+        JobModel convert(JobDTO jobDTO);
+    }
+
+    @Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
+    public interface JobToJobBasicModelMapper extends Converter<Job, JobBasicModel> {
+
+        @Override
+        JobBasicModel convert(Job job);
+    }
+
+    @Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
+    public interface JobToJobModelMapper extends Converter<Job, JobModel> {
+
+        @Override
+        @Mapping(target = "outputs", ignore = true)
+        @Mapping(target = "taskExecutions", ignore = true)
+        JobModel convert(Job job);
+    }
 }

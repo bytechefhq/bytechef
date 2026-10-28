@@ -103,6 +103,7 @@ dependencies {
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:core:commons:commons-util"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
     testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
