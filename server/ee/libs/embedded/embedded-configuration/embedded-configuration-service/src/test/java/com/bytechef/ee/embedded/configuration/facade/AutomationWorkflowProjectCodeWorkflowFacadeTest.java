@@ -39,6 +39,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
@@ -64,6 +65,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
  */
 @ExtendWith(MockitoExtension.class)
 class AutomationWorkflowProjectCodeWorkflowFacadeTest {
+
+    @Mock
+    private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
 
     @Mock
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -93,7 +97,8 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
 
         when(projectService.getProject(7L)).thenReturn(project);
 
-        List<String> warnings = facade().save(jsProject("my-project"), Language.JAVASCRIPT);
+        List<String> warnings =
+            facade().save(jsProject("my-project"), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
         InOrder inOrder = inOrder(projectCodeWorkflowDraftService, automationWorkflowProjectFacade);
 
@@ -117,7 +122,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
 
         when(projectService.getProject(100L)).thenReturn(project);
 
-        facade().save(jsProject("acme-billing"), Language.JAVASCRIPT);
+        facade().save(jsProject("acme-billing"), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
         verify(projectCodeWorkflowDraftService)
             .saveDraft(eq(project), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
@@ -346,7 +351,8 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
 
     private AutomationWorkflowProjectCodeWorkflowFacadeImpl facade() {
         return new AutomationWorkflowProjectCodeWorkflowFacadeImpl(
-            new ApplicationProperties(), automationWorkflowProjectFacade, mock(CacheManager.class),
+            new ApplicationProperties(), automationWorkflowProjectConfigurationAdminFacade,
+            automationWorkflowProjectFacade, mock(CacheManager.class),
             codeWorkflowContainerService, codeWorkflowFileStorage, projectCodeWorkflowDraftService,
             projectCodeWorkflowService, projectService);
     }
@@ -360,7 +366,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
 
         when(projectService.getProject(100L)).thenReturn(project);
 
-        return facade().save(jsProject("acme-billing", triggers), Language.JAVASCRIPT);
+        return facade().save(jsProject("acme-billing", triggers), Language.JAVASCRIPT, Environment.PRODUCTION, false);
     }
 
     private static byte[] jsProject(String name) {
