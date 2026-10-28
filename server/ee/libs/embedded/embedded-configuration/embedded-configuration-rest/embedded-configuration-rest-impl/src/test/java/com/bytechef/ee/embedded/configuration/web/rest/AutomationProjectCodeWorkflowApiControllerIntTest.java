@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurat
 import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurationRestTestConfiguration;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -115,7 +118,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     void testDeployAutomationProjectCodeWorkflowReturnsTheWarnings() {
         byte[] bytes = "export function handler() {}".getBytes(StandardCharsets.UTF_8);
 
-        when(automationWorkflowProjectCodeWorkflowFacade.save(bytes, Language.JAVASCRIPT))
+        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(bytes), eq(Language.JAVASCRIPT), any(), anyBoolean()))
             .thenReturn(List.of("Workflow 'charge' has no trigger that can start it"));
 
         webTestClient
@@ -130,7 +133,8 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .jsonPath("$.warnings[0]")
             .isEqualTo("Workflow 'charge' has no trigger that can start it");
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVASCRIPT));
+        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVASCRIPT), any(),
+            anyBoolean());
     }
 
     @Test
@@ -139,7 +143,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             0x50, 0x4b, 0x03, 0x04
         };
 
-        when(automationWorkflowProjectCodeWorkflowFacade.save(bytes, Language.JAVA))
+        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(bytes), eq(Language.JAVA), any(), anyBoolean()))
             .thenReturn(List.of());
 
         webTestClient
@@ -154,7 +158,55 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .jsonPath("$.warnings")
             .isEmpty();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVA));
+        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVA), any(), anyBoolean());
+    }
+
+    @Test
+    void testDeployAutomationProjectCodeWorkflowPassesTheReleaseFlagAndTheRequestEnvironment() {
+        byte[] bytes = "export function handler() {}".getBytes(StandardCharsets.UTF_8);
+
+        when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
+        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+            .thenReturn(List.of());
+
+        MultipartBodyBuilder multipartBodyBuilder = multipartBody("projectFile", "project.js", bytes);
+
+        multipartBodyBuilder.part("release", "true");
+
+        webTestClient
+            .post()
+            .uri("/internal/automation/projects/deploy")
+            .header("X-Environment", "STAGING")
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .bodyValue(multipartBodyBuilder.build())
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        verify(automationWorkflowProjectCodeWorkflowFacade)
+            .save(eq(bytes), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(true));
+    }
+
+    @Test
+    void testDeployAutomationProjectCodeWorkflowWithoutTheReleaseFieldPassesFalse() {
+        byte[] bytes = "export function handler() {}".getBytes(StandardCharsets.UTF_8);
+
+        when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
+        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+            .thenReturn(List.of());
+
+        webTestClient
+            .post()
+            .uri("/internal/automation/projects/deploy")
+            .header("X-Environment", "STAGING")
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .bodyValue(multipartBody("projectFile", "project.js", bytes).build())
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        verify(automationWorkflowProjectCodeWorkflowFacade)
+            .save(eq(bytes), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(false));
     }
 
     private static MultipartBodyBuilder multipartBody(String partName, String filename, byte[] bytes) {

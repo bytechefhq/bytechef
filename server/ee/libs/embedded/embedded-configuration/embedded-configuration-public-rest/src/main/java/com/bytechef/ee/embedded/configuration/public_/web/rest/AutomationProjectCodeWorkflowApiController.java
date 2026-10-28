@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationP
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -47,26 +48,30 @@ public class AutomationProjectCodeWorkflowApiController implements AutomationPro
 
     private final AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public AutomationProjectCodeWorkflowApiController(
         AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade,
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade) {
+        AutomationWorkflowProjectFacade automationWorkflowProjectFacade, EnvironmentService environmentService) {
 
         this.automationWorkflowProjectCodeWorkflowFacade = automationWorkflowProjectCodeWorkflowFacade;
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
+        this.environmentService = environmentService;
     }
 
     @Override
     public ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
-        EnvironmentModel xEnvironment, MultipartFile projectFile) {
+        EnvironmentModel xEnvironment, MultipartFile projectFile, Boolean release) {
 
         List<String> warnings;
 
         try {
             warnings = automationWorkflowProjectCodeWorkflowFacade.save(
                 projectFile.getBytes(),
-                Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())));
+                Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())),
+                environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name()),
+                Boolean.TRUE.equals(release));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

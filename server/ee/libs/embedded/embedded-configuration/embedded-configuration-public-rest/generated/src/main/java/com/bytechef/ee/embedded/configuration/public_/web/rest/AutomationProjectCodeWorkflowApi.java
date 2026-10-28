@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-11T13:28:57.698426+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T00:01:44.404593+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "automation-project-code-workflow", description = "The Embedded Automation Project Code Workflow Public API")
 public interface AutomationProjectCodeWorkflowApi {
@@ -52,6 +52,7 @@ public interface AutomationProjectCodeWorkflowApi {
      *
      * @param xEnvironment The environment. (optional)
      * @param projectFile The file of a code-native automation project. (optional)
+     * @param release Whether to also point the configuration of the request environment at the newly published version. (optional, default to false)
      * @return Successful operation. (status code 200)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -78,7 +79,8 @@ public interface AutomationProjectCodeWorkflowApi {
     )
     default ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "projectFile", description = "The file of a code-native automation project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile
+        @Parameter(name = "projectFile", description = "The file of a code-native automation project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile,
+        @Parameter(name = "release", description = "Whether to also point the configuration of the request environment at the newly published version.") @Valid @RequestParam(value = "release", required = false) Boolean release
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

@@ -10,8 +10,10 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.AutomationProjectCodeWorkflowDeployResultModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
@@ -39,12 +41,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class AutomationProjectCodeWorkflowApiController implements AutomationProjectCodeWorkflowApi {
 
     private final AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public AutomationProjectCodeWorkflowApiController(
-        AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade) {
+        AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade,
+        EnvironmentService environmentService) {
 
         this.automationWorkflowProjectCodeWorkflowFacade = automationWorkflowProjectCodeWorkflowFacade;
+        this.environmentService = environmentService;
     }
 
     /**
@@ -55,14 +60,16 @@ public class AutomationProjectCodeWorkflowApiController implements AutomationPro
      */
     @Override
     public ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
-        MultipartFile projectFile) {
+        EnvironmentModel xEnvironment, MultipartFile projectFile, Boolean release) {
 
         List<String> warnings;
 
         try {
             warnings = automationWorkflowProjectCodeWorkflowFacade.save(
                 projectFile.getBytes(),
-                Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())));
+                Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())),
+                environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name()),
+                Boolean.TRUE.equals(release));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
