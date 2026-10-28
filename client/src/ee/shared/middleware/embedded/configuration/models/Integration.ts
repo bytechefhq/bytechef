@@ -102,6 +102,10 @@ export interface Integration {
      */
     category?: Category;
     /**
+     * The number of the integration's instance configurations in the Development environment. Only set by the integration list.
+     */
+    readonly developmentConfigurationCount?: number;
+    /**
      * The integration workflow ids belonging to this integration.
      */
     integrationWorkflowIds?: Array<number>;
@@ -151,6 +155,7 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'name': json['name'] == null ? undefined : json['name'],
         'permissionExpression': json['permissionExpression'] == null ? undefined : json['permissionExpression'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
+        'developmentConfigurationCount': json['developmentConfigurationCount'] == null ? undefined : json['developmentConfigurationCount'],
         'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
@@ -161,7 +166,7 @@ export function IntegrationToJSON(json: any): Integration {
     return IntegrationToJSONTyped(json, false);
 }
 
-export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'|'developmentConfigurationCount'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
