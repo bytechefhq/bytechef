@@ -51,8 +51,8 @@ const AutomationWorkflowProjectConfigurationDialog = ({
     const {data: versionsData} = useAutomationWorkflowProjectVersionsQuery({id: project.id});
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurations']});
-        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurations']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
 
         onClose();
     };

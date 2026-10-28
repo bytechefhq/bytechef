@@ -91,10 +91,10 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                                 {enable, id: configuration.id},
                                 {
                                     onSuccess: () => {
-                                        queryClient.invalidateQueries({
+                                        void queryClient.invalidateQueries({
                                             queryKey: ['automationWorkflowProjectConfigurations'],
                                         });
-                                        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+                                        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
                                     },
                                 }
                             )
