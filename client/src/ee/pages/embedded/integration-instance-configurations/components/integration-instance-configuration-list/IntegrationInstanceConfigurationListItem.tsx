@@ -28,12 +28,14 @@ interface IntegrationInstanceConfigurationListItemProps {
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     mcpWorkflowIds?: Set<string>;
     remainingTags?: Tag[];
+    showIntegrationIcon?: boolean;
 }
 
 const IntegrationInstanceConfigurationListItem = ({
     integrationInstanceConfiguration,
     mcpWorkflowIds,
     remainingTags,
+    showIntegrationIcon = true,
 }: IntegrationInstanceConfigurationListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -141,7 +143,7 @@ const IntegrationInstanceConfigurationListItem = ({
                         <div className="flex min-h-8 items-center justify-between">
                             <div className="flex w-full items-center gap-2">
                                 <div className="flex items-center gap-1">
-                                    {integrationInstanceConfiguration?.integration?.icon && (
+                                    {showIntegrationIcon && integrationInstanceConfiguration?.integration?.icon && (
                                         <InlineSVG
                                             className="size-5 flex-none"
                                             src={integrationInstanceConfiguration?.integration.icon}

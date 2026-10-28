@@ -44,6 +44,10 @@ vi.mock(
     })
 );
 
+vi.mock('react-inlinesvg', () => ({
+    default: ({src}: {src: string}) => <svg data-src={src} data-testid="integration-icon" />,
+}));
+
 const integrationInstanceConfiguration = {
     enabled: true,
     id: 1,
@@ -53,12 +57,13 @@ const integrationInstanceConfiguration = {
     tags: [],
 } as unknown as IntegrationInstanceConfiguration;
 
-const renderItem = (overrides: Partial<IntegrationInstanceConfiguration> = {}) =>
+const renderItem = (overrides: Partial<IntegrationInstanceConfiguration> = {}, showIntegrationIcon?: boolean) =>
     render(
         <TooltipProvider>
             <Collapsible>
                 <IntegrationInstanceConfigurationListItem
                     integrationInstanceConfiguration={{...integrationInstanceConfiguration, ...overrides}}
+                    showIntegrationIcon={showIntegrationIcon}
                 />
             </Collapsible>
         </TooltipProvider>
@@ -114,6 +119,31 @@ describe('IntegrationInstanceConfigurationListItem row click', () => {
         await userEvent.click(screen.getByRole('menu'));
 
         expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
+    });
+});
+
+describe('IntegrationInstanceConfigurationListItem integration icon', () => {
+    const integration = {icon: 'icon.svg'} as IntegrationInstanceConfiguration['integration'];
+
+    beforeEach(() => {
+        windowResizeObserver();
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('should show the integration icon by default', () => {
+        renderItem({integration});
+
+        expect(screen.getByTestId('integration-icon')).toHaveAttribute('data-src', 'icon.svg');
+    });
+
+    it('should hide the integration icon when showIntegrationIcon is false', () => {
+        renderItem({integration}, false);
+
+        expect(screen.queryByTestId('integration-icon')).not.toBeInTheDocument();
     });
 });
 
