@@ -27,6 +27,7 @@ import com.bytechef.platform.component.definition.AbstractClusterElementDefiniti
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.datastream.ItemProcessor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
 
 /**
@@ -46,6 +47,12 @@ public class ScriptClusterElementDefinition
 
         this.languageId = languageId;
         this.polyglotEngine = polyglotEngine;
+    }
+
+    @JsonIgnore
+    @Override
+    public ScriptClusterElementDefinition getElement() {
+        return this;
     }
 
     @SuppressWarnings("unchecked")
