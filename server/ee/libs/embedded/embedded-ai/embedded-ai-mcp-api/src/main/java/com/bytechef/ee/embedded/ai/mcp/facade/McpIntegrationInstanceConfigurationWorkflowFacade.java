@@ -34,6 +34,9 @@ public interface McpIntegrationInstanceConfigurationWorkflowFacade {
     McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflowParameters(
         long id, Map<String, ?> parameters);
 
+    McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflowEnabled(
+        long id, boolean enabled);
+
     @Nullable
     McpIntegrationInstanceConfigurationWorkflow getMcpIntegrationInstanceConfigurationWorkflow(long id);
 

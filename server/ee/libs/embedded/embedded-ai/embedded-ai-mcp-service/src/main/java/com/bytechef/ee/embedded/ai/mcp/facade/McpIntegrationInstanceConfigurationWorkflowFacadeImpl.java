@@ -117,6 +117,14 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflowEnabled(
+        long id, boolean enabled) {
+
+        return mcpIntegrationInstanceConfigurationWorkflowService.updateEnabled(id, enabled);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public McpIntegrationInstanceConfigurationWorkflow getMcpIntegrationInstanceConfigurationWorkflow(long id) {
         return mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(id)
             .orElse(null);

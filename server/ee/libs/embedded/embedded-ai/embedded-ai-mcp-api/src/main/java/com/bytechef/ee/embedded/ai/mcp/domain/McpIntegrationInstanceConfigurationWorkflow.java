@@ -43,6 +43,9 @@ public final class McpIntegrationInstanceConfigurationWorkflow {
     @Column
     private MapWrapper parameters = new MapWrapper();
 
+    @Column
+    private boolean enabled = true;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -108,6 +111,14 @@ public final class McpIntegrationInstanceConfigurationWorkflow {
         this.parameters = new MapWrapper(parameters);
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -157,6 +168,7 @@ public final class McpIntegrationInstanceConfigurationWorkflow {
             ", mcpIntegrationInstanceConfigurationId=" + mcpIntegrationInstanceConfigurationId +
             ", integrationInstanceConfigurationWorkflowId=" + integrationInstanceConfigurationWorkflowId +
             ", parameters=" + parameters +
+            ", enabled=" + enabled +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

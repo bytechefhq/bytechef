@@ -95,4 +95,9 @@ public class RemoteMcpIntegrationInstanceConfigurationWorkflowServiceClient
     public McpIntegrationInstanceConfigurationWorkflow updateParameters(long id, Map<String, ?> parameters) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public McpIntegrationInstanceConfigurationWorkflow updateEnabled(long id, boolean enabled) {
+        throw new UnsupportedOperationException();
+    }
 }

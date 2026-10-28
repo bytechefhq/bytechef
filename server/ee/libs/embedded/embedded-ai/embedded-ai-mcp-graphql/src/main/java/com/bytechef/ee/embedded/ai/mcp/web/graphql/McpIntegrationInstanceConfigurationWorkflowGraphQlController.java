@@ -207,6 +207,11 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
                 .updateMcpIntegrationInstanceConfigurationWorkflowParameters(id, parameters);
         }
 
+        if (input.get("enabled") instanceof Boolean enabled) {
+            mcpIntegrationInstanceConfigurationWorkflow = mcpIntegrationInstanceConfigurationWorkflowFacade
+                .updateMcpIntegrationInstanceConfigurationWorkflowEnabled(id, enabled);
+        }
+
         return mcpIntegrationInstanceConfigurationWorkflow;
     }
 
