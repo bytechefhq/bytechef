@@ -9,12 +9,14 @@ import IntegrationInstanceConfigurationListItem from './IntegrationInstanceConfi
 
 const IntegrationInstanceConfigurationList = ({
     componentDefinitions,
+    expandAll = false,
     integration,
     integrationInstanceConfigurations,
     tags,
     taskDispatcherDefinitions,
 }: {
     componentDefinitions?: ComponentDefinitionBasic[];
+    expandAll?: boolean;
     integration: Integration;
     integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
     tags: Tag[];
@@ -64,6 +66,7 @@ const IntegrationInstanceConfigurationList = ({
                         return (
                             <Collapsible
                                 className="group mb-2 rounded border border-border/50"
+                                defaultOpen={expandAll}
                                 key={integrationInstanceConfiguration.id}
                             >
                                 <IntegrationInstanceConfigurationListItem
