@@ -21,10 +21,13 @@ import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjec
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,10 +68,24 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     public long createConfiguration(
         long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
 
+        validateEnvironmentId(environmentId);
         validatePublishedProjectVersion(projectId, projectVersion);
 
-        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService.create(
-            projectId, environmentId, projectVersion, enabled, automationHubVisible);
+        Optional<AutomationWorkflowProjectConfiguration> existingConfigurationOptional =
+            automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, environmentId);
+
+        if (existingConfigurationOptional.isPresent()) {
+            throw newConfigurationAlreadyExistsException(projectId, environmentId);
+        }
+
+        AutomationWorkflowProjectConfiguration configuration;
+
+        try {
+            configuration = automationWorkflowProjectConfigurationService.create(
+                projectId, environmentId, projectVersion, enabled, automationHubVisible);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw newConfigurationAlreadyExistsException(projectId, environmentId);
+        }
 
         publishUpdatedEvent(projectId, environmentId);
 
@@ -124,6 +141,20 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             id, projectVersion, enabled, automationHubVisible);
 
         publishUpdatedEvent(configuration.getProjectId(), configuration.getEnvironmentId());
+    }
+
+    private static ConfigurationException newConfigurationAlreadyExistsException(long projectId, long environmentId) {
+        return new ConfigurationException(
+            "Project id=%s already has a configuration for environment id=%s".formatted(projectId, environmentId),
+            AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_ALREADY_EXISTS);
+    }
+
+    private static void validateEnvironmentId(long environmentId) {
+        if (environmentId < 0 || environmentId >= Environment.values().length) {
+            throw new ConfigurationException(
+                "Environment id=%s is not a known environment".formatted(environmentId),
+                AutomationWorkflowProjectConfigurationErrorType.UNKNOWN_ENVIRONMENT);
+        }
     }
 
     private void publishUpdatedEvent(long projectId, long environmentId) {
