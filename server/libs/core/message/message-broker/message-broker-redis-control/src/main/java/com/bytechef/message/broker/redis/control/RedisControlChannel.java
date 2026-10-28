@@ -37,9 +37,6 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.util.MethodInvoker;
 
 /**
- * Broadcasts CONTROL route messages to every node over Redis pub/sub: each node subscribes to the route's channel and
- * dispatches every message to all delegates registered for it.
- *
  * @author Ivica Cardic
  */
 public class RedisControlChannel implements DisposableBean {
