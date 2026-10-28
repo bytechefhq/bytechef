@@ -63,6 +63,17 @@ class AmqpMessageBrokerEnvironmentPostProcessorTest {
     }
 
     @Test
+    void testPostProcessEnvironmentKeepsRabbitAutoConfigurationForUppercaseAmqpProvider() {
+        StandardEnvironment environment = createEnvironment(
+            new MapPropertySource("application", Map.of("bytechef.message-broker.provider", "AMQP")));
+
+        amqpMessageBrokerEnvironmentPostProcessor.postProcessEnvironment(environment, new SpringApplication());
+
+        assertThat(environment.getProperty("management.health.rabbit.enabled", Boolean.class)).isTrue();
+        assertThat(environment.getProperty("spring.autoconfigure.exclude")).isNull();
+    }
+
+    @Test
     void testPostProcessEnvironmentExcludesRabbitAutoConfigurationForOtherProvider() {
         StandardEnvironment environment = createEnvironment(
             new MapPropertySource("application", Map.of("bytechef.message-broker.provider", "redis")));
