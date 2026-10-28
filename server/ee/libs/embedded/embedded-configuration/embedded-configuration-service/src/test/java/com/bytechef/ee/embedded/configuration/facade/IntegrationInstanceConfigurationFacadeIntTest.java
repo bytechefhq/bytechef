@@ -157,6 +157,29 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testCreateIntegrationInstanceConfigurationWithoutAuthorizationType() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            newIntegrationInstanceConfigurationDTO(integration.getId(), 1)
+                .toBuilder()
+                .authorizationType(null)
+                .build();
+
+        long integrationInstanceConfigurationId =
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationDTO);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId);
+
+        assertThat(integrationInstanceConfiguration.getAuthorizationType()).isNull();
+    }
+
+    @Test
     void testListReadIsDeliberatelyOnlyAuthenticated() {
         long integrationInstanceConfigurationId = createEnabledIntegrationInstanceConfiguration();
 
