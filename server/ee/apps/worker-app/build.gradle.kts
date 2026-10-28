@@ -13,6 +13,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-jms")
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework.boot:spring-boot-starter-opentelemetry")
@@ -55,7 +56,6 @@ dependencies {
             .filter { it.path.startsWith(":server:libs:modules:components") }
             .filterNot { it.path in setOf(
                 ":server:libs:modules:components:ai:agent:chat-memory:chat-memory-builtin",
-                ":server:libs:modules:components:data-stream",
                 ":server:libs:modules:components:deepgram",
                 ":server:libs:modules:components:example") }
             .sortedBy { it.path }
@@ -68,6 +68,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
+    implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
@@ -84,6 +85,8 @@ dependencies {
     implementation(project(":server:ee:libs:modules:components:api-platform"))
     implementation(project(":server:ee:libs:modules:components:app-event"))
     implementation(project(":server:ee:libs:modules:components:request"))
+
+    runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("io.grpc:grpc-api")
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
