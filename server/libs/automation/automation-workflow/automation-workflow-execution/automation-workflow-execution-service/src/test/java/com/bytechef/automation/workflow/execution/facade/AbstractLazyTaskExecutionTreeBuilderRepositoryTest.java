@@ -27,6 +27,7 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.platform.workflow.execution.facade.LazyTaskExecutionTreeBuilder;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

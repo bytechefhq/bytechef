@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.workflow.execution.facade;
+package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Job;
@@ -25,6 +25,7 @@ import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,12 +46,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Builds the lazily loaded task execution tree of a job: top-level rows with child counts, paged children of a task
+ * execution and the path to the task execution worth focusing first. Shared by the automation and embedded execution
+ * facades, which supply their own task execution converter.
+ *
  * @author Ivica Cardic
  */
-class LazyTaskExecutionTreeBuilder {
+public class LazyTaskExecutionTreeBuilder {
 
-    static final int FOCUS_CANDIDATE_PAGE_SIZE = 100;
-    static final int MAX_PAGE_SIZE = 200;
+    public static final int FOCUS_CANDIDATE_PAGE_SIZE = 100;
+    public static final int MAX_PAGE_SIZE = 200;
 
     private static final Logger log = LoggerFactory.getLogger(LazyTaskExecutionTreeBuilder.class);
 
@@ -61,7 +66,8 @@ class LazyTaskExecutionTreeBuilder {
     private final TaskExecutionService taskExecutionService;
     private final Supplier<BiFunction<TaskExecution, JobDTO, TaskExecutionDTO>> taskExecutionDTOConverterFactory;
 
-    LazyTaskExecutionTreeBuilder(
+    @SuppressFBWarnings("EI")
+    public LazyTaskExecutionTreeBuilder(
         TaskExecutionService taskExecutionService, JobService jobService,
         Supplier<BiFunction<TaskExecution, JobDTO, TaskExecutionDTO>> taskExecutionDTOConverterFactory) {
 
@@ -70,20 +76,20 @@ class LazyTaskExecutionTreeBuilder {
         this.taskExecutionDTOConverterFactory = taskExecutionDTOConverterFactory;
     }
 
-    long countTaskExecutions(long jobId, List<TaskExecution> topLevelTaskExecutions) {
+    public long countTaskExecutions(long jobId, List<TaskExecution> topLevelTaskExecutions) {
         return taskExecutionService.countJobTaskExecutions(
             jobId, getSupersededTaskExecutionIds(topLevelTaskExecutions));
     }
 
-    List<TaskExecutionDTO> getTopLevelTaskExecutions(long jobId) {
+    public List<TaskExecutionDTO> getTopLevelTaskExecutions(long jobId) {
         return decorate(getTopLevelTaskExecutionRows(jobId));
     }
 
-    List<TaskExecution> getTopLevelTaskExecutionRows(long jobId) {
+    public List<TaskExecution> getTopLevelTaskExecutionRows(long jobId) {
         return taskExecutionService.getJobTopLevelTaskExecutions(jobId);
     }
 
-    List<TaskExecutionDTO> decorate(List<TaskExecution> taskExecutions) {
+    public List<TaskExecutionDTO> decorate(List<TaskExecution> taskExecutions) {
         if (taskExecutions.isEmpty()) {
             return List.of();
         }
@@ -114,7 +120,7 @@ class LazyTaskExecutionTreeBuilder {
     }
 
     @Nullable
-    JobDTO getChildJob(long taskExecutionId) {
+    public JobDTO getChildJob(long taskExecutionId) {
         Map<Long, Job> childJobMap = getChildJobMap(List.of(taskExecutionId));
 
         Job childJob = childJobMap.get(taskExecutionId);
@@ -122,7 +128,7 @@ class LazyTaskExecutionTreeBuilder {
         return childJob == null ? null : JobDTO.shallow(childJob);
     }
 
-    TaskExecutionChildrenPageDTO getChildrenPage(TaskExecution parent, int pageNumber, int pageSize) {
+    public TaskExecutionChildrenPageDTO getChildrenPage(TaskExecution parent, int pageNumber, int pageSize) {
         Validate.isTrue(pageNumber >= 0, "pageNumber must not be negative");
         Validate.isTrue(pageSize > 0, "pageSize must be positive");
         Validate.isTrue(pageSize <= MAX_PAGE_SIZE, "pageSize must not exceed " + MAX_PAGE_SIZE);
@@ -140,7 +146,7 @@ class LazyTaskExecutionTreeBuilder {
         return getPlainChildrenPage(parent, pageNumber, pageSize);
     }
 
-    List<FocusPathElementDTO> getFocusPath(long jobId, List<TaskExecution> topLevelTaskExecutions) {
+    public List<FocusPathElementDTO> getFocusPath(long jobId, List<TaskExecution> topLevelTaskExecutions) {
         Map<Long, Optional<TaskExecution>> ancestorCache = new HashMap<>();
 
         Optional<List<FocusPathElementDTO>> failedFocusPathOptional = fetchFailedLeafFocusPath(
