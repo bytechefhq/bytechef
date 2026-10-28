@@ -6,6 +6,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.ee.embedded.configuration.web.rest.model.AutomationProjectCodeWorkflowDeployResultModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T23:11:44.401718+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T00:01:44.575346+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "automation-project-code-workflow", description = "The Embedded Automation Project Code Workflow Internal API")
 public interface AutomationProjectCodeWorkflowApi {
@@ -48,7 +49,9 @@ public interface AutomationProjectCodeWorkflowApi {
      * POST /automation/projects/deploy : Deploy a new automation code workflow into the embedded catalog
      * Deploy a new automation code workflow into the embedded catalog.
      *
+     * @param xEnvironment The environment. (optional)
      * @param projectFile The file of a code-native automation project. (optional)
+     * @param release Whether to also point the configuration of the request environment at the newly published version. (optional, default to false)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -69,7 +72,9 @@ public interface AutomationProjectCodeWorkflowApi {
         consumes = { "multipart/form-data" }
     )
     default ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
-        @Parameter(name = "projectFile", description = "The file of a code-native automation project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
+        @Parameter(name = "projectFile", description = "The file of a code-native automation project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile,
+        @Parameter(name = "release", description = "Whether to also point the configuration of the request environment at the newly published version.") @Valid @RequestParam(value = "release", required = false) Boolean release
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

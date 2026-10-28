@@ -1064,6 +1064,13 @@ paths:
       tags:
       - "automation-project-code-workflow"
       operationId: "deployAutomationProjectCodeWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
       requestBody:
         content:
           multipart/form-data:
@@ -1074,6 +1081,10 @@ paths:
                   description: "The file of a code-native automation project."
                   type: "string"
                   format: "binary"
+                release:
+                  description: "Whether to also point the configuration of the request environment at the newly published version."
+                  type: "boolean"
+                  default: false
         required: true
       responses:
         "200":

@@ -2192,6 +2192,10 @@ paths:
                   description: "The file of a code-native automation project."
                   type: "string"
                   format: "binary"
+                release:
+                  description: "Whether to also point the configuration of the request environment at the newly published version."
+                  type: "boolean"
+                  default: false
         required: true
       responses:
         "200":
