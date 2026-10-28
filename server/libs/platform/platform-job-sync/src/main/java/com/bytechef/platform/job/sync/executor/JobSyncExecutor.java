@@ -114,6 +114,10 @@ public class JobSyncExecutor {
     private final Cache<String, CopyOnWriteArrayList<Consumer<ErrorEvent>>> errorListeners = createCache();
     private final Map<String, CountDownLatch> jobCompletionLatches = new ConcurrentHashMap<>();
     private final JobFacade jobFacade;
+    private final Cache<String, RuntimeException> jobFailures = Caffeine.newBuilder()
+        .expireAfterWrite(10, TimeUnit.MINUTES)
+        .maximumSize(1000)
+        .build();
     private final JobService jobService;
     private final Cache<String, CopyOnWriteArrayList<Consumer<JobStatusApplicationEvent>>> jobStatusListeners =
         createCache();
@@ -889,7 +893,15 @@ public class JobSyncExecutor {
         messageBroker.receive(messageRoute, message -> {
             String tenantId = (String) ((MessageEvent<?>) message).getMetadata(CURRENT_TENANT_ID);
 
-            TenantContext.runWithTenantId(tenantId, () -> receiver.receive(message));
+            TenantContext.runWithTenantId(tenantId, () -> {
+                try {
+                    receiver.receive(message);
+                } catch (RuntimeException runtimeException) {
+                    releaseFailedJob(message, runtimeException);
+
+                    throw runtimeException;
+                }
+            });
         });
     }
 
@@ -910,6 +922,12 @@ public class JobSyncExecutor {
 
         Job job = jobService.getJob(jobId);
 
+        if (failJobOnHandlerFailure(jobId)) {
+            jobCompletionLatches.remove(getKey(jobId));
+
+            return;
+        }
+
         if (job.getStatus() == Job.Status.COMPLETED || job.getStatus() == Job.Status.FAILED ||
             job.getStatus() == Job.Status.STOPPED) {
 
@@ -927,6 +945,8 @@ public class JobSyncExecutor {
                 TaskExecution.Status status = taskExecution.getStatus();
 
                 if (status.isTerminated()) {
+                    failJobOnHandlerFailure(jobId);
+
                     jobCompletionLatches.remove(getKey(jobId));
 
                     return;
@@ -941,27 +961,27 @@ public class JobSyncExecutor {
         try {
             long timeoutMillis = getTimeoutMillis(timeout);
 
-            if (timeoutMillis == NO_TIMEOUT) {
-                latch.await();
-            } else {
-                if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
-                    throw new TimeoutException(
-                        "Job %d did not finish within %d milliseconds".formatted(jobId, timeoutMillis));
+            if (jobFailures.getIfPresent(getKey(jobId)) == null) {
+                if (timeoutMillis == NO_TIMEOUT) {
+                    latch.await();
+                } else {
+                    if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                        throw new TimeoutException(
+                            "Job %d did not finish within %d milliseconds".formatted(jobId, timeoutMillis));
+                    }
                 }
             }
+
+            failJobOnHandlerFailure(jobId);
         } catch (InterruptedException | TimeoutException exception) {
             if (log.isTraceEnabled()) {
                 log.trace(exception.getMessage());
             }
 
-            job.setError(
-                new ExecutionError(
-                    Objects.requireNonNullElse(
-                        exception.getMessage(), "Interrupted while waiting for job %d".formatted(jobId)),
-                    List.of()));
-            job.setStatus(Job.Status.FAILED);
-
-            jobService.update(job);
+            failJob(
+                job,
+                Objects.requireNonNullElse(
+                    exception.getMessage(), "Interrupted while waiting for job %d".formatted(jobId)));
         } finally {
             jobCompletionLatches.remove(getKey(jobId));
         }
@@ -993,5 +1013,73 @@ public class JobSyncExecutor {
             new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
             new SuspendTaskExecutionPostOutputProcessor(null),
             new WebhookResponseTaskExecutionPostOutputProcessor());
+    }
+
+    private void failJob(Job job, String message) {
+        job.setError(new ExecutionError(message, List.of()));
+        job.setStatus(Job.Status.FAILED);
+
+        jobService.update(job);
+    }
+
+    private boolean failJobOnHandlerFailure(long jobId) {
+        RuntimeException jobFailure = jobFailures.getIfPresent(getKey(jobId));
+
+        if (jobFailure == null) {
+            return false;
+        }
+
+        failJob(jobService.getJob(jobId), "Job %d failed: %s".formatted(jobId, getMessage(jobFailure)));
+
+        jobFailures.invalidate(getKey(jobId));
+
+        return true;
+    }
+
+    private void releaseFailedJob(Object event, RuntimeException runtimeException) {
+        Long jobId = fetchJobId(event);
+
+        if (jobId == null) {
+            return;
+        }
+
+        jobFailures.put(getKey(jobId), runtimeException);
+
+        CountDownLatch latch = jobCompletionLatches.get(getKey(jobId));
+
+        if (latch != null) {
+            latch.countDown();
+        }
+    }
+
+    private static @Nullable Long fetchJobId(Object event) {
+        return switch (event) {
+            case JobStatusApplicationEvent jobStatusApplicationEvent -> jobStatusApplicationEvent.getJobId();
+            case StartJobEvent startJobEvent -> startJobEvent.getJobId();
+            case StopJobEvent stopJobEvent -> stopJobEvent.getJobId();
+            case TaskExecutionCompleteEvent taskExecutionCompleteEvent -> getJobId(
+                taskExecutionCompleteEvent.getTaskExecution());
+            case TaskExecutionErrorEvent taskExecutionErrorEvent -> getJobId(
+                taskExecutionErrorEvent.getTaskExecution());
+            case TaskExecutionEvent taskExecutionEvent -> getJobId(taskExecutionEvent.getTaskExecution());
+            case TaskStartedApplicationEvent taskStartedApplicationEvent -> taskStartedApplicationEvent.getJobId();
+            default -> null;
+        };
+    }
+
+    private static @Nullable Long getJobId(@Nullable TaskExecution taskExecution) {
+        return taskExecution == null ? null : taskExecution.getJobId();
+    }
+
+    private static String getMessage(RuntimeException runtimeException) {
+        String message = runtimeException.getMessage();
+
+        if (message != null) {
+            return message;
+        }
+
+        Class<? extends RuntimeException> runtimeExceptionClass = runtimeException.getClass();
+
+        return runtimeExceptionClass.getSimpleName();
     }
 }
