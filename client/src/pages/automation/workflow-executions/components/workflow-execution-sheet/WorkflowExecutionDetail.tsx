@@ -3,7 +3,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {PanelRightIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -18,6 +18,8 @@ interface WorkflowExecutionDetailProps {
 
 const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => {
     const [workflowPanelVisible, setWorkflowPanelVisible] = useState(false);
+
+    const {useGetComponentDefinitionsQuery} = useWorkflowExecutionDetailQueries();
 
     const {
         activeTab,
@@ -142,9 +144,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                             minSize={15}
                         >
                             {workflowExecution && (
-                                <WorkflowReadOnlyProvider
-                                    value={{useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery}}
-                                >
+                                <WorkflowReadOnlyProvider value={{useGetComponentDefinitionsQuery}}>
                                     <WorkflowExecutionSheetWorkflowPanel workflowExecution={workflowExecution} />
                                 </WorkflowReadOnlyProvider>
                             )}

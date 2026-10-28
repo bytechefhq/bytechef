@@ -13,9 +13,9 @@ import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
+import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
-import {useGetWorkflowExecutionTaskExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
 import {WorkflowIcon} from 'lucide-react';
 import {ReactNode, useCallback, useMemo} from 'react';
@@ -76,6 +76,8 @@ const WorkflowExecutionSheetContent = ({
     triggerExecution,
 }: WorkflowExecutionSheetContentProps) => {
     const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
+
+    const {useGetWorkflowExecutionTaskExecutionQuery} = useWorkflowExecutionDetailQueries();
 
     const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
         useGetWorkflowExecutionTaskExecutionQuery(

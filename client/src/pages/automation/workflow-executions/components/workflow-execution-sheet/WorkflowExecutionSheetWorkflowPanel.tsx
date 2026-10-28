@@ -2,8 +2,8 @@ import LoadingIcon from '@/components/LoadingIcon';
 import PageLoader from '@/components/PageLoader';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
-import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {ReactFlowProvider} from '@xyflow/react';
 import {Suspense, lazy, useEffect, useState} from 'react';
 
@@ -26,6 +26,8 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
         taskDispatcherDefinitionsError,
         taskDispatcherDefinitionsLoading,
     } = useWorkflowLayout();
+
+    const {useGetWorkflowQuery} = useWorkflowExecutionDetailQueries();
 
     const {data: workflowDetails, isLoading: isWorkflowDetailsLoading} = useGetWorkflowQuery(
         workflow!.id as string,

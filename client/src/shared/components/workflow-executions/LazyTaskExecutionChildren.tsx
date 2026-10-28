@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import TaskExecutionChildrenList from '@/shared/components/workflow-executions/TaskExecutionChildrenList';
+import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {
     FocusPathElement,
     Job,
@@ -12,7 +13,6 @@ import {
 import {
     TASK_EXECUTION_CHILDREN_MAX_PAGES,
     TASK_EXECUTION_CHILDREN_PAGE_SIZE,
-    useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
 } from '@/shared/queries/automation/workflowExecutions.queries';
 import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
@@ -105,6 +105,8 @@ const LazyTaskExecutionChildren = ({
     const listRef = useRef<HTMLDivElement>(null);
     const pageOffsetsSnapshotRef = useRef<PageOffsetsSnapshotI | undefined>(undefined);
     const parentActiveRef = useRef(isParentActive);
+
+    const {useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery} = useWorkflowExecutionDetailQueries();
 
     const {
         data,
