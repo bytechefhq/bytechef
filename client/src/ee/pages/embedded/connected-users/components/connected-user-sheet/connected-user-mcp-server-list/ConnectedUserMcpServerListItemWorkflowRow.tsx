@@ -48,7 +48,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
                 <TooltipContent side="left">Last Execution Date</TooltipContent>
             </Tooltip>
 
-            <div className="relative mr-11 flex shrink-0 items-center">
+            <div className="relative mr-3 flex shrink-0 items-center">
                 {enableIntegrationInstanceWorkflowMutation.isPending && (
                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                 )}
