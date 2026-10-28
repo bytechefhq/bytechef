@@ -1,4 +1,8 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/platform/billing/web/rest/ApiUtil.java
-src/main/java/com/bytechef/platform/billing/web/rest/BillingWebhookApi.java
+src/main/java/com/bytechef/platform/billing/web/rest/BillingApi.java
+src/main/java/com/bytechef/platform/billing/web/rest/model/BillingSubscriptionModel.java
+src/main/java/com/bytechef/platform/billing/web/rest/model/CheckoutSessionModel.java
+src/main/java/com/bytechef/platform/billing/web/rest/model/CheckoutSessionRequestModel.java
+src/main/java/com/bytechef/platform/billing/web/rest/model/JobExecutionsPackageCheckoutRequestModel.java

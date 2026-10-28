@@ -79,6 +79,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CheckoutSession"
+  /billing/job-executions-package/checkout:
+    post:
+      description: "Create a Stripe Checkout Session for a one-time job executions package purchase"
+      summary: "Create a Stripe Checkout Session for a job executions package"
+      tags:
+        - "billing"
+      operationId: "createJobExecutionsPackageCheckoutSession"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobExecutionsPackageCheckoutRequest"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutSession"
 components:
   schemas:
     BillingSubscription:
@@ -109,6 +129,40 @@ components:
           description: "Number of job executions used in the current billing period."
           type: "integer"
           format: "int32"
+        subscriptionModel:
+          description: "The subscription model."
+          type: "string"
+          enum:
+            - "METERED"
+            - "PREPAID"
+        planUnitTotal:
+          description: "The number of plan units granted for the current billing period (PREPAID)."
+          type: "integer"
+          format: "int32"
+        planUnitUsed:
+          description: "The number of plan units consumed in the current billing period (PREPAID)."
+          type: "integer"
+          format: "int32"
+        extraUnitTotal:
+          description: "The number of purchased extra units (PREPAID)."
+          type: "integer"
+          format: "int32"
+        extraUnitUsed:
+          description: "The number of purchased extra units consumed (PREPAID)."
+          type: "integer"
+          format: "int32"
+    JobExecutionsPackageCheckoutRequest:
+      description: "A job executions package checkout request."
+      type: "object"
+      required:
+        - "quantity"
+      properties:
+        quantity:
+          description: "The number of packages to purchase."
+          type: "integer"
+          format: "int32"
+          minimum: 1
+          maximum: 100
     CheckoutSessionRequest:
       description: "A checkout session request."
       type: "object"

@@ -21,6 +21,7 @@ import com.bytechef.platform.billing.facade.BillingSubscriptionFacade;
 import com.bytechef.platform.billing.web.rest.model.BillingSubscriptionModel;
 import com.bytechef.platform.billing.web.rest.model.CheckoutSessionModel;
 import com.bytechef.platform.billing.web.rest.model.CheckoutSessionRequestModel;
+import com.bytechef.platform.billing.web.rest.model.JobExecutionsPackageCheckoutRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
@@ -80,6 +81,16 @@ public class BillingApiController implements BillingApi {
         String checkoutUrl = billingSubscriptionFacade.createCheckoutSession(
             checkoutSessionRequestModel.getPlanName()
                 .getValue());
+
+        return ResponseEntity.ok(new CheckoutSessionModel().checkoutUrl(checkoutUrl));
+    }
+
+    @Override
+    public ResponseEntity<CheckoutSessionModel> createJobExecutionsPackageCheckoutSession(
+        JobExecutionsPackageCheckoutRequestModel jobExecutionsPackageCheckoutRequestModel) {
+
+        String checkoutUrl = billingSubscriptionFacade.createJobExecutionsPackageCheckoutSession(
+            jobExecutionsPackageCheckoutRequestModel.getQuantity());
 
         return ResponseEntity.ok(new CheckoutSessionModel().checkoutUrl(checkoutUrl));
     }

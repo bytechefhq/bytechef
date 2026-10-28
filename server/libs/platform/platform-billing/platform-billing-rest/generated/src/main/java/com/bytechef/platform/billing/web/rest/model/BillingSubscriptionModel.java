@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
@@ -24,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BillingSubscription", description = "A billing subscription.")
 @JsonTypeName("BillingSubscription")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:20.602783+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-28T13:52:37.197604+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class BillingSubscriptionModel {
 
   private @Nullable String planName;
@@ -41,6 +42,51 @@ public class BillingSubscriptionModel {
   private @Nullable String scheduledPlanName;
 
   private @Nullable Integer jobsExecuted;
+
+  /**
+   * The subscription model.
+   */
+  public enum SubscriptionModelEnum {
+    METERED("METERED"),
+    
+    PREPAID("PREPAID");
+
+    private final String value;
+
+    SubscriptionModelEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static SubscriptionModelEnum fromValue(String value) {
+      for (SubscriptionModelEnum b : SubscriptionModelEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable SubscriptionModelEnum subscriptionModel;
+
+  private @Nullable Integer planUnitTotal;
+
+  private @Nullable Integer planUnitUsed;
+
+  private @Nullable Integer extraUnitTotal;
+
+  private @Nullable Integer extraUnitUsed;
 
   public BillingSubscriptionModel planName(@Nullable String planName) {
     this.planName = planName;
@@ -189,6 +235,111 @@ public class BillingSubscriptionModel {
     this.jobsExecuted = jobsExecuted;
   }
 
+  public BillingSubscriptionModel subscriptionModel(@Nullable SubscriptionModelEnum subscriptionModel) {
+    this.subscriptionModel = subscriptionModel;
+    return this;
+  }
+
+  /**
+   * The subscription model.
+   * @return subscriptionModel
+   */
+  
+  @Schema(name = "subscriptionModel", description = "The subscription model.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("subscriptionModel")
+  public @Nullable SubscriptionModelEnum getSubscriptionModel() {
+    return subscriptionModel;
+  }
+
+  @JsonProperty("subscriptionModel")
+  public void setSubscriptionModel(@Nullable SubscriptionModelEnum subscriptionModel) {
+    this.subscriptionModel = subscriptionModel;
+  }
+
+  public BillingSubscriptionModel planUnitTotal(@Nullable Integer planUnitTotal) {
+    this.planUnitTotal = planUnitTotal;
+    return this;
+  }
+
+  /**
+   * The number of plan units granted for the current billing period (PREPAID).
+   * @return planUnitTotal
+   */
+  
+  @Schema(name = "planUnitTotal", description = "The number of plan units granted for the current billing period (PREPAID).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("planUnitTotal")
+  public @Nullable Integer getPlanUnitTotal() {
+    return planUnitTotal;
+  }
+
+  @JsonProperty("planUnitTotal")
+  public void setPlanUnitTotal(@Nullable Integer planUnitTotal) {
+    this.planUnitTotal = planUnitTotal;
+  }
+
+  public BillingSubscriptionModel planUnitUsed(@Nullable Integer planUnitUsed) {
+    this.planUnitUsed = planUnitUsed;
+    return this;
+  }
+
+  /**
+   * The number of plan units consumed in the current billing period (PREPAID).
+   * @return planUnitUsed
+   */
+  
+  @Schema(name = "planUnitUsed", description = "The number of plan units consumed in the current billing period (PREPAID).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("planUnitUsed")
+  public @Nullable Integer getPlanUnitUsed() {
+    return planUnitUsed;
+  }
+
+  @JsonProperty("planUnitUsed")
+  public void setPlanUnitUsed(@Nullable Integer planUnitUsed) {
+    this.planUnitUsed = planUnitUsed;
+  }
+
+  public BillingSubscriptionModel extraUnitTotal(@Nullable Integer extraUnitTotal) {
+    this.extraUnitTotal = extraUnitTotal;
+    return this;
+  }
+
+  /**
+   * The number of purchased extra units (PREPAID).
+   * @return extraUnitTotal
+   */
+  
+  @Schema(name = "extraUnitTotal", description = "The number of purchased extra units (PREPAID).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("extraUnitTotal")
+  public @Nullable Integer getExtraUnitTotal() {
+    return extraUnitTotal;
+  }
+
+  @JsonProperty("extraUnitTotal")
+  public void setExtraUnitTotal(@Nullable Integer extraUnitTotal) {
+    this.extraUnitTotal = extraUnitTotal;
+  }
+
+  public BillingSubscriptionModel extraUnitUsed(@Nullable Integer extraUnitUsed) {
+    this.extraUnitUsed = extraUnitUsed;
+    return this;
+  }
+
+  /**
+   * The number of purchased extra units consumed (PREPAID).
+   * @return extraUnitUsed
+   */
+  
+  @Schema(name = "extraUnitUsed", description = "The number of purchased extra units consumed (PREPAID).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("extraUnitUsed")
+  public @Nullable Integer getExtraUnitUsed() {
+    return extraUnitUsed;
+  }
+
+  @JsonProperty("extraUnitUsed")
+  public void setExtraUnitUsed(@Nullable Integer extraUnitUsed) {
+    this.extraUnitUsed = extraUnitUsed;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -204,12 +355,17 @@ public class BillingSubscriptionModel {
         Objects.equals(this.currentPeriodEnd, billingSubscription.currentPeriodEnd) &&
         Objects.equals(this.cancelAtPeriodEnd, billingSubscription.cancelAtPeriodEnd) &&
         Objects.equals(this.scheduledPlanName, billingSubscription.scheduledPlanName) &&
-        Objects.equals(this.jobsExecuted, billingSubscription.jobsExecuted);
+        Objects.equals(this.jobsExecuted, billingSubscription.jobsExecuted) &&
+        Objects.equals(this.subscriptionModel, billingSubscription.subscriptionModel) &&
+        Objects.equals(this.planUnitTotal, billingSubscription.planUnitTotal) &&
+        Objects.equals(this.planUnitUsed, billingSubscription.planUnitUsed) &&
+        Objects.equals(this.extraUnitTotal, billingSubscription.extraUnitTotal) &&
+        Objects.equals(this.extraUnitUsed, billingSubscription.extraUnitUsed);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(planName, status, productUnitLimit, currentPeriodEnd, cancelAtPeriodEnd, scheduledPlanName, jobsExecuted);
+    return Objects.hash(planName, status, productUnitLimit, currentPeriodEnd, cancelAtPeriodEnd, scheduledPlanName, jobsExecuted, subscriptionModel, planUnitTotal, planUnitUsed, extraUnitTotal, extraUnitUsed);
   }
 
   @Override
@@ -223,6 +379,11 @@ public class BillingSubscriptionModel {
     sb.append("    cancelAtPeriodEnd: ").append(toIndentedString(cancelAtPeriodEnd)).append("\n");
     sb.append("    scheduledPlanName: ").append(toIndentedString(scheduledPlanName)).append("\n");
     sb.append("    jobsExecuted: ").append(toIndentedString(jobsExecuted)).append("\n");
+    sb.append("    subscriptionModel: ").append(toIndentedString(subscriptionModel)).append("\n");
+    sb.append("    planUnitTotal: ").append(toIndentedString(planUnitTotal)).append("\n");
+    sb.append("    planUnitUsed: ").append(toIndentedString(planUnitUsed)).append("\n");
+    sb.append("    extraUnitTotal: ").append(toIndentedString(extraUnitTotal)).append("\n");
+    sb.append("    extraUnitUsed: ").append(toIndentedString(extraUnitUsed)).append("\n");
     sb.append("}");
     return sb.toString();
   }
