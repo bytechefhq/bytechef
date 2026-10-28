@@ -62,7 +62,6 @@ const createWorkflowTemplate = (workflowUuid: string, label: string, lastModifie
 
 const mockProjects = [
     {
-        automationHubVisible: true,
         categoryId: null,
         description: null,
         id: 'project-1',
@@ -78,7 +77,6 @@ const mockProjects = [
         ],
     },
     {
-        automationHubVisible: true,
         categoryId: null,
         description: null,
         id: 'project-2',

@@ -10,7 +10,6 @@ import {
     DialogMain,
 } from '@/components/Dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Switch} from '@/components/ui/switch';
 import {Textarea} from '@/components/ui/textarea';
 import DescriptionFormField from '@/shared/components/entity-form/DescriptionFormField';
 import NameFormField from '@/shared/components/entity-form/NameFormField';
@@ -26,7 +25,6 @@ type EmbeddedCategoryType = AutomationWorkflowProjectCategoriesQuery['automation
 type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowProjectTags'][number];
 
 export interface AutomationWorkflowProjectFormValuesI {
-    automationHubVisible: boolean;
     category?: string;
     description: string;
     name: string;
@@ -35,7 +33,6 @@ export interface AutomationWorkflowProjectFormValuesI {
 }
 
 interface AutomationWorkflowProjectFormI {
-    automationHubVisible: boolean;
     category?: SelectOptionType;
     description: string;
     name: string;
@@ -80,7 +77,6 @@ const AutomationWorkflowProjectDialog = ({
 
     const form = useForm<AutomationWorkflowProjectFormI>({
         defaultValues: {
-            automationHubVisible: project?.automationHubVisible ?? true,
             category: existingCategoryName ? {label: existingCategoryName, value: existingCategoryName} : undefined,
             description: project?.description || '',
             name: project?.name || '',
@@ -93,7 +89,6 @@ const AutomationWorkflowProjectDialog = ({
 
     const saveProject = (formValues: AutomationWorkflowProjectFormI) => {
         onSubmit({
-            automationHubVisible: formValues.automationHubVisible,
             category: formValues.category?.value || undefined,
             description: formValues.description,
             name: formValues.name,
@@ -193,32 +188,6 @@ const AutomationWorkflowProjectDialog = ({
                                             </FormControl>
 
                                             <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={control}
-                                    name="automationHubVisible"
-                                    render={({field}) => (
-                                        <FormItem className="flex items-center justify-between gap-4">
-                                            <div>
-                                                <FormLabel htmlFor="automation-hub-visible">
-                                                    Show in Automation Hub
-                                                </FormLabel>
-
-                                                <p className="text-sm text-muted-foreground">
-                                                    Turn off for flows you only activate through the API.
-                                                </p>
-                                            </div>
-
-                                            <FormControl>
-                                                <Switch
-                                                    checked={field.value}
-                                                    id="automation-hub-visible"
-                                                    onCheckedChange={field.onChange}
-                                                />
-                                            </FormControl>
                                         </FormItem>
                                     )}
                                 />

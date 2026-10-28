@@ -261,7 +261,6 @@ const AutomationWorkflowEditorHeader = ({
 
         updateProjectMutation.mutate(
             {
-                automationHubVisible: values.automationHubVisible,
                 category: values.category || undefined,
                 description: values.description || undefined,
                 id: project.id,

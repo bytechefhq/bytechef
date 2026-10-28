@@ -14,6 +14,7 @@ import {
     useDeleteConnectedUserProjectWorkflowMutation,
     useEnableConnectedUserProjectWorkflowMutation,
 } from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';
@@ -45,6 +46,7 @@ const ConnectedUserProjectWorkflowListItem = ({
     const openAutomationWorkflowExecutionsSheet = useAutomationWorkflowExecutionsSheetStore(
         (state) => state.openAutomationWorkflowExecutionsSheet
     );
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -110,6 +112,7 @@ const ConnectedUserProjectWorkflowListItem = ({
     const handleWorkflowClick = () => {
         openAutomationWorkflowExecutionsSheet({
             connectedUserId: Number(connectedUserProjectWorkflow.connectedUserId),
+            environmentId: currentEnvironmentId,
             projectName,
             workflow: {
                 label: connectedUserProjectWorkflow.workflow.label,

@@ -144,10 +144,6 @@ const AutomationWorkflowProjectListItem = ({
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex items-center space-x-2">
-                            {!project.automationHubVisible && (
-                                <Badge label="Hidden from hub" styleType="secondary-outline" />
-                            )}
-
                             {project.published ? (
                                 <Badge
                                     className="flex space-x-1 border-transparent"

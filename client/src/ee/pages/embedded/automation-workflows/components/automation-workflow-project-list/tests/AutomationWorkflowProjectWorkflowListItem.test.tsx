@@ -1,6 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationWorkflowProjectWorkflowListItem from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-list/AutomationWorkflowProjectWorkflowListItem';
-import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
 import {resetAll, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
@@ -28,11 +27,7 @@ const renderRow = () =>
         <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
             <TooltipProvider>
                 <ul>
-                    <AutomationWorkflowProjectWorkflowListItem
-                        {...handlers}
-                        projectName="Mail Project"
-                        workflow={workflow}
-                    />
+                    <AutomationWorkflowProjectWorkflowListItem {...handlers} workflow={workflow} />
                 </ul>
             </TooltipProvider>
         </QueryClientProvider>
@@ -47,12 +42,6 @@ const openMenu = async () => {
 describe('AutomationWorkflowProjectWorkflowListItem', () => {
     beforeEach(() => {
         windowResizeObserver();
-
-        useAutomationWorkflowExecutionsSheetStore.setState({
-            automationWorkflowExecutionsSheetOpen: false,
-            projectName: undefined,
-            workflow: undefined,
-        });
     });
 
     afterEach(() => {
@@ -74,7 +63,6 @@ describe('AutomationWorkflowProjectWorkflowListItem', () => {
         await userEvent.click(screen.getByText('Mailer'));
 
         expect(handlers.onSelectWorkflow).toHaveBeenCalledWith('wf-1');
-        expect(useAutomationWorkflowExecutionsSheetStore.getState().automationWorkflowExecutionsSheetOpen).toBe(false);
     });
 
     describe('menu', () => {
@@ -83,7 +71,6 @@ describe('AutomationWorkflowProjectWorkflowListItem', () => {
 
             expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
             expect(screen.getByRole('menuitem', {name: 'Edit Workflow'})).toBeInTheDocument();
-            expect(screen.getByRole('menuitem', {name: 'Workflow Executions'})).toBeInTheDocument();
             expect(screen.getByRole('menuitem', {name: 'Delete Workflow'})).toHaveClass(
                 'text-content-destructive-primary'
             );
@@ -97,21 +84,10 @@ describe('AutomationWorkflowProjectWorkflowListItem', () => {
             expect(handlers.onEditWorkflow).toHaveBeenCalledWith(workflow);
         });
 
-        it("should open the workflow's executions when Executions is clicked", async () => {
+        it('does not offer an Executions action', async () => {
             await openMenu();
 
-            await userEvent.click(screen.getByRole('menuitem', {name: 'Workflow Executions'}));
-
-            const {
-                automationWorkflowExecutionsSheetOpen,
-                projectName,
-                workflow: sheetWorkflow,
-            } = useAutomationWorkflowExecutionsSheetStore.getState();
-
-            expect(automationWorkflowExecutionsSheetOpen).toBe(true);
-            expect(projectName).toBe('Mail Project');
-            expect(sheetWorkflow).toEqual({label: 'Mailer', workflowId: 'draft-wf-1', workflowUuid: 'wf-1'});
-            expect(handlers.onSelectWorkflow).not.toHaveBeenCalled();
+            expect(screen.queryByRole('menuitem', {name: 'Workflow Executions'})).not.toBeInTheDocument();
         });
 
         it('should delete the workflow when Delete is clicked', async () => {

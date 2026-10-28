@@ -9,12 +9,14 @@ export interface AutomationWorkflowExecutionsSheetWorkflowI {
 
 interface OpenAutomationWorkflowExecutionsSheetPropsI {
     connectedUserId?: number;
+    environmentId: number;
     projectName?: string;
     workflow: AutomationWorkflowExecutionsSheetWorkflowI;
 }
 
 interface AutomationWorkflowExecutionsSheetStateI {
     connectedUserId: number | undefined;
+    environmentId: number | undefined;
     projectName: string | undefined;
     workflow: AutomationWorkflowExecutionsSheetWorkflowI | undefined;
     openAutomationWorkflowExecutionsSheet: (props: OpenAutomationWorkflowExecutionsSheetPropsI) => void;
@@ -25,13 +27,15 @@ interface AutomationWorkflowExecutionsSheetStateI {
 
 export const useAutomationWorkflowExecutionsSheetStore = create<AutomationWorkflowExecutionsSheetStateI>()((set) => ({
     connectedUserId: undefined,
+    environmentId: undefined,
     projectName: undefined,
     workflow: undefined,
-    openAutomationWorkflowExecutionsSheet: ({connectedUserId, projectName, workflow}) =>
+    openAutomationWorkflowExecutionsSheet: ({connectedUserId, environmentId, projectName, workflow}) =>
         set((state) => ({
             ...state,
             automationWorkflowExecutionsSheetOpen: true,
             connectedUserId,
+            environmentId,
             projectName,
             workflow,
         })),

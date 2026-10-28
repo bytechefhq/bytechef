@@ -72,7 +72,7 @@ describe('automationHub.queries', () => {
     });
 
     it('lists the template projects exactly as the server returned them', async () => {
-        const projects = [{automationHubVisible: true, id: 1}, {id: 2}];
+        const projects = [{id: 1, name: 'First'}, {id: 2}];
 
         automationWorkflowProjectApiMock.getFrontendProjects.mockResolvedValue(projects);
 

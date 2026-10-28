@@ -7,6 +7,17 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflowProjectList from '../components/automation-workflow-project-list/AutomationWorkflowProjectList';
 
+vi.mock('@/shared/queries/platform/environments.queries', () => ({
+    useGetEnvironmentsQuery: () => ({data: [{id: 1, name: 'Development'}]}),
+}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAutomationWorkflowProjectConfigurationsQuery: () => ({
+        data: {automationWorkflowProjectConfigurations: []},
+    }),
+}));
+
 const renderWithProviders = (ui: ReactElement) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
 
@@ -25,7 +36,6 @@ type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowPro
 const makeProject = (
     overrides: Partial<AutomationWorkflowProjectType> & Pick<AutomationWorkflowProjectType, 'id' | 'name'>
 ): AutomationWorkflowProjectType => ({
-    automationHubVisible: true,
     categoryId: null,
     description: null,
     lastPublishedVersion: null,
@@ -91,23 +101,6 @@ describe('AutomationWorkflowProjectList', () => {
 
         expect(screen.getByText('V3')).toBeInTheDocument();
         expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
-    });
-
-    it('renders a hidden from hub badge when the project is not visible in the automation hub', () => {
-        const projects = [makeProject({automationHubVisible: false, id: 'p1', name: 'Hidden Project'})];
-
-        renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
-
-        expect(screen.getByText('Hidden from hub')).toBeInTheDocument();
-    });
-
-    it('does not render a hidden from hub badge when the project is visible in the automation hub', () => {
-        const projects = [makeProject({automationHubVisible: true, id: 'p1', name: 'Visible Project'})];
-
-        renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
-
-        expect(screen.getByText('Visible Project')).toBeInTheDocument();
-        expect(screen.queryByText('Hidden from hub')).not.toBeInTheDocument();
     });
 
     it('renders the project tags as interactive chips', () => {
@@ -246,6 +239,34 @@ describe('AutomationWorkflowProjectList', () => {
         await user.click(await screen.findByRole('menuitem', {name: /import workflow/i}));
 
         expect(onImportWorkflow).toHaveBeenCalledWith('project-4');
+    });
+
+    it('shows the New Configuration button disabled until the project is published', async () => {
+        const user = userEvent.setup();
+
+        const projects = [
+            makeProject({id: 'draft', name: 'Draft Project'}),
+            makeProject({id: 'live', lastPublishedVersion: 1, name: 'Live Project', published: true}),
+        ];
+
+        renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
+
+        const [draftTrigger, liveTrigger] = screen.getAllByText('0 workflows');
+
+        await user.click(draftTrigger);
+        await user.click(screen.getByRole('tab', {name: 'Configurations'}));
+
+        expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeDisabled();
+
+        await user.click(liveTrigger);
+
+        const liveTabs = screen.getAllByRole('tab', {name: 'Configurations'});
+
+        await user.click(liveTabs[liveTabs.length - 1]);
+
+        const buttons = await screen.findAllByRole('button', {name: 'New Configuration'});
+
+        expect(buttons[buttons.length - 1]).toBeEnabled();
     });
 
     it('expands a project to show its workflows and navigates on click', async () => {
