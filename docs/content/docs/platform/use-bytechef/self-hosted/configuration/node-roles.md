@@ -59,9 +59,9 @@ Workers serve no HTTP traffic and stay out of the load balancer pool.
 
 Every node must also share file storage: a volume all nodes mount (NFS, EFS) or the AWS provider, so any node can read what another node wrote. The encryption key and the remember-me key are the same on every node.
 
-The coordinator backup means webhooks keep working when every webhook node is down. Set `BYTECHEF_WEBHOOK_ENABLED=false` on the coordinators to remove that fallback and keep all webhook traffic on webhook nodes. With every webhook node down, webhooks then fail, and the coordinator answers `404`.
+The coordinator backup means webhooks keep working when every webhook node is down. When every webhook node goes down at the same moment, the load balancer can still answer `502` to a webhook call that was connecting to one of them while it noticed the change; later calls go to the coordinators. Set `BYTECHEF_WEBHOOK_ENABLED=false` on the coordinators to remove that fallback and keep all webhook traffic on webhook nodes. With every webhook node down, webhooks then fail, and the coordinator answers `404`.
 
-In the reference nginx configuration, a request that cannot reach a coordinator within 2 seconds is retried on the next one, so a coordinator failure is visible for about 2 seconds. A request that was already sent is never replayed if it is not idempotent.
+In the reference nginx configuration, a request that cannot reach a node within 2 seconds is retried on the next node, and so on until one answers, so a failed node is visible for about 2 seconds per failed node. A request that was already sent is never replayed if it is not idempotent.
 
 ## One coordinator in CE
 
