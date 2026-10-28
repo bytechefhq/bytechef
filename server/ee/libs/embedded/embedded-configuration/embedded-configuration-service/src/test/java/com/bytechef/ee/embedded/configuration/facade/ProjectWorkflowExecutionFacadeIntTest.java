@@ -19,6 +19,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -28,9 +29,12 @@ import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutio
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -121,14 +125,20 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class ProjectWorkflowExecutionFacadeIntTest {
 
     private static final long COPY_JOB_ID = 1L;
+    private static final long OTHER_TEMPLATE_COPY_JOB_ID = 6L;
     private static final long OTHER_USER_JOB_ID = 3L;
     private static final long REFERENCE_JOB_ID = 2L;
+    private static final long TEMPLATE_COPY_JOB_ID = 4L;
+    private static final long TEMPLATE_REFERENCE_JOB_ID = 5L;
 
     @MockitoBean
     private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
 
     @Autowired
     private ConnectedUserProjectService connectedUserProjectService;
+
+    @Autowired
+    private ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
 
     @Autowired
     private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
@@ -218,6 +228,93 @@ class ProjectWorkflowExecutionFacadeIntTest {
         assertThat(matchedJobIds).containsExactlyInAnyOrder(COPY_JOB_ID, REFERENCE_JOB_ID);
     }
 
+    @Test
+    void testGetEmbeddedWorkflowExecutionsOfTemplateWorkflowUuidIncludesReferencesAndCopies() {
+        TemplateFixture templateFixture = createTemplateFixture();
+
+        projectWorkflowExecutionFacade.getWorkflowExecutions(
+            true, null, null, null, null, null, null, null, templateFixture.templateWorkflowUuid(), null,
+            templateFixture.workspaceId(), 0);
+
+        assertThat(matchedJobIds).containsExactlyInAnyOrder(TEMPLATE_COPY_JOB_ID, TEMPLATE_REFERENCE_JOB_ID);
+    }
+
+    @Test
+    void testGetNonEmbeddedWorkflowExecutionsOfTemplateWorkflowUuidExcludesCopies() {
+        TemplateFixture templateFixture = createTemplateFixture();
+
+        projectWorkflowExecutionFacade.getWorkflowExecutions(
+            null, null, null, null, null, null, null, null, templateFixture.templateWorkflowUuid(), null,
+            templateFixture.workspaceId(), 0);
+
+        assertThat(matchedJobIds).containsExactly(TEMPLATE_REFERENCE_JOB_ID);
+    }
+
+    private TemplateFixture createTemplateFixture() {
+        long workspaceId = insertWorkspace();
+        String suffix = UUID.randomUUID()
+            .toString();
+
+        ConnectedUser referencingConnectedUser = createConnectedUser("referencing-user-" + suffix);
+        ConnectedUser copyingConnectedUser = createConnectedUser("copying-user-" + suffix);
+
+        long templateProjectId = insertProject(workspaceId, "template-" + suffix);
+        long copyProjectId = insertProject(workspaceId, "template-copy-" + suffix);
+        long otherTemplateCopyProjectId = insertProject(workspaceId, "other-template-copy-" + suffix);
+
+        String templateWorkflowId = "template-workflow-" + suffix;
+        String copyWorkflowId = "template-copy-workflow-" + suffix;
+        String otherTemplateCopyWorkflowId = "other-template-copy-workflow-" + suffix;
+
+        ProjectWorkflow templateProjectWorkflow = projectWorkflowService.addWorkflow(
+            templateProjectId, 1, templateWorkflowId);
+        ProjectWorkflow copyProjectWorkflow = projectWorkflowService.addWorkflow(copyProjectId, 1, copyWorkflowId);
+        ProjectWorkflow otherTemplateCopyProjectWorkflow = projectWorkflowService.addWorkflow(
+            otherTemplateCopyProjectId, 1, otherTemplateCopyWorkflowId);
+
+        String templateWorkflowUuid = templateProjectWorkflow.getUuidAsString();
+
+        long templateProjectDeploymentId = insertProjectDeployment(
+            templateProjectId, "__EMBEDDED__template-reference-" + suffix);
+        long copyProjectDeploymentId = insertProjectDeployment(copyProjectId, "__EMBEDDED__template-copy-" + suffix);
+        long otherTemplateCopyProjectDeploymentId = insertProjectDeployment(
+            otherTemplateCopyProjectId, "__EMBEDDED__other-template-copy-" + suffix);
+
+        connectedUserReferenceDeploymentService.create(
+            Objects.requireNonNull(referencingConnectedUser.getId()), templateProjectId, templateProjectDeploymentId);
+
+        createWorkflowCopy(copyingConnectedUser, copyProjectId, copyProjectWorkflow, templateWorkflowUuid);
+        createWorkflowCopy(
+            copyingConnectedUser, otherTemplateCopyProjectId, otherTemplateCopyProjectWorkflow,
+            UUID.randomUUID()
+                .toString());
+
+        executionRows.add(new ExecutionRow(TEMPLATE_REFERENCE_JOB_ID, templateProjectDeploymentId, templateWorkflowId));
+        executionRows.add(new ExecutionRow(TEMPLATE_COPY_JOB_ID, copyProjectDeploymentId, copyWorkflowId));
+        executionRows.add(
+            new ExecutionRow(
+                OTHER_TEMPLATE_COPY_JOB_ID, otherTemplateCopyProjectDeploymentId, otherTemplateCopyWorkflowId));
+
+        return new TemplateFixture(templateWorkflowUuid, workspaceId);
+    }
+
+    private void createWorkflowCopy(
+        ConnectedUser connectedUser, long copyProjectId, ProjectWorkflow copyProjectWorkflow,
+        String copiedFromWorkflowUuid) {
+
+        ConnectedUserProject connectedUserProject = connectedUserProjectService.create(
+            Objects.requireNonNull(connectedUser.getId()), copyProjectId);
+
+        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = new ConnectedUserProjectWorkflow();
+
+        connectedUserProjectWorkflow.setConnectedUserProjectId(connectedUserProject.getId());
+        connectedUserProjectWorkflow.setCopiedFromWorkflowUuid(copiedFromWorkflowUuid);
+        connectedUserProjectWorkflow.setProjectWorkflowId(copyProjectWorkflow.getId());
+        connectedUserProjectWorkflow.setWorkflowVersion(1);
+
+        connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
+    }
+
     private ConnectedUser createConnectedUser(String externalUserId) {
         connectedUserService.createConnectedUser(externalUserId, Environment.PRODUCTION);
 
@@ -229,10 +326,10 @@ class ProjectWorkflowExecutionFacadeIntTest {
             jdbcTemplate.queryForObject(
                 """
                     INSERT INTO workspace (name, created_date, created_by, last_modified_date, last_modified_by, version)
-                    VALUES ('test', now(), 'test', now(), 'test', 0)
+                    VALUES (?, now(), 'test', now(), 'test', 0)
                     RETURNING id
                     """,
-                Long.class),
+                Long.class, "test-" + UUID.randomUUID()),
             "workspace id");
     }
 
@@ -265,6 +362,9 @@ class ProjectWorkflowExecutionFacadeIntTest {
     }
 
     private record ExecutionRow(long jobId, long projectDeploymentId, String workflowId) {
+    }
+
+    private record TemplateFixture(String templateWorkflowUuid, long workspaceId) {
     }
 
     @Configuration

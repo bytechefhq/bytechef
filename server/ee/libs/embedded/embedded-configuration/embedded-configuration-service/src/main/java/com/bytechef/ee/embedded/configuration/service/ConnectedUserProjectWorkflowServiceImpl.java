@@ -61,6 +61,12 @@ public class ConnectedUserProjectWorkflowServiceImpl implements ConnectedUserPro
 
     @Override
     @Transactional(readOnly = true)
+    public List<ConnectedUserProjectWorkflow> getCopiedConnectedUserProjectWorkflows(String copiedFromWorkflowUuid) {
+        return connectedUserProjectWorkflowRepository.findAllByCopiedFromWorkflowUuid(copiedFromWorkflowUuid);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long id) {
         return OptionalUtils.get(connectedUserProjectWorkflowRepository.findById(id));
     }

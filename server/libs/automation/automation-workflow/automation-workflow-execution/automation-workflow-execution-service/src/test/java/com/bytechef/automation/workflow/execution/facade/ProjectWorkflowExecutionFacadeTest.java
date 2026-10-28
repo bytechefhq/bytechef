@@ -47,6 +47,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
+import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -108,6 +109,7 @@ public class ProjectWorkflowExecutionFacadeTest {
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserWorkflowCopyResolver.class),
             contextService, evaluator, mock(EnvironmentService.class),
             workflowExecutionRowService, jobService, mock(PrincipalJobService.class), projectFacade,
             projectDeploymentService, mock(ProjectService.class), projectWorkflowService,

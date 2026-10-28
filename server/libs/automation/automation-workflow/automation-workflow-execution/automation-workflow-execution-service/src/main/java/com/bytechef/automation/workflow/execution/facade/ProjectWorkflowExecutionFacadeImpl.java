@@ -35,6 +35,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
+import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -95,6 +96,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider;
+    private final ObjectProvider<ConnectedUserWorkflowCopyResolver> connectedUserWorkflowCopyResolverProvider;
     private final ContextService contextService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
@@ -116,6 +118,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     public ProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService,
         ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider,
+        ObjectProvider<ConnectedUserWorkflowCopyResolver> connectedUserWorkflowCopyResolverProvider,
         ContextService contextService, Evaluator evaluator,
         EnvironmentService environmentService, WorkflowExecutionRowService workflowExecutionRowService,
         JobService jobService,
@@ -128,6 +131,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserProjectDeploymentResolverProvider = connectedUserProjectDeploymentResolverProvider;
+        this.connectedUserWorkflowCopyResolverProvider = connectedUserWorkflowCopyResolverProvider;
         this.contextService = contextService;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
@@ -236,6 +240,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         if (workflowId != null) {
             workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId, projectVersion));
+
+            if (Boolean.TRUE.equals(embedded)) {
+                workflowIds.addAll(getWorkflowCopyWorkflowIds(workflowId));
+            }
         } else if (projectId != null) {
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
@@ -644,6 +652,27 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString()),
                 projectVersion))
             .orElseGet(() -> getWorkflowUuidWorkflowIds(workflowId, projectVersion));
+    }
+
+    /**
+     * Connected users' copies of an automation workflow template get their own uuids, so their runs are found through
+     * the uuid the template's workflow is copied from.
+     */
+    private List<String> getWorkflowCopyWorkflowIds(String workflowUuid) {
+        ConnectedUserWorkflowCopyResolver connectedUserWorkflowCopyResolver =
+            connectedUserWorkflowCopyResolverProvider.getIfAvailable();
+
+        if (connectedUserWorkflowCopyResolver == null) {
+            return List.of();
+        }
+
+        List<String> workflowIds = new ArrayList<>();
+
+        for (String workflowCopyUuid : connectedUserWorkflowCopyResolver.getWorkflowCopyUuids(workflowUuid)) {
+            workflowIds.addAll(getWorkflowUuidWorkflowIds(workflowCopyUuid, null));
+        }
+
+        return workflowIds;
     }
 
     private List<String> getWorkflowUuidWorkflowIds(String workflowUuid, Integer projectVersion) {
