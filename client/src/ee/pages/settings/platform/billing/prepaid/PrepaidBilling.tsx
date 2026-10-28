@@ -11,6 +11,8 @@ import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
+import BuyJobExecutionsPackageDialog from './components/BuyJobExecutionsPackageDialog';
+import ExtraUnitsCard from './components/ExtraUnitsCard';
 import PrepaidManageBillingCard from './components/PrepaidManageBillingCard';
 import PrepaidPlanCard from './components/PrepaidPlanCard';
 import PrepaidSelectPlanDialog from './components/PrepaidSelectPlanDialog';
@@ -19,6 +21,7 @@ const POLL_INTERVAL_MS = 3000;
 const MAX_POLL_ATTEMPTS = 5;
 
 const PrepaidBilling = () => {
+    const [buyPackageOpen, setBuyPackageOpen] = useState(false);
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [pendingUpgradePlanName, setPendingUpgradePlanName] = useState<string | null>(null);
     const [pollAttempts, setPollAttempts] = useState(0);
@@ -36,8 +39,9 @@ const PrepaidBilling = () => {
     const isCancelPolling = searchParams.get('cancel') === 'pending';
     const isReactivatePending = searchParams.get('reactivate') === 'pending';
     const isUpgradePending = searchParams.get('upgrade') === 'pending';
+    const isPackageSuccess = searchParams.get('package') === 'success';
     const isPolling =
-        (isCheckoutSuccess || isCancelPolling || isReactivatePending || isUpgradePending) &&
+        (isCheckoutSuccess || isCancelPolling || isReactivatePending || isUpgradePending || isPackageSuccess) &&
         pollAttempts < MAX_POLL_ATTEMPTS;
 
     const {data: subscription, error: subscriptionError} = useGetCurrentSubscriptionQuery({
@@ -138,6 +142,24 @@ const PrepaidBilling = () => {
         return () => clearTimeout(timer);
     }, [isUpgradePending, pendingUpgradePlanName, pollAttempts, setSearchParams, subscription]);
 
+    useEffect(() => {
+        if (!isPackageSuccess) {
+            return;
+        }
+
+        if (pollAttempts >= MAX_POLL_ATTEMPTS) {
+            setSearchParams({}, {replace: true});
+
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setPollAttempts((prev) => prev + 1);
+        }, POLL_INTERVAL_MS);
+
+        return () => clearTimeout(timer);
+    }, [isPackageSuccess, pollAttempts, setSearchParams]);
+
     const renewalDate = subscription?.currentPeriodEnd
         ? subscription.currentPeriodEnd.toLocaleDateString('en-US', {day: 'numeric', month: 'long', year: 'numeric'})
         : undefined;
@@ -223,6 +245,12 @@ const PrepaidBilling = () => {
                         </div>
                     )}
 
+                    {isPackageSuccess && (
+                        <div className="rounded-lg border border-stroke-brand-secondary bg-surface-brand-secondary px-4 py-3 text-sm text-content-brand-primary">
+                            Adding job executions, please wait…
+                        </div>
+                    )}
+
                     <PrepaidPlanCard
                         {...planCardProps}
                         onCancelPlan={
@@ -235,6 +263,15 @@ const PrepaidBilling = () => {
                             subscription?.cancelAtPeriodEnd ? () => setReactivateDialogOpen(true) : undefined
                         }
                     />
+
+                    {subscription && !isTrialSubscription && (
+                        <ExtraUnitsCard
+                            disabled={subscription.cancelAtPeriodEnd ?? false}
+                            extraUnitTotal={subscription.extraUnitTotal ?? 0}
+                            extraUnitUsed={subscription.extraUnitUsed ?? 0}
+                            onBuy={() => setBuyPackageOpen(true)}
+                        />
+                    )}
 
                     {customerPortalUrl && <PrepaidManageBillingCard customerPortalUrl={customerPortalUrl} />}
 
@@ -276,6 +313,8 @@ const PrepaidBilling = () => {
                         open={reactivateDialogOpen}
                         title="Reactivate subscription?"
                     />
+
+                    <BuyJobExecutionsPackageDialog onClose={() => setBuyPackageOpen(false)} open={buyPackageOpen} />
 
                     <PrepaidSelectPlanDialog
                         currentPlanName={subscription?.planName ?? undefined}

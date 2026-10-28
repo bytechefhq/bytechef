@@ -16,3 +16,11 @@ export const useUpgradeSubscriptionMutation = () =>
         mutationFn: (planName: CheckoutSessionRequestPlanNameEnum) =>
             new BillingApi().upgradeSubscription({checkoutSessionRequest: {planName}}),
     });
+
+export const useCreateJobExecutionsPackageCheckoutSessionMutation = () =>
+    useMutation({
+        mutationFn: (quantity: number) =>
+            new BillingApi().createJobExecutionsPackageCheckoutSession({
+                jobExecutionsPackageCheckoutRequest: {quantity},
+            }),
+    });
