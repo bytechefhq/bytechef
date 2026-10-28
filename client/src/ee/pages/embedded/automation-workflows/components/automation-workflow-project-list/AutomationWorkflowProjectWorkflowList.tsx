@@ -47,7 +47,7 @@ const AutomationWorkflowProjectWorkflowList = ({
         <div className="pt-3">
             {workflows.length > 0 ? (
                 <>
-                    <div className="flex items-center justify-between pl-3">
+                    <div className="mb-2 flex items-center justify-between pl-3">
                         <h3 className="text-sm heading-tertiary">Workflows</h3>
 
                         <ButtonGroup aria-label="Workflow Creation Actions">
