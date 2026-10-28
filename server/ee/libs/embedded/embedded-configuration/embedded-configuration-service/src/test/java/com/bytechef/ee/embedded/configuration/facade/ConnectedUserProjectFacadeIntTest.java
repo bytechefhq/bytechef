@@ -37,6 +37,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -534,6 +535,41 @@ class ConnectedUserProjectFacadeIntTest {
                     .getLabel()).isEqualTo("Sync leads");
                 assertThat(connectedUserProjectWorkflowDTO.components()).extracting("name")
                     .containsExactly("slack");
+            });
+    }
+
+    @Test
+    void testGetConnectedUserProjectWorkflowsKeepsTheLabelOfAReferenceTurnedOffByTheAdministrator() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Turned Off");
+
+        String automationWorkflowUuid =
+            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
+
+        List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs =
+            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectWorkflowDTOs)
+            .singleElement()
+            .satisfies(connectedUserProjectWorkflowDTO -> {
+                assertThat(connectedUserProjectWorkflowDTO.attentionReason())
+                    .isEqualTo(ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR);
+                assertThat(connectedUserProjectWorkflowDTO.workflow()
+                    .getLabel()).isEqualTo("Post");
+                assertThat(connectedUserProjectWorkflowDTO.components()).extracting("name")
+                    .containsExactly("slack");
+                assertThat(connectedUserProjectWorkflowDTO.inputs()).extracting("name")
+                    .containsExactly("channel");
             });
     }
 
