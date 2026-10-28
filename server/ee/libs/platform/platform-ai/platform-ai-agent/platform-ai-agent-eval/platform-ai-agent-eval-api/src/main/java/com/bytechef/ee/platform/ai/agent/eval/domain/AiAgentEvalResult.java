@@ -16,6 +16,7 @@
 
 package com.bytechef.ee.platform.ai.agent.eval.domain;
 
+import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentEvalResultConclusion;
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentEvalResultStatus;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.time.Instant;
@@ -48,6 +49,10 @@ public final class AiAgentEvalResult {
 
     @Nullable
     private Double score;
+
+    @Column("conclusion")
+    @Nullable
+    private Integer conclusion;
 
     @Nullable
     private String errorMessage;
@@ -121,6 +126,23 @@ public final class AiAgentEvalResult {
 
     public void setScore(@Nullable Double score) {
         this.score = score;
+    }
+
+    @Nullable
+    public AiAgentEvalResultConclusion getConclusion() {
+        if (conclusion != null) {
+            return AiAgentEvalResultConclusion.values()[conclusion];
+        }
+
+        if (getStatus() != AiAgentEvalResultStatus.COMPLETED || score == null) {
+            return null;
+        }
+
+        return score >= 1.0 ? AiAgentEvalResultConclusion.PASS : AiAgentEvalResultConclusion.FAIL;
+    }
+
+    public void setConclusion(@Nullable AiAgentEvalResultConclusion conclusion) {
+        this.conclusion = conclusion == null ? null : conclusion.ordinal();
     }
 
     @Nullable
@@ -244,6 +266,7 @@ public final class AiAgentEvalResult {
             ", agentEvalScenarioId=" + agentEvalScenarioId +
             ", status=" + status +
             ", score=" + score +
+            ", conclusion=" + conclusion +
             ", errorMessage='" + errorMessage + '\'' +
             ", transcriptFile='" + transcriptFile + '\'' +
             ", inputTokens=" + inputTokens +

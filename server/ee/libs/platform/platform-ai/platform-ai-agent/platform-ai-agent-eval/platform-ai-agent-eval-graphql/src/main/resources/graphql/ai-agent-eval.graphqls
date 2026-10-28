@@ -105,6 +105,7 @@ type AiAgentEvalResult {
     scenario: AiAgentEvalScenario!
     status: AiAgentEvalResultStatus!
     score: Float
+    conclusion: AiAgentEvalResultConclusion
     errorMessage: String
     transcriptFile: String
     inputTokens: Int
@@ -119,9 +120,19 @@ type AiAgentJudgeVerdict {
     judgeName: String!
     judgeType: AiAgentJudgeType!
     judgeScope: AiAgentJudgeScope!
-    passed: Boolean!
-    score: Float!
+    passed: Boolean! @deprecated(reason: "Use status")
+    status: AiAgentJudgeVerdictStatus!
+    reasonCode: String
+    score: Float
     explanation: String!
+}
+
+enum AiAgentJudgeVerdictStatus {
+    PASS
+    FAIL
+    ABSTAIN
+    NOT_APPLICABLE
+    ERROR
 }
 
 enum AiAgentJudgeType {
@@ -157,4 +168,11 @@ enum AiAgentEvalResultStatus {
     RUNNING
     COMPLETED
     FAILED
+}
+
+enum AiAgentEvalResultConclusion {
+    PASS
+    FAIL
+    INCONCLUSIVE
+    NOT_APPLICABLE
 }

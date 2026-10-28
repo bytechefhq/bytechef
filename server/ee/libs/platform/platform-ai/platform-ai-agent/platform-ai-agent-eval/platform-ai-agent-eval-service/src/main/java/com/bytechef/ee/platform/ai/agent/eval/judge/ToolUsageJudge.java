@@ -59,7 +59,7 @@ final class ToolUsageJudge extends DeterministicJudge<CompletionEvidence> {
         Object transcriptValue = metadata.get("transcript");
 
         if (transcriptValue == null) {
-            return Judgment.fail("No transcript found in context metadata; cannot evaluate tool usage");
+            return Judgment.error("No transcript found in evidence metadata; cannot evaluate tool usage");
         }
 
         String transcript = transcriptValue.toString();
@@ -69,7 +69,7 @@ final class ToolUsageJudge extends DeterministicJudge<CompletionEvidence> {
         try {
             toolCallNames = extractToolCallNames(transcript);
         } catch (JacksonException exception) {
-            return Judgment.fail("Failed to parse transcript JSON: " + exception.getMessage());
+            return Judgment.error("Failed to parse transcript JSON: " + exception.getMessage());
         }
 
         if ("FIRST".equals(position)) {

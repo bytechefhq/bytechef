@@ -113,7 +113,7 @@ class ToolUsageJudgeTest {
     }
 
     @Test
-    void testMissingTranscriptFail() {
+    void testMissingTranscriptError() {
         CompletionEvidence evidence = CompletionEvidence.builder()
             .request("test")
             .response("some output")
@@ -123,7 +123,17 @@ class ToolUsageJudgeTest {
 
         Judgment judgment = judge.judge();
 
-        assertEquals(JudgmentStatus.FAIL, judgment.status());
+        assertEquals(JudgmentStatus.ERROR, judgment.status());
+    }
+
+    @Test
+    void testUnparseableTranscriptError() {
+        ToolUsageJudge judge =
+            new ToolUsageJudge(() -> buildEvidence("not json"), "searchOrders", "ANYWHERE", "AT_LEAST", 1);
+
+        Judgment judgment = judge.judge();
+
+        assertEquals(JudgmentStatus.ERROR, judgment.status());
     }
 
     private CompletionEvidence buildEvidence(String transcript) {
