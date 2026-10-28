@@ -109,7 +109,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         Map<String, ?> sourceInputParameters = evaluator.evaluate(sourceClusterElement.getParameters(), outputs);
 
         ComponentConnection sourceComponentConnection = getComponentConnection(
-            workflowId, sourceClusterElement.getWorkflowNodeName(), environmentId);
+            workflowId, workflowNodeName, sourceClusterElement.getWorkflowNodeName(), environmentId);
 
         CodeEditorScriptInputProvider provider = codeEditorScriptInputProviders.stream()
             .filter(inputProvider -> Objects.equals(inputProvider.getRootComponentName(), workflowNodeType.name()))
@@ -267,17 +267,20 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     }
 
     private ComponentConnection getComponentConnection(
-        String workflowId, String clusterElementWorkflowNodeName, long environmentId) {
+        String workflowId, String workflowNodeName, String clusterElementWorkflowNodeName, long environmentId) {
 
         List<WorkflowTestConfigurationConnection> connections =
             workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                workflowId, clusterElementWorkflowNodeName, environmentId);
+                workflowId, workflowNodeName, environmentId);
 
-        if (connections.isEmpty()) {
+        WorkflowTestConfigurationConnection testConnection = connections.stream()
+            .filter(connection -> Objects.equals(connection.getWorkflowConnectionKey(), clusterElementWorkflowNodeName))
+            .findFirst()
+            .orElse(null);
+
+        if (testConnection == null) {
             return null;
         }
-
-        WorkflowTestConfigurationConnection testConnection = connections.getFirst();
 
         Connection connection = connectionService.getConnection(testConnection.getConnectionId());
 

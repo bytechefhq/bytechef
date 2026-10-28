@@ -133,8 +133,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, Object> inputParameters = clusterElementTestContext.inputParameters();
 
         Map<String, Object> scriptInputParameters = getScriptInputParametersFromSource(
-            workflowId, clusterElementTestContext.workflowNodeType(), clusterElementTestContext.clusterElementMap(),
-            clusterElementTestContext.outputs(), environmentId);
+            workflowId, workflowNodeName, clusterElementTestContext.workflowNodeType(),
+            clusterElementTestContext.clusterElementMap(), clusterElementTestContext.outputs(), environmentId);
 
         inputParameters = MapUtils.concat(inputParameters, Map.of("input", scriptInputParameters));
 
@@ -501,8 +501,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     private Map<String, Object> getScriptInputParametersFromSource(
-        String workflowId, WorkflowNodeType workflowNodeType, ClusterElementMap clusterElementMap,
-        Map<String, ?> outputs, long environmentId) {
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType,
+        ClusterElementMap clusterElementMap, Map<String, ?> outputs, long environmentId) {
 
         Optional<ClusterElement> sourceClusterElementOptional = clusterElementMap.fetchClusterElement(SOURCE);
 
@@ -524,7 +524,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> sourceInputParameters = evaluator.evaluate(sourceClusterElement.getParameters(), outputs);
 
         ComponentConnection sourceComponentConnection = getClusterElementComponentConnection(
-            workflowId, workflowNodeType.name(), sourceClusterElement.getWorkflowNodeName(), environmentId);
+            workflowId, workflowNodeName, sourceClusterElement.getWorkflowNodeName(), environmentId);
 
         return codeEditorScriptInputProvider.getScriptInputParameters(
             workflowNodeType.version(), sourceClusterElement.getComponentName(),
