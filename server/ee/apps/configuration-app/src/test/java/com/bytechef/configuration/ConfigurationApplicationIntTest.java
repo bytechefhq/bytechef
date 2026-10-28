@@ -129,6 +129,14 @@ public class ConfigurationApplicationIntTest {
     }
 
     @Test
+    void testJdbcConvertsFileEntries() {
+        JdbcCustomConversions jdbcCustomConversions = applicationContext.getBean(JdbcCustomConversions.class);
+
+        assertThat(jdbcCustomConversions.hasCustomWriteTarget(FileEntry.class)).isTrue();
+        assertThat(jdbcCustomConversions.hasCustomReadTarget(String.class, FileEntry.class)).isTrue();
+    }
+
+    @Test
     void testApiKeyAndConnectedUserGrpcServicesAreServed() {
         List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
             .values()
