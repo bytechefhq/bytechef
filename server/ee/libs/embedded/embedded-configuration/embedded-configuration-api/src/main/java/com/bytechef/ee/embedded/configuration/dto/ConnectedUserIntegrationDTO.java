@@ -57,16 +57,18 @@ public record ConnectedUserIntegrationDTO(
     }
 
     public ConnectedUserIntegrationDTO(
-        Authorization authorization, List<Connection> connections,
+        @Nullable Authorization authorization, List<Connection> connections,
         IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
         List<IntegrationInstance> integrationInstances, List<IntegrationInstanceWorkflow> integrationInstanceWorkflows,
         @Nullable OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
 
         this(
-            new ConnectionConfig(
-                authorization.getType(),
-                oAuth2AuthorizationParameters == null ? null : new OAuth2(oAuth2AuthorizationParameters, redirectUri),
-                authorization.getProperties()),
+            authorization == null ? null
+                : new ConnectionConfig(
+                    authorization.getType(),
+                    oAuth2AuthorizationParameters == null
+                        ? null : new OAuth2(oAuth2AuthorizationParameters, redirectUri),
+                    authorization.getProperties()),
             integrationInstanceConfiguration,
             toIntegrationInstances(
                 connections, integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
