@@ -483,7 +483,23 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     public void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
-        projectDeploymentWorkflowService.update(projectDeploymentWorkflow);
+        ProjectDeploymentWorkflow oldProjectDeploymentWorkflow =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                Validate.notNull(projectDeploymentWorkflow.getId(), "id"));
+
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+            oldProjectDeploymentWorkflow.getProjectDeploymentId());
+
+        if (projectDeployment.isEnabled() && oldProjectDeploymentWorkflow.isEnabled()) {
+            disableWorkflowTriggers(oldProjectDeploymentWorkflow);
+        }
+
+        ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
+            projectDeploymentWorkflow);
+
+        if (projectDeployment.isEnabled() && updatedProjectDeploymentWorkflow.isEnabled()) {
+            enableWorkflowTriggers(updatedProjectDeploymentWorkflow);
+        }
     }
 
     private void checkProjectDeploymentWorkflows(
