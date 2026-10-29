@@ -153,6 +153,10 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         validatePublishedProjectVersion(configuration.getProjectId(), projectVersion);
 
+        if (projectVersion < configuration.getProjectVersion()) {
+            validateReferencedWorkflowsExistInVersion(configuration, projectVersion);
+        }
+
         configuration = automationWorkflowProjectConfigurationService.update(
             id, projectVersion, enabled, automationHubVisible);
 
@@ -237,6 +241,49 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             projectWorkflow.getUuidAsString(), workflowId, workflow.getLabel(),
             automationWorkflowProjectConfigurationService.isWorkflowEnabled(configuration, projectWorkflow.getUuid()),
             lastExecutionDate);
+    }
+
+    private void validateReferencedWorkflowsExistInVersion(
+        AutomationWorkflowProjectConfiguration configuration, int targetProjectVersion) {
+
+        List<ProjectWorkflow> currentProjectWorkflows = projectWorkflowService.getProjectWorkflows(
+            configuration.getProjectId(), configuration.getProjectVersion());
+
+        Set<String> targetWorkflowUuids = projectWorkflowService
+            .getProjectWorkflows(configuration.getProjectId(), targetProjectVersion)
+            .stream()
+            .map(ProjectWorkflow::getUuidAsString)
+            .collect(Collectors.toSet());
+
+        Set<String> currentWorkflowUuids = currentProjectWorkflows.stream()
+            .map(ProjectWorkflow::getUuidAsString)
+            .collect(Collectors.toSet());
+
+        Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
+
+        Set<String> missingWorkflowUuids = connectedUserWorkflowReferenceAdminFacade
+            .getReferences(currentWorkflowUuids)
+            .stream()
+            .filter(reference -> !reference.dangling() && Objects.equals(reference.environment(), environment.name()))
+            .map(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid)
+            .filter(workflowUuid -> !targetWorkflowUuids.contains(workflowUuid))
+            .collect(Collectors.toSet());
+
+        if (missingWorkflowUuids.isEmpty()) {
+            return;
+        }
+
+        String workflowLabels = currentProjectWorkflows.stream()
+            .filter(projectWorkflow -> missingWorkflowUuids.contains(projectWorkflow.getUuidAsString()))
+            .map(projectWorkflow -> workflowService.getWorkflow(projectWorkflow.getWorkflowId())
+                .getLabel())
+            .sorted()
+            .collect(Collectors.joining(", "));
+
+        throw new ConfigurationException(
+            "Version %d lacks workflows connected users still use: %s. Turn them off in this configuration or remove them from those users first."
+                .formatted(targetProjectVersion, workflowLabels),
+            AutomationWorkflowProjectConfigurationErrorType.VERSION_LACKS_REFERENCED_WORKFLOWS);
     }
 
     private void validatePublishedProjectVersion(long projectId, int projectVersion) {
