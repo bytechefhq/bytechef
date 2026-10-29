@@ -1,0 +1,3 @@
+mutation provisionConnectedUserProjectWorkflows($connectedUserId: ID!, $workflows: [ProvisionConnectedUserProjectWorkflowInput!]!) {
+    provisionConnectedUserProjectWorkflows(connectedUserId: $connectedUserId, workflows: $workflows)
+}
