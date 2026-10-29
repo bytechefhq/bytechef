@@ -47,6 +47,8 @@ service IntegrationInstanceRemoteService {
   rpc GetIntegrationInstance(IdRequest) returns (RemoteIntegrationInstance);
   rpc GetIntegrationInstanceConfigurationIntegrationInstances(IdsRequest) returns (RemoteIntegrationInstances);
   rpc GetIntegrationInstances(IdsRequest) returns (RemoteIntegrationInstances);
+  rpc GetIntegrationInstancesByWorkflowUuid(WorkflowUuidIntegrationInstancesRequest)
+      returns (RemoteIntegrationInstances);
   rpc GetWorkflowIntegrationInstance(WorkflowIntegrationInstanceRequest) returns (RemoteIntegrationInstance);
 }
 
@@ -257,6 +259,12 @@ message ConnectedUserIntegrationInstancesRequest {
 message ComponentIntegrationInstanceRequest {
   int64 connected_user_id = 1;
   string component_name = 2;
+  int32 environment = 3;
+}
+
+message WorkflowUuidIntegrationInstancesRequest {
+  int64 connected_user_id = 1;
+  string workflow_uuid = 2;
   int32 environment = 3;
 }
 

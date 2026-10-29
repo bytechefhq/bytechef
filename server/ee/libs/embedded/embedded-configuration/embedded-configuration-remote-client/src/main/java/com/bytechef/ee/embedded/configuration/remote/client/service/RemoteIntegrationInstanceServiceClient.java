@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInsta
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstance;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowIntegrationInstanceRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowUuidIntegrationInstancesRequest;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -210,7 +211,14 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     public List<IntegrationInstance> getIntegrationInstancesByWorkflowUuid(
         long connectedUserId, String workflowUuid, Environment environment) {
 
-        throw new UnsupportedOperationException();
+        RemoteIntegrationInstances remoteIntegrationInstances = getStub().getIntegrationInstancesByWorkflowUuid(
+            WorkflowUuidIntegrationInstancesRequest.newBuilder()
+                .setConnectedUserId(connectedUserId)
+                .setWorkflowUuid(workflowUuid)
+                .setEnvironment(environment.ordinal())
+                .build());
+
+        return embeddedConfigurationProtoMapper.toIntegrationInstances(remoteIntegrationInstances);
     }
 
     @Override

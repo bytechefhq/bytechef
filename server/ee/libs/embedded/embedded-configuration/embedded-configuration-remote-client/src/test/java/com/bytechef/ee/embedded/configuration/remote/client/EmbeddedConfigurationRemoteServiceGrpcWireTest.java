@@ -438,6 +438,26 @@ class EmbeddedConfigurationRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testGetIntegrationInstancesByWorkflowUuid() {
+        IntegrationInstance integrationInstance = integrationInstance();
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(
+            7L, "workflow-uuid", Environment.PRODUCTION))
+                .thenReturn(List.of(integrationInstance));
+
+        RemoteIntegrationInstanceServiceClient remoteIntegrationInstanceServiceClient =
+            new RemoteIntegrationInstanceServiceClient(fixedGrpcChannels, JSON_MAPPER);
+
+        assertThat(remoteIntegrationInstanceServiceClient.getIntegrationInstancesByWorkflowUuid(
+            7L, "workflow-uuid", Environment.PRODUCTION))
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(integrationInstance);
+        assertThat(remoteIntegrationInstanceServiceClient.getIntegrationInstancesByWorkflowUuid(
+            7L, "other-uuid", Environment.PRODUCTION))
+                .isEmpty();
+    }
+
+    @Test
     void testGetConnectedUserIntegrationInstancesWithUnknownEnvironmentIsAnInvalidArgument() {
         IntegrationInstanceRemoteServiceGrpc.IntegrationInstanceRemoteServiceBlockingStub stub =
             IntegrationInstanceRemoteServiceGrpc.newBlockingStub(managedChannel);
