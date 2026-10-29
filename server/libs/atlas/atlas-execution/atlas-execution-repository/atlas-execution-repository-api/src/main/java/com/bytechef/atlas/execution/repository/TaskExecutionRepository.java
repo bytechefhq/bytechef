@@ -57,9 +57,6 @@ public interface TaskExecutionRepository {
      */
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);
 
-    /**
-     * Returns the task executions of the job that are created or started, in the order they were created.
-     */
     List<TaskExecution> findAllUnfinishedByJobId(long jobId);
 
     /**

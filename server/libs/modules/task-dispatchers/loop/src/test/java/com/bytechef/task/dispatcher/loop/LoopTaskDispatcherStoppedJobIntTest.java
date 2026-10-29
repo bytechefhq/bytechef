@@ -54,8 +54,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Reproduces a loop whose job a user stops while one of its children is in flight.
- *
  * @author Ivica Cardic
  */
 @TaskDispatcherIntTest
