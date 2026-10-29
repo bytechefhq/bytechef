@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
+import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.facade.ConnectedUserMcpServerFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,6 +61,20 @@ class ConnectedUserMcpServerGraphQlController {
     @MutationMapping
     boolean enableConnectedUserMcpTool(@Argument long id, @Argument boolean enable) {
         connectedUserMcpServerFacade.enableMcpTool(id, enable);
+
+        return true;
+    }
+
+    @QueryMapping
+    List<ProvisionableConnectedUserMcpServerDTO> provisionableConnectedUserMcpServers(
+        @Argument long connectedUserId) {
+
+        return connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId);
+    }
+
+    @MutationMapping
+    boolean provisionConnectedUserMcpServer(@Argument long connectedUserId, @Argument long mcpServerId) {
+        connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, mcpServerId);
 
         return true;
     }

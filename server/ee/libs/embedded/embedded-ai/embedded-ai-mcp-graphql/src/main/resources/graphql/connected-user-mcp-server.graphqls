@@ -1,11 +1,21 @@
 extend type Query {
     connectedUserMcpServers(connectedUserId: ID!): [ConnectedUserMcpServer!]!
+    provisionableConnectedUserMcpServers(connectedUserId: ID!): [ProvisionableConnectedUserMcpServer!]!
 }
 
 extend type Mutation {
     deleteConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!): Boolean
     enableConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!, enable: Boolean!): Boolean
     enableConnectedUserMcpTool(id: ID!, enable: Boolean!): Boolean
+    provisionConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!): Boolean
+}
+
+type ProvisionableConnectedUserMcpServer {
+    id: ID!
+    name: String!
+    provisioned: Boolean!
+    coveredComponentNames: [String!]!
+    missingComponentNames: [String!]!
 }
 
 type ConnectedUserMcpServer {
