@@ -6,4 +6,4 @@ bytechef:
     remember-me:
       key: rememberMe
   tenant:
-    mode: single
+    mode: SINGLE

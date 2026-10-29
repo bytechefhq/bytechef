@@ -1,5 +1,5 @@
 bytechef:
   scheduler:
-    provider: quartz
+    provider: QUARTZ
   tenant:
     mode: SINGLE

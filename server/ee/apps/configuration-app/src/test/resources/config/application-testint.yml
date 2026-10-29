@@ -17,10 +17,10 @@ spring:
 
 bytechef:
   encryption:
-    provider: filesystem
+    provider: FILESYSTEM
   edition: EE
   file-storage:
-    provider: jdbc
+    provider: JDBC
   worker:
     enabled: false
   workflow:
@@ -28,4 +28,4 @@ bytechef:
       jdbc:
         enabled: true
     output-storage:
-      provider: jdbc
+      provider: JDBC

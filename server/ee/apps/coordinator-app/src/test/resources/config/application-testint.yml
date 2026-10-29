@@ -6,9 +6,9 @@ bytechef:
   file-storage:
     filesystem:
       basedir: ${java.io.tmpdir}/bytechef/file-storage
-    provider: jdbc
+    provider: JDBC
   message-broker:
-    provider: memory
+    provider: MEMORY
   workflow:
     output-storage:
-      provider: jdbc
+      provider: JDBC
