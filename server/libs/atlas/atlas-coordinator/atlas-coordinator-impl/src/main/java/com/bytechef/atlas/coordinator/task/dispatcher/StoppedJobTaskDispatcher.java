@@ -28,10 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Cancels, instead of dispatching, every task execution of a job that a user stopped. It goes first in the dispatcher
- * chain so that flow-control dispatchers, which never reach the pre-send processors, and the tasks they create while
- * the stop is in progress do not start.
- *
  * @author Ivica Cardic
  */
 public class StoppedJobTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {

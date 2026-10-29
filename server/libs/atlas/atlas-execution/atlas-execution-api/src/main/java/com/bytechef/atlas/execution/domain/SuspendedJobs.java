@@ -17,38 +17,21 @@
 package com.bytechef.atlas.execution.domain;
 
 /**
- * Tells a job that is stopped on a suspend it will resume from apart from a job that was stopped for good.
- *
  * @author Ivica Cardic
  */
 public final class SuspendedJobs {
 
-    /**
-     * The job metadata key holding the id a suspended job resumes with. It is removed when the job resumes.
-     */
     public static final String JOB_RESUME_ID = "jobResumeId";
 
-    /**
-     * The job metadata key set while a job is stopped on a deprecated wait for approval task. It is removed when the
-     * approval resumes the job.
-     */
     public static final String WAIT_FOR_APPROVAL = "waitForApproval";
 
     private SuspendedJobs() {
     }
 
-    /**
-     * Tells whether the job is stopped on a suspend, for example an approval it waits for, rather than stopped by a
-     * user.
-     */
     public static boolean isSuspended(Job job) {
         return job.getStatus() == Job.Status.STOPPED && job.getMetadata(JOB_RESUME_ID) != null;
     }
 
-    /**
-     * Tells whether the job was stopped for good, by a user, rather than suspended until it resumes or waiting on a
-     * deprecated wait for approval task.
-     */
     public static boolean isStoppedByUser(Job job) {
         return job.getStatus() == Job.Status.STOPPED && !isSuspended(job) &&
             !Boolean.TRUE.equals(job.getMetadata(WAIT_FOR_APPROVAL));
