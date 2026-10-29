@@ -106,6 +106,6 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
         return new ConnectedUserWorkflowReferenceDTO(
             reference.getAutomationWorkflowUuid(), connectedUser.getExternalId(), environment.name(),
             reference.isEnabled(), reference.isDangling(), reference.getDanglingReason(),
-            workflowIds.get(reference.getProjectWorkflowId()));
+            workflowIds.get(reference.getProjectWorkflowId()), reference.getProjectDeploymentId());
     }
 }

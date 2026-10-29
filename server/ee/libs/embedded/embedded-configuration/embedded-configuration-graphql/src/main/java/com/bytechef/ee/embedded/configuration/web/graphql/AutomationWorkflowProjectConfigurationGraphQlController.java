@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,6 +43,13 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
         @Argument String projectId) {
 
         return automationWorkflowProjectConfigurationAdminFacade.getConfigurations(Long.parseLong(projectId));
+    }
+
+    @QueryMapping
+    public AutomationWorkflowProjectConfigurationVersionImpactDTO automationWorkflowProjectConfigurationVersionImpact(
+        @Argument String id, @Argument int projectVersion) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(Long.parseLong(id), projectVersion);
     }
 
     @MutationMapping
