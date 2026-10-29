@@ -248,6 +248,11 @@ const Property = ({
     const nativePillTarget = usePillTarget({
         acceptsPill: acceptsNativePill,
         insertPill: insertPillValue,
+        onFocusTarget: () => {
+            if (!isPillContainer && acceptsNativePill() && workflowNodeDetailsPanelOpen) {
+                openDataPillPanel();
+            }
+        },
     });
 
     const handleContainerMouseDown = (event: MouseEvent<HTMLElement>) => {
