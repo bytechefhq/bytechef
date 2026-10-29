@@ -1,8 +1,8 @@
 bytechef:
   ai:
     auto-memory:
-      # Auto-memory storage provider (aws(ee) | filesystem | jdbc) default: jdbc
-      provider: jdbc
+      # Auto-memory storage provider (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
+      provider: JDBC
     copilot:
       enabled: false
     firecrawl:
@@ -29,8 +29,8 @@ bytechef:
         bucket-prefix: bytechef-chat-memory
         key-prefix: ""
         session-bucket-prefix: bytechef-session
-      # Chat memory provider (aws | in_memory | jdbc | redis)
-      provider: jdbc
+      # Chat memory provider (AWS | IN_MEMORY | JDBC | REDIS)
+      provider: JDBC
       redis:
         host: localhost
         port: 6379
@@ -58,8 +58,8 @@ bytechef:
           options:
             model: gpt-5.1
             temperature: 1
-            reasoning-effect: medium
-            verbosity: low
+            reasoning-effect: MEDIUM
+            verbosity: LOW
         perplexity:
           options:
             model: sonar
@@ -78,7 +78,7 @@ bytechef:
           options:
             model: dall-e-3
     vectorstore:
-      provider: pgvector
+      provider: PGVECTOR
       pgvector:
         dimensions: 1536
   analytics:
@@ -92,7 +92,7 @@ bytechef:
     # Cache provider (CAFFEINE) default: CAFFEINE
     provider: CAFFEINE
   cloud:
-    # Cloud provider (AWS(ee) | NONE)
+    # Cloud provider (AWS(EE) | NONE)
     provider: NONE
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
@@ -119,8 +119,8 @@ bytechef:
         trigger-poll-events: 1
         trigger-webhook-events: 1
   data-storage:
-    # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
-    provider: jdbc
+    # Data storage provider (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
+    provider: JDBC
   datasource:
     # Maximum JDBC connections. Shared by Quartz's 10 job-store threads, workflow task execution and request
     # threads, so it must stay comfortably above Quartz's thread count on its own.
@@ -131,17 +131,17 @@ bytechef:
   # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
   edition: EE
   embedded:
-    # Origins allowed to embed the Automation Hub, Workflow Builder and Integration Marketplace pages (ee), e.g.
+    # Origins allowed to embed the Automation Hub, Workflow Builder and Integration Marketplace pages (EE), e.g.
     # https://app.example.com,https://admin.example.com. Empty lets any origin embed them.
     allowed-parent-origins: []
-  # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
+  # Encryption key provider (FILESYSTEM - the key generated on filesystem, PROPERTY - the key read from property) default: FILESYSTEM
   encryption:
-    provider: filesystem
+    provider: FILESYSTEM
   # Enabled feature flags, e.g. [ff-123, ff-456]
   feature-flags: []
   file-storage:
-    # File storage provider (aws(ee) | filesystem | jdbc) default: filesystem
-    provider: filesystem
+    # File storage provider (AWS(EE) | FILESYSTEM | JDBC) default: FILESYSTEM
+    provider: FILESYSTEM
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
   help-hub:
@@ -164,12 +164,12 @@ bytechef:
       enable: false
       required: false
   message-broker:
-    # Messaging provider between Coordinator and Workers (AMPQ | AWS | JMS | KAFKA | MEMORY | REDIS)
+    # Messaging provider between Coordinator and Workers (AMQP | AWS | JMS | KAFKA | MEMORY | REDIS)
     provider: MEMORY
     aws:
-      # Transport for CONTROL routes, which must reach every node (redis | sqs) default: sqs
-      # sqs: one shared queue, correct for a single node only. redis: pub/sub broadcast, required with more than one node.
-      control-provider: sqs
+      # Transport for CONTROL routes, which must reach every node (REDIS | SQS) default: SQS
+      # SQS: one shared queue, correct for a single node only. REDIS: pub/sub broadcast, required with more than one node.
+      control-provider: SQS
   oauth2:
 #    predefinedApps:
 #      mailchimp:
@@ -210,8 +210,8 @@ bytechef:
   resources:
     web: file:///opt/bytechef/client/
   scheduler:
-    # Trigger scheduler provider (aws(ee) | quartz) default: quartz
-    provider: quartz
+    # Trigger scheduler provider (AWS(EE) | QUARTZ) default: QUARTZ
+    provider: QUARTZ
     quartz:
       # Clustered mode: required when more than one coordinator runs (EE). default: false
       clustered: false
@@ -235,15 +235,15 @@ bytechef:
     two-factor-authentication:
       enabled: false
   session:
-    # HTTP session store (memory | redis | jdbc) default: memory
-    # redis or jdbc share sessions between coordinators, so no sticky sessions are needed.
-    store: memory
+    # HTTP session store (MEMORY | REDIS | JDBC) default: MEMORY
+    # REDIS or JDBC share sessions between coordinators, so no sticky sessions are needed.
+    store: MEMORY
   sign-up:
     activation-required: false
     enabled: true
-  # Tenant support mode (single | multi - ee only) default: single
+  # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
   tenant:
-    mode: single
+    mode: SINGLE
   user-guiding:
     container-id: 38U111210PF6ID
     enabled: false
@@ -273,8 +273,8 @@ bytechef:
       sync-concurrency-limit: 5
   workflow:
     output-storage:
-      # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
-      provider: jdbc
+      # Output storage provider for workflow output data (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
+      provider: JDBC
     repository:
       # Workflow definition repositories (classpath | filesystem | git | jdbc); more than one may be enabled
       classpath:
