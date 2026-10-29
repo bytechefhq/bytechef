@@ -172,7 +172,6 @@ dependencies {
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-in-memory-config"))
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-jdbc-config"))
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-redis-config"))
-    implementation(project(":server:libs:config:ai-model-config"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:automation-demo-config"))
@@ -284,7 +283,6 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-rest"))
-    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-graphql"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest"))
@@ -340,7 +338,6 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-file-storage:platform-ai-agent-eval-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-graphql"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-service"))
-    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-service"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-service"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-graphql"))
