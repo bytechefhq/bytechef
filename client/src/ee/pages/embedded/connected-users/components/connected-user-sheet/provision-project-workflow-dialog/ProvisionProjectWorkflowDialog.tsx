@@ -20,9 +20,14 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
+interface ProvisionProjectWorkflowStateI {
+    inputs: Record<string, string>;
+    selected: boolean;
+}
+
 interface ProvisionProjectWorkflowFormI {
     projectId: string;
-    workflows: Array<{inputs: Record<string, string>; selected: boolean; workflowUuid: string}>;
+    workflows: Record<string, ProvisionProjectWorkflowStateI>;
 }
 
 interface ProvisionProjectWorkflowDialogProps {
@@ -34,7 +39,7 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
     const queryClient = useQueryClient();
 
     const {handleSubmit, setValue, watch} = useForm<ProvisionProjectWorkflowFormI>({
-        defaultValues: {projectId: '', workflows: []},
+        defaultValues: {projectId: '', workflows: {}},
     });
 
     const {data} = useProvisionableConnectedUserProjectsQuery({connectedUserId: connectedUserId.toString()});
@@ -55,53 +60,53 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
     const provisionableProjects = data?.provisionableConnectedUserProjects;
 
     const provisionableProject = useMemo(
-        () => provisionableProjects?.find((current) => current.projectId === projectId),
+        () => provisionableProjects?.find((project) => project.projectId === projectId),
         [provisionableProjects, projectId]
     );
 
+    const selectableWorkflows = useMemo(
+        () =>
+            (provisionableProject?.workflows || []).filter(
+                (workflow) =>
+                    !workflow.provisioned && !workflow.dangling && formWorkflows[workflow.workflowUuid]?.selected
+            ),
+        [formWorkflows, provisionableProject]
+    );
+
     const canSave =
-        !!provisionableProject &&
-        formWorkflows.some((formWorkflow) => formWorkflow.selected) &&
-        formWorkflows.every((formWorkflow) => {
-            if (!formWorkflow.selected) {
-                return true;
-            }
-
-            const workflow = provisionableProject.workflows.find(
-                (current) => current.workflowUuid === formWorkflow.workflowUuid
-            );
-
-            return (workflow?.inputs ?? []).every(
-                (input) => !input.required || !!formWorkflow.inputs?.[input.name]?.trim()
-            );
-        });
+        selectableWorkflows.length > 0 &&
+        selectableWorkflows.every((workflow) =>
+            workflow.inputs.every(
+                (input) => !input.required || !!formWorkflows[workflow.workflowUuid]?.inputs[input.name]?.trim()
+            )
+        );
 
     const handleProjectChange = (value: string) => {
-        const selectedProject = provisionableProjects?.find((current) => current.projectId === value);
-
         setValue('projectId', value);
-        setValue(
-            'workflows',
-            (selectedProject?.workflows ?? []).map((workflow) => ({
-                inputs: {},
-                selected: false,
-                workflowUuid: workflow.workflowUuid,
-            }))
-        );
+        setValue('workflows', {});
+    };
+
+    const handleWorkflowChange = (workflowUuid: string, workflowState: Partial<ProvisionProjectWorkflowStateI>) => {
+        setValue('workflows', {
+            ...formWorkflows,
+            [workflowUuid]: {
+                inputs: formWorkflows[workflowUuid]?.inputs || {},
+                selected: formWorkflows[workflowUuid]?.selected || false,
+                ...workflowState,
+            },
+        });
     };
 
     const handleSave = ({workflows}: ProvisionProjectWorkflowFormI) => {
         provisionConnectedUserProjectWorkflowsMutation.mutate({
             connectedUserId: connectedUserId.toString(),
-            workflows: workflows
-                .filter((workflow) => workflow.selected)
-                .map(({inputs, workflowUuid}) => {
-                    const hasInputs = !!provisionableProject?.workflows.find(
-                        (current) => current.workflowUuid === workflowUuid
-                    )?.inputs.length;
+            workflows: selectableWorkflows.map((workflow) => {
+                const inputs = workflows[workflow.workflowUuid]?.inputs || {};
 
-                    return hasInputs ? {inputs, workflowUuid} : {workflowUuid};
-                }),
+                return workflow.inputs.length > 0
+                    ? {inputs, workflowUuid: workflow.workflowUuid}
+                    : {workflowUuid: workflow.workflowUuid};
+            }),
         });
     };
 
@@ -133,19 +138,20 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
                             >
                                 <option value="">Select...</option>
 
-                                {provisionableProjects?.map((current) => (
-                                    <option key={current.projectId} value={current.projectId}>
-                                        {current.name}
+                                {provisionableProjects?.map((project) => (
+                                    <option key={project.projectId} value={project.projectId}>
+                                        {`${project.name} V${project.projectVersion}`}
                                     </option>
                                 ))}
                             </select>
                         </fieldset>
                     )}
 
-                    {provisionableProject?.workflows.map((workflow, workflowIndex) => {
+                    {provisionableProject?.workflows.map((workflow) => {
                         const label = workflow.label || workflow.workflowUuid;
                         const locked = workflow.provisioned || workflow.dangling;
-                        const selected = !!formWorkflows[workflowIndex]?.selected;
+                        const workflowState = formWorkflows[workflow.workflowUuid];
+                        const selected = !!workflowState?.selected;
 
                         return (
                             <div
@@ -159,7 +165,9 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
                                             checked={locked || selected}
                                             disabled={locked}
                                             onCheckedChange={(checked) =>
-                                                setValue(`workflows.${workflowIndex}.selected`, checked === true)
+                                                handleWorkflowChange(workflow.workflowUuid, {
+                                                    selected: checked === true,
+                                                })
                                             }
                                         />
 
@@ -177,21 +185,25 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
                                     !locked &&
                                     workflow.inputs.map((input) => (
                                         <fieldset className="space-y-1 border-0 p-0" key={input.name}>
-                                            <Label htmlFor={`provision-workflow-${workflowIndex}-${input.name}`}>
+                                            <Label
+                                                htmlFor={`provision-workflow-${workflow.workflowUuid}-${input.name}`}
+                                            >
                                                 {input.label || input.name}
 
                                                 {input.required && ' *'}
                                             </Label>
 
                                             <Input
-                                                id={`provision-workflow-${workflowIndex}-${input.name}`}
+                                                id={`provision-workflow-${workflow.workflowUuid}-${input.name}`}
                                                 onChange={(event) =>
-                                                    setValue(`workflows.${workflowIndex}.inputs`, {
-                                                        ...formWorkflows[workflowIndex]?.inputs,
-                                                        [input.name]: event.target.value,
+                                                    handleWorkflowChange(workflow.workflowUuid, {
+                                                        inputs: {
+                                                            ...workflowState?.inputs,
+                                                            [input.name]: event.target.value,
+                                                        },
                                                     })
                                                 }
-                                                value={formWorkflows[workflowIndex]?.inputs?.[input.name] || ''}
+                                                value={workflowState?.inputs[input.name] || ''}
                                             />
                                         </fieldset>
                                     ))}

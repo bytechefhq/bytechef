@@ -48,13 +48,15 @@ const PROJECTS = [
 ];
 
 const renderDialog = (onClose = vi.fn(), queryClient = new QueryClient()) => {
-    render(
+    const dialog = (
         <QueryClientProvider client={queryClient}>
             <ProvisionProjectWorkflowDialog connectedUserId={7} onClose={onClose} />
         </QueryClientProvider>
     );
 
-    return {onClose, queryClient};
+    const {rerender} = render(dialog);
+
+    return {onClose, queryClient, rerenderDialog: () => rerender(dialog)};
 };
 
 describe('ProvisionProjectWorkflowDialog', () => {
@@ -75,6 +77,12 @@ describe('ProvisionProjectWorkflowDialog', () => {
             true
         );
         expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+    });
+
+    it('shows each project with its version', () => {
+        renderDialog();
+
+        expect(screen.getByRole('option', {name: 'Onboarding V3'})).toBeInTheDocument();
     });
 
     it("lists the chosen project's workflows and disables provisioned ones", async () => {
@@ -131,6 +139,33 @@ describe('ProvisionProjectWorkflowDialog', () => {
         expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['provisionableConnectedUserProjects']});
         expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['connectedUsers', 7]});
         expect(onClose).toHaveBeenCalled();
+    });
+
+    it('keeps the selection and inputs on the same workflow when a refetch reorders the list', async () => {
+        const {rerenderDialog} = renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Welcome'}));
+        await userEvent.type(screen.getByLabelText(/Name/), 'x');
+
+        const [project] = PROJECTS;
+
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {provisionableConnectedUserProjects: [{...project, workflows: [...project.workflows].reverse()}]},
+        });
+
+        rerenderDialog();
+
+        expect(screen.getByRole('checkbox', {name: 'Welcome'})).toBeChecked();
+        expect(screen.getByRole('checkbox', {name: 'Dotted'})).not.toBeChecked();
+        expect(screen.getByLabelText(/Name/)).toHaveValue('x');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.mutate).toHaveBeenCalledWith({
+            connectedUserId: '7',
+            workflows: [{inputs: {name: 'x'}, workflowUuid: 'wf-1'}],
+        });
     });
 
     it('keeps dotted input names as literal keys', async () => {
