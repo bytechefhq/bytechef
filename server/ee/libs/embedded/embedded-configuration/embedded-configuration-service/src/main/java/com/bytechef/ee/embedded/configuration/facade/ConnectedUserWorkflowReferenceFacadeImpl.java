@@ -174,7 +174,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
             if ((!requestedConnectionIds.isEmpty() || inputs != null) && !reference.isDangling()) {
                 return applyWorkflow(
-                    reference, externalUserId, environment, reference.isEnabled(), ApplyMode.RE_PROVISION,
+                    reference, externalUserId, environment, reference.isEnabled(), ApplyMode.PROVISION,
                     requestedConnectionIds, inputs);
             }
 
@@ -264,9 +264,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         connectedUserReferenceDeploymentManager.putWorkflows(
             reference.getProjectDeploymentId(), projectVersion, Map.of(automationWorkflowUuid, rowSpec));
 
-        if (applyMode.intentFollowsResolution()) {
-            reference.setEnabled(requestedEnabled);
-        }
+        reference.setEnabled(enable && (reference.isEnabled() || requestedEnabled));
 
         ConnectedUserProjectWorkflow savedReference = connectedUserProjectWorkflowRepository.save(reference);
 
@@ -368,9 +366,10 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     }
 
     private boolean isRowEnabled(ConnectedUserProjectWorkflow reference) {
-        return connectedUserReferenceDeploymentManager
-            .fetchRow(reference.getProjectDeploymentId(), reference.getAutomationWorkflowUuid())
-            .map(ProjectDeploymentWorkflow::isEnabled)
+        Optional<ProjectDeploymentWorkflow> row = connectedUserReferenceDeploymentManager.fetchRow(
+            reference.getProjectDeploymentId(), reference.getAutomationWorkflowUuid());
+
+        return row.map(ProjectDeploymentWorkflow::isEnabled)
             .orElse(false);
     }
 
@@ -395,32 +394,23 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     }
 
     /**
-     * How {@code applyWorkflow} treats the user's intent ({@code reference.enabled}) and an incomplete resolution. An
-     * explicit enable or disable and a first provisioning set the intent to the resolution result; re-provisioning an
-     * existing reference and resuming it after its inputs are filled keep the intent, so only the row follows the
-     * resolution and a workflow paused by a missing input or connection resumes once it is complete.
+     * Which incomplete resolutions {@code applyWorkflow} reports by throwing. Whatever the mode, the user's intent
+     * ({@code reference.enabled}) is lowered only by a disable ({@code enable == false}); an enable raises it only when
+     * the resolution is complete and never lowers an intent that is already on, so a workflow paused by a missing input
+     * or connection keeps its switch on and resumes once it is complete.
      */
     private enum ApplyMode {
 
-        EXPLICIT(true, true, true),
-        PROVISION(true, true, false),
-        RE_PROVISION(false, true, false),
-        RESUME(false, false, false);
+        EXPLICIT(true, true),
+        PROVISION(true, false),
+        RESUME(false, false);
 
-        private final boolean intentFollowsResolution;
         private final boolean throwsOnMissingConnection;
         private final boolean throwsOnIncompleteWorkflow;
 
-        ApplyMode(
-            boolean intentFollowsResolution, boolean throwsOnMissingConnection, boolean throwsOnIncompleteWorkflow) {
-
-            this.intentFollowsResolution = intentFollowsResolution;
+        ApplyMode(boolean throwsOnMissingConnection, boolean throwsOnIncompleteWorkflow) {
             this.throwsOnMissingConnection = throwsOnMissingConnection;
             this.throwsOnIncompleteWorkflow = throwsOnIncompleteWorkflow;
-        }
-
-        boolean intentFollowsResolution() {
-            return intentFollowsResolution;
         }
 
         boolean throwsOnIncompleteWorkflow() {

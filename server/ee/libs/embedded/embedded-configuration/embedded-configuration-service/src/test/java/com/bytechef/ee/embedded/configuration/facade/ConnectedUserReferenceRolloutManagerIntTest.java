@@ -473,7 +473,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testEnableReferenceWithAMissingConnectionThrowsAndKeepsTheReferenceDisabled() {
+    void testEnableReferenceWithAMissingConnectionThrowsAndPausesTheRowButKeepsTheSwitchOn() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Missing Connection Enable");
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -498,7 +498,95 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .findById(reference.getId())
             .orElseThrow();
 
-        assertThat(reloadedReference.isEnabled()).isFalse();
+        assertThat(reloadedReference.isEnabled()).isTrue();
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+    }
+
+    @Test
+    void testReProvisioningAnExistingReferenceWithAMissingConnectionKeepsIntentAndThrows() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Re-provision Missing Connection");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(reference.isEnabled()).isTrue();
+
+        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            .thenReturn(List.of());
+
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of()))
+                .isInstanceOf(MissingConnectionException.class);
+
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+    }
+
+    @Test
+    void testConfigurationSavePausesAWorkflowWhoseConnectionIsGoneAndKeepsIntent() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Save Pauses");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+
+        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            .thenReturn(List.of());
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isEqualTo("MISSING_CONNECTION:slack");
+    }
+
+    @Test
+    void testConfigurationSaveResumesAPausedWorkflowOnceItsConnectionIsAvailable() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Save Resumes");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            .thenReturn(List.of());
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+
+        stubEntitledSlackConnection(778L);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isNull();
     }
 
     @Test
@@ -969,7 +1057,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testRepublishAddingAConnectionTheUserLacksDisablesOnlyThatReference() {
+    void testRepublishAddingAConnectionTheUserLacksPausesOnlyThatReferenceAndKeepsIntent() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Missing");
 
         String slackUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);

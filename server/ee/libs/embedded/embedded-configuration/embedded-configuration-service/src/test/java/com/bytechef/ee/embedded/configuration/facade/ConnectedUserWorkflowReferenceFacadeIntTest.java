@@ -1023,6 +1023,54 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     @Test
+    void testEnablingAPausedWorkflowKeepsTheSwitchOn() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Paused");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(
+            automationWorkflowProjectId, Environment.PRODUCTION.ordinal());
+
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.enableReference(
+            connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION))
+                .isInstanceOf(MissingInputException.class)
+                .extracting("inputName")
+                .isEqualTo("channel");
+
+        assertThat(getReference(reference.getId()).isEnabled()).isTrue();
+        assertThat(fetchRow(reference))
+            .get()
+            .extracting(ProjectDeploymentWorkflow::isEnabled)
+            .isEqualTo(false);
+
+        connectedUserWorkflowReferenceFacade.updateReferenceInputs(
+            connectedUser.getExternalId(), workflowUuid, Map.of("channel", "#alerts"), Environment.PRODUCTION);
+
+        assertThat(fetchRow(reference))
+            .get()
+            .extracting(ProjectDeploymentWorkflow::isEnabled)
+            .isEqualTo(true);
+        assertThat(getReference(reference.getId()).isEnabled()).isTrue();
+    }
+
+    @Test
     void testUpdateReferenceInputsRefusesADanglingReference() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Inputs Dangling");
 
