@@ -60,4 +60,9 @@ public class IntegrationCodeWorkflowServiceImpl implements IntegrationCodeWorkfl
     public List<Long> getCodeWorkflowIntegrationIds() {
         return integrationCodeWorkflowRepository.findDistinctIntegrationIds();
     }
+
+    @Override
+    public List<IntegrationCodeWorkflow> getIntegrationCodeWorkflows(long integrationId) {
+        return integrationCodeWorkflowRepository.findAllByIntegrationId(integrationId);
+    }
 }
