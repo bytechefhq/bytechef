@@ -776,17 +776,6 @@ class AutomationWorkflowProjectFacadeIntTest {
     }
 
     @Test
-    void testUpdateProjectRejectsAnEmbeddedPrefixedName() {
-        long projectId = automationWorkflowProjectFacade.createProject(
-            "Updatable " + UUID.randomUUID(), "", null, List.of(), null);
-
-        assertThatThrownBy(
-            () -> automationWorkflowProjectFacade.updateProject(
-                projectId, "__EMBEDDED_x", "", null, List.of(), null))
-                    .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     void testProjectWithTheMarkerNameButNoSettingsRowIsNotAnAutomationWorkflowProject() {
         Project project = new Project();
 

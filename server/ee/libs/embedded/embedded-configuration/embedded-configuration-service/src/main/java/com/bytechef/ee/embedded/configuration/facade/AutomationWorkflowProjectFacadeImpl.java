@@ -73,8 +73,6 @@ import tools.jackson.core.type.TypeReference;
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
-    private static final String RESERVED_NAME_PREFIX = "__EMBEDDED";
-
     private static final String DEFAULT_DEFINITION = """
         {
             "label": "New Workflow",
@@ -141,11 +139,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     @Override
     public long createProject(
         String name, String description, String category, List<String> tags, String permissionExpression) {
-        if (name != null && name.startsWith(RESERVED_NAME_PREFIX)) {
-            throw new IllegalArgumentException(
-                "Project name must not start with '" + RESERVED_NAME_PREFIX + "': " + name);
-        }
-
         Project project = new Project();
 
         project.setName(name);
@@ -404,11 +397,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
         String permissionExpression) {
-        if (name != null && name.startsWith(RESERVED_NAME_PREFIX)) {
-            throw new IllegalArgumentException(
-                "Project name must not start with '" + RESERVED_NAME_PREFIX + "': " + name);
-        }
-
         Project project = getCatalogProject(projectId);
 
         project.setName(name);
