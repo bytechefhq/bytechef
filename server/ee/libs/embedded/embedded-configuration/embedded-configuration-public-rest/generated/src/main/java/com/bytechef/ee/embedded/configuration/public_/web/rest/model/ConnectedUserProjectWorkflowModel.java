@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-18T21:40:19.187161+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ConnectedUserProjectWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -428,11 +428,11 @@ public class ConnectedUserProjectWorkflowModel {
   }
 
   /**
-   * The values the connected user has already supplied, keyed by input name.
+   * The values the connected user has already supplied, keyed by input name. Values of inputs the configuration provides are left out.
    * @return inputValues
    */
   
-  @Schema(name = "inputValues", description = "The values the connected user has already supplied, keyed by input name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "inputValues", description = "The values the connected user has already supplied, keyed by input name. Values of inputs the configuration provides are left out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputValues")
   public Map<String, Object> getInputValues() {
     return inputValues;

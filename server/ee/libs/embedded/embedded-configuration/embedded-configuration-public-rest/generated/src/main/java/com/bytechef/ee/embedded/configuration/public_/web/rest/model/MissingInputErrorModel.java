@@ -22,8 +22,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "MissingInputError", description = "Returned when a reference cannot be enabled because a required workflow input has no value yet.")
 @JsonTypeName("MissingInputError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-18T21:40:19.187161+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class MissingInputErrorModel implements DisableFrontendProjectWorkflow409ResponseModel, EnableFrontendProjectWorkflow409ResponseModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+public class MissingInputErrorModel implements DisableFrontendProjectWorkflow409ResponseModel, EnableFrontendProjectWorkflow409ResponseModel, UpdateFrontendProjectWorkflowInputs409ResponseModel {
 
   private @Nullable String missingInputName;
 

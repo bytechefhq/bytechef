@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProjectComponent", description = "A component used in an automation workflow.")
 @JsonTypeName("AutomationWorkflowProjectComponent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class AutomationWorkflowProjectComponentModel {
 
   private @Nullable String name;
@@ -34,6 +34,8 @@ public class AutomationWorkflowProjectComponentModel {
   private @Nullable Boolean connectionRequired;
 
   private @Nullable Long integrationId;
+
+  private @Nullable Boolean provided;
 
   public AutomationWorkflowProjectComponentModel name(@Nullable String name) {
     this.name = name;
@@ -140,6 +142,27 @@ public class AutomationWorkflowProjectComponentModel {
     this.integrationId = integrationId;
   }
 
+  public AutomationWorkflowProjectComponentModel provided(@Nullable Boolean provided) {
+    this.provided = provided;
+    return this;
+  }
+
+  /**
+   * Whether the configuration provides the connection of this component, so the connected user cannot choose one. The provided connection is neither listed among the connected user's connections nor returned.
+   * @return provided
+   */
+  
+  @Schema(name = "provided", description = "Whether the configuration provides the connection of this component, so the connected user cannot choose one. The provided connection is neither listed among the connected user's connections nor returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("provided")
+  public @Nullable Boolean getProvided() {
+    return provided;
+  }
+
+  @JsonProperty("provided")
+  public void setProvided(@Nullable Boolean provided) {
+    this.provided = provided;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -153,12 +176,13 @@ public class AutomationWorkflowProjectComponentModel {
         Objects.equals(this.title, automationWorkflowProjectComponent.title) &&
         Objects.equals(this.icon, automationWorkflowProjectComponent.icon) &&
         Objects.equals(this.connectionRequired, automationWorkflowProjectComponent.connectionRequired) &&
-        Objects.equals(this.integrationId, automationWorkflowProjectComponent.integrationId);
+        Objects.equals(this.integrationId, automationWorkflowProjectComponent.integrationId) &&
+        Objects.equals(this.provided, automationWorkflowProjectComponent.provided);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, title, icon, connectionRequired, integrationId);
+    return Objects.hash(name, title, icon, connectionRequired, integrationId, provided);
   }
 
   @Override
@@ -170,6 +194,7 @@ public class AutomationWorkflowProjectComponentModel {
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    connectionRequired: ").append(toIndentedString(connectionRequired)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
+    sb.append("    provided: ").append(toIndentedString(provided)).append("\n");
     sb.append("}");
     return sb.toString();
   }

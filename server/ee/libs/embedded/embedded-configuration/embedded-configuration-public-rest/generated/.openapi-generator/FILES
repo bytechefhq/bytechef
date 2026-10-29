@@ -46,10 +46,13 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Miss
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/MissingInputErrorModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/OAuth2Model.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/OptionModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ProvidedValueLockedErrorModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ProvisionFrontendWorkflowReference409ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ProvisionWorkflowReferenceRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/PublishFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ReauthorizeConnectionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendIntegrationInstanceWorkflowRequestModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendProjectWorkflowInputs409ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendWorkflowConfigurationConnectionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateWorkflowInputsRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/WorkflowModel.java
