@@ -1,0 +1,6 @@
+spring:
+  liquibase:
+    contexts: mono
+
+bytechef:
+  edition: ee
