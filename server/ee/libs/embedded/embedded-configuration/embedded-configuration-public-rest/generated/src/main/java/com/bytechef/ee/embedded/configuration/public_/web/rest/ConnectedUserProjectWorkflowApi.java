@@ -9,6 +9,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUs
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.DisableFrontendProjectWorkflow409ResponseModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnableConnectedUserWorkflowResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnableFrontendProjectWorkflow409ResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.MissingConnectionErrorModel;
@@ -45,7 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-18T21:40:19.187161+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T14:51:45.918422+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Connected User Project Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -531,7 +532,7 @@ public interface ConnectedUserProjectWorkflowApi {
      *
      * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
-     * @return Successful operation. (status code 204)
+     * @return Successful operation. (status code 200)
      *         or A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. (status code 409)
      */
     @Operation(
@@ -540,7 +541,9 @@ public interface ConnectedUserProjectWorkflowApi {
         description = "Enable a workflow.",
         tags = { "connected-user-project-workflow" },
         responses = {
-            @ApiResponse(responseCode = "204", description = "Successful operation."),
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = EnableConnectedUserWorkflowResponseModel.class))
+            }),
             @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = EnableFrontendProjectWorkflow409ResponseModel.class))
             })
@@ -554,12 +557,17 @@ public interface ConnectedUserProjectWorkflowApi {
         value = ConnectedUserProjectWorkflowApi.PATH_ENABLE_FRONTEND_PROJECT_WORKFLOW,
         produces = { "application/json" }
     )
-    default ResponseEntity<Void> enableFrontendProjectWorkflow(
+    default ResponseEntity<EnableConnectedUserWorkflowResponseModel> enableFrontendProjectWorkflow(
         @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"attentionReason\" : \"attentionReason\", \"enabled\" : true }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"invalidWorkflowErrorCount\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
@@ -580,7 +588,7 @@ public interface ConnectedUserProjectWorkflowApi {
      * @param externalUserId The external user id. (required)
      * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
-     * @return Successful operation. (status code 204)
+     * @return Successful operation. (status code 200)
      *         or A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. (status code 409)
      */
     @Operation(
@@ -589,7 +597,9 @@ public interface ConnectedUserProjectWorkflowApi {
         description = "Enable a workflow.",
         tags = { "connected-user-project-workflow" },
         responses = {
-            @ApiResponse(responseCode = "204", description = "Successful operation."),
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = EnableConnectedUserWorkflowResponseModel.class))
+            }),
             @ApiResponse(responseCode = "409", description = "A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = EnableFrontendProjectWorkflow409ResponseModel.class))
             })
@@ -603,13 +613,18 @@ public interface ConnectedUserProjectWorkflowApi {
         value = ConnectedUserProjectWorkflowApi.PATH_ENABLE_PROJECT_WORKFLOW,
         produces = { "application/json" }
     )
-    default ResponseEntity<Void> enableProjectWorkflow(
+    default ResponseEntity<EnableConnectedUserWorkflowResponseModel> enableProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"attentionReason\" : \"attentionReason\", \"enabled\" : true }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"invalidWorkflowErrorCount\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);

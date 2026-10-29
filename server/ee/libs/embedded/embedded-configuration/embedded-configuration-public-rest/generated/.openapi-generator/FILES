@@ -28,6 +28,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Crea
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CredentialStatusModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/DisableFrontendProjectWorkflow409ResponseModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/EnableConnectedUserWorkflowResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/EnableFrontendProjectWorkflow409ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputModel.java
