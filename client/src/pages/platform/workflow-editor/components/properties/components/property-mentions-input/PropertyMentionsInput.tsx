@@ -327,16 +327,27 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         'relative flex items-center rounded-md transition-colors',
                         error &&
                             'border-stroke-destructive-secondary text-content-destructive ring-stroke-destructive-secondary focus-within:ring-stroke-destructive-secondary',
-                        isFocused && 'ring-2 ring-ring',
                         label && 'mt-1',
-                        leadingIcon && 'rounded-md border border-stroke-neutral-secondary'
+                        leadingIcon && 'rounded-md border border-stroke-neutral-secondary',
+                        isFormulaMode &&
+                            !error &&
+                            'border border-violet-500 shadow-[0_0_0_4px_theme(colors.violet.100)] dark:border-violet-400 dark:shadow-[0_0_0_4px_theme(colors.violet.950)]',
+                        isFocused && 'ring-2 ring-ring',
+                        isFocused && isFormulaMode && !error && 'ring-violet-500 dark:ring-violet-400'
                     )}
                     onDragEnter={handleDragEnter}
                     onDragOver={handleDragOver}
                     title={controlType}
                 >
                     {leadingIcon && (
-                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md bg-surface-neutral-secondary px-3">
+                        <span
+                            className={twMerge(
+                                'pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md bg-surface-neutral-secondary px-3',
+                                isFormulaMode &&
+                                    !error &&
+                                    'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300'
+                            )}
+                        >
                             {isFromAi ? <SquareFunctionIcon className="size-4" /> : leadingIcon}
                         </span>
                     )}
@@ -344,8 +355,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     <div
                         className={twMerge(
                             'property-mentions-editor flex h-full min-h-9 w-full rounded-md bg-surface-neutral-primary dark:bg-surface-neutral-secondary',
-                            // Data pill chips size themselves, so the editor's own text-xs does not
-                            // reach them. The modifier lets the stylesheet bring them down to match.
                             isFormulaMode && 'property-mentions-editor--formula-mode',
                             leadingIcon && 'min-h-[34px] border-0 pr-0.5 pl-10',
                             className
