@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
+import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -31,6 +32,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -51,6 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -69,6 +73,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     private static final String TOOL_DESCRIPTION = "toolDescription";
     private static final String TOOL_NAME = "toolName";
 
+    private final ConnectedUserService connectedUserService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceFacade integrationInstanceFacade;
@@ -87,6 +92,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
     @SuppressFBWarnings("EI")
     public ConnectedUserMcpServerFacadeImpl(
+        ConnectedUserService connectedUserService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
@@ -97,6 +103,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         McpToolService mcpToolService, PrincipalJobService principalJobService, WorkflowService workflowService) {
 
+        this.connectedUserService = connectedUserService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceFacade = integrationInstanceFacade;
@@ -278,6 +285,103 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         return connectedUserMcpServers;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public List<ProvisionableConnectedUserMcpServerDTO> getProvisionableMcpServers(long connectedUserId) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        UserInstanceCoverage userInstanceCoverage = getUserInstanceCoverage(connectedUserId);
+
+        Set<Long> provisionedMcpServerIds = new LinkedHashSet<>();
+
+        for (ConnectedUserMcpServerDTO connectedUserMcpServer : getConnectedUserMcpServers(connectedUserId)) {
+            provisionedMcpServerIds.add(connectedUserMcpServer.id());
+        }
+
+        List<ProvisionableConnectedUserMcpServerDTO> provisionableMcpServers = new ArrayList<>();
+
+        for (McpServer mcpServer : mcpServerService.getMcpServers(PlatformType.EMBEDDED)) {
+            if (!mcpServer.isEnabled() || mcpServer.getEnvironment() != connectedUser.getEnvironment()) {
+                continue;
+            }
+
+            McpServerCoverage mcpServerCoverage = getMcpServerCoverage(mcpServer.getId(), userInstanceCoverage);
+
+            provisionableMcpServers.add(new ProvisionableConnectedUserMcpServerDTO(
+                mcpServer.getId(), mcpServer.getName(), provisionedMcpServerIds.contains(mcpServer.getId()),
+                new ArrayList<>(mcpServerCoverage.coveredComponentNames()),
+                new ArrayList<>(mcpServerCoverage.missingComponentNames())));
+        }
+
+        provisionableMcpServers.sort(
+            Comparator.comparing(ProvisionableConnectedUserMcpServerDTO::name, String.CASE_INSENSITIVE_ORDER));
+
+        return provisionableMcpServers;
+    }
+
+    private McpServerCoverage getMcpServerCoverage(long mcpServerId, UserInstanceCoverage userInstanceCoverage) {
+        Set<String> coveredComponentNames = new TreeSet<>();
+        Set<String> missingComponentNames = new TreeSet<>();
+
+        for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
+            if (userInstanceCoverage.componentNames()
+                .contains(mcpComponent.getComponentName())) {
+
+                coveredComponentNames.add(mcpComponent.getComponentName());
+            } else {
+                missingComponentNames.add(mcpComponent.getComponentName());
+            }
+        }
+
+        for (McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration : mcpIntegrationInstanceConfigurationService
+            .getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId)) {
+
+            long integrationInstanceConfigurationId =
+                Objects.requireNonNull(mcpIntegrationInstanceConfiguration.getIntegrationInstanceConfigurationId());
+
+            if (userInstanceCoverage.integrationInstanceConfigurationIds()
+                .contains(integrationInstanceConfigurationId)) {
+
+                coveredComponentNames.add(getComponentName(integrationInstanceConfigurationId));
+            } else {
+                missingComponentNames.add(getComponentName(integrationInstanceConfigurationId));
+            }
+        }
+
+        // A component may be listed both as a tool component and through a workflow configuration; covered wins.
+        missingComponentNames.removeAll(coveredComponentNames);
+
+        return new McpServerCoverage(coveredComponentNames, missingComponentNames);
+    }
+
+    private String getComponentName(long integrationInstanceConfigurationId) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId);
+
+        Integration integration =
+            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
+
+        return integration.getComponentName();
+    }
+
+    private UserInstanceCoverage getUserInstanceCoverage(long connectedUserId) {
+        Set<String> componentNames = new LinkedHashSet<>();
+        Set<Long> integrationInstanceConfigurationIds = new LinkedHashSet<>();
+
+        for (IntegrationInstance integrationInstance : integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUserId)) {
+
+            long integrationInstanceConfigurationId = integrationInstance.getIntegrationInstanceConfigurationId();
+
+            integrationInstanceConfigurationIds.add(integrationInstanceConfigurationId);
+            componentNames.add(getComponentName(integrationInstanceConfigurationId));
+        }
+
+        return new UserInstanceCoverage(componentNames, integrationInstanceConfigurationIds);
+    }
+
     private Map<Long, List<ConnectedUserMcpServerWorkflowDTO>> getWorkflowsByMcpServerId(
         List<IntegrationInstance> integrationInstances) {
 
@@ -374,5 +478,11 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         }
 
         return Objects.requireNonNullElse(workflow.getLabel(), workflow.getId());
+    }
+
+    private record McpServerCoverage(Set<String> coveredComponentNames, Set<String> missingComponentNames) {
+    }
+
+    private record UserInstanceCoverage(Set<String> componentNames, Set<Long> integrationInstanceConfigurationIds) {
     }
 }
