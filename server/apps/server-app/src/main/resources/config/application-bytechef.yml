@@ -5,6 +5,8 @@ bytechef:
       provider: JDBC
     copilot:
       enabled: false
+      # Default LLM provider of the Copilot when the user has not selected one; empty uses the catalog default
+      provider:
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
