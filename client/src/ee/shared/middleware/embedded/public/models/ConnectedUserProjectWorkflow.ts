@@ -91,7 +91,7 @@ export interface ConnectedUserProjectWorkflow {
      */
     inputs?: Array<AutomationWorkflowProjectWorkflowInput>;
     /**
-     * The values the connected user has already supplied, keyed by input name.
+     * The values the connected user has already supplied, keyed by input name. Values of inputs the configuration provides are left out.
      */
     inputValues?: { [key: string]: any; };
     /**

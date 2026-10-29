@@ -35,6 +35,10 @@ export interface AutomationWorkflowProjectWorkflowInput {
      * Whether a value must be supplied.
      */
     required?: boolean;
+    /**
+     * Whether the configuration provides the value of this input, so the connected user cannot set it. The value itself is not returned.
+     */
+    provided?: boolean;
 }
 
 /**
@@ -58,6 +62,7 @@ export function AutomationWorkflowProjectWorkflowInputFromJSONTyped(json: any, i
         'label': json['label'] == null ? undefined : json['label'],
         'type': json['type'] == null ? undefined : json['type'],
         'required': json['required'] == null ? undefined : json['required'],
+        'provided': json['provided'] == null ? undefined : json['provided'],
     };
 }
 
@@ -76,6 +81,7 @@ export function AutomationWorkflowProjectWorkflowInputToJSONTyped(value?: Automa
         'label': value['label'],
         'type': value['type'],
         'required': value['required'],
+        'provided': value['provided'],
     };
 }
 

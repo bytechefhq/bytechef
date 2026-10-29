@@ -34,6 +34,11 @@ import {
     DisableFrontendProjectWorkflow409ResponseToJSON,
 } from '../models/DisableFrontendProjectWorkflow409Response';
 import {
+    type EnableConnectedUserWorkflowResponse,
+    EnableConnectedUserWorkflowResponseFromJSON,
+    EnableConnectedUserWorkflowResponseToJSON,
+} from '../models/EnableConnectedUserWorkflowResponse';
+import {
     type EnableFrontendProjectWorkflow409Response,
     EnableFrontendProjectWorkflow409ResponseFromJSON,
     EnableFrontendProjectWorkflow409ResponseToJSON,
@@ -44,15 +49,10 @@ import {
     EnvironmentToJSON,
 } from '../models/Environment';
 import {
-    type MissingConnectionError,
-    MissingConnectionErrorFromJSON,
-    MissingConnectionErrorToJSON,
-} from '../models/MissingConnectionError';
-import {
-    type MissingInputError,
-    MissingInputErrorFromJSON,
-    MissingInputErrorToJSON,
-} from '../models/MissingInputError';
+    type ProvisionFrontendWorkflowReference409Response,
+    ProvisionFrontendWorkflowReference409ResponseFromJSON,
+    ProvisionFrontendWorkflowReference409ResponseToJSON,
+} from '../models/ProvisionFrontendWorkflowReference409Response';
 import {
     type ProvisionWorkflowReferenceRequest,
     ProvisionWorkflowReferenceRequestFromJSON,
@@ -63,6 +63,11 @@ import {
     PublishFrontendProjectWorkflowRequestFromJSON,
     PublishFrontendProjectWorkflowRequestToJSON,
 } from '../models/PublishFrontendProjectWorkflowRequest';
+import {
+    type UpdateFrontendProjectWorkflowInputs409Response,
+    UpdateFrontendProjectWorkflowInputs409ResponseFromJSON,
+    UpdateFrontendProjectWorkflowInputs409ResponseToJSON,
+} from '../models/UpdateFrontendProjectWorkflowInputs409Response';
 import {
     type UpdateFrontendWorkflowConfigurationConnectionRequest,
     UpdateFrontendWorkflowConfigurationConnectionRequestFromJSON,
@@ -1350,19 +1355,20 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
      * Enable a workflow.
      * Enable a workflow
      */
-    async enableFrontendProjectWorkflowRaw(requestParameters: EnableFrontendProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableFrontendProjectWorkflowRaw(requestParameters: EnableFrontendProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnableConnectedUserWorkflowResponse>> {
         const requestOptions = await this.enableFrontendProjectWorkflowRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnableConnectedUserWorkflowResponseFromJSON(jsonValue));
     }
 
     /**
      * Enable a workflow.
      * Enable a workflow
      */
-    async enableFrontendProjectWorkflow(requestParameters: EnableFrontendProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.enableFrontendProjectWorkflowRaw(requestParameters, initOverrides);
+    async enableFrontendProjectWorkflow(requestParameters: EnableFrontendProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnableConnectedUserWorkflowResponse> {
+        const response = await this.enableFrontendProjectWorkflowRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -1416,19 +1422,20 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
      * Enable a workflow.
      * Enable a workflow
      */
-    async enableProjectWorkflowRaw(requestParameters: EnableProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async enableProjectWorkflowRaw(requestParameters: EnableProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnableConnectedUserWorkflowResponse>> {
         const requestOptions = await this.enableProjectWorkflowRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnableConnectedUserWorkflowResponseFromJSON(jsonValue));
     }
 
     /**
      * Enable a workflow.
      * Enable a workflow
      */
-    async enableProjectWorkflow(requestParameters: EnableProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.enableProjectWorkflowRaw(requestParameters, initOverrides);
+    async enableProjectWorkflow(requestParameters: EnableProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnableConnectedUserWorkflowResponse> {
+        const response = await this.enableProjectWorkflowRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
