@@ -82,6 +82,13 @@ public class ProjectDeploymentWorkflow implements Comparable<ProjectDeploymentWo
     public ProjectDeploymentWorkflow() {
     }
 
+    /**
+     * Removes every input; {@link #setInputs(Map)} ignores an empty map, so this is the way to clear them.
+     */
+    public void clearInputs() {
+        this.inputs = new MapWrapper();
+    }
+
     @Override
     public int compareTo(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
         return workflowId.compareTo(projectDeploymentWorkflow.workflowId);

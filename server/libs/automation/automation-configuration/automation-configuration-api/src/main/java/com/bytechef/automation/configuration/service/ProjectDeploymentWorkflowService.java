@@ -28,6 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface ProjectDeploymentWorkflowService {
 
+    /**
+     * Removes every input of the deployment workflow; {@link #update(ProjectDeploymentWorkflow)} keeps the stored
+     * inputs when it is given none.
+     */
+    void clearInputs(long id);
+
     ProjectDeploymentWorkflow create(ProjectDeploymentWorkflow projectDeploymentWorkflow);
 
     List<ProjectDeploymentWorkflow> create(List<ProjectDeploymentWorkflow> projectDeploymentWorkflows);

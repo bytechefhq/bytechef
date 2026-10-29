@@ -206,6 +206,16 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
     }
 
     @Override
+    public void clearInputs(long id) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository.findById(id)
+            .orElseThrow();
+
+        projectDeploymentWorkflow.clearInputs();
+
+        projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+    }
+
+    @Override
     public void updateEnabled(Long id, boolean enabled) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository.findById(id)
             .orElseThrow();
