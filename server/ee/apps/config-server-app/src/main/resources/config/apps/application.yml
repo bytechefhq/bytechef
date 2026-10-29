@@ -193,8 +193,8 @@ bytechef:
           options:
             model: gpt-5.1
             temperature: 1
-            reasoning-effect: medium
-            verbosity: low
+            reasoning-effect: MEDIUM
+            verbosity: LOW
         perplexity:
           options:
             model: sonar
@@ -217,8 +217,8 @@ bytechef:
     # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.
     concurrency-limit: 200
   cache:
-    # Cache provider (caffeine) default: caffeine
-    provider: caffeine
+    # Cache provider (CAFFEINE) default: CAFFEINE
+    provider: CAFFEINE
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true
@@ -244,19 +244,19 @@ bytechef:
         trigger-poll-events: 1
         trigger-webhook-events: 1
   data-storage:
-    # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
-    provider: jdbc
-  # Microservice discovery service provider (redis). Required for api-gateway routing and remote worker calls.
+    # Data storage provider (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
+    provider: JDBC
+  # Microservice discovery service provider (REDIS). Required for api-gateway routing and remote worker calls.
   discovery-service:
-    provider: redis
+    provider: REDIS
   # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
   edition: EE
-  # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
+  # Encryption key provider (FILESYSTEM - the key generated on filesystem, PROPERTY - the key read from property) default: FILESYSTEM
   encryption:
-    provider: filesystem
+    provider: FILESYSTEM
   file-storage:
-    # File storage provider (aws(ee) | filesystem | jdbc) default: filesystem
-    provider: filesystem
+    # File storage provider (AWS(EE) | FILESYSTEM | JDBC) default: FILESYSTEM
+    provider: FILESYSTEM
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
   # Enabled feature flags, e.g. [ff-123, ff-456]
@@ -267,8 +267,8 @@ bytechef:
     # SMTP host; empty disables the mail health check and logs that mail is not configured
     host:
   message-broker:
-    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
-    provider: redis
+    # Messaging provider between Coordinator and Workers (AMQP | JMS | KAFKA | REDIS) default: REDIS
+    provider: REDIS
   oauth2:
     #    predefinedApps:
     #      mailchimp:
@@ -292,16 +292,16 @@ bytechef:
   resources:
     web: file:///opt/bytechef/client/
   scheduler:
-    # Trigger scheduler provider (aws(ee) | quartz) default: quartz
-    provider: quartz
+    # Trigger scheduler provider (AWS(EE) | QUARTZ) default: QUARTZ
+    provider: QUARTZ
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; script-src: https://*.command.ai; frame-src: https://*.command.ai; img-src: https://*.command.ai; media-src: https://*.command.ai; connect-src: https://*.command.ai; style-src: https://*.command.ai;"
   sign-up:
     activation-required: false
     enabled: true
-  # Tenant support mode (single | multi - ee only) default: single
+  # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
   tenant:
-    mode: single
+    mode: SINGLE
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
@@ -319,8 +319,8 @@ bytechef:
       sync-concurrency-limit: 5
   workflow:
     output-storage:
-      # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
-      provider: jdbc
+      # Output storage provider for workflow output data (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
+      provider: JDBC
     repository:
       classpath:
         enabled: false
