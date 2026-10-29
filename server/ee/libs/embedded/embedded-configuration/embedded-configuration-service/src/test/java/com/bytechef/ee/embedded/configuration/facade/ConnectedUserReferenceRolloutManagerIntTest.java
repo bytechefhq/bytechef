@@ -20,10 +20,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
@@ -55,6 +57,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflo
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
@@ -115,6 +118,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -127,6 +131,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -168,6 +173,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String EXTERNAL_USER_ID = "rollout-user-1";
     private static final long ROLLOUT_COMPLETION_TIMEOUT_SECONDS = 60;
+    private static final int COALESCED_REQUEST_COUNT = 5;
     private static final long ROLLOUT_LOCK_WAIT_SECONDS = 5;
     private static final long RUNNING_FIRST_TEMPLATE_JOB_ID = 4242L;
 
@@ -178,6 +184,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     private static final String SLACK_TRIGGER_WORKFLOW_DEFINITION = """
         {"label":"Post","triggers":[{"name":"newMessage1","type":"slack/v1/newMessage","parameters":{}}],
+         "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
+         "triggers":[{"name":"newMessage1","type":"slack/v1/newMessage","parameters":{}}],
          "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
@@ -2248,6 +2260,376 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             });
     }
 
+    @Test
+    void testRemovingAProvidedInputTakesTheAdministratorsValueOffEveryRowAndPausesTheWorkflow() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Input Removed");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        provideValues(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
+
+        String runningExternalUserId = createConnectedUser();
+        String stoppedExternalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow runningReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            runningExternalUserId, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("note", "kept"));
+        ConnectedUserProjectWorkflow stoppedReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            stoppedExternalUserId, workflowUuid, Environment.PRODUCTION);
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            stoppedExternalUserId, workflowUuid, false, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(runningReference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator", "note", "kept"));
+            });
+        assertThat(fetchDeploymentRow(stoppedReference).getInputs()).isEqualTo(Map.of("channel", "#administrator"));
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of());
+
+        assertThat(fetchDeploymentRow(runningReference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isFalse();
+                assertThat(row.getInputs()).isEqualTo(Map.of("note", "kept"));
+            });
+        assertThat(getStoredReference(runningReference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(runningReference))
+            .attentionReason()).isEqualTo("INPUT_REQUIRED:channel");
+        assertThat(getInputValues(runningExternalUserId, workflowUuid)).isEqualTo(Map.of("note", "kept"));
+
+        assertThat(fetchDeploymentRow(stoppedReference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isFalse();
+                assertThat(row.getInputs()).isEmpty();
+            });
+        assertThat(getStoredReference(stoppedReference).isEnabled()).isFalse();
+        assertThat(getInputValues(stoppedExternalUserId, workflowUuid)).isEmpty();
+    }
+
+    @Test
+    void testDeletingTheConfigurationTakesTheAdministratorsProvidedValuesOffEveryRow() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Input Configuration Deleted");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        provideValues(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
+
+        String externalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#administrator"));
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(configuration.getId());
+
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isFalse();
+                assertThat(row.getInputs()).isEmpty();
+            });
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(getInputValues(externalUserId, workflowUuid)).isEmpty();
+    }
+
+    @Test
+    void testSavingTheConfigurationAgainWithUnchangedValuesLeavesRowsAndTriggersAlone() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Unchanged Save");
+
+        String workflowUuid = addWorkflow(
+            automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        Map<String, Long> providedConnections = Map.of("slack", ADMINISTRATOR_CONNECTION_ID);
+        Map<String, Object> providedInputs = Map.of("channel", "#administrator");
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, providedConnections, providedInputs);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            createConnectedUser(), workflowUuid, Environment.PRODUCTION);
+
+        String workflowId = fetchDeploymentRow(reference).getWorkflowId();
+
+        verify(triggerLifecycleFacade, times(1))
+            .executeTriggerEnable(eq(workflowId), any(), any(), any(), any(), any(), anyLong());
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, providedConnections, providedInputs);
+
+        ProjectDeploymentWorkflow rowBeforeTheSecondSave = fetchDeploymentRow(reference);
+
+        clearInvocations(triggerLifecycleFacade);
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, providedConnections, providedInputs);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+            configuration.getId(), configuration.getProjectVersion(), configuration.isEnabled(),
+            configuration.isAutomationHubVisible());
+
+        rollOutTheLastUpdatedEvent();
+
+        verifyNoInteractions(triggerLifecycleFacade);
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getVersion()).isEqualTo(rowBeforeTheSecondSave.getVersion());
+                assertThat(row.getLastModifiedDate()).isEqualTo(rowBeforeTheSecondSave.getLastModifiedDate());
+            });
+
+        provideValuesAndRollOut(
+            automationWorkflowProjectId, workflowUuid, providedConnections, Map.of("channel", "#changed"));
+
+        verify(triggerLifecycleFacade, times(1))
+            .executeTriggerEnable(eq(workflowId), any(), any(), any(), any(), any(), anyLong());
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#changed"));
+    }
+
+    @Test
+    void testConcurrentRolloutRequestsForOnePairCoalesceIntoTwoPassesEndingInTheNewestState()
+        throws InterruptedException {
+
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Coalesced Rollouts");
+
+        ConnectedUserProjectWorkflow reference = createReferenceBehindTwoPublishedVersions(automationWorkflowProjectId);
+
+        CoalescedRollout coalescedRollout = runRequestsWhileARolloutWaitsForTheLock(
+            automationWorkflowProjectId, COALESCED_REQUEST_COUNT, 3);
+
+        assertThat(coalescedRollout.rolloutFailure()).isNull();
+        assertThat(coalescedRollout.requestsReturnedWhileTheRolloutWaited()).isTrue();
+        assertThat(coalescedRollout.rolloutFinishedWhileLocked()).isFalse();
+        assertThat(coalescedRollout.passCount()).isEqualTo(2);
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(3);
+    }
+
+    @Test
+    void testARequestDuringARunningRolloutRunsExactlyOneMorePass() throws InterruptedException {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("One More Pass");
+
+        ConnectedUserProjectWorkflow reference = createReferenceBehindTwoPublishedVersions(automationWorkflowProjectId);
+
+        CoalescedRollout coalescedRollout = runRequestsWhileARolloutWaitsForTheLock(
+            automationWorkflowProjectId, 1, 3);
+
+        assertThat(coalescedRollout.rolloutFailure()).isNull();
+        assertThat(coalescedRollout.requestsReturnedWhileTheRolloutWaited()).isTrue();
+        assertThat(coalescedRollout.passCount()).isEqualTo(2);
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(3);
+
+        Logger logger = getRolloutManagerLogger();
+        Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
+
+        logger.setLevel(Level.DEBUG);
+
+        try {
+            connectedUserReferenceRolloutManager.rollOutAndApply(
+                automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+        } finally {
+            logger.setLevel(previousLevel);
+
+            detachAppenderFromRolloutManagerLogger(appender);
+        }
+
+        assertThat(countRolloutPasses(appender, automationWorkflowProjectId)).isEqualTo(1);
+    }
+
+    @Test
+    void testRolloutRequestsForDifferentPairsAreNotCoalesced() throws InterruptedException {
+        long lockedAutomationWorkflowProjectId = createAutomationWorkflowProject("Coalescing Locked Pair");
+
+        addWorkflow(lockedAutomationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(lockedAutomationWorkflowProjectId);
+
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Coalescing Free Pair");
+
+        ConnectedUserProjectWorkflow reference = createReferenceBehindTwoPublishedVersions(automationWorkflowProjectId);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
+
+        CountDownLatch startedLatch = new CountDownLatch(0);
+        CountDownLatch lockedFinishedLatch = new CountDownLatch(1);
+        CountDownLatch freeFinishedLatch = new CountDownLatch(1);
+        AtomicBoolean freeFinishedWhileTheOtherPairWaited = new AtomicBoolean();
+        AtomicBoolean lockedFinishedWhileLocked = new AtomicBoolean();
+        AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            automationWorkflowProjectConfigurationService.lockRollout(
+                lockedAutomationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+            startRolloutThread(lockedAutomationWorkflowProjectId, startedLatch, lockedFinishedLatch, rolloutFailure);
+
+            awaitAWaitingAdvisoryLock();
+
+            startRolloutThread(automationWorkflowProjectId, startedLatch, freeFinishedLatch, rolloutFailure);
+
+            freeFinishedWhileTheOtherPairWaited.set(
+                awaitQuietly(freeFinishedLatch, ROLLOUT_COMPLETION_TIMEOUT_SECONDS));
+            lockedFinishedWhileLocked.set(lockedFinishedLatch.getCount() == 0);
+        });
+
+        boolean lockedFinished = lockedFinishedLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+        assertThat(freeFinishedWhileTheOtherPairWaited.get()).isTrue();
+        assertThat(lockedFinishedWhileLocked.get()).isFalse();
+        assertThat(lockedFinished).isTrue();
+        assertThat(rolloutFailure.get()).isNull();
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+    }
+
+    /**
+     * Holds the rollout lock of the pair, starts a rollout that waits for it, then, while it waits, commits a
+     * configuration save to {@code newestProjectVersion} and sends {@code requestCount} more rollout requests. Returns
+     * whether those requests returned while the rollout still waited, and how many passes the rollout ran once the lock
+     * was released.
+     */
+    private CoalescedRollout runRequestsWhileARolloutWaitsForTheLock(
+        long automationWorkflowProjectId, int requestCount, int newestProjectVersion) throws InterruptedException {
+
+        CountDownLatch startedLatch = new CountDownLatch(0);
+        CountDownLatch rolloutFinishedLatch = new CountDownLatch(1);
+        CountDownLatch requestsFinishedLatch = new CountDownLatch(requestCount);
+        AtomicBoolean requestsReturnedWhileTheRolloutWaited = new AtomicBoolean();
+        AtomicBoolean rolloutFinishedWhileLocked = new AtomicBoolean();
+        AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+        TransactionTemplate saveTransactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        saveTransactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        Logger logger = getRolloutManagerLogger();
+        Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
+
+        logger.setLevel(Level.DEBUG);
+
+        boolean rolloutFinished;
+
+        try {
+            transactionTemplate.executeWithoutResult(status -> {
+                automationWorkflowProjectConfigurationService.lockRollout(
+                    automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+                startRolloutThread(automationWorkflowProjectId, startedLatch, rolloutFinishedLatch, rolloutFailure);
+
+                awaitAWaitingAdvisoryLock();
+
+                saveTransactionTemplate.executeWithoutResult(
+                    saveStatus -> updateProductionConfigurationVersion(
+                        automationWorkflowProjectId, newestProjectVersion));
+
+                for (int index = 0; index < requestCount; index++) {
+                    startRolloutThread(automationWorkflowProjectId, startedLatch, requestsFinishedLatch,
+                        rolloutFailure);
+                }
+
+                requestsReturnedWhileTheRolloutWaited.set(
+                    awaitQuietly(requestsFinishedLatch, ROLLOUT_COMPLETION_TIMEOUT_SECONDS));
+                rolloutFinishedWhileLocked.set(rolloutFinishedLatch.getCount() == 0);
+            });
+
+            rolloutFinished = rolloutFinishedLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } finally {
+            logger.setLevel(previousLevel);
+
+            detachAppenderFromRolloutManagerLogger(appender);
+        }
+
+        assertThat(rolloutFinished).isTrue();
+
+        return new CoalescedRollout(
+            requestsReturnedWhileTheRolloutWaited.get(), rolloutFinishedWhileLocked.get(),
+            countRolloutPasses(appender, automationWorkflowProjectId), rolloutFailure.get());
+    }
+
+    private ConnectedUserProjectWorkflow createReferenceBehindTwoPublishedVersions(long automationWorkflowProjectId) {
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            createConnectedUser(), workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        return reference;
+    }
+
+    private void awaitAWaitingAdvisoryLock() {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(ROLLOUT_COMPLETION_TIMEOUT_SECONDS);
+
+        while (countWaitingAdvisoryLocks() == 0) {
+            if (System.nanoTime() > deadline) {
+                throw new IllegalStateException("No rollout started waiting for the rollout lock");
+            }
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+
+                throw new IllegalStateException(interruptedException);
+            }
+        }
+    }
+
+    private int countWaitingAdvisoryLocks() {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_locks WHERE locktype = 'advisory' AND NOT granted", Integer.class));
+    }
+
+    private static long countRolloutPasses(ListAppender<ILoggingEvent> appender, long automationWorkflowProjectId) {
+        String passMessagePrefix = "Running a rollout pass of automation workflow project id=%d ".formatted(
+            automationWorkflowProjectId);
+
+        return appender.list.stream()
+            .map(ILoggingEvent::getFormattedMessage)
+            .filter(message -> message.startsWith(passMessagePrefix))
+            .count();
+    }
+
+    private Map<String, ?> getInputValues(String externalUserId, String workflowUuid) {
+        return connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION)
+            .stream()
+            .filter(workflow -> Objects.equals(workflow.automationWorkflowUuid(), workflowUuid))
+            .findFirst()
+            .orElseThrow()
+            .inputValues();
+    }
+
     private ConnectedUserWorkflowTemplateDTO getTemplate(String externalUserId, String workflowUuid) {
         return automationWorkflowProjectFacade.getPublishedProjects(externalUserId, Environment.PRODUCTION)
             .stream()
@@ -2293,10 +2675,24 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         provideValues(automationWorkflowProjectId, workflowUuid, providedConnections, providedInputs);
 
-        verify(automationWorkflowProjectConfigurationUpdatedEventListener, atLeastOnce())
-            .onAutomationWorkflowProjectConfigurationUpdated(any());
+        rollOutTheLastUpdatedEvent();
+    }
 
-        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+    /**
+     * Hands the last updated event the listener received, with its removed provided input names, to the rollout, as the
+     * listener does.
+     */
+    private void rollOutTheLastUpdatedEvent() {
+        ArgumentCaptor<AutomationWorkflowProjectConfigurationUpdatedEvent> eventCaptor = ArgumentCaptor.forClass(
+            AutomationWorkflowProjectConfigurationUpdatedEvent.class);
+
+        verify(automationWorkflowProjectConfigurationUpdatedEventListener, atLeastOnce())
+            .onAutomationWorkflowProjectConfigurationUpdated(eventCaptor.capture());
+
+        AutomationWorkflowProjectConfigurationUpdatedEvent event = eventCaptor.getValue();
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(
+            event.projectId(), event.environmentId(), event.removedProvidedInputNames());
     }
 
     private void stubAdministratorSlackConnection(long connectionId) {
@@ -2305,6 +2701,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         connection.setComponentName("slack");
         connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
         connection.setId(connectionId);
+        connection.setType(PlatformType.EMBEDDED);
 
         when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
         when(connectionService.getConnection(connectionId)).thenReturn(connection);
@@ -2362,8 +2759,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             connectedUser.getId(), automationWorkflowProjectId);
     }
 
+    private static Logger getRolloutManagerLogger() {
+        return (Logger) LoggerFactory.getLogger(ConnectedUserReferenceRolloutManager.class);
+    }
+
     private static ListAppender<ILoggingEvent> attachAppenderToRolloutManagerLogger() {
-        Logger logger = (Logger) LoggerFactory.getLogger(ConnectedUserReferenceRolloutManager.class);
+        Logger logger = getRolloutManagerLogger();
 
         ListAppender<ILoggingEvent> appender = new ListAppender<>();
 
@@ -2465,6 +2866,11 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))
             .thenReturn(slot);
         when(connectionService.getConnection(connectionId)).thenReturn(connection);
+    }
+
+    private record CoalescedRollout(
+        boolean requestsReturnedWhileTheRolloutWaited, boolean rolloutFinishedWhileLocked, long passCount,
+        Throwable rolloutFailure) {
     }
 
     @Configuration

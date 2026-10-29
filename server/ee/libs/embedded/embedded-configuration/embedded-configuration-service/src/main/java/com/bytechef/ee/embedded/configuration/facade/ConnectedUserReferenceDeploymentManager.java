@@ -270,6 +270,56 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     /**
+     * Removes the named inputs from a connected user's stored inputs of the workflow, e.g. the administrator's values
+     * of inputs the configuration no longer provides. A row without any of them is left untouched; a turned-on row is
+     * redeployed with the remaining inputs.
+     */
+    public void removeInputs(long projectDeploymentId, String automationWorkflowUuid, Set<String> inputNames) {
+        if (inputNames.isEmpty()) {
+            return;
+        }
+
+        Optional<ProjectDeployment> projectDeploymentOptional = projectDeploymentService.fetchProjectDeployment(
+            projectDeploymentId);
+
+        if (projectDeploymentOptional.isEmpty()) {
+            return;
+        }
+
+        ProjectDeployment projectDeployment = projectDeploymentOptional.get();
+
+        Optional<ProjectDeploymentWorkflow> rowOptional = fetchRowAtCurrentVersion(
+            projectDeployment, automationWorkflowUuid);
+
+        if (rowOptional.isEmpty()) {
+            return;
+        }
+
+        ProjectDeploymentWorkflow row = rowOptional.get();
+
+        Map<String, Object> remainingInputs = new LinkedHashMap<>(row.getInputs());
+
+        boolean removed = false;
+
+        for (String inputName : inputNames) {
+            if (remainingInputs.containsKey(inputName)) {
+                remainingInputs.remove(inputName);
+
+                removed = true;
+            }
+        }
+
+        if (!removed) {
+            return;
+        }
+
+        RowSpec rowSpec = new RowSpec(
+            new ResolvedWorkflowConnections(row.getConnections(), List.of()), row.isEnabled(), remainingInputs);
+
+        putWorkflow(projectDeployment, automationWorkflowUuid, rowSpec);
+    }
+
+    /**
      * Returns the names of the components whose connection, and of the inputs whose value, the configuration of the
      * automation workflow project in the environment provides for the workflow.
      */
@@ -510,11 +560,19 @@ class ConnectedUserReferenceDeploymentManager {
             row.setEnabled(false);
             row.setWorkflowId(workflowId);
 
-            if (rowSpec.inputs() != null) {
-                row.setInputs(rowSpec.inputs());
+            Map<String, ?> inputs = rowSpec.inputs();
+
+            if (inputs != null) {
+                row.setInputs(inputs);
             }
 
-            projectDeploymentWorkflowService.update(row);
+            ProjectDeploymentWorkflow updatedRow = projectDeploymentWorkflowService.update(row);
+
+            Map<String, ?> updatedInputs = updatedRow.getInputs();
+
+            if (inputs != null && inputs.isEmpty() && !updatedInputs.isEmpty()) {
+                projectDeploymentWorkflowService.clearInputs(updatedRow.getId());
+            }
         } else {
             ProjectDeploymentWorkflow row = new ProjectDeploymentWorkflow();
 

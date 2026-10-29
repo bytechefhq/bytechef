@@ -41,6 +41,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,11 +142,22 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
 
+        Map<String, Set<String>> providedInputNames = new HashMap<>();
+
+        for (AutomationWorkflowProjectConfigurationWorkflow configurationWorkflow : configuration.getWorkflows()) {
+            Set<String> workflowProvidedInputNames = getProvidedInputNames(configurationWorkflow.getProvidedInputs());
+
+            if (!workflowProvidedInputNames.isEmpty()) {
+                providedInputNames.put(
+                    String.valueOf(configurationWorkflow.getWorkflowUuid()), workflowProvidedInputNames);
+            }
+        }
+
         automationWorkflowProjectConfigurationService.delete(id);
 
         applicationEventPublisher.publishEvent(
             new AutomationWorkflowProjectConfigurationDeletedEvent(
-                configuration.getProjectId(), configuration.getEnvironmentId()));
+                configuration.getProjectId(), configuration.getEnvironmentId(), providedInputNames));
     }
 
     @Override
@@ -307,11 +320,23 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             configuration, projectWorkflow.getWorkflowId(), validatedProvidedConnections);
         validateProvidedInputs(projectWorkflow.getWorkflowId(), validatedProvidedInputs);
 
+        Set<String> previouslyProvidedInputNames = configuration.fetchWorkflow(projectWorkflow.getUuid())
+            .map(configurationWorkflow -> getProvidedInputNames(configurationWorkflow.getProvidedInputs()))
+            .orElse(Set.of());
+
+        Set<String> removedProvidedInputNames = new HashSet<>(previouslyProvidedInputNames);
+
+        removedProvidedInputNames.removeAll(getProvidedInputNames(validatedProvidedInputs));
+
         AutomationWorkflowProjectConfiguration updatedConfiguration =
             automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
                 id, UUID.fromString(workflowUuid), validatedProvidedConnections, validatedProvidedInputs);
 
-        publishUpdatedEvent(updatedConfiguration.getProjectId(), updatedConfiguration.getEnvironmentId());
+        applicationEventPublisher.publishEvent(
+            new AutomationWorkflowProjectConfigurationUpdatedEvent(
+                updatedConfiguration.getProjectId(), updatedConfiguration.getEnvironmentId(),
+                removedProvidedInputNames.isEmpty()
+                    ? Map.of() : Map.of(workflowUuid, removedProvidedInputNames)));
     }
 
     private List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> toConnectionSlotDTOs(
@@ -375,6 +400,18 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .map(input -> new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
                 input.name(), input.label(), input.type(), input.required()))
             .toList();
+    }
+
+    /**
+     * Returns the names of the inputs a configuration workflow provides a value for; an input stored without a value
+     * provides nothing, matching how resolution reads the provided inputs.
+     */
+    private static Set<String> getProvidedInputNames(Map<String, ?> providedInputs) {
+        return providedInputs.entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() != null)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toSet());
     }
 
     private static ConfigurationException newInvalidProvidedValueException(String message) {

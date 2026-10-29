@@ -62,6 +62,8 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +132,17 @@ class AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest {
     void testUpdatedEventHandsTheRolloutToTheListenerAfterCommit() {
         applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4001L, 2L));
 
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4001L, 2L);
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4001L, 2L, Map.of());
+    }
+
+    @Test
+    void testUpdatedEventHandsTheRemovedProvidedInputNamesToTheRollout() {
+        applicationEventPublisher.publishEvent(
+            new AutomationWorkflowProjectConfigurationUpdatedEvent(
+                4003L, 2L, Map.of("workflow-uuid", Set.of("channel"))));
+
+        verify(connectedUserReferenceRolloutManager, timeout(5000))
+            .rollOutAndApply(4003L, 2L, Map.of("workflow-uuid", Set.of("channel")));
     }
 
     @Test
@@ -142,17 +154,17 @@ class AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest {
 
             return null;
         }).when(connectedUserReferenceRolloutManager)
-            .rollOutAndApply(4002L, 2L);
+            .rollOutAndApply(4002L, 2L, Map.of());
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
             applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4002L, 2L));
 
-            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOutAndApply(4002L, 2L);
+            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOutAndApply(4002L, 2L, Map.of());
         });
 
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4002L, 2L);
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4002L, 2L, Map.of());
 
         assertThat(rolloutThread.get()).isNotSameAs(Thread.currentThread());
     }
