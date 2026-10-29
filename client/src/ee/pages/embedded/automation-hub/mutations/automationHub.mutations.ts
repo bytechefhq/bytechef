@@ -28,9 +28,14 @@ export const useDeprovisionReferenceMutation = () => {
     });
 };
 
+const omitKeys = <T>(source: Record<string, T>, keysToOmit: string[]): Record<string, T> =>
+    Object.fromEntries(Object.entries(source).filter(([key]) => !keysToOmit.includes(key)));
+
 export interface ProvisionReferenceRequestI {
     connections: Record<string, number>;
     inputs?: Record<string, unknown>;
+    providedComponentNames?: string[];
+    providedInputNames?: string[];
     workflowUuid: string;
 }
 
@@ -38,9 +43,12 @@ export const useProvisionReferenceMutation = () => {
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, ProvisionReferenceRequestI>({
-        mutationFn: ({connections, inputs, workflowUuid}) =>
+        mutationFn: ({connections, inputs, providedComponentNames = [], providedInputNames = [], workflowUuid}) =>
             new ConnectedUserProjectWorkflowApi().provisionFrontendWorkflowReference({
-                provisionWorkflowReferenceRequest: {connections, inputs},
+                provisionWorkflowReferenceRequest: {
+                    connections: omitKeys(connections, providedComponentNames),
+                    inputs: inputs && omitKeys(inputs, providedInputNames),
+                },
                 workflowUuid,
             }),
         onSuccess: () => {
@@ -58,10 +66,15 @@ export const useSetAutomationEnabledMutation = () => {
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, SetAutomationEnabledRequestI>({
-        mutationFn: ({enabled, workflowUuid}) =>
-            enabled
-                ? new ConnectedUserProjectWorkflowApi().enableFrontendProjectWorkflow({workflowUuid})
-                : new ConnectedUserProjectWorkflowApi().disableFrontendProjectWorkflow({workflowUuid}),
+        mutationFn: async ({enabled, workflowUuid}) => {
+            if (enabled) {
+                await new ConnectedUserProjectWorkflowApi().enableFrontendProjectWorkflow({workflowUuid});
+
+                return;
+            }
+
+            await new ConnectedUserProjectWorkflowApi().disableFrontendProjectWorkflow({workflowUuid});
+        },
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: AutomationHubKeys.automations});
         },
