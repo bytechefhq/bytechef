@@ -1,10 +1,14 @@
 extend type Query {
     connectedUserProjects(connectedUserId: ID, environmentId: ID): [ConnectedUserProject!]!
+    provisionableConnectedUserProjects(connectedUserId: ID!): [ProvisionableConnectedUserProject!]!
 }
 
 extend type Mutation {
     deleteConnectedUserProjectWorkflow(id: ID!): Boolean
     enableConnectedUserProjectWorkflow(id: ID!, enable: Boolean!): Boolean
+    provisionConnectedUserProjectWorkflows(
+        connectedUserId: ID!, workflows: [ProvisionConnectedUserProjectWorkflowInput!]!
+    ): Boolean
 }
 
 type ConnectedUserProject {
@@ -41,3 +45,30 @@ type ConnectedUserProjectWorkflow {
     version: Int
 }
 
+
+type ProvisionableConnectedUserProject {
+    projectId: ID!
+    name: String!
+    projectVersion: Int!
+    workflows: [ProvisionableConnectedUserProjectWorkflow!]!
+}
+
+type ProvisionableConnectedUserProjectWorkflow {
+    workflowUuid: ID!
+    label: String
+    inputs: [ProvisionableConnectedUserProjectWorkflowInput!]!
+    provisioned: Boolean!
+    dangling: Boolean!
+}
+
+type ProvisionableConnectedUserProjectWorkflowInput {
+    name: String!
+    label: String
+    type: String
+    required: Boolean!
+}
+
+input ProvisionConnectedUserProjectWorkflowInput {
+    workflowUuid: ID!
+    inputs: Map
+}

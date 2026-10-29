@@ -24,4 +24,9 @@ public class EmbeddedConfigurationGraphQlTestConfiguration {
     RuntimeWiringConfigurer longScalarWiringConfigurer() {
         return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar());
     }
+
+    @Bean
+    RuntimeWiringConfigurer mapScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.mapScalar());
+    }
 }

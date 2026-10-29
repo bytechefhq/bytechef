@@ -7,10 +7,14 @@
 
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
@@ -91,6 +95,91 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             .path("connectedUserProjects[0].connectedUserProjectWorkflows[1].copiedFromWorkflowUuid")
             .entity(String.class)
             .isEqualTo(COPIED_FROM_WORKFLOW_UUID);
+    }
+
+    @Test
+    void testProvisionableConnectedUserProjects() {
+        when(connectedUserProjectAdminFacade.getProvisionableProjects(7L))
+            .thenReturn(List.of(
+                new ProvisionableAutomationWorkflowProjectDTO(
+                    5L, "Project", 2,
+                    List.of(new ProvisionableAutomationWorkflowProjectDTO.Workflow(
+                        "uuid-1", "Label",
+                        List.of(new ConnectedUserWorkflowTemplateDTO.Input("name", "Name", "STRING", true)),
+                        true, false)))));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    provisionableConnectedUserProjects(connectedUserId: "7") {
+                        projectId
+                        name
+                        projectVersion
+                        workflows {
+                            workflowUuid
+                            label
+                            provisioned
+                            dangling
+                            inputs {
+                                name
+                                label
+                                type
+                                required
+                            }
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("provisionableConnectedUserProjects[0].projectId")
+            .entity(String.class)
+            .isEqualTo("5")
+            .path("provisionableConnectedUserProjects[0].name")
+            .entity(String.class)
+            .isEqualTo("Project")
+            .path("provisionableConnectedUserProjects[0].projectVersion")
+            .entity(Integer.class)
+            .isEqualTo(2)
+            .path("provisionableConnectedUserProjects[0].workflows[0].workflowUuid")
+            .entity(String.class)
+            .isEqualTo("uuid-1")
+            .path("provisionableConnectedUserProjects[0].workflows[0].provisioned")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("provisionableConnectedUserProjects[0].workflows[0].dangling")
+            .entity(Boolean.class)
+            .isEqualTo(false)
+            .path("provisionableConnectedUserProjects[0].workflows[0].inputs[0].name")
+            .entity(String.class)
+            .isEqualTo("name")
+            .path("provisionableConnectedUserProjects[0].workflows[0].inputs[0].required")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+    }
+
+    @Test
+    void testProvisionConnectedUserProjectWorkflows() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    provisionConnectedUserProjectWorkflows(
+                        connectedUserId: "7",
+                        workflows: [
+                            {workflowUuid: "uuid-1", inputs: {name: "x"}},
+                            {workflowUuid: "uuid-2"}
+                        ])
+                }
+                """)
+            .execute()
+            .path("provisionConnectedUserProjectWorkflows")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(connectedUserProjectAdminFacade).provisionProjectWorkflows(
+            7L,
+            List.of(
+                new ProvisionConnectedUserProjectWorkflowDTO("uuid-1", Map.of("name", "x")),
+                new ProvisionConnectedUserProjectWorkflowDTO("uuid-2", null)));
     }
 
     private static ConnectedUserProjectDTO createConnectedUserProjectDTO() {
