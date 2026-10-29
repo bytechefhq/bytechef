@@ -291,6 +291,10 @@ describe('workflowExecution-utils', () => {
             expect(isJobEnded(createJob({metadata: {jobResumeId: 'resume-id'}, status: 'STOPPED'}))).toBe(false);
         });
 
+        it('should not treat a job waiting for an approval as ended', () => {
+            expect(isJobEnded(createJob({metadata: {waitForApproval: true}, status: 'STOPPED'}))).toBe(false);
+        });
+
         it.each(['CREATED', 'STARTED'] as const)('should not treat a %s job as ended', (status) => {
             expect(isJobEnded(createJob({status}))).toBe(false);
         });

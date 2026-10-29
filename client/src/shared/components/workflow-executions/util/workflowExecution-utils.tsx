@@ -29,7 +29,7 @@ export function isJobEnded(job?: Job): boolean {
     const jobStatus = job?.status;
 
     if (jobStatus === 'STOPPED') {
-        return job?.metadata?.jobResumeId == null;
+        return job?.metadata?.jobResumeId == null && job?.metadata?.waitForApproval !== true;
     }
 
     return jobStatus === 'COMPLETED' || jobStatus === 'FAILED';
