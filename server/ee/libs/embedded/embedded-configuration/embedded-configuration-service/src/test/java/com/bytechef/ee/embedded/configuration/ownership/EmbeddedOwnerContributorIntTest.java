@@ -40,12 +40,14 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationTestSupport;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacadeIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -139,6 +141,9 @@ class EmbeddedOwnerContributorIntTest {
         {"label":"Sync leads","description":"Posts new leads","triggers":[],
          "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
+
+    @Autowired
+    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
 
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -284,7 +289,8 @@ class EmbeddedOwnerContributorIntTest {
         String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(catalogProjectId);
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, catalogProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, catalogWorkflowUuid, Environment.PRODUCTION);
@@ -359,7 +365,8 @@ class EmbeddedOwnerContributorIntTest {
         String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
-        automationWorkflowProjectFacade.publishProject(catalogProjectId);
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, catalogProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, catalogWorkflowUuid, Environment.PRODUCTION);
