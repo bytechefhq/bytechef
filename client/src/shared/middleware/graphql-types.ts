@@ -3060,14 +3060,14 @@ export type ProvisionableConnectedUserProject = {
 export type ProvisionableConnectedUserProjectWorkflow = {
   __typename?: 'ProvisionableConnectedUserProjectWorkflow';
   dangling: Scalars['Boolean']['output'];
-  inputs: Array<ProvisionableConnectedUserProjectWorkflowInput>;
+  inputs: Array<ProvisionableConnectedUserProjectWorkflowInputDefinition>;
   label?: Maybe<Scalars['String']['output']>;
   provisioned: Scalars['Boolean']['output'];
   workflowUuid: Scalars['ID']['output'];
 };
 
-export type ProvisionableConnectedUserProjectWorkflowInput = {
-  __typename?: 'ProvisionableConnectedUserProjectWorkflowInput';
+export type ProvisionableConnectedUserProjectWorkflowInputDefinition = {
+  __typename?: 'ProvisionableConnectedUserProjectWorkflowInputDefinition';
   label?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   required: Scalars['Boolean']['output'];
