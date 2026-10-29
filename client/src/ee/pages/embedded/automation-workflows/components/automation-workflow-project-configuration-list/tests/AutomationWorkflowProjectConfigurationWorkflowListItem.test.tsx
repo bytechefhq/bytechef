@@ -23,6 +23,18 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
 }));
 
+vi.mock('../AutomationWorkflowProjectConfigurationWorkflowDialog', () => ({
+    default: ({onClose}: {onClose: () => void}) => (
+        <div>
+            <span>Provided Values Dialog</span>
+
+            <button onClick={onClose} type="button">
+                Close Dialog
+            </button>
+        </div>
+    ),
+}));
+
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
     default: (props: unknown) => {
         mocks.workflowTriggerAndComponentsRowProps(props);
@@ -46,6 +58,8 @@ const workflow: WorkflowType = {
     enabled: true,
     label: 'Mailer',
     lastExecutionDate: null,
+    providedConnections: null,
+    providedInputs: null,
     workflowId: 'pinned-wf-1',
     workflowUuid: 'wf-1',
 };
@@ -167,6 +181,25 @@ describe('AutomationWorkflowProjectConfigurationWorkflowListItem', () => {
 
         expect(state.automationWorkflowExecutionsSheetOpen).toBe(true);
         expect(state.projectName).toBe('Mail Project');
+    });
+
+    it('opens and closes the provided values dialog from the actions menu', async () => {
+        const user = userEvent.setup();
+
+        renderItem();
+
+        expect(screen.queryByText('Provided Values Dialog')).not.toBeInTheDocument();
+
+        screen.getByRole('button', {name: 'Workflow Actions'}).focus();
+
+        await user.keyboard('{ArrowDown}');
+        await user.click(await screen.findByRole('menuitem', {name: 'Edit'}));
+
+        expect(screen.getByText('Provided Values Dialog')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Close Dialog'}));
+
+        expect(screen.queryByText('Provided Values Dialog')).not.toBeInTheDocument();
     });
 
     it("passes the template's deduplicated components and trigger labels to the components row", () => {

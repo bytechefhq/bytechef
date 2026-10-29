@@ -52,7 +52,15 @@ const configuration: AutomationWorkflowProjectConfigurationType = {
     projectId: 'project-1',
     projectVersion: 2,
     workflows: [
-        {enabled: true, label: 'Mailer', lastExecutionDate: null, workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'},
+        {
+            enabled: true,
+            label: 'Mailer',
+            lastExecutionDate: null,
+            providedConnections: null,
+            providedInputs: null,
+            workflowId: 'pinned-wf-1',
+            workflowUuid: 'wf-1',
+        },
     ],
 };
 
