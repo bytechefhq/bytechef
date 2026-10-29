@@ -1,4 +1,4 @@
-# Configuration rollout follow-ups: blocked destructive rollback, serialized rollouts, turned-off state on enable, hub listing filter, paused workflows resume, version impact warning
+# Configuration rollout follow-ups: blocked destructive rollback, serialized rollouts, turned-off state on enable, hub listing filter, paused workflows resume, version impact warning, provided connections and inputs
 
 Issue: bytechefhq/bytechef#6786. Follow-up to #6756 (automation workflow project configurations).
 
@@ -195,6 +195,77 @@ editing and the chosen version differs from the current one, shows one warning l
 `Version 4 adds a required Jira connection to Sync Issues: connected users without a Jira integration will pause.`
 Saving is not blocked.
 
+
+## 7. Connections and inputs provided by the configuration
+
+User decision (2026-10-29): an administrator can predefine, per workflow of a configuration, connections and input
+values. Every connected user's workflow uses them, and the user cannot change them through the UI or the API. Example:
+the administrator attaches their own, non-shared OpenAI connection to "Summarize Email"; every user's "Summarize Email"
+runs on it.
+
+### Storage (new changeset)
+
+Two nullable `TEXT` columns on `automation_workflow_project_configuration_workflow` (new changeset in the
+`embedded/configuration` changelog directory, `columnExists` preconditions, rollback drops them; existing identifiers
+untouched):
+
+- `provided_connections` — JSON map `componentName -> connectionId`.
+- `provided_inputs` — JSON map `inputName -> value`.
+
+Mapped as `MapWrapper` fields on `AutomationWorkflowProjectConfigurationWorkflow`. A configuration workflow row is
+created on demand when a workflow has none yet (enabled defaults to true, matching `isWorkflowEnabled`'s default).
+
+### Admin
+
+- Facade: `AutomationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(long id, String workflowUuid,
+  Map<String, Long> providedConnections, Map<String, Object> providedInputs)`. Validation: every component name is a
+  connection slot of the workflow at the configuration's pinned version; every connection exists, belongs to that
+  component and to the configuration's environment; every input name is an input of that workflow. Violations throw
+  `ConfigurationException` with a new `AutomationWorkflowProjectConfigurationErrorType.INVALID_PROVIDED_VALUE`. Saving
+  publishes `AutomationWorkflowProjectConfigurationUpdatedEvent`.
+- The configuration DTO's `Workflow` gains `providedConnections` and `providedInputs`; GraphQL exposes both and a mutation
+  `updateAutomationWorkflowProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, providedConnections: Map,
+  providedInputs: Map): Boolean`.
+- UI: each workflow row of a configuration card gets an "Edit" action (in its existing actions menu) opening a dialog
+  that lists the workflow's connection slots (one connection picker per component, listing the administrator's
+  connections of that component in the configuration's environment, plus "Let each user connect") and its inputs (a
+  value field per input, empty means "Let each user fill it").
+
+### Resolution
+
+- `ConnectedUserWorkflowConnectionResolver.resolve` gains the provided map: a slot whose component has a provided
+  connection takes it without the entitlement check; other slots resolve as today.
+- `resolveReference` merges inputs as `userInputs` overridden by `providedInputs`; provided inputs never count as
+  missing.
+- Every path that resolves a reference (first provisioning, enable, rollout, `applyConfigurationState`, inputs update,
+  #6770's admin provisioning) reads the configuration workflow's provided values for the reference's environment.
+- Because `rollOut` only visits deployments that are behind the released version, a change of provided values (same
+  version) must still reach every reference: `applyConfigurationState` re-resolves rows, not just the enabled flag,
+  when the configuration's provided values changed (simplest correct rule: always re-resolve in
+  `applyConfigurationState`).
+
+### Locked for the user
+
+- Public API: a requested connection id for a provided component (provisioning with `connections`) and an input value
+  for a provided input (provisioning with `inputs`, `PUT .../inputs`) are rejected with a new 409
+  `ProvidedValueLockedError` naming the slot or input. Requests that omit them succeed.
+- Reads: `ConnectedUserWorkflowTemplateDTO.Input` gains `boolean provided`; the template components and the connected
+  user workflow connection rows gain `boolean provided`. The OpenAPI schemas carry `provided`.
+- The provided connection is never added to the user's connections, never shared with them, and its credentials are
+  never returned to them.
+- Automation Hub: provided connections show "Provided by your administrator" with no picker; provided inputs are not
+  editable (shown read-only with the same label, or hidden from the inputs dialog).
+
+### Tests
+
+- Admin facade IntTests: validation errors; saving publishes the event; values round-trip.
+- Resolution IntTests: a non-shared administrator connection is used for every user's workflow; user-owned connections
+  are ignored for that slot; provided inputs override and never count as missing; changing provided values reaches
+  existing references without a version change; removing a provided connection hands the slot back to the user
+  (auto-wire or `MISSING_CONNECTION`).
+- Public REST tests: requested connection or input for a provided slot → 409 `ProvidedValueLockedError`; reads carry
+  `provided: true`; the provided connection never appears in the user's connection list.
+- Client: configuration workflow dialog; hub read-only rendering.
 
 ## Tests
 

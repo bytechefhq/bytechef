@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Block destructive configuration rollbacks, serialize rollouts, report the turned-off state on enable, filter hidden projects in the listing API, resume rollout-paused workflows when the user completes them, and warn the administrator about workflows a version change will pause.
+**Goal:** Block destructive configuration rollbacks, serialize rollouts, report the turned-off state on enable, filter hidden projects in the listing API, resume rollout-paused workflows when the user completes them, warn the administrator about workflows a version change will pause, and let a configuration provide locked connections and inputs.
 
 **Architecture:** All server work is in `server/ee/libs/embedded/embedded-configuration` (api, service, graphql, public-rest, remote-client). The configuration admin facade gains the rollback guard and a version-impact read; the rollout manager gains a per-(project, environment) row lock and stops overwriting the user's enabled intent; the public REST layer changes the enable response and filters listings. Client changes are the configuration dialog and the Automation Hub query; docs and the embedded sample app get matching copy.
 
@@ -14,7 +14,7 @@
 
 - Every file under `server/ee/` carries the ByteChef Enterprise license header and an `@version ee` Javadoc tag.
 - Facades call services and facades only, never repositories; admin facades stay `@PreAuthorize("isTenantAdmin()")`.
-- No Liquibase changes of any kind (user decision).
+- Liquibase: one new changeset for Task 11 only (two columns); existing changesets and identifiers are never edited (user decision).
 - When a facade interface changes, its `embedded-configuration-remote-client` stub changes with it (throws `UnsupportedOperationException`).
 - Java style: descriptive names, one blank line before control statements and between an assignment and its first use, no trailing blank line before `}`, no chaining on method-call results except streams/Optional/builders, test method names camelCase.
 - Client: sorted object keys, `I`/`Props` interface suffixes, sorted named imports, lucide `Icon` suffix, `twMerge`, hook order, no fixed sleeps in tests, `void queryClient.invalidateQueries(...)`; regenerated `client/src/shared/middleware/graphql.ts` / `graphql-types.ts` in their own commit.
@@ -155,7 +155,37 @@
 
 - [ ] Add the line: projects with "Show in Automation Hub" off are not listed here; to provision one of their workflows, paste its UUID (from the administrator's Automation Workflows page) into "Catalog workflow UUID". Where the sample calls an enable endpoint, show `attentionReason` from the new 200 body (it already maps `TURNED_OFF_BY_ADMINISTRATOR` to a message). Run the sample's `npm run lint` and `npm run build` in `front-end`. Commit in that repository (subject only): `Explain provisioning hidden projects by UUID and show why an enabled workflow stays paused`. Leave the unrelated uncommitted `front-end/package.json` change alone. Never push.
 
-### Task 10: Whole-branch verification
+### Task 11: Store provided connections and inputs on configuration workflows
+
+**Files:** new changeset `.../resources/config/liquibase/changelog/embedded/configuration/<timestamp>_embedded_configuration_added_provided_values.xml` (own commit first, `6786 Add provided connection and input columns to configuration workflows`); `AutomationWorkflowProjectConfigurationWorkflow` (two `MapWrapper` fields); `AutomationWorkflowProjectConfigurationService` + impl + remote stub (`updateWorkflowProvidedValues(long id, UUID workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs)`, creating the row on demand); `AutomationWorkflowProjectConfigurationAdminFacade` + impl (`updateConfigurationWorkflow(...)` with the validation and `INVALID_PROVIDED_VALUE = 104`, publishes the updated event); configuration DTO `Workflow` gains `providedConnections`, `providedInputs`; GraphQL schema + controller (mutation and fields).
+**Tests:** admin facade IntTest (round-trip, each validation error, event published) and GraphQL controller IntTest.
+**Commits:** changeset commit, then `6786 Let a configuration provide connections and inputs for its workflows`.
+
+### Task 12: Resolve references with provided values
+
+**Files:** `ConnectedUserWorkflowConnectionResolver` (provided map bypasses entitlement for its components), `ConnectedUserReferenceDeploymentManager.resolveReference` (+ `findMissingRequiredInput` sees merged inputs) and every caller (`ConnectedUserWorkflowReferenceFacadeImpl` provisioning/enable/inputs, `ConnectedUserReferenceRolloutManager.rollOutDeployment` and `applyConfigurationState` — which now always re-resolves rows), reading provided values via the configuration service for the reference's project and environment.
+**Tests:** IntTests listed under the design's section 7 "Resolution".
+**Commit:** `6786 Resolve connected user workflows with the connections and inputs their configuration provides`
+
+### Task 13: Lock provided values in the public API and mark them in reads
+
+**Files:** `openapi.yaml` (`ProvidedValueLockedError` 409 on provisioning and inputs operations; `provided` on input and connection schemas) + regenerated models (own commit); exception + handler mapping to 409; `ConnectedUserWorkflowTemplateDTO.Input` / components and the connected user workflow connection read gain `provided`; controllers map them.
+**Tests:** public REST IntTests from the design's section 7.
+**Commits:** generated models commit, then `6786 Reject user changes to provided connections and inputs and mark them in reads`
+
+### Task 14: Admin dialog for provided values (client)
+
+**Files:** GraphQL operation for the mutation and the new fields in `automationWorkflowProjectConfigurations.graphql`; regenerated types (own commit); new `AutomationWorkflowProjectConfigurationWorkflowDialog.tsx` opened from the configuration workflow row's actions menu ("Edit"); connection pickers list the administrator's connections of the component in the configuration's environment (reuse the existing connections query the integration configuration dialog uses), with "Let each user connect"; input fields with empty meaning "Let each user fill it".
+**Tests:** dialog test (renders slots and inputs, saves the mutation variables, invalidates `['automationWorkflowProjectConfigurations']`).
+**Commits:** operation, regenerate, `6786 client - Provide connections and inputs from a configuration workflow`
+
+### Task 15: Automation Hub shows provided values read-only (client)
+
+**Files:** the hub's connection step and inputs dialog components (find the components rendering a workflow's connections and inputs under `client/src/ee/pages/embedded/automation-hub/`); regenerate the embedded REST client if its models changed.
+**Tests:** a provided connection renders "Provided by your administrator" without a picker; a provided input is not editable.
+**Commit:** `6786 client - Show connections and inputs provided by the administrator as read-only in the Automation Hub`
+
+### Task 16: Whole-branch verification
 
 - [ ] `./gradlew -p server/ee/libs/embedded/embedded-configuration spotlessApply check` green.
 - [ ] `cd client && npm run format && npm run check` green.
