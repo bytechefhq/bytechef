@@ -16,9 +16,11 @@ import {
     useEnableAutomationWorkflowProjectConfigurationWorkflowMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon, HistoryIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {EllipsisVerticalIcon, HistoryIcon, PencilIcon} from 'lucide-react';
+import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+import AutomationWorkflowProjectConfigurationWorkflowDialog from './AutomationWorkflowProjectConfigurationWorkflowDialog';
 
 type AutomationWorkflowProjectConfigurationType =
     AutomationWorkflowProjectConfigurationsQuery['automationWorkflowProjectConfigurations'][number];
@@ -37,6 +39,8 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
     workflow,
     workflowTemplate,
 }: AutomationWorkflowProjectConfigurationWorkflowListItemProps) => {
+    const [showProvidedValuesDialog, setShowProvidedValuesDialog] = useState(false);
+
     const openAutomationWorkflowExecutionsSheet = useAutomationWorkflowExecutionsSheetStore(
         (state) => state.openAutomationWorkflowExecutionsSheet
     );
@@ -165,6 +169,13 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
 
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
+                            aria-label="Edit"
+                            icon={<PencilIcon />}
+                            label="Edit"
+                            onClick={() => setShowProvidedValuesDialog(true)}
+                        />
+
+                        <DropdownMenuItem
                             aria-label="View Executions"
                             icon={<HistoryIcon />}
                             label="Executions"
@@ -173,6 +184,14 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+
+            {showProvidedValuesDialog && (
+                <AutomationWorkflowProjectConfigurationWorkflowDialog
+                    configuration={configuration}
+                    onClose={() => setShowProvidedValuesDialog(false)}
+                    workflow={workflow}
+                />
+            )}
         </li>
     );
 };
