@@ -56,7 +56,7 @@ const execution = {
     id: 5,
     job: {id: 5, status: 'COMPLETED'},
     project: {id: 1, name: 'Mail Project'},
-    projectDeployment: {id: 2, name: '__EMBEDDED__user-1__DEVELOPMENT'},
+    projectDeployment: {id: 2, name: 'user-1'},
     workflow: {id: 'draft-wf-1', label: 'Mailer'},
 };
 
