@@ -20,6 +20,7 @@ import com.bytechef.ee.platform.connection.remote.grpc.proto.GetComponentConnect
 import com.bytechef.ee.platform.connection.remote.grpc.proto.IdRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.TypeRequest;
+import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionCreatedByRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionTagIdsRequest;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
@@ -206,7 +207,13 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Connection updateCreatedBy(long id, String newCreatedBy) {
-        throw new UnsupportedOperationException();
+        UpdateConnectionCreatedByRequest updateConnectionCreatedByRequest =
+            UpdateConnectionCreatedByRequest.newBuilder()
+                .setId(id)
+                .setCreatedBy(newCreatedBy)
+                .build();
+
+        return connectionProtoMapper.toConnection(getStub().updateCreatedBy(updateConnectionCreatedByRequest));
     }
 
     @Override
