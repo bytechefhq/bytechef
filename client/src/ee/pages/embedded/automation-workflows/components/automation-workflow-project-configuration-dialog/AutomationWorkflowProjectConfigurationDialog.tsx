@@ -182,8 +182,7 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
                                 {movesToOlderVersion && (
                                     <p className="text-sm text-content-warning-primary">
-                                        Connected users whose automations are not in this version will be disconnected
-                                        from them.
+                                        Versions that lack workflows connected users still use cannot be selected.
                                     </p>
                                 )}
                             </fieldset>
