@@ -208,6 +208,17 @@ class ConnectionRemoteServiceGrpcWireTest {
     }
 
     @Test
+    void testUpdateCreatedBy() {
+        Connection connection = connection(7L);
+
+        when(connectionService.updateCreatedBy(7L, "external-user")).thenReturn(connection);
+
+        assertThat(remoteConnectionServiceClient.updateCreatedBy(7L, "external-user"))
+            .usingRecursiveComparison()
+            .isEqualTo(connection);
+    }
+
+    @Test
     void testUpdateWithoutNameOrTagsLeavesThemUnchanged() {
         Connection connection = connection(7L);
 
