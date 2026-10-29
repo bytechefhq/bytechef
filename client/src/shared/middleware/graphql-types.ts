@@ -1759,6 +1759,8 @@ export type Mutation = {
   importWorkflowTemplate: Scalars['ID']['output'];
   insertDataTableRow: DataTableRow;
   inviteUser: Scalars['Boolean']['output'];
+  provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
@@ -2364,6 +2366,18 @@ export type MutationInviteUserArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: Scalars['String']['input'];
+};
+
+
+export type MutationProvisionConnectedUserMcpServerArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  mcpServerId: Scalars['ID']['input'];
+};
+
+
+export type MutationProvisionConnectedUserProjectWorkflowsArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  workflows: Array<ProvisionConnectedUserProjectWorkflowInput>;
 };
 
 
@@ -3017,6 +3031,45 @@ export enum PropertyType {
   Time = 'TIME'
 }
 
+export type ProvisionConnectedUserProjectWorkflowInput = {
+  inputs?: InputMaybe<Scalars['Map']['input']>;
+  workflowUuid: Scalars['ID']['input'];
+};
+
+export type ProvisionableConnectedUserMcpServer = {
+  __typename?: 'ProvisionableConnectedUserMcpServer';
+  coveredComponentNames: Array<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  missingComponentNames: Array<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  provisioned: Scalars['Boolean']['output'];
+};
+
+export type ProvisionableConnectedUserProject = {
+  __typename?: 'ProvisionableConnectedUserProject';
+  name: Scalars['String']['output'];
+  projectId: Scalars['ID']['output'];
+  projectVersion: Scalars['Int']['output'];
+  workflows: Array<ProvisionableConnectedUserProjectWorkflow>;
+};
+
+export type ProvisionableConnectedUserProjectWorkflow = {
+  __typename?: 'ProvisionableConnectedUserProjectWorkflow';
+  dangling: Scalars['Boolean']['output'];
+  inputs: Array<ProvisionableConnectedUserProjectWorkflowInput>;
+  label?: Maybe<Scalars['String']['output']>;
+  provisioned: Scalars['Boolean']['output'];
+  workflowUuid: Scalars['ID']['output'];
+};
+
+export type ProvisionableConnectedUserProjectWorkflowInput = {
+  __typename?: 'ProvisionableConnectedUserProjectWorkflowInput';
+  label?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  required: Scalars['Boolean']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
@@ -3172,6 +3225,8 @@ export type Query = {
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
+  provisionableConnectedUserMcpServers: Array<ProvisionableConnectedUserMcpServer>;
+  provisionableConnectedUserProjects: Array<ProvisionableConnectedUserProject>;
   searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
@@ -3778,6 +3833,16 @@ export type QueryProjectDeploymentWorkflowArgs = {
 export type QueryProjectTemplateArgs = {
   id: Scalars['String']['input'];
   sharedProject: Scalars['Boolean']['input'];
+};
+
+
+export type QueryProvisionableConnectedUserMcpServersArgs = {
+  connectedUserId: Scalars['ID']['input'];
+};
+
+
+export type QueryProvisionableConnectedUserProjectsArgs = {
+  connectedUserId: Scalars['ID']['input'];
 };
 
 
