@@ -172,16 +172,16 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     /**
-     * Rolls the configuration of a project in an environment out to its reference deployments while holding a row lock
-     * on that configuration, so rollouts for the same project and environment run one after the other and a later one
-     * reads the newer committed configuration. Each deployment and reference is still processed in its own
-     * {@code REQUIRES_NEW} transaction, so one failure does not undo the others.
+     * Rolls the configuration of a project in an environment out to its reference deployments while holding a
+     * transaction-scoped advisory lock for that pair, so rollouts for the same project and environment run one after
+     * the other without blocking administrator writes to the configuration. Each deployment and reference is still
+     * processed in its own {@code REQUIRES_NEW} transaction, so one failure does not undo the others.
      */
     @Transactional
     public void rollOutAndApply(long automationWorkflowProjectId, long environmentId) {
-        automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(
-            automationWorkflowProjectId, environmentId);
+        automationWorkflowProjectConfigurationService.lockRollout(automationWorkflowProjectId, environmentId);
 
+        // rollOut reads the configuration only now, so it sees the newest state committed before the lock was acquired
         rollOut(automationWorkflowProjectId, environmentId);
         applyConfigurationState(automationWorkflowProjectId, environmentId);
     }

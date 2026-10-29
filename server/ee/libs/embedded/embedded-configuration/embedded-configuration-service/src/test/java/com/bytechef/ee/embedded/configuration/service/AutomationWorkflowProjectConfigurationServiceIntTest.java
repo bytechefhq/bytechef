@@ -23,6 +23,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.IllegalTransactionStateException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @version ee
@@ -41,6 +44,9 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PlatformTransactionManager platformTransactionManager;
 
     @AfterEach
     void afterEach() {
@@ -83,22 +89,36 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
     }
 
     @Test
-    void testFetchConfigurationForUpdateReturnsTheConfigurationWithItsWorkflows() {
+    void testLockRolloutHoldsAnAdvisoryLockInTheCallersTransaction() {
         long projectId = insertProject(insertWorkspace());
-        UUID workflowUuid = UUID.randomUUID();
 
-        AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 3, true, true);
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
-        automationWorkflowProjectConfigurationService.updateWorkflowEnabled(configuration.getId(), workflowUuid, false);
+        int heldAdvisoryLockCount = Objects.requireNonNull(transactionTemplate.execute(status -> {
+            automationWorkflowProjectConfigurationService.lockRollout(projectId, ENVIRONMENT_ID);
 
-        assertThat(automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(projectId, ENVIRONMENT_ID))
-            .hasValueSatisfying(fetchedConfiguration -> {
-                assertThat(fetchedConfiguration.getId()).isEqualTo(configuration.getId());
-                assertThat(fetchedConfiguration.getProjectVersion()).isEqualTo(3);
-                assertThat(fetchedConfiguration.isWorkflowEnabled(workflowUuid)).isFalse();
-            });
-        assertThat(automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(projectId, 1L)).isEmpty();
+            return countAdvisoryLocksHeldByThisSession();
+        }));
+
+        assertThat(heldAdvisoryLockCount).isEqualTo(1);
+    }
+
+    @Test
+    void testLockRolloutOutsideATransactionThrows() {
+        assertThatThrownBy(() -> automationWorkflowProjectConfigurationService.lockRollout(1L, ENVIRONMENT_ID))
+            .isInstanceOf(IllegalTransactionStateException.class);
+    }
+
+    @Test
+    void testRolloutLockKeyIsDeterministicPerProjectAndEnvironment() {
+        long rolloutLockKey = AutomationWorkflowProjectConfigurationServiceImpl.getRolloutLockKey(7L, 2L);
+
+        assertThat(AutomationWorkflowProjectConfigurationServiceImpl.getRolloutLockKey(7L, 2L))
+            .isEqualTo(rolloutLockKey);
+        assertThat(AutomationWorkflowProjectConfigurationServiceImpl.getRolloutLockKey(7L, 1L))
+            .isNotEqualTo(rolloutLockKey);
+        assertThat(AutomationWorkflowProjectConfigurationServiceImpl.getRolloutLockKey(72L, 2L))
+            .isNotEqualTo(rolloutLockKey);
     }
 
     @Test
@@ -177,6 +197,13 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
         assertThat(countWorkflowRows()).isZero();
         assertThat(automationWorkflowProjectConfigurationService.fetchConfiguration(projectId, ENVIRONMENT_ID))
             .isEmpty();
+    }
+
+    private int countAdvisoryLocksHeldByThisSession() {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_locks WHERE locktype = 'advisory' AND granted AND pid = pg_backend_pid()",
+                Integer.class));
     }
 
     private int countWorkflowRows() {
