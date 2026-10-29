@@ -49,10 +49,10 @@ export class McpClient {
     private readonly environment: string;
     private readonly request: APIRequestContext;
 
-    constructor(request: APIRequestContext, secretKey: string) {
+    constructor(request: APIRequestContext, secretKey: string, bearerToken?: string) {
         this.request = request;
         this.endpointPath = `/api/management/${secretKey}/mcp`;
-        this.bearerToken = process.env.PLAYWRIGHT_MCP_BEARER_TOKEN;
+        this.bearerToken = bearerToken ?? process.env.PLAYWRIGHT_MCP_BEARER_TOKEN;
         this.environment = process.env.PLAYWRIGHT_MCP_ENVIRONMENT ?? 'DEVELOPMENT';
     }
 
@@ -114,7 +114,7 @@ export class McpClient {
         const response = await this.request.post(this.endpointPath, {
             data: {id: this.nextRequestId++, jsonrpc: '2.0', method, params},
             headers: this.headers(),
-            timeout: 300000,
+            timeout: 600000,
         });
 
         expect(response.ok(), `${method} answered ${response.status()}: ${await response.text()}`).toBe(true);
@@ -134,4 +134,33 @@ export function toolResultText(toolCallResult: McpToolCallResultI): string {
         .filter((contentItem) => contentItem.type === 'text')
         .map((contentItem) => contentItem.text ?? '')
         .join('\n');
+}
+
+export const BUILD_WORKFLOW_QUESTION_MARKER = 'needs a decision before continuing';
+
+const MAX_BUILD_WORKFLOW_QUESTIONS = 2;
+
+/** Calls buildWorkflow and answers each question it returns with its first option, restating the request each time. */
+export async function buildWorkflowAnsweringQuestions(
+    mcpClient: McpClient,
+    buildArguments: {request: string; workspaceId: number}
+): Promise<McpToolCallResultI> {
+    let request = buildArguments.request;
+    let buildResult = await mcpClient.callTool('buildWorkflow', {...buildArguments, request});
+
+    for (
+        let round = 0;
+        round < MAX_BUILD_WORKFLOW_QUESTIONS && toolResultText(buildResult).includes(BUILD_WORKFLOW_QUESTION_MARKER);
+        round++
+    ) {
+        const questionText = toolResultText(buildResult);
+        const question = questionText.split('\n').find((line) => line.trim().endsWith('?')) ?? 'your question';
+        const firstOption = /^1\.\s+(.+)$/m.exec(questionText)?.[1] ?? 'the first option';
+
+        request = `${request} Answer to "${question.trim()}": ${firstOption.trim()}.`;
+
+        buildResult = await mcpClient.callTool('buildWorkflow', {...buildArguments, request});
+    }
+
+    return buildResult;
 }

@@ -725,3 +725,7 @@ Five canonical triage roles mapped to this repo's labels — `needs triage` and 
 ### Domain docs
 
 Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### AI Hub
+
+The full-page agent chat at `/automation/ai-hub`: ASK/BUILD tool sets, the approval gate, Stop and in-flight semantics, and the deferred phases. See `docs/agents/ai-hub.md`.

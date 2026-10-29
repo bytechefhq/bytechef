@@ -24,6 +24,7 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
     const latestRunningRef = useRef<boolean>(workflowIsRunning);
     const navConfirmedRef = useRef(false);
     const suppressBeforeUnloadPromptRef = useRef(false);
+    const workflowTestJobIdRef = useRef<string | undefined>(workflowTestExecution?.job?.id);
 
     const blocker = useBlocker(workflowIsRunning);
 
@@ -38,7 +39,7 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
     }, [blocker]);
 
     const confirmLeave = useCallback(async () => {
-        const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
+        const jobId = workflowTestJobIdRef.current ?? getPersistedJobId();
 
         setShowLeaveDialog(false);
 
@@ -62,7 +63,7 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
         }
 
         setPendingAction(null);
-    }, [blocker, getPersistedJobId, pendingAction, persistJobId, workflowTestExecution?.job?.id]);
+    }, [blocker, getPersistedJobId, pendingAction, persistJobId]);
 
     const onBeforeUnload = useCallback((event: BeforeUnloadEvent) => {
         if (!latestRunningRef.current) {
@@ -95,14 +96,14 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
     }, []);
 
     const stopBestEffort = useCallback(() => {
-        const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
+        const jobId = workflowTestJobIdRef.current ?? getPersistedJobId();
 
         if (!jobId) {
             return;
         }
 
         workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
-    }, [getPersistedJobId, persistJobId, workflowTestExecution?.job?.id]);
+    }, [getPersistedJobId, persistJobId]);
 
     const onPageHide = useCallback(() => {
         isUnloadingRef.current = true;
@@ -113,6 +114,10 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
     useEffect(() => {
         latestRunningRef.current = workflowIsRunning;
     }, [workflowIsRunning]);
+
+    useEffect(() => {
+        workflowTestJobIdRef.current = workflowTestExecution?.job?.id;
+    }, [workflowTestExecution?.job?.id]);
 
     // Intercept keyboard reload to show the custom dialog
     useEffect(() => {
@@ -138,13 +143,13 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
                 return;
             }
 
-            const jobId = workflowTestExecution?.job?.id ?? getPersistedJobId();
+            const jobId = workflowTestJobIdRef.current ?? getPersistedJobId();
 
             if (jobId) {
                 workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
             }
         };
-    }, [onBeforeUnload, onKeyDown, onPageHide, getPersistedJobId, persistJobId, workflowTestExecution?.job?.id]);
+    }, [onBeforeUnload, onKeyDown, onPageHide, getPersistedJobId, persistJobId]);
 
     useEffect(() => {
         if (blocker && blocker.state === 'blocked' && latestRunningRef.current) {

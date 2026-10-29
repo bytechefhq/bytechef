@@ -65,9 +65,13 @@ Use Ask mode to get explanations, debug errors, research components, or plan cha
 
 Build mode has full access to **create and modify** content on the current surface. In the workflow editor it follows a structured process:
 
-> discover the right components → configure them → pre-validate each task → build → validate the full workflow → deploy
+> discover the right components → configure them → build → save → deploy
 
-It fixes any validation errors before proceeding, and can deploy the finished workflow directly from the conversation.
+Saving validates the workflow: Copilot never stores a workflow with errors, and fixes whatever the save reports before
+it continues. A connection you still have to bind, or a knowledge base or data table you still have to create, does not
+stop the save - Copilot tells you what to set up. It can deploy the finished workflow directly from the conversation.
+
+For prompts to try, and what each one builds, see [AI Building Examples](/platform/automation/build/ai-examples).
 
 Build mode reads executions too. Asked to debug a failed run, it explains what failed and suggests a fix, and changes the workflow only after you confirm.
 

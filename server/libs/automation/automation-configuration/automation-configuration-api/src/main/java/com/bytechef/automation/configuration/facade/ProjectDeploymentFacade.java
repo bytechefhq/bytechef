@@ -23,6 +23,8 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -52,6 +54,15 @@ public interface ProjectDeploymentFacade {
 
     List<Tag> getProjectDeploymentTags();
 
+    /**
+     * Lists the enabled hosted-chat workflows of a workspace.
+     *
+     * @param workspaceId   the workspace
+     * @param environmentId the environment to list, or {@code null} to list every environment
+     * @return one row per enabled deployment workflow that has a hosted chat trigger
+     */
+    List<ChatWorkflow> getWorkspaceChatWorkflows(long workspaceId, @Nullable Long environmentId);
+
     List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields);
 
@@ -67,5 +78,24 @@ public interface ProjectDeploymentFacade {
 
     void updateProjectDeploymentTags(long id, List<Tag> tags);
 
+    /**
+     * Finds the hosted-chat workflow of the workspace, in any environment, whose workflow execution id is the given
+     * one. The id is compared as a string against the listing and is never parsed.
+     *
+     * @param workspaceId         the workspace
+     * @param workflowExecutionId the workflow execution id to look for
+     * @return the listing row carrying the id, or empty when the listing of every environment lacks it
+     */
+    Optional<ChatWorkflow> findWorkspaceChatWorkflow(long workspaceId, String workflowExecutionId);
+
     void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow);
+
+    /**
+     * One row of {@link #getWorkspaceChatWorkflows(long, Long)}: the fields a chat launcher renders plus the ids needed
+     * to open the workflow.
+     */
+    record ChatWorkflow(
+        long projectDeploymentId, long projectId, String projectName, long projectWorkflowId,
+        String workflowExecutionId, String workflowId, String workflowLabel) {
+    }
 }

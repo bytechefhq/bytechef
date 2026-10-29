@@ -40,6 +40,7 @@ import com.bytechef.ai.copilot.tool.SampleOutputTools;
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
+import com.bytechef.ai.copilot.tool.advisor.TokenUsageLoggerAdvisor;
 import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
@@ -132,6 +133,9 @@ public class CopilotConfiguration {
           Never create an empty or default "Manual" placeholder workflow and fill it in afterwards; the single
           create call must carry the whole workflow.
 
+        Both calls validate the definition first. If they report errors, nothing was saved: fix them and make the
+        same call again.
+
         If you are given both, the `workflowId` wins — update it. Never create a second workflow for a project you
         were already pointed at.
 
@@ -139,7 +143,8 @@ public class CopilotConfiguration {
         nor a `projectId`, say so plainly and tell the caller to create or choose the project first, then re-invoke
         you with its `projectId`.
 
-        After persisting, call `getWorkflow(workflowId)` to confirm, then continue with step 8 as written. The
+        A successful save stored exactly the definition you sent; do not re-read it with `getWorkflow`. Continue
+        with step 8 as written. The
         `workflowId | projectId | projectWorkflowId` line is REQUIRED on both branches — `createProjectWorkflow`
         returns all three ids.
         """;
@@ -151,7 +156,8 @@ public class CopilotConfiguration {
         You are a one-shot subagent. Your caller gives you EITHER a `workflowId` (the workflow already exists) OR a
         `projectId` (the workflow does not exist yet).
 
-        Build and validate the COMPLETE converted definition first, then persist it with ONE call:
+        Build the COMPLETE converted definition first, then persist it with ONE call. The call validates the
+        definition first; if it reports errors, nothing was saved: fix them and make the same call again.
 
         - Given a `workflowId` (a leading `Target workflowId:` line counts) - `getWorkflow(workflowId)` for its
           current `version`, then `updateWorkflow(workflowId, workflow, version)`.
@@ -484,6 +490,7 @@ public class CopilotConfiguration {
             .state(state)
             .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .advisor(questionAnswerAdvisor)
+            .advisor(new TokenUsageLoggerAdvisor(CopilotAgentType.WORKFLOW_EDITOR_ASK.key()))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .permissionService(permissionService)
@@ -524,6 +531,7 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
             .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .advisor(new TokenUsageLoggerAdvisor(CopilotAgentType.WORKFLOW_EDITOR_BUILD.key()))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .permissionService(permissionService)
@@ -885,6 +893,7 @@ public class CopilotConfiguration {
 
         return ChatClient.builder(chatModel)
             .defaultSystem(buildWorkflowSubAgentSystemPrompt(askToolAvailable))
+            .defaultAdvisors(new TokenUsageLoggerAdvisor(CopilotAgentType.BUILD_WORKFLOW.key()))
             .defaultTools(
                 withDataTableTools(
                     projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools))

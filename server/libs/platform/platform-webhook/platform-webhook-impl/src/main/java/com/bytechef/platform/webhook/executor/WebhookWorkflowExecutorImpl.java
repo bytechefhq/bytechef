@@ -61,6 +61,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.LongConsumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -157,6 +158,13 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     @Override
     public @Nullable Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        return executeSync(workflowExecutionId, webhookRequest, jobId -> {});
+    }
+
+    @Override
+    public @Nullable Object executeSync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, LongConsumer jobIdListener) {
+
         Object outputs;
 
         String workflowId = getWorkflowId(workflowExecutionId);
@@ -180,7 +188,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                 AtomicReference<@Nullable Object> collectedWebhookResponse = new AtomicReference<>();
 
                 Job job = executeSyncJob(
-                    workflowExecutionId, workflowId, inputMap, triggerOutputValue, collectedWebhookResponse, timeout);
+                    workflowExecutionId, workflowId, inputMap, triggerOutputValue, collectedWebhookResponse, timeout,
+                    jobIdListener);
 
                 Object webhookResponse = collectedWebhookResponse.get();
 
@@ -200,7 +209,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             AtomicReference<@Nullable Object> collectedWebhookResponse = new AtomicReference<>();
 
             Job job = executeSyncJob(
-                workflowExecutionId, workflowId, inputMap, triggerOutput.value(), collectedWebhookResponse, timeout);
+                workflowExecutionId, workflowId, inputMap, triggerOutput.value(), collectedWebhookResponse, timeout,
+                jobIdListener);
 
             Object webhookResponse = collectedWebhookResponse.get();
 
@@ -279,32 +289,30 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
+    @Override
+    public void stopSyncJob(long jobId) {
+        jobSyncExecutor.stopJob(jobId);
+    }
+
     /**
-     * Runs a single sync job and, if a stream bridge is supplied, registers it with {@link JobSyncExecutor}'s SSE
-     * bridge cache as part of the job-creation step so streaming task outputs (e.g. {@code openAi/v1/streamAsk}'s
-     * per-token Flux chunks) flow to the bridge while the job runs. Without this registration, the in-process
-     * {@code SseStreamTaskExecutionPostOutputProcessor} sees no listener and the streamed events are silently dropped —
-     * the user sees an empty assistant reply for any sync chat workflow whose AI agent uses the streaming variant.
-     *
-     * <p>
-     * Bridge registration happens inside the {@code JobFactoryFunction} wrapper rather than after
-     * {@code jobSyncExecutor.execute} returns, because by the time {@code execute} returns the job has already finished
-     * — too late for tasks to find a registered bridge. Wrapping the factory inserts the registration at the only
-     * window between "jobId exists" and "first task starts": after {@code createSyncJob} returns the id, before
-     * {@code awaitJob} dispatches tasks. Tested by the bridge agent's E2E test suite.
-     * </p>
+     * Runs a single sync job: starts it, reports its id to {@code jobIdListener} once the job exists and before the
+     * caller blocks on it, so the caller can stop it with {@link #stopSyncJob}, then waits for it to finish.
      */
     private Job executeSyncJob(
         WorkflowExecutionId workflowExecutionId, String workflowId, Map<String, ?> inputMap, Object triggerOutputValue,
-        AtomicReference<@Nullable Object> collectedWebhookResponse, @Nullable Duration timeout) {
+        AtomicReference<@Nullable Object> collectedWebhookResponse, @Nullable Duration timeout,
+        LongConsumer jobIdListener) {
 
-        return jobSyncExecutor.execute(
+        long jobId = jobSyncExecutor.startJob(
             createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutputValue),
             jobParameters -> principalJobFacade.createSyncJob(
-                jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
-            true,
-            taskExecutionCompleteEvent -> collectWebhookResponse(
-                taskExecutionCompleteEvent, collectedWebhookResponse),
+                jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
+
+        jobIdListener.accept(jobId);
+
+        return jobSyncExecutor.awaitJob(
+            jobId, true,
+            taskExecutionCompleteEvent -> collectWebhookResponse(taskExecutionCompleteEvent, collectedWebhookResponse),
             timeout);
     }
 

@@ -120,6 +120,9 @@ class AnthropicChatActionTest {
             assertEquals(
                 AnthropicCacheStrategy.CONVERSATION_HISTORY, anthropicChatOptions.getCacheOptions()
                     .getStrategy());
+            assertTrue(
+                anthropicChatOptions.getCacheOptions()
+                    .isCacheToolResults());
         }
     }
 

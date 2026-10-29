@@ -317,6 +317,46 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
+        it('skips toast for AI Hub chat turn errors, which the hub surfaces itself', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {error: 'TURN_IN_FLIGHT'},
+                status: 409,
+                url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts errors from other agents chat endpoints and other internal urls', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            for (const url of [
+                'http://localhost/api/platform/internal/ai/chat/workflow_editor_build',
+                'http://localhost/api/platform/internal/ai/chat/ai_hub_other',
+                'http://localhost/api/platform/internal/projects/1',
+            ]) {
+                clearActiveToasts();
+
+                hoisted.registeredHandlers!.response(
+                    createMockResponse({jsonData: {detail: 'Conflict', title: 'Error'}, status: 409, url})
+                );
+
+                await act(async () => {
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+                });
+            }
+
+            expect(hoisted.toastError).toHaveBeenCalledTimes(3);
+        });
+
         it('skips toast for a failed AI Hub presence heartbeat', async () => {
             renderHook(() => useFetchInterceptor());
 
@@ -470,6 +510,90 @@ describe('useFetchInterceptor', () => {
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
+        });
+
+        it('does not toast a CONFLICT on resolving an AI Hub tool approval, which the approval card shows', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    errors: [
+                        {
+                            extensions: {errorCode: 'CONFLICT'},
+                            message: 'Approval 4 is already APPROVED',
+                            path: ['resolveAiHubToolApproval'],
+                        },
+                    ],
+                },
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts another error on resolving an AI Hub tool approval', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    errors: [
+                        {
+                            extensions: {errorCode: 'NOT_FOUND'},
+                            message: 'Not found',
+                            path: ['resolveAiHubToolApproval'],
+                        },
+                    ],
+                },
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith(
+                'Error',
+                expect.objectContaining({description: 'Not found'})
+            );
+        });
+
+        it('still toasts a CONFLICT from another GraphQL field', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {
+                    errors: [
+                        {
+                            extensions: {errorCode: 'CONFLICT'},
+                            message: 'AiHubChat thread-1 already exists',
+                            path: ['createAiHubChat'],
+                        },
+                    ],
+                },
+                status: 200,
+                url: 'http://localhost/graphql',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith(
+                'Error',
+                expect.objectContaining({description: 'AiHubChat thread-1 already exists'})
+            );
         });
 
         it('does not show toast for GraphQL response without errors', async () => {
@@ -735,6 +859,30 @@ describe('useFetchInterceptor', () => {
                 expect.objectContaining({description: 'Tool failed\nWorkflow not found'})
             );
         });
+
+        it('skips the toast for a failed AI Hub chat title, which the chats sidebar marks', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            hoisted.registeredHandlers!.response(
+                createMockResponse({
+                    jsonData: {
+                        errors: [
+                            {
+                                extensions: {errorCode: 'TITLE_GENERATION_FAILED'},
+                                message: 'Chat title generation is temporarily unavailable.',
+                                path: ['generateAiHubChatTitle'],
+                            },
+                        ],
+                    },
+                    status: 200,
+                    url: 'http://localhost/graphql',
+                })
+            );
+
+            await flush();
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
     });
 
     describe('csrf-aware fetch wrapper', () => {
@@ -818,6 +966,158 @@ describe('useFetchInterceptor', () => {
             expect(innerFetch).toHaveBeenCalledTimes(1);
             expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
             expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('does not retry or log out when the AI Hub chat turn endpoint refuses the turn itself', async () => {
+            const innerFetch = vi.fn().mockResolvedValueOnce(
+                createMockResponse({
+                    jsonData: {error: 'Workspace is not accessible to the current user'},
+                    status: 403,
+                    url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                })
+            );
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(1);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('reads the AI Hub refusal from a clone, leaving the body for the caller', async () => {
+            const refusalResponse = new Response(
+                JSON.stringify({error: 'AiHubChat is not accessible to the current user'}),
+                {
+                    headers: {'Content-Type': 'application/json'},
+                    status: 403,
+                }
+            );
+
+            const innerFetch = vi.fn().mockResolvedValueOnce(refusalResponse);
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect(innerFetch).toHaveBeenCalledTimes(1);
+            expect(result.bodyUsed).toBe(false);
+            await expect(result.json()).resolves.toEqual({error: 'AiHubChat is not accessible to the current user'});
+        });
+
+        it('replays a CSRF 403 without a JSON body from the AI Hub chat turn endpoint', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonRejects: true,
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                )
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/platform/internal/ai/chat/ai_hub'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(200);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(innerFetch).toHaveBeenNthCalledWith(2, '/api/account', {method: 'GET'});
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('does not log out when the replay of a CSRF 403 is the AI Hub controller refusing the turn', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonRejects: true,
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                )
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonData: {error: 'Workspace is not accessible to the current user'},
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                );
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('replays a 403 from the AI Hub chat turn endpoint whose JSON body is not the controller refusal', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce(
+                    createMockResponse({
+                        jsonData: {
+                            error: 'Forbidden',
+                            path: '/api/platform/internal/ai/chat/ai_hub',
+                            status: 403,
+                            timestamp: '2026-10-19T12:00:00.000+00:00',
+                        },
+                        status: 403,
+                        url: 'http://localhost/api/platform/internal/ai/chat/ai_hub',
+                    })
+                )
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/api/platform/internal/ai/chat/ai_hub'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/ai_hub', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).toHaveBeenCalled();
+            expect(hoisted.navigate).toHaveBeenCalledWith('/login');
+        });
+
+        it('still replays and escalates a 403 from another agent chat endpoint', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/api/platform/internal/ai/chat/copilot'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/api/platform/internal/ai/chat/copilot'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/platform/internal/ai/chat/copilot', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.navigate).toHaveBeenCalledWith('/login');
         });
 
         it('does not retry a non-403 response', async () => {
