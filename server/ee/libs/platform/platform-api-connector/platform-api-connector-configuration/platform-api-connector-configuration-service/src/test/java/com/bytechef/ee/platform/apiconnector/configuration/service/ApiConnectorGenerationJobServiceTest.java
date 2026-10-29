@@ -13,6 +13,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob.Status;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,6 +94,43 @@ class ApiConnectorGenerationJobServiceTest {
         assertThat(firstCoordinator.isCancellationRequested(jobId)).isTrue();
         assertThat(firstCoordinator.get(jobId)).hasValueSatisfying(
             sharedJob -> assertThat(sharedJob.getStatus()).isEqualTo(Status.CANCELLED));
+    }
+
+    @Test
+    void testACancelledJobStaysCancelled() {
+        String cancelledBeforeProcessingJobId = firstCoordinator.create("https://example.com/docs")
+            .getId();
+
+        secondCoordinator.requestCancellation(cancelledBeforeProcessingJobId);
+
+        firstCoordinator.markAsProcessing(cancelledBeforeProcessingJobId);
+
+        String cancelledWhileProcessingJobId = firstCoordinator.create("https://example.com/docs")
+            .getId();
+
+        firstCoordinator.markAsProcessing(cancelledWhileProcessingJobId);
+
+        secondCoordinator.requestCancellation(cancelledWhileProcessingJobId);
+
+        firstCoordinator.markAsFailed(cancelledWhileProcessingJobId, "Documentation not reachable");
+
+        String cancelledBeforeCompletionJobId = firstCoordinator.create("https://example.com/docs")
+            .getId();
+
+        secondCoordinator.requestCancellation(cancelledBeforeCompletionJobId);
+
+        firstCoordinator.markAsCompleted(cancelledBeforeCompletionJobId, "openapi: 3.0.1");
+
+        for (String jobId : List.of(
+            cancelledBeforeProcessingJobId, cancelledWhileProcessingJobId, cancelledBeforeCompletionJobId)) {
+
+            assertThat(secondCoordinator.get(jobId))
+                .hasValueSatisfying(sharedJob -> {
+                    assertThat(sharedJob.getStatus()).isEqualTo(Status.CANCELLED);
+                    assertThat(sharedJob.getErrorMessage()).isNull();
+                    assertThat(sharedJob.getSpecification()).isNull();
+                });
+        }
     }
 
     @Test

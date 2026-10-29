@@ -130,6 +130,10 @@ public class ApiConnectorGenerationJobServiceImpl implements ApiConnectorGenerat
 
     private void update(String jobId, Consumer<ApiConnectorGenerationJob> jobConsumer) {
         get(jobId).ifPresent(job -> {
+            if (job.isCancellationRequested()) {
+                return;
+            }
+
             jobConsumer.accept(job);
 
             put(job);
