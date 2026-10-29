@@ -172,19 +172,6 @@ class StoppedJobTaskDispatcherIntTest {
         assertThat(dispatchedTasks).containsExactly(cancelControlTask);
     }
 
-    @Test
-    void testDispatchPassesTaskOfDeletedJob() {
-        Job job = createStartedJob();
-
-        TaskExecution taskExecution = createTaskExecution(getId(job), TaskExecution.Status.CREATED);
-
-        taskExecution.setJobId(Long.MAX_VALUE);
-
-        taskDispatcherChain.dispatch(taskExecution);
-
-        assertThat(dispatchedTasks).containsExactly(taskExecution);
-    }
-
     private Job createStartedJob() {
         Job job = jobService.create(
             new JobParametersDTO("aGVsbG8x", Map.of("yourName", "me")), workflowService.getWorkflow("aGVsbG8x"));

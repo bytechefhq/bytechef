@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,12 +64,8 @@ public class StoppedJobTaskDispatcher implements TaskDispatcher<TaskExecution>, 
             return null;
         }
 
-        Optional<Job> jobOptional = jobService.fetchJob(taskExecution.getJobId());
+        Job job = jobService.getJob(taskExecution.getJobId());
 
-        if (jobOptional.isPresent() && SuspendedJobs.isStoppedByUser(jobOptional.get())) {
-            return this;
-        }
-
-        return null;
+        return SuspendedJobs.isStoppedByUser(job) ? this : null;
     }
 }
