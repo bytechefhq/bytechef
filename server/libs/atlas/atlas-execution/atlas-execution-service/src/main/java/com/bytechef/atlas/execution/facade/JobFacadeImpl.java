@@ -148,7 +148,7 @@ public class JobFacadeImpl implements JobFacade {
         contextService.push(
             jobId, Context.Classname.JOB, taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, jobContext));
 
-        Job job = jobService.getJob(jobId);
+        Job job = jobService.resumeToStatusStarted(jobId);
 
         Map<String, Object> metadata = new HashMap<>(job.getMetadata());
 
@@ -157,8 +157,6 @@ public class JobFacadeImpl implements JobFacade {
         job.setMetadata(metadata);
 
         jobService.update(job);
-
-        jobService.resumeToStatusStarted(jobId);
 
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
 
