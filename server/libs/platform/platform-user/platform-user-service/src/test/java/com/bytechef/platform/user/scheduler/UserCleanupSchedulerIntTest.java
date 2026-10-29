@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,6 +161,23 @@ class UserCleanupSchedulerIntTest {
 
         assertThat(removeOldPersistentTokens.cron()).isEqualTo("0 0 0 * * ?");
         assertThat(removeNotActivatedUsers.cron()).isEqualTo("0 0 1 * * ?");
+    }
+
+    @Test
+    void testCleanupJobsRunOnOneCoordinatorAtATime() throws NoSuchMethodException {
+        SchedulerLock removeOldPersistentTokens = UserCleanupScheduler.class
+            .getMethod("removeOldPersistentTokens")
+            .getAnnotation(SchedulerLock.class);
+        SchedulerLock removeNotActivatedUsers = UserCleanupScheduler.class
+            .getMethod("removeNotActivatedUsers")
+            .getAnnotation(SchedulerLock.class);
+
+        assertThat(removeOldPersistentTokens.name()).isEqualTo("removeOldPersistentTokens");
+        assertThat(removeOldPersistentTokens.lockAtLeastFor()).isEqualTo("PT5M");
+        assertThat(removeOldPersistentTokens.lockAtMostFor()).isEqualTo("PT1H");
+        assertThat(removeNotActivatedUsers.name()).isEqualTo("removeNotActivatedUsers");
+        assertThat(removeNotActivatedUsers.lockAtLeastFor()).isEqualTo("PT5M");
+        assertThat(removeNotActivatedUsers.lockAtMostFor()).isEqualTo("PT1H");
     }
 
     @Test

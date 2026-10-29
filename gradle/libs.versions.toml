@@ -14,6 +14,7 @@ java = "25"
 jjwt = "0.13.0"
 markpollack-agent-claude = "0.31.0"
 markpollack-agent-judge = "0.18.0"
+net-javacrumbs-shedlock = "7.10.1"
 openai-java = "4.38.0"
 org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "2.0.0"
@@ -50,6 +51,8 @@ io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.4
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
+net-javacrumbs-shedlock-shedlock-provider-jdbc-template = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version.ref = "net-javacrumbs-shedlock" }
+net-javacrumbs-shedlock-shedlock-spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version.ref = "net-javacrumbs-shedlock" }
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.57.0"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.5.1"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r"
