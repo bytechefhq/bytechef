@@ -45,9 +45,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Routes a job's SSE stream events to the SSE connections registered for the job. A registration made with
- * {@link #register(long, SseStreamBridge)} receives events right away and ends when the job completes, fails or stops
- * ({@code STOPPED}). A {@code STOPPED} status reaches the bridge as {@link SseStreamBridge#onSuspend()} unless the
- * event marks it as not suspended, in which case it reaches the bridge as {@link SseStreamBridge#onComplete()}.
+ * {@link #register(long, SseStreamBridge)} receives events right away and ends when the job completes, fails, stops
+ * ({@code STOPPED}) or is refused ({@code PAYMENT_REQUIRED}, which reaches the bridge as
+ * {@link SseStreamBridge#onComplete()}). A {@code STOPPED} status reaches the bridge as
+ * {@link SseStreamBridge#onSuspend()} unless the event marks it as not suspended, in which case it reaches the bridge
+ * as {@link SseStreamBridge#onComplete()}.
  *
  * <p>
  * A registration for a resumed job, made with {@link #registerForResume(long, SseStreamBridge)}, stays pending so it
@@ -311,14 +313,16 @@ public class SseStreamBridgeRegistry {
             return;
         }
 
+        boolean paymentRequired = "PAYMENT_REQUIRED".equals(status);
+
         if ("COMPLETED".equals(status) || "FAILED".equals(status) || "CANCELLED".equals(status) ||
-            ("STOPPED".equals(status) && !suspended)) {
+            ("STOPPED".equals(status) && !suspended) || paymentRequired) {
 
             activatePendingRegistrations(jobKey);
         }
 
         if ("COMPLETED".equals(status) || "FAILED".equals(status) || "STOPPED".equals(status) ||
-            "CANCELLED".equals(status)) {
+            "CANCELLED".equals(status) || paymentRequired) {
 
             CopyOnWriteArrayList<SseStreamBridge> sseStreamBridges = bridges.getIfPresent(jobKey);
 

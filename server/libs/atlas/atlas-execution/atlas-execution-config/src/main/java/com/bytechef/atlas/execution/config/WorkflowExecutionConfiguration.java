@@ -29,9 +29,11 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
+import com.bytechef.atlas.execution.service.JobStartGuard;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,8 +59,10 @@ public class WorkflowExecutionConfiguration {
     }
 
     @Bean
-    JobService jobService(JobRepository jobRepository) {
-        return new JobServiceImpl(jobRepository);
+    JobService jobService(JobRepository jobRepository, ObjectProvider<JobStartGuard> jobStartGuards) {
+        return new JobServiceImpl(
+            jobRepository, jobStartGuards.orderedStream()
+                .toList());
     }
 
     @Bean

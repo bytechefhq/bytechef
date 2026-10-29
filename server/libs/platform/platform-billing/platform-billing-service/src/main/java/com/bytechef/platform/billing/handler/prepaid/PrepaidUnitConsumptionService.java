@@ -16,11 +16,14 @@
 
 package com.bytechef.platform.billing.handler.prepaid;
 
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.service.JobStartGuard;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.repository.PrepaidBillingSubscriptionRepository;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,14 +32,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Consumes one prepaid job-execution unit for a started job. Only deployed jobs (those with a {@code principal_job}
- * row) are ever counted; the plan pool is drained before the extra pool.
+ * Consumes one prepaid job-execution unit when a job starts, and refuses the start when both pools are exhausted. Only
+ * deployed top-level jobs (those with a {@code principal_job} row and no parent) are ever counted; subflow jobs run on
+ * their parent's unit. The plan pool is drained before the extra pool.
  *
  * @author Matija Petanjek
  */
 @Service
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
-public class PrepaidUnitConsumptionService {
+public class PrepaidUnitConsumptionService implements JobStartGuard {
 
     private static final Logger log = LoggerFactory.getLogger(PrepaidUnitConsumptionService.class);
 
@@ -52,17 +56,22 @@ public class PrepaidUnitConsumptionService {
         this.prepaidBillingSubscriptionRepository = prepaidBillingSubscriptionRepository;
     }
 
+    @Override
     @Transactional
-    public void consumeUnit(long jobId) {
-        if (!prepaidBillingSubscriptionRepository.existsPrincipalJobByJobId(jobId)) {
-            return;
+    public boolean tryStart(Job job) {
+        long jobId = Objects.requireNonNull(job.getId(), "id");
+
+        if (job.getParentTaskExecutionId() != null ||
+            !prepaidBillingSubscriptionRepository.existsPrincipalJobByJobId(jobId)) {
+
+            return true;
         }
 
         Optional<BillingSubscription> currentSubscriptionOptional =
             billingSubscriptionService.fetchCurrentSubscription();
 
         if (currentSubscriptionOptional.isEmpty()) {
-            return;
+            return true;
         }
 
         BillingSubscription billingSubscription = currentSubscriptionOptional.get();
@@ -70,7 +79,7 @@ public class PrepaidUnitConsumptionService {
         if (billingSubscription.getSubscriptionModel() != SubscriptionModel.PREPAID ||
             "TRIAL".equals(billingSubscription.getPlanName())) {
 
-            return;
+            return true;
         }
 
         long subscriptionId = billingSubscription.getId();
@@ -78,7 +87,11 @@ public class PrepaidUnitConsumptionService {
         if (prepaidBillingSubscriptionRepository.incrementPlanUnitUsed(subscriptionId) == 0 &&
             prepaidBillingSubscriptionRepository.incrementExtraUnitUsed(subscriptionId) == 0) {
 
-            log.warn("Job {} started with no prepaid units left; nothing was counted", jobId);
+            log.warn("Job {} refused: no prepaid units left", jobId);
+
+            return false;
         }
+
+        return true;
     }
 }

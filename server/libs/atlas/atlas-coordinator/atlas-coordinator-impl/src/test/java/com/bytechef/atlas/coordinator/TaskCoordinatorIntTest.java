@@ -372,6 +372,33 @@ public class TaskCoordinatorIntTest {
     }
 
     @Test
+    public void testStartOfJobRequiringPaymentPublishesStatusWithoutExecuting() {
+        long jobId = saveJob(Job.Status.CREATED, "aGVsbG8x", 0);
+
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        JobExecutor jobExecutor = mock(JobExecutor.class);
+        JobService refusingJobService = new JobServiceImpl(jobRepository, List.of(job -> false));
+
+        TaskCoordinator taskCoordinator = new TaskCoordinator(
+            List.of(), List.of(), eventPublisher, jobExecutor, refusingJobService, mock(TaskCompletionHandler.class),
+            newTaskDispatcher(), taskExecutionService);
+
+        taskCoordinator.onStartJobEvent(new StartJobEvent(jobId));
+
+        ArgumentCaptor<JobStatusApplicationEvent> jobStatusApplicationEventArgumentCaptor = ArgumentCaptor.forClass(
+            JobStatusApplicationEvent.class);
+
+        verify(eventPublisher).publishEvent(jobStatusApplicationEventArgumentCaptor.capture());
+
+        JobStatusApplicationEvent jobStatusApplicationEvent = jobStatusApplicationEventArgumentCaptor.getValue();
+
+        assertThat(jobStatusApplicationEvent.getStatus()).isEqualTo(Job.Status.PAYMENT_REQUIRED);
+        assertThat(getJob(jobId).getStatus()).isEqualTo(Job.Status.PAYMENT_REQUIRED);
+
+        verify(jobExecutor, never()).execute(any());
+    }
+
+    @Test
     public void testResumeOfFailedJobDispatchesFailedTaskWithCompletedTaskOutputs() {
         Job job = new Job();
 

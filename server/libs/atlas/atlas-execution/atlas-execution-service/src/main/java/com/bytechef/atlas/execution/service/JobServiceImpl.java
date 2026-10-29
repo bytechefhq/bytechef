@@ -42,10 +42,16 @@ public class JobServiceImpl implements JobService {
     private static final int DEFAULT_PAGE_SIZE = 20;
 
     private final JobRepository jobRepository;
+    private final List<JobStartGuard> jobStartGuards;
+
+    public JobServiceImpl(JobRepository jobRepository) {
+        this(jobRepository, List.of());
+    }
 
     @SuppressFBWarnings("EI2")
-    public JobServiceImpl(JobRepository jobRepository) {
+    public JobServiceImpl(JobRepository jobRepository, List<JobStartGuard> jobStartGuards) {
         this.jobRepository = jobRepository;
+        this.jobStartGuards = jobStartGuards;
     }
 
     @Override
@@ -159,13 +165,19 @@ public class JobServiceImpl implements JobService {
             job.getParentTaskExecutionId() == null || job.getStatus() == Job.Status.STOPPED,
             "Can't restart failed subflow job " + id);
 
-        if (job.getStatus() == Job.Status.FAILED) {
-            job.setError(null);
-            job.setStartDate(Instant.now());
-        }
+        Job.Status status = job.getStatus();
 
         job.setEndDate(null);
-        job.setStatus(Job.Status.STARTED);
+
+        // A restart of a FAILED or PAYMENT_REQUIRED job is a new run; resuming a STOPPED (suspended) job is not.
+        if (status == Job.Status.FAILED || status == Job.Status.PAYMENT_REQUIRED) {
+            job.setError(null);
+            job.setStartDate(Instant.now());
+
+            setStatusToStartedOrPaymentRequired(job);
+        } else {
+            job.setStatus(Job.Status.STARTED);
+        }
 
         jobRepository.save(job);
 
@@ -186,7 +198,8 @@ public class JobServiceImpl implements JobService {
 
         job.setCurrentTask(0);
         job.setStartDate(Instant.now());
-        job.setStatus(Job.Status.STARTED);
+
+        setStatusToStartedOrPaymentRequired(job);
 
         jobRepository.save(job);
 
@@ -214,8 +227,23 @@ public class JobServiceImpl implements JobService {
         return jobRepository.save(job);
     }
 
+    private void setStatusToStartedOrPaymentRequired(Job job) {
+        for (JobStartGuard jobStartGuard : jobStartGuards) {
+            if (!jobStartGuard.tryStart(job)) {
+                job.setEndDate(Instant.now());
+                job.setStatus(Job.Status.PAYMENT_REQUIRED);
+
+                return;
+            }
+        }
+
+        job.setStatus(Job.Status.STARTED);
+    }
+
     private static boolean isRestartable(Job job) {
-        return job.getStatus() == Job.Status.STOPPED || job.getStatus() == Job.Status.FAILED;
+        Job.Status status = job.getStatus();
+
+        return status == Job.Status.STOPPED || status == Job.Status.FAILED || status == Job.Status.PAYMENT_REQUIRED;
     }
 
     private static Job getJob(JobParametersDTO jobParametersDTO, Workflow workflow) {

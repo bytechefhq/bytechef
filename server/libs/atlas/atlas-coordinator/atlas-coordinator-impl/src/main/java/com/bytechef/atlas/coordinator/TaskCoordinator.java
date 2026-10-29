@@ -149,6 +149,12 @@ public class TaskCoordinator {
             ? jobService.getJob(resumeJobEvent.getJobId())
             : jobService.resumeToStatusStarted(resumeJobEvent.getJobId());
 
+        if (job.getStatus() == Job.Status.PAYMENT_REQUIRED) {
+            publishPaymentRequired(job);
+
+            return;
+        }
+
         Map<String, ?> data = resumeJobEvent.getData();
 
         Long taskExecutionId = resumeJobEvent.getTaskExecutionId();
@@ -196,6 +202,12 @@ public class TaskCoordinator {
         }
 
         Job job = jobService.setStatusToStarted(startJobEvent.getJobId());
+
+        if (job.getStatus() == Job.Status.PAYMENT_REQUIRED) {
+            publishPaymentRequired(job);
+
+            return;
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
@@ -295,6 +307,14 @@ public class TaskCoordinator {
 
             eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, Job.Status.FAILED));
         }
+    }
+
+    private void publishPaymentRequired(Job job) {
+        long jobId = Validate.notNull(job.getId(), "id");
+
+        log.info("Job id={} was not started: payment required", jobId);
+
+        eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, Job.Status.PAYMENT_REQUIRED));
     }
 
     private static String resolveErrorMessage(Exception exception) {

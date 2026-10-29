@@ -54,7 +54,8 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public enum Status {
 
-        CREATED, STARTED, COMPLETED, FAILED, STOPPED, CANCELLED
+        // Append only: the status is persisted as its ordinal.
+        CREATED, STARTED, COMPLETED, FAILED, STOPPED, CANCELLED, PAYMENT_REQUIRED
     }
 
     @CreatedBy
@@ -172,7 +173,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     }
 
     /**
-     * Get time execution entered end status: COMPLETED, STOPPED, FAILED
+     * Get time execution entered end status: COMPLETED, STOPPED, FAILED, PAYMENT_REQUIRED
      *
      * @return {@link Instant}
      */
