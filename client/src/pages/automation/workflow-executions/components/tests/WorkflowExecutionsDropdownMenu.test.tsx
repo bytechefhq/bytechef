@@ -37,6 +37,11 @@ const stoppedJobExecution = {
     job: {id: '11', status: 'STOPPED'},
 } as unknown as WorkflowExecution;
 
+const paymentRequiredJobExecution = {
+    id: 13,
+    job: {id: '13', status: 'PAYMENT_REQUIRED'},
+} as unknown as WorkflowExecution;
+
 const jobExecution = {
     id: 5,
     job: {id: '5', status: 'STARTED'},
@@ -126,6 +131,22 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         await user.click(restartMenuItem);
 
         expect(restartJobMutateMock).toHaveBeenCalledWith(11);
+    });
+
+    it('restarts a job that required payment', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(paymentRequiredJobExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        const restartMenuItem = await screen.findByRole('menuitem', {name: /Restart/});
+
+        expect(restartMenuItem).not.toHaveAttribute('data-disabled');
+
+        await user.click(restartMenuItem);
+
+        expect(restartJobMutateMock).toHaveBeenCalledWith(13);
     });
 
     it('renders with the design-system DropdownMenu', async () => {

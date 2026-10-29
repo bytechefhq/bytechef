@@ -65,6 +65,10 @@ const WorkflowExecutionsHeader = ({
                         />
                     )}
 
+                    {workflowStatus === 'paymentRequired' && (
+                        <Badge label="Payment required" styleType="destructive-outline" weight="semibold" />
+                    )}
+
                     {workflowStatus === 'failed' && (
                         <Badge label="Workflow failed" styleType="destructive-filled" weight="semibold" />
                     )}

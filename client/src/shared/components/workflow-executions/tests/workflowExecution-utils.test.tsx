@@ -154,6 +154,12 @@ describe('workflowExecution-utils', () => {
                 expect(getWorkflowStatusType(job)).toBe('stopped');
             });
 
+            it('should return paymentRequired when job is PAYMENT_REQUIRED and no trigger execution', () => {
+                const job = createJob({status: 'PAYMENT_REQUIRED'});
+
+                expect(getWorkflowStatusType(job)).toBe('paymentRequired');
+            });
+
             it('should return failed when job is COMPLETED but trigger is FAILED', () => {
                 const job = createJob({status: 'COMPLETED'});
                 const trigger = createTriggerExecution({status: 'FAILED'});
