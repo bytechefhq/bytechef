@@ -8,6 +8,8 @@ type AutomationWorkflowProject {
     version: Int!
     lastPublishedVersion: Int
     permissionExpression: String
+    configurationCount: Int!
+    lastPublishedDate: String
     workflowTemplates: [AutomationWorkflowProjectWorkflowTemplate!]!
 }
 

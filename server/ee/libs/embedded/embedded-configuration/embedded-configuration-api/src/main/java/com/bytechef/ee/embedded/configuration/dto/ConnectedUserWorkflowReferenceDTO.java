@@ -7,12 +7,15 @@
 
 package com.bytechef.ee.embedded.configuration.dto;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
+
 public record ConnectedUserWorkflowReferenceDTO(
     String automationWorkflowUuid, String externalUserId, String environment, boolean enabled, boolean dangling,
-    String danglingReason) {
+    String danglingReason, @Nullable String workflowId) {
 }

@@ -77,6 +77,11 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
     }
 
     @Override
+    public List<AutomationWorkflowProjectConfiguration> getConfigurations(Set<Long> projectIds) {
+        return automationWorkflowProjectConfigurationRepository.findAllByProjectIdIn(projectIds);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public boolean isWorkflowEnabled(AutomationWorkflowProjectConfiguration configuration, UUID workflowUuid) {
         return configuration.isWorkflowEnabled(workflowUuid);

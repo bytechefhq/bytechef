@@ -99,9 +99,10 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             DRAFT_WORKFLOW_ID);
 
         AutomationWorkflowProjectDTO projectOne = new AutomationWorkflowProjectDTO(
-            1L, "Project One", "First project", null, List.of(), true, 5, 2, List.of(workflowTemplateOne), null, true);
+            1L, "Project One", "First project", null, List.of(), true, 5, 2, List.of(workflowTemplateOne), null, true,
+            0, null);
         AutomationWorkflowProjectDTO projectTwo = new AutomationWorkflowProjectDTO(
-            2L, "Project Two", null, 10L, List.of(20L), false, 1, null, List.of(), null, true);
+            2L, "Project Two", null, 10L, List.of(20L), false, 1, null, List.of(), null, true, 0, null);
 
         when(automationWorkflowProjectFacade.getProjects()).thenReturn(List.of(projectOne, projectTwo));
 

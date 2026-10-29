@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.repository;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +24,8 @@ public interface AutomationWorkflowProjectConfigurationRepository
     extends ListCrudRepository<AutomationWorkflowProjectConfiguration, Long> {
 
     List<AutomationWorkflowProjectConfiguration> findAllByProjectId(long projectId);
+
+    List<AutomationWorkflowProjectConfiguration> findAllByProjectIdIn(Set<Long> projectIds);
 
     Optional<AutomationWorkflowProjectConfiguration> findByProjectIdAndEnvironmentId(
         long projectId, long environmentId);

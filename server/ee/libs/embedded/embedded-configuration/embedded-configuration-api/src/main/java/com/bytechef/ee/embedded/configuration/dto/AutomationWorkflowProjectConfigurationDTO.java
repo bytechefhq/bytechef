@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.dto;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -19,11 +20,12 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record AutomationWorkflowProjectConfigurationDTO(
     long id, long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible,
-    List<Workflow> workflows, Instant lastModifiedDate) {
+    List<Workflow> workflows, Instant lastModifiedDate, @Nullable Instant lastExecutionDate) {
 
     /**
      * @version ee
      */
-    public record Workflow(String workflowUuid, String workflowId, String label, boolean enabled) {
+    public record Workflow(
+        String workflowUuid, String workflowId, String label, boolean enabled, @Nullable Instant lastExecutionDate) {
     }
 }

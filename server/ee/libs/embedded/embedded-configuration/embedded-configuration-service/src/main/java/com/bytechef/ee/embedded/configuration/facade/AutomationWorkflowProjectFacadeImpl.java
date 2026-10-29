@@ -304,16 +304,23 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public AutomationWorkflowProjectDTO getProject(long projectId) {
         Project project = getMarkedProject(projectId);
 
-        return toDTO(project, automationWorkflowProjectService.getAutomationWorkflowProject(projectId));
+        List<AutomationWorkflowProjectConfiguration> configurations =
+            automationWorkflowProjectConfigurationService.getConfigurations(projectId);
+
+        return toDTO(
+            project, automationWorkflowProjectService.getAutomationWorkflowProject(projectId), configurations.size());
     }
 
     @Override
     public List<AutomationWorkflowProjectDTO> getProjects() {
         Map<Long, AutomationWorkflowProject> automationWorkflowProjects = getAutomationWorkflowProjects();
+        Map<Long, Long> configurationCounts = getConfigurationCounts(automationWorkflowProjects.keySet());
 
         return getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())
             .stream()
-            .map(project -> toDTO(project, automationWorkflowProjects.get(project.getId())))
+            .map(project -> toDTO(
+                project, automationWorkflowProjects.get(project.getId()),
+                Math.toIntExact(configurationCounts.getOrDefault(project.getId(), 0L))))
             .toList();
     }
 
@@ -511,7 +518,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.id(), project.name(), project.description(), project.categoryId(), project.tagIds(),
             project.published(), project.version(), project.lastPublishedVersion(), visibleTemplates,
-            project.permissionExpression(), project.automationHubVisible());
+            project.permissionExpression(), project.automationHubVisible(), project.configurationCount(),
+            project.lastPublishedDate());
     }
 
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {
@@ -584,7 +592,16 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .toList();
     }
 
-    private AutomationWorkflowProjectDTO toDTO(Project project, AutomationWorkflowProject automationWorkflowProject) {
+    private Map<Long, Long> getConfigurationCounts(Set<Long> projectIds) {
+        return automationWorkflowProjectConfigurationService.getConfigurations(projectIds)
+            .stream()
+            .collect(
+                Collectors.groupingBy(AutomationWorkflowProjectConfiguration::getProjectId, Collectors.counting()));
+    }
+
+    private AutomationWorkflowProjectDTO toDTO(
+        Project project, AutomationWorkflowProject automationWorkflowProject, int configurationCount) {
+
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), project.getLastProjectVersion());
 
@@ -616,7 +633,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.getId(), displayName, project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
-            automationWorkflowProject.getPermissionExpression(), true);
+            automationWorkflowProject.getPermissionExpression(), true, configurationCount,
+            project.getLastPublishedDate());
     }
 
     private AutomationWorkflowProjectDTO toPublishedDTO(
@@ -667,6 +685,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return new AutomationWorkflowProjectDTO(
             project.getId(), displayName, project.getDescription(), project.getCategoryId(),
             project.getTagIds(), publishedVersion != null, project.getLastProjectVersion(), publishedVersion,
-            workflowTemplates, automationWorkflowProject.getPermissionExpression(), automationHubVisible);
+            workflowTemplates, automationWorkflowProject.getPermissionExpression(), automationHubVisible, 0,
+            project.getLastPublishedDate());
     }
 }
