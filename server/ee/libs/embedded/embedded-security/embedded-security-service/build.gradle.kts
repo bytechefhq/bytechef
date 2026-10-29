@@ -16,6 +16,7 @@ dependencies {
     runtimeOnly(libs.jjwt.impl)
     runtimeOnly(libs.jjwt.jackson)
 
+    testImplementation("io.grpc:grpc-inprocess")
     testImplementation("org.springframework.boot:spring-boot-liquibase")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
@@ -27,4 +28,7 @@ dependencies {
     testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-remote-client"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-remote-grpc"))
+    testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
 }
