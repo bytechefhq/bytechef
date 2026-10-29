@@ -4,15 +4,15 @@ server:
 bytechef:
   edition: EE
   message-broker:
-    provider: memory
+    provider: MEMORY
   file-storage:
     filesystem:
       basedir: ${java.io.tmpdir}/bytechef/file-storage
-    provider: jdbc
+    provider: JDBC
   oauth2:
     redirect-uri:
   worker:
     enabled: false
   workflow:
     output-storage:
-      provider: jdbc
+      provider: JDBC

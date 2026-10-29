@@ -15,4 +15,4 @@ spring:
 bytechef:
   edition: EE
   encryption:
-    provider: filesystem
+    provider: FILESYSTEM

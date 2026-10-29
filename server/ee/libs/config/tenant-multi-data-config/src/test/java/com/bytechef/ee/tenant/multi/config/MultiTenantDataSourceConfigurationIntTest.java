@@ -29,7 +29,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * multi-tenant mode is enabled with EE edition.
  *
  * <p>
- * These tests verify that when bytechef.edition=ee and bytechef.tenant.mode=multi, the MultiTenantDataSource is the
+ * These tests verify that when bytechef.edition=EE and bytechef.tenant.mode=MULTI, the MultiTenantDataSource is the
  * primary DataSource bean.
  *
  * @version ee

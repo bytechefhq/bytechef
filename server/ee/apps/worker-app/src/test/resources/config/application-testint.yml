@@ -3,16 +3,16 @@ server:
 
 bytechef:
   discovery-service:
-    provider: redis
+    provider: REDIS
   data-storage:
-    provider: jdbc
+    provider: JDBC
   edition: EE
   file-storage:
     filesystem:
       basedir: ${java.io.tmpdir}/bytechef/file-storage
-    provider: jdbc
+    provider: JDBC
   message-broker:
-    provider: memory
+    provider: MEMORY
   workflow:
     output-storage:
-      provider: jdbc
+      provider: JDBC
