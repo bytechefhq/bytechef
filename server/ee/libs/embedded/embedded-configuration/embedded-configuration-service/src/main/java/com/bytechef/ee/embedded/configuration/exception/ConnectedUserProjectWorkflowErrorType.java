@@ -23,6 +23,9 @@ public class ConnectedUserProjectWorkflowErrorType extends AbstractErrorType {
     public static final ConnectedUserProjectWorkflowErrorType WORKFLOW_TEMPLATE_NOT_RELEASED =
         new ConnectedUserProjectWorkflowErrorType(101);
 
+    public static final ConnectedUserProjectWorkflowErrorType WORKFLOW_NOT_PROVISIONABLE =
+        new ConnectedUserProjectWorkflowErrorType(102);
+
     private ConnectedUserProjectWorkflowErrorType(int errorKey) {
         super(ConnectedUserProjectWorkflow.class, errorKey);
     }
