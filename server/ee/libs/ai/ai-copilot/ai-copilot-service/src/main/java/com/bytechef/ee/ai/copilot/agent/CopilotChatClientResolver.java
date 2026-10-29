@@ -53,7 +53,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
     @SuppressFBWarnings("EI")
     public CopilotChatClientResolver(
         CatalogChatClientResolver catalogChatClientResolver,
-        @Value("${bytechef.ai.copilot.provider:}") String defaultProvider) {
+        @Value("${bytechef.ai.copilot.provider}") String defaultProvider) {
 
         this.catalogChatClientResolver = catalogChatClientResolver;
         this.defaultProvider = defaultProvider;
