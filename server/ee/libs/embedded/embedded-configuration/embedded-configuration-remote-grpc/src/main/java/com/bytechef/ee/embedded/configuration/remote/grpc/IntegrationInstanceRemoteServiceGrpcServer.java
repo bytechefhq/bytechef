@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.remote.grpc.proto.IntegrationInsta
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstance;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstances;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowIntegrationInstanceRequest;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.WorkflowUuidIntegrationInstancesRequest;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
@@ -106,6 +107,18 @@ public class IntegrationInstanceRemoteServiceGrpcServer
         responseObserver.onNext(
             embeddedConfigurationProtoMapper.toProto(
                 integrationInstanceService.getIntegrationInstances(request.getIdsList())));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getIntegrationInstancesByWorkflowUuid(
+        WorkflowUuidIntegrationInstancesRequest request, StreamObserver<RemoteIntegrationInstances> responseObserver) {
+
+        responseObserver.onNext(
+            embeddedConfigurationProtoMapper.toProto(
+                integrationInstanceService.getIntegrationInstancesByWorkflowUuid(
+                    request.getConnectedUserId(), request.getWorkflowUuid(),
+                    EmbeddedConfigurationProtoMapper.toEnvironment(request.getEnvironment()))));
         responseObserver.onCompleted();
     }
 
