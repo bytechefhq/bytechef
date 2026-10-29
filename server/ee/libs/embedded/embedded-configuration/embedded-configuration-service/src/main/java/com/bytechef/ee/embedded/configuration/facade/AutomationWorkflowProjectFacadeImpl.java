@@ -74,7 +74,6 @@ import tools.jackson.core.type.TypeReference;
 @SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
     private static final String RESERVED_NAME_PREFIX = "__EMBEDDED";
-    private static final String LEGACY_NAME_PREFIX = "__EMBEDDED_AUTOMATION__";
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -259,11 +258,9 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public long duplicateProject(long projectId) {
         Project sourceProject = getCatalogProject(projectId);
 
-        String sourceDisplayName = getDisplayName(sourceProject);
-
         Project newProject = new Project();
 
-        newProject.setName(sourceDisplayName + " (Copy)");
+        newProject.setName(sourceProject.getName() + " (Copy)");
         newProject.setDescription(sourceProject.getDescription());
         newProject.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
         newProject.setCategoryId(sourceProject.getCategoryId());
@@ -563,8 +560,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return projectService.getProjects(List.copyOf(projectIds))
             .stream()
             .filter(project -> Objects.equals(project.getWorkspaceId(), Workspace.DEFAULT_WORKSPACE_ID))
-            .sorted(Comparator.comparing(AutomationWorkflowProjectFacadeImpl::getDisplayName,
-                String.CASE_INSENSITIVE_ORDER))
+            .sorted(Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER))
             .toList();
     }
 
@@ -572,16 +568,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         return automationWorkflowProjectService.getAutomationWorkflowProjects()
             .stream()
             .collect(Collectors.toMap(AutomationWorkflowProject::getProjectId, Function.identity()));
-    }
-
-    private static String getDisplayName(Project project) {
-        String name = project.getName();
-
-        if (name.startsWith(LEGACY_NAME_PREFIX)) {
-            return name.substring(LEGACY_NAME_PREFIX.length());
-        }
-
-        return name;
     }
 
     private Project getCatalogProject(long projectId) {
@@ -653,15 +639,13 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .filter(Objects::nonNull)
             .toList();
 
-        String displayName = getDisplayName(project);
-
         ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
 
         boolean published = lastPublishedProjectVersion != null;
         Integer lastPublishedVersion = published ? lastPublishedProjectVersion.getVersion() : null;
 
         return new AutomationWorkflowProjectDTO(
-            project.getId(), displayName, project.getDescription(), project.getCategoryId(),
+            project.getId(), project.getName(), project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
             automationWorkflowProject.getPermissionExpression(), true, configurationCount,
             project.getLastPublishedDate());
@@ -709,10 +693,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
                 .toList();
         }
 
-        String displayName = getDisplayName(project);
-
         return new AutomationWorkflowProjectDTO(
-            project.getId(), displayName, project.getDescription(), project.getCategoryId(),
+            project.getId(), project.getName(), project.getDescription(), project.getCategoryId(),
             project.getTagIds(), publishedVersion != null, project.getLastProjectVersion(), publishedVersion,
             workflowTemplates, automationWorkflowProject.getPermissionExpression(), automationHubVisible, 0,
             project.getLastPublishedDate());
