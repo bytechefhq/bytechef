@@ -47,7 +47,7 @@ bytechef:
       chat:
         provider: openai
       embedding:
-        provider: openai
+        provider: OPENAI
       enabled: true
       openai:
 
