@@ -156,19 +156,12 @@ public class AutomationWorkflowProjectConfiguration {
         this.workflows = workflows == null ? Collections.emptySet() : workflows;
     }
 
-    /**
-     * Returns the stored row of the workflow, if any. Rows are sparse: a workflow without a row is enabled and has no
-     * provided connections or inputs.
-     */
     public Optional<AutomationWorkflowProjectConfigurationWorkflow> fetchWorkflow(UUID workflowUuid) {
         return workflows.stream()
             .filter(workflow -> Objects.equals(workflow.getWorkflowUuid(), workflowUuid))
             .findFirst();
     }
 
-    /**
-     * Returns whether the workflow is enabled; a workflow without a stored row is enabled.
-     */
     public boolean isWorkflowEnabled(UUID workflowUuid) {
         return fetchWorkflow(workflowUuid)
             .map(AutomationWorkflowProjectConfigurationWorkflow::isEnabled)

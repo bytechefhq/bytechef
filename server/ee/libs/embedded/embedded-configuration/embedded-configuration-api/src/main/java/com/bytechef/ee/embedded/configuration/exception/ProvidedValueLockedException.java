@@ -8,9 +8,6 @@
 package com.bytechef.ee.embedded.configuration.exception;
 
 /**
- * Thrown when a connected user tries to set a connection or an input value that the configuration of the automation
- * workflow project provides for every connected user.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -34,9 +31,6 @@ public class ProvidedValueLockedException extends RuntimeException {
         return kind;
     }
 
-    /**
-     * Returns the component name of the connection slot, or the input name, the configuration provides.
-     */
     public String getName() {
         return name;
     }

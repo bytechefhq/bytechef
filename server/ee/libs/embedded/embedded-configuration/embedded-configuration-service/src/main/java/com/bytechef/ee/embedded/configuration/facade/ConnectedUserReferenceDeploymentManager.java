@@ -267,11 +267,6 @@ class ConnectedUserReferenceDeploymentManager {
         }
     }
 
-    /**
-     * Removes the named inputs from a connected user's stored inputs of the workflow, e.g. the administrator's values
-     * of inputs the configuration no longer provides. A row without any of them is left untouched; a turned-on row is
-     * redeployed with the remaining inputs.
-     */
     public void removeInputs(long projectDeploymentId, String automationWorkflowUuid, Set<String> inputNames) {
         if (inputNames.isEmpty()) {
             return;
@@ -317,33 +312,18 @@ class ConnectedUserReferenceDeploymentManager {
         putWorkflow(projectDeployment, automationWorkflowUuid, rowSpec);
     }
 
-    /**
-     * Returns the names of the components whose connection, and of the inputs whose value, the configuration of the
-     * automation workflow project in the environment provides for the workflow.
-     */
     public ProvidedNames getProvidedNames(
         long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
 
         return toProvidedNames(getProvidedValues(automationWorkflowProjectId, environment, automationWorkflowUuid));
     }
 
-    /**
-     * Returns the names of the components whose connection, and of the inputs whose value, the configuration provides
-     * for the workflow.
-     */
     public ProvidedNames getProvidedNames(
         AutomationWorkflowProjectConfiguration configuration, String automationWorkflowUuid) {
 
         return toProvidedNames(getProvidedValues(configuration, automationWorkflowUuid));
     }
 
-    /**
-     * Rejects a connected user's request that sets the connection of a component, or the value of an input, the
-     * configuration of the automation workflow project in the environment provides for the workflow. A request that
-     * leaves them out, or gives an input no value, passes.
-     *
-     * @throws ProvidedValueLockedException naming the first provided component or input the request sets
-     */
     public void checkProvidedValuesNotRequested(
         long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> userInputs) {
@@ -376,12 +356,6 @@ class ConnectedUserReferenceDeploymentManager {
         }
     }
 
-    /**
-     * Resolves a connected user's reference to the workflow {@code workflowId} of the automation workflow project in
-     * the environment, applying the connections and inputs the project's configuration provides for the workflow: a
-     * provided connection fills its component's slots, and the returned row inputs are {@code userInputs} overridden by
-     * the provided inputs, so a provided input never counts as missing.
-     */
     public ReferenceResolution resolveReference(
         long connectedUserId, long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid,
         String workflowId, boolean enable, Map<String, Long> requestedConnectionIds,
@@ -484,11 +458,6 @@ class ConnectedUserReferenceDeploymentManager {
         return null;
     }
 
-    /**
-     * The single place every resolution path reads the connections and inputs the configuration of the automation
-     * workflow project in the environment provides for the workflow. No configuration, or no configuration row for the
-     * workflow, provides nothing.
-     */
     private ProvidedValues getProvidedValues(
         long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
 
@@ -584,10 +553,6 @@ class ConnectedUserReferenceDeploymentManager {
         }
     }
 
-    /**
-     * Returns the user's inputs overridden by the provided inputs. Provided inputs that are not inputs of the workflow,
-     * or that have no value, are ignored.
-     */
     private static Map<String, Object> mergeInputs(
         Workflow workflow, Map<String, ?> userInputs, Map<String, Object> providedInputs) {
 
@@ -634,10 +599,6 @@ class ConnectedUserReferenceDeploymentManager {
         int workflowErrorCount) {
     }
 
-    /**
-     * The names of the components whose connection, and of the inputs whose value, a configuration provides for a
-     * workflow.
-     */
     @SuppressFBWarnings("EI")
     public record ProvidedNames(Set<String> componentNames, Set<String> inputNames) {
     }

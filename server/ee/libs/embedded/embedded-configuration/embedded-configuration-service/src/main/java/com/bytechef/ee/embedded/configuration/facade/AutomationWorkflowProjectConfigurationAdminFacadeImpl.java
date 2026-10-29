@@ -403,10 +403,6 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .toList();
     }
 
-    /**
-     * Returns the names of the inputs a configuration workflow provides a value for; an input stored without a value
-     * provides nothing, matching how resolution reads the provided inputs.
-     */
     private static Set<String> getProvidedInputNames(Map<String, ?> providedInputs) {
         return providedInputs.entrySet()
             .stream()
@@ -473,10 +469,6 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         return affectedConnectedUserCount;
     }
 
-    /**
-     * Returns the non-dangling references in the configuration's environment whose connected user turned the workflow
-     * on: a workflow the user turned off does not pause on a new requirement, so it is not counted.
-     */
     private Map<String, List<ConnectedUserWorkflowReferenceDTO>> getTurnedOnReferences(
         AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
 

@@ -13,10 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @param removedProvidedInputNames The input names whose value the configuration stopped providing in this change,
- *                                  keyed by workflow uuid. The rollout removes them from every connected user's
- *                                  workflow of that template, so the administrator's value does not stay behind.
- *
  * @version ee
  *
  * @author Ivica Cardic

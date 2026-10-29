@@ -99,11 +99,6 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
         return ResponseEntity.ok(models);
     }
 
-    /**
-     * Returns the template among the projects published to the connected user. Unlike the listing, a project hidden
-     * from the Automation Hub is not left out, so its workflows stay activatable by workflow uuid; the configuration
-     * and permission visibility {@code getPublishedProjects} applies still hold.
-     */
     @Override
     public ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplate(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
