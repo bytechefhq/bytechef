@@ -881,7 +881,7 @@ public class ApplicationProperties {
 
             /**
              * Maximum number of archived (compacted-away) events kept in a session document by Chat Memory v2 when the
-             * provider is redis or aws.
+             * provider is REDIS or AWS.
              */
             private Integer sessionMaxArchivedEvents;
 
@@ -4665,7 +4665,7 @@ public class ApplicationProperties {
         }
 
         /**
-         * HTTP session store: memory, redis or jdbc. redis and jdbc require the Enterprise Edition
+         * HTTP session store: MEMORY, REDIS or JDBC. REDIS and JDBC require the Enterprise Edition
          */
         private Store store;
 
