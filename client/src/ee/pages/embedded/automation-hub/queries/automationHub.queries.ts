@@ -24,7 +24,6 @@ export const useGetTemplateProjectsQuery = () =>
     useQuery<AutomationWorkflowProject[]>({
         queryFn: () => new AutomationWorkflowProjectApi().getFrontendProjects({}),
         queryKey: AutomationHubKeys.templates,
-        select: (projects) => projects.filter((project) => project.automationHubVisible !== false),
     });
 
 export const useGetAutomationsQuery = () =>
