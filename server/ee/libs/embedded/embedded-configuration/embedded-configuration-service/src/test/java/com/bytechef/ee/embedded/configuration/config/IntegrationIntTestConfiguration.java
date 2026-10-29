@@ -69,7 +69,7 @@ import tools.jackson.databind.ObjectMapper;
         pattern = {
             "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.AutomationWorkflowProjectFacadeIntTestConfiguration",
             "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration",
-            ".*IntTest\\$.*"
+            ".*IntTest\\$.*", "com\\.bytechef\\.ee\\.embedded\\.configuration\\.remote\\..*"
         }))
 @EnableAutoConfiguration
 @EnableCaching

@@ -76,7 +76,8 @@ import org.springframework.jdbc.core.simple.JdbcClient;
         @Filter(
             type = FilterType.REGEX,
             pattern = "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration"),
-        @Filter(type = FilterType.REGEX, pattern = ".*IntTest\\$.*")
+        @Filter(type = FilterType.REGEX, pattern = ".*IntTest\\$.*"),
+        @Filter(type = FilterType.REGEX, pattern = "com\\.bytechef\\.ee\\.embedded\\.configuration\\.remote\\..*")
     })
 @EnableAutoConfiguration
 @EnableCaching
