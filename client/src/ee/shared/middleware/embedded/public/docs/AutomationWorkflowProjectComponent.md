@@ -12,6 +12,7 @@ Name | Type
 `icon` | string
 `connectionRequired` | boolean
 `integrationId` | number
+`provided` | boolean
 
 ## Example
 
@@ -25,6 +26,7 @@ const example = {
   "icon": null,
   "connectionRequired": null,
   "integrationId": null,
+  "provided": null,
 } satisfies AutomationWorkflowProjectComponent
 
 console.log(example)

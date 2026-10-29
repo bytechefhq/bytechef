@@ -947,7 +947,7 @@ example().catch(console.error);
 
 ## enableFrontendProjectWorkflow
 
-> enableFrontendProjectWorkflow(workflowUuid, xEnvironment)
+> EnableConnectedUserWorkflowResponse enableFrontendProjectWorkflow(workflowUuid, xEnvironment)
 
 Enable a workflow
 
@@ -999,7 +999,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**EnableConnectedUserWorkflowResponse**](EnableConnectedUserWorkflowResponse.md)
 
 ### Authorization
 
@@ -1014,7 +1014,7 @@ example().catch(console.error);
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **204** | Successful operation. |  -  |
+| **200** | Successful operation. |  -  |
 | **409** | A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -1022,7 +1022,7 @@ example().catch(console.error);
 
 ## enableProjectWorkflow
 
-> enableProjectWorkflow(externalUserId, workflowUuid, xEnvironment)
+> EnableConnectedUserWorkflowResponse enableProjectWorkflow(externalUserId, workflowUuid, xEnvironment)
 
 Enable a workflow
 
@@ -1077,7 +1077,7 @@ example().catch(console.error);
 
 ### Return type
 
-`void` (Empty response body)
+[**EnableConnectedUserWorkflowResponse**](EnableConnectedUserWorkflowResponse.md)
 
 ### Authorization
 
@@ -1092,7 +1092,7 @@ example().catch(console.error);
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **204** | Successful operation. |  -  |
+| **200** | Successful operation. |  -  |
 | **409** | A required connection could not be auto-wired, a required workflow input has no value, or the workflow that would run has validation errors. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
@@ -1468,7 +1468,7 @@ example().catch(console.error);
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
 | **400** | A requested connection is not one of the connected user\&#39;s connections. |  -  |
-| **409** | A required connection could not be auto-wired. |  -  |
+| **409** | A required connection could not be auto-wired, or the request sets a connection or an input value the configuration provides. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -1550,7 +1550,7 @@ example().catch(console.error);
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
 | **400** | A requested connection is not one of the connected user\&#39;s connections. |  -  |
-| **409** | A required connection could not be auto-wired. |  -  |
+| **409** | A required connection could not be auto-wired, or the request sets a connection or an input value the configuration provides. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -1939,7 +1939,7 @@ example().catch(console.error);
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
-| **409** | A required workflow input has no value; the reference stays disabled. |  -  |
+| **409** | A required workflow input has no value, so the reference stays disabled, or the request sets the value of an input the configuration provides. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
@@ -2263,7 +2263,7 @@ example().catch(console.error);
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
-| **409** | A required workflow input has no value; the reference stays disabled. |  -  |
+| **409** | A required workflow input has no value, so the reference stays disabled, or the request sets the value of an input the configuration provides. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

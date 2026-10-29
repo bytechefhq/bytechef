@@ -39,6 +39,10 @@ export interface AutomationWorkflowProjectComponent {
      * The id of the integration that backs this component in the current environment, absent when no enabled integration configuration visible to the connected user exists for it; present only when connectionRequired is true. When several integrations back the component, the one with the lowest id is returned.
      */
     integrationId?: number;
+    /**
+     * Whether the configuration provides the connection of this component, so the connected user cannot choose one. The provided connection is neither listed among the connected user's connections nor returned.
+     */
+    provided?: boolean;
 }
 
 /**
@@ -63,6 +67,7 @@ export function AutomationWorkflowProjectComponentFromJSONTyped(json: any, ignor
         'icon': json['icon'] == null ? undefined : json['icon'],
         'connectionRequired': json['connectionRequired'] == null ? undefined : json['connectionRequired'],
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
+        'provided': json['provided'] == null ? undefined : json['provided'],
     };
 }
 
@@ -82,6 +87,7 @@ export function AutomationWorkflowProjectComponentToJSONTyped(value?: Automation
         'icon': value['icon'],
         'connectionRequired': value['connectionRequired'],
         'integrationId': value['integrationId'],
+        'provided': value['provided'],
     };
 }
 

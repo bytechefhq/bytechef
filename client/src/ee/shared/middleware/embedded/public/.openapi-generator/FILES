@@ -30,6 +30,7 @@ docs/CreateFrontendProjectWorkflowFromPromptRequest.md
 docs/CreateFrontendProjectWorkflowRequest.md
 docs/CredentialStatus.md
 docs/DisableFrontendProjectWorkflow409Response.md
+docs/EnableConnectedUserWorkflowResponse.md
 docs/EnableFrontendProjectWorkflow409Response.md
 docs/Environment.md
 docs/Input.md
@@ -50,10 +51,13 @@ docs/MissingConnectionError.md
 docs/MissingInputError.md
 docs/OAuth2.md
 docs/Option.md
+docs/ProvidedValueLockedError.md
+docs/ProvisionFrontendWorkflowReference409Response.md
 docs/ProvisionWorkflowReferenceRequest.md
 docs/PublishFrontendProjectWorkflowRequest.md
 docs/ReauthorizeConnectionRequest.md
 docs/UpdateFrontendIntegrationInstanceWorkflowRequest.md
+docs/UpdateFrontendProjectWorkflowInputs409Response.md
 docs/UpdateFrontendWorkflowConfigurationConnectionRequest.md
 docs/UpdateWorkflowInputsRequest.md
 docs/Workflow.md
@@ -78,6 +82,7 @@ models/CreateFrontendProjectWorkflowFromPromptRequest.ts
 models/CreateFrontendProjectWorkflowRequest.ts
 models/CredentialStatus.ts
 models/DisableFrontendProjectWorkflow409Response.ts
+models/EnableConnectedUserWorkflowResponse.ts
 models/EnableFrontendProjectWorkflow409Response.ts
 models/Environment.ts
 models/Input.ts
@@ -95,10 +100,13 @@ models/MissingConnectionError.ts
 models/MissingInputError.ts
 models/OAuth2.ts
 models/Option.ts
+models/ProvidedValueLockedError.ts
+models/ProvisionFrontendWorkflowReference409Response.ts
 models/ProvisionWorkflowReferenceRequest.ts
 models/PublishFrontendProjectWorkflowRequest.ts
 models/ReauthorizeConnectionRequest.ts
 models/UpdateFrontendIntegrationInstanceWorkflowRequest.ts
+models/UpdateFrontendProjectWorkflowInputs409Response.ts
 models/UpdateFrontendWorkflowConfigurationConnectionRequest.ts
 models/UpdateWorkflowInputsRequest.ts
 models/Workflow.ts
