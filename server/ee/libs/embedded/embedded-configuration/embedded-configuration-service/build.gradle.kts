@@ -37,6 +37,9 @@ dependencies {
 
     testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
     testImplementation("org.liquibase:liquibase-core")
+    testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-grpc"))
+    testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service"))
