@@ -39,14 +39,20 @@ const AutomationInputsDialog = ({inputValues, inputs, label, onClose, workflowUu
     const {isPending, mutateAsync: updateInputs} = useUpdateAutomationInputsMutation();
 
     const missingRequired = inputs.some(
-        (input) => input.required && toInputValueText(values[input.name ?? '']).trim() === ''
+        (input) => !input.provided && input.required && toInputValueText(values[input.name ?? '']).trim() === ''
     );
 
     const handleSave = async () => {
         setError(undefined);
 
         try {
-            await updateInputs({inputs: values, workflowUuid});
+            const providedInputNames = new Set(inputs.filter((input) => input.provided).map((input) => input.name));
+
+            const editableValues = Object.fromEntries(
+                Object.entries(values).filter(([inputName]) => !providedInputNames.has(inputName))
+            );
+
+            await updateInputs({inputs: editableValues, workflowUuid});
 
             onClose();
         } catch {
@@ -69,17 +75,25 @@ const AutomationInputsDialog = ({inputValues, inputs, label, onClose, workflowUu
                             <Label htmlFor={`automation-input-${input.name}`}>
                                 {input.label || input.name}
 
-                                {input.required && <span className="ml-0.5 text-destructive">*</span>}
+                                {input.required && !input.provided && (
+                                    <span className="ml-0.5 text-destructive">*</span>
+                                )}
                             </Label>
 
-                            <Input
-                                id={`automation-input-${input.name}`}
-                                onChange={(event) =>
-                                    setValues((current) => ({...current, [input.name ?? '']: event.target.value}))
-                                }
-                                type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
-                                value={toInputValueText(values[input.name ?? ''])}
-                            />
+                            {input.provided ? (
+                                <p className="text-sm text-muted-foreground" id={`automation-input-${input.name}`}>
+                                    Provided by your administrator
+                                </p>
+                            ) : (
+                                <Input
+                                    id={`automation-input-${input.name}`}
+                                    onChange={(event) =>
+                                        setValues((current) => ({...current, [input.name ?? '']: event.target.value}))
+                                    }
+                                    type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
+                                    value={toInputValueText(values[input.name ?? ''])}
+                                />
+                            )}
                         </div>
                     ))}
 
