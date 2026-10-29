@@ -28,7 +28,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -202,6 +204,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
 
     @Autowired
+    private ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver;
+
+    @Autowired
     private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
 
     @MockitoSpyBean
@@ -244,6 +249,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Autowired
     private ProjectWorkflowService projectWorkflowService;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @BeforeEach
     void setUp() {
@@ -964,6 +972,54 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             .get()
             .extracting(ProjectDeploymentWorkflow::getInputs)
             .isEqualTo(Map.of("channel", "#alerts"));
+    }
+
+    @Test
+    void testFillingTheMissingInputResumesTheWorkflow() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Resume On Input");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(
+            automationWorkflowProjectId, Environment.PRODUCTION.ordinal());
+
+        assertThat(fetchRow(reference))
+            .get()
+            .extracting(ProjectDeploymentWorkflow::isEnabled)
+            .isEqualTo(false);
+        assertThat(getReference(reference.getId()).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getReference(reference.getId()))
+            .attentionReason()).isEqualTo("INPUT_REQUIRED:channel");
+
+        connectedUserWorkflowReferenceFacade.updateReferenceInputs(
+            connectedUser.getExternalId(), workflowUuid, Map.of("channel", "#alerts"), Environment.PRODUCTION);
+
+        assertThat(fetchRow(reference))
+            .get()
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#alerts"));
+            });
+        assertThat(getReference(reference.getId()).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getReference(reference.getId()))
+            .attentionReason()).isNull();
     }
 
     @Test

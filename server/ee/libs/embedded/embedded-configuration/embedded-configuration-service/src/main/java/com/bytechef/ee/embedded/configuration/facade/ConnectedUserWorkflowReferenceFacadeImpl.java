@@ -107,7 +107,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             if (reference.isDangling()) {
                 removeRow(reference);
             } else {
-                applyWorkflow(reference, externalUserId, environment, false, true, Map.of(), null);
+                applyWorkflow(reference, externalUserId, environment, false, ApplyMode.EXPLICIT, Map.of(), null);
             }
 
             return;
@@ -123,7 +123,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             throw new DanglingReferenceException(automationWorkflowUuid);
         }
 
-        applyWorkflow(reference, externalUserId, environment, true, true, Map.of(), null);
+        applyWorkflow(reference, externalUserId, environment, true, ApplyMode.EXPLICIT, Map.of(), null);
     }
 
     @Override
@@ -174,8 +174,8 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
             if ((!requestedConnectionIds.isEmpty() || inputs != null) && !reference.isDangling()) {
                 return applyWorkflow(
-                    reference, externalUserId, environment, reference.isEnabled(), false, requestedConnectionIds,
-                    inputs);
+                    reference, externalUserId, environment, reference.isEnabled(), ApplyMode.RE_PROVISION,
+                    requestedConnectionIds, inputs);
             }
 
             return reference;
@@ -204,7 +204,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         ConnectedUserProjectWorkflow savedReference = connectedUserProjectWorkflowRepository.save(reference);
 
         return applyWorkflow(
-            savedReference, externalUserId, environment, true, false, requestedConnectionIds, inputs);
+            savedReference, externalUserId, environment, true, ApplyMode.PROVISION, requestedConnectionIds, inputs);
     }
 
     @Override
@@ -218,11 +218,15 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
         connectedUserReferenceDeploymentManager.updateInputs(
             reference.getProjectDeploymentId(), automationWorkflowUuid, inputs);
+
+        if (reference.isEnabled() && !isRowEnabled(reference)) {
+            applyWorkflow(reference, externalUserId, environment, true, ApplyMode.RESUME, Map.of(), null);
+        }
     }
 
     private ConnectedUserProjectWorkflow applyWorkflow(
         ConnectedUserProjectWorkflow reference, String externalUserId, Environment environment, boolean enable,
-        boolean throwOnMissingInput, Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs) {
+        ApplyMode applyMode, Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
         ProjectDeployment projectDeployment = connectedUserReferenceDeploymentManager.getDeployment(
             reference.getProjectDeploymentId());
@@ -260,19 +264,21 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         connectedUserReferenceDeploymentManager.putWorkflows(
             reference.getProjectDeploymentId(), projectVersion, Map.of(automationWorkflowUuid, rowSpec));
 
-        reference.setEnabled(requestedEnabled);
+        if (applyMode.intentFollowsResolution()) {
+            reference.setEnabled(requestedEnabled);
+        }
 
         ConnectedUserProjectWorkflow savedReference = connectedUserProjectWorkflowRepository.save(reference);
 
-        if (enable && resolution.missingComponentName() != null) {
+        if (enable && applyMode.throwsOnMissingConnection() && resolution.missingComponentName() != null) {
             throw new MissingConnectionException(resolution.missingComponentName());
         }
 
-        if (enable && throwOnMissingInput && resolution.missingInputName() != null) {
+        if (enable && applyMode.throwsOnIncompleteWorkflow() && resolution.missingInputName() != null) {
             throw new MissingInputException(resolution.missingInputName());
         }
 
-        if (enable && throwOnMissingInput && resolution.workflowErrorCount() > 0) {
+        if (enable && applyMode.throwsOnIncompleteWorkflow() && resolution.workflowErrorCount() > 0) {
             throw new InvalidWorkflowException(automationWorkflowUuid, resolution.workflowErrorCount());
         }
 
@@ -361,6 +367,13 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             .orElseThrow();
     }
 
+    private boolean isRowEnabled(ConnectedUserProjectWorkflow reference) {
+        return connectedUserReferenceDeploymentManager
+            .fetchRow(reference.getProjectDeploymentId(), reference.getAutomationWorkflowUuid())
+            .map(ProjectDeploymentWorkflow::isEnabled)
+            .orElse(false);
+    }
+
     private void removeRow(ConnectedUserProjectWorkflow reference) {
         Long projectDeploymentId = reference.getProjectDeploymentId();
 
@@ -379,5 +392,43 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             .orElseThrow(() -> new ConfigurationException(
                 "No reference to automation workflow: %s".formatted(automationWorkflowUuid),
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
+    }
+
+    /**
+     * How {@code applyWorkflow} treats the user's intent ({@code reference.enabled}) and an incomplete resolution. An
+     * explicit enable or disable and a first provisioning set the intent to the resolution result; re-provisioning an
+     * existing reference and resuming it after its inputs are filled keep the intent, so only the row follows the
+     * resolution and a workflow paused by a missing input or connection resumes once it is complete.
+     */
+    private enum ApplyMode {
+
+        EXPLICIT(true, true, true),
+        PROVISION(true, true, false),
+        RE_PROVISION(false, true, false),
+        RESUME(false, false, false);
+
+        private final boolean intentFollowsResolution;
+        private final boolean throwsOnMissingConnection;
+        private final boolean throwsOnIncompleteWorkflow;
+
+        ApplyMode(
+            boolean intentFollowsResolution, boolean throwsOnMissingConnection, boolean throwsOnIncompleteWorkflow) {
+
+            this.intentFollowsResolution = intentFollowsResolution;
+            this.throwsOnMissingConnection = throwsOnMissingConnection;
+            this.throwsOnIncompleteWorkflow = throwsOnIncompleteWorkflow;
+        }
+
+        boolean intentFollowsResolution() {
+            return intentFollowsResolution;
+        }
+
+        boolean throwsOnIncompleteWorkflow() {
+            return throwsOnIncompleteWorkflow;
+        }
+
+        boolean throwsOnMissingConnection() {
+            return throwsOnMissingConnection;
+        }
     }
 }
