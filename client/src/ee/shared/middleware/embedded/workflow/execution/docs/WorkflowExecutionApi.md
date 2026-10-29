@@ -251,7 +251,7 @@ async function example() {
   const body = {
     // number | The id of an environment. (optional)
     environmentId: 789,
-    // 'CREATED' | 'STARTED' | 'STOPPED' | 'FAILED' | 'COMPLETED' | The status of an executed job (optional)
+    // 'CREATED' | 'STARTED' | 'STOPPED' | 'FAILED' | 'COMPLETED' | 'PAYMENT_REQUIRED' | The status of an executed job (optional)
     jobStatus: jobStatus_example,
     // Date | The start date of a job. (optional)
     jobStartDate: 2013-10-20T19:20:30+01:00,
@@ -287,7 +287,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **environmentId** | `number` | The id of an environment. | [Optional] [Defaults to `undefined`] |
-| **jobStatus** | `CREATED`, `STARTED`, `STOPPED`, `FAILED`, `COMPLETED` | The status of an executed job | [Optional] [Defaults to `undefined`] [Enum: CREATED, STARTED, STOPPED, FAILED, COMPLETED] |
+| **jobStatus** | `CREATED`, `STARTED`, `STOPPED`, `FAILED`, `COMPLETED`, `PAYMENT_REQUIRED` | The status of an executed job | [Optional] [Defaults to `undefined`] [Enum: CREATED, STARTED, STOPPED, FAILED, COMPLETED, PAYMENT_REQUIRED] |
 | **jobStartDate** | `Date` | The start date of a job. | [Optional] [Defaults to `undefined`] |
 | **jobEndDate** | `Date` | The end date of a job. | [Optional] [Defaults to `undefined`] |
 | **integrationId** | `number` | The id of a Integration. | [Optional] [Defaults to `undefined`] |

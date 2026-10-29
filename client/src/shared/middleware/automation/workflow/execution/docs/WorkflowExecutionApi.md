@@ -323,7 +323,7 @@ async function example() {
     embedded: true,
     // number | The id of an environment. (optional)
     environmentId: 789,
-    // 'CREATED' | 'STARTED' | 'STOPPED' | 'FAILED' | 'COMPLETED' | The status of an executed job (optional)
+    // 'CREATED' | 'STARTED' | 'STOPPED' | 'CANCELLED' | 'FAILED' | 'COMPLETED' | 'PAYMENT_REQUIRED' | The status of an executed job (optional)
     jobStatus: jobStatus_example,
     // Date | The start date of a job. (optional)
     jobStartDate: 2013-10-20T19:20:30+01:00,
@@ -363,7 +363,7 @@ example().catch(console.error);
 | **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
 | **embedded** | `boolean` | If embedded automation workflows executions should be filtered. | [Optional] [Defaults to `undefined`] |
 | **environmentId** | `number` | The id of an environment. | [Optional] [Defaults to `undefined`] |
-| **jobStatus** | `CREATED`, `STARTED`, `STOPPED`, `FAILED`, `COMPLETED` | The status of an executed job | [Optional] [Defaults to `undefined`] [Enum: CREATED, STARTED, STOPPED, FAILED, COMPLETED] |
+| **jobStatus** | `CREATED`, `STARTED`, `STOPPED`, `CANCELLED`, `FAILED`, `COMPLETED`, `PAYMENT_REQUIRED` | The status of an executed job | [Optional] [Defaults to `undefined`] [Enum: CREATED, STARTED, STOPPED, CANCELLED, FAILED, COMPLETED, PAYMENT_REQUIRED] |
 | **jobStartDate** | `Date` | The start date of a job. | [Optional] [Defaults to `undefined`] |
 | **jobEndDate** | `Date` | The end date of a job. | [Optional] [Defaults to `undefined`] |
 | **projectId** | `number` | The id of a project. | [Optional] [Defaults to `undefined`] |

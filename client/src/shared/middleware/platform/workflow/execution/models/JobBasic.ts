@@ -28,7 +28,7 @@ export interface JobBasic {
      */
     readonly createdDate?: Date;
     /**
-     * The time execution entered end status COMPLETED, STOPPED, FAILED
+     * The time execution entered end status COMPLETED, STOPPED, FAILED, PAYMENT_REQUIRED
      */
     endDate?: Date;
     /**
@@ -80,6 +80,7 @@ export const JobBasicStatusEnum = {
     Cancelled: 'CANCELLED',
     Failed: 'FAILED',
     Completed: 'COMPLETED',
+    PaymentRequired: 'PAYMENT_REQUIRED',
 } as const;
 export type JobBasicStatusEnum = typeof JobBasicStatusEnum[keyof typeof JobBasicStatusEnum];
 

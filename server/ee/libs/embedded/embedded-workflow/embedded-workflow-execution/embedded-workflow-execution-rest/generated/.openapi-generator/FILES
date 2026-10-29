@@ -3,6 +3,8 @@ pom.xml
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/ApiUtil.java
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/WorkflowExecutionApi.java
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/AuthorizationTypeModel.java
+src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/ClusterElementCallModel.java
+src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/ClusterElementCallRecordModel.java
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/IntegrationStatusModel.java
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/WebhookRetryModel.java
 src/main/java/com/bytechef/ee/embedded/workflow/execution/web/rest/model/WorkflowBasic1Model.java

@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.874518+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.296368+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class JobBasicModel {
 
   private @Nullable String createdBy;
@@ -68,7 +68,9 @@ public class JobBasicModel {
     
     FAILED("FAILED"),
     
-    COMPLETED("COMPLETED");
+    COMPLETED("COMPLETED"),
+    
+    PAYMENT_REQUIRED("PAYMENT_REQUIRED");
 
     private final String value;
 
@@ -162,11 +164,11 @@ public class JobBasicModel {
   }
 
   /**
-   * The time execution entered end status COMPLETED, STOPPED, FAILED
+   * The time execution entered end status COMPLETED, STOPPED, FAILED, PAYMENT_REQUIRED
    * @return endDate
    */
   @Valid 
-  @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED, PAYMENT_REQUIRED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
   public @Nullable OffsetDateTime getEndDate() {
     return endDate;
