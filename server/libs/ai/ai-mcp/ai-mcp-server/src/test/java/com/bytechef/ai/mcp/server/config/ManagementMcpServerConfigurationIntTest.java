@@ -168,6 +168,14 @@ class ManagementMcpServerConfigurationIntTest {
     }
 
     @Test
+    void testInstructionsDescribeBuildAiAgentWithAProjectIdOrAnAiAgentId() {
+        assertThat(ManagementMcpServerConfiguration.INSTRUCTIONS)
+            .contains("createProject (if needed) → buildAiAgent with a plain-language instruction")
+            .contains("the projectId for a new agent or the aiAgentId for an existing one")
+            .contains("searchAiAgentTools");
+    }
+
+    @Test
     void testWorksWithNoContributors() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();

@@ -22,6 +22,7 @@ import {isParsedToolResultValue} from '@/ee/pages/automation/ai-hub/runtime-prov
 import {generateMessageId} from '@/ee/pages/automation/ai-hub/stores/messageId';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import refreshAgentAfterExternalChange from '@/pages/automation/agents/utils/refreshAgentAfterExternalChange';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ApprovalResolutionContext} from '@/shared/components/ai-chat/approvalResolutionContext';
 import {AskUserQuestionDataI} from '@/shared/components/ai-chat/messages/AskUserQuestionMessage';
@@ -78,6 +79,8 @@ const ASK_WORKFLOW_QUESTION_EVENT_NAME = 'ask-workflow-question';
 type OpenChatTabResultType =
     {chatId: number; opened: true; threadId: string; title: string | null} | {error: string; opened: false};
 
+type OpenAiAgentTabResultType = {aiAgentId: string; name: string; opened: true} | {error: string; opened: false};
+
 type OpenWorkflowTabResultType =
     | {name: string; opened: true; projectId: string; projectWorkflowId: number; workflowId: string}
     | {error: string; opened: false};
@@ -85,6 +88,23 @@ type OpenWorkflowTabResultType =
 interface ToolCallErrorResultI {
     error: string;
 }
+
+/**
+ * Narrows the {@code openAiAgentTab} result JSON, as lenient on the failure side as the workflow variant.
+ */
+const validateOpenAiAgentTabResult = (raw: unknown): OpenAiAgentTabResultType | null => {
+    if (typeof raw !== 'object' || raw === null) {
+        return null;
+    }
+
+    const record = raw as Record<string, unknown>;
+
+    if (record.opened === true && typeof record.aiAgentId === 'string' && typeof record.name === 'string') {
+        return {aiAgentId: record.aiAgentId, name: record.name, opened: true};
+    }
+
+    return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
 
 /**
  * Narrows the {@code openWorkflowTab} result JSON. Lenient on the failure side: an {@code opened: false} without an
@@ -383,6 +403,8 @@ interface BuildSubscriberDepsI {
     onRunStarted?: () => void;
     /** Fires instead of the red error bubble when the server rejects the turn with 409 TURN_IN_FLIGHT. */
     onTurnInFlight?: (threadId: string) => void;
+    /** Fires after a successful tool call that changed an AI Agent. */
+    onAiAgentMutated?: () => void;
     /** Fires with the raw tool result after a successful {@code buildWorkflow} or {@code importWorkflow}. */
     onWorkflowMutated?: (toolResultContent: string) => void;
     /**
@@ -443,6 +465,18 @@ export const hasLivePropertyOptionPicker = (
             })
     );
 
+const AI_AGENT_MUTATING_TOOL_NAMES = new Set([
+    'addAiAgentChannel',
+    'addAiAgentElement',
+    'createAiAgent',
+    'deleteAiAgentChannel',
+    'deleteAiAgentElement',
+    'publishProject',
+    'updateAiAgent',
+    'updateAiAgentElement',
+    'updateAiAgentSettings',
+]);
+
 const WORKFLOW_MUTATING_TOOL_NAMES = new Set([
     'buildWorkflow',
     'createProjectWorkflow',
@@ -461,7 +495,11 @@ const WORKFLOW_MUTATING_TOOL_NAMES = new Set([
 export function invalidateWorkflowQueries(queryClient: QueryClient, toolResultContent?: string): void {
     const projectIds = new Set<number>();
 
-    aiHubTabsStore.getState().openTabs.forEach((tab) => projectIds.add(Number(tab.projectId)));
+    aiHubTabsStore.getState().openTabs.forEach((tab) => {
+        if (tab.kind === 'workflow') {
+            projectIds.add(Number(tab.projectId));
+        }
+    });
 
     if (toolResultContent?.trimStart().startsWith('{')) {
         const result = parseJson<{projectId?: unknown}>(toolResultContent, 'workflow mutation result');
@@ -531,6 +569,7 @@ export const buildAiHubSubscriber = ({
     assistantMessageIndex = 0,
     chatId: subscriberChatId,
     getLastUserMessage,
+    onAiAgentMutated,
     onChatOpened,
     onRunStarted,
     onTurnInFlight,
@@ -603,6 +642,26 @@ export const buildAiHubSubscriber = ({
             projectWorkflowId: parsed.projectWorkflowId,
             workflowId: parsed.workflowId,
         });
+    };
+
+    const openAiAgentTab = (toolCallName: string, toolResultContent: string) => {
+        const parsed = validateOpenAiAgentTabResult(parseJson<unknown>(toolResultContent, 'openAiAgentTab result'));
+
+        if (parsed === null) {
+            console.warn(`[AiHub] ${toolCallName}: unparseable result`, toolResultContent);
+
+            recordToolFailure(toolCallName, 'unparseable result');
+
+            return;
+        }
+
+        if (!parsed.opened) {
+            recordToolFailure(toolCallName, parsed.error);
+
+            return;
+        }
+
+        aiHubTabsStore.getState().openAiAgentTab({aiAgentId: parsed.aiAgentId, name: parsed.name});
     };
 
     const openChat = (toolCallName: string, toolResultContent: string) => {
@@ -807,8 +866,14 @@ export const buildAiHubSubscriber = ({
                 onWorkflowMutated?.(toolResultContent);
             }
 
+            if (toolCallName !== undefined && AI_AGENT_MUTATING_TOOL_NAMES.has(toolCallName)) {
+                onAiAgentMutated?.();
+            }
+
             if (toolCallName === 'openWorkflowTab') {
                 openWorkflowTab(toolCallName, toolResultContent);
+            } else if (toolCallName === 'openAiAgentTab') {
+                openAiAgentTab(toolCallName, toolResultContent);
             } else if (toolCallName === 'openWorkflowChatTab') {
                 openChat(toolCallName, toolResultContent);
             } else {
@@ -1087,6 +1152,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
     );
     const truncateChatMessagesMutation = useTruncateAiHubChatMessagesMutation();
 
+    const handleAiAgentMutated = useCallback(() => {
+        void refreshAgentAfterExternalChange(queryClient);
+    }, [queryClient]);
+
     const handleWorkflowMutated = useCallback(
         (toolResultContent: string) => invalidateWorkflowQueries(queryClient, toolResultContent),
         [queryClient]
@@ -1102,6 +1171,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
                 chatId: threadId,
                 getLastUserMessage: () => getLastUserMessageText(useAiHubStore.getState().messages),
+                onAiAgentMutated: handleAiAgentMutated,
                 onWorkflowMutated: handleWorkflowMutated,
                 runLifecycle: {onSettle: () => aiHubRunStateStore.getState().setChatRunning(threadId, false)},
             });
@@ -1117,7 +1187,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 threadId,
             });
         },
-        [addMessage, appendToLastAssistantMessage, handleWorkflowMutated]
+        [addMessage, appendToLastAssistantMessage, handleAiAgentMutated, handleWorkflowMutated]
     );
 
     const resolveToolApproval = useCallback(
@@ -1295,6 +1365,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
             chatId,
             getLastUserMessage: () => input,
+            onAiAgentMutated: handleAiAgentMutated,
             onChatOpened: () => queryClient.invalidateQueries({queryKey: AiHubChatsKeys.all}),
             onRunStarted: () => useAiHubStore.getState().markPendingToolApprovalsSuperseded(),
             onTurnInFlight: handleTurnInFlight,

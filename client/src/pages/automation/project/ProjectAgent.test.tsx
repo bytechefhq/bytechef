@@ -1,11 +1,25 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectAgent from './ProjectAgent';
+
+const hoisted = vi.hoisted(() => ({
+    openCopilot: vi.fn(),
+}));
+
+vi.mock('@/shared/components/copilot/hooks/useOpenCopilot', () => ({
+    default: () => hoisted.openCopilot,
+}));
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: (selector: (state: {ai: {copilot: {enabled: boolean}}}) => unknown) =>
+        selector({ai: {copilot: {enabled: true}}}),
+}));
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
@@ -23,10 +37,12 @@ vi.mock('@/pages/automation/agents/AgentDetailContent', () => ({
 vi.mock('@/pages/automation/agents/components/detail/AgentDetailHeader', () => ({
     default: ({
         leading,
+        onAskCopilot,
         onToggleTestPanel,
         testPanelOpen,
     }: {
         leading?: ReactNode;
+        onAskCopilot?: () => void;
         onToggleTestPanel: () => void;
         testPanelOpen: boolean;
     }) => (
@@ -34,6 +50,8 @@ vi.mock('@/pages/automation/agents/components/detail/AgentDetailHeader', () => (
             {leading}
 
             <button onClick={onToggleTestPanel}>{testPanelOpen ? 'Hide Test Agent panel' : 'Test Agent'}</button>
+
+            {onAskCopilot && <button onClick={onAskCopilot}>Ask Copilot</button>}
         </header>
     ),
 }));
@@ -91,6 +109,18 @@ describe('ProjectAgent', () => {
         expect(screen.getByTestId('projects-sidebar')).toHaveTextContent('7');
         expect(screen.getByTestId('agent-detail-content')).toHaveTextContent('22');
         expect(screen.getByText('Support Bot')).toBeInTheDocument();
+    });
+
+    it('opens the AI Agent Copilot on the open agent from the header', () => {
+        renderProjectAgent();
+
+        fireEvent.click(screen.getByText('Ask Copilot'));
+
+        expect(hoisted.openCopilot).toHaveBeenCalledWith({
+            mode: MODE.ASK,
+            parameters: {aiAgentId: '22'},
+            source: Source.AI_AGENT,
+        });
     });
 
     it('renders an item switcher for the header title, scoped to the agent and its project', () => {

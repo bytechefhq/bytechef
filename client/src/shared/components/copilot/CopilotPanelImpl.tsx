@@ -16,10 +16,10 @@ import {
     isWorkflowEditorSource,
     useCopilotStore,
 } from '@/shared/components/copilot/stores/useCopilotStore';
+import getCopilotSuggestions from '@/shared/components/copilot/utils/getCopilotSuggestions';
 import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
 import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {type SuggestionConfig} from '@assistant-ui/react';
 import {BotMessageSquareIcon, BrainCircuitIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -27,29 +27,6 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const ANIMATION_DURATION_MS = 300;
-
-const COPILOT_SUGGESTIONS: SuggestionConfig[] = [
-    {
-        label: 'does end-to-end.',
-        prompt: 'Describe what this workflow does end-to-end.',
-        title: 'Describe what this workflow',
-    },
-    {
-        label: 'of this action are required?',
-        prompt: 'Which properties of this action are required?',
-        title: 'Which properties',
-    },
-    {
-        label: 'that can send an email',
-        prompt: 'Search for an action that can send an email',
-        title: 'Search for an action',
-    },
-    {
-        label: 'conditional branching in workflows?',
-        prompt: 'How do I implement conditional branching in workflows?',
-        title: 'How do I implement',
-    },
-];
 
 interface CopilotPanelProps {
     className?: string;
@@ -110,6 +87,11 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
 
         return findAvailableRememberedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
     }, [currentWorkspaceId, providerCatalogData, selectedLlmModel, selectedLlmProvider]);
+
+    const copilotSuggestions = useMemo(
+        () => getCopilotSuggestions(source || context?.source),
+        [context?.source, source]
+    );
 
     const handleCleanMessages = () => {
         resetMessages();
@@ -217,7 +199,7 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
                         <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
                     </div>
                 ) : (
-                    <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>
+                    <CopilotRuntimeProvider source={source} suggestions={copilotSuggestions}>
                         <Thread
                             composerActions={
                                 !source ? (

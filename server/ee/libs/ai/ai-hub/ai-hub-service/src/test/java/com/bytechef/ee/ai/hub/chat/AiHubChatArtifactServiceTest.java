@@ -408,6 +408,19 @@ class AiHubChatArtifactServiceTest {
     }
 
     @Test
+    void testDeleteReferenceRemovesAiAgentReferencedRow() {
+        AiHubChat chat = buildChat(CHAT_ID, USER_ID, THREAD_ID);
+        AiHubChatArtifact referenced = buildArtifact(604L, "AI_AGENT_REFERENCED", "42");
+
+        when(chatArtifactRepository.findById(604L)).thenReturn(Optional.of(referenced));
+        when(chatService.getViewable(CHAT_ID, WORKSPACE_ID, USER_ID)).thenReturn(chat);
+
+        chatArtifactService.deleteReference(604L, WORKSPACE_ID, USER_ID);
+
+        verify(chatArtifactRepository).deleteById(604L);
+    }
+
+    @Test
     void testDeleteReferenceIsIdempotentWhenRowIsGone() {
         when(chatArtifactRepository.findById(600L)).thenReturn(Optional.empty());
 
@@ -432,7 +445,7 @@ class AiHubChatArtifactServiceTest {
     }
 
     @Test
-    void testDeleteReferenceRefusesReferenceKindsOtherThanWorkflow() {
+    void testDeleteReferenceRefusesReferenceKindsOtherThanWorkflowAndAiAgent() {
         AiHubChatArtifact referenced = buildArtifact(602L, "FILE_REFERENCED", "f-1");
 
         when(chatArtifactRepository.findById(602L)).thenReturn(Optional.of(referenced));
