@@ -18,10 +18,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -128,19 +129,38 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
 
     @Override
     public AutomationWorkflowProjectConfiguration updateWorkflowEnabled(long id, UUID workflowUuid, boolean enabled) {
+        return updateWorkflow(id, workflowUuid, workflow -> workflow.setEnabled(enabled));
+    }
+
+    @Override
+    public AutomationWorkflowProjectConfiguration updateWorkflowProvidedValues(
+        long id, UUID workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs) {
+
+        return updateWorkflow(id, workflowUuid, workflow -> {
+            workflow.setProvidedConnections(providedConnections);
+            workflow.setProvidedInputs(providedInputs);
+        });
+    }
+
+    private AutomationWorkflowProjectConfiguration updateWorkflow(
+        long id, UUID workflowUuid, Consumer<AutomationWorkflowProjectConfigurationWorkflow> workflowUpdater) {
+
         AutomationWorkflowProjectConfiguration configuration = getConfiguration(id);
 
         Set<AutomationWorkflowProjectConfigurationWorkflow> workflows = new HashSet<>(configuration.getWorkflows());
 
-        Optional<AutomationWorkflowProjectConfigurationWorkflow> existingWorkflowOptional = workflows.stream()
-            .filter(workflow -> Objects.equals(workflow.getWorkflowUuid(), workflowUuid))
-            .findFirst();
+        Optional<AutomationWorkflowProjectConfigurationWorkflow> existingWorkflowOptional =
+            configuration.fetchWorkflow(workflowUuid);
 
         if (existingWorkflowOptional.isPresent()) {
-            existingWorkflowOptional.get()
-                .setEnabled(enabled);
+            workflowUpdater.accept(existingWorkflowOptional.get());
         } else {
-            workflows.add(new AutomationWorkflowProjectConfigurationWorkflow(workflowUuid, enabled));
+            AutomationWorkflowProjectConfigurationWorkflow workflow =
+                new AutomationWorkflowProjectConfigurationWorkflow(workflowUuid, true);
+
+            workflowUpdater.accept(workflow);
+
+            workflows.add(workflow);
         }
 
         configuration.setWorkflows(workflows);

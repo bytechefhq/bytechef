@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigu
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -56,9 +57,9 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
             5L, 7L, 0L, 2, true, false,
             List.of(
                 new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-one", "workflow-id-one", "One", true,
-                    null),
+                    null, Map.of("openai", 42L), Map.of("channel", "general")),
                 new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-two", "workflow-id-two", "Two", false,
-                    null)),
+                    null, Map.of(), Map.of())),
             Instant.parse("2026-10-28T10:00:00Z"), null);
 
         when(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(7L))
@@ -80,6 +81,8 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
                             workflowId
                             label
                             enabled
+                            providedConnections
+                            providedInputs
                         }
                     }
                 }
@@ -102,7 +105,16 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
             .isEqualTo("Two")
             .path("automationWorkflowProjectConfigurations[0].workflows[*].workflowId")
             .entityList(String.class)
-            .containsExactly("workflow-id-one", "workflow-id-two");
+            .containsExactly("workflow-id-one", "workflow-id-two")
+            .path("automationWorkflowProjectConfigurations[0].workflows[0].providedConnections.openai")
+            .entity(Long.class)
+            .isEqualTo(42L)
+            .path("automationWorkflowProjectConfigurations[0].workflows[0].providedInputs.channel")
+            .entity(String.class)
+            .isEqualTo("general")
+            .path("automationWorkflowProjectConfigurations[0].workflows[1].providedConnections")
+            .entity(Map.class)
+            .isEqualTo(Map.of());
     }
 
     @Test
@@ -180,6 +192,43 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
 
         verify(automationWorkflowProjectConfigurationAdminFacade)
             .enableConfigurationWorkflow(5L, "uuid", false);
+    }
+
+    @Test
+    void testUpdateAutomationWorkflowProjectConfigurationWorkflowConvertsConnectionIdsAndDelegates() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateAutomationWorkflowProjectConfigurationWorkflow(
+                        id: "5", workflowUuid: "uuid", providedConnections: {openai: 42, slack: "43"},
+                        providedInputs: {channel: "general", limit: 3})
+                }
+                """)
+            .execute()
+            .path("updateAutomationWorkflowProjectConfigurationWorkflow")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(automationWorkflowProjectConfigurationAdminFacade)
+            .updateConfigurationWorkflow(
+                5L, "uuid", Map.of("openai", 42L, "slack", 43L), Map.of("channel", "general", "limit", 3));
+    }
+
+    @Test
+    void testUpdateAutomationWorkflowProjectConfigurationWorkflowWithoutValuesClearsThem() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateAutomationWorkflowProjectConfigurationWorkflow(id: "5", workflowUuid: "uuid")
+                }
+                """)
+            .execute()
+            .path("updateAutomationWorkflowProjectConfigurationWorkflow")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(automationWorkflowProjectConfigurationAdminFacade)
+            .updateConfigurationWorkflow(5L, "uuid", Map.of(), Map.of());
     }
 
     @Test

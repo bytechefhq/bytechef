@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.service;
 
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -48,4 +49,11 @@ public interface AutomationWorkflowProjectConfigurationService {
     AutomationWorkflowProjectConfiguration updateEnabled(long id, boolean enabled);
 
     AutomationWorkflowProjectConfiguration updateWorkflowEnabled(long id, UUID workflowUuid, boolean enabled);
+
+    /**
+     * Replaces the connections and input values the configuration provides to every connected user of the workflow,
+     * creating the workflow's row (enabled) when it has none. Empty maps clear the values.
+     */
+    AutomationWorkflowProjectConfiguration updateWorkflowProvidedValues(
+        long id, UUID workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs);
 }

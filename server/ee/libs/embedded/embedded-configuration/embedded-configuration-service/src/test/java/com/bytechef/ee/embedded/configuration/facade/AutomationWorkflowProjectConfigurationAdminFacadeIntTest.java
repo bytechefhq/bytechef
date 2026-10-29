@@ -58,6 +58,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
@@ -147,6 +148,11 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         {"label":"%s","triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String SLACK_WITH_CHANNEL_DEFINITION = """
+        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
     private static final String SLACK_AND_JIRA_DEFINITION = """
         {"label":"%s","triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}},
          {"name":"createIssue1","type":"jira/v1/createIssue","parameters":{}}]}
@@ -163,6 +169,9 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
     @Autowired
     private ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private ProjectDeploymentService projectDeploymentService;
@@ -622,6 +631,152 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             .affectedConnectedUserCount()).isEqualTo(1);
     }
 
+    @Test
+    void testUpdateConfigurationWorkflowProvidesValuesVisibleInTheListing() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Values");
+
+        givenConnection(11L, "slack", ENVIRONMENT_ID);
+
+        applicationEvents.clear();
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of("slack", 11L), Map.of("channel", "general"));
+
+        AutomationWorkflowProjectConfigurationDTO.Workflow workflow =
+            automationWorkflowProjectConfigurationAdminFacade.getConfigurations(fixture.projectId())
+                .getFirst()
+                .workflows()
+                .getFirst();
+
+        assertThat(workflow.providedConnections()).isEqualTo(Map.of("slack", 11L));
+        assertThat(workflow.providedInputs()).isEqualTo(Map.of("channel", "general"));
+        assertThat(workflow.enabled()).isTrue();
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
+            .toList())
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(fixture.projectId(), ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowWithEmptyMapsClearsTheValues() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Values Cleared");
+
+        givenConnection(11L, "slack", ENVIRONMENT_ID);
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of("slack", 11L), Map.of("channel", "general"));
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of());
+
+        AutomationWorkflowProjectConfigurationDTO.Workflow workflow =
+            automationWorkflowProjectConfigurationAdminFacade.getConfigurations(fixture.projectId())
+                .getFirst()
+                .workflows()
+                .getFirst();
+
+        assertThat(workflow.providedConnections()).isEmpty();
+        assertThat(workflow.providedInputs()).isEmpty();
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAComponentThatIsNotAConnectionSlot() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Unknown Slot");
+
+        givenConnection(11L, "jira", ENVIRONMENT_ID);
+
+        assertInvalidProvidedValue(fixture, Map.of("jira", 11L), Map.of(), "jira");
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAConnectionOfAnotherComponent() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Other Component");
+
+        givenConnection(12L, "jira", ENVIRONMENT_ID);
+
+        assertInvalidProvidedValue(fixture, Map.of("slack", 12L), Map.of(),
+            "Connection id=12 belongs to component jira");
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAConnectionOfAnotherEnvironment() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Other Environment");
+
+        givenConnection(13L, "slack", ENVIRONMENT_ID + 1);
+
+        assertInvalidProvidedValue(
+            fixture, Map.of("slack", 13L), Map.of(), "Connection id=13 for component slack belongs to environment");
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAMissingConnection() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Missing Connection");
+
+        when(connectionService.fetchConnection(14L)).thenReturn(Optional.empty());
+
+        assertInvalidProvidedValue(
+            fixture, Map.of("slack", 14L), Map.of(), "Connection id=14 for component slack does not exist");
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAnUnknownInput() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Unknown Input");
+
+        assertInvalidProvidedValue(fixture, Map.of(), Map.of("topic", "news"), "Input topic");
+    }
+
+    private void assertInvalidProvidedValue(
+        ProvidedValuesFixture fixture, Map<String, Long> providedConnections, Map<String, Object> providedInputs,
+        String expectedMessage) {
+
+        applicationEvents.clear();
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+                fixture.configurationId(), fixture.workflowUuid(), providedConnections, providedInputs))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> {
+                        assertThat(configurationException.getMessage()).contains(expectedMessage);
+                        assertThat(configurationException.getErrorKey()).isEqualTo(
+                            AutomationWorkflowProjectConfigurationErrorType.INVALID_PROVIDED_VALUE.getErrorKey());
+                    });
+
+        AutomationWorkflowProjectConfigurationDTO.Workflow workflow =
+            automationWorkflowProjectConfigurationAdminFacade.getConfigurations(fixture.projectId())
+                .getFirst()
+                .workflows()
+                .getFirst();
+
+        assertThat(workflow.providedConnections()).isEmpty();
+        assertThat(workflow.providedInputs()).isEmpty();
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
+            .count()).isZero();
+    }
+
+    private ProvidedValuesFixture createProvidedValuesFixture(String name) {
+        long projectId = createProject(name);
+
+        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_CHANNEL_DEFINITION, name));
+
+        publish(projectId);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(new ComponentConnection("slack", 1, "postMessage1", "slack", true)));
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        return new ProvidedValuesFixture(projectId, configurationId, workflowUuid);
+    }
+
+    private void givenConnection(long connectionId, String componentName, long environmentId) {
+        Connection connection = new Connection();
+
+        connection.setId(connectionId);
+        connection.setComponentName(componentName);
+        connection.setEnvironmentId((int) environmentId);
+
+        when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
+    }
+
     private String addWorkflow(long projectId, String definition) {
         return automationWorkflowProjectFacade.createProjectWorkflow(projectId, definition, null);
     }
@@ -708,5 +863,8 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         }
 
         return projectId;
+    }
+
+    private record ProvidedValuesFixture(long projectId, long configurationId, String workflowUuid) {
     }
 }

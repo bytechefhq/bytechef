@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
@@ -156,12 +157,20 @@ public class AutomationWorkflowProjectConfiguration {
     }
 
     /**
+     * Returns the stored row of the workflow, if any. Rows are sparse: a workflow without a row is enabled and has no
+     * provided connections or inputs.
+     */
+    public Optional<AutomationWorkflowProjectConfigurationWorkflow> fetchWorkflow(UUID workflowUuid) {
+        return workflows.stream()
+            .filter(workflow -> Objects.equals(workflow.getWorkflowUuid(), workflowUuid))
+            .findFirst();
+    }
+
+    /**
      * Returns whether the workflow is enabled; a workflow without a stored row is enabled.
      */
     public boolean isWorkflowEnabled(UUID workflowUuid) {
-        return workflows.stream()
-            .filter(workflow -> Objects.equals(workflow.getWorkflowUuid(), workflowUuid))
-            .findFirst()
+        return fetchWorkflow(workflowUuid)
             .map(AutomationWorkflowProjectConfigurationWorkflow::isEnabled)
             .orElse(true);
     }

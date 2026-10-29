@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version ee
@@ -32,4 +33,11 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(long configurationId, int projectVersion);
 
     void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible);
+
+    /**
+     * Sets the connections (component name to connection id) and input values (input name to value) the configuration
+     * provides to every connected user of the workflow. Empty maps clear them.
+     */
+    void updateConfigurationWorkflow(
+        long id, String workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs);
 }
