@@ -48,6 +48,8 @@ bytechef:
         provider: openai
       embedding:
         provider: OPENAI
+      # Default LLM provider of the Copilot when the user has not selected one; empty uses the catalog default
+      provider:
       enabled: true
       openai:
 
