@@ -46,6 +46,8 @@ bytechef:
       aws:
         # Sign OTLP log export requests with AWS SigV4 (CloudWatch OTLP endpoint https://logs.{region}.amazonaws.com/v1/logs).
         enabled: false
+        # AWS service name used in the SigV4 signature scope
+        service: logs
       enabled: false
       endpoint: http://localhost:4318/v1/logs
     metrics:
