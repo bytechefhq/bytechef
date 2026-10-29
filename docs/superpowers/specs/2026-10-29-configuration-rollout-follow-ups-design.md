@@ -234,7 +234,7 @@ created on demand when a workflow has none yet (enabled defaults to true, matchi
   publishes `AutomationWorkflowProjectConfigurationUpdatedEvent`.
 - The configuration DTO's `Workflow` gains `providedConnections` and `providedInputs`; GraphQL exposes both and a mutation
   `updateAutomationWorkflowProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, providedConnections: Map,
-  providedInputs: Map): Boolean`.
+  providedInputs: Map): Boolean!`.
 - UI: each workflow row of a configuration card gets an "Edit" action (in its existing actions menu) opening a dialog
   that lists the workflow's connection slots (one connection picker per component, listing the administrator's
   connections of that component in the configuration's environment, plus "Let each user connect") and its inputs (a
