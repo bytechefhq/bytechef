@@ -1,16 +1,24 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the ByteChef Enterprise license (the "Enterprise License");
- * you may not use this file except in compliance with the Enterprise License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.bytechef.ee.platform.ai.agent.catalog;
+package com.bytechef.platform.ai.provider.catalog;
 
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
-import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -21,12 +29,9 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Component;
 
 /**
- * @version ee
- *
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnEEVersion
 public class CatalogChatClientResolverImpl implements CatalogChatClientResolver {
 
     private final CatalogChatModelFactory catalogChatModelFactory;
