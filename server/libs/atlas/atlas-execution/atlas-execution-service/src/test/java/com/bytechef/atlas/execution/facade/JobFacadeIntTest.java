@@ -17,12 +17,14 @@
 package com.bytechef.atlas.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.event.JobDeletedEvent;
@@ -63,7 +65,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import tools.jackson.databind.ObjectMapper;
@@ -96,7 +97,7 @@ public class JobFacadeIntTest {
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(
-            NullPointerException.class,
+            IllegalArgumentException.class,
             () -> jobFacade.createJob(new JobParametersDTO("aGVsbG8x", Collections.emptyMap())));
     }
 
@@ -151,6 +152,27 @@ public class JobFacadeIntTest {
             .containsExactlyInAnyOrder(parentJobId, childJobId);
     }
 
+    @Test
+    public void testResumeApprovalRemovesWaitForApprovalMarker() {
+        Job job = newJob();
+
+        job.setMetadata(Map.of(SuspendedJobs.WAIT_FOR_APPROVAL, true, "projectVersion", 2));
+        job.setStatus(Job.Status.STOPPED);
+
+        job = jobRepository.save(job);
+
+        long jobId = Validate.notNull(job.getId(), "id");
+
+        jobFacade.resumeApproval(jobId, "approval-uuid", true);
+
+        Job resumedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(resumedJob.getStatus()).isEqualTo(Job.Status.STARTED);
+        assertThat(resumedJob.getMetadata(SuspendedJobs.WAIT_FOR_APPROVAL)).isNull();
+        assertThat(resumedJob.getMetadata("projectVersion")).isEqualTo(2);
+    }
+
     private static Job newJob() {
         Job job = new Job();
 
@@ -187,22 +209,14 @@ public class JobFacadeIntTest {
     @Configuration
     public static class WorkflowExecutionIntTestConfiguration {
 
-        @MockitoBean
-        private ContextService contextService;
-
-        @MockitoBean
-        private WorkflowService workflowService;
-
-        @MockitoBean
-        private TaskFileStorage taskFileStorage;
-
         @Bean
         JobFacade jobFacade(
             ApplicationEventPublisher eventPublisher, JobService jobService,
             TaskExecutionService taskExecutionService) {
 
             return new JobFacadeImpl(
-                eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
+                eventPublisher, mock(ContextService.class), jobService, taskExecutionService,
+                mock(TaskFileStorage.class), mock(WorkflowService.class));
         }
 
         @Bean
