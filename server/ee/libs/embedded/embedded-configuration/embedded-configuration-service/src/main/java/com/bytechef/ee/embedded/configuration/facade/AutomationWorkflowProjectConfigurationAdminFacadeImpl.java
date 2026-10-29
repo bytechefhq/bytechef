@@ -25,6 +25,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReference
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -64,6 +65,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
     private final ConnectionService connectionService;
@@ -77,6 +79,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     public AutomationWorkflowProjectConfigurationAdminFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
+        ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
         ConnectionService connectionService, JobService jobService, ProjectService projectService,
@@ -85,6 +88,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
+        this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
         this.connectionService = connectionService;
@@ -528,6 +532,12 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                     "Connection id=%s for component %s belongs to environment id=%s, not id=%s".formatted(
                         connectionId, componentName, connection.getEnvironmentId(),
                         configuration.getEnvironmentId()));
+            }
+
+            if (connectedUserConnectionMembership.isOwnedByConnectedUser(connectionId)) {
+                throw newInvalidProvidedValueException(
+                    "Connection id=%s for component %s belongs to a connected user".formatted(
+                        connectionId, componentName));
             }
         }
     }

@@ -25,6 +25,8 @@ public interface IntegrationInstanceService {
 
     void delete(long id);
 
+    boolean existsByConnectionId(long connectionId);
+
     Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment);
 

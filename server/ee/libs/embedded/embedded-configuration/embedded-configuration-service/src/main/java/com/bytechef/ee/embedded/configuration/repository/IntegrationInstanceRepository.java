@@ -111,4 +111,11 @@ public interface IntegrationInstanceRepository
     Optional<IntegrationInstance> findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
         @Param("connectedUserId") long connectedUserId, @Param("componentNames") List<String> componentNames,
         @Param("environment") int environment);
+
+    @Query("""
+        SELECT COUNT(*) > 0
+        FROM integration_instance
+        WHERE connection_id = :connectionId
+        """)
+    boolean existsByConnectionId(@Param("connectionId") long connectionId);
 }

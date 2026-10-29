@@ -36,4 +36,11 @@ public interface ConnectedUserConnectionRepository extends ListCrudRepository<Co
         WHERE connected_user_id = :connectedUserId
         """)
     List<ConnectedUserConnection> findAllByConnectedUserId(@Param("connectedUserId") long connectedUserId);
+
+    @Query("""
+        SELECT COUNT(*) > 0
+        FROM connected_user_connection
+        WHERE connection_id = :connectionId
+        """)
+    boolean existsByConnectionId(@Param("connectionId") long connectionId);
 }

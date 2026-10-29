@@ -40,6 +40,7 @@ import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectCon
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -77,6 +78,7 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -169,6 +171,9 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
     @Autowired
     private ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+
+    @Autowired
+    private ConnectedUserConnectionService connectedUserConnectionService;
 
     @Autowired
     private ConnectionService connectionService;
@@ -724,6 +729,51 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         assertInvalidProvidedValue(fixture, Map.of(), Map.of("topic", "news"), "Input topic");
     }
 
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAConnectionOwnedByAConnectedUser() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Connected User Connection");
+
+        givenConnection(15L, "slack", ENVIRONMENT_ID);
+
+        connectedUserConnectionService.create(9001L, 15L);
+
+        try {
+            assertInvalidProvidedValue(
+                fixture, Map.of("slack", 15L), Map.of(),
+                "Connection id=15 for component slack belongs to a connected user");
+        } finally {
+            connectedUserConnectionService.deleteByConnectionId(15L);
+        }
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsANullConnectionId() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Null Connection");
+
+        Map<String, Long> providedConnections = new HashMap<>();
+
+        providedConnections.put("slack", null);
+
+        assertInvalidProvidedValue(fixture, providedConnections, Map.of(), "Component slack has no connection id");
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAWorkflowOutsideThePinnedVersion() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Unpinned Workflow");
+
+        String unpinnedWorkflowUuid = addWorkflow(
+            fixture.projectId(), withLabel(SLACK_WITH_CHANNEL_DEFINITION, "Provided Unpinned Workflow Draft"));
+
+        publish(fixture.projectId());
+
+        ProvidedValuesFixture unpinnedFixture = new ProvidedValuesFixture(
+            fixture.projectId(), fixture.configurationId(), unpinnedWorkflowUuid);
+
+        assertInvalidProvidedValue(
+            unpinnedFixture, Map.of(), Map.of("channel", "general"),
+            "Workflow uuid=%s is not part of version 1".formatted(unpinnedWorkflowUuid));
+    }
+
     private void assertInvalidProvidedValue(
         ProvidedValuesFixture fixture, Map<String, Long> providedConnections, Map<String, Object> providedInputs,
         String expectedMessage) {
@@ -747,6 +797,8 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
         assertThat(workflow.providedConnections()).isEmpty();
         assertThat(workflow.providedInputs()).isEmpty();
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(fixture.configurationId())
+            .fetchWorkflow(UUID.fromString(fixture.workflowUuid()))).isEmpty();
         assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
             .count()).isZero();
     }

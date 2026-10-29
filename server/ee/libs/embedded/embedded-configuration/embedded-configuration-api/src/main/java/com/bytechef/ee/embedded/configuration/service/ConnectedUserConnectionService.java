@@ -21,6 +21,8 @@ public interface ConnectedUserConnectionService {
 
     void deleteByConnectionId(long connectionId);
 
+    boolean existsByConnectionId(long connectionId);
+
     List<Long> getConnectionIds(long connectedUserId);
 
     Set<Long> getSharedConnectionIds();

@@ -7,14 +7,23 @@
 
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
+import com.bytechef.exception.ConfigurationException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +56,9 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
 
     @Autowired
     private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
+
+    @Autowired
+    private AutomationWorkflowProjectConfigurationGraphQlController automationWorkflowProjectConfigurationGraphQlController;
 
     @Autowired
     private GraphQlTester graphQlTester;
@@ -229,6 +241,33 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
 
         verify(automationWorkflowProjectConfigurationAdminFacade)
             .updateConfigurationWorkflow(5L, "uuid", Map.of(), Map.of());
+    }
+
+    @Test
+    void testUpdateAutomationWorkflowProjectConfigurationWorkflowRejectsANonNumericConnectionId() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateAutomationWorkflowProjectConfigurationWorkflow(
+                        id: "5", workflowUuid: "uuid", providedConnections: {slack: "abc"})
+                }
+                """)
+            .execute()
+            .errors()
+            .satisfy(errors -> assertThat(errors).hasSize(1));
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationGraphQlController
+                .updateAutomationWorkflowProjectConfigurationWorkflow(
+                    "5", "uuid", Map.of("slack", "abc"), Map.of()))
+                        .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> {
+                            assertThat(configurationException.getMessage()).contains("abc", "slack");
+                            assertThat(configurationException.getErrorKey()).isEqualTo(
+                                AutomationWorkflowProjectConfigurationErrorType.INVALID_PROVIDED_VALUE.getErrorKey());
+                        });
+
+        verify(automationWorkflowProjectConfigurationAdminFacade, never())
+            .updateConfigurationWorkflow(anyLong(), anyString(), anyMap(), any());
     }
 
     @Test

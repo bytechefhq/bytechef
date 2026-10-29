@@ -60,6 +60,12 @@ public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnecti
 
     @Override
     @Transactional(readOnly = true)
+    public boolean existsByConnectionId(long connectionId) {
+        return connectedUserConnectionRepository.existsByConnectionId(connectionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Long> getConnectionIds(long connectedUserId) {
         return connectedUserConnectionRepository.findAllByConnectedUserId(connectedUserId)
             .stream()
