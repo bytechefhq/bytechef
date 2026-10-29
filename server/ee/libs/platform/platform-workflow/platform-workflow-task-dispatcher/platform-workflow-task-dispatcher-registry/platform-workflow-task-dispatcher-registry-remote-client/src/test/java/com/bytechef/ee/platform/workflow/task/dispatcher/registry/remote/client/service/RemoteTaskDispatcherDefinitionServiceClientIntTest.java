@@ -18,6 +18,7 @@ import com.bytechef.definition.BaseProperty;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatcherDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatcherProtoMapper;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
@@ -33,8 +34,10 @@ import com.bytechef.platform.workflow.task.dispatcher.subflow.domain.SubflowEntr
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcherDefinitionFactory;
 import com.bytechef.task.dispatcher.loop.LoopTaskDispatcherDefinitionFactory;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcherDefinitionFactory;
+import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcherDefinitionFactory;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
+import io.grpc.ServerInterceptors;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -53,6 +56,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.grpc.server.exception.GrpcExceptionHandlerInterceptor;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -82,8 +86,10 @@ class RemoteTaskDispatcherDefinitionServiceClientIntTest {
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
             .addService(
-                new TaskDispatcherDefinitionRemoteServiceGrpcServer(
-                    taskDispatcherDefinitionService, new TaskDispatcherProtoMapper(objectMapper)))
+                ServerInterceptors.intercept(
+                    new TaskDispatcherDefinitionRemoteServiceGrpcServer(
+                        taskDispatcherDefinitionService, new TaskDispatcherProtoMapper(objectMapper)),
+                    new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .build()
             .start();
 
@@ -131,9 +137,10 @@ class RemoteTaskDispatcherDefinitionServiceClientIntTest {
         assertThatThrownBy(() -> remoteTaskDispatcherDefinitionServiceClient.getTaskDispatcherDefinition(
             "missing", null))
                 .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("Task dispatcher definition with name 'missing' and version 'null' not found")
                 .extracting(exception -> ((StatusRuntimeException) exception).getStatus()
                     .getCode())
-                .isEqualTo(Status.Code.UNKNOWN);
+                .isEqualTo(Status.Code.INVALID_ARGUMENT);
     }
 
     @Test
@@ -143,7 +150,7 @@ class RemoteTaskDispatcherDefinitionServiceClientIntTest {
 
         assertThat(taskDispatcherDefinitions)
             .extracting(TaskDispatcherDefinition::getName)
-            .containsExactly("condition", "loop", "subflow");
+            .containsExactly("condition", "loop", "subflow", "terminate");
         assertThat(taskDispatcherDefinitions)
             .usingRecursiveComparison()
             .isEqualTo(taskDispatcherDefinitionService.getTaskDispatcherDefinitions());
@@ -232,7 +239,8 @@ class RemoteTaskDispatcherDefinitionServiceClientIntTest {
     void testIsDynamicOutputDefined() {
         assertThat(remoteTaskDispatcherDefinitionServiceClient.isDynamicOutputDefined("loop", 1)).isTrue();
         assertThat(remoteTaskDispatcherDefinitionServiceClient.isDynamicOutputDefined("subflow", 1)).isTrue();
-        assertThat(remoteTaskDispatcherDefinitionServiceClient.isDynamicOutputDefined("condition", 1)).isFalse();
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.isDynamicOutputDefined("condition", 1)).isTrue();
+        assertThat(remoteTaskDispatcherDefinitionServiceClient.isDynamicOutputDefined("terminate", 1)).isFalse();
     }
 
     @Test
@@ -272,7 +280,8 @@ class RemoteTaskDispatcherDefinitionServiceClientIntTest {
     @Import({
         ConditionTaskDispatcherDefinitionFactory.class, JacksonConfiguration.class,
         LoopTaskDispatcherDefinitionFactory.class, SubflowTaskDispatcherDefinitionFactory.class,
-        TaskDispatcherDefinitionRegistry.class, TaskDispatcherDefinitionServiceImpl.class
+        TaskDispatcherDefinitionRegistry.class, TaskDispatcherDefinitionServiceImpl.class,
+        TerminateTaskDispatcherDefinitionFactory.class
     })
     @SpringBootConfiguration
     static class Config {
