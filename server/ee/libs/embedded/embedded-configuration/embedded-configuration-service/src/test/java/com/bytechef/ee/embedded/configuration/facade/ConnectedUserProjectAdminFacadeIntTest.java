@@ -15,8 +15,10 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -183,7 +185,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
     @Autowired
     private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
 
-    @Autowired
+    @MockitoSpyBean
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @Autowired
@@ -407,6 +409,42 @@ class ConnectedUserProjectAdminFacadeIntTest {
                                 .getErrorKey()));
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
+    }
+
+    @Test
+    void testProvisionProjectWorkflowsKeepsEarlierReferencesWhenALaterWorkflowFails() {
+        givenSlackAutomationWorkflowEnvironment();
+
+        long projectId = createProjectWithWorkflows("Provision Partial", 2);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        List<ConnectedUserWorkflowTemplateDTO> templates = findPublishedProject(connectedUser, projectId)
+            .workflowTemplates();
+
+        String firstWorkflowUuid = templates.getFirst()
+            .workflowUuid();
+        String failingWorkflowUuid = templates.getLast()
+            .workflowUuid();
+
+        doThrow(new IllegalStateException("Trigger registration failed"))
+            .when(connectedUserWorkflowReferenceFacade)
+            .getOrCreateReference(
+                anyString(), eq(failingWorkflowUuid), any(Environment.class), anyMap(), any());
+
+        assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUser.getId(),
+            List.of(
+                new ProvisionConnectedUserProjectWorkflowDTO(firstWorkflowUuid, null),
+                new ProvisionConnectedUserProjectWorkflowDTO(failingWorkflowUuid, null))))
+                    .isInstanceOf(IllegalStateException.class);
+
+        assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId()))
+            .extracting(ConnectedUserProjectWorkflow::getAutomationWorkflowUuid,
+                ConnectedUserProjectWorkflow::isEnabled)
+            .containsExactly(tuple(firstWorkflowUuid, true));
     }
 
     @Test
