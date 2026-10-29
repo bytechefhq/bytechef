@@ -1,11 +1,20 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {type ConnectedUserImportResult} from '@/ee/shared/middleware/embedded/connected-user';
 import {useImportConnectedUsersMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
+import {InfoIcon} from 'lucide-react';
 import {useState} from 'react';
 
 const ConnectedUserImportDialog = ({onClose}: {onClose: () => void}) => {
@@ -37,11 +46,29 @@ const ConnectedUserImportDialog = ({onClose}: {onClose: () => void}) => {
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>Import connected users</DialogTitle>
+
+                    <DialogDescription>Upload a CSV file to create connected users in bulk.</DialogDescription>
                 </DialogHeader>
 
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <Label htmlFor="connected-user-import-file">CSV file</Label>
+                        <div className="flex items-center gap-1">
+                            <Label htmlFor="connected-user-import-file">CSV file</Label>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <InfoIcon
+                                        aria-label="CSV columns"
+                                        className="size-4 text-content-neutral-secondary"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>
+                                    Columns: externalId (required, at most 50 characters), name, email, plus any
+                                    metadata columns
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
 
                         <input
                             accept=".csv"
@@ -53,11 +80,6 @@ const ConnectedUserImportDialog = ({onClose}: {onClose: () => void}) => {
                             }}
                             type="file"
                         />
-
-                        <p className="text-sm text-muted-foreground">
-                            Columns: externalId (required, at most 50 characters), name, email, plus any metadata
-                            columns
-                        </p>
                     </div>
 
                     {importResult && (
