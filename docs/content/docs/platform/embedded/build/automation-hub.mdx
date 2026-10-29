@@ -121,7 +121,7 @@ An automation a user activates in the hub is a **reference**: it points at your 
 
 - **Enabled configuration.** A project appears in the hub for an environment only when it has an enabled configuration there. The hub shows the templates of the version the configuration points at, minus workflows switched off in it. Publishing alone changes nothing. See [Automations](/platform/embedded/build/automations#configurations).
 - **Permission expressions.** A project's expression decides which connected users see the project, and a workflow's expression decides which of its templates they see. A user cannot activate a template their expression hides. See [Permission Expressions](/platform/embedded/build/permission-expressions).
-- **Show in Automation Hub.** Each configuration has this switch, on by default. Turn it off for flows you only activate through the API; the configuration row then shows a **Hidden from hub** badge. The hub leaves the project out, but it can still be activated through the API, and `GET /api/embedded/v1/automation/projects` still lists it with `automationHubVisible: false`.
+- **Show in Automation Hub.** Each configuration has this switch, on by default. It controls whether the project is listed by the API, so it decides whether the project appears in the hub and in your own UIs built on `GET /api/embedded/v1/automation/projects`. Turn it off for flows you only activate by UUID; the configuration row then shows a **Hidden from hub** badge. The workflows of a hidden project can still be provisioned by UUID. Turning off the configuration or a workflow is what stops provisioning and running.
 
 ## Theming
 
