@@ -161,7 +161,6 @@ dependencies {
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-in-memory-config"))
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-jdbc-config"))
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-redis-config"))
-    implementation(project(":server:libs:config:ai-model-config"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:automation-demo-config"))
