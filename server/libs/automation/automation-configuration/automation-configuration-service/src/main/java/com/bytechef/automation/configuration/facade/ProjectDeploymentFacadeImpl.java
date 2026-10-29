@@ -490,15 +490,43 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             oldProjectDeploymentWorkflow.getProjectDeploymentId());
 
-        if (projectDeployment.isEnabled() && oldProjectDeploymentWorkflow.isEnabled()) {
-            disableWorkflowTriggers(oldProjectDeploymentWorkflow);
-        }
-
         ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
             projectDeploymentWorkflow);
 
+        boolean oldTriggersEnabled = projectDeployment.isEnabled() && oldProjectDeploymentWorkflow.isEnabled();
+
+        if (oldTriggersEnabled) {
+            disableWorkflowTriggers(oldProjectDeploymentWorkflow);
+        }
+
         if (projectDeployment.isEnabled() && updatedProjectDeploymentWorkflow.isEnabled()) {
-            enableWorkflowTriggers(updatedProjectDeploymentWorkflow);
+            try {
+                enableWorkflowTriggers(updatedProjectDeploymentWorkflow);
+            } catch (RuntimeException exception) {
+                if (oldTriggersEnabled) {
+                    restoreWorkflowTriggers(
+                        updatedProjectDeploymentWorkflow, oldProjectDeploymentWorkflow, exception);
+                }
+
+                throw exception;
+            }
+        }
+    }
+
+    private void restoreWorkflowTriggers(
+        ProjectDeploymentWorkflow failedProjectDeploymentWorkflow,
+        ProjectDeploymentWorkflow previousProjectDeploymentWorkflow, RuntimeException exception) {
+
+        try {
+            disableWorkflowTriggers(failedProjectDeploymentWorkflow);
+        } catch (RuntimeException disableException) {
+            exception.addSuppressed(disableException);
+        }
+
+        try {
+            enableWorkflowTriggers(previousProjectDeploymentWorkflow);
+        } catch (RuntimeException enableException) {
+            exception.addSuppressed(enableException);
         }
     }
 
@@ -642,7 +670,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
                 workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
-                getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger));
+                getConnectionId(projectDeploymentWorkflow, workflowTrigger));
         }
     }
 
@@ -725,7 +753,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, workflowNodeType,
                 workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
-                getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
+                getConnectionId(projectDeploymentWorkflow, workflowTrigger),
                 getWebhookUrl(workflowExecutionId), projectDeployment.getEnvironmentId());
         }
     }
@@ -762,23 +790,27 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return CollectionUtils.filter(tags, tag -> containsTag(projectDeployment, tag));
     }
 
-    private Long getConnectionId(long projectDeploymentId, String workflowId, WorkflowTrigger workflowTrigger) {
+    private Long getConnectionId(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, WorkflowTrigger workflowTrigger) {
+
         return componentConnectionFacade.getComponentConnections(workflowTrigger)
             .stream()
             .findFirst()
-            .map(workflowConnection -> getConnectionId(
-                projectDeploymentId, workflowId, workflowConnection.workflowNodeName(), workflowConnection.key()))
+            .flatMap(workflowConnection -> getConnectionId(
+                projectDeploymentWorkflow, workflowConnection.workflowNodeName(), workflowConnection.key()))
             .orElse(null);
     }
 
-    private Long getConnectionId(
-        long projectDeploymentId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
+    private static Optional<Long> getConnectionId(
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, String workflowNodeName, String workflowConnectionKey) {
 
-        return projectDeploymentWorkflowService
-            .fetchProjectDeploymentWorkflowConnection(
-                projectDeploymentId, workflowId, workflowNodeName, workflowConnectionKey)
-            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
-            .orElse(null);
+        return projectDeploymentWorkflow.getConnections()
+            .stream()
+            .filter(projectDeploymentWorkflowConnection -> Objects.equals(
+                projectDeploymentWorkflowConnection.getWorkflowNodeName(), workflowNodeName) &&
+                Objects.equals(projectDeploymentWorkflowConnection.getWorkflowConnectionKey(), workflowConnectionKey))
+            .findFirst()
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId);
     }
 
     private Optional<ProjectDeploymentWorkflow> getFirst(
