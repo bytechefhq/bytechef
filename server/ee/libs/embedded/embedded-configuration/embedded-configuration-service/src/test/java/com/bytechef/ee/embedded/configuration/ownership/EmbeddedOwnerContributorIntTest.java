@@ -45,7 +45,6 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -144,9 +143,6 @@ class EmbeddedOwnerContributorIntTest {
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
-    @MockitoBean
-    private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
-
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
 
@@ -221,7 +217,7 @@ class EmbeddedOwnerContributorIntTest {
     @Test
     void testEmbeddedCatalogProjectsAreHiddenFromWorkspaceProjects() {
         long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Plain Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Plain Catalog " + UUID.randomUUID(), "", null, List.of(), null);
 
         long plainProjectId = createPlainProject();
 
@@ -256,7 +252,7 @@ class EmbeddedOwnerContributorIntTest {
     @Test
     void testWorkspaceProjectIdsExcludingConnectedUserProjectsKeepCatalogProjects() {
         long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Reachable Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Reachable Catalog " + UUID.randomUUID(), "", null, List.of(), null);
 
         String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
             externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
@@ -283,7 +279,7 @@ class EmbeddedOwnerContributorIntTest {
     @Test
     void testEmbeddedFilterSelectsConnectedUserAndReferenceDeployments() {
         long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Reference Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Reference Catalog " + UUID.randomUUID(), "", null, List.of(), null);
 
         String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
@@ -329,7 +325,7 @@ class EmbeddedOwnerContributorIntTest {
     @Test
     void testOwnedProjectIdsSeparateCatalogFromConnectedUserProjects() {
         long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Owner Kinds Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Owner Kinds Catalog " + UUID.randomUUID(), "", null, List.of(), null);
 
         String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
             externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
@@ -358,7 +354,7 @@ class EmbeddedOwnerContributorIntTest {
     @Test
     void testStartupCheckFindsTheEmbeddedRowsInTheOwnerTables() {
         long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Startup Check Catalog " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Startup Check Catalog " + UUID.randomUUID(), "", null, List.of(), null);
 
         String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
