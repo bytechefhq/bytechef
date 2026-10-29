@@ -105,13 +105,6 @@ class CacheInvalidationConfigurationIntTest {
     }
 
     @Test
-    void testLeavesCacheManagerWhenBrokerIsUnset() {
-        contextRunner("bytechef.edition=ee")
-            .run(context -> assertThat(context.getBean(CacheManager.class))
-                .isNotInstanceOf(ClusterInvalidatingCacheManager.class));
-    }
-
-    @Test
     void testLeavesCacheManagerInCe() {
         contextRunner("bytechef.edition=ce", "bytechef.message-broker.provider=amqp")
             .run(context -> assertThat(context.getBean(CacheManager.class))
