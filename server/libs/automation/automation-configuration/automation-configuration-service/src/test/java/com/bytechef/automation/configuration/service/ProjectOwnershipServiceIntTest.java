@@ -385,6 +385,59 @@ public class ProjectOwnershipServiceIntTest {
     }
 
     @Test
+    public void testGetOwnedProjectDeploymentIdsReturnsOnlyIdsClaimedByTheOwner() {
+        long projectId = saveProject("p1");
+
+        long embeddedProjectDeploymentId = saveDeployment(projectId, "d1");
+        long mcpServerProjectDeploymentId = saveDeployment(projectId, "d2");
+        long plainProjectDeploymentId = saveDeployment(projectId, "d3");
+
+        testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.EMBEDDED, embeddedProjectDeploymentId);
+        testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.MCP_SERVER, mcpServerProjectDeploymentId);
+
+        assertThat(
+            projectOwnershipService.getOwnedProjectDeploymentIds(
+                List.of(embeddedProjectDeploymentId, mcpServerProjectDeploymentId, plainProjectDeploymentId),
+                ProjectDeploymentOwner.EMBEDDED))
+                    .isEqualTo(Set.of(embeddedProjectDeploymentId));
+    }
+
+    @Test
+    public void testGetOwnedProjectDeploymentIdsHandlesMoreIdsThanOneChunk() {
+        long ownedProjectDeploymentId = saveDeployment(saveProject("p1"), "d1");
+
+        testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.EMBEDDED, ownedProjectDeploymentId);
+
+        List<Long> projectDeploymentIds = new ArrayList<>();
+
+        for (long projectDeploymentId = ownedProjectDeploymentId + 1; projectDeploymentId <= ownedProjectDeploymentId
+            + 2499; projectDeploymentId++) {
+
+            projectDeploymentIds.add(projectDeploymentId);
+        }
+
+        projectDeploymentIds.add(1500, ownedProjectDeploymentId);
+
+        assertThat(
+            projectOwnershipService.getOwnedProjectDeploymentIds(
+                projectDeploymentIds, ProjectDeploymentOwner.EMBEDDED))
+                    .isEqualTo(Set.of(ownedProjectDeploymentId));
+    }
+
+    @Test
+    public void testGetOwnedProjectDeploymentIdsWithoutAContributorOrIdsReturnsEmpty() {
+        long projectDeploymentId = saveDeployment(saveProject("p1"), "d1");
+
+        ProjectOwnershipService emptyService = new ProjectOwnershipServiceImpl(jdbcClient, List.of(), List.of());
+
+        assertThat(
+            emptyService.getOwnedProjectDeploymentIds(List.of(projectDeploymentId), ProjectDeploymentOwner.EMBEDDED))
+                .isEmpty();
+        assertThat(projectOwnershipService.getOwnedProjectDeploymentIds(List.of(), ProjectDeploymentOwner.EMBEDDED))
+            .isEmpty();
+    }
+
+    @Test
     public void testAfterSingletonsInstantiatedThrowsWhenTheEnterpriseEditionLacksEmbeddedContributors() {
         ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
             jdbcClient, List.of(deploymentOwnerContributor(ProjectDeploymentOwner.API_COLLECTION)),

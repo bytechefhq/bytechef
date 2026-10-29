@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -185,6 +186,9 @@ class EmbeddedOwnerContributorIntTest {
     private PrincipalJobService principalJobService;
 
     @Autowired
+    private ProjectDeploymentFacade projectDeploymentFacade;
+
+    @Autowired
     private ProjectDeploymentService projectDeploymentService;
 
     @Autowired
@@ -326,6 +330,41 @@ class EmbeddedOwnerContributorIntTest {
             .extracting(ProjectDeployment::getId)
             .contains(plainDeploymentId)
             .doesNotContain(connectedUserDeploymentId, referenceDeploymentId);
+    }
+
+    @Test
+    void testOwnedProjectDeploymentIdsIncludeConnectedUserAndReferenceDeployments() {
+        long catalogProjectId = automationWorkflowProjectFacade.createProject(
+            "Owned Deployments Catalog " + UUID.randomUUID(), "", null, List.of(), null);
+
+        String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
+
+        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, catalogProjectId);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, catalogWorkflowUuid, Environment.PRODUCTION);
+
+        String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        connectedUserProjectFacade.publishProjectWorkflow(externalUserId, copyWorkflowUuid, "published", null);
+
+        long connectedUserProjectId = connectedUserProjectService.getConnectUserProject(
+            externalUserId, Environment.PRODUCTION)
+            .getProjectId();
+        long connectedUserDeploymentId = projectDeploymentService.getProjectDeploymentId(
+            connectedUserProjectId, Environment.PRODUCTION);
+        long referenceDeploymentId = reference.getProjectDeploymentId();
+
+        long plainDeploymentId = createPlainDeployment();
+
+        assertThat(
+            projectDeploymentFacade.getOwnedProjectDeploymentIds(
+                List.of(connectedUserDeploymentId, referenceDeploymentId, plainDeploymentId),
+                ProjectDeploymentOwner.EMBEDDED))
+                    .containsExactlyInAnyOrder(connectedUserDeploymentId, referenceDeploymentId);
     }
 
     @Test

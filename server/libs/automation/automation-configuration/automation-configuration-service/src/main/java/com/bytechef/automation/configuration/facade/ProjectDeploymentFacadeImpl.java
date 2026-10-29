@@ -31,8 +31,10 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
 import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -68,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +100,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -113,7 +117,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService, JobFacade jobFacade,
         JobService jobService, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService, TagService tagService,
+        ProjectOwnershipService projectOwnershipService, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
@@ -129,6 +134,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.projectDeploymentDeleteEventListeners = projectDeploymentDeleteEventListeners;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -293,6 +299,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(projectId, environment);
 
         enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, enable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> getOwnedProjectDeploymentIds(
+        Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner) {
+
+        return projectOwnershipService.getOwnedProjectDeploymentIds(projectDeploymentIds, projectDeploymentOwner);
     }
 
     @Override
