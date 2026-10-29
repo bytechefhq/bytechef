@@ -33,6 +33,17 @@ const projects = [
                 label: 'Mail digest',
             },
             {components: [], id: 'wf-plain', inputs: [], label: 'Plain'},
+            {
+                components: [
+                    {connectionRequired: true, integrationId: 5, name: 'slack', provided: true, title: 'Slack'},
+                ],
+                id: 'wf-provided',
+                inputs: [
+                    {label: 'Region', name: 'region', provided: true, required: true},
+                    {label: 'Note', name: 'note'},
+                ],
+                label: 'Provided automation',
+            },
         ],
     },
     {
@@ -254,6 +265,43 @@ describe('ActivationDialog', () => {
             )
         ).toBe(true);
         expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+    });
+
+    it('does not require, show a picker for or send what the administrator provides', async () => {
+        const onActivated = vi.fn();
+
+        renderDialog({onActivated, workflowTemplateId: 'wf-provided'});
+
+        expect(await screen.findByText('Provided by your administrator')).toBeInTheDocument();
+        expect(screen.queryByLabelText(/Region/)).not.toBeInTheDocument();
+        expect(screen.queryByTestId('connect-row-slack')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Next'})).toBeEnabled();
+
+        await userEvent.type(screen.getByLabelText(/Note/), 'hello');
+        await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Activate'}));
+
+        await waitFor(() => expect(onActivated).toHaveBeenCalledWith('wf-provided'));
+
+        const provision = calls.find(
+            (call) => call.url.endsWith('/workflow-templates/wf-provided/provision') && call.method === 'POST'
+        );
+
+        expect(JSON.parse(provision!.body!)).toEqual({connections: {}, inputs: {note: 'hello'}});
+        expect(calls.some((call) => call.url.includes('/components/slack/connections'))).toBe(false);
+    });
+
+    it('explains a locked provided value instead of the generic failure', async () => {
+        provisionResponse = {body: {providedInputName: 'region'}, status: 409};
+
+        renderDialog({workflowTemplateId: 'wf-provided'});
+
+        await screen.findByText('Provided by your administrator');
+        await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Activate'}));
+
+        expect(await screen.findByText(/administrator already provides/)).toBeInTheDocument();
+        expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
     });
 
     const isDeprovision = (call: FetchCall) =>

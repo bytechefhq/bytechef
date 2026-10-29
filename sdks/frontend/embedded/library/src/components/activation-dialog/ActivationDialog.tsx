@@ -3,7 +3,13 @@ import {ApiResponseError, createApiClient} from '../shared/apiClient';
 import dialogStyles from '../shared/dialog.module.css';
 import DialogPoweredBy from '../shared/DialogPoweredBy';
 import XIcon from '../connect-dialog/assets/x.svg';
-import {activationReducer, canProceed, initialActivationState, toInputValueText} from './activationReducer';
+import {
+    activationReducer,
+    canProceed,
+    hasEditableInputs,
+    initialActivationState,
+    toInputValueText,
+} from './activationReducer';
 import ConnectDialogOpener from './ConnectDialogOpener';
 import styles from './ActivationDialog.module.css';
 import {
@@ -12,6 +18,7 @@ import {
     ConnectedUserWorkflowType,
     ConnectionType,
     MissingConnectionErrorType,
+    ProvidedValueLockedErrorType,
     TemplateComponentType,
     TemplateInputType,
 } from './types';
@@ -54,6 +61,9 @@ const FORBIDDEN_MESSAGE = "You don't have permission to do this.";
 const STATUS_UNKNOWN_MESSAGE = 'Could not check your automations. Please try again.';
 const ROLLBACK_FAILED_MESSAGE =
     'Activation failed and could not be fully undone. Check your automations before trying again.';
+const PROVIDED_BY_ADMINISTRATOR_LABEL = 'Provided by your administrator';
+const PROVIDED_VALUE_LOCKED_MESSAGE =
+    'Your administrator already provides some of the details for this automation, so they cannot be changed. Reload the page and try again.';
 const NOT_ENABLED_MESSAGE = 'Your settings were saved, but the automation could not be switched on. Please try again.';
 
 const INPUT_TYPE_ATTRIBUTES: Record<string, string> = {
@@ -98,6 +108,16 @@ const readMissingConnectionComponentName = (error: unknown): string | undefined 
     }
 
     return undefined;
+};
+
+const isProvidedValueLockedError = (error: unknown): boolean => {
+    if (error instanceof ApiResponseError && error.status === 409) {
+        const body = error.body as ProvidedValueLockedErrorType | undefined;
+
+        return !!body?.providedComponentName || !!body?.providedInputName;
+    }
+
+    return false;
 };
 
 const findTemplate = (
@@ -256,6 +276,25 @@ const ActivationBody = ({
     const components = useMemo(() => templateComponents(template), [template]);
     const inputs = useMemo(() => templateInputs(template), [template]);
 
+    const providedComponents = useMemo(
+        () =>
+            components.filter(
+                (component, index) =>
+                    component.provided &&
+                    component.connectionRequired &&
+                    components.findIndex((candidate) => candidate.name === component.name) === index
+            ),
+        [components]
+    );
+    const providedComponentNames = useMemo(
+        () => components.filter((component) => component.provided).map((component) => component.name),
+        [components]
+    );
+    const providedInputNames = useMemo(
+        () => inputs.filter((input) => input.provided).map((input) => input.name),
+        [inputs]
+    );
+
     const requiredComponents = useMemo(
         () => state.requiredComponents.map((name) => components.find((component) => component.name === name) ?? {name}),
         [components, state.requiredComponents]
@@ -301,7 +340,14 @@ const ActivationBody = ({
         setBusy(true);
 
         const connections = Object.fromEntries(
-            Object.entries(state.selections).filter((selection): selection is [string, number] => selection[1] != null)
+            Object.entries(state.selections).filter(
+                (selection): selection is [string, number] =>
+                    selection[1] != null && !providedComponentNames.includes(selection[0])
+            )
+        );
+
+        const editableInputValues = Object.fromEntries(
+            Object.entries(state.inputValues).filter(([inputName]) => !providedInputNames.includes(inputName))
         );
 
         let activatedBefore: boolean;
@@ -325,7 +371,7 @@ const ActivationBody = ({
 
         try {
             await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
-                body: {connections, inputs: inputs.length > 0 ? state.inputValues : undefined},
+                body: {connections, inputs: hasEditableInputs(inputs) ? editableInputValues : undefined},
                 method: 'POST',
             });
 
@@ -338,9 +384,12 @@ const ActivationBody = ({
             const rolledBack = activatedBefore || (await rollBackProvision());
 
             const missingConnectionComponentName = readMissingConnectionComponentName(error);
+            const providedValueLocked = isProvidedValueLockedError(error);
 
             if (!rolledBack) {
                 dispatch({error: ROLLBACK_FAILED_MESSAGE, type: 'FAILED'});
+            } else if (providedValueLocked) {
+                dispatch({error: PROVIDED_VALUE_LOCKED_MESSAGE, type: 'FAILED'});
             } else if (missingConnectionComponentName) {
                 dispatch({componentName: missingConnectionComponentName, type: 'MISSING_CONNECTION'});
             } else if (activatedBefore && provisioned) {
@@ -364,9 +413,11 @@ const ActivationBody = ({
         onClose();
     }, [
         fetch,
-        inputs.length,
+        inputs,
         onActivated,
         onClose,
+        providedComponentNames,
+        providedInputNames,
         rollBackProvision,
         state.inputValues,
         state.selections,
@@ -420,7 +471,7 @@ const ActivationBody = ({
     const backShown =
         state.step !== 'connect' &&
         state.step !== 'done' &&
-        (state.requiredComponents.length > 0 || (state.step === 'activate' && inputs.length > 0));
+        (state.requiredComponents.length > 0 || (state.step === 'activate' && hasEditableInputs(inputs)));
 
     useEffect(() => {
         let cancelled = false;
@@ -494,6 +545,27 @@ const ActivationBody = ({
                                 selectedConnectionId={state.selections[component.name]}
                             />
                         ))}
+
+                        {providedComponents.map((component) => (
+                            <div
+                                className={styles.componentRow}
+                                data-testid={`provided-row-${component.name}`}
+                                key={component.name}
+                            >
+                                <div className={styles.componentTitle}>
+                                    {component.icon && (
+                                        <span
+                                            className={styles.componentIcon}
+                                            dangerouslySetInnerHTML={{__html: component.icon}}
+                                        />
+                                    )}
+
+                                    <span>{component.title || component.name}</span>
+                                </div>
+
+                                <span className={styles.notice}>{PROVIDED_BY_ADMINISTRATOR_LABEL}</span>
+                            </div>
+                        ))}
                     </div>
                 )}
 
@@ -506,19 +578,29 @@ const ActivationBody = ({
                                 <label className={styles.label} htmlFor={`activation-input-${input.name}`}>
                                     {input.label || input.name}
 
-                                    {input.required && <span className={styles.required}>*</span>}
+                                    {input.required && !input.provided && <span className={styles.required}>*</span>}
                                 </label>
 
-                                <input
-                                    className={styles.input}
-                                    id={`activation-input-${input.name}`}
-                                    onChange={(event) =>
-                                        dispatch({name: input.name, type: 'SET_INPUT_VALUE', value: event.target.value})
-                                    }
-                                    required={input.required}
-                                    type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
-                                    value={toInputValueText(state.inputValues[input.name])}
-                                />
+                                {input.provided ? (
+                                    <span className={styles.notice} id={`activation-input-${input.name}`}>
+                                        {PROVIDED_BY_ADMINISTRATOR_LABEL}
+                                    </span>
+                                ) : (
+                                    <input
+                                        className={styles.input}
+                                        id={`activation-input-${input.name}`}
+                                        onChange={(event) =>
+                                            dispatch({
+                                                name: input.name,
+                                                type: 'SET_INPUT_VALUE',
+                                                value: event.target.value,
+                                            })
+                                        }
+                                        required={input.required}
+                                        type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
+                                        value={toInputValueText(state.inputValues[input.name])}
+                                    />
+                                )}
                             </div>
                         ))}
                     </div>
