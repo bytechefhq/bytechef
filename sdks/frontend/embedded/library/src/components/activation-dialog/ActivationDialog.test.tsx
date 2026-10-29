@@ -12,55 +12,43 @@ vi.mock('../connect-dialog/index', () => ({
     default: useConnectDialogMock,
 }));
 
-const projects = [
+const templates = [
     {
-        id: 1,
-        name: 'Sales',
-        workflowTemplates: [
-            {
-                components: [
-                    {connectionRequired: true, integrationId: 5, name: 'slack', title: 'Slack'},
-                    {connectionRequired: false, name: 'logger', title: 'Logger'},
-                ],
-                id: 'wf-slack',
-                inputs: [{label: 'Channel', name: 'channel', required: true}],
-                label: 'Daily standup reminder',
-            },
-            {
-                components: [{connectionRequired: true, integrationId: null, name: 'gmail', title: 'Gmail'}],
-                id: 'wf-gmail',
-                inputs: [],
-                label: 'Mail digest',
-            },
-            {components: [], id: 'wf-plain', inputs: [], label: 'Plain'},
-            {
-                components: [
-                    {connectionRequired: true, integrationId: 5, name: 'slack', provided: true, title: 'Slack'},
-                ],
-                id: 'wf-provided',
-                inputs: [
-                    {label: 'Region', name: 'region', provided: true, required: true},
-                    {label: 'Note', name: 'note'},
-                ],
-                label: 'Provided automation',
-            },
-            {
-                components: [
-                    {connectionRequired: true, integrationId: 5, name: 'slack', provided: true, title: 'Slack'},
-                ],
-                id: 'wf-provided-only',
-                inputs: [],
-                label: 'Provided connection only',
-            },
+        components: [
+            {connectionRequired: true, integrationId: 5, name: 'slack', title: 'Slack'},
+            {connectionRequired: false, name: 'logger', title: 'Logger'},
         ],
+        id: 'wf-slack',
+        inputs: [{label: 'Channel', name: 'channel', required: true}],
+        label: 'Daily standup reminder',
     },
     {
-        id: 2,
-        kind: 'REFERENCE',
-        name: 'Code workflows',
-        workflowTemplates: [{components: [], id: 'wf-code', inputs: [], label: 'Code workflow'}],
+        components: [{connectionRequired: true, integrationId: null, name: 'gmail', title: 'Gmail'}],
+        id: 'wf-gmail',
+        inputs: [],
+        label: 'Mail digest',
     },
+    {components: [], id: 'wf-plain', inputs: [], label: 'Plain'},
+    {
+        components: [{connectionRequired: true, integrationId: 5, name: 'slack', provided: true, title: 'Slack'}],
+        id: 'wf-provided',
+        inputs: [
+            {label: 'Region', name: 'region', provided: true, required: true},
+            {label: 'Note', name: 'note'},
+        ],
+        label: 'Provided automation',
+    },
+    {
+        components: [{connectionRequired: true, integrationId: 5, name: 'slack', provided: true, title: 'Slack'}],
+        id: 'wf-provided-only',
+        inputs: [],
+        label: 'Provided connection only',
+    },
+    {components: [], id: 'wf-code', inputs: [], kind: 'REFERENCE', label: 'Code workflow'},
+    {components: [], id: 'wf-hidden', inputs: [], label: 'Hidden from the hub'},
 ];
+
+const WORKFLOW_TEMPLATE_URL_PATTERN = /\/automation\/workflow-templates\/([^/]+)$/;
 
 type FetchCall = {body?: string; method: string; url: string};
 
@@ -88,8 +76,14 @@ const installFetch = () => {
 
         calls.push({body: init?.body as string | undefined, method, url});
 
-        if (url.endsWith('/automation/projects')) {
-            return respond(200, projects);
+        const workflowTemplateMatch = method === 'GET' ? WORKFLOW_TEMPLATE_URL_PATTERN.exec(url) : null;
+
+        if (workflowTemplateMatch) {
+            const template = templates.find(
+                (workflowTemplate) => workflowTemplate.id === decodeURIComponent(workflowTemplateMatch[1])
+            );
+
+            return template ? respond(200, template) : respond(404, {});
         }
 
         if (url.includes('/components/slack/connections')) {
@@ -314,6 +308,27 @@ describe('ActivationDialog', () => {
         expect(screen.getByRole('button', {name: 'Activate'})).toBeEnabled();
     });
 
+    it('activates a template of a project hidden from the hub, read by its uuid', async () => {
+        const onActivated = vi.fn();
+
+        renderDialog({onActivated, workflowTemplateId: 'wf-hidden'});
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Activate'}));
+
+        await waitFor(() => expect(onActivated).toHaveBeenCalledWith('wf-hidden'));
+        expect(calls.some((call) => call.url.endsWith('/automation/projects'))).toBe(false);
+        expect(
+            calls.some(
+                (call) =>
+                    call.method === 'GET' &&
+                    call.url === 'https://api.example.com/api/embedded/v1/automation/workflow-templates/wf-hidden'
+            )
+        ).toBe(true);
+        expect(
+            calls.some((call) => call.method === 'POST' && call.url.endsWith('/workflow-templates/wf-hidden/provision'))
+        ).toBe(true);
+    });
+
     it('explains a locked provided value instead of the generic failure', async () => {
         provisionResponse = {body: {providedInputName: 'region'}, status: 409};
 
@@ -506,14 +521,14 @@ describe('ActivationDialog', () => {
         expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
     });
 
-    it('does not offer Edit workflow for a template from a code-workflow (REFERENCE) project', async () => {
+    it('does not offer Edit workflow for a code-workflow (REFERENCE) template', async () => {
         renderDialog({onEditWorkflow: vi.fn(), workflowTemplateId: 'wf-code'});
 
         expect(await screen.findByRole('button', {name: 'Activate'})).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Edit workflow'})).not.toBeInTheDocument();
     });
 
-    it('offers Edit workflow for a template from a project without a kind', async () => {
+    it('offers Edit workflow for a template without a kind', async () => {
         renderDialog({onEditWorkflow: vi.fn(), workflowTemplateId: 'wf-plain'});
 
         expect(await screen.findByRole('button', {name: 'Edit workflow'})).toBeInTheDocument();

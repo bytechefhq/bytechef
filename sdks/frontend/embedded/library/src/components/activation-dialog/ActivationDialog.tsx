@@ -13,7 +13,6 @@ import {
 import ConnectDialogOpener from './ConnectDialogOpener';
 import styles from './ActivationDialog.module.css';
 import {
-    AutomationProjectType,
     AutomationTemplateType,
     ConnectedUserWorkflowType,
     ConnectionType,
@@ -120,23 +119,6 @@ const isProvidedValueLockedError = (error: unknown): boolean => {
     return false;
 };
 
-const findTemplate = (
-    projects: AutomationProjectType[],
-    workflowTemplateId: string
-): {kind?: AutomationProjectType['kind']; template: AutomationTemplateType} | undefined => {
-    for (const project of projects) {
-        const template = project.workflowTemplates?.find(
-            (workflowTemplate) => workflowTemplate.id === workflowTemplateId
-        );
-
-        if (template) {
-            return {kind: project.kind, template};
-        }
-    }
-
-    return undefined;
-};
-
 const templateComponents = (template: AutomationTemplateType): TemplateComponentType[] => [
     ...(template.triggers ?? []),
     ...(template.components ?? []),
@@ -148,7 +130,6 @@ const templateInputs = (template: AutomationTemplateType): TemplateInputType[] =
 interface LoadResultType {
     error?: string;
     key: string;
-    kind?: AutomationProjectType['kind'];
     template?: AutomationTemplateType;
 }
 
@@ -714,16 +695,16 @@ const ActivationDialog = ({
     useEffect(() => {
         let cancelled = false;
 
-        fetch<AutomationProjectType[]>('/api/embedded/v1/automation/projects')
-            .then((projects) => {
-                const found = findTemplate(projects, workflowTemplateId);
-
-                return found
-                    ? {key: workflowTemplateId, kind: found.kind, template: found.template}
-                    : {error: TEMPLATE_NOT_FOUND_MESSAGE, key: workflowTemplateId};
-            })
+        fetch<AutomationTemplateType>(
+            `/api/embedded/v1/automation/workflow-templates/${encodeURIComponent(workflowTemplateId)}`
+        )
+            .then((loadedTemplate) =>
+                loadedTemplate?.id
+                    ? {key: workflowTemplateId, template: loadedTemplate}
+                    : {error: TEMPLATE_NOT_FOUND_MESSAGE, key: workflowTemplateId}
+            )
             .catch((error: unknown) => {
-                console.error('Failed to load the automation templates:', error);
+                console.error('Failed to load the automation template:', error);
 
                 return {error: describeError(error), key: workflowTemplateId};
             })
@@ -833,7 +814,7 @@ const ActivationDialog = ({
                         connectOpenRef={connectOpenRef}
                         baseUrl={baseUrl}
                         connectionCreationAllowed={connectionCreationAllowed}
-                        editable={loadResult?.kind !== 'REFERENCE'}
+                        editable={template.kind !== 'REFERENCE'}
                         environment={environment}
                         fetch={fetch}
                         jwtToken={jwtToken}

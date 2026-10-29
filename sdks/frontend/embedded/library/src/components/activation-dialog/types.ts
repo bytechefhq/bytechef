@@ -23,15 +23,10 @@ export interface AutomationTemplateType {
     description?: string;
     id: string;
     inputs?: TemplateInputType[];
+    /** REFERENCE when the template can only be referenced, never copied, e.g. a code workflow. */
+    kind?: 'COPY' | 'REFERENCE';
     label?: string;
     triggers?: TemplateComponentType[];
-}
-
-export interface AutomationProjectType {
-    id: number;
-    kind?: 'COPY' | 'REFERENCE';
-    name?: string;
-    workflowTemplates?: AutomationTemplateType[];
 }
 
 export interface ConnectionType {
