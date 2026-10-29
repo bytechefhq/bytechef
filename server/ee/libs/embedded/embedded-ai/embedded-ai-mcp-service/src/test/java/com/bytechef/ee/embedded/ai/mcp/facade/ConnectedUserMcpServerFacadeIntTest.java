@@ -324,8 +324,8 @@ public class ConnectedUserMcpServerFacadeIntTest {
         McpServer uncoveredMcpServer = mcpServerRepository.save(
             new McpServer("Chat", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
-        mcpComponentRepository.save(new McpComponent("slack", 1, uncoveredMcpServer.getId(), null));
-        mcpComponentRepository.save(new McpComponent("gmail", 1, uncoveredMcpServer.getId(), null));
+        saveMcpComponentWithTool("slack", uncoveredMcpServer);
+        saveMcpComponentWithTool("gmail", uncoveredMcpServer);
 
         ProvisionableConnectedUserMcpServerDTO provisionableMcpServer =
             connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId)
@@ -347,6 +347,53 @@ public class ConnectedUserMcpServerFacadeIntTest {
         assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
             .extracting(ProvisionableConnectedUserMcpServerDTO::name)
             .containsExactly("Google", "Workflows only");
+    }
+
+    @Test
+    public void testGetProvisionableMcpServersSkipsComponentsWithoutEnabledTools() {
+        for (McpTool mcpTool : mcpToolRepository.findAll()) {
+            mcpTool.setEnabled(false);
+
+            mcpToolRepository.save(mcpTool);
+        }
+
+        assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
+            .extracting(
+                ProvisionableConnectedUserMcpServerDTO::name,
+                ProvisionableConnectedUserMcpServerDTO::coveredComponentNames,
+                ProvisionableConnectedUserMcpServerDTO::missingComponentNames)
+            .containsExactly(
+                tuple("Google", List.of(), List.of()), tuple("Workflows only", List.of("gmail"), List.of()));
+
+        assertThatThrownBy(
+            () -> connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, toolsMcpServer.getId()))
+                .isInstanceOfSatisfying(
+                    ConfigurationException.class,
+                    configurationException -> assertThat(configurationException.getErrorKey())
+                        .isEqualTo(ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION.getErrorKey()));
+    }
+
+    @Test
+    public void testGetProvisionableMcpServersSkipsConfigurationsWithoutEnabledWorkflows() {
+        jdbcTemplate.update("UPDATE integration_instance_configuration_workflow SET enabled = false");
+
+        assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
+            .extracting(
+                ProvisionableConnectedUserMcpServerDTO::name,
+                ProvisionableConnectedUserMcpServerDTO::coveredComponentNames,
+                ProvisionableConnectedUserMcpServerDTO::missingComponentNames)
+            .containsExactly(
+                tuple("Google", List.of("gmail"), List.of()), tuple("Workflows only", List.of(), List.of()));
+
+        assertThatThrownBy(
+            () -> connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, workflowsMcpServer.getId()))
+                .isInstanceOfSatisfying(
+                    ConfigurationException.class,
+                    configurationException -> assertThat(configurationException.getErrorKey())
+                        .isEqualTo(ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION.getErrorKey()));
+
+        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
+            anyLong(), anyString(), eq(true));
     }
 
     @Test
@@ -462,7 +509,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
         McpServer uncoveredMcpServer = mcpServerRepository.save(
             new McpServer("Chat", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
-        mcpComponentRepository.save(new McpComponent("slack", 1, uncoveredMcpServer.getId(), null));
+        saveMcpComponentWithTool("slack", uncoveredMcpServer);
 
         assertThatThrownBy(
             () -> connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, uncoveredMcpServer.getId()))
@@ -470,6 +517,33 @@ public class ConnectedUserMcpServerFacadeIntTest {
                     ConfigurationException.class,
                     configurationException -> assertThat(configurationException.getErrorKey())
                         .isEqualTo(ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION.getErrorKey()));
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .hasSize(2);
+        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
+            anyLong(), anyString(), eq(true));
+    }
+
+    @Test
+    public void testProvisionMcpServerRejectsDisabledServersAndOtherEnvironments() {
+        McpServer disabledMcpServer = mcpServerRepository.save(
+            new McpServer("Disabled", PlatformType.EMBEDDED, Environment.DEVELOPMENT, false));
+        McpServer productionMcpServer = mcpServerRepository.save(
+            new McpServer("Production", PlatformType.EMBEDDED, Environment.PRODUCTION));
+
+        saveMcpComponentWithTool("gmail", disabledMcpServer);
+        saveMcpComponentWithTool("gmail", productionMcpServer);
+
+        for (McpServer unprovisionableMcpServer : List.of(disabledMcpServer, productionMcpServer)) {
+            assertThatThrownBy(
+                () -> connectedUserMcpServerFacade.provisionMcpServer(
+                    connectedUserId, unprovisionableMcpServer.getId()))
+                        .isInstanceOfSatisfying(
+                            ConfigurationException.class,
+                            configurationException -> assertThat(configurationException.getErrorKey())
+                                .isEqualTo(
+                                    ConnectedUserMcpServerErrorType.MCP_SERVER_NOT_PROVISIONABLE.getErrorKey()));
+        }
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .hasSize(2);
@@ -535,6 +609,13 @@ public class ConnectedUserMcpServerFacadeIntTest {
                 VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
                 """,
             mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId, toolParameters);
+    }
+
+    private void saveMcpComponentWithTool(String componentName, McpServer mcpServer) {
+        McpComponent mcpComponent = mcpComponentRepository.save(
+            new McpComponent(componentName, 1, mcpServer.getId(), null));
+
+        mcpToolRepository.save(new McpTool(componentName + "Tool", Map.of(), mcpComponent.getId()));
     }
 
     private long insert(String sql, Object... arguments) {

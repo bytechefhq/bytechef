@@ -20,6 +20,9 @@ public class ConnectedUserMcpServerErrorType extends AbstractErrorType {
     public static final ConnectedUserMcpServerErrorType NO_COVERED_INTEGRATION =
         new ConnectedUserMcpServerErrorType(100);
 
+    public static final ConnectedUserMcpServerErrorType MCP_SERVER_NOT_PROVISIONABLE =
+        new ConnectedUserMcpServerErrorType(101);
+
     private ConnectedUserMcpServerErrorType(int errorKey) {
         super(McpIntegrationInstanceTool.class, errorKey);
     }
