@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface ConnectedUserProjectAdminFacade {
     void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable);
 
     List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
+
+    List<ProvisionableAutomationWorkflowProjectDTO> getProvisionableProjects(long connectedUserId);
 }
