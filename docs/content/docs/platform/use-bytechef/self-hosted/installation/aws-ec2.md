@@ -74,7 +74,7 @@ sudo docker run --name bytechef -d -p 8080:8080 --restart unless-stopped \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://<rds-endpoint>:5432/bytechef \
     --env BYTECHEF_DATASOURCE_USERNAME=<db-user> \
     --env BYTECHEF_DATASOURCE_PASSWORD=<db-password> \
-    --env BYTECHEF_ENCRYPTION_PROVIDER=property \
+    --env BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY \
     --env BYTECHEF_ENCRYPTION_PROPERTY_KEY=<stable-encryption-key> \
     --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=<stable-remember-me-key> \
     --env BYTECHEF_PUBLIC_URL=https://bytechef.example.com \
@@ -109,7 +109,7 @@ Browse to `http://<instance-public-dns>:8080/login` (or your `BYTECHEF_PUBLIC_UR
   ```
 
 - **Health checks:** configure the target group / load balancer health check to `GET /actuator/health/readiness` on port `8080`.
-- **Persistence:** all state is in PostgreSQL except file entries, whose provider defaults to **`filesystem`** - mount an EBS volume for `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` if you keep that default, or set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` to keep files in the database, or `aws` (lowercase, with `BYTECHEF_CLOUD_PROVIDER=aws`) to keep them in S3.
+- **Persistence:** all state is in PostgreSQL except file entries, whose provider defaults to **`FILESYSTEM`** - mount an EBS volume for `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` if you keep that default, or set `BYTECHEF_FILE_STORAGE_PROVIDER=JDBC` to keep files in the database, or `AWS` (with `BYTECHEF_CLOUD_PROVIDER=AWS`) to keep them in S3.
 - **Restart policy:** the `--restart unless-stopped` flag above brings the container back after a reboot. Manage it with a systemd unit if you need more control.
 - **Backups:** take regular PostgreSQL dumps. With RDS, use automated snapshots; with a containerized database from the Compose file above:
 

@@ -169,9 +169,9 @@ where they live with the `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` environment variable
 
 | Provider | Where memories live |
 |---|---|
-| `jdbc` (default) | The ByteChef database. Existing deployments are unaffected. |
-| `filesystem` | One JSON file per memory on the server's file system, via the configured file storage. |
-| `aws` | The same file-based layout on S3. Requires the Enterprise Edition AWS file-storage module. |
+| `JDBC` (default) | The ByteChef database. Existing deployments are unaffected. |
+| `FILESYSTEM` | One JSON file per memory on the server's file system, via the configured file storage. |
+| `AWS` | The same file-based layout on S3. Requires the Enterprise Edition AWS file-storage module. |
 
 Selecting a provider whose file-storage backend is not configured fails fast at startup rather than
 falling back - a silent fallback would write memories to storage the operator did not choose. On every

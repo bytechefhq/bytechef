@@ -23,7 +23,7 @@ gcloud run deploy bytechef \
   --port=8080 \
   --allow-unauthenticated \
   --add-cloudsql-instances=<connection-name> \
-  --set-env-vars=BYTECHEF_DATASOURCE_URL="jdbc:postgresql:///bytechef?cloudSqlInstance=<connection-name>&socketFactory=com.google.cloud.sql.postgres.SocketFactory",BYTECHEF_DATASOURCE_USERNAME="<db-user>",BYTECHEF_ENCRYPTION_PROVIDER=property,BYTECHEF_PUBLIC_URL="https://bytechef.example.com" \
+  --set-env-vars=BYTECHEF_DATASOURCE_URL="jdbc:postgresql:///bytechef?cloudSqlInstance=<connection-name>&socketFactory=com.google.cloud.sql.postgres.SocketFactory",BYTECHEF_DATASOURCE_USERNAME="<db-user>",BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY,BYTECHEF_PUBLIC_URL="https://bytechef.example.com" \
   --set-secrets=BYTECHEF_DATASOURCE_PASSWORD=db-password:latest,BYTECHEF_ENCRYPTION_PROPERTY_KEY=encryption-key:latest,BYTECHEF_SECURITY_REMEMBER_ME_KEY=remember-me-key:latest
 ```
 
@@ -129,5 +129,5 @@ Then browse to `http://<external-ip>:8080` and click **Create account** to regis
 
 ## Storage note (Cloud Run)
 
-Cloud Run instances have ephemeral local storage, and file storage defaults to **`filesystem`** - so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database, or store them in object storage of your own. Leaving the default in place writes files to a disk that disappears with the instance.
+Cloud Run instances have ephemeral local storage, and file storage defaults to **`FILESYSTEM`** - so set `BYTECHEF_FILE_STORAGE_PROVIDER=JDBC` explicitly to keep files in the database, or store them in object storage of your own. Leaving the default in place writes files to a disk that disappears with the instance.
 

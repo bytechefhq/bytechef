@@ -83,10 +83,10 @@ these messages over a different transport, chosen with `bytechef.message-broker.
 
 | Value | Behaviour |
 |---|---|
-| `sqs` (default) | Control messages go through SQS and reach only one node. Fine for a single node. |
-| `redis` | Control messages go over Redis pub/sub (for example Amazon ElastiCache), so every node receives them. Required when you run more than one node. Set the connection with `BYTECHEF_REDIS_*`. |
+| `SQS` (default) | Control messages go through SQS and reach only one node. Fine for a single node. |
+| `REDIS` | Control messages go over Redis pub/sub (for example Amazon ElastiCache), so every node receives them. Required when you run more than one node. Set the connection with `BYTECHEF_REDIS_*`. |
 
-With `sqs` and more than one node, each control message reaches a single node, often not the one that needs it:
+With `SQS` and more than one node, each control message reaches a single node, often not the one that needs it:
 
 - Cancelling a task or a job does not stop a task running on another worker.
 - Cancelling a trigger execution does not stop it on another node.
@@ -95,7 +95,7 @@ With `sqs` and more than one node, each control message reaches a single node, o
 - EE cache invalidation between nodes is off, so other nodes keep cached entries for up to 10 minutes after a change.
 - EE shared state caches (the editor's webhook test, embedded JWT public keys) stay in each node's memory, so with more than one coordinator these can fail when a request lands on another coordinator.
 
-At startup, the `AWS` provider logs a warning when `control-provider` is `sqs`.
+At startup, the `AWS` provider logs a warning when `control-provider` is `SQS`.
 
 ## Switching providers
 

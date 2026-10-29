@@ -43,7 +43,7 @@ How each webhook mode runs on a webhook node:
 
 Select the edition with `BYTECHEF_EDITION`. Multi-tenancy (`BYTECHEF_TENANT_MODE=MULTI`) also requires EE.
 
-Between the nodes, a self-hosted cluster uses RabbitMQ (`AMQP`) or Redis (`REDIS`) as the [message broker](/platform/use-bytechef/self-hosted/configuration/message-brokers). On AWS, use `AWS` (SQS, EE) and set `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=redis` (for example Amazon ElastiCache), which is required for more than one node - see [AWS SQS control messages](/platform/use-bytechef/self-hosted/configuration/message-brokers#aws-sqs-control-messages).
+Between the nodes, a self-hosted cluster uses RabbitMQ (`AMQP`) or Redis (`REDIS`) as the [message broker](/platform/use-bytechef/self-hosted/configuration/message-brokers). On AWS, use `AWS` (SQS, EE) and set `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS` (for example Amazon ElastiCache), which is required for more than one node - see [AWS SQS control messages](/platform/use-bytechef/self-hosted/configuration/message-brokers#aws-sqs-control-messages).
 
 ## Load balancer routing
 
@@ -70,7 +70,7 @@ CE supports one coordinator. More than one starts and runs, but CE has no cache 
 With `BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED=true`, every running coordinator checks in to the shared Quartz job store. A CE coordinator that sees another coordinator checking in logs, about a minute after startup and every 10 minutes after that:
 
 ```
-Another coordinator is running against this database. The Community Edition supports one coordinator: with more, caches go stale and sessions are not shared. Running more than one coordinator requires ByteChef Enterprise Edition (bytechef.edition=ee, BYTECHEF_EDITION=ee).
+Another coordinator is running against this database. The Community Edition supports one coordinator: with more, caches go stale and sessions are not shared. Running more than one coordinator requires ByteChef Enterprise Edition (bytechef.edition=EE, BYTECHEF_EDITION=EE).
 ```
 
 The coordinator keeps running. Running more than one coordinator requires EE.
@@ -108,11 +108,11 @@ Workers and webhook nodes do not use sessions, so they keep the session store di
 
 Caffeine is the only cache provider, so every node keeps its own caches. In EE, evictions are broadcast to every other node over the message broker as a control message, and no setting is needed; webhook nodes take part like coordinators. CE runs one coordinator and does not broadcast evictions. A CE webhook node does not need them: production webhooks run published workflow versions, which never change, and the editor's webhook test runs on the coordinator.
 
-The broadcast needs a broker whose control routes reach every node: `AMQP`, `REDIS`, `KAFKA` (a consumer group per node), `JMS` (a topic), or `AWS` with `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=redis`. With `AWS` and the default `sqs` control provider, a control message reaches one node only, so cache invalidation stays off and every node keeps its caches for up to 10 minutes. The in-memory broker has a single node and needs no invalidation.
+The broadcast needs a broker whose control routes reach every node: `AMQP`, `REDIS`, `KAFKA` (a consumer group per node), `JMS` (a topic), or `AWS` with `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS`. With `AWS` and the default `SQS` control provider, a control message reaches one node only, so cache invalidation stays off and every node keeps its caches for up to 10 minutes. The in-memory broker has a single node and needs no invalidation.
 
 ### Shared state caches
 
-A few caches hold state instead of copies of stored data: the editor's webhook test (whether a test webhook is enabled and the output of its registration) and the public keys of embedded JWTs. In EE, when the message broker is not the in-memory one and a Redis connection is configured (`BYTECHEF_SESSION_STORE=redis`, the `REDIS` broker, or `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=redis`), these caches live in Redis under the key prefix `bytechef:cache:` with a 10-minute TTL, so every coordinator sees the same entries. All other caches stay in each node's memory. With the in-memory broker, or the `AWS` broker with the default `sqs` control provider, these caches stay in memory even when Redis is configured, the same as cache invalidation; both setups are meant for a single node.
+A few caches hold state instead of copies of stored data: the editor's webhook test (whether a test webhook is enabled and the output of its registration) and the public keys of embedded JWTs. In EE, when the message broker is not the in-memory one and a Redis connection is configured (`BYTECHEF_SESSION_STORE=REDIS`, the `REDIS` broker, or `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS`), these caches live in Redis under the key prefix `bytechef:cache:` with a 10-minute TTL, so every coordinator sees the same entries. All other caches stay in each node's memory. With the in-memory broker, or the `AWS` broker with the default `SQS` control provider, these caches stay in memory even when Redis is configured, the same as cache invalidation; both setups are meant for a single node.
 
 Without Redis, these caches stay in each node's memory too. With more than one EE coordinator, the editor's webhook test and the embedded JWT checks can then fail when a request lands on a different coordinator than the one that stored the state, so configure Redis when you run more than one coordinator.
 
@@ -140,7 +140,7 @@ docker compose -f docker-compose.cluster.yml up -d
 BYTECHEF_WEBHOOKS=2 docker compose -f docker-compose.cluster.yml up -d
 
 # EE high availability: 2 coordinators
-BYTECHEF_EDITION=ee BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
+BYTECHEF_EDITION=EE BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.cluster.yml up -d
 
 # Webhooks only on 2 webhook nodes, no coordinator fallback
 BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
@@ -150,18 +150,18 @@ BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker
 
 | Variable | Default | Values |
 | -------- | ------- | ------ |
-| `BYTECHEF_EDITION` | `ce` | `ce`, `ee` |
-| `BYTECHEF_COORDINATORS` | `1` | more than 1 requires `ee` |
+| `BYTECHEF_EDITION` | `CE` | `CE`, `EE` |
+| `BYTECHEF_COORDINATORS` | `1` | more than 1 requires `EE` |
 | `BYTECHEF_WORKERS` | `3` | |
 | `BYTECHEF_WEBHOOKS` | `0` | with 0, the coordinators serve webhooks |
 | `BYTECHEF_COORDINATOR_WEBHOOKS` | `true` | with `false` and every webhook node down, webhooks fail |
-| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | `amqp` | `amqp` (RabbitMQ), `redis` |
-| `BYTECHEF_SESSION_STORE` | `redis` | `redis`, `jdbc` (`ee` only) |
-| `BYTECHEF_TENANT_MODE` | `single` | `single`, `multi` (`ee` only) |
+| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | `AMQP` | `AMQP` (RabbitMQ), `REDIS` |
+| `BYTECHEF_SESSION_STORE` | `REDIS` | `REDIS`, `JDBC` (`EE` only) |
+| `BYTECHEF_TENANT_MODE` | `SINGLE` | `SINGLE`, `MULTI` (`EE` only) |
 | `BYTECHEF_IMAGE` | `docker.bytechef.io/bytechef/bytechef:latest` | a locally built image |
 | `BYTECHEF_PORT` | `8080` | published port of the load balancer |
 | `RABBITMQ_MANAGEMENT_PORT` | `15672` | published port of the RabbitMQ management UI (user `bytechef`, password `RABBITMQ_PASSWORD`) |
 
-With `BYTECHEF_EDITION=ce` and more than one coordinator, every coordinator starts and logs the warning above. The file storage is a volume all nodes mount; in production, mount shared storage (NFS, EFS) or use the `aws` provider.
+With `BYTECHEF_EDITION=CE` and more than one coordinator, every coordinator starts and logs the warning above. The file storage is a volume all nodes mount; in production, mount shared storage (NFS, EFS) or use the `AWS` provider.
 
-The file sets `BYTECHEF_SESSION_STORE=redis` on every node. In EE with the `redis` session store, the Redis connection opens at startup, so the nodes fail to start when Redis is unreachable. PostgreSQL, the message broker and the load balancer are single containers in this file; for production, use managed or clustered services.
+The file sets `BYTECHEF_SESSION_STORE=REDIS` on every node. In EE with the `REDIS` session store, the Redis connection opens at startup, so the nodes fail to start when Redis is unreachable. PostgreSQL, the message broker and the load balancer are single containers in this file; for production, use managed or clustered services.

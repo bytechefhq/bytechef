@@ -32,7 +32,7 @@ az containerapp create \
     BYTECHEF_DATASOURCE_URL="jdbc:postgresql://<pg-host>:5432/bytechef" \
     BYTECHEF_DATASOURCE_USERNAME="<db-user>" \
     BYTECHEF_DATASOURCE_PASSWORD=secretref:db-password \
-    BYTECHEF_ENCRYPTION_PROVIDER=property \
+    BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY \
     BYTECHEF_ENCRYPTION_PROPERTY_KEY=secretref:encryption-key \
     BYTECHEF_SECURITY_REMEMBER_ME_KEY=secretref:remember-me-key \
     BYTECHEF_PUBLIC_URL="https://bytechef.example.com"
@@ -54,4 +54,4 @@ Open the Container App's ingress URL and click **Create account** to register th
 
 ## Storage note
 
-Container Apps replicas have ephemeral local storage, and file storage defaults to **`filesystem`** - so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database, or attach durable object storage of your own. Leaving the default in place writes files to a disk that disappears with the replica. See [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage).
+Container Apps replicas have ephemeral local storage, and file storage defaults to **`FILESYSTEM`** - so set `BYTECHEF_FILE_STORAGE_PROVIDER=JDBC` explicitly to keep files in the database, or attach durable object storage of your own. Leaving the default in place writes files to a disk that disappears with the replica. See [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage).

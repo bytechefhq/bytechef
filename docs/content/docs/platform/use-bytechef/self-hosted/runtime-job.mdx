@@ -219,15 +219,15 @@ variable through relaxed binding. The ones that matter for ephemeral runs:
 | `SPRING_PROFILES_ACTIVE` | - | Set to `prod` for INFO-level `com.bytechef` logging; the `dev` profile logs it at DEBUG. Note that INFO is already enough to put the `--connections` value in the log. |
 | `BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATION_PATTERN` | `${user.home}/bytechef/data/workflows/*.{json\|yml\|yaml}` | Where to find workflow files. |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_ENABLED` (+ `_URL`, `_BRANCH`, `_SEARCH_PATHS`, `_USERNAME`, `_PASSWORD`) | `false` | Pull workflows from Git instead of a volume. |
-| `BYTECHEF_FILE_STORAGE_PROVIDER` | `filesystem` | Where file entries (large task outputs, file properties) are stored during the run. |
+| `BYTECHEF_FILE_STORAGE_PROVIDER` | `FILESYSTEM` | Where file entries (large task outputs, file properties) are stored during the run. |
 | `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` | `${user.home}/bytechef/data/file-storage` | Base directory for the filesystem provider. |
-| `BYTECHEF_DATA_STORAGE_PROVIDER` | `filesystem` | Where workflow data-storage values are kept for the run. |
-| `BYTECHEF_WORKFLOW_OUTPUT_STORAGE_PROVIDER` | `filesystem` | Where task and job outputs are kept for the run. |
-| `BYTECHEF_ENCRYPTION_PROVIDER` | `filesystem` | Set to `property` with `BYTECHEF_ENCRYPTION_PROPERTY_KEY` to avoid writing a generated key to an ephemeral filesystem. |
+| `BYTECHEF_DATA_STORAGE_PROVIDER` | `FILESYSTEM` | Where workflow data-storage values are kept for the run. |
+| `BYTECHEF_WORKFLOW_OUTPUT_STORAGE_PROVIDER` | `FILESYSTEM` | Where task and job outputs are kept for the run. |
+| `BYTECHEF_ENCRYPTION_PROVIDER` | `FILESYSTEM` | Set to `PROPERTY` with `BYTECHEF_ENCRYPTION_PROPERTY_KEY` to avoid writing a generated key to an ephemeral filesystem. |
 | `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | `10` | Concurrent task consumers within the run. |
 
 The Runtime Job app ships only the filesystem and database file-storage backends, so
-`BYTECHEF_FILE_STORAGE_PROVIDER=aws` is not available in this distribution.
+`BYTECHEF_FILE_STORAGE_PROVIDER=AWS` is not available in this distribution.
 
 ## Kubernetes example
 
