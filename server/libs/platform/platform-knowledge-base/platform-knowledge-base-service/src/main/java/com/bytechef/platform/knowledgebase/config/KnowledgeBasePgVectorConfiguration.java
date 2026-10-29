@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.knowledgebase.config;
 
+import com.bytechef.pgvector.util.PgVectorSchemaUtils;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import io.micrometer.observation.ObservationRegistry;
@@ -48,21 +49,15 @@ class KnowledgeBasePgVectorConfiguration {
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy) {
 
-        return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
-            .schemaName(properties.getSchemaName())
-            .idType(properties.getIdType())
-            .vectorTableName("kb_" + properties.getTableName())
-            .vectorTableValidationsEnabled(properties.isSchemaValidation())
-            .dimensions(properties.getDimensions())
-            .distanceType(properties.getDistanceType())
-            .removeExistingVectorStoreTable(properties.isRemoveExistingVectorStoreTable())
-            .indexType(properties.getIndexType())
-            .initializeSchema(true)
-            .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
-            .customObservationConvention(customObservationConvention.getIfAvailable(() -> null))
-            .batchingStrategy(batchingStrategy)
-            .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
-            .build();
+        PgVectorSchemaUtils.initializeSchema(
+            () -> buildVectorStore(
+                pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
+                batchingStrategy, true)
+                    .afterPropertiesSet());
+
+        return buildVectorStore(
+            pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
+            batchingStrategy, false);
     }
 
     @Bean
@@ -78,5 +73,28 @@ class KnowledgeBasePgVectorConfiguration {
             : tableName;
 
         return new KnowledgeBaseVectorStoreMetadataService(pgVectorJdbcTemplate, objectMapper, () -> fullTableName);
+    }
+
+    private static PgVectorStore buildVectorStore(
+        JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
+        ObjectProvider<ObservationRegistry> observationRegistry,
+        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
+        BatchingStrategy batchingStrategy, boolean initializeSchema) {
+
+        return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
+            .schemaName(properties.getSchemaName())
+            .idType(properties.getIdType())
+            .vectorTableName("kb_" + properties.getTableName())
+            .vectorTableValidationsEnabled(properties.isSchemaValidation())
+            .dimensions(properties.getDimensions())
+            .distanceType(properties.getDistanceType())
+            .removeExistingVectorStoreTable(properties.isRemoveExistingVectorStoreTable())
+            .indexType(properties.getIndexType())
+            .initializeSchema(initializeSchema)
+            .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
+            .customObservationConvention(customObservationConvention.getIfAvailable(() -> null))
+            .batchingStrategy(batchingStrategy)
+            .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
+            .build();
     }
 }

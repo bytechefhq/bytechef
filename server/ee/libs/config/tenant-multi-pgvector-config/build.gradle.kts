@@ -10,6 +10,7 @@ dependencies {
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework:spring-tx")
     implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:config:pgvector-config"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
 
