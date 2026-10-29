@@ -353,7 +353,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
-    public void enableProjectWorkflow(
+    public @Nullable String enableProjectWorkflow(
         String externalUserId, String workflowUuid, boolean enable, Long environmentId) {
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
@@ -368,7 +368,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         if (isReference) {
             connectedUserWorkflowReferenceFacade.enableReference(externalUserId, workflowUuid, enable, environment);
 
-            return;
+            if (!enable) {
+                return null;
+            }
+
+            return connectedUserProjectWorkflowRepository
+                .findByConnectedUserProjectIdAndAutomationWorkflowUuid(connectedUserProject.getId(), workflowUuid)
+                .map(connectedUserReferenceAttentionResolver::resolve)
+                .map(ReferenceState::attentionReason)
+                .orElse(null);
         }
 
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
@@ -403,6 +411,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(
             connectedUserProject.getProjectId(), workflowId, enable, environment);
+
+        return null;
     }
 
     @Override

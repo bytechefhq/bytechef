@@ -618,8 +618,12 @@ paths:
           schema:
             type: "string"
       responses:
-        "204":
+        "200":
           description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnableConnectedUserWorkflowResponse"
         "409":
           description: "A required connection could not be auto-wired, a required workflow input has no value, or\
             \ the workflow that would run has validation errors."
@@ -1519,8 +1523,12 @@ paths:
           schema:
             type: "string"
       responses:
-        "204":
+        "200":
           description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnableConnectedUserWorkflowResponse"
         "409":
           description: "A required connection could not be auto-wired, a required workflow input has no value, or\
             \ the workflow that would run has validation errors."
@@ -2006,6 +2014,18 @@ paths:
         - bearerAuth: [ ]
 components:
   schemas:
+    EnableConnectedUserWorkflowResponse:
+      description: "The outcome of enabling a workflow."
+      type: "object"
+      properties:
+        attentionReason:
+          description: "Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or INVALID_WORKFLOW:<errorCount>. Null when nothing blocks it."
+          type: "string"
+        enabled:
+          description: "Whether the workflow is enabled for the connected user."
+          type: "boolean"
+      required:
+        - "enabled"
     ConnectedUserProjectWorkflow:
       description: "A group of tasks that make one logical workflow."
       type: "object"
