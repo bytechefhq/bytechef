@@ -46,18 +46,14 @@ public class RemoteTriggerStateFacadeClient implements TriggerStateFacade {
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
         TriggerStateValue triggerStateValue = getStub().fetchValue(toWorkflowExecutionIdRequest(workflowExecutionId));
 
-        if (!triggerStateValue.hasValue()) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable((T) platformWorkflowExecutionProtoMapper.toObject(triggerStateValue.getValue()));
+        return Optional.ofNullable((T) platformWorkflowExecutionProtoMapper.toTriggerStateObject(triggerStateValue));
     }
 
     @Override
     public void save(WorkflowExecutionId workflowExecutionId, Object value) {
         getStub().save(
             SaveTriggerStateRequest.newBuilder()
-                .setValue(platformWorkflowExecutionProtoMapper.toBytes(value))
+                .setValue(platformWorkflowExecutionProtoMapper.toTriggerStateValue(value))
                 .setWorkflowExecutionId(workflowExecutionId.toString())
                 .build());
     }
