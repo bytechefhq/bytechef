@@ -56,12 +56,12 @@ type ProvisionableConnectedUserProject {
 type ProvisionableConnectedUserProjectWorkflow {
     workflowUuid: ID!
     label: String
-    inputs: [ProvisionableConnectedUserProjectWorkflowInput!]!
+    inputs: [ProvisionableConnectedUserProjectWorkflowInputDefinition!]!
     provisioned: Boolean!
     dangling: Boolean!
 }
 
-type ProvisionableConnectedUserProjectWorkflowInput {
+type ProvisionableConnectedUserProjectWorkflowInputDefinition {
     name: String!
     label: String
     type: String
