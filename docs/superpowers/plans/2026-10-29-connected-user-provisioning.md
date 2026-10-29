@@ -165,8 +165,8 @@ Same command. Expected: all pass (Task 1 tests included).
       provisionConnectedUserProjectWorkflows(connectedUserId: ID!, workflows: [ProvisionConnectedUserProjectWorkflowInput!]!): Boolean
   }
   type ProvisionableConnectedUserProject { projectId: ID!, name: String!, projectVersion: Int!, workflows: [ProvisionableConnectedUserProjectWorkflow!]! }
-  type ProvisionableConnectedUserProjectWorkflow { workflowUuid: ID!, label: String, inputs: [ProvisionableConnectedUserProjectWorkflowInput!]!, provisioned: Boolean!, dangling: Boolean! }
-  type ProvisionableConnectedUserProjectWorkflowInput { name: String!, label: String, type: String, required: Boolean! }
+  type ProvisionableConnectedUserProjectWorkflow { workflowUuid: ID!, label: String, inputs: [ProvisionableConnectedUserProjectWorkflowInputDefinition!]!, provisioned: Boolean!, dangling: Boolean! }
+  type ProvisionableConnectedUserProjectWorkflowInputDefinition { name: String!, label: String, type: String, required: Boolean! }
   input ProvisionConnectedUserProjectWorkflowInput { workflowUuid: ID!, inputs: Map }
   ```
 - Consumes: Task 1 and Task 2 facade methods. The controller returns the DTOs directly (records map field by field); the mutation maps the input list to `ProvisionConnectedUserProjectWorkflowDTO` and returns `true`.

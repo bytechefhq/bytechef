@@ -109,11 +109,15 @@ written, so a dialog that raced a configuration or permission change does not ha
 workflows are accepted and left as they are (the public path's "get or create" semantics), unless inputs are
 supplied, in which case the inputs are updated, again like the public path.
 
-The facade method is `@Transactional`. `getOrCreateReference` saves the reference and then throws
+The facade method is not `@Transactional`: each `getOrCreateReference` runs in its own transaction and commits
+with the trigger registrations its deployment update makes (including provider-side dynamic webhooks), exactly
+like N calls on the public path. One outer transaction would roll the earlier rows back on a later failure while
+their triggers stayed registered. `getOrCreateReference` saves the reference and then throws
 `MissingConnectionException` when a component has no connection for this user; its own proxy is `noRollbackFor`
 that exception. Builder's call: the admin facade catches `MissingConnectionException` per workflow and continues
 with the next one, so the reference stays and shows the missing-connection attention reason on the tab, which is
-the behaviour the customer would see. Any other exception aborts the call and rolls everything back. Required
+the behaviour the customer would see. Any other exception aborts the call at that workflow: the references
+provisioned before it stay committed and provisioned, and the ones after it are not attempted. Required
 inputs are enforced by the dialog only; the server path does not reject an empty required input
 (`throwOnMissingInput` is false there), same as the public API.
 
@@ -157,7 +161,10 @@ ProvisionableConnectedUserMcpServerDTO(
 
 - `coveredComponentNames`: component names of the server's `McpComponent`s and of the integrations behind its
   `McpIntegrationInstanceConfiguration`s for which the user has at least one integration instance (component
-  match for tools; configuration id match for workflows). De-duplicated, sorted.
+  match for tools; configuration id match for workflows). De-duplicated, sorted. Only an `McpComponent` with at
+  least one enabled `McpTool`, and only a configuration with at least one enabled
+  `IntegrationInstanceConfigurationWorkflow`, counts; one with nothing enabled is left out of both lists, because
+  the write below would enable nothing through it.
 - `missingComponentNames`: the rest.
 - `provisioned`: the server is already in `getConnectedUserMcpServers(connectedUserId)`.
 
@@ -175,10 +182,12 @@ provisionConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!): Boolean
 
 `ConnectedUserMcpServerFacade.provisionMcpServer(long connectedUserId, long mcpServerId)`:
 
-1. Rejects a server that is not in the provisionable list for this user, or has no covered component
-   (`ConfigurationException` with a new `ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION`; this is the
-   first `AbstractErrorType` in the embedded-ai modules, so it gets its own class and key range next to the
-   facade), so the mutation cannot create an empty server entry.
+1. Rejects a server that is not in the provisionable list for this user (disabled, or of another environment;
+   `ConfigurationException` with `ConnectedUserMcpServerErrorType.MCP_SERVER_NOT_PROVISIONABLE`, "MCP server %s
+   cannot be provisioned for connected user %s"), or has no covered component (`ConfigurationException` with
+   `ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION`). This is the first `AbstractErrorType` in the
+   embedded-ai modules, so it gets its own class and key range next to the facade. Together the two rejections
+   mean the mutation cannot create an empty server entry.
 2. For every `McpComponent` of the server and every `McpTool` of it with `McpTool.enabled` (the same flag the read
    path and the self-service `enableMcpIntegrationInstanceTool` honour; "exposed" means exactly that flag): for
    each integration instance of the user whose integration's component name matches, create the
