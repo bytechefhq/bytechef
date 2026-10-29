@@ -7,7 +7,4 @@ dependencies {
     implementation(project(":server:ee:libs:core:remote:remote-grpc"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-grpc"))
-    testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
-
-    testImplementation("io.grpc:grpc-inprocess")
 }
