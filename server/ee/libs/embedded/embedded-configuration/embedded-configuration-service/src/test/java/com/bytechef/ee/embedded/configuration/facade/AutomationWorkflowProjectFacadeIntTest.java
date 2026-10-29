@@ -756,10 +756,10 @@ class AutomationWorkflowProjectFacadeIntTest {
         long legacyProjectId = projectService.create(legacyProject)
             .getId();
 
-        automationWorkflowProjectService.create(legacyProjectId, null, true);
+        automationWorkflowProjectService.create(legacyProjectId, null);
 
         long plainProjectId = automationWorkflowProjectFacade.createProject(
-            "Xylophone", "", null, List.of(), null, null);
+            "Xylophone", "", null, List.of(), null);
 
         assertThat(automationWorkflowProjectFacade.getProject(legacyProjectId)
             .name()).isEqualTo("Legacy");
@@ -779,10 +779,10 @@ class AutomationWorkflowProjectFacadeIntTest {
         long legacyProjectId = projectService.create(legacyProject)
             .getId();
 
-        automationWorkflowProjectService.create(legacyProjectId, null, true);
+        automationWorkflowProjectService.create(legacyProjectId, null);
 
-        long betaProjectId = automationWorkflowProjectFacade.createProject("Beta", "", null, List.of(), null, null);
-        long alphaProjectId = automationWorkflowProjectFacade.createProject("alpha", "", null, List.of(), null, null);
+        long betaProjectId = automationWorkflowProjectFacade.createProject("Beta", "", null, List.of(), null);
+        long alphaProjectId = automationWorkflowProjectFacade.createProject("alpha", "", null, List.of(), null);
 
         List<Long> projectIds = List.of(legacyProjectId, betaProjectId, alphaProjectId);
 
@@ -797,7 +797,7 @@ class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testDuplicateProjectOfAPlainNamedProject() {
         long projectId = automationWorkflowProjectFacade.createProject(
-            "Xylophone", "", null, List.of(), null, null);
+            "Xylophone", "", null, List.of(), null);
 
         long duplicateProjectId = automationWorkflowProjectFacade.duplicateProject(projectId);
 
@@ -810,11 +810,11 @@ class AutomationWorkflowProjectFacadeIntTest {
     @Test
     void testUpdateProjectRejectsAnEmbeddedPrefixedName() {
         long projectId = automationWorkflowProjectFacade.createProject(
-            "Updatable " + UUID.randomUUID(), "", null, List.of(), null, null);
+            "Updatable " + UUID.randomUUID(), "", null, List.of(), null);
 
         assertThatThrownBy(
             () -> automationWorkflowProjectFacade.updateProject(
-                projectId, "__EMBEDDED_x", "", null, List.of(), null, null))
+                projectId, "__EMBEDDED_x", "", null, List.of(), null))
                     .isInstanceOf(IllegalArgumentException.class);
     }
 
