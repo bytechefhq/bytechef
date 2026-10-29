@@ -43,6 +43,7 @@ import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
@@ -108,6 +109,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver;
+    private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowValidator connectedUserWorkflowValidator;
     private final ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver;
@@ -142,6 +144,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver,
+        ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserService connectedUserService, ConnectedUserWorkflowValidator connectedUserWorkflowValidator,
         ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver,
         ConnectionService connectionService,
@@ -164,6 +167,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectedUserReferenceAttentionResolver = connectedUserReferenceAttentionResolver;
+        this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowValidator = connectedUserWorkflowValidator;
         this.connectedUserWorkflowWebhookUrlResolver = connectedUserWorkflowWebhookUrlResolver;
@@ -876,11 +880,13 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
                 ReferenceState referenceState = connectedUserReferenceAttentionResolver.resolve(reference);
 
+                List<ConnectedUserWorkflowTemplateDTO.Input> inputs = template == null ? List.of() : template.inputs();
+
                 ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO =
                     ConnectedUserProjectWorkflowDTO.ofReference(
                         connectedUser.getId(), reference, new WorkflowDTO(workflow, List.of(), List.of()),
-                        template == null ? List.of() : template.components(),
-                        template == null ? List.of() : template.inputs(), referenceState.inputs(),
+                        template == null ? List.of() : template.components(), inputs,
+                        withoutProvidedInputValues(referenceState.inputs(), inputs),
                         referenceState.attentionReason());
 
                 return connectedUserProjectWorkflowDTO.withStaticWebhookUrl(
@@ -901,12 +907,43 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
+        Optional<ProjectDeployment> projectDeploymentOptional = connectedUserReferenceDeploymentManager
+            .fetchDeployment(projectDeploymentId);
+
+        if (projectDeploymentOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ProjectDeployment projectDeployment = projectDeploymentOptional.get();
+
+        ProvidedNames providedNames = connectedUserReferenceDeploymentManager.getProvidedNames(
+            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
+
         return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, automationWorkflowUuid)
             .map(workflowService::getWorkflow)
             .map(workflow -> new ConnectedUserWorkflowTemplateDTO(
                 automationWorkflowUuid, workflow.getLabel(), workflow.getDescription(), null,
                 workflowComponentResolver.getTriggerComponents(workflow),
-                workflowComponentResolver.getTaskComponents(workflow), toInputs(workflow), null));
+                workflowComponentResolver.getTaskComponents(workflow), toInputs(workflow), null))
+            .map(template -> template.withProvided(providedNames.componentNames(), providedNames.inputNames()));
+    }
+
+    /**
+     * Leaves out the values of the inputs the configuration provides: they are the administrator's, not the connected
+     * user's, so they are neither shown to the user nor sent back when the user stores their own input values.
+     */
+    private static Map<String, ?> withoutProvidedInputValues(
+        Map<String, ?> inputValues, List<ConnectedUserWorkflowTemplateDTO.Input> inputs) {
+
+        Map<String, Object> userInputValues = new LinkedHashMap<>(inputValues);
+
+        for (ConnectedUserWorkflowTemplateDTO.Input input : inputs) {
+            if (input.provided()) {
+                userInputValues.remove(input.name());
+            }
+        }
+
+        return userInputValues;
     }
 
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {

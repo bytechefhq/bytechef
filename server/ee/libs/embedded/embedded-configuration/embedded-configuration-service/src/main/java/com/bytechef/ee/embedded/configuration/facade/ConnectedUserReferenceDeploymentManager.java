@@ -22,6 +22,7 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectCo
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
+import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -32,6 +33,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -268,6 +270,65 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     /**
+     * Returns the names of the components whose connection, and of the inputs whose value, the configuration of the
+     * automation workflow project in the environment provides for the workflow.
+     */
+    public ProvidedNames getProvidedNames(
+        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
+
+        return toProvidedNames(getProvidedValues(automationWorkflowProjectId, environment, automationWorkflowUuid));
+    }
+
+    /**
+     * Returns the names of the components whose connection, and of the inputs whose value, the configuration provides
+     * for the workflow.
+     */
+    public ProvidedNames getProvidedNames(
+        AutomationWorkflowProjectConfiguration configuration, String automationWorkflowUuid) {
+
+        return toProvidedNames(getProvidedValues(configuration, automationWorkflowUuid));
+    }
+
+    /**
+     * Rejects a connected user's request that sets the connection of a component, or the value of an input, the
+     * configuration of the automation workflow project in the environment provides for the workflow. A request that
+     * leaves them out, or gives an input no value, passes.
+     *
+     * @throws ProvidedValueLockedException naming the first provided component or input the request sets
+     */
+    public void checkProvidedValuesNotRequested(
+        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid,
+        Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> userInputs) {
+
+        if (requestedConnectionIds.isEmpty() && (userInputs == null || userInputs.isEmpty())) {
+            return;
+        }
+
+        ProvidedNames providedNames = getProvidedNames(
+            automationWorkflowProjectId, environment, automationWorkflowUuid);
+
+        Set<String> providedComponentNames = providedNames.componentNames();
+
+        for (String componentName : requestedConnectionIds.keySet()) {
+            if (providedComponentNames.contains(componentName)) {
+                throw new ProvidedValueLockedException(componentName, ProvidedValueLockedException.Kind.CONNECTION);
+            }
+        }
+
+        if (userInputs == null) {
+            return;
+        }
+
+        Set<String> providedInputNames = providedNames.inputNames();
+
+        for (Map.Entry<String, ?> entry : userInputs.entrySet()) {
+            if (entry.getValue() != null && providedInputNames.contains(entry.getKey())) {
+                throw new ProvidedValueLockedException(entry.getKey(), ProvidedValueLockedException.Kind.INPUT);
+            }
+        }
+    }
+
+    /**
      * Resolves a connected user's reference to the workflow {@code workflowId} of the automation workflow project in
      * the environment, applying the connections and inputs the project's configuration provides for the workflow: a
      * provided connection fills its component's slots, and the returned row inputs are {@code userInputs} overridden by
@@ -306,6 +367,10 @@ class ConnectedUserReferenceDeploymentManager {
             .orElseThrow(() -> new IllegalArgumentException(
                 "Automation workflow %s is not deployed in deployment id=%s".formatted(
                     automationWorkflowUuid, projectDeploymentId)));
+
+        checkProvidedValuesNotRequested(
+            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid, Map.of(),
+            userInputs);
 
         ProvidedValues providedValues = getProvidedValues(
             projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
@@ -385,7 +450,14 @@ class ConnectedUserReferenceDeploymentManager {
 
         return automationWorkflowProjectConfigurationService
             .fetchConfiguration(automationWorkflowProjectId, environment.ordinal())
-            .flatMap(configuration -> configuration.fetchWorkflow(UUID.fromString(automationWorkflowUuid)))
+            .map(configuration -> getProvidedValues(configuration, automationWorkflowUuid))
+            .orElse(ProvidedValues.NONE);
+    }
+
+    private static ProvidedValues getProvidedValues(
+        AutomationWorkflowProjectConfiguration configuration, String automationWorkflowUuid) {
+
+        return configuration.fetchWorkflow(UUID.fromString(automationWorkflowUuid))
             .map(configurationWorkflow -> new ProvidedValues(
                 configurationWorkflow.getProvidedConnections(), configurationWorkflow.getProvidedInputs()))
             .orElse(ProvidedValues.NONE);
@@ -480,6 +552,21 @@ class ConnectedUserReferenceDeploymentManager {
         return inputs;
     }
 
+    private ProvidedNames toProvidedNames(ProvidedValues providedValues) {
+        Set<String> providedInputNames = new LinkedHashSet<>();
+        Map<String, Object> providedInputs = providedValues.inputs();
+
+        for (Map.Entry<String, Object> entry : providedInputs.entrySet()) {
+            if (entry.getValue() != null) {
+                providedInputNames.add(entry.getKey());
+            }
+        }
+
+        return new ProvidedNames(
+            connectedUserWorkflowConnectionResolver.getProvidedComponentNames(providedValues.connectionIds()),
+            providedInputNames);
+    }
+
     private static boolean isUnchanged(ProjectDeploymentWorkflow row, RowSpec rowSpec) {
         ResolvedWorkflowConnections resolved = rowSpec.resolved();
 
@@ -493,6 +580,14 @@ class ConnectedUserReferenceDeploymentManager {
     public record ReferenceResolution(
         RowSpec rowSpec, @Nullable String missingComponentName, @Nullable String missingInputName,
         int workflowErrorCount) {
+    }
+
+    /**
+     * The names of the components whose connection, and of the inputs whose value, a configuration provides for a
+     * workflow.
+     */
+    @SuppressFBWarnings("EI")
+    public record ProvidedNames(Set<String> componentNames, Set<String> inputNames) {
     }
 
     @SuppressFBWarnings("EI")

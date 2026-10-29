@@ -198,6 +198,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     private ConnectUserProjectRepository connectUserProjectRepository;
 
     @Autowired
+    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+
+    @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
 
     @Autowired
@@ -1171,7 +1174,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             connectedUser.getExternalId(), hiddenWorkflowUuid, Environment.PRODUCTION))
                 .isInstanceOf(AutomationWorkflowTemplateNotVisibleException.class);
 
-        verifyNoInteractions(connectedUserReferenceDeploymentManager);
+        verify(connectedUserReferenceDeploymentManager, never()).getOrCreateDeployment(anyLong(), anyString(), any());
+        verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(anyLong(), anyInt(), anyMap());
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
@@ -1375,6 +1379,37 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                 assertThat(row.isEnabled()).isTrue();
                 assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator"));
             });
+    }
+
+    @Test
+    void testAProvidedConnectionIsNeverAmongTheConnectedUsersConnections() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Not Listed");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        long ownedConnectionId = givenOwnedConnection(connectedUser);
+        long administratorConnectionId = givenAdministratorConnection();
+
+        provideValues(
+            automationWorkflowProjectId, workflowUuid, Map.of("slack", administratorConnectionId), Map.of());
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        assertThat(getConnectionIds(reference)).containsExactly(administratorConnectionId);
+
+        assertThat(connectedUserConnectionFacade.getConnections(connectedUser.getId(), "slack", List.of()))
+            .extracting(ConnectionDTO::id)
+            .containsExactly(ownedConnectionId);
+        assertThat(connectedUserConnectionFacade.getConnections(connectedUser.getId(), null, List.of()))
+            .extracting(ConnectionDTO::id)
+            .containsExactly(ownedConnectionId);
+        assertThat(connectedUserConnectionFacade.getOwnedConnectionIds(connectedUser.getId()))
+            .containsExactly(ownedConnectionId);
     }
 
     private long givenAdministratorConnection() {

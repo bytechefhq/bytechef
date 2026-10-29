@@ -279,11 +279,14 @@ paths:
         "400":
           description: "A requested connection is not one of the connected user's connections."
         "409":
-          description: "A required connection could not be auto-wired."
+          description: "A required connection could not be auto-wired, or the request sets a connection or an input\
+            \ value the configuration provides."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MissingConnectionError"
+                oneOf:
+                  - $ref: "#/components/schemas/MissingConnectionError"
+                  - $ref: "#/components/schemas/ProvidedValueLockedError"
       security:
         - jwtBearerAuth: [ ]
     delete:
@@ -698,11 +701,14 @@ paths:
         "204":
           description: "Successful operation."
         "409":
-          description: "A required workflow input has no value; the reference stays disabled."
+          description: "A required workflow input has no value, so the reference stays disabled, or the request sets\
+            \ the value of an input the configuration provides."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MissingInputError"
+                oneOf:
+                  - $ref: "#/components/schemas/MissingInputError"
+                  - $ref: "#/components/schemas/ProvidedValueLockedError"
       security:
         - jwtBearerAuth: [ ]
   /automation/workflows/{workflowUuid}/publish:
@@ -1232,11 +1238,14 @@ paths:
         "400":
           description: "A requested connection is not one of the connected user's connections."
         "409":
-          description: "A required connection could not be auto-wired."
+          description: "A required connection could not be auto-wired, or the request sets a connection or an input\
+            \ value the configuration provides."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MissingConnectionError"
+                oneOf:
+                  - $ref: "#/components/schemas/MissingConnectionError"
+                  - $ref: "#/components/schemas/ProvidedValueLockedError"
       security:
         - bearerAuth: [ ]
     delete:
@@ -1615,11 +1624,14 @@ paths:
         "204":
           description: "Successful operation."
         "409":
-          description: "A required workflow input has no value; the reference stays disabled."
+          description: "A required workflow input has no value, so the reference stays disabled, or the request sets\
+            \ the value of an input the configuration provides."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MissingInputError"
+                oneOf:
+                  - $ref: "#/components/schemas/MissingInputError"
+                  - $ref: "#/components/schemas/ProvidedValueLockedError"
       security:
         - bearerAuth: [ ]
   /{externalUserId}/automation/workflows/{workflowUuid}/publish:
@@ -2085,7 +2097,8 @@ components:
           items:
             $ref: "#/components/schemas/AutomationWorkflowProjectWorkflowInput"
         inputValues:
-          description: "The values the connected user has already supplied, keyed by input name."
+          description: "The values the connected user has already supplied, keyed by input name. Values of inputs\
+            \ the configuration provides are left out."
           type: "object"
           additionalProperties: true
         attentionReason:
@@ -2617,6 +2630,17 @@ components:
         missingInputName:
           description: "The name of the required input that has no value."
           type: "string"
+    ProvidedValueLockedError:
+      type: "object"
+      description: "Returned when a request sets the connection of a component, or the value of an input, that the\
+        \ configuration provides for every connected user. Exactly one of the properties is present."
+      properties:
+        providedComponentName:
+          description: "The name of the component whose connection the configuration provides."
+          type: "string"
+        providedInputName:
+          description: "The name of the input whose value the configuration provides."
+          type: "string"
     AutomationWorkflowProjectWorkflowTemplate:
       type: "object"
       description: "An automation workflow template within an automation workflow project."
@@ -2666,6 +2690,10 @@ components:
         required:
           description: "Whether a value must be supplied."
           type: "boolean"
+        provided:
+          description: "Whether the configuration provides the value of this input, so the connected user cannot set\
+            \ it. The value itself is not returned."
+          type: "boolean"
     AutomationWorkflowProjectComponent:
       type: "object"
       description: "A component used in an automation workflow."
@@ -2686,6 +2714,11 @@ components:
           description: "The id of the integration that backs this component in the current environment, absent when no enabled integration configuration visible to the connected user exists for it; present only when connectionRequired is true. When several integrations back the component, the one with the lowest id is returned."
           type: "integer"
           format: "int64"
+        provided:
+          description: "Whether the configuration provides the connection of this component, so the connected user\
+            \ cannot choose one. The provided connection is neither listed among the connected user's connections nor\
+            \ returned."
+          type: "boolean"
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid

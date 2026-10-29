@@ -114,6 +114,54 @@ class AutomationWorkflowProjectApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetFrontendProjectsMarksTheComponentsAndInputsTheConfigurationProvides() {
+        ConnectedUserWorkflowTemplateDTO.Component openAiComponent =
+            new ConnectedUserWorkflowTemplateDTO.Component("openAi", "OpenAI", "openai-icon-svg", true, null, true);
+        ConnectedUserWorkflowTemplateDTO.Component slackComponent =
+            new ConnectedUserWorkflowTemplateDTO.Component("slack", "Slack", "slack-icon-svg", true, 8L, false);
+
+        ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
+            WORKFLOW_UUID, "Summarize Email", null, null, List.of(), List.of(openAiComponent, slackComponent),
+            List.of(
+                new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true, true),
+                new ConnectedUserWorkflowTemplateDTO.Input("channel", "Channel", "STRING", true, false)),
+            null);
+
+        AutomationWorkflowProjectDTO projectDTO = new AutomationWorkflowProjectDTO(
+            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, true, 0,
+            null);
+
+        when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
+            .thenReturn(List.of(projectDTO));
+
+        webTestClient
+            .get()
+            .uri("/v1/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].workflowTemplates[0].components[0].name")
+            .isEqualTo("openAi")
+            .jsonPath("$[0].workflowTemplates[0].components[0].provided")
+            .isEqualTo(true)
+            .jsonPath("$[0].workflowTemplates[0].components[1].name")
+            .isEqualTo("slack")
+            .jsonPath("$[0].workflowTemplates[0].components[1].provided")
+            .isEqualTo(false)
+            .jsonPath("$[0].workflowTemplates[0].inputs[0].name")
+            .isEqualTo("model")
+            .jsonPath("$[0].workflowTemplates[0].inputs[0].provided")
+            .isEqualTo(true)
+            .jsonPath("$[0].workflowTemplates[0].inputs[1].name")
+            .isEqualTo("channel")
+            .jsonPath("$[0].workflowTemplates[0].inputs[1].provided")
+            .isEqualTo(false);
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
     void testGetFrontendProjectsListTheTriggerComponentsOfATemplateFirstAndOnce() {
         ConnectedUserWorkflowTemplateDTO.Component gmailComponent =
             new ConnectedUserWorkflowTemplateDTO.Component("gmail", "Gmail", "gmail-icon-svg", true, 7L);
