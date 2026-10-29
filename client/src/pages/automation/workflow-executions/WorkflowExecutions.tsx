@@ -51,6 +51,10 @@ const jobStatusOptions = [
         label: GetWorkflowExecutionsPageJobStatusEnum.Failed,
         value: GetWorkflowExecutionsPageJobStatusEnum.Failed,
     },
+    {
+        label: GetWorkflowExecutionsPageJobStatusEnum.PaymentRequired,
+        value: GetWorkflowExecutionsPageJobStatusEnum.PaymentRequired,
+    },
 ];
 
 const ProjectLabel = ({project}: {project: Project}) => (

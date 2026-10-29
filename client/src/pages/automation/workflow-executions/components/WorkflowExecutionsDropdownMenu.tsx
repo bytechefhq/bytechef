@@ -14,7 +14,7 @@ import {toast} from 'sonner';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
-const RESTARTABLE_JOB_STATUSES = new Set<string>(['FAILED', 'STOPPED']);
+const RESTARTABLE_JOB_STATUSES = new Set<string>(['FAILED', 'PAYMENT_REQUIRED', 'STOPPED']);
 
 const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecution}) => {
     const queryClient = useQueryClient();

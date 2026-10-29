@@ -74,6 +74,10 @@ const jobStatusOptions = [
         label: GetWorkflowExecutionsPageJobStatusEnum.Failed,
         value: GetWorkflowExecutionsPageJobStatusEnum.Failed,
     },
+    {
+        label: GetWorkflowExecutionsPageJobStatusEnum.PaymentRequired,
+        value: GetWorkflowExecutionsPageJobStatusEnum.PaymentRequired,
+    },
 ];
 
 type ConnectedUserProjectType = ConnectedUserProjectsQuery['connectedUserProjects'][number];
