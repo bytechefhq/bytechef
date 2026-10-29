@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
@@ -27,6 +28,7 @@ import com.bytechef.exception.ConfigurationException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -127,6 +129,99 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
             .path("automationWorkflowProjectConfigurations[0].workflows[1].providedConnections")
             .entity(Map.class)
             .isEqualTo(Map.of());
+    }
+
+    @Test
+    void testAutomationWorkflowProjectConfigurationWorkflowProvidableValuesReturnsSlotsInputsAndProvidedValues() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one"))
+            .thenReturn(
+                new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO(
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot(
+                            "openai", "OpenAI", true,
+                            List.of(
+                                new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection(
+                                    42L, "Company OpenAI")))),
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                            "channel", "Channel", "STRING", true)),
+                    Map.of("openai", 42L), Map.of("channel", "general")));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationWorkflowProvidableValues(id: "5", workflowUuid: "uuid-one") {
+                        connectionSlots {
+                            componentName
+                            title
+                            required
+                            providableConnections {
+                                id
+                                name
+                            }
+                        }
+                        inputs {
+                            name
+                            label
+                            type
+                            required
+                        }
+                        providedConnections
+                        providedInputs
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.connectionSlots[0].componentName")
+            .entity(String.class)
+            .isEqualTo("openai")
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.connectionSlots[0].title")
+            .entity(String.class)
+            .isEqualTo("OpenAI")
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.connectionSlots[0].required")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path(
+                "automationWorkflowProjectConfigurationWorkflowProvidableValues.connectionSlots[0].providableConnections[0].id")
+            .entity(String.class)
+            .isEqualTo("42")
+            .path(
+                "automationWorkflowProjectConfigurationWorkflowProvidableValues.connectionSlots[0].providableConnections[0].name")
+            .entity(String.class)
+            .isEqualTo("Company OpenAI")
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.inputs[0].name")
+            .entity(String.class)
+            .isEqualTo("channel")
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.inputs[0].required")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.providedConnections.openai")
+            .entity(Long.class)
+            .isEqualTo(42L)
+            .path("automationWorkflowProjectConfigurationWorkflowProvidableValues.providedInputs.channel")
+            .entity(String.class)
+            .isEqualTo("general");
+    }
+
+    @Test
+    void testAutomationWorkflowProjectConfigurationsListReadsNoLongerCarryConnectionSlotsOrInputs() {
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurations(projectId: "7") {
+                        workflows {
+                            connectionSlots {
+                                componentName
+                            }
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .errors()
+            .expect(error -> Objects.toString(error.getMessage(), "")
+                .contains("connectionSlots"))
+            .verify();
     }
 
     @Test

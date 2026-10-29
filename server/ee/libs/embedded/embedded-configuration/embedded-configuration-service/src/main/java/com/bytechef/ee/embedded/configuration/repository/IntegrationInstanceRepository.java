@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -118,4 +119,11 @@ public interface IntegrationInstanceRepository
         WHERE connection_id = :connectionId
         """)
     boolean existsByConnectionId(@Param("connectionId") long connectionId);
+
+    @Query("""
+        SELECT connection_id
+        FROM integration_instance
+        WHERE connection_id IN (:connectionIds)
+        """)
+    List<Long> findConnectionIdsIn(@Param("connectionIds") Collection<Long> connectionIds);
 }

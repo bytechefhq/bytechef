@@ -21,6 +21,7 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectCo
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
@@ -29,14 +30,18 @@ import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMe
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,6 +70,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
@@ -79,6 +85,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     public AutomationWorkflowProjectConfigurationAdminFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
+        ComponentDefinitionService componentDefinitionService,
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
@@ -88,6 +95,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
+        this.componentDefinitionService = componentDefinitionService;
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
@@ -163,6 +171,35 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .stream()
             .map(this::toDTO)
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
+        long configurationId, String workflowUuid) {
+
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService
+            .fetchProjectWorkflow(configuration.getProjectId(), configuration.getProjectVersion(), workflowUuid)
+            .orElseThrow(() -> newInvalidProvidedValueException(
+                "Workflow uuid=%s is not part of version %d".formatted(
+                    workflowUuid, configuration.getProjectVersion())));
+
+        String workflowId = projectWorkflow.getWorkflowId();
+
+        Optional<AutomationWorkflowProjectConfigurationWorkflow> configurationWorkflowOptional =
+            configuration.fetchWorkflow(projectWorkflow.getUuid());
+
+        return new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO(
+            toConnectionSlotDTOs(configuration, workflowId), toInputDTOs(workflowService.getWorkflow(workflowId)),
+            configurationWorkflowOptional
+                .map(AutomationWorkflowProjectConfigurationWorkflow::getProvidedConnections)
+                .orElse(Map.of()),
+            configurationWorkflowOptional
+                .map(AutomationWorkflowProjectConfigurationWorkflow::getProvidedInputs)
+                .orElse(Map.of()));
     }
 
     @Override
@@ -275,6 +312,69 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                 id, UUID.fromString(workflowUuid), validatedProvidedConnections, validatedProvidedInputs);
 
         publishUpdatedEvent(updatedConfiguration.getProjectId(), updatedConfiguration.getEnvironmentId());
+    }
+
+    private List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> toConnectionSlotDTOs(
+        AutomationWorkflowProjectConfiguration configuration, String workflowId) {
+
+        Map<String, List<ComponentConnection>> componentConnectionsByName = workflowConnectionSlot.getSlots(workflowId)
+            .stream()
+            .collect(Collectors.groupingBy(ComponentConnection::componentName, LinkedHashMap::new,
+                Collectors.toList()));
+
+        List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> connectionSlots =
+            new ArrayList<>();
+
+        for (Map.Entry<String, List<ComponentConnection>> entry : componentConnectionsByName.entrySet()) {
+            String componentName = entry.getKey();
+            ComponentConnection firstComponentConnection = entry.getValue()
+                .getFirst();
+
+            boolean required = entry.getValue()
+                .stream()
+                .anyMatch(ComponentConnection::required);
+
+            String title = componentDefinitionService
+                .fetchComponentDefinition(componentName, firstComponentConnection.componentVersion())
+                .map(ComponentDefinition::getTitle)
+                .filter(StringUtils::isNotBlank)
+                .orElse(componentName);
+
+            connectionSlots.add(
+                new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot(
+                    componentName, title, required, getProvidableConnections(configuration, componentName)));
+        }
+
+        return connectionSlots;
+    }
+
+    private List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection>
+        getProvidableConnections(
+            AutomationWorkflowProjectConfiguration configuration, String componentName) {
+
+        List<Connection> connections = connectionService.getConnections(
+            componentName, null, null, configuration.getEnvironmentId(), PlatformType.EMBEDDED);
+
+        Set<Long> ownedConnectionIds = connectedUserConnectionMembership.getConnectedUserOwnedConnectionIds(
+            connections.stream()
+                .map(Connection::getId)
+                .collect(Collectors.toSet()));
+
+        return connections.stream()
+            .filter(connection -> !ownedConnectionIds.contains(connection.getId()))
+            .map(
+                connection -> new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection(
+                    Objects.requireNonNull(connection.getId()), connection.getName()))
+            .toList();
+    }
+
+    private static List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input>
+        toInputDTOs(Workflow workflow) {
+        return workflow.getInputs()
+            .stream()
+            .map(input -> new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                input.name(), input.label(), input.type(), input.required()))
+            .toList();
     }
 
     private static ConfigurationException newInvalidProvidedValueException(String message) {

@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,13 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable);
 
     List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId);
+
+    /**
+     * Returns the connection slots (with the connections an administrator can provide), the inputs and the values
+     * already provided for one workflow of the configuration, at the configuration's pinned project version.
+     */
+    AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
+        long configurationId, String workflowUuid);
 
     AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(long configurationId, int projectVersion);
 

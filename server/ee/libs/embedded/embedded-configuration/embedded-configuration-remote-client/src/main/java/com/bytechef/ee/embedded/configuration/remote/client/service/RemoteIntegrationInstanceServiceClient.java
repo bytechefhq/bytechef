@@ -13,6 +13,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,6 +63,11 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     @Override
     public boolean existsByConnectionId(long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<Long> getConnectionIdsIn(Set<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 

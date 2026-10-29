@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @version ee
@@ -26,6 +27,8 @@ public interface IntegrationInstanceService {
     void delete(long id);
 
     boolean existsByConnectionId(long connectionId);
+
+    Set<Long> getConnectionIdsIn(Set<Long> connectionIds);
 
     Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment);
