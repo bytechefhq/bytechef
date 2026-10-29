@@ -13,5 +13,9 @@ dependencies {
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation("org.springframework.grpc:spring-grpc-core")
     testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
+    testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-config"))
+    testImplementation(project(":server:libs:modules:components:math-helper"))
+    testImplementation(project(":server:libs:modules:components:var"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }
