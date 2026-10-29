@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * provisioned regardless of whether the Knowledge Base feature is enabled.
  *
  * <p>
- * Gated on the PgVector provider being configured ({@code bytechef.ai.vectorstore.provider=pgvector} plus a
+ * Gated on the PgVector provider being configured ({@code bytechef.ai.vectorstore.provider=PGVECTOR} plus a
  * {@code bytechef.ai.vectorstore.pgvector.url}) because the loader depends on the {@code pgVectorJdbcTemplate} bean,
  * which only exists under those same conditions (see {@code PgVectorJdbcConfiguration} and
  * {@link MultiTenantPgVectorDataSourceConfiguration}). Deployments such as the {@code liquibase} migration run that do
