@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProject", description = "An automation workflow automation workflow project.")
 @JsonTypeName("AutomationWorkflowProject")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T18:00:54.064737+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class AutomationWorkflowProjectModel {
 
   private @Nullable Long id;
@@ -108,11 +108,11 @@ public class AutomationWorkflowProjectModel {
   }
 
   /**
-   * Whether the project is listed in the Automation Hub. The API returns hidden projects too, so a custom UI can offer them.
+   * Whether the project is listed in the Automation Hub. The project listing leaves out hidden projects; a workflow of a hidden project is still available by its workflow uuid.
    * @return automationHubVisible
    */
   
-  @Schema(name = "automationHubVisible", description = "Whether the project is listed in the Automation Hub. The API returns hidden projects too, so a custom UI can offer them.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "automationHubVisible", description = "Whether the project is listed in the Automation Hub. The project listing leaves out hidden projects; a workflow of a hidden project is still available by its workflow uuid.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("automationHubVisible")
   public @Nullable Boolean getAutomationHubVisible() {
     return automationHubVisible;

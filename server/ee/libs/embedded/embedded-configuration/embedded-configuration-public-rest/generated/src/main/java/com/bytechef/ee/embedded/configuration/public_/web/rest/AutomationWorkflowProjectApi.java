@@ -6,6 +6,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T18:00:54.064737+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "automation-workflow-project", description = "The Embedded Automation Workflow Project Public API")
 public interface AutomationWorkflowProjectApi {
@@ -88,6 +89,54 @@ public interface AutomationWorkflowProjectApi {
     }
 
 
+    String PATH_GET_FRONTEND_WORKFLOW_TEMPLATE = "/automation/workflow-templates/{workflowUuid}";
+    /**
+     * GET /automation/workflow-templates/{workflowUuid} : Get an automation workflow template available to the connected user
+     * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+     *
+     * @param workflowUuid The workflow template uuid. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The automation workflow template. (status code 200)
+     *         or The template does not exist or is not available to the connected user. (status code 404)
+     */
+    @Operation(
+        operationId = "getFrontendWorkflowTemplate",
+        summary = "Get an automation workflow template available to the connected user",
+        description = "Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.",
+        tags = { "automation-workflow-project" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The automation workflow template.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = AutomationWorkflowProjectWorkflowTemplateModel.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The template does not exist or is not available to the connected user.")
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = AutomationWorkflowProjectApi.PATH_GET_FRONTEND_WORKFLOW_TEMPLATE,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> getFrontendWorkflowTemplate(
+        @Parameter(name = "workflowUuid", description = "The workflow template uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"id\" : \"id\", \"label\" : \"label\", \"description\" : \"description\", \"components\" : [ { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true }, { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true } ], \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     String PATH_GET_PROJECTS = "/{externalUserId}/automation/projects";
     /**
      * GET /{externalUserId}/automation/projects : Get automation workflow projects available to a connected user identified by external user id
@@ -124,6 +173,56 @@ public interface AutomationWorkflowProjectApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "[ { \"id\" : 0, \"name\" : \"name\", \"description\" : \"description\", \"automationHubVisible\" : true, \"workflowTemplates\" : [ { \"id\" : \"id\", \"label\" : \"label\", \"description\" : \"description\", \"components\" : [ { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true }, { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true } ], \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true } ] }, { \"id\" : \"id\", \"label\" : \"label\", \"description\" : \"description\", \"components\" : [ { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true }, { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true } ], \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true } ] } ] }, { \"id\" : 0, \"name\" : \"name\", \"description\" : \"description\", \"automationHubVisible\" : true, \"workflowTemplates\" : [ { \"id\" : \"id\", \"label\" : \"label\", \"description\" : \"description\", \"components\" : [ { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true }, { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true } ], \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true } ] }, { \"id\" : \"id\", \"label\" : \"label\", \"description\" : \"description\", \"components\" : [ { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true }, { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true } ], \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true } ] } ] } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GET_WORKFLOW_TEMPLATE = "/{externalUserId}/automation/workflow-templates/{workflowUuid}";
+    /**
+     * GET /{externalUserId}/automation/workflow-templates/{workflowUuid} : Get an automation workflow template available to a connected user identified by external user id
+     * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param workflowUuid The workflow template uuid. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The automation workflow template. (status code 200)
+     *         or The template does not exist or is not available to the connected user. (status code 404)
+     */
+    @Operation(
+        operationId = "getWorkflowTemplate",
+        summary = "Get an automation workflow template available to a connected user identified by external user id",
+        description = "Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.",
+        tags = { "automation-workflow-project" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The automation workflow template.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = AutomationWorkflowProjectWorkflowTemplateModel.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "The template does not exist or is not available to the connected user.")
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = AutomationWorkflowProjectApi.PATH_GET_WORKFLOW_TEMPLATE,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplate(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "workflowUuid", description = "The workflow template uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"id\" : \"id\", \"label\" : \"label\", \"description\" : \"description\", \"components\" : [ { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true }, { \"name\" : \"name\", \"title\" : \"title\", \"icon\" : \"icon\", \"connectionRequired\" : true, \"integrationId\" : 6, \"provided\" : true } ], \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : true, \"provided\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
