@@ -159,6 +159,11 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     }
 
     @Override
+    public void clearInputs(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateEnabled(Long id, boolean enable) {
         throw new UnsupportedOperationException();
     }
