@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.JobIdsPage;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.RemoteTriggerExecution;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.RemoteWorkflowNodeType;
 import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.TaskStateValue;
+import com.bytechef.ee.platform.workflow.execution.remote.grpc.proto.TriggerStateValue;
 import com.bytechef.ee.remote.grpc.JsonBytes;
 import com.bytechef.ee.remote.grpc.ProtoJsonMapper;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -44,7 +45,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class PlatformWorkflowExecutionProtoMapper {
 
-    private static final List<String> ALLOWED_TASK_STATE_CLASS_PREFIXES = List.of("java.", "com.bytechef.");
+    private static final List<String> ALLOWED_STATE_CLASS_PREFIXES = List.of("java.", "com.bytechef.");
 
     private final AtlasExecutionProtoMapper atlasExecutionProtoMapper;
     private final JsonBytes jsonBytes;
@@ -173,19 +174,28 @@ public class PlatformWorkflowExecutionProtoMapper {
             return null;
         }
 
-        String classname = taskStateValue.getClassname();
+        return toStateObject(taskStateValue.getValue(), taskStateValue.getClassname(), "task");
+    }
 
-        if (ALLOWED_TASK_STATE_CLASS_PREFIXES.stream()
-            .noneMatch(classname::startsWith)) {
+    public TriggerStateValue toTriggerStateValue(@Nullable Object value) {
+        TriggerStateValue.Builder builder = TriggerStateValue.newBuilder();
 
-            throw new IllegalArgumentException("Disallowed class in task state: " + classname);
+        if (value != null) {
+            Class<?> valueClass = value.getClass();
+
+            builder.setClassname(valueClass.getName())
+                .setValue(jsonBytes.write(value));
         }
 
-        try {
-            return objectMapper.convertValue(jsonBytes.read(taskStateValue.getValue()), Class.forName(classname));
-        } catch (ClassNotFoundException classNotFoundException) {
-            throw new IllegalArgumentException("Unknown class in task state: " + classname, classNotFoundException);
+        return builder.build();
+    }
+
+    public @Nullable Object toTriggerStateObject(TriggerStateValue triggerStateValue) {
+        if (!triggerStateValue.hasClassname()) {
+            return null;
         }
+
+        return toStateObject(triggerStateValue.getValue(), triggerStateValue.getClassname(), "trigger");
     }
 
     public Timestamp toTimestamp(Instant instant) {
@@ -216,6 +226,21 @@ public class PlatformWorkflowExecutionProtoMapper {
         return new WorkflowNodeType(
             remoteWorkflowNodeType.getName(), remoteWorkflowNodeType.getVersion(),
             remoteWorkflowNodeType.hasOperation() ? remoteWorkflowNodeType.getOperation() : null);
+    }
+
+    private Object toStateObject(ByteString value, String classname, String stateName) {
+        if (ALLOWED_STATE_CLASS_PREFIXES.stream()
+            .noneMatch(classname::startsWith)) {
+
+            throw new IllegalArgumentException("Disallowed class in " + stateName + " state: " + classname);
+        }
+
+        try {
+            return objectMapper.convertValue(jsonBytes.read(value), Class.forName(classname));
+        } catch (ClassNotFoundException classNotFoundException) {
+            throw new IllegalArgumentException(
+                "Unknown class in " + stateName + " state: " + classname, classNotFoundException);
+        }
     }
 
     @JsonIgnoreProperties(
