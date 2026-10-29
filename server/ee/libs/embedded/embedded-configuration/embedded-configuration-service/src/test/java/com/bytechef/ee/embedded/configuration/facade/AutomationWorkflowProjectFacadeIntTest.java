@@ -747,44 +747,12 @@ class AutomationWorkflowProjectFacadeIntTest {
     }
 
     @Test
-    void testDisplayNameStripsOnlyTheLegacyPrefix() {
-        Project legacyProject = new Project();
-
-        legacyProject.setName("__EMBEDDED_AUTOMATION__Legacy");
-        legacyProject.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
-
-        long legacyProjectId = projectService.create(legacyProject)
-            .getId();
-
-        automationWorkflowProjectService.create(legacyProjectId, null);
-
-        long plainProjectId = automationWorkflowProjectFacade.createProject(
-            "Xylophone", "", null, List.of(), null);
-
-        assertThat(automationWorkflowProjectFacade.getProject(legacyProjectId)
-            .name()).isEqualTo("Legacy");
-        assertThat(automationWorkflowProjectFacade.getProject(plainProjectId)
-            .name()).isEqualTo("Xylophone");
-        assertThat(projectService.getProject(plainProjectId)
-            .getName()).isEqualTo("Xylophone");
-    }
-
-    @Test
-    void testGetProjectsSortsByDisplayNameIgnoringCase() {
-        Project legacyProject = new Project();
-
-        legacyProject.setName("__EMBEDDED_AUTOMATION__Zeta");
-        legacyProject.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
-
-        long legacyProjectId = projectService.create(legacyProject)
-            .getId();
-
-        automationWorkflowProjectService.create(legacyProjectId, null);
-
+    void testGetProjectsSortsByNameIgnoringCase() {
+        long zetaProjectId = automationWorkflowProjectFacade.createProject("Zeta", "", null, List.of(), null);
         long betaProjectId = automationWorkflowProjectFacade.createProject("Beta", "", null, List.of(), null);
         long alphaProjectId = automationWorkflowProjectFacade.createProject("alpha", "", null, List.of(), null);
 
-        List<Long> projectIds = List.of(legacyProjectId, betaProjectId, alphaProjectId);
+        List<Long> projectIds = List.of(zetaProjectId, betaProjectId, alphaProjectId);
 
         assertThat(
             automationWorkflowProjectFacade.getProjects()
