@@ -595,7 +595,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     class: twMerge(
                         'w-full max-w-full min-w-0 border-none text-sm wrap-break-word break-all whitespace-pre-wrap ring-0 outline-hidden',
                         controlType === 'RICH_TEXT' && 'prose prose-sm',
-                        isFormulaMode && 'font-mono text-[13px]/5',
                         className
                     ),
                     id: elementId ?? '',

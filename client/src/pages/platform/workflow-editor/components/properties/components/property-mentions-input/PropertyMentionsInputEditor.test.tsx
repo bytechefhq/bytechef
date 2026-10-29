@@ -669,75 +669,15 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'FormulaEditor'}).textContent).toBe('3 + 4');
         });
 
-        it('should render the editor content in a monospace font in formula mode', async () => {
-            renderEditor({isFormulaMode: true, value: '=1 + 2'});
-
-            await microtaskTick(2);
-
-            expect(screen.getByRole('textbox', {name: 'Editor'})).toHaveClass('font-mono');
-        });
-
-        it('should not render the editor content in a monospace font outside formula mode', async () => {
-            renderEditor({isFormulaMode: false, value: 'plain'});
-
-            await microtaskTick(2);
-
-            expect(screen.getByRole('textbox', {name: 'Editor'})).not.toHaveClass('font-mono');
-        });
-
-        // The editor is created once, so the monospace class only tracks the toggle if tiptap's
-        // useEditor effect reapplies editorProps.attributes through setOptions on rerender.
-        it('should apply the monospace font when formula mode is switched on', async () => {
-            const {rerender} = render(
-                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
-                    <PropertyMentionsInput
-                        controlType="TEXT"
-                        isFormulaMode={false}
-                        label="FormulaEditor"
-                        leadingIcon="📄"
-                        path="parameters.field"
-                        placeholder=""
-                        type="STRING"
-                        value="plain"
-                    />
-                </WorkflowEditorProvider>
-            );
-
-            await microtaskTick(2);
-
-            expect(screen.getByRole('textbox', {name: 'FormulaEditor'})).not.toHaveClass('font-mono');
-
-            rerender(
-                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
-                    <PropertyMentionsInput
-                        controlType="TEXT"
-                        isFormulaMode={true}
-                        label="FormulaEditor"
-                        leadingIcon="📄"
-                        path="parameters.field"
-                        placeholder=""
-                        type="STRING"
-                        value="plain"
-                    />
-                </WorkflowEditorProvider>
-            );
-
-            await microtaskTick(2);
-
-            expect(screen.getByRole('textbox', {name: 'FormulaEditor'})).toHaveClass('font-mono');
-        });
-
-        // 13px mono reads alongside the 14px sans of every other property value: 14px mono was too heavy,
-        // 12px too faint. The /5 pins the leading so the field holds its height across the toggle.
-        it('should set the editor content to 13px mono in formula mode', async () => {
+        it('should render the editor content in the same 14px font as other properties in formula mode', async () => {
             renderEditor({isFormulaMode: true, value: '=1 + 2'});
 
             await microtaskTick(2);
 
             const textbox = screen.getByRole('textbox', {name: 'Editor'});
 
-            expect(textbox).toHaveClass('text-[13px]/5');
-            expect(textbox).not.toHaveClass('text-sm');
+            expect(textbox).toHaveClass('text-sm');
+            expect(textbox).not.toHaveClass('font-mono');
         });
 
         it('should keep the editor content at text-sm outside formula mode', async () => {
@@ -748,9 +688,7 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'Editor'})).toHaveClass('text-sm');
         });
 
-        // Data pill chips size themselves, so the editor's own text size does not reach them. The
-        // modifier on the wrapper is what the stylesheet hangs the matching chip size off.
-        it('should mark the editor wrapper so data pill chips can shrink with the text', async () => {
+        it('should mark the editor wrapper in formula mode', async () => {
             const {container} = renderEditor({isFormulaMode: true, value: '=1 + 2'});
 
             await microtaskTick(2);
