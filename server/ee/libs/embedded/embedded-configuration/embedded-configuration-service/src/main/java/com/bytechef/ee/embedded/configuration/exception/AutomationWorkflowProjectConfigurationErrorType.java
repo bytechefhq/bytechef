@@ -26,6 +26,9 @@ public class AutomationWorkflowProjectConfigurationErrorType extends AbstractErr
     public static final AutomationWorkflowProjectConfigurationErrorType CONFIGURATION_ALREADY_EXISTS =
         new AutomationWorkflowProjectConfigurationErrorType(102);
 
+    public static final AutomationWorkflowProjectConfigurationErrorType VERSION_LACKS_REFERENCED_WORKFLOWS =
+        new AutomationWorkflowProjectConfigurationErrorType(103);
+
     private AutomationWorkflowProjectConfigurationErrorType(int errorKey) {
         super(AutomationWorkflowProjectConfiguration.class, errorKey);
     }

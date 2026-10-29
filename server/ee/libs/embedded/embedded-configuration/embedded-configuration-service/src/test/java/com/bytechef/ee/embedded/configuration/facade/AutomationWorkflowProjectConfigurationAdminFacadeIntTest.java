@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
@@ -25,8 +27,10 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
+import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -95,6 +99,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
     ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
     ComponentConnectionFacade.class,
     ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
+    ConnectedUserWorkflowReferenceAdminFacade.class,
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -119,6 +124,9 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
     @Autowired
     private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
+
+    @Autowired
+    private ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
 
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -304,6 +312,142 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationDeletedEvent.class)
             .toList())
                 .containsExactly(new AutomationWorkflowProjectConfigurationDeletedEvent(projectId, ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testUpdateConfigurationRejectsOlderVersionLackingReferencedWorkflow() {
+        long projectId = createPublishedProject("Rollback Blocked", 1);
+
+        String workflowUuid = addWorkflowAndPublish(projectId, "Rollback Blocked Workflow");
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 2, true, true);
+
+        givenReferences(newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+                configurationId, 1, true, true))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> {
+                        assertThat(configurationException.getMessage())
+                            .contains("Version 1 lacks workflows connected users still use: Rollback Blocked Workflow")
+                            .contains("Turn them off in this configuration or remove them from those users first.");
+                        assertThat(configurationException.getErrorKey())
+                            .isEqualTo(
+                                AutomationWorkflowProjectConfigurationErrorType.VERSION_LACKS_REFERENCED_WORKFLOWS
+                                    .getErrorKey());
+                    });
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .getProjectVersion()).isEqualTo(2);
+    }
+
+    @Test
+    void testUpdateConfigurationAllowsOlderVersionContainingReferencedWorkflows() {
+        long projectId = createPublishedProject("Rollback Allowed", 1);
+
+        addWorkflowAndPublish(projectId, "Rollback Allowed Workflow");
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 2, true, true);
+
+        String firstWorkflowUuid = projectWorkflowService.getProjectWorkflows(projectId, 1)
+            .getFirst()
+            .getUuidAsString();
+
+        givenReferences(newReference(firstWorkflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 1, true, true);
+
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testUpdateConfigurationIgnoresDanglingAndOtherEnvironmentReferences() {
+        long projectId = createPublishedProject("Rollback Ignored References", 1);
+
+        String workflowUuid = addWorkflowAndPublish(projectId, "Rollback Ignored Workflow");
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 2, true, true);
+
+        Environment otherEnvironment = Environment.values()[(int) ENVIRONMENT_ID + 1];
+
+        givenReferences(
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), true),
+            newReference(workflowUuid, otherEnvironment.name(), false));
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 1, true, true);
+
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testUpdateConfigurationStillBlocksWhenWorkflowIsTurnedOff() {
+        long projectId = createPublishedProject("Rollback Turned Off", 1);
+
+        String workflowUuid = addWorkflowAndPublish(projectId, "Rollback Turned Off Workflow");
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 2, true, true);
+
+        automationWorkflowProjectConfigurationAdminFacade.enableConfigurationWorkflow(
+            configurationId, workflowUuid, false);
+
+        givenReferences(newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+
+        assertThatThrownBy(
+            () -> automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+                configurationId, 1, true, true))
+                    .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                        configurationException.getErrorKey())
+                            .isEqualTo(
+                                AutomationWorkflowProjectConfigurationErrorType.VERSION_LACKS_REFERENCED_WORKFLOWS
+                                    .getErrorKey()));
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .getProjectVersion()).isEqualTo(2);
+    }
+
+    @Test
+    void testUpdateConfigurationAllowsNewerVersionRemovingReferencedWorkflow() {
+        long projectId = createPublishedProject("Roll Forward", 1);
+
+        String workflowUuid = addWorkflowAndPublish(projectId, "Roll Forward Workflow");
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 2, true, true);
+
+        automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        givenReferences(newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(configurationId, 3, true, true);
+
+        assertThat(automationWorkflowProjectConfigurationService.getConfiguration(configurationId)
+            .getProjectVersion()).isEqualTo(3);
+    }
+
+    private String addWorkflowAndPublish(long projectId, String label) {
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            projectId, "{\"label\": \"" + label + "\", \"description\": \"\", \"tasks\": []}", null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        return workflowUuid;
+    }
+
+    private void givenReferences(ConnectedUserWorkflowReferenceDTO... references) {
+        when(connectedUserWorkflowReferenceAdminFacade.getReferences(anySet()))
+            .thenReturn(List.of(references));
+    }
+
+    private static ConnectedUserWorkflowReferenceDTO newReference(
+        String automationWorkflowUuid, String environment, boolean dangling) {
+
+        return new ConnectedUserWorkflowReferenceDTO(
+            automationWorkflowUuid, "user-" + UUID.randomUUID(), environment, true, dangling, null, null);
     }
 
     private long createPublishedProject(String name, int publishedVersionCount) {
