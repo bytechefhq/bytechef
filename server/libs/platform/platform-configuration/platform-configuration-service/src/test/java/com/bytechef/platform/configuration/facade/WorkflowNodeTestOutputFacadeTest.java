@@ -65,7 +65,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -361,12 +360,12 @@ class WorkflowNodeTestOutputFacadeTest {
 
         List<Map<String, Object>> sampleRows = (List<Map<String, Object>>) sampleOutput.get("rows");
 
-        Assertions.assertThat(sampleRows)
+        assertThat(sampleRows)
             .hasSize(MAX_SAMPLE_ITEMS);
-        Assertions.assertThat((List<Object>) sampleRows.getFirst()
+        assertThat((List<Object>) sampleRows.getFirst()
             .get("tags"))
-            .hasSize(MAX_SAMPLE_ITEMS);
-        Assertions.assertThat(sampleRows.getLast())
+                .hasSize(MAX_SAMPLE_ITEMS);
+        assertThat(sampleRows.getLast())
             .containsEntry("id", MAX_SAMPLE_ITEMS - 1);
     }
 
@@ -394,7 +393,7 @@ class WorkflowNodeTestOutputFacadeTest {
 
         OutputResponse outputResponse = outputResponseArgumentCaptor.getValue();
 
-        Assertions.assertThat(outputResponse.sampleOutput())
+        assertThat(outputResponse.sampleOutput())
             .isEqualTo(rows);
     }
 }
