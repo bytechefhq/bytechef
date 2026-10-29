@@ -11,6 +11,8 @@ type Mutation {
 
 scalar Long
 
+scalar Map
+
 # Minimal type stubs referenced by this module's graphqls files but defined in other modules.
 type ConnectedUser {
     id: ID!
