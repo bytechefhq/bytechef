@@ -11,7 +11,9 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.AutomationWorkflowProjectMapper;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -19,6 +21,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -39,15 +42,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class AutomationWorkflowProjectApiController implements AutomationWorkflowProjectApi {
 
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private final AutomationWorkflowProjectMapper automationWorkflowProjectMapper;
     private final ConversionService conversionService;
     private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectApiController(
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade, ConversionService conversionService,
+        AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
+        AutomationWorkflowProjectMapper automationWorkflowProjectMapper, ConversionService conversionService,
         EnvironmentService environmentService) {
 
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
+        this.automationWorkflowProjectMapper = automationWorkflowProjectMapper;
         this.conversionService = conversionService;
         this.environmentService = environmentService;
     }
@@ -68,6 +74,17 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
         return ResponseEntity.ok(models);
     }
 
+    @CrossOrigin
+    @Override
+    public ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> getFrontendWorkflowTemplate(
+        String workflowUuid, EnvironmentModel xEnvironment) {
+
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return getWorkflowTemplate(externalUserId, workflowUuid, xEnvironment);
+    }
+
     @Override
     public ResponseEntity<List<AutomationWorkflowProjectModel>> getProjects(
         String externalUserId, EnvironmentModel xEnvironment) {
@@ -80,6 +97,27 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
             .toList();
 
         return ResponseEntity.ok(models);
+    }
+
+    /**
+     * Returns the template among the projects published to the connected user. Unlike the listing, a project hidden
+     * from the Automation Hub is not left out, so its workflows stay activatable by workflow uuid; the configuration
+     * and permission visibility {@code getPublishedProjects} applies still hold.
+     */
+    @Override
+    public ResponseEntity<AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplate(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        return automationWorkflowProjectFacade.getPublishedProjects(externalUserId, getEnvironment(xEnvironment))
+            .stream()
+            .flatMap(project -> project.workflowTemplates()
+                .stream())
+            .filter(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid))
+            .findFirst()
+            .map(automationWorkflowProjectMapper::toWorkflowTemplateModel)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 
     @InitBinder
