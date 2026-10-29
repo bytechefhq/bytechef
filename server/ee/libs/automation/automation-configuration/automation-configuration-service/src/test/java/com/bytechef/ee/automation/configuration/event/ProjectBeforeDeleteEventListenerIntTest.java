@@ -20,6 +20,7 @@ import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.ee.automation.configuration.config.EmbeddedOwnerContributorsTestConfiguration;
 import com.bytechef.ee.automation.configuration.repository.ProjectCodeWorkflowRepository;
 import com.bytechef.ee.automation.configuration.repository.ProjectGitConfigurationRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
@@ -121,7 +122,7 @@ class ProjectBeforeDeleteEventListenerIntTest {
 
     @EnableAutoConfiguration
     @Import({
-        LiquibaseConfiguration.class, ProjectCallback.class,
+        EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, ProjectCallback.class,
         ProjectBeforeDeleteEventListenerIntTest.Config.ProjectBeforeDeleteEventListenerIntTestJdbcConfiguration.class
     })
     @SpringBootConfiguration
