@@ -68,7 +68,7 @@ references are gone or a version containing those workflows is chosen. The messa
 ### UI
 
 The configuration dialog's existing "older version" warning (from #6756) is replaced: when the chosen version is older
-than the current one, the dialog says that versions lacking workflows connected users still use cannot be selected,
+than the current one, the dialog says `Versions that lack workflows connected users still use cannot be saved.`,
 and a rejected save shows the server message through the global error toast. The rollout's existing
 `NOT_IN_RELEASED_VERSION_DANGLING_REASON` path stays as a safety net for references created between the check and the
 rollout.
@@ -86,14 +86,15 @@ rollout.
 
 The listener today calls `rollOut(projectId, environmentId)` then `applyConfigurationState(projectId,
 environmentId)`, neither with a transaction of its own; each deployment and each reference is processed in its own
-`REQUIRES_NEW` transaction with per-item failures caught and logged. A new `@Transactional` method
-`rollOutAndApply(projectId, environmentId)` (on a Spring proxy) wraps both calls and the listener calls it instead. It
+`REQUIRES_NEW` transaction with per-item failures caught and logged. A new method
+`rollOutAndApply(projectId, environmentId)` wraps both calls in one transaction per pass (a `TransactionTemplate`, see
+the coalescing amendment below) and the listener calls it instead. It
 first takes a PostgreSQL transaction-scoped advisory lock, `pg_advisory_xact_lock(key)`, through
 `AutomationWorkflowProjectConfigurationService.lockRollout(projectId, environmentId)`, which is
 `@Transactional(propagation = MANDATORY)` so it can never run outside the caller's transaction. The key is a
 deterministic long: the first 8 bytes of SHA-256 over
 `"automation-workflow-project-configuration-rollout:" + projectId + ":" + environmentId`. The lock is released when
-`rollOutAndApply`'s transaction ends. Only then does `rollOut` read the configuration, so a second rollout for the same
+`rollOutAndApply`'s transaction (one pass, see below) ends. Only then does `rollOut` read the configuration, so a second rollout for the same
 pair waits for the first and then rolls out the newest committed state.
 
 The advisory lock touches no table row, so administrator writes to the configuration (`updateConfiguration`,
@@ -101,8 +102,19 @@ The advisory lock touches no table row, so administrator writes to the configura
 publishes its `AFTER_COMMIT` event. The rollout that event starts queues behind the running one and reads the newest
 committed state when it gets the lock. An earlier draft used a `SELECT ... FOR UPDATE` row lock on the configuration.
 It was dropped because it made administrator saves (and the child-row insert, through the foreign key's `FOR KEY
-SHARE`) wait for the whole rollout, with no lock timeout. When the configuration no longer exists (deleted), the
-deleted-event path runs as today without a lock.
+SHARE`) wait for the whole rollout, with no lock timeout. The deleted-event listener also calls `rollOutAndApply`, so it
+runs under the same lock (`rollOut` finds no released version and does nothing; `applyConfigurationState` turns the
+rows off).
+
+Final review amendment (coalescing): a rollout queued on the advisory lock held a `workerExecutor` permit and a
+database connection, so a burst of saves stalled the shared worker lane. `rollOutAndApply` therefore coalesces
+requests per (project, environment) on the node: a concurrent map holds the pairs with a rollout in flight and a
+pending mark. A request that finds its pair in flight sets the mark (merging its removed provided input names, see
+section 7) and returns at once. The running rollout clears the mark before each pass and runs passes until no mark is
+set, so a save during a pass causes exactly one more pass. Marking and finishing both run in an atomic `compute` on
+the map, so a request arriving while the rollout finishes either joins it or starts a new one and is never lost. Each
+pass runs in its own `REQUIRES_NEW` transaction holding the advisory lock, which still serializes rollouts started on
+different nodes (those still wait on the lock, bounded by the node count).
 
 The per-deployment and per-reference `REQUIRES_NEW` transactions and their failure handling stay as they are, so one
 deployment's failure still does not undo the others. The cost is a second database connection held by each running
@@ -149,6 +161,15 @@ Client: the `select` filter on `automationHubVisible` in
 `activation-dialog.mdx` (and any page describing "Show in Automation Hub") says the flag controls listing through the
 API, not provisioning. This reverses #6756's final-review ruling that kept the flag a client-side hint.
 
+Final review amendment (single-template read): the SDK activation dialog found its template through the listing, so
+a hidden project's workflow showed "This automation could not be found". Two reads return one template by workflow
+uuid: `GET /automation/workflow-templates/{workflowUuid}` (`getFrontendWorkflowTemplate`, frontend JWT) and
+`GET /{externalUserId}/automation/workflow-templates/{workflowUuid}` (`getWorkflowTemplate`, backend). They look the
+template up in `getPublishedProjects(externalUserId, environment)` without the hub-visibility filter (configuration
+and permission visibility still apply) and answer `404` when it is not there. The response is the
+`AutomationWorkflowProjectWorkflowTemplate` schema, `provided` flags included. The SDK activation dialog reads its
+template through the frontend one.
+
 Tests: a public REST / facade test that a project with `automationHubVisible = false` is absent from
 `GET /automation/projects` and still provisionable by `POST /automation/workflow-templates/{workflowUuid}/provision`; the hub query test no
 longer filters.
@@ -194,8 +215,10 @@ present in both:
 - `newRequiredConnections`: component names of required connection slots in the requested version that the current
   version's workflow does not have.
 - `affectedConnectedUserCount`: non-dangling references in the configuration's environment to that workflow whose
-  stored inputs lack a value for one of `newRequiredInputs`, plus, when `newRequiredConnections` is non-empty, every
-  reference to it (connection entitlement is not checked per user; the copy says "may pause").
+  connected user turned it on (a workflow the user turned off does not pause) and whose stored inputs lack a value for
+  one of `newRequiredInputs`, plus, when `newRequiredConnections` is non-empty, every such reference to it (connection
+  entitlement is not checked per user; the copy says "may pause").
+- `label`: the workflow's label in the requested version, or its uuid when it has none; never null.
 
 Only workflows with at least one new required input or connection are returned. Exposed through GraphQL
 (`automationWorkflowProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!)`). The configuration dialog, when
@@ -248,6 +271,16 @@ created on demand when a workflow has none yet (enabled defaults to true, matchi
   missing.
 - Every path that resolves a reference (first provisioning, enable, rollout, `applyConfigurationState`, inputs update,
   #6770's admin provisioning) reads the configuration workflow's provided values for the reference's environment.
+- Removing a provided input (the dialog's "Let each user fill it"), or deleting the configuration, must not leave the
+  administrator's value on the rows (final review amendment): `AutomationWorkflowProjectConfigurationUpdatedEvent`
+  carries `removedProvidedInputNames` (workflow uuid -> input names that stopped being provided, computed in
+  `updateConfigurationWorkflow` from the stored and the new values) and
+  `AutomationWorkflowProjectConfigurationDeletedEvent` carries every provided input name per workflow of the deleted
+  configuration. The rollout removes those keys from each affected reference row before re-resolution (through the
+  deployment manager), so a required one pauses the workflow with `INPUT_REQUIRED:<name>` and the value no longer
+  appears in `inputValues`. Clearing a row's last input uses `ProjectDeploymentWorkflowService.clearInputs`, because
+  `ProjectDeploymentWorkflow.setInputs` ignores an empty map. This replaces the earlier ruling that the row keeps the
+  administrator's last value.
 - Because `rollOut` only visits deployments that are behind the released version, a change of provided values (same
   version) must still reach every reference: `applyConfigurationState` re-resolves rows, not just the enabled flag,
   when the configuration's provided values changed (simplest correct rule: always re-resolve in
