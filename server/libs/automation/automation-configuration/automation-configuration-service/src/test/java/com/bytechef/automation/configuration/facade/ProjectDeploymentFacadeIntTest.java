@@ -25,12 +25,14 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.Job;
@@ -39,6 +41,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -66,6 +69,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
@@ -503,6 +507,64 @@ public class ProjectDeploymentFacadeIntTest {
             });
     }
 
+    @Test
+    public void testUpdateProjectDeploymentWorkflowInputsReschedulesEnabledTriggers() {
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?");
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(
+            projectDeploymentId, projectDeploymentWorkflow.getWorkflowId(), true);
+
+        reset(triggerLifecycleFacade);
+
+        projectDeploymentWorkflow = projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+            projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setInputs(Map.of("cronExpression", "5/5 16 * * ?"));
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
+        InOrder inOrder = inOrder(triggerLifecycleFacade);
+
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerDisable(
+                any(), any(), any(),
+                argThat(parameters -> Objects.equals(parameters.get("expression"), "0/5 15 * * ?")), any());
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), any(), any(),
+                argThat(parameters -> Objects.equals(parameters.get("expression"), "5/5 16 * * ?")), any(),
+                any(), anyLong());
+
+        assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+            .first()
+            .satisfies(
+                workflow -> assertThat(workflow.getInputs()).isEqualTo(Map.of("cronExpression", "5/5 16 * * ?")));
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowInputsWithProjectDeploymentDisabledShouldNotAffectTriggers() {
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?");
+
+        reset(triggerLifecycleFacade);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setInputs(Map.of("cronExpression", "5/5 16 * * ?"));
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
+        verifyNoInteractions(triggerLifecycleFacade);
+    }
+
     @Disabled
     @Test
     public void testUpdateProjectDeploymentTags() {
@@ -744,6 +806,52 @@ public class ProjectDeploymentFacadeIntTest {
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerDisable(any(), any(), any(), any(), any());
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerEnable(
             any(), any(), any(), any(), any(), any(), anyLong());
+    }
+
+    private long createCronInputProjectDeployment(String cronExpression) {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        projectDeploymentFacadeHelper.addTestWorkflow(
+            projectDTO,
+            """
+                {
+                    "label": "Cron Input Workflow",
+                    "inputs": [
+                        {"name": "cronExpression", "label": "Cron expression", "type": "string", "required": true}
+                    ],
+                    "triggers": [
+                        {
+                            "label": "Cron",
+                            "name": "trigger_1",
+                            "type": "schedule/v1/cron",
+                            "parameters": {
+                                "expression": "${cronExpression}",
+                                "timezone": "Europe/Zagreb"
+                            }
+                        }
+                    ],
+                    "tasks": []
+                }""");
+
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), 1)
+            .getFirst();
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            List.of(), null, null, Map.of("cronExpression", cronExpression), true, null, null, null, null, null,
+            null, null, 0, publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name("Cron Input Deployment")
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(1)
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        return projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO);
     }
 
     @Nested
