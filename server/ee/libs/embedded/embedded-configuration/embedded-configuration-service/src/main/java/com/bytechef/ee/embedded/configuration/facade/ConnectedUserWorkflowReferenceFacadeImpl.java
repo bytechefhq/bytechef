@@ -249,7 +249,8 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             : inputs;
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUser.getId(), workflowId, enable, requestedConnectionIds, currentConnections, currentInputs);
+            connectedUser.getId(), projectDeployment.getProjectId(), projectDeployment.getEnvironment(),
+            automationWorkflowUuid, workflowId, enable, requestedConnectionIds, currentConnections, currentInputs);
 
         RowSpec resolvedRowSpec = resolution.rowSpec();
 
@@ -258,8 +259,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
                 projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
 
-        RowSpec rowSpec = new RowSpec(
-            resolvedRowSpec.resolved(), rowEnabled, inputs == null ? resolvedRowSpec.inputs() : inputs);
+        RowSpec rowSpec = new RowSpec(resolvedRowSpec.resolved(), rowEnabled, resolvedRowSpec.inputs());
 
         connectedUserReferenceDeploymentManager.putWorkflows(
             reference.getProjectDeploymentId(), projectVersion, Map.of(automationWorkflowUuid, rowSpec));

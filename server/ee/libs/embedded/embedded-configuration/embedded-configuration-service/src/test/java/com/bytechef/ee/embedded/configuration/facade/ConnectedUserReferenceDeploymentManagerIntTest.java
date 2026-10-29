@@ -148,6 +148,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     private static final long JIRA_CONNECTION_ID = 888L;
     private static final long OTHER_SLACK_CONNECTION_ID = 778L;
     private static final long SLACK_CONNECTION_ID = 777L;
+    private static final long UNCONFIGURED_PROJECT_ID = 0L;
+    private static final String UNCONFIGURED_WORKFLOW_UUID = "00000000-0000-0000-0000-000000000000";
 
     private static final String SLACK_AND_JIRA_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION = """
         {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
@@ -266,12 +268,13 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowId = createDraftWorkflow("Resolve Complete", SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, workflowId, true, Map.of(), List.of(), Map.of("channel", "general"));
+            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            true, Map.of(), List.of(), Map.of("channel", "general"));
 
         RowSpec rowSpec = resolution.rowSpec();
 
         assertThat(rowSpec.enabled()).isTrue();
-        assertThat(rowSpec.inputs()).isNull();
+        assertThat(rowSpec.inputs()).isEqualTo(Map.of("channel", "general"));
         assertThat(rowSpec.resolved()
             .connections()).containsExactly(slackConnection(SLACK_CONNECTION_ID));
         assertThat(resolution.missingComponentName()).isNull();
@@ -283,7 +286,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowId = createDraftWorkflow("Resolve Not Asked", SLACK_WORKFLOW_DEFINITION);
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, workflowId, false, Map.of(), List.of(), Map.of());
+            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            false, Map.of(), List.of(), Map.of());
 
         assertThat(resolution.rowSpec()
             .enabled()).isFalse();
@@ -299,7 +303,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
             .thenReturn(List.of());
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, workflowId, true, Map.of(), List.of(), Map.of());
+            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            true, Map.of(), List.of(), Map.of());
 
         assertThat(resolution.rowSpec()
             .enabled()).isFalse();
@@ -311,7 +316,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         String workflowId = createDraftWorkflow("Resolve Missing Input", SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
         ReferenceResolution resolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserId, workflowId, true, Map.of(), List.of(), Map.of());
+            connectedUserId, UNCONFIGURED_PROJECT_ID, Environment.PRODUCTION, UNCONFIGURED_WORKFLOW_UUID, workflowId,
+            true, Map.of(), List.of(), Map.of());
 
         assertThat(resolution.rowSpec()
             .enabled()).isFalse();

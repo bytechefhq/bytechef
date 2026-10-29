@@ -112,17 +112,7 @@ class ConnectedUserReferenceDeploymentManager {
 
     @Nullable
     public String findMissingRequiredInput(String workflowId, Map<String, ?> inputs) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        for (Workflow.Input input : workflow.getInputs()) {
-            Object value = inputs.get(input.name());
-
-            if (input.required() && (value == null || StringUtils.isBlank(String.valueOf(value)))) {
-                return input.name();
-            }
-        }
-
-        return null;
+        return findMissingRequiredInput(workflowService.getWorkflow(workflowId), inputs);
     }
 
     public ProjectDeployment getDeployment(long projectDeploymentId) {
@@ -277,24 +267,39 @@ class ConnectedUserReferenceDeploymentManager {
         }
     }
 
+    /**
+     * Resolves a connected user's reference to the workflow {@code workflowId} of the automation workflow project in
+     * the environment, applying the connections and inputs the project's configuration provides for the workflow: a
+     * provided connection fills its component's slots, and the returned row inputs are {@code userInputs} overridden by
+     * the provided inputs, so a provided input never counts as missing.
+     */
     public ReferenceResolution resolveReference(
-        long connectedUserId, String workflowId, boolean enable, Map<String, Long> requestedConnectionIds,
-        List<ProjectDeploymentWorkflowConnection> currentConnections, Map<String, ?> inputs) {
-        ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
-            workflowId, connectedUserId, requestedConnectionIds, currentConnections);
+        long connectedUserId, long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid,
+        String workflowId, boolean enable, Map<String, Long> requestedConnectionIds,
+        List<ProjectDeploymentWorkflowConnection> currentConnections, Map<String, ?> userInputs) {
 
-        String missingInputName = findMissingRequiredInput(workflowId, inputs);
+        ProvidedValues providedValues = getProvidedValues(
+            automationWorkflowProjectId, environment, automationWorkflowUuid);
+
+        ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
+            workflowId, connectedUserId, requestedConnectionIds, currentConnections, providedValues.connectionIds());
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, Object> inputs = mergeInputs(workflow, userInputs, providedValues.inputs());
+
+        String missingInputName = findMissingRequiredInput(workflow, inputs);
 
         int workflowErrorCount = enable ? getWorkflowErrorCount(connectedUserId, workflowId) : 0;
 
         boolean enabled = enable && resolved.isComplete() && missingInputName == null && workflowErrorCount == 0;
 
         return new ReferenceResolution(
-            new RowSpec(resolved, enabled, null), resolved.firstMissingComponentName(), missingInputName,
+            new RowSpec(resolved, enabled, inputs), resolved.firstMissingComponentName(), missingInputName,
             workflowErrorCount);
     }
 
-    public void updateInputs(long projectDeploymentId, String automationWorkflowUuid, Map<String, ?> inputs) {
+    public void updateInputs(long projectDeploymentId, String automationWorkflowUuid, Map<String, ?> userInputs) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
 
         ProjectDeploymentWorkflow row = fetchRowAtCurrentVersion(projectDeployment, automationWorkflowUuid)
@@ -302,8 +307,14 @@ class ConnectedUserReferenceDeploymentManager {
                 "Automation workflow %s is not deployed in deployment id=%s".formatted(
                     automationWorkflowUuid, projectDeploymentId)));
 
+        ProvidedValues providedValues = getProvidedValues(
+            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
+        Workflow workflow = workflowService.getWorkflow(row.getWorkflowId());
+
+        Map<String, Object> inputs = mergeInputs(workflow, userInputs, providedValues.inputs());
+
         if (row.isEnabled()) {
-            String missingInputName = findMissingRequiredInput(row.getWorkflowId(), inputs);
+            String missingInputName = findMissingRequiredInput(workflow, inputs);
 
             if (missingInputName != null) {
                 throw new MissingInputException(missingInputName);
@@ -347,8 +358,37 @@ class ConnectedUserReferenceDeploymentManager {
                 projectDeployment.getId(), projectWorkflow.getWorkflowId()));
     }
 
+    @Nullable
+    private static String findMissingRequiredInput(Workflow workflow, Map<String, ?> inputs) {
+        for (Workflow.Input input : workflow.getInputs()) {
+            Object value = inputs.get(input.name());
+
+            if (input.required() && (value == null || StringUtils.isBlank(String.valueOf(value)))) {
+                return input.name();
+            }
+        }
+
+        return null;
+    }
+
     private static String getDeploymentName(String externalUserId, Environment environment) {
         return MARKER + externalUserId + "__" + environment.name();
+    }
+
+    /**
+     * The single place every resolution path reads the connections and inputs the configuration of the automation
+     * workflow project in the environment provides for the workflow. No configuration, or no configuration row for the
+     * workflow, provides nothing.
+     */
+    private ProvidedValues getProvidedValues(
+        long automationWorkflowProjectId, Environment environment, String automationWorkflowUuid) {
+
+        return automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, environment.ordinal())
+            .flatMap(configuration -> configuration.fetchWorkflow(UUID.fromString(automationWorkflowUuid)))
+            .map(configurationWorkflow -> new ProvidedValues(
+                configurationWorkflow.getProvidedConnections(), configurationWorkflow.getProvidedInputs()))
+            .orElse(ProvidedValues.NONE);
     }
 
     private int getWorkflowErrorCount(long connectedUserId, String workflowId) {
@@ -420,6 +460,26 @@ class ConnectedUserReferenceDeploymentManager {
         }
     }
 
+    /**
+     * Returns the user's inputs overridden by the provided inputs. Provided inputs that are not inputs of the workflow,
+     * or that have no value, are ignored.
+     */
+    private static Map<String, Object> mergeInputs(
+        Workflow workflow, Map<String, ?> userInputs, Map<String, Object> providedInputs) {
+
+        Map<String, Object> inputs = new LinkedHashMap<>(userInputs);
+
+        for (Workflow.Input input : workflow.getInputs()) {
+            Object providedValue = providedInputs.get(input.name());
+
+            if (providedValue != null) {
+                inputs.put(input.name(), providedValue);
+            }
+        }
+
+        return inputs;
+    }
+
     private static boolean isUnchanged(ProjectDeploymentWorkflow row, RowSpec rowSpec) {
         ResolvedWorkflowConnections resolved = rowSpec.resolved();
 
@@ -433,6 +493,12 @@ class ConnectedUserReferenceDeploymentManager {
     public record ReferenceResolution(
         RowSpec rowSpec, @Nullable String missingComponentName, @Nullable String missingInputName,
         int workflowErrorCount) {
+    }
+
+    @SuppressFBWarnings("EI")
+    private record ProvidedValues(Map<String, Long> connectionIds, Map<String, Object> inputs) {
+
+        private static final ProvidedValues NONE = new ProvidedValues(Map.of(), Map.of());
     }
 
     @SuppressFBWarnings("EI")

@@ -180,7 +180,7 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
         givenOwnedConnection(connectedUserId, 11L, "slack");
 
         ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
-            workflowId, connectedUserId, Map.of(), List.of());
+            workflowId, connectedUserId, Map.of(), List.of(), Map.of());
 
         assertThat(resolved.connections())
             .containsExactly(new ProjectDeploymentWorkflowConnection(11L, "slack", "postMessage1"));
@@ -196,7 +196,7 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
         givenOwnedConnection(connectedUserId, 21L, "openAi");
 
         ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
-            workflowId, connectedUserId, Map.of(), List.of());
+            workflowId, connectedUserId, Map.of(), List.of(), Map.of());
 
         assertThat(resolved.connections())
             .containsExactly(new ProjectDeploymentWorkflowConnection(21L, "openAi_1", "aiAgent1"));
@@ -213,7 +213,7 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
 
         ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
             workflowId, connectedUserId, Map.of("slack", 12L),
-            List.of(new ProjectDeploymentWorkflowConnection(11L, "slack", "postMessage1")));
+            List.of(new ProjectDeploymentWorkflowConnection(11L, "slack", "postMessage1")), Map.of());
 
         assertThat(resolved.connections())
             .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
@@ -233,7 +233,7 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
 
         ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
             workflowId, connectedUserId, Map.of(),
-            List.of(new ProjectDeploymentWorkflowConnection(12L, "slack", "renamedNode")));
+            List.of(new ProjectDeploymentWorkflowConnection(12L, "slack", "renamedNode")), Map.of());
 
         assertThat(resolved.connections())
             .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
@@ -256,7 +256,8 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
             workflowId, connectedUserId, Map.of(),
             List.of(
                 new ProjectDeploymentWorkflowConnection(31L, "jira", "createIssue1"),
-                new ProjectDeploymentWorkflowConnection(12L, "slack", "postMessage1")));
+                new ProjectDeploymentWorkflowConnection(12L, "slack", "postMessage1")),
+            Map.of());
 
         assertThat(resolved.connections()).containsExactly(
             new ProjectDeploymentWorkflowConnection(31L, "jira", "createIssue1"),
@@ -273,7 +274,7 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
 
         ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
             workflowId, connectedUserId, Map.of(),
-            List.of(new ProjectDeploymentWorkflowConnection(99L, "slack", "postMessage1")));
+            List.of(new ProjectDeploymentWorkflowConnection(99L, "slack", "postMessage1")), Map.of());
 
         assertThat(resolved.connections())
             .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
@@ -290,7 +291,7 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
         givenOwnedConnection(createConnectedUser(), 99L, "slack");
 
         assertThatThrownBy(() -> connectedUserWorkflowConnectionResolver.resolve(
-            workflowId, connectedUserId, Map.of("slack", 99L), List.of()))
+            workflowId, connectedUserId, Map.of("slack", 99L), List.of(), Map.of()))
                 .isInstanceOf(ConnectionNotEntitledException.class);
     }
 
@@ -303,7 +304,7 @@ class ConnectedUserWorkflowConnectionResolverIntTest {
                 new ComponentConnection("httpClient", 1, "get1", "httpClient", false)));
 
         ResolvedWorkflowConnections resolved = connectedUserWorkflowConnectionResolver.resolve(
-            workflowId, connectedUserId, Map.of(), List.of());
+            workflowId, connectedUserId, Map.of(), List.of(), Map.of());
 
         assertThat(resolved.missingComponentNames()).containsExactly("slack");
         assertThat(resolved.firstMissingComponentName()).isEqualTo("slack");

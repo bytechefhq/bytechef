@@ -1310,6 +1310,100 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                 .doesNotContain(workflowUuid);
     }
 
+    @Test
+    void testEnableReferenceUsesAConnectionTheConfigurationProvides() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Enable");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION))
+                .isInstanceOf(MissingConnectionException.class);
+
+        long administratorConnectionId = givenAdministratorConnection();
+
+        provideValues(
+            automationWorkflowProjectId, workflowUuid, Map.of("slack", administratorConnectionId), Map.of());
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION);
+
+        ConnectedUserProjectWorkflow reference = getOnlyReference(connectedUser);
+
+        assertThat(reference.isEnabled()).isTrue();
+        assertThat(fetchRow(reference))
+            .get()
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getConnections())
+                    .containsExactly(
+                        new ProjectDeploymentWorkflowConnection(administratorConnectionId, "slack", "postMessage1"));
+            });
+    }
+
+    @Test
+    void testEnableReferenceIsSatisfiedByAnInputTheConfigurationProvides() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Input Enable");
+
+        String workflowUuid =
+            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        assertThat(reference.isEnabled()).isFalse();
+
+        provideValues(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION);
+
+        assertThat(getReference(reference.getId()).isEnabled()).isTrue();
+        assertThat(fetchRow(reference))
+            .get()
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator"));
+            });
+    }
+
+    private long givenAdministratorConnection() {
+        long connectionId = NEXT_CONNECTION_ID.getAndIncrement();
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("slack");
+        connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
+        connection.setId(connectionId);
+        connection.setType(PlatformType.EMBEDDED);
+
+        when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
+
+        return connectionId;
+    }
+
+    private void provideValues(
+        long automationWorkflowProjectId, String workflowUuid, Map<String, Long> providedConnections,
+        Map<String, Object> providedInputs) {
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
+            configuration.getId(), UUID.fromString(workflowUuid), providedConnections, providedInputs);
+    }
+
     private String addAutomationWorkflow(long automationWorkflowProjectId, String definition) {
         return automationWorkflowProjectFacade.createProjectWorkflow(automationWorkflowProjectId, definition, null);
     }

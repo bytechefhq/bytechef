@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -161,6 +162,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 })
 class ConnectedUserReferenceRolloutManagerIntTest {
 
+    private static final long ADMINISTRATOR_CONNECTION_ID = 900L;
     private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String EXTERNAL_USER_ID = "rollout-user-1";
     private static final long ROLLOUT_COMPLETION_TIMEOUT_SECONDS = 60;
@@ -1825,6 +1827,316 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                 assertThat(storedReference.isDangling()).isTrue();
                 assertThat(storedReference.isEnabled()).isFalse();
             });
+    }
+
+    @Test
+    void testAProvidedConnectionIsUsedForEveryUsersWorkflowWithoutEntitlement() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Every User");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubNoEntitledSlackConnection();
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        provideValues(
+            automationWorkflowProjectId, workflowUuid, Map.of("slack", ADMINISTRATOR_CONNECTION_ID), Map.of());
+
+        ConnectedUserProjectWorkflow firstReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            createConnectedUser(), workflowUuid, Environment.PRODUCTION);
+
+        for (ConnectedUserProjectWorkflow reference : List.of(firstReference, secondReference)) {
+            assertThat(getStoredReference(reference).isEnabled()).isTrue();
+            assertThat(fetchDeploymentRow(reference))
+                .satisfies(row -> {
+                    assertThat(row.isEnabled()).isTrue();
+                    assertThat(row.getConnections())
+                        .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                        .containsExactly(ADMINISTRATOR_CONNECTION_ID);
+                });
+        }
+
+        assertThat(firstReference.getProjectDeploymentId()).isNotEqualTo(secondReference.getProjectDeploymentId());
+    }
+
+    @Test
+    void testAUsersOwnConnectionIsIgnoredWhileAConnectionIsProvidedAndChangesReachExistingReferences() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Overrides");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(getRowConnectionIds(reference)).containsExactly(777L);
+
+        provideValuesAndRollOut(
+            automationWorkflowProjectId, workflowUuid, Map.of("slack", ADMINISTRATOR_CONNECTION_ID), Map.of());
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+        assertThat(getRowConnectionIds(reference)).containsExactly(ADMINISTRATOR_CONNECTION_ID);
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            EXTERNAL_USER_ID, workflowUuid, true, Environment.PRODUCTION);
+
+        assertThat(getRowConnectionIds(reference)).containsExactly(ADMINISTRATOR_CONNECTION_ID);
+    }
+
+    @Test
+    void testRemovingAProvidedConnectionAutoWiresTheUsersOwnConnection() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Removed Auto-wire");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        provideValues(
+            automationWorkflowProjectId, workflowUuid, Map.of("slack", ADMINISTRATOR_CONNECTION_ID), Map.of());
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(getRowConnectionIds(reference)).containsExactly(ADMINISTRATOR_CONNECTION_ID);
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of());
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+        assertThat(getRowConnectionIds(reference)).containsExactly(777L);
+    }
+
+    @Test
+    void testRemovingAProvidedConnectionTheUserCannotReplacePausesTheWorkflowAndKeepsIntent() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Removed Missing");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubNoEntitledSlackConnection();
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        provideValues(
+            automationWorkflowProjectId, workflowUuid, Map.of("slack", ADMINISTRATOR_CONNECTION_ID), Map.of());
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of());
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(getRowConnectionIds(reference)).isEmpty();
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isEqualTo("MISSING_CONNECTION:slack");
+    }
+
+    @Test
+    void testADeletedProvidedConnectionIsIgnoredAndTheSlotFallsBackToTheUser() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Deleted");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        provideValues(
+            automationWorkflowProjectId, workflowUuid, Map.of("slack", ADMINISTRATOR_CONNECTION_ID), Map.of());
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(getRowConnectionIds(reference)).containsExactly(ADMINISTRATOR_CONNECTION_ID);
+
+        when(connectionService.fetchConnection(ADMINISTRATOR_CONNECTION_ID)).thenReturn(Optional.empty());
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+        assertThat(getRowConnectionIds(reference)).containsExactly(777L);
+
+        stubNoEntitledSlackConnection();
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isEqualTo("MISSING_CONNECTION:slack");
+    }
+
+    @Test
+    void testProvidedInputsOverrideTheUsersValueAndNeverCountAsMissing() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Inputs");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        provideValues(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
+
+        ConnectedUserProjectWorkflow firstReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(getStoredReference(firstReference).isEnabled()).isTrue();
+        assertThat(fetchDeploymentRow(firstReference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator"));
+            });
+
+        String secondExternalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            secondExternalUserId, workflowUuid, Environment.PRODUCTION, Map.of(),
+            Map.of("channel", "#mine", "note", "kept"));
+
+        assertThat(fetchDeploymentRow(secondReference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator", "note", "kept"));
+            });
+
+        connectedUserWorkflowReferenceFacade.updateReferenceInputs(
+            secondExternalUserId, workflowUuid, Map.of(), Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(secondReference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator"));
+            });
+    }
+
+    @Test
+    void testChangingProvidedInputsReachesExistingReferencesWithoutAVersionChange() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Inputs Change");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#mine"));
+
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#mine"));
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of("channel", "#first"));
+
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#first"));
+
+        provideValuesAndRollOut(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of("channel", "#second"));
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#second"));
+            });
+    }
+
+    @Test
+    void testProvidedKeysThatAreNotSlotsOrInputsOfTheVersionAreIgnored() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Unknown Keys");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+        stubNoEntitledSlackConnection();
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
+            configuration.getId(), UUID.fromString(workflowUuid),
+            Map.of("jira", 901L, "slack", ADMINISTRATOR_CONNECTION_ID),
+            Map.of("channel", "#administrator", "unknown", "ignored"));
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getConnections())
+                    .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                    .containsExactly(ADMINISTRATOR_CONNECTION_ID);
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator"));
+            });
+    }
+
+    private List<Long> getRowConnectionIds(ConnectedUserProjectWorkflow reference) {
+        return fetchDeploymentRow(reference).getConnections()
+            .stream()
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .toList();
+    }
+
+    private void provideValues(
+        long automationWorkflowProjectId, String workflowUuid, Map<String, Long> providedConnections,
+        Map<String, Object> providedInputs) {
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            configuration.getId(), workflowUuid, providedConnections, providedInputs);
+    }
+
+    private void provideValuesAndRollOut(
+        long automationWorkflowProjectId, String workflowUuid, Map<String, Long> providedConnections,
+        Map<String, Object> providedInputs) {
+
+        provideValues(automationWorkflowProjectId, workflowUuid, providedConnections, providedInputs);
+
+        verify(automationWorkflowProjectConfigurationUpdatedEventListener, atLeastOnce())
+            .onAutomationWorkflowProjectConfigurationUpdated(any());
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    private void stubAdministratorSlackConnection(long connectionId) {
+        Connection connection = new Connection();
+
+        connection.setComponentName("slack");
+        connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
+        connection.setId(connectionId);
+
+        when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
+        when(connectionService.getConnection(connectionId)).thenReturn(connection);
+    }
+
+    private void stubNoEntitledSlackConnection() {
+        when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            .thenReturn(List.of());
     }
 
     private ConnectedUserProjectWorkflow getStoredReference(ConnectedUserProjectWorkflow reference) {
