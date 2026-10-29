@@ -17,8 +17,10 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.security:spring-security-crypto")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation(project(":server:libs:config:liquibase-config"))
