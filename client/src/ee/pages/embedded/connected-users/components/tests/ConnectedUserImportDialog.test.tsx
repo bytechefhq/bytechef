@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -34,12 +35,20 @@ afterEach(() => {
 
 describe('ConnectedUserImportDialog', () => {
     it('uploads the file with the environment id and shows the summary', async () => {
-        render(<ConnectedUserImportDialog onClose={vi.fn()} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserImportDialog onClose={vi.fn()} />
+            </TooltipProvider>
+        );
+
+        expect(screen.getByText('Upload a CSV file to create connected users in bulk.')).toBeInTheDocument();
+
+        await userEvent.hover(screen.getByLabelText('CSV columns'));
 
         expect(
-            screen.getByText(
-                'Columns: externalId (required, at most 50 characters), name, email, plus any metadata columns'
-            )
+            await screen.findByRole('tooltip', {
+                name: 'Columns: externalId (required, at most 50 characters), name, email, plus any metadata columns',
+            })
         ).toBeInTheDocument();
 
         const file = new File(['externalId\na\nb'], 'users.csv', {type: 'text/csv'});
@@ -56,7 +65,11 @@ describe('ConnectedUserImportDialog', () => {
     });
 
     it('keeps Import disabled until a file is chosen', () => {
-        render(<ConnectedUserImportDialog onClose={vi.fn()} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserImportDialog onClose={vi.fn()} />
+            </TooltipProvider>
+        );
 
         expect(screen.getByRole('button', {name: 'Import'})).toBeDisabled();
     });

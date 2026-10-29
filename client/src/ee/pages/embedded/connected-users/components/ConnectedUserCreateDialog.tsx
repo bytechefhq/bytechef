@@ -1,6 +1,13 @@
 import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import ConnectedUserMetadataFields, {
     type MetadataRowI,
@@ -66,6 +73,10 @@ const ConnectedUserCreateDialog = ({onClose}: {onClose: () => void}) => {
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>New connected user</DialogTitle>
+
+                    <DialogDescription>
+                        Create a connected user your application identifies by its external ID.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
