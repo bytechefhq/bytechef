@@ -25,6 +25,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.event.JobDeletedEvent;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
@@ -63,6 +64,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -75,7 +78,11 @@ import tools.jackson.databind.ObjectMapper;
 @Import({
     JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
 })
+@RecordApplicationEvents
 public class JobFacadeIntTest {
+
+    @Autowired
+    private ApplicationEvents applicationEvents;
 
     @Autowired
     private JobFacade jobFacade;
@@ -120,6 +127,28 @@ public class JobFacadeIntTest {
         assertThat(jobRepository.findById(childJobId)).isEmpty();
         assertThat(taskExecutionRepository.findById(parentTaskExecutionId)).isEmpty();
         assertThat(taskExecutionRepository.findById(childTaskExecutionId)).isEmpty();
+    }
+
+    @Test
+    public void testDeleteJobPublishesJobDeletedEventForEveryDeletedJob() {
+        Job parentJob = jobRepository.save(newJob());
+        long parentJobId = Validate.notNull(parentJob.getId(), "id");
+
+        TaskExecution parentTaskExecution = taskExecutionRepository.save(newTaskExecution(parentJobId, null));
+
+        Job childJob = newJob();
+
+        childJob.setParentTaskExecutionId(Validate.notNull(parentTaskExecution.getId(), "id"));
+
+        childJob = jobRepository.save(childJob);
+
+        long childJobId = Validate.notNull(childJob.getId(), "id");
+
+        jobFacade.deleteJob(parentJobId);
+
+        assertThat(applicationEvents.stream(JobDeletedEvent.class))
+            .extracting(JobDeletedEvent::jobId)
+            .containsExactlyInAnyOrder(parentJobId, childJobId);
     }
 
     private static Job newJob() {

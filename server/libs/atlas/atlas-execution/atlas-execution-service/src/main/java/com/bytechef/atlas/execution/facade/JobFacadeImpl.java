@@ -28,6 +28,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.event.JobDeletedEvent;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -122,6 +123,8 @@ public class JobFacadeImpl implements JobFacade {
         taskExecutionService.deleteJobTaskExecutions(id);
 
         jobService.deleteJob(id);
+
+        eventPublisher.publishEvent(new JobDeletedEvent(id));
     }
 
     @Override
