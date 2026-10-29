@@ -21,6 +21,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useProvisionableConnectedUserMcpServersQuery: hoisted.provisionableQuery,
 }));
 
+vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
+    useGetComponentDefinitionsQuery: () => ({data: [{name: 'googleMail', title: 'Gmail'}]}),
+}));
+
 const MCP_SERVERS = [
     {
         coveredComponentNames: ['Slack', 'Jira'],
@@ -102,6 +106,28 @@ describe('ProvisionMcpServerDialog', () => {
         expect(screen.getByRole('radio', {name: /Full server/})).toBeEnabled();
         expect(screen.getByRole('radio', {name: /Partial server/})).toBeEnabled();
         expect(screen.getByRole('radio', {name: /Uncovered server/})).toBeDisabled();
+    });
+
+    it('shows component titles instead of component names', () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {
+                provisionableConnectedUserMcpServers: [
+                    {
+                        coveredComponentNames: ['googleMail'],
+                        id: '9',
+                        missingComponentNames: ['unknownComponent'],
+                        name: 'Google',
+                        provisioned: false,
+                    },
+                ],
+            },
+        });
+
+        renderDialog();
+
+        expect(
+            screen.getByText('Uses Gmail. Missing unknownComponent: add those integrations first to expose them.')
+        ).toBeInTheDocument();
     });
 
     it('lists provisioned servers last with a badge and keeps them selectable', () => {

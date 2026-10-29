@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
     useProvisionConnectedUserMcpServerMutation,
@@ -31,9 +32,12 @@ interface ProvisionableMcpServerI {
     provisioned: boolean;
 }
 
-const describeMcpServer = ({coveredComponentNames, missingComponentNames}: ProvisionableMcpServerI): string => {
-    const covered = coveredComponentNames.join(', ');
-    const missing = missingComponentNames.join(', ');
+const describeMcpServer = (
+    {coveredComponentNames, missingComponentNames}: ProvisionableMcpServerI,
+    getComponentTitle: (componentName: string) => string
+): string => {
+    const covered = coveredComponentNames.map(getComponentTitle).join(', ');
+    const missing = missingComponentNames.map(getComponentTitle).join(', ');
 
     if (coveredComponentNames.length === 0) {
         return `Add ${missing} on the Integrations tab first.`;
@@ -52,6 +56,8 @@ const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServer
     const queryClient = useQueryClient();
 
     const {data} = useProvisionableConnectedUserMcpServersQuery({connectedUserId: connectedUserId.toString()});
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
     const provisionConnectedUserMcpServerMutation = useProvisionConnectedUserMcpServerMutation({
         onSuccess: () => {
@@ -72,6 +78,19 @@ const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServer
         ],
         [provisionableMcpServers]
     );
+
+    const componentTitles = useMemo(
+        () =>
+            new Map(
+                (componentDefinitions ?? []).map((componentDefinition) => [
+                    componentDefinition.name,
+                    componentDefinition.title || componentDefinition.name,
+                ])
+            ),
+        [componentDefinitions]
+    );
+
+    const getComponentTitle = (componentName: string) => componentTitles.get(componentName) || componentName;
 
     const selectedMcpServer = orderedMcpServers.find((mcpServer) => mcpServer.id === mcpServerId);
 
@@ -126,7 +145,7 @@ const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServer
                                             </span>
 
                                             <span className="text-sm font-normal text-content-neutral-secondary">
-                                                {describeMcpServer(mcpServer)}
+                                                {describeMcpServer(mcpServer, getComponentTitle)}
                                             </span>
                                         </Label>
                                     </div>
