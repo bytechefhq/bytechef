@@ -11,4 +11,4 @@ spring:
 
 bytechef:
   discovery-service:
-    provider: redis
+    provider: REDIS
