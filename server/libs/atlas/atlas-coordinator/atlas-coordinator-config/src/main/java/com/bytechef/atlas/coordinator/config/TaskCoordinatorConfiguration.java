@@ -35,6 +35,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
+import com.bytechef.atlas.coordinator.task.dispatcher.StoppedJobTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
@@ -158,12 +159,19 @@ public class TaskCoordinatorConfiguration {
 
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
-                taskDispatcherResolverFactories.stream()
-                    .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(
-                        taskDispatcherChain)),
+                Stream.concat(
+                    Stream.of(stoppedJobTaskDispatcher()),
+                    taskDispatcherResolverFactories.stream()
+                        .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(
+                            taskDispatcherChain))),
                 Stream.of(controlTaskDispatcher(), defaultTaskDispatcher())));
 
         return taskDispatcherChain;
+    }
+
+    @Bean
+    StoppedJobTaskDispatcher stoppedJobTaskDispatcher() {
+        return new StoppedJobTaskDispatcher(jobService, taskExecutionService);
     }
 
     @Bean
