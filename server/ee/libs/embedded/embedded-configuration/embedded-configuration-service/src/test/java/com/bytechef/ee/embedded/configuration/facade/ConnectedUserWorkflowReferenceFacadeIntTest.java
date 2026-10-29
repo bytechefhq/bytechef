@@ -533,6 +533,45 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     @Test
+    void testHiddenProjectStaysProvisionableByWorkflowUuid() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Hidden From Hub");
+
+        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.update(
+            configuration.getId(), configuration.getProjectVersion(), true, false);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        List<AutomationWorkflowProjectDTO> publishedProjects = automationWorkflowProjectFacade.getPublishedProjects(
+            connectedUser.getExternalId(), Environment.PRODUCTION);
+
+        AutomationWorkflowProjectDTO hiddenProject = publishedProjects.stream()
+            .filter(project -> project.id() == automationWorkflowProjectId)
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(hiddenProject.automationHubVisible()).isFalse();
+        assertThat(hiddenProject.workflowTemplates())
+            .extracting(ConnectedUserWorkflowTemplateDTO::workflowUuid)
+            .contains(workflowUuid);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        assertThat(reference.getId()).isNotNull();
+        assertThat(getReference(reference.getId()).isDangling()).isFalse();
+    }
+
+    @Test
     void testEnableReferenceWhileAdministrativelyOffSavesTheIntentButKeepsTheRowOff() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Administratively Off");
 
