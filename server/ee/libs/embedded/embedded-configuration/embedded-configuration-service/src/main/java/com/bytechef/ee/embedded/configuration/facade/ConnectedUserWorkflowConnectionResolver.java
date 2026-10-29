@@ -98,6 +98,24 @@ public class ConnectedUserWorkflowConnectionResolver {
         return new ResolvedWorkflowConnections(connections, List.copyOf(missingComponentNames));
     }
 
+    /**
+     * Returns the component names whose provided connection still exists. A provided connection that no longer exists
+     * provides nothing, so its slot is handed back to the connected user.
+     */
+    public Set<String> getProvidedComponentNames(Map<String, Long> providedConnectionIds) {
+        Set<String> providedComponentNames = new LinkedHashSet<>();
+
+        for (Map.Entry<String, Long> entry : providedConnectionIds.entrySet()) {
+            Optional<Long> connectionId = fetchExistingConnectionId(entry.getValue());
+
+            if (connectionId.isPresent()) {
+                providedComponentNames.add(entry.getKey());
+            }
+        }
+
+        return providedComponentNames;
+    }
+
     private Optional<Long> fetchExistingConnectionId(@Nullable Long connectionId) {
         if (connectionId == null) {
             return Optional.empty();

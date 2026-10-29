@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledExc
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
+import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
@@ -524,6 +525,17 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Object> handleMissingInputException(MissingInputException missingInputException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(Map.of("missingInputName", missingInputException.getInputName()));
+    }
+
+    @ExceptionHandler(ProvidedValueLockedException.class)
+    public ResponseEntity<Object> handleProvidedValueLockedException(
+        ProvidedValueLockedException providedValueLockedException) {
+
+        String propertyName = providedValueLockedException.getKind() == ProvidedValueLockedException.Kind.CONNECTION
+            ? "providedComponentName" : "providedInputName";
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(Map.of(propertyName, providedValueLockedException.getName()));
     }
 
     @InitBinder

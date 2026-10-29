@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectService;
@@ -88,6 +89,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final AutomationWorkflowProjectService automationWorkflowProjectService;
     private final CategoryService categoryService;
+    private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserService connectedUserService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
@@ -107,6 +109,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public AutomationWorkflowProjectFacadeImpl(
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         AutomationWorkflowProjectService automationWorkflowProjectService, CategoryService categoryService,
+        ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
@@ -119,6 +122,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.automationWorkflowProjectService = automationWorkflowProjectService;
         this.categoryService = categoryService;
+        this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserService = connectedUserService;
         this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
@@ -364,7 +368,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
                     configuration, projectWorkflow.getUuid()));
 
             if (embeddedPermissionEvaluator.evaluate(projectDTO.permissionExpression(), connectedUser)) {
-                projects.add(filterWorkflowTemplates(projectDTO, connectedUser, integrationIdsByComponentName));
+                projects.add(
+                    filterWorkflowTemplates(projectDTO, connectedUser, integrationIdsByComponentName, configuration));
             }
         }
 
@@ -506,13 +511,14 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     private AutomationWorkflowProjectDTO filterWorkflowTemplates(
         AutomationWorkflowProjectDTO project, ConnectedUser connectedUser,
-        Map<String, Long> integrationIdsByComponentName) {
+        Map<String, Long> integrationIdsByComponentName, AutomationWorkflowProjectConfiguration configuration) {
 
         List<ConnectedUserWorkflowTemplateDTO> visibleTemplates = project.workflowTemplates()
             .stream()
             .filter(template -> embeddedPermissionEvaluator.evaluate(
                 template.permissionExpression(), connectedUser))
             .map(template -> template.withIntegrationIds(integrationIdsByComponentName))
+            .map(template -> markProvided(template, configuration))
             .toList();
 
         return new AutomationWorkflowProjectDTO(
@@ -520,6 +526,15 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             project.published(), project.version(), project.lastPublishedVersion(), visibleTemplates,
             project.permissionExpression(), project.automationHubVisible(), project.configurationCount(),
             project.lastPublishedDate());
+    }
+
+    private ConnectedUserWorkflowTemplateDTO markProvided(
+        ConnectedUserWorkflowTemplateDTO template, AutomationWorkflowProjectConfiguration configuration) {
+
+        ProvidedNames providedNames = connectedUserReferenceDeploymentManager.getProvidedNames(
+            configuration, template.workflowUuid());
+
+        return template.withProvided(providedNames.componentNames(), providedNames.inputNames());
     }
 
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {

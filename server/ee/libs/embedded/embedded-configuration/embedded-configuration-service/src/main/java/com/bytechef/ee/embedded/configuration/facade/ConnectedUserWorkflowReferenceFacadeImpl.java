@@ -234,6 +234,10 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         int projectVersion = projectDeployment.getProjectVersion();
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
+        connectedUserReferenceDeploymentManager.checkProvidedValuesNotRequested(
+            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid,
+            requestedConnectionIds, inputs);
+
         String workflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             projectDeployment.getProjectId(), projectVersion, automationWorkflowUuid);
 
