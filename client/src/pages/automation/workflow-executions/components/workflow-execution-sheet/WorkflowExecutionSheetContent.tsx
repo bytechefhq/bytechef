@@ -15,6 +15,7 @@ import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/W
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
+import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {WorkflowIcon} from 'lucide-react';
@@ -205,7 +206,7 @@ const WorkflowExecutionSheetContent = ({
                                     <WorkflowExecutionsAccordionItem
                                         defaultValue={focusedExecution?.path}
                                         execution={latestTaskExecution}
-                                        jobStatus={job?.status}
+                                        jobEnded={isJobEnded(job)}
                                         key={latestTaskExecution.id}
                                         lazy={lazy}
                                         onExecutionClick={handleTaskClick}
@@ -218,7 +219,7 @@ const WorkflowExecutionSheetContent = ({
                                                     ? `Attempt ${previousTaskExecutions.length + 1}`
                                                     : undefined
                                             }
-                                            jobStatus={job?.status}
+                                            jobEnded={isJobEnded(job)}
                                             taskExecution={latestTaskExecution}
                                         />
                                     </WorkflowExecutionsAccordionItem>

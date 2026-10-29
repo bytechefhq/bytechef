@@ -43,36 +43,37 @@ describe('WorkflowTaskExecutionItem', () => {
             expect(container.querySelector('.animate-spin.text-primary')).toBeInTheDocument();
         });
 
-        it('should not render a spinner for a started task of a failed job', () => {
+        it('should not render a spinner for a started task of an ended job', () => {
             const taskExecution = createTaskExecution({
                 endDate: undefined,
                 status: 'STARTED',
             });
 
-            const {container} = render(<WorkflowTaskExecutionItem jobStatus="FAILED" taskExecution={taskExecution} />);
+            const {container} = render(<WorkflowTaskExecutionItem jobEnded taskExecution={taskExecution} />);
 
             expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
             expect(container.querySelector('.text-destructive')).toBeInTheDocument();
         });
 
-        it('should render a spinner for a started task of a stopped job, which may be suspended', () => {
+        it('should show a dash instead of a duration for an unfinished task of an ended job', () => {
             const taskExecution = createTaskExecution({
                 endDate: undefined,
                 status: 'STARTED',
             });
 
-            const {container} = render(<WorkflowTaskExecutionItem jobStatus="STOPPED" taskExecution={taskExecution} />);
+            render(<WorkflowTaskExecutionItem jobEnded taskExecution={taskExecution} />);
 
-            expect(container.querySelector('.animate-spin.text-primary')).toBeInTheDocument();
+            expect(screen.getByText('-')).toBeInTheDocument();
+            expect(screen.queryByText('0ms')).not.toBeInTheDocument();
         });
 
-        it('should render a spinner for a started task of a running job', () => {
+        it('should render a spinner for a started task of a running or suspended job', () => {
             const taskExecution = createTaskExecution({
                 endDate: undefined,
                 status: 'STARTED',
             });
 
-            const {container} = render(<WorkflowTaskExecutionItem jobStatus="STARTED" taskExecution={taskExecution} />);
+            const {container} = render(<WorkflowTaskExecutionItem jobEnded={false} taskExecution={taskExecution} />);
 
             expect(container.querySelector('.animate-spin.text-primary')).toBeInTheDocument();
         });
