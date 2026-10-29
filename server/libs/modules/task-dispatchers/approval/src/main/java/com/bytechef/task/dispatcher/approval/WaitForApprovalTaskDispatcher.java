@@ -23,12 +23,15 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +66,14 @@ public class WaitForApprovalTaskDispatcher implements TaskDispatcher<TaskExecuti
         taskExecution = taskExecutionService.update(taskExecution);
 
         Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
+
+        Map<String, Object> metadata = new HashMap<>(job.getMetadata());
+
+        metadata.put(SuspendedJobs.WAIT_FOR_APPROVAL, true);
+
+        job.setMetadata(metadata);
+
+        jobService.update(job);
 
         job = jobService.setStatusToStopped(Objects.requireNonNull(job.getId()));
 

@@ -52,6 +52,15 @@ class SuspendedJobsTest {
     }
 
     @Test
+    void testIsStoppedByUserWhenWaitingForApproval() {
+        Job job = createJob(Job.Status.STOPPED, false);
+
+        job.setMetadata(Map.of(SuspendedJobs.WAIT_FOR_APPROVAL, true));
+
+        assertThat(SuspendedJobs.isStoppedByUser(job)).isFalse();
+    }
+
+    @Test
     void testIsStoppedByUserWhenCompleted() {
         assertThat(SuspendedJobs.isStoppedByUser(createJob(Job.Status.COMPLETED, false))).isFalse();
     }

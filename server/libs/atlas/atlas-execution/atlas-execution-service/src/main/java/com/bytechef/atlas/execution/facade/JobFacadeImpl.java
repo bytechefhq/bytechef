@@ -26,6 +26,7 @@ import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.event.JobDeletedEvent;
@@ -146,6 +147,16 @@ public class JobFacadeImpl implements JobFacade {
 
         contextService.push(
             jobId, Context.Classname.JOB, taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, jobContext));
+
+        Job job = jobService.getJob(jobId);
+
+        Map<String, Object> metadata = new HashMap<>(job.getMetadata());
+
+        metadata.remove(SuspendedJobs.WAIT_FOR_APPROVAL);
+
+        job.setMetadata(metadata);
+
+        jobService.update(job);
 
         jobService.resumeToStatusStarted(jobId);
 

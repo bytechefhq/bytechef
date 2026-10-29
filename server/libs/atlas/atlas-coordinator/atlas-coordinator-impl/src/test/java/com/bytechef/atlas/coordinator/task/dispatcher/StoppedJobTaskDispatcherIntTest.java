@@ -132,6 +132,23 @@ class StoppedJobTaskDispatcherIntTest {
     }
 
     @Test
+    void testDispatchPassesTaskOfJobWaitingForApproval() {
+        Job job = createStartedJob();
+
+        job.setMetadata(Map.of(SuspendedJobs.WAIT_FOR_APPROVAL, true));
+
+        jobService.update(job);
+
+        jobService.setStatusToStopped(getId(job));
+
+        TaskExecution taskExecution = createTaskExecution(getId(job), TaskExecution.Status.CREATED);
+
+        taskDispatcherChain.dispatch(taskExecution);
+
+        assertThat(dispatchedTasks).containsExactly(taskExecution);
+    }
+
+    @Test
     void testDispatchPassesTaskOfRunningJob() {
         Job job = createStartedJob();
 
