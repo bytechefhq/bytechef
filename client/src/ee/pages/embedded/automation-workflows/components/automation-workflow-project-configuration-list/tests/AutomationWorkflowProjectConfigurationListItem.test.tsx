@@ -24,6 +24,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
 }));
 
+vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
+    default: () => null,
+}));
+
 vi.mock('@tanstack/react-query', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@tanstack/react-query')>()),
     useQueryClient: () => ({invalidateQueries: mocks.invalidateQueries}),
@@ -39,16 +43,21 @@ const configuration = {
     enabled: false,
     environmentId: '2',
     id: 'configuration-1',
+    lastExecutionDate: null,
     lastModifiedDate: null,
     projectId: 'project-1',
     projectVersion: 2,
-    workflows: [{enabled: true, label: 'Mailer', workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'}],
+    workflows: [
+        {enabled: true, label: 'Mailer', lastExecutionDate: null, workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'},
+    ],
 };
 
 const project = {
     categoryId: null,
+    configurationCount: 0,
     description: null,
     id: 'project-1',
+    lastPublishedDate: null,
     lastPublishedVersion: 2,
     name: 'Mail Project',
     permissionExpression: null,
@@ -60,6 +69,7 @@ const project = {
             components: [],
             description: null,
             label: 'Mailer',
+            lastExecutionDate: null,
             lastModifiedDate: null,
             permissionExpression: null,
             triggers: [],
@@ -106,7 +116,6 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         renderItem();
 
-        await user.click(screen.getByText('1 workflow'));
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         const state = useAutomationWorkflowExecutionsSheetStore.getState();
@@ -122,13 +131,28 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         renderItem({project: {...project, workflowTemplates: []}});
 
-        await user.click(screen.getByText('1 workflow'));
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         const state = useAutomationWorkflowExecutionsSheetStore.getState();
 
         expect(state.automationWorkflowExecutionsSheetOpen).toBe(true);
         expect(state.workflow).toEqual({label: 'Mailer', workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'});
+    });
+
+    it('collapses and expands the workflows when the row is clicked', async () => {
+        const user = userEvent.setup();
+
+        renderItem();
+
+        expect(screen.getByRole('button', {name: 'Mailer'})).toBeInTheDocument();
+
+        await user.click(screen.getByText('Staging'));
+
+        expect(screen.queryByRole('button', {name: 'Mailer'})).not.toBeInTheDocument();
+
+        await user.click(screen.getByText('Staging'));
+
+        expect(screen.getByRole('button', {name: 'Mailer'})).toBeInTheDocument();
     });
 
     it('shows the newer version hint when the project published a later version', () => {
@@ -218,7 +242,6 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
             options.onSuccess()
         );
 
-        await user.click(screen.getByText('1 workflow'));
         await user.click(await screen.findByRole('switch', {name: 'Enable Mailer'}));
 
         expect(mocks.enableWorkflowMutate.mock.calls[0][0]).toEqual({

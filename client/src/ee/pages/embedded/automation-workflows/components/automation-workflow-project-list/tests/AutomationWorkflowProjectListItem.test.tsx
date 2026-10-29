@@ -19,8 +19,10 @@ const handlers = {
 
 const project: AutomationWorkflowProjectType = {
     categoryId: null,
+    configurationCount: 0,
     description: null,
     id: 'project-1',
+    lastPublishedDate: null,
     lastPublishedVersion: null,
     name: 'Alpha Project',
     permissionExpression: null,

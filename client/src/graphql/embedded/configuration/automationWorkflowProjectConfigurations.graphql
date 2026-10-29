@@ -7,11 +7,13 @@ query automationWorkflowProjectConfigurations($projectId: ID!) {
         enabled
         automationHubVisible
         lastModifiedDate
+        lastExecutionDate
         workflows {
             workflowUuid
             workflowId
             label
             enabled
+            lastExecutionDate
         }
     }
 }
