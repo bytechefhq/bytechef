@@ -67,6 +67,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @ContextConfiguration(classes = {
     A2AServerController.class, AutomationA2AServerRestTestConfiguration.class
 })
+@TestPropertySource(properties = "bytechef.public-url=")
 @WebMvcTest(controllers = A2AServerController.class)
 class A2AServerControllerIntTest {
 

@@ -38,7 +38,10 @@ import org.testcontainers.utility.DockerImageName;
  *
  * @author Marko Krikovic
  */
-@SpringBootTest(properties = "bytechef.message-broker.provider=aws")
+@SpringBootTest(
+    properties = {
+        "bytechef.message-broker.provider=AWS", "bytechef.message-broker.aws.control-provider=SQS"
+    })
 @Testcontainers
 @Import({
     AwsMessageBrokerConfiguration.class, AwsMessageBrokerListenerRegistrarConfiguration.class,

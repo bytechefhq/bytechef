@@ -75,7 +75,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = AutomationA2AServerSecurityIntTestConfiguration.class,
+    classes = AutomationA2AServerSecurityIntTestConfiguration.class, properties = "bytechef.public-url=",
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(PostgreSQLContainerConfiguration.class)
 class AutomationA2AServerSecurityConfigurerIntTest {
