@@ -106,6 +106,8 @@ public final class JobExecutionErrors {
 
         if (status == Job.Status.STOPPED) {
             message = "Workflow run " + job.getId() + " was stopped before it completed.";
+        } else if (status == Job.Status.PAYMENT_REQUIRED) {
+            message = "Workflow run " + job.getId() + " was not started: no job execution units are left.";
         } else {
             message = "Workflow run " + job.getId() + " ended in status " + status + " without completing.";
         }

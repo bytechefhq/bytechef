@@ -114,7 +114,7 @@ public class WorkflowExecutionTools {
     public List<WorkflowExecutionSummary> listWorkflowExecutions(
         @ToolParam(
             required = false,
-            description = "Optional job status filter; exactly one of CREATED, STARTED, COMPLETED, FAILED, STOPPED") @Nullable String jobStatus,
+            description = "Optional job status filter; exactly one of CREATED, STARTED, COMPLETED, FAILED, STOPPED, PAYMENT_REQUIRED") @Nullable String jobStatus,
         @ToolParam(
             required = false,
             description = "Optional workflow id to filter a specific workflow's history") @Nullable String workflowId,

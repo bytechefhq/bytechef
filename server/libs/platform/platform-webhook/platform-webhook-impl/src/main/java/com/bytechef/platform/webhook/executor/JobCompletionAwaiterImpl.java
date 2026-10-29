@@ -93,7 +93,7 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
         String status = payload != null ? payload.toString() : "";
 
         if ("COMPLETED".equals(status) || "FAILED".equals(status) || "STOPPED".equals(status) ||
-            "CANCELLED".equals(status)) {
+            "CANCELLED".equals(status) || "PAYMENT_REQUIRED".equals(status)) {
 
             try {
                 Job job = jobService.getJob(jobId);
@@ -134,6 +134,7 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
         Job.Status status = job.getStatus();
 
         return status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.CANCELLED ||
-            (status == Job.Status.STOPPED && !JobSuspends.isAwaitingSubflow(job));
+            status == Job.Status.PAYMENT_REQUIRED
+            || (status == Job.Status.STOPPED && !JobSuspends.isAwaitingSubflow(job));
     }
 }

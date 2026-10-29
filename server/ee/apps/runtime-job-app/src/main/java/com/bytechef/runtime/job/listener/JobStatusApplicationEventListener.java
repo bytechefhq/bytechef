@@ -35,7 +35,7 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
     private static final int EXIT_CODE_SUCCESS = 0;
 
     private static final Set<Job.Status> TERMINAL_STATUSES =
-        EnumSet.of(Job.Status.COMPLETED, Job.Status.FAILED, Job.Status.STOPPED);
+        EnumSet.of(Job.Status.COMPLETED, Job.Status.FAILED, Job.Status.STOPPED, Job.Status.PAYMENT_REQUIRED);
 
     private static final Logger log = LoggerFactory.getLogger(JobStatusApplicationEventListener.class);
 

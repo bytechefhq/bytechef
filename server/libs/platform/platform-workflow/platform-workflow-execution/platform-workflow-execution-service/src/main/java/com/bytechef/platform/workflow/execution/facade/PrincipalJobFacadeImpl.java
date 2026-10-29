@@ -75,11 +75,9 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     @Override
     // TODO @Transactional
     public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
-        long jobId = jobFacade.createJob(jobParametersDTO);
-
-        principalJobService.create(jobId, jobPrincipalId, type);
-
-        return jobId;
+        // The principal_job row must exist before the start, where it marks the job as deployed for billing.
+        return jobFacade.createJob(
+            jobParametersDTO, jobId -> principalJobService.create(jobId, jobPrincipalId, type));
     }
 
     @Override

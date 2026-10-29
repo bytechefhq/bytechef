@@ -16,12 +16,14 @@
 
 package com.bytechef.platform.billing.handler.prepaid;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscription.SubscriptionModel;
 import com.bytechef.platform.billing.repository.PrepaidBillingSubscriptionRepository;
@@ -55,7 +57,7 @@ class PrepaidUnitConsumptionServiceTest {
     void testNonDeployedJobIsNeverCounted() {
         when(prepaidBillingSubscriptionRepository.existsPrincipalJobByJobId(JOB_ID)).thenReturn(false);
 
-        prepaidUnitConsumptionService.consumeUnit(JOB_ID);
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isTrue();
 
         verify(prepaidBillingSubscriptionRepository).existsPrincipalJobByJobId(JOB_ID);
 
@@ -65,12 +67,19 @@ class PrepaidUnitConsumptionServiceTest {
     }
 
     @Test
+    void testSubflowJobIsNeverCounted() {
+        assertThat(prepaidUnitConsumptionService.tryStart(job(3L))).isTrue();
+
+        verifyNoMoreInteractions(prepaidBillingSubscriptionRepository, billingSubscriptionService);
+    }
+
+    @Test
     void testConsumesPlanUnitFirst() {
         deployedWithSubscription("GROWTH", SubscriptionModel.PREPAID);
 
         when(prepaidBillingSubscriptionRepository.incrementPlanUnitUsed(SUBSCRIPTION_ID)).thenReturn(1);
 
-        prepaidUnitConsumptionService.consumeUnit(JOB_ID);
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isTrue();
 
         verify(prepaidBillingSubscriptionRepository).incrementPlanUnitUsed(SUBSCRIPTION_ID);
         verify(prepaidBillingSubscriptionRepository, never()).incrementExtraUnitUsed(anyLong());
@@ -83,19 +92,19 @@ class PrepaidUnitConsumptionServiceTest {
         when(prepaidBillingSubscriptionRepository.incrementPlanUnitUsed(SUBSCRIPTION_ID)).thenReturn(0);
         when(prepaidBillingSubscriptionRepository.incrementExtraUnitUsed(SUBSCRIPTION_ID)).thenReturn(1);
 
-        prepaidUnitConsumptionService.consumeUnit(JOB_ID);
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isTrue();
 
         verify(prepaidBillingSubscriptionRepository).incrementExtraUnitUsed(SUBSCRIPTION_ID);
     }
 
     @Test
-    void testBothPoolsExhaustedCountsNothing() {
+    void testBothPoolsExhaustedRefusesStart() {
         deployedWithSubscription("GROWTH", SubscriptionModel.PREPAID);
 
         when(prepaidBillingSubscriptionRepository.incrementPlanUnitUsed(SUBSCRIPTION_ID)).thenReturn(0);
         when(prepaidBillingSubscriptionRepository.incrementExtraUnitUsed(SUBSCRIPTION_ID)).thenReturn(0);
 
-        prepaidUnitConsumptionService.consumeUnit(JOB_ID);
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isFalse();
 
         verify(prepaidBillingSubscriptionRepository).incrementExtraUnitUsed(SUBSCRIPTION_ID);
     }
@@ -104,11 +113,11 @@ class PrepaidUnitConsumptionServiceTest {
     void testSkipsMeteredAndTrial() {
         deployedWithSubscription("GROWTH", SubscriptionModel.METERED);
 
-        prepaidUnitConsumptionService.consumeUnit(JOB_ID);
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isTrue();
 
         deployedWithSubscription("TRIAL", SubscriptionModel.PREPAID);
 
-        prepaidUnitConsumptionService.consumeUnit(JOB_ID);
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isTrue();
 
         verify(prepaidBillingSubscriptionRepository, never()).incrementPlanUnitUsed(anyLong());
         verify(prepaidBillingSubscriptionRepository, never()).incrementExtraUnitUsed(anyLong());
@@ -119,9 +128,18 @@ class PrepaidUnitConsumptionServiceTest {
         when(prepaidBillingSubscriptionRepository.existsPrincipalJobByJobId(JOB_ID)).thenReturn(true);
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
 
-        prepaidUnitConsumptionService.consumeUnit(JOB_ID);
+        assertThat(prepaidUnitConsumptionService.tryStart(job(null))).isTrue();
 
         verify(prepaidBillingSubscriptionRepository, never()).incrementPlanUnitUsed(anyLong());
+    }
+
+    private static Job job(Long parentTaskExecutionId) {
+        Job job = new Job();
+
+        job.setId(JOB_ID);
+        job.setParentTaskExecutionId(parentTaskExecutionId);
+
+        return job;
     }
 
     private void deployedWithSubscription(String planName, SubscriptionModel subscriptionModel) {

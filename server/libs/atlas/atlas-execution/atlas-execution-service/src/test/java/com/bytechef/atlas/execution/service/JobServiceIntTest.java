@@ -29,6 +29,7 @@ import com.bytechef.error.ExecutionError;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +166,89 @@ public class JobServiceIntTest {
 
         assertThat(persistedJob.getStatus()).isEqualTo(Job.Status.FAILED);
         assertThat(persistedJob.getLastModifiedDate()).isEqualTo(originalJob.getLastModifiedDate());
+    }
+
+    @Test
+    public void testSetStatusToStartedRefusedByGuardRequiresPayment() {
+        long jobId = saveResumableJob(Job.Status.CREATED);
+
+        Job startedJob = newRefusingJobService(new AtomicInteger()).setStatusToStarted(jobId);
+
+        assertThat(startedJob.getStatus()).isEqualTo(Job.Status.PAYMENT_REQUIRED);
+
+        Job persistedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(persistedJob.getStatus()).isEqualTo(Job.Status.PAYMENT_REQUIRED);
+        assertThat(persistedJob.getCurrentTask()).isZero();
+        assertThat(persistedJob.getEndDate()).isNotNull();
+    }
+
+    @Test
+    public void testSetStatusToStartedWithoutGuards() {
+        long jobId = saveResumableJob(Job.Status.CREATED);
+
+        Job startedJob = jobService.setStatusToStarted(jobId);
+
+        assertThat(startedJob.getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    public void testResumeToStatusStartedRestartsPaymentRequiredJob() {
+        long jobId = saveResumableJob(Job.Status.PAYMENT_REQUIRED);
+
+        jobService.resumeToStatusStarted(jobId);
+
+        Job persistedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(persistedJob.getStatus()).isEqualTo(Job.Status.STARTED);
+        assertThat(persistedJob.getEndDate()).isNull();
+        assertThat(persistedJob.getStartDate()).isAfter(ORIGINAL_START_DATE);
+    }
+
+    @Test
+    public void testResumeToStatusStartedRechecksGuardForFailedAndPaymentRequiredJobs() {
+        AtomicInteger guardCallCount = new AtomicInteger();
+
+        JobService refusingJobService = newRefusingJobService(guardCallCount);
+
+        long failedJobId = saveResumableJob(Job.Status.FAILED);
+
+        Job failedJob = refusingJobService.resumeToStatusStarted(failedJobId);
+
+        assertThat(failedJob.getStatus()).isEqualTo(Job.Status.PAYMENT_REQUIRED);
+
+        long paymentRequiredJobId = saveResumableJob(Job.Status.PAYMENT_REQUIRED);
+
+        refusingJobService.resumeToStatusStarted(paymentRequiredJobId);
+
+        Job persistedJob = jobRepository.findById(paymentRequiredJobId)
+            .orElseThrow();
+
+        assertThat(persistedJob.getStatus()).isEqualTo(Job.Status.PAYMENT_REQUIRED);
+        assertThat(persistedJob.getEndDate()).isNotNull();
+        assertThat(guardCallCount).hasValue(2);
+    }
+
+    @Test
+    public void testResumeToStatusStartedNeverChecksGuardForStoppedJob() {
+        AtomicInteger guardCallCount = new AtomicInteger();
+
+        long jobId = saveResumableJob(Job.Status.STOPPED);
+
+        Job resumedJob = newRefusingJobService(guardCallCount).resumeToStatusStarted(jobId);
+
+        assertThat(resumedJob.getStatus()).isEqualTo(Job.Status.STARTED);
+        assertThat(guardCallCount).hasValue(0);
+    }
+
+    private JobService newRefusingJobService(AtomicInteger guardCallCount) {
+        return new JobServiceImpl(jobRepository, List.of(job -> {
+            guardCallCount.incrementAndGet();
+
+            return false;
+        }));
     }
 
     private static Job newJob(Job.Status status) {
