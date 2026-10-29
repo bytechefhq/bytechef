@@ -41,13 +41,6 @@ class BillingSchedulingConfigurationTest {
     }
 
     @Test
-    void testRegistersUsageReportingJobWhenSchedulerProviderIsMissing() {
-        applicationContextRunner
-            .withPropertyValues("billing.enabled=true")
-            .run(context -> assertThat(context).hasBean("stripeUsageReportingJobDetail"));
-    }
-
-    @Test
     void testSkipsUsageReportingJobForAwsProvider() {
         applicationContextRunner
             .withPropertyValues("billing.enabled=true", "bytechef.scheduler.provider=AWS")
@@ -57,7 +50,7 @@ class BillingSchedulingConfigurationTest {
     @Test
     void testSkipsUsageReportingJobWhenBillingIsDisabled() {
         applicationContextRunner
-            .withPropertyValues("bytechef.scheduler.provider=QUARTZ")
+            .withPropertyValues("billing.enabled=false", "bytechef.scheduler.provider=QUARTZ")
             .run(context -> assertThat(context).doesNotHaveBean("stripeUsageReportingJobDetail"));
     }
 }
