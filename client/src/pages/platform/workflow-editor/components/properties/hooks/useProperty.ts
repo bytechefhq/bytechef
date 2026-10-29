@@ -125,6 +125,7 @@ type UsePropertyReturnType = {
     handleDeleteCustomPropertyClick: (path: string) => void;
     handleDynamicSwitch: () => void;
     hasDynamicSwitch: boolean;
+    replaceValueWithPillEntry: () => void;
     handleFromAiClick: ((fromAi: boolean) => void) | undefined;
     handleFormulaSwitch: () => void;
     handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
@@ -1318,6 +1319,17 @@ export const useProperty = ({
         startPillEntry,
     ]);
 
+    // A builder that holds entries has no room for a pill; the entries go once the user confirms.
+    const replaceValueWithPillEntry = useCallback(() => {
+        cancelPendingSaves();
+
+        dispatchValueAction({type: 'valueCleared'});
+
+        saveResolvedValue(null);
+
+        startPillEntry();
+    }, [cancelPendingSaves, saveResolvedValue, startPillEntry]);
+
     const validateMentionInputValue = useCallback(
         (value: string | number) => {
             const holdsNoPill =
@@ -2142,6 +2154,7 @@ export const useProperty = ({
         placeholder,
         propertiesDataSource,
         propertyParameterValue,
+        replaceValueWithPillEntry,
         required,
         resetOnModeChangeRef,
         selectValue,

@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/AlertDialog';
 import {MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
@@ -95,6 +96,7 @@ const Property = ({
     toolsMode,
 }: PropertyProps) => {
     const [containerHasLocalEntries, setContainerHasLocalEntries] = useState(false);
+    const [replaceEntriesDialogOpen, setReplaceEntriesDialogOpen] = useState(false);
 
     const containerHasLocalEntriesRef = useRef(false);
 
@@ -166,6 +168,7 @@ const Property = ({
         placeholder,
         propertiesDataSource,
         propertyParameterValue,
+        replaceValueWithPillEntry,
         required,
         selectValue,
         setIsFormulaMode,
@@ -299,15 +302,32 @@ const Property = ({
         !containerHasLocalEntries &&
         isPillContainerEmpty();
 
-    const showDynamicSwitch =
-        hasDynamicSwitch &&
-        !isFromAi &&
-        !isFormulaMode &&
-        (controlType === 'SELECT' || mentionInput || (!containerHasLocalEntries && isPillContainerEmpty()));
+    const showDynamicSwitch = hasDynamicSwitch && !isFromAi && !isFormulaMode;
+
+    const handleDynamicSwitchClick = () => {
+        if (!mentionInput && isPillContainer && (containerHasLocalEntriesRef.current || !isPillContainerEmpty())) {
+            setReplaceEntriesDialogOpen(true);
+
+            return;
+        }
+
+        handleDynamicSwitch();
+    };
+
+    const handleReplaceEntriesConfirm = () => {
+        setReplaceEntriesDialogOpen(false);
+
+        handleContainerLocalEntriesChange(false);
+
+        replaceValueWithPillEntry();
+    };
 
     const dynamicSwitch = showDynamicSwitch ? (
-        <PropertyDynamicSwitch dynamic={mentionInput} handleClick={handleDynamicSwitch} />
+        <PropertyDynamicSwitch dynamic={mentionInput} handleClick={handleDynamicSwitchClick} />
     ) : undefined;
+
+    const replacedEntriesNoun =
+        controlType === 'ARRAY_BUILDER' ? 'items' : controlType === 'OBJECT_BUILDER' ? 'properties' : 'fields';
 
     // An array item's object has no label row to hold a Dynamic switch, so it keeps the hint.
     const containerPillHint =
@@ -1276,6 +1296,17 @@ const Property = ({
                     value={propertyParameterValue}
                     workflow={workflow}
                     workflowNodeName={currentNode?.name ?? ''}
+                />
+            )}
+
+            {replaceEntriesDialogOpen && (
+                <AlertDialog
+                    confirmLabel="Replace"
+                    description={`The ${replacedEntriesNoun} in ${label || name} will be removed.`}
+                    onCancel={() => setReplaceEntriesDialogOpen(false)}
+                    onConfirm={handleReplaceEntriesConfirm}
+                    open={replaceEntriesDialogOpen}
+                    title="Replace with a data pill?"
                 />
             )}
         </li>

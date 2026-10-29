@@ -2,6 +2,7 @@ vi.mock('@/pages/platform/workflow-editor/utils/saveProperty', () => ({default: 
 
 import {TooltipProvider} from '@/components/ui/tooltip';
 import Property from '@/pages/platform/workflow-editor/components/properties/Property';
+import {registerPendingSave} from '@/pages/platform/workflow-editor/components/properties/pendingPropertySaves';
 import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -600,7 +601,7 @@ describe('pill target inside an object or array builder', () => {
         expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.acceptsPill() ?? false).toBe(false);
     });
 
-    it('shows the Dynamic switch on an empty array and hides it once an item exists', async () => {
+    it('keeps the Dynamic switch on an array once an item exists', async () => {
         setParameters({counts: []});
 
         renderUncontrolled(arrayProperty);
@@ -614,15 +615,174 @@ describe('pill target inside an object or array builder', () => {
 
         await settle();
 
-        expect(screen.queryByRole('switch', {name: 'Text'})).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).not.toBeChecked();
     });
 
-    it('does not show the Dynamic switch on a non-empty array', async () => {
+    it('turns Dynamic on for an empty array without asking', async () => {
+        setParameters({counts: []});
+
         renderUncontrolled(arrayProperty);
 
         await settle();
 
-        expect(screen.queryByRole('switch', {name: 'Text'})).toBeNull();
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).toBeChecked();
+    });
+
+    it.each([
+        ['an array', arrayProperty, 'counts', 'items'],
+        ['an object', objectProperty, 'settings', 'properties'],
+    ])('keeps the entries of %s when replacing them with a data pill is cancelled', async (_, property, path, noun) => {
+        renderUncontrolled(property);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        expect(screen.getByRole('alertdialog')).toHaveTextContent(`The ${noun} in ${property.label} will be removed.`);
+
+        fireEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        await settle();
+
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).not.toBeChecked();
+        expect(savedPaths()).not.toContain(path);
+    });
+
+    it.each([
+        ['an array', arrayProperty, 'counts'],
+        ['an object', objectProperty, 'settings'],
+    ])(
+        'clears the entries of %s and opens the data pill editor once the replacement is confirmed',
+        async (_, property, path) => {
+            const {container} = renderUncontrolled(property);
+
+            await settle();
+
+            fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+            await settle();
+
+            fireEvent.click(screen.getByRole('button', {name: 'Replace'}));
+
+            await settle();
+
+            expect(screen.queryByRole('alertdialog')).toBeNull();
+            expect(screen.getByRole('switch', {name: 'Text'})).toBeChecked();
+            expect(container.querySelector('input[type=number]')).toBeNull();
+
+            const clearRequest = (saveProperty as unknown as Mock).mock.calls
+                .map(([request]) => request)
+                .find((request) => request.path === path);
+
+            expect(clearRequest?.value).toBeNull();
+        }
+    );
+
+    it('asks before replacing an item that was added but not saved yet', async () => {
+        setParameters({counts: []});
+
+        renderUncontrolled(arrayProperty);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('button', {name: /add array item/i}));
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        expect(screen.getByRole('alertdialog')).toHaveTextContent('The items in Counts will be removed.');
+    });
+
+    it('cancels the pending saves inside the builder once the replacement is confirmed', async () => {
+        const cancelItemSave = vi.fn();
+
+        const unregisterItemSave = registerPendingSave('counts[0]', {cancel: cancelItemSave, isPending: () => true});
+
+        renderUncontrolled(arrayProperty);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        expect(cancelItemSave).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Replace'}));
+
+        await settle();
+
+        unregisterItemSave();
+
+        expect(cancelItemSave).toHaveBeenCalled();
+    });
+
+    it('keeps the entries when the replacement dialog is dismissed with Escape', async () => {
+        renderUncontrolled(arrayProperty);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        fireEvent.keyDown(screen.getByRole('alertdialog'), {key: 'Escape'});
+
+        await settle();
+
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).not.toBeChecked();
+        expect(savedPaths()).toEqual([]);
+    });
+
+    it('shows an empty array once Dynamic is turned off again without a data pill', async () => {
+        const {container} = renderUncontrolled(arrayProperty);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Replace'}));
+
+        await settle();
+
+        setParameters({counts: null});
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).not.toBeChecked();
+        expect(container.querySelector('input[type=number]')).toBeNull();
+        expect(screen.getByRole('button', {name: /add array item/i})).toBeInTheDocument();
+    });
+
+    it('names the fields of a JSON schema builder in the replacement dialog', async () => {
+        setParameters({schema: JSON.stringify({properties: {name: {type: 'string'}}, type: 'object'})});
+
+        renderUncontrolled(schemaProperty);
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        expect(screen.getByRole('alertdialog')).toHaveTextContent('The fields in Response will be removed.');
     });
 
     it('a click on a nested field of a non-empty object registers the nested field, not the object', async () => {

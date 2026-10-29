@@ -856,6 +856,58 @@ test.describe('Property formula modes', () => {
             }
         });
 
+        test('should replace the items of an array with a data pill only after confirmation', async ({
+            authenticatedPage: page,
+            workflow,
+        }) => {
+            const arrayProperty = getProperty(configurationPanel, 'arrayMaxItems');
+
+            const dataPillPanel = await openVarDataPills(page, configurationPanel);
+
+            await test.step('Add an item', async () => {
+                await arrayProperty.getByRole('button', {name: 'Add array item'}).click();
+
+                await expect(arrayProperty.getByLabel('Array property item at index 0')).toBeVisible();
+                await expect(getDynamicSwitch(arrayProperty)).toBeVisible();
+            });
+
+            await test.step('Cancel the replacement', async () => {
+                await getDynamicSwitch(arrayProperty).click();
+
+                const replaceDialog = page.getByRole('alertdialog');
+
+                await expect(replaceDialog).toContainText('The items in Array Max Items will be removed.');
+
+                await replaceDialog.getByRole('button', {name: 'Cancel'}).click();
+
+                await expect(replaceDialog).toHaveCount(0);
+                await expect(getDynamicSwitch(arrayProperty)).not.toBeChecked();
+                await expect(arrayProperty.getByLabel('Array property item at index 0')).toBeVisible();
+            });
+
+            await test.step('Confirm the replacement and insert a data pill', async () => {
+                await getDynamicSwitch(arrayProperty).click();
+
+                await page.getByRole('alertdialog').getByRole('button', {name: 'Replace'}).click();
+
+                await expect(getDynamicSwitch(arrayProperty)).toBeChecked();
+                await expect(getPropertyEditor(arrayProperty)).toBeVisible();
+
+                const saveResponsePromise = propertyTestingParametersSavePromise(page, STRING_PILL_REFERENCE);
+
+                await getVarDataPill(dataPillPanel, 'String').click();
+
+                await saveResponsePromise;
+
+                await expectStoredParameter({
+                    expected: STRING_PILL_REFERENCE,
+                    page,
+                    propertyName: 'arrayMaxItems',
+                    workflowId: workflow.workflowId,
+                });
+            });
+        });
+
         test('should keep the emptied data pill editor until Dynamic is turned off', async ({
             authenticatedPage: page,
             workflow,
