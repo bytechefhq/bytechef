@@ -47,7 +47,7 @@ class UnfinishedTaskExecutionCancellerTest {
 
     @Test
     void testCancelSendsNoCancelControlTaskWhenTheJobHasNoTaskExecutions() {
-        when(taskExecutionService.getJobTaskExecutions(JOB_ID)).thenReturn(List.of());
+        when(taskExecutionService.getJobUnfinishedTaskExecutions(JOB_ID)).thenReturn(List.of());
 
         unfinishedTaskExecutionCanceller.cancel(JOB_ID);
 
@@ -57,7 +57,7 @@ class UnfinishedTaskExecutionCancellerTest {
 
     @Test
     void testCancelSkipsTerminatedTaskExecutions() {
-        when(taskExecutionService.getJobTaskExecutions(JOB_ID))
+        when(taskExecutionService.getJobUnfinishedTaskExecutions(JOB_ID))
             .thenReturn(
                 List.of(
                     createTaskExecution(1L, TaskExecution.Status.COMPLETED),
@@ -72,7 +72,7 @@ class UnfinishedTaskExecutionCancellerTest {
 
     @Test
     void testCancelSendsNoCancelControlTaskWhenNoTaskExecutionWasCancelled() {
-        when(taskExecutionService.getJobTaskExecutions(JOB_ID))
+        when(taskExecutionService.getJobUnfinishedTaskExecutions(JOB_ID))
             .thenReturn(
                 List.of(
                     createTaskExecution(1L, TaskExecution.Status.STARTED),
@@ -88,7 +88,7 @@ class UnfinishedTaskExecutionCancellerTest {
 
     @Test
     void testCancelKeepsCancellingAndSendsCancelControlTaskWhenOneCancelFails() {
-        when(taskExecutionService.getJobTaskExecutions(JOB_ID))
+        when(taskExecutionService.getJobUnfinishedTaskExecutions(JOB_ID))
             .thenReturn(
                 List.of(
                     createTaskExecution(1L, TaskExecution.Status.STARTED),

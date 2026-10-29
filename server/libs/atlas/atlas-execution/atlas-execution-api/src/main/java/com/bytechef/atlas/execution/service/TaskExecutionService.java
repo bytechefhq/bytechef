@@ -76,6 +76,8 @@ public interface TaskExecutionService {
 
     List<TaskExecution> getJobTopLevelTaskExecutions(long jobId);
 
+    List<TaskExecution> getJobUnfinishedTaskExecutions(long jobId);
+
     List<TaskExecution> getParentTaskExecutions(long parentId);
 
     TaskExecution update(TaskExecution taskExecution);

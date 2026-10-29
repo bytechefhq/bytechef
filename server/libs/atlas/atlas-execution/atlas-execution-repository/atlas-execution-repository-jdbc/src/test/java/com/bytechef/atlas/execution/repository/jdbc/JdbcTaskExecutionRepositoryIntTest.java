@@ -465,6 +465,22 @@ public class JdbcTaskExecutionRepositoryIntTest {
             .isEmpty());
     }
 
+    @Test
+    public void testFindAllUnfinishedByJobId() {
+        long jobId = saveJob();
+
+        long createdId = saveTaskExecutionId(jobId, TaskExecution.Status.CREATED);
+        long startedId = saveTaskExecutionId(jobId, TaskExecution.Status.STARTED);
+
+        saveTaskExecutionId(jobId, TaskExecution.Status.COMPLETED);
+        saveTaskExecutionId(jobId, TaskExecution.Status.FAILED);
+        saveTaskExecutionId(jobId, TaskExecution.Status.CANCELLED);
+        saveTaskExecutionId(saveJob(), TaskExecution.Status.STARTED);
+
+        Assertions.assertEquals(
+            List.of(createdId, startedId), toIds(taskExecutionRepository.findAllUnfinishedByJobId(jobId)));
+    }
+
     private ChildrenFixture saveChildrenFixture() {
         long jobId = saveJob();
 
@@ -498,6 +514,19 @@ public class JdbcTaskExecutionRepositoryIntTest {
 
     private long saveTaskExecutionId(long jobId, long parentId, int taskNumber) {
         TaskExecution taskExecution = saveTaskExecution(jobId, parentId, taskNumber, null);
+
+        return Objects.requireNonNull(taskExecution.getId());
+    }
+
+    private long saveTaskExecutionId(long jobId, TaskExecution.Status status) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(jobId)
+            .status(status)
+            .taskNumber(0)
+            .workflowTask(new WorkflowTask(Map.of("name", "task0", "type", "test/v1")))
+            .build();
+
+        taskExecution = taskExecutionRepository.save(taskExecution);
 
         return Objects.requireNonNull(taskExecution.getId());
     }

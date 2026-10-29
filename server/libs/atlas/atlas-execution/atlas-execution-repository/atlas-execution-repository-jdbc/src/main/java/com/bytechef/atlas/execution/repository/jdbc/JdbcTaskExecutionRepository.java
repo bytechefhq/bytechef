@@ -180,6 +180,10 @@ public interface JdbcTaskExecutionRepository
     List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId);
 
     @Override
+    @Query("SELECT * FROM task_execution WHERE job_id = :jobId AND status IN (0, 1) ORDER BY id")
+    List<TaskExecution> findAllUnfinishedByJobId(@Param("jobId") long jobId);
+
+    @Override
     List<TaskExecution> findAllByParentIdOrderByTaskNumber(long parentId);
 
     @Override

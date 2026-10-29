@@ -377,7 +377,7 @@ class TaskCoordinatorTest {
 
         TaskExecutionService stopTaskExecutionService = mock(TaskExecutionService.class);
 
-        when(stopTaskExecutionService.getJobTaskExecutions(4567L))
+        when(stopTaskExecutionService.getJobUnfinishedTaskExecutions(4567L))
             .thenReturn(
                 List.of(
                     outerLoopTaskExecution, completedTaskExecution, innerLoopTaskExecution, innerTaskExecution));

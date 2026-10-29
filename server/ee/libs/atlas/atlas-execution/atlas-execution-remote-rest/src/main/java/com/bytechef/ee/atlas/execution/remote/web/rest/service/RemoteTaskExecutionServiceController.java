@@ -101,6 +101,16 @@ public class RemoteTaskExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
+        value = "/get-job-unfinished-task-executions/{jobId}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<TaskExecution>> getJobUnfinishedTaskExecutions(@PathVariable long jobId) {
+        return ResponseEntity.ok(taskExecutionService.getJobUnfinishedTaskExecutions(jobId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
         value = "/get-parent-task-executions/{parentId}",
         produces = {
             "application/json"
