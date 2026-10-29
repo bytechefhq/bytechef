@@ -310,6 +310,15 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
+    public List<TaskExecution> findAllUnfinishedByJobId(long jobId) {
+        return findAllByJobIdOrderByCreatedDate(jobId)
+            .stream()
+            .filter(taskExecution -> !taskExecution.getStatus()
+                .isTerminated())
+            .toList();
+    }
+
+    @Override
     public List<TaskExecution> findAllByJobIdOrderByIdDesc(long jobId) {
         Store store = Objects.requireNonNull(cache.computeIfAbsent(getStoreKey(), (key1) -> new Store()));
 

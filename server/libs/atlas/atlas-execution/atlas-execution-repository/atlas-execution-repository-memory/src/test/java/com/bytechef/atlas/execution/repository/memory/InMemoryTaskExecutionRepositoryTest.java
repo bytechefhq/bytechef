@@ -525,6 +525,20 @@ class InMemoryTaskExecutionRepositoryTest {
             .isEmpty());
     }
 
+    @Test
+    void testFindAllUnfinishedByJobId() {
+        long createdId = saveTaskExecutionId(501L, TaskExecution.Status.CREATED);
+        long startedId = saveTaskExecutionId(501L, TaskExecution.Status.STARTED);
+
+        saveTaskExecutionId(501L, TaskExecution.Status.COMPLETED);
+        saveTaskExecutionId(501L, TaskExecution.Status.FAILED);
+        saveTaskExecutionId(501L, TaskExecution.Status.CANCELLED);
+        saveTaskExecutionId(502L, TaskExecution.Status.STARTED);
+
+        assertEquals(
+            List.of(createdId, startedId), getIds(inMemoryTaskExecutionRepository.findAllUnfinishedByJobId(501L)));
+    }
+
     private List<Long> saveChildren(long jobId, long parentId) {
         return saveChildren(jobId, parentId, Instant.parse("2026-01-01T00:00:00Z"));
     }
@@ -554,6 +568,17 @@ class InMemoryTaskExecutionRepositoryTest {
         }
 
         return childIds;
+    }
+
+    private long saveTaskExecutionId(long jobId, TaskExecution.Status status) {
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setStatus(status);
+
+        taskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+        return Objects.requireNonNull(taskExecution.getId());
     }
 
     private static void setCreatedDate(TaskExecution taskExecution, Instant createdDate) {

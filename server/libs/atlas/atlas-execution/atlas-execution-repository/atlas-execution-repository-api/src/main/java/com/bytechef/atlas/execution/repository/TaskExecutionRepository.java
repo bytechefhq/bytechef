@@ -58,6 +58,11 @@ public interface TaskExecutionRepository {
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);
 
     /**
+     * Returns the task executions of the job that are created or started, in the order they were created.
+     */
+    List<TaskExecution> findAllUnfinishedByJobId(long jobId);
+
+    /**
      * Returns the execution steps of the given job ordered by id in descending order
      *
      * @param jobId

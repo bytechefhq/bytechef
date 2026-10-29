@@ -150,6 +150,16 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public List<TaskExecution> getJobUnfinishedTaskExecutions(long jobId) {
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(TASK_EXECUTION_SERVICE + "/get-job-unfinished-task-executions/{jobId}")
+                .build(jobId),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
     public List<TaskExecution> getJobTopLevelTaskExecutions(long jobId) {
         throw new UnsupportedOperationException();
     }

@@ -276,6 +276,12 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<TaskExecution> getJobUnfinishedTaskExecutions(long jobId) {
+        return taskExecutionRepository.findAllUnfinishedByJobId(jobId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<TaskExecution> getJobTopLevelTaskExecutions(long jobId) {
         return taskExecutionRepository.findAllByJobIdAndParentIdIsNullOrderByCreatedDate(jobId);
     }

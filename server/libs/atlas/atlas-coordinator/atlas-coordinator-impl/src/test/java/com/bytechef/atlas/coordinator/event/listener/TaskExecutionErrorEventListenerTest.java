@@ -146,7 +146,7 @@ public class TaskExecutionErrorEventListenerTest {
             .thenReturn(forkJoinTaskExecution);
         when(jobService.getTaskExecutionJob(10L))
             .thenReturn(new Job(4567L));
-        when(taskExecutionService.getJobTaskExecutions(4567L))
+        when(taskExecutionService.getJobUnfinishedTaskExecutions(4567L))
             .thenReturn(
                 List.of(
                     forkJoinTaskExecution, erroredTaskExecution, startedSiblingTaskExecution,
@@ -196,7 +196,7 @@ public class TaskExecutionErrorEventListenerTest {
             .thenAnswer(invocation -> invocation.getArgument(0));
         when(jobService.getTaskExecutionJob(11L))
             .thenReturn(new Job(4567L));
-        when(taskExecutionService.getJobTaskExecutions(4567L))
+        when(taskExecutionService.getJobUnfinishedTaskExecutions(4567L))
             .thenReturn(List.of(erroredTaskExecution, siblingTaskExecution));
         when(taskExecutionService.cancelIfUnfinished(12L))
             .thenReturn(false);

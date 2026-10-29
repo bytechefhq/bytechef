@@ -48,7 +48,7 @@ public class UnfinishedTaskExecutionCanceller {
     }
 
     public void cancel(long jobId) {
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobUnfinishedTaskExecutions(jobId);
 
         Long cancelledTaskExecutionId = null;
 
