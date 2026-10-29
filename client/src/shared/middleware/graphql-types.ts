@@ -537,6 +537,28 @@ export type AutomationWorkflowProjectConfiguration = {
   workflows: Array<AutomationWorkflowProjectConfigurationWorkflow>;
 };
 
+export type AutomationWorkflowProjectConfigurationConnectionSlot = {
+  __typename?: 'AutomationWorkflowProjectConfigurationConnectionSlot';
+  componentName: Scalars['String']['output'];
+  providableConnections: Array<AutomationWorkflowProjectConfigurationProvidableConnection>;
+  required: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type AutomationWorkflowProjectConfigurationInput = {
+  __typename?: 'AutomationWorkflowProjectConfigurationInput';
+  label?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  required: Scalars['Boolean']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+};
+
+export type AutomationWorkflowProjectConfigurationProvidableConnection = {
+  __typename?: 'AutomationWorkflowProjectConfigurationProvidableConnection';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type AutomationWorkflowProjectConfigurationVersionImpact = {
   __typename?: 'AutomationWorkflowProjectConfigurationVersionImpact';
   workflows: Array<AutomationWorkflowProjectConfigurationVersionImpactWorkflow>;
@@ -556,8 +578,18 @@ export type AutomationWorkflowProjectConfigurationWorkflow = {
   enabled: Scalars['Boolean']['output'];
   label?: Maybe<Scalars['String']['output']>;
   lastExecutionDate?: Maybe<Scalars['String']['output']>;
+  providedConnections?: Maybe<Scalars['Map']['output']>;
+  providedInputs?: Maybe<Scalars['Map']['output']>;
   workflowId: Scalars['ID']['output'];
   workflowUuid: Scalars['ID']['output'];
+};
+
+export type AutomationWorkflowProjectConfigurationWorkflowProvidableValues = {
+  __typename?: 'AutomationWorkflowProjectConfigurationWorkflowProvidableValues';
+  connectionSlots: Array<AutomationWorkflowProjectConfigurationConnectionSlot>;
+  inputs: Array<AutomationWorkflowProjectConfigurationInput>;
+  providedConnections?: Maybe<Scalars['Map']['output']>;
+  providedInputs?: Maybe<Scalars['Map']['output']>;
 };
 
 export type AutomationWorkflowProjectTag = {
@@ -1820,6 +1852,7 @@ export type Mutation = {
   updateApprovalTask?: Maybe<ApprovalTask>;
   updateAutomationWorkflowProject: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectConfiguration: Scalars['Boolean']['output'];
+  updateAutomationWorkflowProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
@@ -2628,6 +2661,14 @@ export type MutationUpdateAutomationWorkflowProjectConfigurationArgs = {
 };
 
 
+export type MutationUpdateAutomationWorkflowProjectConfigurationWorkflowArgs = {
+  id: Scalars['ID']['input'];
+  providedConnections?: InputMaybe<Scalars['Map']['input']>;
+  providedInputs?: InputMaybe<Scalars['Map']['input']>;
+  workflowUuid: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateAutomationWorkflowProjectWorkflowArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   label: Scalars['String']['input'];
@@ -3153,6 +3194,7 @@ export type Query = {
   automationSearch: Array<SearchResult>;
   automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
   automationWorkflowProjectConfigurationVersionImpact: AutomationWorkflowProjectConfigurationVersionImpact;
+  automationWorkflowProjectConfigurationWorkflowProvidableValues: AutomationWorkflowProjectConfigurationWorkflowProvidableValues;
   automationWorkflowProjectConfigurations: Array<AutomationWorkflowProjectConfiguration>;
   automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
   automationWorkflowProjectVersions: Array<AutomationWorkflowProjectVersion>;
@@ -3438,6 +3480,12 @@ export type QueryAutomationSearchArgs = {
 export type QueryAutomationWorkflowProjectConfigurationVersionImpactArgs = {
   id: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationWorkflowProvidableValuesArgs = {
+  id: Scalars['ID']['input'];
+  workflowUuid: Scalars['ID']['input'];
 };
 
 

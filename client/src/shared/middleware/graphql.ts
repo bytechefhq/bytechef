@@ -1080,12 +1080,20 @@ export type AutomationWorkflowProjectConfigurationVersionImpactQueryVariables = 
 
 export type AutomationWorkflowProjectConfigurationVersionImpactQuery = { automationWorkflowProjectConfigurationVersionImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }> } };
 
+export type AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQueryVariables = Exact<{
+  id: string | number;
+  workflowUuid: string | number;
+}>;
+
+
+export type AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery = { automationWorkflowProjectConfigurationWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> } };
+
 export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
   projectId: string | number;
 }>;
 
 
-export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, lastExecutionDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean, lastExecutionDate: string | null }> }> };
+export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, lastExecutionDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean, lastExecutionDate: string | null, providedConnections: any, providedInputs: any }> }> };
 
 export type AutomationWorkflowProjectTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1462,6 +1470,16 @@ export type UpdateAutomationWorkflowProjectConfigurationMutationVariables = Exac
 
 
 export type UpdateAutomationWorkflowProjectConfigurationMutation = { updateAutomationWorkflowProjectConfiguration: boolean };
+
+export type UpdateAutomationWorkflowProjectConfigurationWorkflowMutationVariables = Exact<{
+  id: string | number;
+  workflowUuid: string | number;
+  providedConnections?: any;
+  providedInputs?: any;
+}>;
+
+
+export type UpdateAutomationWorkflowProjectConfigurationWorkflowMutation = { updateAutomationWorkflowProjectConfigurationWorkflow: boolean };
 
 export type UpdateEmbeddedMcpComponentMutationVariables = Exact<{
   id: string | number;
@@ -6043,6 +6061,49 @@ export const useAutomationWorkflowProjectConfigurationVersionImpactQuery = <
   }
     )};
 
+export const AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDocument = new TypedDocumentString(`
+    query automationWorkflowProjectConfigurationWorkflowProvidableValues($id: ID!, $workflowUuid: ID!) {
+  automationWorkflowProjectConfigurationWorkflowProvidableValues(
+    id: $id
+    workflowUuid: $workflowUuid
+  ) {
+    connectionSlots {
+      componentName
+      title
+      required
+      providableConnections {
+        id
+        name
+      }
+    }
+    inputs {
+      name
+      label
+      type
+      required
+    }
+    providedConnections
+    providedInputs
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery = <
+      TData = AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectConfigurationWorkflowProvidableValues', variables],
+    queryFn: fetcher<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQuery, AutomationWorkflowProjectConfigurationWorkflowProvidableValuesQueryVariables>(AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDocument, variables),
+    ...options
+  }
+    )};
+
 export const AutomationWorkflowProjectConfigurationsDocument = new TypedDocumentString(`
     query automationWorkflowProjectConfigurations($projectId: ID!) {
   automationWorkflowProjectConfigurations(projectId: $projectId) {
@@ -6060,6 +6121,8 @@ export const AutomationWorkflowProjectConfigurationsDocument = new TypedDocument
       label
       enabled
       lastExecutionDate
+      providedConnections
+      providedInputs
     }
   }
 }
@@ -7460,6 +7523,30 @@ export const useUpdateAutomationWorkflowProjectConfigurationMutation = <
       {
     mutationKey: ['updateAutomationWorkflowProjectConfiguration'],
     mutationFn: (variables?: UpdateAutomationWorkflowProjectConfigurationMutationVariables) => fetcher<UpdateAutomationWorkflowProjectConfigurationMutation, UpdateAutomationWorkflowProjectConfigurationMutationVariables>(UpdateAutomationWorkflowProjectConfigurationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAutomationWorkflowProjectConfigurationWorkflowDocument = new TypedDocumentString(`
+    mutation updateAutomationWorkflowProjectConfigurationWorkflow($id: ID!, $workflowUuid: ID!, $providedConnections: Map, $providedInputs: Map) {
+  updateAutomationWorkflowProjectConfigurationWorkflow(
+    id: $id
+    workflowUuid: $workflowUuid
+    providedConnections: $providedConnections
+    providedInputs: $providedInputs
+  )
+}
+    `);
+
+export const useUpdateAutomationWorkflowProjectConfigurationWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAutomationWorkflowProjectConfigurationWorkflowMutation, TError, UpdateAutomationWorkflowProjectConfigurationWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAutomationWorkflowProjectConfigurationWorkflowMutation, TError, UpdateAutomationWorkflowProjectConfigurationWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAutomationWorkflowProjectConfigurationWorkflow'],
+    mutationFn: (variables?: UpdateAutomationWorkflowProjectConfigurationWorkflowMutationVariables) => fetcher<UpdateAutomationWorkflowProjectConfigurationWorkflowMutation, UpdateAutomationWorkflowProjectConfigurationWorkflowMutationVariables>(UpdateAutomationWorkflowProjectConfigurationWorkflowDocument, variables)(),
     ...options
   }
     )};
