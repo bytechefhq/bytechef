@@ -40,7 +40,7 @@ export interface AutomationWorkflowProject {
      */
     description?: string;
     /**
-     * Whether the project is listed in the Automation Hub. The API returns hidden projects too, so a custom UI can offer them.
+     * Whether the project is listed in the Automation Hub. The project listing leaves out hidden projects; a workflow of a hidden project is still available by its workflow uuid.
      */
     automationHubVisible?: boolean;
     /**

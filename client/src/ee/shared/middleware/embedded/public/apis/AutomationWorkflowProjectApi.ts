@@ -19,6 +19,11 @@ import {
     AutomationWorkflowProjectToJSON,
 } from '../models/AutomationWorkflowProject';
 import {
+    type AutomationWorkflowProjectWorkflowTemplate,
+    AutomationWorkflowProjectWorkflowTemplateFromJSON,
+    AutomationWorkflowProjectWorkflowTemplateToJSON,
+} from '../models/AutomationWorkflowProjectWorkflowTemplate';
+import {
     type Environment,
     EnvironmentFromJSON,
     EnvironmentToJSON,
@@ -31,11 +36,37 @@ export interface GetFrontendProjectsRequest {
     xEnvironment?: Environment;
 }
 
+export interface GetFrontendWorkflowTemplateRequest {
+    /**
+     * The workflow template uuid.
+     */
+    workflowUuid: string;
+    /**
+     * The environment.
+     */
+    xEnvironment?: Environment;
+}
+
 export interface GetProjectsRequest {
     /**
      * The external user id.
      */
     externalUserId: string;
+    /**
+     * The environment.
+     */
+    xEnvironment?: Environment;
+}
+
+export interface GetWorkflowTemplateRequest {
+    /**
+     * The external user id.
+     */
+    externalUserId: string;
+    /**
+     * The workflow template uuid.
+     */
+    workflowUuid: string;
     /**
      * The environment.
      */
@@ -99,6 +130,65 @@ export class AutomationWorkflowProjectApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for getFrontendWorkflowTemplate without sending the request
+     */
+    async getFrontendWorkflowTemplateRequestOpts(requestParameters: GetFrontendWorkflowTemplateRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['workflowUuid'] == null) {
+            throw new runtime.RequiredError(
+                'workflowUuid',
+                'Required parameter "workflowUuid" was null or undefined when calling getFrontendWorkflowTemplate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xEnvironment'] != null) {
+            headerParameters['X-Environment'] = String(requestParameters['xEnvironment']);
+        }
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtBearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/automation/workflow-templates/{workflowUuid}`;
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+     * Get an automation workflow template available to the connected user
+     */
+    async getFrontendWorkflowTemplateRaw(requestParameters: GetFrontendWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AutomationWorkflowProjectWorkflowTemplate>> {
+        const requestOptions = await this.getFrontendWorkflowTemplateRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AutomationWorkflowProjectWorkflowTemplateFromJSON(jsonValue));
+    }
+
+    /**
+     * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+     * Get an automation workflow template available to the connected user
+     */
+    async getFrontendWorkflowTemplate(requestParameters: GetFrontendWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationWorkflowProjectWorkflowTemplate> {
+        const response = await this.getFrontendWorkflowTemplateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getProjects without sending the request
      */
     async getProjectsRequestOpts(requestParameters: GetProjectsRequest): Promise<runtime.RequestOpts> {
@@ -154,6 +244,73 @@ export class AutomationWorkflowProjectApi extends runtime.BaseAPI {
      */
     async getProjects(requestParameters: GetProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AutomationWorkflowProject>> {
         const response = await this.getProjectsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getWorkflowTemplate without sending the request
+     */
+    async getWorkflowTemplateRequestOpts(requestParameters: GetWorkflowTemplateRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['externalUserId'] == null) {
+            throw new runtime.RequiredError(
+                'externalUserId',
+                'Required parameter "externalUserId" was null or undefined when calling getWorkflowTemplate().'
+            );
+        }
+
+        if (requestParameters['workflowUuid'] == null) {
+            throw new runtime.RequiredError(
+                'workflowUuid',
+                'Required parameter "workflowUuid" was null or undefined when calling getWorkflowTemplate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xEnvironment'] != null) {
+            headerParameters['X-Environment'] = String(requestParameters['xEnvironment']);
+        }
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/{externalUserId}/automation/workflow-templates/{workflowUuid}`;
+        urlPath = urlPath.replace('{externalUserId}', encodeURIComponent(String(requestParameters['externalUserId'])));
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+     * Get an automation workflow template available to a connected user identified by external user id
+     */
+    async getWorkflowTemplateRaw(requestParameters: GetWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AutomationWorkflowProjectWorkflowTemplate>> {
+        const requestOptions = await this.getWorkflowTemplateRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AutomationWorkflowProjectWorkflowTemplateFromJSON(jsonValue));
+    }
+
+    /**
+     * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
+     * Get an automation workflow template available to a connected user identified by external user id
+     */
+    async getWorkflowTemplate(requestParameters: GetWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationWorkflowProjectWorkflowTemplate> {
+        const response = await this.getWorkflowTemplateRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
