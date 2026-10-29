@@ -46,14 +46,10 @@ public class TriggerStateRemoteServiceGrpcServer
 
     @Override
     public void fetchValue(WorkflowExecutionIdRequest request, StreamObserver<TriggerStateValue> responseObserver) {
-        Optional<Object> value = triggerStateFacade.fetchValue(
+        Optional<Object> valueOptional = triggerStateFacade.fetchValue(
             WorkflowExecutionId.parse(request.getWorkflowExecutionId()));
 
-        TriggerStateValue.Builder builder = TriggerStateValue.newBuilder();
-
-        value.ifPresent(curValue -> builder.setValue(platformWorkflowExecutionProtoMapper.toBytes(curValue)));
-
-        responseObserver.onNext(builder.build());
+        responseObserver.onNext(platformWorkflowExecutionProtoMapper.toTriggerStateValue(valueOptional.orElse(null)));
         responseObserver.onCompleted();
     }
 
@@ -61,7 +57,7 @@ public class TriggerStateRemoteServiceGrpcServer
     public void save(SaveTriggerStateRequest request, StreamObserver<Empty> responseObserver) {
         triggerStateFacade.save(
             WorkflowExecutionId.parse(request.getWorkflowExecutionId()),
-            platformWorkflowExecutionProtoMapper.toObject(request.getValue()));
+            platformWorkflowExecutionProtoMapper.toTriggerStateObject(request.getValue()));
 
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();

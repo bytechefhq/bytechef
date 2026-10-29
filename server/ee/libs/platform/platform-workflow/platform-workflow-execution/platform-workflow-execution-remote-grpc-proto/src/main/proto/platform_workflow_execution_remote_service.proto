@@ -174,11 +174,14 @@ message SaveTaskStateRequest {
 
 message TriggerStateValue {
   optional bytes value = 1;
+  optional string classname = 2;
 }
 
 message SaveTriggerStateRequest {
+  reserved 2;
+
   string workflow_execution_id = 1;
-  bytes value = 2;
+  TriggerStateValue value = 3;
 }
 
 message RemoteTriggerExecution {
