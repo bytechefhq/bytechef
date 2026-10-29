@@ -27,7 +27,7 @@ deployments:
 - Recovering references that are already dangling (from before this change, or deleted projects): those stay terminal.
 - Making enable fail when the administrator has turned the workflow off. The user's intent is still stored and resumes
   automatically; that behaviour from #6756 stays.
-- Cross-node locking beyond what the database row lock gives.
+- Cross-node locking beyond what the database advisory lock gives.
 
 ## Anti-goals
 
@@ -88,12 +88,21 @@ The listener today calls `rollOut(projectId, environmentId)` then `applyConfigur
 environmentId)`, neither with a transaction of its own; each deployment and each reference is processed in its own
 `REQUIRES_NEW` transaction with per-item failures caught and logged. A new `@Transactional` method
 `rollOutAndApply(projectId, environmentId)` (on a Spring proxy) wraps both calls and the listener calls it instead. It
-first takes a row lock on the `automation_workflow_project_configuration` row for (project, environment) through a new
-repository query `findByProjectIdAndEnvironmentIdForUpdate` written as a native `@Query("SELECT * ... FOR UPDATE")`,
-following `ConnectedUserProjectRepository.findByIdForUpdate`, exposed on `AutomationWorkflowProjectConfigurationService`
-as `fetchConfigurationForUpdate`. It then reads the configuration and rolls out from that state. A second rollout for
-the same pair waits on the lock and then sees the newer committed configuration. When the configuration no longer
-exists (deleted), the deleted-event path runs as today without a lock.
+first takes a PostgreSQL transaction-scoped advisory lock, `pg_advisory_xact_lock(key)`, through
+`AutomationWorkflowProjectConfigurationService.lockRollout(projectId, environmentId)`, which is
+`@Transactional(propagation = MANDATORY)` so it can never run outside the caller's transaction. The key is a
+deterministic long: the first 8 bytes of SHA-256 over
+`"automation-workflow-project-configuration-rollout:" + projectId + ":" + environmentId`. The lock is released when
+`rollOutAndApply`'s transaction ends. Only then does `rollOut` read the configuration, so a second rollout for the same
+pair waits for the first and then rolls out the newest committed state.
+
+The advisory lock touches no table row, so administrator writes to the configuration (`updateConfiguration`,
+`enableConfiguration`, `enableConfigurationWorkflow`) never wait on a running rollout. Each of them commits and
+publishes its `AFTER_COMMIT` event. The rollout that event starts queues behind the running one and reads the newest
+committed state when it gets the lock. An earlier draft used a `SELECT ... FOR UPDATE` row lock on the configuration.
+It was dropped because it made administrator saves (and the child-row insert, through the foreign key's `FOR KEY
+SHARE`) wait for the whole rollout, with no lock timeout. When the configuration no longer exists (deleted), the
+deleted-event path runs as today without a lock.
 
 The per-deployment and per-reference `REQUIRES_NEW` transactions and their failure handling stay as they are, so one
 deployment's failure still does not undo the others. The cost is a second database connection held by each running
