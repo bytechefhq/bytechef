@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecutionChildrenPage", description = "A page of the children of a task execution. At most one of children and iterations is non-empty; both are empty on an empty page.")
 @JsonTypeName("TaskExecutionChildrenPage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-30T23:21:21.375131+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.296368+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionChildrenPageModel {
 
   private List<@Valid TaskExecutionModel> children = new ArrayList<>();

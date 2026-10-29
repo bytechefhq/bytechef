@@ -3,6 +3,8 @@ pom.xml
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/ApiUtil.java
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/TriggerFormApi.java
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/WorkflowExecutionApi.java
+src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/ClusterElementCallModel.java
+src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/ClusterElementCallRecordModel.java
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/ProjectStatusModel.java
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/TriggerFormInputModel.java
 src/main/java/com/bytechef/automation/workflow/execution/web/rest/model/TriggerFormModel.java

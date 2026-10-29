@@ -9,9 +9,11 @@ All URIs are relative to */api/automation/internal*
 | [**duplicateWorkflow**](WorkflowApi.md#duplicateworkflow) | **POST** /projects/{id}/workflows/{workflowId}/duplicate | Duplicates existing workflow. |
 | [**getProjectVersionWorkflows**](WorkflowApi.md#getprojectversionworkflows) | **GET** /projects/{id}/versions/{projectVersion}/workflows | Get workflows for particular project version. |
 | [**getProjectWorkflow**](WorkflowApi.md#getprojectworkflow) | **GET** /workflows/by-project-workflow-id/{projectWorkflowId} | Get workflow for particular project. |
+| [**getProjectWorkflowVersions**](WorkflowApi.md#getprojectworkflowversions) | **GET** /projects/{id}/workflows/{workflowUuid}/versions | Get published project versions that contain a workflow. |
 | [**getProjectWorkflows**](WorkflowApi.md#getprojectworkflows) | **GET** /projects/{id}/workflows | Get workflows for particular project. |
 | [**getWorkflow**](WorkflowApi.md#getworkflow) | **GET** /workflows/{id} | Get a workflow by id |
 | [**getWorkflows**](WorkflowApi.md#getworkflows) | **GET** /workflows | Get all workflows. |
+| [**restoreProjectVersionWorkflow**](WorkflowApi.md#restoreprojectversionworkflow) | **POST** /projects/{id}/versions/{projectVersion}/workflows/{workflowUuid}/restore | Loads a workflow of a published project version into the draft. |
 | [**updateWorkflow**](WorkflowApi.md#updateworkflow) | **PUT** /workflows/{id} | Update an existing workflow |
 
 
@@ -363,6 +365,76 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
+## getProjectWorkflowVersions
+
+> Array&lt;ProjectVersion&gt; getProjectWorkflowVersions(id, workflowUuid)
+
+Get published project versions that contain a workflow.
+
+Get published project versions that contain a workflow.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowApi,
+} from '';
+import type { GetProjectWorkflowVersionsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowApi();
+
+  const body = {
+    // number | The id of a project.
+    id: 789,
+    // string | The uuid of a workflow.
+    workflowUuid: workflowUuid_example,
+  } satisfies GetProjectWorkflowVersionsRequest;
+
+  try {
+    const data = await api.getProjectWorkflowVersions(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a project. | [Defaults to `undefined`] |
+| **workflowUuid** | `string` | The uuid of a workflow. | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;ProjectVersion&gt;**](ProjectVersion.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The list of project version objects. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
 ## getProjectWorkflows
 
 > Array&lt;Workflow&gt; getProjectWorkflows(id)
@@ -552,6 +624,79 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The array of workflows. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## restoreProjectVersionWorkflow
+
+> restoreProjectVersionWorkflow(id, projectVersion, workflowUuid)
+
+Loads a workflow of a published project version into the draft.
+
+Loads a workflow of a published project version into the draft.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowApi,
+} from '';
+import type { RestoreProjectVersionWorkflowRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowApi();
+
+  const body = {
+    // number | The id of a project.
+    id: 789,
+    // number | The version of a project.
+    projectVersion: 56,
+    // string | The uuid of a workflow.
+    workflowUuid: workflowUuid_example,
+  } satisfies RestoreProjectVersionWorkflowRequest;
+
+  try {
+    const data = await api.restoreProjectVersionWorkflow(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a project. | [Defaults to `undefined`] |
+| **projectVersion** | `number` | The version of a project. | [Defaults to `undefined`] |
+| **workflowUuid** | `string` | The uuid of a workflow. | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

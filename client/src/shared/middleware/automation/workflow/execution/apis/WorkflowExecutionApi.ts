@@ -454,7 +454,9 @@ export const GetWorkflowExecutionsPageJobStatusEnum = {
     Created: 'CREATED',
     Started: 'STARTED',
     Stopped: 'STOPPED',
+    Cancelled: 'CANCELLED',
     Failed: 'FAILED',
     Completed: 'COMPLETED',
+    PaymentRequired: 'PAYMENT_REQUIRED',
 } as const;
 export type GetWorkflowExecutionsPageJobStatusEnum = typeof GetWorkflowExecutionsPageJobStatusEnum[keyof typeof GetWorkflowExecutionsPageJobStatusEnum];

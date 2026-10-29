@@ -86,7 +86,13 @@ export interface GetProjectWorkflowRequest {
 }
 
 export interface GetProjectWorkflowVersionsRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * The uuid of a workflow.
+     */
     workflowUuid: string;
 }
 
@@ -105,8 +111,17 @@ export interface GetWorkflowRequest {
 }
 
 export interface RestoreProjectVersionWorkflowRequest {
+    /**
+     * The id of a project.
+     */
     id: number;
+    /**
+     * The version of a project.
+     */
     projectVersion: number;
+    /**
+     * The uuid of a workflow.
+     */
     workflowUuid: string;
 }
 

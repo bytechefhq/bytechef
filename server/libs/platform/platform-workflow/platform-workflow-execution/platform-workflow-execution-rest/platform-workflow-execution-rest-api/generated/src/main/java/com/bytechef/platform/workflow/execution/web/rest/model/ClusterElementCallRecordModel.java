@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementCallRecord", description = "One call a task made to one of its cluster elements, such as an AI agent's tool or sub-agent.")
 @JsonTypeName("ClusterElementCallRecord")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-01T20:10:42.326774+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.296368+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ClusterElementCallRecordModel {
 
   private @Nullable String componentName;
