@@ -158,6 +158,27 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService, Sma
 
     @Override
     @Transactional(readOnly = true)
+    public Set<Long> getOwnedProjectDeploymentIds(
+        Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner) {
+
+        if (projectDeploymentIds.isEmpty()) {
+            return Set.of();
+        }
+
+        String condition = getSelectProjectDeploymentsCondition(projectDeploymentOwner, "project_deployment.id");
+
+        if (condition.equals(MATCH_NOTHING)) {
+            return Set.of();
+        }
+
+        return selectIdsInChunks(
+            "SELECT project_deployment.id FROM project_deployment WHERE project_deployment.id IN (:ids) AND " +
+                condition,
+            projectDeploymentIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners) {
         if (projectIds.isEmpty() || projectOwners.isEmpty()) {
             return Set.of();
@@ -172,27 +193,29 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService, Sma
             return Set.of();
         }
 
-        String query = "SELECT project.id FROM project WHERE project.id IN (:ids) AND " + combine(conditions);
+        return selectIdsInChunks(
+            "SELECT project.id FROM project WHERE project.id IN (:ids) AND " + combine(conditions), projectIds);
+    }
 
-        Set<Long> ownedProjectIds = new HashSet<>();
+    private Set<Long> selectIdsInChunks(String query, Collection<Long> ids) {
+        Set<Long> selectedIds = new HashSet<>();
 
-        List<Long> distinctProjectIds = projectIds.stream()
+        List<Long> distinctIds = ids.stream()
             .distinct()
             .toList();
 
-        for (int fromIndex = 0; fromIndex < distinctProjectIds.size(); fromIndex += CHUNK_SIZE) {
-            List<Long> projectIdsChunk = distinctProjectIds.subList(
-                fromIndex, Math.min(fromIndex + CHUNK_SIZE, distinctProjectIds.size()));
+        for (int fromIndex = 0; fromIndex < distinctIds.size(); fromIndex += CHUNK_SIZE) {
+            List<Long> idsChunk = distinctIds.subList(fromIndex, Math.min(fromIndex + CHUNK_SIZE, distinctIds.size()));
 
-            ownedProjectIds.addAll(
+            selectedIds.addAll(
                 jdbcClient
                     .sql(query)
-                    .param("ids", projectIdsChunk)
+                    .param("ids", idsChunk)
                     .query(Long.class)
                     .list());
         }
 
-        return ownedProjectIds;
+        return selectedIds;
     }
 
     private boolean hasRows(List<String> ownerTables) {

@@ -19,7 +19,6 @@ package com.bytechef.platform.ai.auto.memory.web.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -28,9 +27,9 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
-import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryConcurrentModificationException;
@@ -53,9 +52,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -138,10 +135,10 @@ class AiAutoMemoryGraphQlControllerIntTest {
     private AiAutoMemoryService aiAutoMemoryService;
 
     @MockitoBean
-    private ProjectDeploymentService projectDeploymentService;
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @MockitoBean
-    private ProjectFacade projectFacade;
+    private ProjectDeploymentService projectDeploymentService;
 
     @MockitoBean
     private UserService userService;
@@ -687,9 +684,9 @@ class AiAutoMemoryGraphQlControllerIntTest {
     }
 
     @Test
-    void testListingsKeepEmbeddedCatalogReferenceDeployments() {
+    void testListingsDropConnectedUserReferenceDeployments() {
         givenDeployments(deployment(5L, 50L, "Orders"), deployment(7L, 70L, "acme"));
-        givenOwnedProjects(Map.of(ProjectOwner.EMBEDDED_CATALOG, Set.of(70L)));
+        givenEmbeddedDeployments(7L);
         givenPrincipalCounts(
             new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 5L, 1),
             new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 7L, 1));
@@ -704,15 +701,15 @@ class AiAutoMemoryGraphQlControllerIntTest {
             .execute()
             .path("aiAutoMemoryPrincipals[*].label")
             .entityList(String.class)
-            .containsExactly("Orders", "acme");
+            .containsExactly("Orders");
 
-        assertListedMemoryIds(LIST_WITHOUT_PRINCIPAL, "3", "4");
+        assertListedMemoryIds(LIST_WITHOUT_PRINCIPAL, "3");
     }
 
     @Test
     void testListingsDropEmbeddedConnectedUserDeployments() {
         givenDeployments(deployment(5L, 50L, "Orders"), deployment(6L, 60L, "customer-42"));
-        givenOwnedProjects(Map.of(ProjectOwner.EMBEDDED_CONNECTED_USER, Set.of(60L)));
+        givenEmbeddedDeployments(6L);
         givenPrincipalCounts(
             new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 5L, 1),
             new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 6L, 1));
@@ -756,9 +753,9 @@ class AiAutoMemoryGraphQlControllerIntTest {
     }
 
     @Test
-    void testADeploymentWhoseProjectIsGoneIsNotTreatedAsEmbedded() {
+    void testADeploymentNoEmbeddedOwnerClaimsIsListedWithItsName() {
         givenDeployments(deployment(6L, 60L, "Orders"));
-        givenOwnedProjects(Map.of());
+        givenEmbeddedDeployments();
         givenPrincipalCounts(new AiAutoMemoryPrincipalCount(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 6L, 1));
 
         graphQlTester.document(PRINCIPALS_QUERY)
@@ -773,7 +770,7 @@ class AiAutoMemoryGraphQlControllerIntTest {
         authenticateWith("ROLE_ADMIN");
 
         givenDeployments(deployment(5L, 60L, "customer-42"));
-        givenOwnedProjects(Map.of(ProjectOwner.EMBEDDED_CONNECTED_USER, Set.of(60L)));
+        givenEmbeddedDeployments(5L);
 
         listWithPrincipal("PROJECT_DEPLOYMENT", 5L)
             .execute()
@@ -905,17 +902,15 @@ class AiAutoMemoryGraphQlControllerIntTest {
         });
     }
 
-    private void givenOwnedProjects(Map<ProjectOwner, Set<Long>> ownedProjectIdsByOwner) {
-        when(projectFacade.getOwnedProjectIds(any(), anySet())).thenAnswer(invocation -> {
-            Collection<Long> projectIds = invocation.getArgument(0);
-            Set<ProjectOwner> projectOwners = invocation.getArgument(1);
+    private void givenEmbeddedDeployments(Long... embeddedDeploymentIds) {
+        when(projectDeploymentFacade.getOwnedProjectDeploymentIds(any(), eq(ProjectDeploymentOwner.EMBEDDED)))
+            .thenAnswer(invocation -> {
+                Collection<Long> projectDeploymentIds = invocation.getArgument(0);
 
-            return projectOwners.stream()
-                .flatMap(projectOwner -> ownedProjectIdsByOwner.getOrDefault(projectOwner, Set.of())
-                    .stream())
-                .filter(projectIds::contains)
-                .collect(Collectors.toSet());
-        });
+                return Arrays.stream(embeddedDeploymentIds)
+                    .filter(projectDeploymentIds::contains)
+                    .collect(Collectors.toSet());
+            });
     }
 
     private static ProjectDeployment deployment(long id, long projectId, String name) {

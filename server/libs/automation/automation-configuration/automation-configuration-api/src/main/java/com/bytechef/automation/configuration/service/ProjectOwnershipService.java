@@ -34,5 +34,8 @@ public interface ProjectOwnershipService {
     String getExcludeProjectDeploymentsCondition(
         Set<ProjectDeploymentOwner> projectDeploymentOwners, String projectDeploymentIdColumn);
 
+    Set<Long> getOwnedProjectDeploymentIds(
+        Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner);
+
     Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners);
 }

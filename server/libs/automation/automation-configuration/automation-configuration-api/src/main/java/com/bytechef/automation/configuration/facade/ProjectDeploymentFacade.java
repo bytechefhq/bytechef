@@ -20,9 +20,12 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -47,6 +50,9 @@ public interface ProjectDeploymentFacade {
     void enableProjectDeploymentWorkflow(long projectDeploymentId, String workflowId, boolean enable);
 
     void enableProjectDeploymentWorkflow(long projectId, String workflowId, boolean enable, Environment environment);
+
+    Set<Long> getOwnedProjectDeploymentIds(
+        Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner);
 
     ProjectDeploymentDTO getProjectDeployment(long id);
 
