@@ -18,6 +18,7 @@ import com.bytechef.definition.BaseProperty;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatcherDefinitionRemoteServiceGrpcServer;
 import com.bytechef.ee.platform.workflow.task.dispatcher.remote.grpc.TaskDispatcherProtoMapper;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
+import com.bytechef.ee.remote.grpc.GrpcRemoteExceptionHandler;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
@@ -35,6 +36,7 @@ import com.bytechef.task.dispatcher.loop.LoopTaskDispatcherDefinitionFactory;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcherDefinitionFactory;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
+import io.grpc.ServerInterceptors;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -53,6 +55,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.grpc.server.exception.GrpcExceptionHandlerInterceptor;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -82,8 +85,10 @@ class RemoteTaskDispatcherDefinitionServiceClientIntTest {
         server = InProcessServerBuilder.forName(name)
             .directExecutor()
             .addService(
-                new TaskDispatcherDefinitionRemoteServiceGrpcServer(
-                    taskDispatcherDefinitionService, new TaskDispatcherProtoMapper(objectMapper)))
+                ServerInterceptors.intercept(
+                    new TaskDispatcherDefinitionRemoteServiceGrpcServer(
+                        taskDispatcherDefinitionService, new TaskDispatcherProtoMapper(objectMapper)),
+                    new GrpcExceptionHandlerInterceptor(new GrpcRemoteExceptionHandler())))
             .build()
             .start();
 
@@ -131,9 +136,10 @@ class RemoteTaskDispatcherDefinitionServiceClientIntTest {
         assertThatThrownBy(() -> remoteTaskDispatcherDefinitionServiceClient.getTaskDispatcherDefinition(
             "missing", null))
                 .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("Task dispatcher definition with name 'missing' and version 'null' not found")
                 .extracting(exception -> ((StatusRuntimeException) exception).getStatus()
                     .getCode())
-                .isEqualTo(Status.Code.UNKNOWN);
+                .isEqualTo(Status.Code.INVALID_ARGUMENT);
     }
 
     @Test
