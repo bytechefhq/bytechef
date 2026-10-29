@@ -20,6 +20,7 @@ import com.bytechef.ee.platform.connection.remote.grpc.proto.IdsRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteConnection;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.RemoteConnections;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.TypeRequest;
+import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionCreatedByRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionRequest;
 import com.bytechef.ee.platform.connection.remote.grpc.proto.UpdateConnectionTagIdsRequest;
 import com.bytechef.platform.connection.domain.Connection;
@@ -165,6 +166,13 @@ public class ConnectionRemoteServiceGrpcServer extends ConnectionRemoteServiceGr
             connectionService.updateConnectionParameters(
                 request.getConnectionId(), connectionProtoMapper.toMap(request.getParameters())),
             responseObserver);
+    }
+
+    @Override
+    public void updateCreatedBy(
+        UpdateConnectionCreatedByRequest request, StreamObserver<RemoteConnection> responseObserver) {
+
+        reply(connectionService.updateCreatedBy(request.getId(), request.getCreatedBy()), responseObserver);
     }
 
     @Override
