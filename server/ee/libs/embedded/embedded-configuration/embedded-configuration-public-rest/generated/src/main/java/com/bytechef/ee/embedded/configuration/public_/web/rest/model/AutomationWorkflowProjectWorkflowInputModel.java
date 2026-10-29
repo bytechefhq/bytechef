@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProjectWorkflowInput", description = "A value the connected user supplies before an automation workflow runs.")
 @JsonTypeName("AutomationWorkflowProjectWorkflowInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class AutomationWorkflowProjectWorkflowInputModel {
 
   private @Nullable String name;
@@ -32,6 +32,8 @@ public class AutomationWorkflowProjectWorkflowInputModel {
   private @Nullable String type;
 
   private @Nullable Boolean required;
+
+  private @Nullable Boolean provided;
 
   public AutomationWorkflowProjectWorkflowInputModel name(@Nullable String name) {
     this.name = name;
@@ -117,6 +119,27 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     this.required = required;
   }
 
+  public AutomationWorkflowProjectWorkflowInputModel provided(@Nullable Boolean provided) {
+    this.provided = provided;
+    return this;
+  }
+
+  /**
+   * Whether the configuration provides the value of this input, so the connected user cannot set it. The value itself is not returned.
+   * @return provided
+   */
+  
+  @Schema(name = "provided", description = "Whether the configuration provides the value of this input, so the connected user cannot set it. The value itself is not returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("provided")
+  public @Nullable Boolean getProvided() {
+    return provided;
+  }
+
+  @JsonProperty("provided")
+  public void setProvided(@Nullable Boolean provided) {
+    this.provided = provided;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -129,12 +152,13 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     return Objects.equals(this.name, automationWorkflowProjectWorkflowInput.name) &&
         Objects.equals(this.label, automationWorkflowProjectWorkflowInput.label) &&
         Objects.equals(this.type, automationWorkflowProjectWorkflowInput.type) &&
-        Objects.equals(this.required, automationWorkflowProjectWorkflowInput.required);
+        Objects.equals(this.required, automationWorkflowProjectWorkflowInput.required) &&
+        Objects.equals(this.provided, automationWorkflowProjectWorkflowInput.provided);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, label, type, required);
+    return Objects.hash(name, label, type, required, provided);
   }
 
   @Override
@@ -145,6 +169,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
+    sb.append("    provided: ").append(toIndentedString(provided)).append("\n");
     sb.append("}");
     return sb.toString();
   }
