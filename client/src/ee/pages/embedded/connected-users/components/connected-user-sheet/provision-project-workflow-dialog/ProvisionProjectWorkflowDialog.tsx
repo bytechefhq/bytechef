@@ -33,7 +33,7 @@ interface ProvisionProjectWorkflowDialogProps {
 const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionProjectWorkflowDialogProps) => {
     const queryClient = useQueryClient();
 
-    const {handleSubmit, register, setValue, watch} = useForm<ProvisionProjectWorkflowFormI>({
+    const {handleSubmit, setValue, watch} = useForm<ProvisionProjectWorkflowFormI>({
         defaultValues: {projectId: '', workflows: []},
     });
 
@@ -185,7 +185,13 @@ const ProvisionProjectWorkflowDialog = ({connectedUserId, onClose}: ProvisionPro
 
                                             <Input
                                                 id={`provision-workflow-${workflowIndex}-${input.name}`}
-                                                {...register(`workflows.${workflowIndex}.inputs.${input.name}`)}
+                                                onChange={(event) =>
+                                                    setValue(`workflows.${workflowIndex}.inputs`, {
+                                                        ...formWorkflows[workflowIndex]?.inputs,
+                                                        [input.name]: event.target.value,
+                                                    })
+                                                }
+                                                value={formWorkflows[workflowIndex]?.inputs?.[input.name] || ''}
                                             />
                                         </fieldset>
                                     ))}
