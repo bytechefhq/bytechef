@@ -38,6 +38,7 @@ const AutomationCard = ({
     const navigate = useNavigate();
 
     const inputs = automation.inputs ?? [];
+    const hasEditableInputs = inputs.some((input) => !input.provided);
 
     const label = automation.label || 'Untitled automation';
 
@@ -65,7 +66,7 @@ const AutomationCard = ({
             await reportSetEnabledError(error, {
                 components: automation.components,
                 label,
-                onMissingInput: inputs.length > 0 ? () => setInputsDialogOpen(true) : undefined,
+                onMissingInput: hasEditableInputs ? () => setInputsDialogOpen(true) : undefined,
             });
         }
     };
@@ -104,7 +105,7 @@ const AutomationCard = ({
                                 ? () => navigate(`/embedded/hub/builder/${automation.workflowUuid}`)
                                 : undefined
                         }
-                        onEditInputs={inputs.length > 0 ? () => setInputsDialogOpen(true) : undefined}
+                        onEditInputs={hasEditableInputs ? () => setInputsDialogOpen(true) : undefined}
                         onRemove={() => setRemoveDialogOpen(true)}
                     />
                 </CardAction>

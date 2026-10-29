@@ -42,6 +42,8 @@ const AutomationInputsDialog = ({inputValues, inputs, label, onClose, workflowUu
         (input) => !input.provided && input.required && toInputValueText(values[input.name ?? '']).trim() === ''
     );
 
+    const hasEditableInputs = inputs.some((input) => !input.provided);
+
     const handleSave = async () => {
         setError(undefined);
 
@@ -103,7 +105,11 @@ const AutomationInputsDialog = ({inputValues, inputs, label, onClose, workflowUu
                 <DialogFooter>
                     <Button disabled={isPending} label="Cancel" onClick={onClose} variant="outline" />
 
-                    <Button disabled={isPending || missingRequired} label="Save" onClick={handleSave} />
+                    <Button
+                        disabled={isPending || missingRequired || !hasEditableInputs}
+                        label="Save"
+                        onClick={handleSave}
+                    />
                 </DialogFooter>
             </DialogContent>
         </Dialog>

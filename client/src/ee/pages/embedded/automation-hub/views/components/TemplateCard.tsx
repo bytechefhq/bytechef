@@ -50,6 +50,7 @@ const TemplateCard = ({
     const label = automation?.label || template.label || 'Untitled automation';
     const description = automation?.description || template.description;
     const attentionDescription = describeAttentionReason(automation?.attentionReason);
+    const hasEditableInputs = (automation?.inputs ?? []).some((input) => !input.provided);
 
     const handleRemove = async () => {
         setRemoving(true);
@@ -72,7 +73,7 @@ const TemplateCard = ({
             await reportSetEnabledError(error, {
                 components: template.components,
                 label,
-                onMissingInput: (automation?.inputs ?? []).length > 0 ? () => setInputsDialogOpen(true) : undefined,
+                onMissingInput: hasEditableInputs ? () => setInputsDialogOpen(true) : undefined,
             });
         }
     };
@@ -112,9 +113,7 @@ const TemplateCard = ({
                                     ? () => navigate(`/embedded/hub/builder/${automation.workflowUuid}`)
                                     : undefined
                             }
-                            onEditInputs={
-                                (automation.inputs ?? []).length > 0 ? () => setInputsDialogOpen(true) : undefined
-                            }
+                            onEditInputs={hasEditableInputs ? () => setInputsDialogOpen(true) : undefined}
                             onRemove={() => setRemoveDialogOpen(true)}
                         />
                     </CardAction>
