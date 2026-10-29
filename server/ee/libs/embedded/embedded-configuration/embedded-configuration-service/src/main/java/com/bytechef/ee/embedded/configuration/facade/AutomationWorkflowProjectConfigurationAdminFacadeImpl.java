@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
@@ -26,9 +27,11 @@ import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjec
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,26 +61,31 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
     private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final WorkflowConnectionSlot workflowConnectionSlot;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectConfigurationAdminFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
+        ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade, JobService jobService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        WorkflowService workflowService) {
+        WorkflowConnectionSlot workflowConnectionSlot, WorkflowService workflowService) {
 
         this.applicationEventPublisher = applicationEventPublisher;
         this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
+        this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
         this.jobService = jobService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
+        this.workflowConnectionSlot = workflowConnectionSlot;
         this.workflowService = workflowService;
     }
 
@@ -147,6 +156,74 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(
+        long configurationId, int projectVersion) {
+
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
+
+        Map<String, ProjectWorkflow> currentProjectWorkflows = projectWorkflowService
+            .getProjectWorkflows(configuration.getProjectId(), configuration.getProjectVersion())
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getUuidAsString, projectWorkflow -> projectWorkflow));
+
+        List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> impactedWorkflows = new ArrayList<>();
+        List<WorkflowChange> workflowChanges = new ArrayList<>();
+
+        for (ProjectWorkflow requestedProjectWorkflow : projectWorkflowService.getProjectWorkflows(
+            configuration.getProjectId(), projectVersion)) {
+
+            ProjectWorkflow currentProjectWorkflow = currentProjectWorkflows.get(
+                requestedProjectWorkflow.getUuidAsString());
+
+            if (currentProjectWorkflow == null) {
+                continue;
+            }
+
+            Workflow requestedWorkflow = workflowService.getWorkflow(requestedProjectWorkflow.getWorkflowId());
+
+            List<String> newRequiredInputs = getNewRequiredInputs(
+                workflowService.getWorkflow(currentProjectWorkflow.getWorkflowId()), requestedWorkflow);
+            List<String> newRequiredConnections = getNewRequiredConnections(
+                currentProjectWorkflow.getWorkflowId(), requestedProjectWorkflow.getWorkflowId());
+
+            if (!newRequiredInputs.isEmpty() || !newRequiredConnections.isEmpty()) {
+                workflowChanges.add(
+                    new WorkflowChange(
+                        requestedProjectWorkflow.getUuidAsString(), requestedWorkflow.getLabel(), newRequiredInputs,
+                        newRequiredConnections));
+            }
+        }
+
+        if (workflowChanges.isEmpty()) {
+            return new AutomationWorkflowProjectConfigurationVersionImpactDTO(impactedWorkflows);
+        }
+
+        Map<String, List<ConnectedUserWorkflowReferenceDTO>> referencesByWorkflowUuid = getLiveReferences(
+            configuration,
+            workflowChanges.stream()
+                .map(WorkflowChange::workflowUuid)
+                .collect(Collectors.toSet()));
+
+        for (WorkflowChange workflowChange : workflowChanges) {
+            int affectedConnectedUserCount = getAffectedConnectedUserCount(
+                workflowChange, referencesByWorkflowUuid.getOrDefault(workflowChange.workflowUuid(), List.of()));
+
+            impactedWorkflows.add(
+                new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                    workflowChange.workflowUuid(), workflowChange.label(), workflowChange.newRequiredInputs(),
+                    workflowChange.newRequiredConnections(), affectedConnectedUserCount));
+        }
+
+        impactedWorkflows.sort(
+            Comparator.comparing(AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow::label,
+                Comparator.nullsLast(Comparator.naturalOrder())));
+
+        return new AutomationWorkflowProjectConfigurationVersionImpactDTO(impactedWorkflows);
+    }
+
+    @Override
     public void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -180,6 +257,82 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     private void publishUpdatedEvent(long projectId, long environmentId) {
         applicationEventPublisher.publishEvent(
             new AutomationWorkflowProjectConfigurationUpdatedEvent(projectId, environmentId));
+    }
+
+    private int getAffectedConnectedUserCount(
+        WorkflowChange workflowChange, List<ConnectedUserWorkflowReferenceDTO> references) {
+
+        if (!workflowChange.newRequiredConnections()
+            .isEmpty()) {
+
+            return references.size();
+        }
+
+        int affectedConnectedUserCount = 0;
+
+        for (ConnectedUserWorkflowReferenceDTO reference : references) {
+            Long projectDeploymentId = reference.projectDeploymentId();
+
+            Map<String, ?> storedInputs = projectDeploymentId == null
+                ? Map.of()
+                : connectedUserReferenceDeploymentManager.getInputs(projectDeploymentId, workflowChange.workflowUuid());
+
+            boolean lacksNewRequiredInput = workflowChange.newRequiredInputs()
+                .stream()
+                .anyMatch(inputName -> {
+                    Object value = storedInputs.get(inputName);
+
+                    return value == null || StringUtils.isBlank(String.valueOf(value));
+                });
+
+            if (lacksNewRequiredInput) {
+                affectedConnectedUserCount++;
+            }
+        }
+
+        return affectedConnectedUserCount;
+    }
+
+    private Map<String, List<ConnectedUserWorkflowReferenceDTO>> getLiveReferences(
+        AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
+
+        Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
+
+        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
+            .stream()
+            .filter(reference -> !reference.dangling() && Objects.equals(reference.environment(), environment.name()))
+            .collect(Collectors.groupingBy(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid));
+    }
+
+    private List<String> getNewRequiredConnections(String currentWorkflowId, String requestedWorkflowId) {
+        Set<String> currentComponentNames = workflowConnectionSlot.getSlots(currentWorkflowId)
+            .stream()
+            .map(ComponentConnection::componentName)
+            .collect(Collectors.toSet());
+
+        return workflowConnectionSlot.getSlots(requestedWorkflowId)
+            .stream()
+            .filter(ComponentConnection::required)
+            .map(ComponentConnection::componentName)
+            .filter(componentName -> !currentComponentNames.contains(componentName))
+            .distinct()
+            .sorted()
+            .toList();
+    }
+
+    private static List<String> getNewRequiredInputs(Workflow currentWorkflow, Workflow requestedWorkflow) {
+        Set<String> currentRequiredInputNames = currentWorkflow.getInputs()
+            .stream()
+            .filter(Workflow.Input::required)
+            .map(Workflow.Input::name)
+            .collect(Collectors.toSet());
+
+        return requestedWorkflow.getInputs()
+            .stream()
+            .filter(Workflow.Input::required)
+            .map(Workflow.Input::name)
+            .filter(inputName -> !currentRequiredInputNames.contains(inputName))
+            .toList();
     }
 
     private Map<String, List<String>> getReferenceWorkflowIds(
@@ -300,5 +453,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                 "Project id=%s version v=%s is not a published version".formatted(projectId, projectVersion),
                 AutomationWorkflowProjectConfigurationErrorType.PROJECT_VERSION_NOT_PUBLISHED);
         }
+    }
+
+    private record WorkflowChange(
+        String workflowUuid, String label, List<String> newRequiredInputs, List<String> newRequiredConnections) {
     }
 }

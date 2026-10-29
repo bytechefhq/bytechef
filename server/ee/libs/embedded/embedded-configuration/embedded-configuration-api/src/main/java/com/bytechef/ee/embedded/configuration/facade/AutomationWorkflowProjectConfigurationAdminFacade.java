@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import java.util.List;
 
 /**
@@ -27,6 +28,8 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable);
 
     List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId);
+
+    AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(long configurationId, int projectVersion);
 
     void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible);
 }

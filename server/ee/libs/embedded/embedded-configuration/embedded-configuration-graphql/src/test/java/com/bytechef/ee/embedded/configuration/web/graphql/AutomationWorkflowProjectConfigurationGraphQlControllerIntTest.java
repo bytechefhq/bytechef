@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
@@ -102,6 +103,47 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
             .path("automationWorkflowProjectConfigurations[0].workflows[*].workflowId")
             .entityList(String.class)
             .containsExactly("workflow-id-one", "workflow-id-two");
+    }
+
+    @Test
+    void testAutomationWorkflowProjectConfigurationVersionImpactReturnsTheWorkflowsItWouldPause() {
+        when(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(5L, 4))
+            .thenReturn(
+                new AutomationWorkflowProjectConfigurationVersionImpactDTO(
+                    List.of(
+                        new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 12))));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectConfigurationVersionImpact(id: "5", projectVersion: 4) {
+                        workflows {
+                            workflowUuid
+                            label
+                            newRequiredInputs
+                            newRequiredConnections
+                            affectedConnectedUserCount
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectConfigurationVersionImpact.workflows[0].workflowUuid")
+            .entity(String.class)
+            .isEqualTo("uuid-one")
+            .path("automationWorkflowProjectConfigurationVersionImpact.workflows[0].label")
+            .entity(String.class)
+            .isEqualTo("Notify Slack")
+            .path("automationWorkflowProjectConfigurationVersionImpact.workflows[0].newRequiredInputs")
+            .entityList(String.class)
+            .containsExactly("channel")
+            .path("automationWorkflowProjectConfigurationVersionImpact.workflows[0].newRequiredConnections")
+            .entityList(String.class)
+            .containsExactly("jira")
+            .path("automationWorkflowProjectConfigurationVersionImpact.workflows[0].affectedConnectedUserCount")
+            .entity(Integer.class)
+            .isEqualTo(12);
     }
 
     @Test

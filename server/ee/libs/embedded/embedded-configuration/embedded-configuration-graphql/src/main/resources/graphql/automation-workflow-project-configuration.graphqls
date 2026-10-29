@@ -18,8 +18,21 @@ type AutomationWorkflowProjectConfigurationWorkflow {
     lastExecutionDate: String
 }
 
+type AutomationWorkflowProjectConfigurationVersionImpact {
+    workflows: [AutomationWorkflowProjectConfigurationVersionImpactWorkflow!]!
+}
+
+type AutomationWorkflowProjectConfigurationVersionImpactWorkflow {
+    workflowUuid: ID!
+    label: String!
+    newRequiredInputs: [String!]!
+    newRequiredConnections: [String!]!
+    affectedConnectedUserCount: Int!
+}
+
 extend type Query {
     automationWorkflowProjectConfigurations(projectId: ID!): [AutomationWorkflowProjectConfiguration!]!
+    automationWorkflowProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!): AutomationWorkflowProjectConfigurationVersionImpact!
 }
 
 extend type Mutation {

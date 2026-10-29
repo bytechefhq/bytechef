@@ -9,12 +9,18 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
@@ -27,6 +33,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
@@ -42,6 +49,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
@@ -69,6 +77,8 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +129,29 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
     private static final long ENVIRONMENT_ID = 0L;
 
+    private static final String CHANNEL_REQUIRED_DEFINITION = """
+        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
+    private static final String CHANNEL_OPTIONAL_DEFINITION = """
+        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":false}],
+         "triggers":[],"tasks":[]}
+        """;
+
+    private static final String NO_INPUT_DEFINITION = """
+        {"label":"%s","triggers":[],"tasks":[]}
+        """;
+
+    private static final String SLACK_DEFINITION = """
+        {"label":"%s","triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String SLACK_AND_JIRA_DEFINITION = """
+        {"label":"%s","triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}},
+         {"name":"createIssue1","type":"jira/v1/createIssue","parameters":{}}]}
+        """;
+
     @Autowired
     private ApplicationEvents applicationEvents;
 
@@ -126,7 +159,19 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     private AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
 
     @Autowired
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @Autowired
     private ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+
+    @Autowired
+    private ProjectDeploymentService projectDeploymentService;
+
+    @Autowired
+    private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -429,6 +474,201 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             .getProjectVersion()).isEqualTo(3);
     }
 
+    @Test
+    void testGetVersionImpactCountsOnlyReferencesLackingTheNewRequiredInput() {
+        long projectId = createProject("Impact New Input");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Notify Slack"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(CHANNEL_REQUIRED_DEFINITION, "Notify Slack"));
+        publish(projectId);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of("channel", "general"));
+        givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
+        givenStoredInputs(103L, projectId, 1, workflowUuid, Map.of("channel", "  "));
+        givenReferences(
+            newReference(workflowUuid, environmentName, false, 101L),
+            newReference(workflowUuid, environmentName, false, 102L),
+            newReference(workflowUuid, environmentName, false, 103L));
+
+        AutomationWorkflowProjectConfigurationVersionImpactDTO versionImpact =
+            automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2);
+
+        assertThat(versionImpact.workflows()).containsExactly(
+            new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                workflowUuid, "Notify Slack", List.of("channel"), List.of(), 2));
+    }
+
+    @Test
+    void testGetVersionImpactReportsAnOptionalInputThatBecameRequired() {
+        long projectId = createProject("Impact Optional To Required");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, "Optional Flow"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(CHANNEL_REQUIRED_DEFINITION, "Optional Flow"));
+        publish(projectId);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
+        givenReferences(
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false, 101L));
+
+        AutomationWorkflowProjectConfigurationVersionImpactDTO versionImpact =
+            automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2);
+
+        assertThat(versionImpact.workflows()).containsExactly(
+            new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                workflowUuid, "Optional Flow", List.of("channel"), List.of(), 1));
+    }
+
+    @Test
+    void testGetVersionImpactOmitsWorkflowsWithoutNewRequirements() {
+        long projectId = createProject("Impact No Change");
+
+        String relaxedWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_REQUIRED_DEFINITION, "Relaxed"));
+        String unchangedWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_REQUIRED_DEFINITION, "Unchanged"));
+
+        publish(projectId);
+        redefineDraftWorkflow(relaxedWorkflowUuid, withLabel(CHANNEL_OPTIONAL_DEFINITION, "Relaxed"));
+        addWorkflow(projectId, withLabel(CHANNEL_REQUIRED_DEFINITION, "Only In New Version"));
+        publish(projectId);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
+
+        givenStoredInputs(101L, projectId, 1, relaxedWorkflowUuid, Map.of());
+        givenStoredInputs(101L, projectId, 1, unchangedWorkflowUuid, Map.of());
+        givenReferences(
+            newReference(relaxedWorkflowUuid, environmentName, false, 101L),
+            newReference(unchangedWorkflowUuid, environmentName, false, 101L));
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2)
+            .workflows()).isEmpty();
+    }
+
+    @Test
+    void testGetVersionImpactReportsANewRequiredConnectionAndCountsEveryReference() {
+        long projectId = createProject("Impact New Connection");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_DEFINITION, "Sync Issues"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(SLACK_AND_JIRA_DEFINITION, "Sync Issues"));
+        publish(projectId);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenAnswer(invocation -> switch (invocation.<WorkflowTask>getArgument(0)
+                .getName()) {
+                case "postMessage1" -> List.of(new ComponentConnection("slack", 1, "postMessage1", "slack", true));
+                case "createIssue1" -> List.of(new ComponentConnection("jira", 1, "createIssue1", "jira", true));
+                default -> List.of();
+            });
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
+        givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
+        givenReferences(
+            newReference(workflowUuid, environmentName, false, 101L),
+            newReference(workflowUuid, environmentName, false, 102L));
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2)
+            .workflows()).containsExactly(
+                new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                    workflowUuid, "Sync Issues", List.of(), List.of("jira"), 2));
+    }
+
+    @Test
+    void testGetVersionImpactIgnoresDanglingAndOtherEnvironmentReferences() {
+        long projectId = createProject("Impact Ignored References");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Ignored References"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(CHANNEL_REQUIRED_DEFINITION, "Ignored References"));
+        publish(projectId);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
+        Environment otherEnvironment = Environment.values()[(int) ENVIRONMENT_ID + 1];
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
+        givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
+        givenStoredInputs(103L, projectId, 1, workflowUuid, Map.of());
+        givenReferences(
+            newReference(workflowUuid, environmentName, false, 101L),
+            newReference(workflowUuid, environmentName, true, 102L),
+            newReference(workflowUuid, otherEnvironment.name(), false, 103L));
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2)
+            .workflows()
+            .getFirst()
+            .affectedConnectedUserCount()).isEqualTo(1);
+    }
+
+    private String addWorkflow(long projectId, String definition) {
+        return automationWorkflowProjectFacade.createProjectWorkflow(projectId, definition, null);
+    }
+
+    private long createProject(String name) {
+        return automationWorkflowProjectFacade.createProject(name + " " + UUID.randomUUID(), "", null, List.of(), null);
+    }
+
+    private void givenStoredInputs(
+        long projectDeploymentId, long projectId, int projectVersion, String workflowUuid, Map<String, ?> inputs) {
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setId(projectDeploymentId);
+        projectDeployment.setProjectId(projectId);
+        projectDeployment.setProjectVersion(projectVersion);
+
+        when(projectDeploymentService.fetchProjectDeployment(projectDeploymentId))
+            .thenReturn(Optional.of(projectDeployment));
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setInputs(inputs);
+
+        String workflowId = projectWorkflowService.fetchProjectWorkflow(projectId, projectVersion, workflowUuid)
+            .orElseThrow()
+            .getWorkflowId();
+
+        when(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(projectDeploymentId, workflowId))
+            .thenReturn(Optional.of(projectDeploymentWorkflow));
+    }
+
+    private static String withLabel(String definitionTemplate, String label) {
+        return definitionTemplate.replace("%s", label);
+    }
+
+    private void publish(long projectId) {
+        automationWorkflowProjectFacade.publishProject(projectId);
+    }
+
+    private void redefineDraftWorkflow(String workflowUuid, String definition) {
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(draftWorkflowId, definition, draftWorkflow.getVersion());
+    }
+
     private String addWorkflowAndPublish(long projectId, String label) {
         String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
             projectId, "{\"label\": \"" + label + "\", \"description\": \"\", \"tasks\": []}", null);
@@ -446,8 +686,15 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     private static ConnectedUserWorkflowReferenceDTO newReference(
         String automationWorkflowUuid, String environment, boolean dangling) {
 
+        return newReference(automationWorkflowUuid, environment, dangling, null);
+    }
+
+    private static ConnectedUserWorkflowReferenceDTO newReference(
+        String automationWorkflowUuid, String environment, boolean dangling, Long projectDeploymentId) {
+
         return new ConnectedUserWorkflowReferenceDTO(
-            automationWorkflowUuid, "user-" + UUID.randomUUID(), environment, true, dangling, null, null);
+            automationWorkflowUuid, "user-" + UUID.randomUUID(), environment, true, dangling, null, null,
+            projectDeploymentId);
     }
 
     private long createPublishedProject(String name, int publishedVersionCount) {
