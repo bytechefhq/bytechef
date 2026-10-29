@@ -40,9 +40,9 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
  */
 @Configuration
 @ConditionalOnEEVersion
-@ConditionalOnExpression("!'${bytechef.message-broker.provider:memory}'.equalsIgnoreCase('memory') && " +
-    "!('${bytechef.message-broker.provider:memory}'.equalsIgnoreCase('aws') && " +
-    "!'${bytechef.message-broker.aws.control-provider:sqs}'.equalsIgnoreCase('redis'))")
+@ConditionalOnExpression("!'${bytechef.message-broker.provider}'.equalsIgnoreCase('MEMORY') && " +
+    "!('${bytechef.message-broker.provider}'.equalsIgnoreCase('AWS') && " +
+    "!'${bytechef.message-broker.aws.control-provider}'.equalsIgnoreCase('REDIS'))")
 public class CacheInvalidationConfiguration {
 
     private static final String SHARED_CACHE_KEY_PREFIX = "bytechef:cache:";

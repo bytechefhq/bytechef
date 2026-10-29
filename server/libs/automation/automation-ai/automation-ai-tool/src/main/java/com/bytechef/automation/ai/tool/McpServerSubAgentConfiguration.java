@@ -39,7 +39,7 @@ import org.springframework.core.io.Resource;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("${bytechef.ai.copilot.enabled:false} or ${bytechef.ai.hub.enabled:false}")
+@ConditionalOnExpression("${bytechef.ai.copilot.enabled} or ${bytechef.ai.hub.enabled}")
 public class McpServerSubAgentConfiguration {
 
     @Value("classpath:prompt_mcp_agent.txt")
