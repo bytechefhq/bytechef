@@ -53,7 +53,7 @@ class TwimlController {
     @SuppressFBWarnings("EI")
     TwimlController(
         CallSessionRegistry callSessionRegistry,
-        @Value("${bytechef.webhook.url:}") String publicUrl) {
+        @Value("${bytechef.public-url}") String publicUrl) {
 
         this.callSessionRegistry = callSessionRegistry;
         this.publicUrl = publicUrl;
