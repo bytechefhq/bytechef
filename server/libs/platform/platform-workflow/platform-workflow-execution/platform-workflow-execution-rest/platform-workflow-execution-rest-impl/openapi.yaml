@@ -360,7 +360,7 @@ components:
           readOnly: true
         endDate:
           description: "The time execution entered end status COMPLETED, STOPPED,\
-            \ FAILED"
+            \ FAILED, PAYMENT_REQUIRED"
           type: "string"
           format: "date-time"
         error:
@@ -424,6 +424,7 @@ components:
             - "CANCELLED"
             - "FAILED"
             - "COMPLETED"
+            - "PAYMENT_REQUIRED"
           readOnly: true
         taskExecutions:
           type: "array"
@@ -457,7 +458,7 @@ components:
           readOnly: true
         endDate:
           description: "The time execution entered end status COMPLETED, STOPPED,\
-            \ FAILED"
+            \ FAILED, PAYMENT_REQUIRED"
           type: "string"
           format: "date-time"
         id:
@@ -502,6 +503,7 @@ components:
             - "CANCELLED"
             - "FAILED"
             - "COMPLETED"
+            - "PAYMENT_REQUIRED"
           readOnly: true
         workflowId:
           type: "string"

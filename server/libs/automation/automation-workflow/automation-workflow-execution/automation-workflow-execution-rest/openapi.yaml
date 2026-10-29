@@ -73,6 +73,7 @@ paths:
           - "CANCELLED"
           - "FAILED"
           - "COMPLETED"
+          - "PAYMENT_REQUIRED"
       - name: "jobStartDate"
         description: "The start date of a job."
         in: "query"
