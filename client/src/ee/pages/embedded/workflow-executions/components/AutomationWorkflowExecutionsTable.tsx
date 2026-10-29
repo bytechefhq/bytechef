@@ -1,6 +1,5 @@
 import EmbeddedWorkflowExecutionsTableContent from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionsTableContent';
 import {getWorkflowExecutionColumns} from '@/ee/pages/embedded/workflow-executions/components/getWorkflowExecutionColumns';
-import {getConnectedUserExternalId} from '@/ee/pages/embedded/workflow-executions/utils/getConnectedUserExternalId';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {getProjectVersion} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
@@ -29,7 +28,7 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
     const columns = getWorkflowExecutionColumns<WorkflowExecution>({
         middleColumns: [
             columnHelper.accessor((row) => row.projectDeployment, {
-                cell: (info) => getConnectedUserExternalId(info.getValue()?.name),
+                cell: (info) => info.getValue()?.name,
                 header: 'Connected user',
                 id: 'connectedUser',
             }),
