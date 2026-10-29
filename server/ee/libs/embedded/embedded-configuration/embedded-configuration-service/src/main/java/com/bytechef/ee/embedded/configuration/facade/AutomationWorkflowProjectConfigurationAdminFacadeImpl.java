@@ -243,6 +243,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
             Workflow requestedWorkflow = workflowService.getWorkflow(requestedProjectWorkflow.getWorkflowId());
 
+            String label = StringUtils.isBlank(requestedWorkflow.getLabel())
+                ? requestedProjectWorkflow.getUuidAsString() : requestedWorkflow.getLabel();
+
             List<String> newRequiredInputs = getNewRequiredInputs(
                 workflowService.getWorkflow(currentProjectWorkflow.getWorkflowId()), requestedWorkflow);
             List<String> newRequiredConnections = getNewRequiredConnections(
@@ -251,8 +254,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             if (!newRequiredInputs.isEmpty() || !newRequiredConnections.isEmpty()) {
                 workflowChanges.add(
                     new WorkflowChange(
-                        requestedProjectWorkflow.getUuidAsString(), requestedWorkflow.getLabel(), newRequiredInputs,
-                        newRequiredConnections));
+                        requestedProjectWorkflow.getUuidAsString(), label, newRequiredInputs, newRequiredConnections));
             }
         }
 
@@ -260,7 +262,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             return new AutomationWorkflowProjectConfigurationVersionImpactDTO(impactedWorkflows);
         }
 
-        Map<String, List<ConnectedUserWorkflowReferenceDTO>> referencesByWorkflowUuid = getLiveReferences(
+        Map<String, List<ConnectedUserWorkflowReferenceDTO>> referencesByWorkflowUuid = getTurnedOnReferences(
             configuration,
             workflowChanges.stream()
                 .map(WorkflowChange::workflowUuid)
@@ -277,8 +279,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         }
 
         impactedWorkflows.sort(
-            Comparator.comparing(AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow::label,
-                Comparator.nullsLast(Comparator.naturalOrder())));
+            Comparator.comparing(AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow::label));
 
         return new AutomationWorkflowProjectConfigurationVersionImpactDTO(impactedWorkflows);
     }
@@ -472,14 +473,19 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         return affectedConnectedUserCount;
     }
 
-    private Map<String, List<ConnectedUserWorkflowReferenceDTO>> getLiveReferences(
+    /**
+     * Returns the non-dangling references in the configuration's environment whose connected user turned the workflow
+     * on: a workflow the user turned off does not pause on a new requirement, so it is not counted.
+     */
+    private Map<String, List<ConnectedUserWorkflowReferenceDTO>> getTurnedOnReferences(
         AutomationWorkflowProjectConfiguration configuration, Set<String> workflowUuids) {
 
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
         return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
             .stream()
-            .filter(reference -> !reference.dangling() && Objects.equals(reference.environment(), environment.name()))
+            .filter(reference -> reference.enabled() && !reference.dangling() &&
+                Objects.equals(reference.environment(), environment.name()))
             .collect(Collectors.groupingBy(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid));
     }
 
@@ -669,6 +675,12 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
                     "Connection id=%s for component %s belongs to environment id=%s, not id=%s".formatted(
                         connectionId, componentName, connection.getEnvironmentId(),
                         configuration.getEnvironmentId()));
+            }
+
+            if (connection.getType() != PlatformType.EMBEDDED) {
+                throw newInvalidProvidedValueException(
+                    "Connection id=%s for component %s is not an embedded connection".formatted(
+                        connectionId, componentName));
             }
 
             if (connectedUserConnectionMembership.isOwnedByConnectedUser(connectionId)) {

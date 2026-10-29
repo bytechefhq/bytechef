@@ -64,6 +64,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -640,6 +641,54 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     @Test
+    void testGetVersionImpactCountsOnlyReferencesWhoseUserTurnedTheWorkflowOn() {
+        long projectId = createProject("Impact Turned Off References");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Turned Off References"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(CHANNEL_REQUIRED_DEFINITION, "Turned Off References"));
+        publish(projectId);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        String environmentName = Environment.values()[(int) ENVIRONMENT_ID].name();
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
+        givenStoredInputs(102L, projectId, 1, workflowUuid, Map.of());
+        givenReferences(
+            newReference(workflowUuid, environmentName, true, false, 101L),
+            newReference(workflowUuid, environmentName, false, false, 102L));
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2)
+            .workflows()
+            .getFirst()
+            .affectedConnectedUserCount()).isEqualTo(1);
+    }
+
+    @Test
+    void testGetVersionImpactLabelsAWorkflowWithoutALabelByItsUuid() {
+        long projectId = createProject("Impact Without Label");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, ""));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(CHANNEL_REQUIRED_DEFINITION, ""));
+        publish(projectId);
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        givenReferences();
+
+        assertThat(automationWorkflowProjectConfigurationAdminFacade.getVersionImpact(configurationId, 2)
+            .workflows()).containsExactly(
+                new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                    workflowUuid, workflowUuid, List.of("channel"), List.of(), 0));
+    }
+
+    @Test
     void testGetProvidableValuesExposesTheSlotsAndInputsOfThePinnedVersionNotTheDraft() {
         long projectId = createProject("Pinned Slots");
 
@@ -765,6 +814,46 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     @Test
+    void testUpdateConfigurationWorkflowNamesTheInputsItStopsProvidingInTheUpdatedEvent() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Input Removed");
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
+
+        applicationEvents.clear();
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of());
+
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
+            .toList())
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(fixture.projectId(), ENVIRONMENT_ID),
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(
+                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
+    }
+
+    @Test
+    void testDeleteConfigurationNamesEveryProvidedInputInTheDeletedEvent() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Input Deleted");
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
+
+        applicationEvents.clear();
+
+        automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(fixture.configurationId());
+
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationDeletedEvent.class)
+            .toList())
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationDeletedEvent(
+                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
+    }
+
+    @Test
     void testUpdateConfigurationWorkflowWithEmptyMapsClearsTheValues() {
         ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Values Cleared");
 
@@ -815,46 +904,6 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     @Test
-    void testUpdateConfigurationWorkflowNamesTheInputsItStopsProvidingInTheUpdatedEvent() {
-        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Input Removed");
-
-        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
-            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
-
-        applicationEvents.clear();
-
-        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
-            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
-        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
-            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of());
-
-        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
-            .toList())
-                .containsExactly(
-                    new AutomationWorkflowProjectConfigurationUpdatedEvent(fixture.projectId(), ENVIRONMENT_ID),
-                    new AutomationWorkflowProjectConfigurationUpdatedEvent(
-                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
-    }
-
-    @Test
-    void testDeleteConfigurationNamesEveryProvidedInputInTheDeletedEvent() {
-        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Input Deleted");
-
-        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
-            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
-
-        applicationEvents.clear();
-
-        automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(fixture.configurationId());
-
-        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationDeletedEvent.class)
-            .toList())
-                .containsExactly(
-                    new AutomationWorkflowProjectConfigurationDeletedEvent(
-                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
-    }
-
-    @Test
     void testUpdateConfigurationWorkflowRejectsAMissingConnection() {
         ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Missing Connection");
 
@@ -869,6 +918,17 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Unknown Input");
 
         assertInvalidProvidedValue(fixture, Map.of(), Map.of("topic", "news"), "Input topic");
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRejectsAnAutomationConnection() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Automation Connection");
+
+        givenConnection(16L, "slack", ENVIRONMENT_ID, PlatformType.AUTOMATION);
+
+        assertInvalidProvidedValue(
+            fixture, Map.of("slack", 16L), Map.of(),
+            "Connection id=16 for component slack is not an embedded connection");
     }
 
     @Test
@@ -973,6 +1033,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
         connection.setComponentName(componentName);
         connection.setEnvironmentId((int) environmentId);
         connection.setName(name);
+        connection.setType(PlatformType.EMBEDDED);
 
         return connection;
     }
@@ -987,11 +1048,16 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     private void givenConnection(long connectionId, String componentName, long environmentId) {
+        givenConnection(connectionId, componentName, environmentId, PlatformType.EMBEDDED);
+    }
+
+    private void givenConnection(long connectionId, String componentName, long environmentId, PlatformType type) {
         Connection connection = new Connection();
 
         connection.setId(connectionId);
         connection.setComponentName(componentName);
         connection.setEnvironmentId((int) environmentId);
+        connection.setType(type);
 
         when(connectionService.fetchConnection(connectionId)).thenReturn(Optional.of(connection));
     }
@@ -1066,8 +1132,15 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     private static ConnectedUserWorkflowReferenceDTO newReference(
         String automationWorkflowUuid, String environment, boolean dangling, Long projectDeploymentId) {
 
+        return newReference(automationWorkflowUuid, environment, true, dangling, projectDeploymentId);
+    }
+
+    private static ConnectedUserWorkflowReferenceDTO newReference(
+        String automationWorkflowUuid, String environment, boolean enabled, boolean dangling,
+        Long projectDeploymentId) {
+
         return new ConnectedUserWorkflowReferenceDTO(
-            automationWorkflowUuid, "user-" + UUID.randomUUID(), environment, true, dangling, null, null,
+            automationWorkflowUuid, "user-" + UUID.randomUUID(), environment, enabled, dangling, null, null,
             projectDeploymentId);
     }
 
