@@ -1,0 +1,21 @@
+query automationWorkflowProjectConfigurationWorkflowProvidableValues($id: ID!, $workflowUuid: ID!) {
+    automationWorkflowProjectConfigurationWorkflowProvidableValues(id: $id, workflowUuid: $workflowUuid) {
+        connectionSlots {
+            componentName
+            title
+            required
+            providableConnections {
+                id
+                name
+            }
+        }
+        inputs {
+            name
+            label
+            type
+            required
+        }
+        providedConnections
+        providedInputs
+    }
+}
