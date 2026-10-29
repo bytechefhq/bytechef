@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:agent:chat-memory:chat-memory-builtin"))
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
@@ -36,7 +37,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
-    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api"))
 
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.assertj:assertj-core")
@@ -47,7 +47,6 @@ dependencies {
     testImplementation("org.springframework.graphql:spring-graphql")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
-    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:ee:libs:ai:ai-hub:ai-hub-rest")) {
         exclude(module = "ai-hub-service")
@@ -57,5 +56,5 @@ dependencies {
     }
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
-    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-service"))
+    testImplementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-service"))
 }

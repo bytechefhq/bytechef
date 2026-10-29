@@ -18,10 +18,10 @@ import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.CopilotChatClientResolver;
 import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
-import com.bytechef.ee.ai.copilot.agent.CopilotChatClientResolver;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
-import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
+import com.bytechef.platform.ai.provider.catalog.CatalogChatClientResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
