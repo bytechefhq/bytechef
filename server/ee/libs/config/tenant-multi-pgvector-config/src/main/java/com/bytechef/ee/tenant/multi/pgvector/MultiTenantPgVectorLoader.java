@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.tenant.multi.pgvector;
 
+import com.bytechef.pgvector.util.PgVectorSchemaUtils;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.event.TenantSchemaCreatedEvent;
 import com.bytechef.tenant.service.TenantService;
@@ -67,7 +68,8 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
     }
 
     private void initializeSchema(String tenantId) {
-        TenantContext.runWithTenantId(tenantId, () -> doInitializeSchema(tenantId));
+        PgVectorSchemaUtils.initializeSchema(
+            () -> TenantContext.runWithTenantId(tenantId, () -> doInitializeSchema(tenantId)));
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")

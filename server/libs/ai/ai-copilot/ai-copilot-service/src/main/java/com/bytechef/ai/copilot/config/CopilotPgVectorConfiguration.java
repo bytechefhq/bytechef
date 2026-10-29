@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.Embedding.Provider;
+import com.bytechef.pgvector.util.PgVectorSchemaUtils;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
@@ -60,9 +61,15 @@ public class CopilotPgVectorConfiguration {
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy) {
 
+        PgVectorSchemaUtils.initializeSchema(
+            () -> buildVectorStore(
+                pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
+                batchingStrategy, true)
+                    .afterPropertiesSet());
+
         return buildVectorStore(
             pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
-            batchingStrategy);
+            batchingStrategy, false);
     }
 
     @Bean
@@ -73,16 +80,24 @@ public class CopilotPgVectorConfiguration {
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy, ApplicationProperties applicationProperties) {
 
+        EmbeddingModel copilotDocsEmbeddingModel = copilotDocsEmbeddingModel(applicationProperties);
+
+        PgVectorSchemaUtils.initializeSchema(
+            () -> buildVectorStore(
+                pgVectorJdbcTemplate, copilotDocsEmbeddingModel, properties, observationRegistry,
+                customObservationConvention, batchingStrategy, true)
+                    .afterPropertiesSet());
+
         return buildVectorStore(
-            pgVectorJdbcTemplate, copilotDocsEmbeddingModel(applicationProperties), properties, observationRegistry,
-            customObservationConvention, batchingStrategy);
+            pgVectorJdbcTemplate, copilotDocsEmbeddingModel, properties, observationRegistry,
+            customObservationConvention, batchingStrategy, false);
     }
 
-    private static VectorStore buildVectorStore(
+    private static PgVectorStore buildVectorStore(
         JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
         ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
-        BatchingStrategy batchingStrategy) {
+        BatchingStrategy batchingStrategy, boolean initializeSchema) {
 
         return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
             .schemaName(properties.getSchemaName())
@@ -93,7 +108,7 @@ public class CopilotPgVectorConfiguration {
             .distanceType(properties.getDistanceType())
             .removeExistingVectorStoreTable(properties.isRemoveExistingVectorStoreTable())
             .indexType(properties.getIndexType())
-            .initializeSchema(true)
+            .initializeSchema(initializeSchema)
             .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
             .customObservationConvention(customObservationConvention.getIfAvailable(() -> null))
             .batchingStrategy(batchingStrategy)

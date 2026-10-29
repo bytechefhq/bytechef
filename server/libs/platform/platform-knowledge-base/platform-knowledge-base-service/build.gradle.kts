@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-file-storage:platform-knowledge-base-file-storage-api"))
     implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:config:pgvector-config"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
