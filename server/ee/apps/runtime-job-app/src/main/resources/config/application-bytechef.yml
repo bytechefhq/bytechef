@@ -4,8 +4,8 @@ bytechef:
     # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.
     concurrency-limit: 200
   cache:
-    # Cache provider (caffeine) default: caffeine
-    provider: caffeine
+    # Cache provider (CAFFEINE) default: CAFFEINE
+    provider: CAFFEINE
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job execution)
     enabled: true
@@ -20,17 +20,17 @@ bytechef:
         task-execution-error-events: 1
   data-storage:
     # Data storage provider
-    provider: filesystem
+    provider: FILESYSTEM
   # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
   edition: EE
-  # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
+  # Encryption key provider (FILESYSTEM - the key generated on filesystem, PROPERTY - the key read from property) default: FILESYSTEM
   encryption:
-    provider: filesystem
+    provider: FILESYSTEM
   # Enabled feature flags, e.g. [ff-123, ff-456]
   feature-flags: []
   file-storage:
-    # File storage provider (aws(ee) | filesystem | jdbc) default: filesystem
-    provider: filesystem
+    # File storage provider (AWS(EE) | FILESYSTEM | JDBC) default: FILESYSTEM
+    provider: FILESYSTEM
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
   mail:
@@ -39,8 +39,8 @@ bytechef:
     host:
     port: 25
   message-broker:
-    # Messaging provider between Coordinator and Workers (memory) default: memory
-    provider: memory
+    # Messaging provider between Coordinator and Workers (MEMORY) default: MEMORY
+    provider: MEMORY
   observability:
     logging:
       aws:
@@ -55,9 +55,9 @@ bytechef:
       enabled: false
       endpoint: http://localhost:4318/v1/traces
   public-url:
-  # Tenant support mode (single | multi - ee only) default: single
+  # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
   tenant:
-    mode: single
+    mode: SINGLE
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
   # property on any given task.
@@ -75,7 +75,7 @@ bytechef:
   workflow:
     output-storage:
       # Output storage provider for workflow output data
-      provider: filesystem
+      provider: FILESYSTEM
     repository:
       filesystem:
         enabled: true
