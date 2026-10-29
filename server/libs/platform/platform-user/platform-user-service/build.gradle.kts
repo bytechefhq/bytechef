@@ -2,6 +2,7 @@ dependencies {
     implementation("dev.samstevens.totp:totp:1.7.1")
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.commons.validator)
+    implementation(libs.net.javacrumbs.shedlock.shedlock.spring)
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-context-support")
     implementation("org.springframework:spring-web")

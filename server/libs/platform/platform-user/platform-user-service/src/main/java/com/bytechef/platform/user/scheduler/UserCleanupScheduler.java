@@ -21,6 +21,7 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -51,6 +52,7 @@ public class UserCleanupScheduler {
      * Not activated users are deleted 3 days after registration, every day at 01:00.
      */
     @Scheduled(cron = "0 0 1 * * ?")
+    @SchedulerLock(name = "removeNotActivatedUsers", lockAtLeastFor = "PT5M", lockAtMostFor = "PT1H")
     public void removeNotActivatedUsers() {
         runForEachTenant(userService::removeNotActivatedUsers);
     }
@@ -59,6 +61,7 @@ public class UserCleanupScheduler {
      * Persistent tokens provide automatic authentication and are deleted once they expire, every day at midnight.
      */
     @Scheduled(cron = "0 0 0 * * ?")
+    @SchedulerLock(name = "removeOldPersistentTokens", lockAtLeastFor = "PT5M", lockAtMostFor = "PT1H")
     public void removeOldPersistentTokens() {
         runForEachTenant(userService::removeOldPersistentTokens);
     }

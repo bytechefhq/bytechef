@@ -2,6 +2,8 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
 
+    implementation(libs.net.javacrumbs.shedlock.shedlock.provider.jdbc.template)
+    implementation(libs.net.javacrumbs.shedlock.shedlock.spring)
     implementation("org.springframework:spring-context-support")
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
@@ -18,10 +20,12 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation("org.springframework.boot:spring-boot-starter-jdbc-test")
+    testImplementation("org.liquibase:liquibase-core")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     implementation("org.springframework.boot:spring-boot-quartz")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }
