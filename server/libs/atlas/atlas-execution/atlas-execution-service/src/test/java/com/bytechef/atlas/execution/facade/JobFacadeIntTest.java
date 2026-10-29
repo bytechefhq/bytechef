@@ -53,6 +53,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,8 @@ import tools.jackson.databind.ObjectMapper;
 })
 @RecordApplicationEvents
 public class JobFacadeIntTest {
+
+    private static final List<UpdatedJobState> UPDATED_JOB_STATES = new CopyOnWriteArrayList<>();
 
     @Autowired
     private ApplicationEvents applicationEvents;
@@ -163,6 +166,8 @@ public class JobFacadeIntTest {
 
         long jobId = Validate.notNull(job.getId(), "id");
 
+        UPDATED_JOB_STATES.clear();
+
         jobFacade.resumeApproval(jobId, "approval-uuid", true);
 
         Job resumedJob = jobRepository.findById(jobId)
@@ -171,6 +176,12 @@ public class JobFacadeIntTest {
         assertThat(resumedJob.getStatus()).isEqualTo(Job.Status.STARTED);
         assertThat(resumedJob.getMetadata(SuspendedJobs.WAIT_FOR_APPROVAL)).isNull();
         assertThat(resumedJob.getMetadata("projectVersion")).isEqualTo(2);
+        assertThat(UPDATED_JOB_STATES)
+            .as("the marker must not be removed while the job is still stopped")
+            .doesNotContain(new UpdatedJobState(Job.Status.STOPPED, false));
+    }
+
+    private record UpdatedJobState(Job.Status status, boolean waitingForApproval) {
     }
 
     private static Job newJob() {
@@ -221,7 +232,16 @@ public class JobFacadeIntTest {
 
         @Bean
         JobService jobService(JobRepository jobRepository) {
-            return new JobServiceImpl(jobRepository);
+            return new JobServiceImpl(jobRepository) {
+
+                @Override
+                public Job update(Job job) {
+                    UPDATED_JOB_STATES.add(
+                        new UpdatedJobState(job.getStatus(), job.getMetadata(SuspendedJobs.WAIT_FOR_APPROVAL) != null));
+
+                    return super.update(job);
+                }
+            };
         }
 
         @Bean
