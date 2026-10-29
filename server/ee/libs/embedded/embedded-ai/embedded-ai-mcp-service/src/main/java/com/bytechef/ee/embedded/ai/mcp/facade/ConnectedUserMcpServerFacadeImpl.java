@@ -325,16 +325,17 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     @Override
     @PreAuthorize("isTenantAdmin()")
     public void provisionMcpServer(long connectedUserId, long mcpServerId) {
-        McpServerCoverage mcpServerCoverage = getMcpServerCoverage(
-            mcpServerId, getUserInstanceCoverage(connectedUserId));
-
-        boolean provisionable = getProvisionableMcpServers(connectedUserId)
+        ProvisionableConnectedUserMcpServerDTO provisionableMcpServer = getProvisionableMcpServers(connectedUserId)
             .stream()
-            .anyMatch(candidate -> candidate.id() == mcpServerId);
+            .filter(candidate -> candidate.id() == mcpServerId)
+            .findFirst()
+            .orElseThrow(() -> new ConfigurationException(
+                "MCP server %d cannot be provisioned for connected user %d".formatted(mcpServerId, connectedUserId),
+                ConnectedUserMcpServerErrorType.MCP_SERVER_NOT_PROVISIONABLE));
 
-        if (!provisionable || mcpServerCoverage.coveredComponentNames()
-            .isEmpty()) {
+        List<String> coveredComponentNames = provisionableMcpServer.coveredComponentNames();
 
+        if (coveredComponentNames.isEmpty()) {
             throw new ConfigurationException(
                 "MCP server %d has no integration covered by connected user %d".formatted(
                     mcpServerId, connectedUserId),
@@ -396,6 +397,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         Set<String> missingComponentNames = new TreeSet<>();
 
         for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
+            if (!hasEnabledMcpTool(mcpComponent)) {
+                continue;
+            }
+
             if (userInstanceCoverage.componentNames()
                 .contains(mcpComponent.getComponentName())) {
 
@@ -407,6 +412,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
         for (McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration : mcpIntegrationInstanceConfigurationService
             .getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId)) {
+
+            if (!hasEnabledConfigurationWorkflow(mcpIntegrationInstanceConfiguration)) {
+                continue;
+            }
 
             long integrationInstanceConfigurationId =
                 Objects.requireNonNull(mcpIntegrationInstanceConfiguration.getIntegrationInstanceConfigurationId());
@@ -435,6 +444,35 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
 
         return integration.getComponentName();
+    }
+
+    private boolean hasEnabledConfigurationWorkflow(
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration) {
+
+        for (McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow : mcpIntegrationInstanceConfigurationWorkflowService
+            .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
+                mcpIntegrationInstanceConfiguration.getId())) {
+
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                    mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+            if (integrationInstanceConfigurationWorkflow.isEnabled()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasEnabledMcpTool(McpComponent mcpComponent) {
+        for (McpTool mcpTool : mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())) {
+            if (mcpTool.isEnabled()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private UserInstanceCoverage getUserInstanceCoverage(long connectedUserId) {
