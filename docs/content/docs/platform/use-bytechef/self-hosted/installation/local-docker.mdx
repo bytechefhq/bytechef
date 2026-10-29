@@ -179,6 +179,71 @@ docker run --name bytechef -it -p 8080:8080 \
 </Tab>
 </Tabs>
 
+## Run ByteChef with a local LLM (Ollama)
+
+`docker-compose.ollama.yml` adds an [Ollama](https://ollama.com) server to the PostgreSQL and
+ByteChef pair, so AI steps can run on a model that never leaves your machine.
+
+```bash
+curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/docker-compose.ollama.yml
+echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)" > .env
+docker compose -f docker-compose.ollama.yml up
+```
+
+`POSTGRES_PASSWORD` has no default. Docker Compose reads it from the `.env` file next to the Compose
+file, so it stays the same on every start. Keep that file: PostgreSQL sets the password only when it
+first creates the `storage_db` volume.
+
+On first start the one-off `ollama-pull` service downloads a chat model (`qwen3:8b`, about 5 GB)
+and an embedding model (`nomic-embed-text`). ByteChef starts without waiting for it, and the models
+appear in the **Model** dropdowns once the download finishes. Follow it with:
+
+```bash
+docker compose -f docker-compose.ollama.yml logs -f ollama-pull
+```
+
+To use other models, set `OLLAMA_CHAT_MODEL` and `OLLAMA_EMBEDDING_MODEL` before `up`. You can also
+pull more at any time:
+
+```bash
+OLLAMA_CHAT_MODEL=qwen3:4b docker compose -f docker-compose.ollama.yml up
+docker compose -f docker-compose.ollama.yml exec ollama ollama pull llama3.2
+```
+
+Inside the stack Ollama is reachable at `http://ollama:11434`, not `localhost`:
+
+- **Workflows:** create an **Ollama** connection with **URL** set to `http://ollama:11434` and
+  leave **Token** empty.
+- **AI Providers:** Ollama is already configured through `BYTECHEF_AI_PROVIDER_OLLAMA_URL`, with the
+  pulled models as the default chat and embedding models.
+
+Ollama's port is not published on the host, so the stack does not clash with an Ollama you already
+run there. The models live in the `ollama_models` volume, so `docker compose down -v` deletes them
+along with the database.
+
+<Callout type="warn">
+Docker on macOS (Docker Desktop, OrbStack) cannot give containers the Apple GPU, so Ollama in a container runs on the CPU and is
+many times slower. On a Mac, install Ollama natively, use the plain `docker-compose.yml`, and point
+the Ollama connection at `http://host.docker.internal:11434`.
+</Callout>
+
+On Linux with an NVIDIA GPU and the
+[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html),
+give the `ollama` service the GPU in a `compose.override.yml`, and pass both files to
+`docker compose -f docker-compose.ollama.yml -f compose.override.yml up`:
+
+```yaml
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+```
+
 ## Development setup with Docker
 
 This approach is intended for contributors who want to work on the client codebase while running the server in Docker.
