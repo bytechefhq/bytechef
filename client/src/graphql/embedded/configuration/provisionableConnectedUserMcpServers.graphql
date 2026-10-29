@@ -1,0 +1,9 @@
+query provisionableConnectedUserMcpServers($connectedUserId: ID!) {
+    provisionableConnectedUserMcpServers(connectedUserId: $connectedUserId) {
+        id
+        name
+        provisioned
+        coveredComponentNames
+        missingComponentNames
+    }
+}

@@ -1,0 +1,19 @@
+query provisionableConnectedUserProjects($connectedUserId: ID!) {
+    provisionableConnectedUserProjects(connectedUserId: $connectedUserId) {
+        projectId
+        name
+        projectVersion
+        workflows {
+            workflowUuid
+            label
+            inputs {
+                name
+                label
+                type
+                required
+            }
+            provisioned
+            dangling
+        }
+    }
+}

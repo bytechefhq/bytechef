@@ -1,0 +1,3 @@
+mutation provisionConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!) {
+    provisionConnectedUserMcpServer(connectedUserId: $connectedUserId, mcpServerId: $mcpServerId)
+}
