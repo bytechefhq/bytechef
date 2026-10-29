@@ -106,7 +106,7 @@ public class AutomationMcpServerConfiguration {
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         McpToolService mcpToolService, PrincipalJobFacade principalJobFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        @Value("${bytechef.public-url:#{null}}") @Nullable String publicUrl,
+        @Value("${bytechef.public-url}") @Nullable String publicUrl,
         TaskExecutionService taskExecutionService, ToolExecutionRecorder toolExecutionRecorder,
         WorkflowService workflowService, WorkspaceMcpServerService workspaceMcpServerService) {
 

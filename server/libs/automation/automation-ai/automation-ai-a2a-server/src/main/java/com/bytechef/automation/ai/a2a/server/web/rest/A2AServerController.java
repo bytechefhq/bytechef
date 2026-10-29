@@ -69,7 +69,7 @@ class A2AServerController {
     @SuppressFBWarnings("EI")
     A2AServerController(
         A2AAgentCardFactory agentCardFactory, A2AProtocolHandler protocolHandler,
-        A2AAgentExecutorImpl a2aAgentExecutor, @Value("${bytechef.public-url:}") String publicUrl) {
+        A2AAgentExecutorImpl a2aAgentExecutor, @Value("${bytechef.public-url}") String publicUrl) {
 
         this.agentCardFactory = agentCardFactory;
         this.protocolHandler = protocolHandler;

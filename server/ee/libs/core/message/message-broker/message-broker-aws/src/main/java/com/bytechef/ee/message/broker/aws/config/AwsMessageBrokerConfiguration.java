@@ -47,7 +47,7 @@ public class AwsMessageBrokerConfiguration {
     private static final Logger log = LoggerFactory.getLogger(AwsMessageBrokerConfiguration.class);
 
     public AwsMessageBrokerConfiguration(
-        @Value("${bytechef.message-broker.aws.control-provider:sqs}") String controlProvider) {
+        @Value("${bytechef.message-broker.aws.control-provider}") String controlProvider) {
 
         if (log.isDebugEnabled()) {
             log.debug("Message broker provider type enabled: aws");
