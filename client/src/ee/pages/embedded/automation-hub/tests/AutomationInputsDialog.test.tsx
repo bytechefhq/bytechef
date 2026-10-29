@@ -61,4 +61,18 @@ describe('AutomationInputsDialog', () => {
             })
         );
     });
+
+    it('disables Save when every input is provided', () => {
+        render(
+            <AutomationInputsDialog
+                inputValues={{}}
+                inputs={[{label: 'API region', name: 'region', provided: true, required: true}]}
+                label="Sync leads"
+                onClose={vi.fn()}
+                workflowUuid="copy-uuid"
+            />
+        );
+
+        expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+    });
 });

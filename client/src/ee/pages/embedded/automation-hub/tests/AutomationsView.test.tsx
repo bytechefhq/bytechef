@@ -860,6 +860,36 @@ describe('AutomationsView', () => {
             expect(screen.getByRole('menuitem', {name: /remove/i})).toBeInTheDocument();
         });
 
+        it('withholds Settings from a template card whose inputs are all provided', async () => {
+            const user = userEvent.setup();
+
+            useGetAutomationsQueryMock.mockReturnValue({
+                data: [{...automationWithInputs, inputs: [{name: 'sheetName', provided: true, required: true}]}],
+                isLoading: false,
+            });
+
+            renderView();
+
+            await user.click(screen.getByRole('button', {name: 'Sync leads actions'}));
+
+            expect(screen.queryByRole('menuitem', {name: /settings/i})).not.toBeInTheDocument();
+        });
+
+        it('withholds Settings from an automation card whose inputs are all provided', async () => {
+            const user = userEvent.setup();
+
+            useGetAutomationsQueryMock.mockReturnValue({
+                data: [{...blankAutomation, inputs: [{name: 'sheetName', provided: true, required: true}]}],
+                isLoading: false,
+            });
+
+            renderView();
+
+            await user.click(screen.getByRole('button', {name: 'Weekly digest actions'}));
+
+            expect(screen.queryByRole('menuitem', {name: /settings/i})).not.toBeInTheDocument();
+        });
+
         it('refuses to save while a required value is blank', async () => {
             const user = userEvent.setup();
 
