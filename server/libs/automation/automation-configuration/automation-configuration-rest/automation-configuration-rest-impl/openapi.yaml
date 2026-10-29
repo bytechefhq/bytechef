@@ -1543,6 +1543,7 @@ components:
             - "FAILED"
             - "STOPPED"
             - "CANCELLED"
+            - "PAYMENT_REQUIRED"
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
