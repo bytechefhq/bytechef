@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {McpServer} from '@/shared/middleware/graphql';
+import {PlusIcon} from 'lucide-react';
 import {ComponentType, ReactNode, useState} from 'react';
 
 export type McpServerToolsTabType = 'components' | 'workflows';
@@ -66,6 +67,7 @@ const McpServerTabs = ({
 
                     {activeTab !== 'connect' && (
                         <Button
+                            icon={<PlusIcon />}
                             label={isComponentsTab ? 'Add Component' : 'Add Workflows'}
                             onClick={handleAddClick}
                             size="sm"

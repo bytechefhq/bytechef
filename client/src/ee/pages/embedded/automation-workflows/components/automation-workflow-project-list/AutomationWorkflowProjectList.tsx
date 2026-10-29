@@ -117,11 +117,11 @@ const AutomationWorkflowProjectList = ({
                                         <Button
                                             aria-label="Create Workflow"
                                             onClick={() => onCreateWorkflow(project.id)}
-                                            size="xs"
-                                            variant="outline"
+                                            size="sm"
+                                            variant="secondary"
                                         >
                                             <PlusIcon />
-                                            Workflow
+                                            New Workflow
                                         </Button>
 
                                         <DropdownMenu>
@@ -129,8 +129,8 @@ const AutomationWorkflowProjectList = ({
                                                 <Button
                                                     aria-label="More Workflow Creation Actions"
                                                     icon={<ChevronDownIcon />}
-                                                    size="xs"
-                                                    variant="outline"
+                                                    size="sm"
+                                                    variant="secondary"
                                                 >
                                                     <> </>
                                                 </Button>
@@ -154,11 +154,11 @@ const AutomationWorkflowProjectList = ({
                                                     aria-label="New Configuration"
                                                     disabled={!project.published}
                                                     onClick={() => setConfigurationDialog({project})}
-                                                    size="xs"
-                                                    variant="outline"
+                                                    size="sm"
+                                                    variant="secondary"
                                                 >
                                                     <PlusIcon />
-                                                    Configuration
+                                                    New Configuration
                                                 </Button>
                                             </span>
                                         </TooltipTrigger>

@@ -22,7 +22,7 @@ import {
     useUpdateA2aServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, EditIcon, EllipsisVerticalIcon, NetworkIcon, Trash2Icon} from 'lucide-react';
+import {ChevronDownIcon, EditIcon, EllipsisVerticalIcon, NetworkIcon, PlusIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import A2aServerConnect from './A2aServerConnect';
@@ -194,6 +194,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
 
                         {activeTab === 'projects' && (
                             <Button
+                                icon={<PlusIcon />}
                                 label="Add Workflows"
                                 onClick={() => setAddProjectDialogOpen(true)}
                                 size="sm"
