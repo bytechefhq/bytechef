@@ -370,6 +370,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             integrationInstances);
 
         for (ConnectedUserMcpServerWorkflowDTO workflow : workflowsByServerId.getOrDefault(mcpServerId, List.of())) {
+            if (workflow.enabled()) {
+                continue;
+            }
+
             integrationInstanceFacade.enableIntegrationInstanceWorkflow(
                 workflow.integrationInstanceId(), workflow.workflowId(), true);
         }
