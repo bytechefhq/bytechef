@@ -95,10 +95,6 @@ public class AutomationWorkflowProjectConfigurationWorkflow {
         return id;
     }
 
-    /**
-     * Returns the connections the configuration provides to every connected user, keyed by the component name of the
-     * workflow's connection slot.
-     */
     public Map<String, Long> getProvidedConnections() {
         if (providedConnections == null) {
             return Map.of();
@@ -116,9 +112,6 @@ public class AutomationWorkflowProjectConfigurationWorkflow {
         return Collections.unmodifiableMap(connectionIds);
     }
 
-    /**
-     * Returns the input values the configuration provides to every connected user, keyed by the workflow input name.
-     */
     public Map<String, Object> getProvidedInputs() {
         if (providedInputs == null) {
             return Map.of();

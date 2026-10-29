@@ -116,11 +116,6 @@ public class ConnectedUserReferenceRolloutManager {
         applyConfigurationState(automationWorkflowProjectId, environmentId, Map.of());
     }
 
-    /**
-     * Applies the configuration of a project in an environment to every reference of its reference deployments there.
-     * The inputs named in {@code removedProvidedInputNames} (keyed by workflow uuid) are first removed from each
-     * reference's stored inputs: their values were the administrator's, provided by the configuration until now.
-     */
     public void applyConfigurationState(
         long automationWorkflowProjectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
 
@@ -200,27 +195,6 @@ public class ConnectedUserReferenceRolloutManager {
         rollOutAndApply(automationWorkflowProjectId, environmentId, Map.of());
     }
 
-    /**
-     * Rolls the configuration of a project in an environment out to its reference deployments and applies it to their
-     * references.
-     *
-     * <p>
-     * Requests for the same project and environment are coalesced on this node: when a rollout for the pair is already
-     * running here, the request only marks it pending (merging its removed provided input names) and returns at once,
-     * so queued saves never hold a worker thread or a database connection. The running rollout, once a pass finishes,
-     * runs exactly one more pass while a request arrived during the previous one; each pass reads the newest committed
-     * configuration. Marking and finishing both go through an atomic compute on the in-flight map, so a request that
-     * arrives while the rollout is finishing either joins it or starts a new one, and is never lost.
-     *
-     * <p>
-     * Each pass runs in its own transaction holding a transaction-scoped advisory lock for the pair, so rollouts
-     * started on different nodes still run one after the other without blocking administrator writes to the
-     * configuration. Each deployment and reference is processed in its own {@code REQUIRES_NEW} transaction, so one
-     * failure does not undo the others. Different pairs run in parallel.
-     *
-     * @param removedProvidedInputNames the inputs, keyed by workflow uuid, the configuration stopped providing; they
-     *                                  are removed from every reference's stored inputs
-     */
     public void rollOutAndApply(
         long automationWorkflowProjectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
 
@@ -300,11 +274,6 @@ public class ConnectedUserReferenceRolloutManager {
         }
     }
 
-    /**
-     * Returns the removed provided input names of the next pass and clears the pending mark, or, when no request
-     * arrived since the last pass, removes the in-flight entry and returns {@code null}; both happen atomically with
-     * {@link #rollOutAndApply(long, long, Map)}'s marking.
-     */
     private @Nullable Map<String, Set<String>> takePendingPass(RolloutKey rolloutKey) {
         AtomicReference<Map<String, Set<String>>> passRemovedProvidedInputNames = new AtomicReference<>();
 
@@ -492,11 +461,6 @@ public class ConnectedUserReferenceRolloutManager {
         connectedUserProjectWorkflowRepository.saveAll(references);
     }
 
-    /**
-     * Resolves the reference against the given version, starting from its current row's connections and inputs; the
-     * inputs named in {@code removedInputNames} are left out, so a value the configuration no longer provides does not
-     * stay on the row.
-     */
     private RowSpec resolveRowSpec(
         ConnectedUserProjectWorkflow reference, ProjectDeployment projectDeployment, int projectVersion,
         Set<String> removedInputNames) {
@@ -533,11 +497,7 @@ public class ConnectedUserReferenceRolloutManager {
     private record RolloutKey(long automationWorkflowProjectId, long environmentId) {
     }
 
-    /**
-     * A rollout running on this node for one project and environment, with whether another pass was requested while it
-     * ran and the provided input names those requests removed. Only read and written inside an atomic compute on the
-     * in-flight map for its key.
-     */
+    // Read and written only inside an atomic compute on rolloutsInFlight, so a request is never lost.
     private static final class PendingRollout {
 
         private final Map<String, Set<String>> removedProvidedInputNames = new HashMap<>();

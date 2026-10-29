@@ -397,12 +397,6 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
                 WorkflowErrorType.WORKFLOW_NOT_FOUND));
     }
 
-    /**
-     * Which incomplete resolutions {@code applyWorkflow} reports by throwing. Whatever the mode, the user's intent
-     * ({@code reference.enabled}) is lowered only by a disable ({@code enable == false}); an enable raises it only when
-     * the resolution is complete and never lowers an intent that is already on, so a workflow paused by a missing input
-     * or connection keeps its switch on and resumes once it is complete.
-     */
     private enum ApplyMode {
 
         EXPLICIT(true, true),

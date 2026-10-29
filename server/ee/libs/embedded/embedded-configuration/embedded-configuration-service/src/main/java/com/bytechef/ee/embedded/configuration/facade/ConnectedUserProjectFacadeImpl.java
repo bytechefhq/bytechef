@@ -913,10 +913,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .map(template -> template.withProvided(providedNames.componentNames(), providedNames.inputNames()));
     }
 
-    /**
-     * Leaves out the values of the inputs the configuration provides: they are the administrator's, not the connected
-     * user's, so they are neither shown to the user nor sent back when the user stores their own input values.
-     */
     private static Map<String, ?> withoutProvidedInputValues(
         Map<String, ?> inputValues, List<ConnectedUserWorkflowTemplateDTO.Input> inputs) {
 

@@ -32,8 +32,11 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId);
 
     /**
-     * Returns the connection slots (with the connections an administrator can provide), the inputs and the values
-     * already provided for one workflow of the configuration, at the configuration's pinned project version.
+     * Returns the connections and inputs an administrator can provide for a workflow, with the values provided.
+     *
+     * @param configurationId the configuration id
+     * @param workflowUuid    the workflow uuid
+     * @return the providable and provided values at the configuration's pinned project version
      */
     AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
         long configurationId, String workflowUuid);
@@ -43,8 +46,12 @@ public interface AutomationWorkflowProjectConfigurationAdminFacade {
     void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible);
 
     /**
-     * Sets the connections (component name to connection id) and input values (input name to value) the configuration
-     * provides to every connected user of the workflow. Empty maps clear them.
+     * Sets the connections and input values the configuration provides to every connected user of the workflow.
+     *
+     * @param id                  the configuration id
+     * @param workflowUuid        the workflow uuid
+     * @param providedConnections the connection ids keyed by component name; empty clears them
+     * @param providedInputs      the input values keyed by input name; empty clears them
      */
     void updateConfigurationWorkflow(
         long id, String workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs);

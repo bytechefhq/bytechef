@@ -2504,12 +2504,6 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .getProjectVersion()).isEqualTo(2);
     }
 
-    /**
-     * Holds the rollout lock of the pair, starts a rollout that waits for it, then, while it waits, commits a
-     * configuration save to {@code newestProjectVersion} and sends {@code requestCount} more rollout requests. Returns
-     * whether those requests returned while the rollout still waited, and how many passes the rollout ran once the lock
-     * was released.
-     */
     private CoalescedRollout runRequestsWhileARolloutWaitsForTheLock(
         long automationWorkflowProjectId, int requestCount, int newestProjectVersion) throws InterruptedException {
 
@@ -2678,10 +2672,6 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         rollOutTheLastUpdatedEvent();
     }
 
-    /**
-     * Hands the last updated event the listener received, with its removed provided input names, to the rollout, as the
-     * listener does.
-     */
     private void rollOutTheLastUpdatedEvent() {
         ArgumentCaptor<AutomationWorkflowProjectConfigurationUpdatedEvent> eventCaptor = ArgumentCaptor.forClass(
             AutomationWorkflowProjectConfigurationUpdatedEvent.class);

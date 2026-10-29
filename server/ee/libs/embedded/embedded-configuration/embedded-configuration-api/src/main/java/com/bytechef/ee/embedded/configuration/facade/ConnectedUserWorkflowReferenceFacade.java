@@ -23,7 +23,13 @@ public interface ConnectedUserWorkflowReferenceFacade {
     void deleteReference(String externalUserId, String automationWorkflowUuid, Environment environment);
 
     /**
-     * Turns the connected user's workflow on or off and returns the stored reference after the change.
+     * Turns the connected user's workflow on or off.
+     *
+     * @param externalUserId         the connected user's external id
+     * @param automationWorkflowUuid the automation workflow uuid
+     * @param enable                 whether to turn the workflow on
+     * @param environment            the environment
+     * @return the stored reference after the change
      */
     ConnectedUserProjectWorkflow enableReference(
         String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment);

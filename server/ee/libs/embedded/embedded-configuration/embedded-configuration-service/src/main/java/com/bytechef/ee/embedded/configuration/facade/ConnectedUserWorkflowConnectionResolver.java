@@ -48,14 +48,6 @@ public class ConnectedUserWorkflowConnectionResolver {
         this.workflowConnectionSlot = workflowConnectionSlot;
     }
 
-    /**
-     * Resolves the connection of every slot of the workflow. A slot whose component has a connection the configuration
-     * provides takes that connection without the connected user's entitlement check, because the administrator's
-     * connection is not the user's; a provided connection that no longer exists is ignored, so its slot resolves as if
-     * nothing was provided. Every other slot takes the requested connection, then a current connection the user is
-     * still entitled to, then the user's first entitled connection. Provided component names that are not slots of the
-     * workflow are ignored.
-     */
     public ResolvedWorkflowConnections resolve(
         String workflowId, long connectedUserId, Map<String, Long> requestedConnectionIds,
         List<ProjectDeploymentWorkflowConnection> currentConnections, Map<String, Long> providedConnectionIds) {
@@ -98,10 +90,6 @@ public class ConnectedUserWorkflowConnectionResolver {
         return new ResolvedWorkflowConnections(connections, List.copyOf(missingComponentNames));
     }
 
-    /**
-     * Returns the component names whose provided connection still exists. A provided connection that no longer exists
-     * provides nothing, so its slot is handed back to the connected user.
-     */
     public Set<String> getProvidedComponentNames(Map<String, Long> providedConnectionIds) {
         Set<String> providedComponentNames = new LinkedHashSet<>();
 

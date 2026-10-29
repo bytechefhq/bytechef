@@ -41,10 +41,6 @@ public record ConnectedUserWorkflowTemplateDTO(
             workflowId);
     }
 
-    /**
-     * Returns a copy whose components and inputs are marked provided when the configuration provides a connection for
-     * the component or a value for the input; only components that need a connection can be provided.
-     */
     public ConnectedUserWorkflowTemplateDTO withProvided(
         Set<String> providedComponentNames, Set<String> providedInputNames) {
 
@@ -78,8 +74,6 @@ public record ConnectedUserWorkflowTemplateDTO(
      * @param integrationId the id of the integration backing this component; null when the component needs a connection
      *                      but no integration visible to the user is configured, and always null when the component
      *                      needs no connection
-     * @param provided      true when the configuration of the connected user's environment provides the connection of
-     *                      this component, so the connected user cannot choose one
      */
     public record Component(
         String name, String title, String icon, boolean connectionRequired, @Nullable Long integrationId,
@@ -116,10 +110,6 @@ public record ConnectedUserWorkflowTemplateDTO(
         }
     }
 
-    /**
-     * @param provided true when the configuration of the connected user's environment provides the value of this input,
-     *                 so the connected user cannot set it
-     */
     public record Input(String name, String label, String type, boolean required, boolean provided) {
 
         public Input(String name, String label, String type, boolean required) {
