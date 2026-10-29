@@ -34,6 +34,13 @@ const PROJECTS = [
                 provisioned: false,
                 workflowUuid: 'wf-1',
             },
+            {
+                dangling: false,
+                inputs: [{label: 'Email', name: 'user.email', required: true, type: 'string'}],
+                label: 'Dotted',
+                provisioned: false,
+                workflowUuid: 'wf-4',
+            },
             {dangling: false, inputs: [], label: 'Already there', provisioned: true, workflowUuid: 'wf-2'},
             {dangling: true, inputs: [], label: 'Broken', provisioned: true, workflowUuid: 'wf-3'},
         ],
@@ -124,5 +131,22 @@ describe('ProvisionProjectWorkflowDialog', () => {
         expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['provisionableConnectedUserProjects']});
         expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['connectedUsers', 7]});
         expect(onClose).toHaveBeenCalled();
+    });
+
+    it('keeps dotted input names as literal keys', async () => {
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+        await userEvent.click(screen.getByRole('checkbox', {name: 'Dotted'}));
+        await userEvent.type(screen.getByLabelText(/Email/), 'a@b.c');
+
+        await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.mutate).toHaveBeenCalledWith({
+            connectedUserId: '7',
+            workflows: [{inputs: {'user.email': 'a@b.c'}, workflowUuid: 'wf-4'}],
+        });
     });
 });
