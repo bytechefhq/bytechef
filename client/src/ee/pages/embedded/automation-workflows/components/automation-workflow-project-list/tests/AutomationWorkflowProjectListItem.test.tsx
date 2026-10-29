@@ -53,11 +53,11 @@ const project: AutomationWorkflowProjectType = {
     ],
 };
 
-const renderItem = () =>
+const renderItem = (overrides: Partial<AutomationWorkflowProjectType> = {}) =>
     render(
         <TooltipProvider>
             <Collapsible>
-                <AutomationWorkflowProjectListItem {...handlers} project={project} tags={[]} />
+                <AutomationWorkflowProjectListItem {...handlers} project={{...project, ...overrides}} tags={[]} />
             </Collapsible>
         </TooltipProvider>
     );
@@ -170,6 +170,39 @@ describe('AutomationWorkflowProjectListItem', () => {
             await userEvent.click(screen.getByRole('menu'));
 
             expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
+        });
+    });
+
+    describe('summary', () => {
+        it('should say when the project was last published', () => {
+            const lastPublishedDate = new Date('2026-10-01T10:15:00Z');
+
+            renderItem({lastPublishedDate: lastPublishedDate.toISOString(), lastPublishedVersion: 1, published: true});
+
+            expect(
+                screen.getByText(
+                    `Published at ${lastPublishedDate.toLocaleDateString()} ${lastPublishedDate.toLocaleTimeString()}`
+                )
+            ).toBeInTheDocument();
+            expect(screen.queryByText('Not yet published')).not.toBeInTheDocument();
+        });
+
+        it('should say when the project is not yet published', () => {
+            renderItem();
+
+            expect(screen.getByText('Not yet published')).toBeInTheDocument();
+        });
+
+        it('should count a single configuration in the singular', () => {
+            renderItem({configurationCount: 1});
+
+            expect(screen.getByText('1 configuration')).toBeInTheDocument();
+        });
+
+        it('should count several configurations in the plural', () => {
+            renderItem({configurationCount: 3});
+
+            expect(screen.getByText('3 configurations')).toBeInTheDocument();
         });
     });
 });

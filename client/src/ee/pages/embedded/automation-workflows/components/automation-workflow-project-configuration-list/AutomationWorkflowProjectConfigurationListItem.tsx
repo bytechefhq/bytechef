@@ -84,6 +84,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={handleConfigurationListItemClick}
+                role="presentation"
             >
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
