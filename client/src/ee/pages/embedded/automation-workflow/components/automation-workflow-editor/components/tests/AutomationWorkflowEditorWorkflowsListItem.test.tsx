@@ -14,6 +14,7 @@ const workflow = {
     ],
     description: 'Sends mail',
     label: 'Mailer',
+    lastExecutionDate: null,
     lastModifiedDate: '2026-02-11T09:30:00Z',
     permissionExpression: null,
     triggers: [],
@@ -23,8 +24,10 @@ const workflow = {
 
 const project = {
     categoryId: null,
+    configurationCount: 0,
     description: null,
     id: 'project-1',
+    lastPublishedDate: null,
     lastPublishedVersion: null,
     name: 'Project One',
     permissionExpression: null,
@@ -61,6 +64,7 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
     it('shows how long ago a recently edited workflow was edited', () => {
         const recentlyEditedWorkflow = {
             ...workflow,
+            lastExecutionDate: null,
             lastModifiedDate: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
         };
 

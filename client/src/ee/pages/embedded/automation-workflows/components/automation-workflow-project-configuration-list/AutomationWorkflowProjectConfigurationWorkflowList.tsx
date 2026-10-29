@@ -18,16 +18,25 @@ const AutomationWorkflowProjectConfigurationWorkflowList = ({
     configuration,
     project,
 }: AutomationWorkflowProjectConfigurationWorkflowListProps) => (
-    <ul className="divide-y divide-stroke-neutral-primary">
-        {configuration.workflows.map((workflow) => (
-            <AutomationWorkflowProjectConfigurationWorkflowListItem
-                configuration={configuration}
-                key={workflow.workflowUuid}
-                project={project}
-                workflow={workflow}
-            />
-        ))}
-    </ul>
+    <div className="pt-3">
+        <h3 className="flex justify-start px-3 text-sm font-semibold text-content-neutral-tertiary uppercase">
+            Workflows
+        </h3>
+
+        <ul className="divide-y divide-stroke-neutral-primary">
+            {configuration.workflows.map((workflow) => (
+                <AutomationWorkflowProjectConfigurationWorkflowListItem
+                    configuration={configuration}
+                    key={workflow.workflowUuid}
+                    project={project}
+                    workflow={workflow}
+                    workflowTemplate={project.workflowTemplates.find(
+                        (workflowTemplate) => workflowTemplate.workflowUuid === workflow.workflowUuid
+                    )}
+                />
+            ))}
+        </ul>
+    </div>
 );
 
 export default AutomationWorkflowProjectConfigurationWorkflowList;

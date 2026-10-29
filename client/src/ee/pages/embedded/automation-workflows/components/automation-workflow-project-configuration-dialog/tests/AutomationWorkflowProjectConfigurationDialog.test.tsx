@@ -37,8 +37,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
 
 const project = {
     categoryId: null,
+    configurationCount: 0,
     description: null,
     id: 'project-1',
+    lastPublishedDate: null,
     lastPublishedVersion: 3,
     name: 'My Project',
     permissionExpression: null,
@@ -53,6 +55,7 @@ const existingConfiguration = {
     enabled: true,
     environmentId: '2',
     id: 'configuration-1',
+    lastExecutionDate: null,
     lastModifiedDate: null,
     projectId: 'project-1',
     projectVersion: 3,
@@ -160,6 +163,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             enabled: true,
             environmentId: '2',
             id: 'configuration-1',
+            lastExecutionDate: null,
             lastModifiedDate: null,
             projectId: 'project-1',
             projectVersion: 3,

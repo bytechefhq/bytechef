@@ -66,6 +66,7 @@ const workflow = {
     components: [],
     description: 'Sends mail',
     label: 'Workflow One',
+    lastExecutionDate: null,
     lastModifiedDate: '2026-02-11T09:30:00Z',
     permissionExpression: null,
     triggers: [],
@@ -75,8 +76,10 @@ const workflow = {
 
 const project = {
     categoryId: null,
+    configurationCount: 0,
     description: null,
     id: 'project-1',
+    lastPublishedDate: null,
     lastPublishedVersion: null,
     name: 'Project One',
     permissionExpression: null,

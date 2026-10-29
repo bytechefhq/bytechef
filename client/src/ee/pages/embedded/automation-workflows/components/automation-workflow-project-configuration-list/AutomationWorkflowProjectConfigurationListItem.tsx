@@ -9,6 +9,7 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
@@ -17,7 +18,7 @@ import {
 import {Environment} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
-import {useState} from 'react';
+import {MouseEvent, useCallback, useRef, useState} from 'react';
 
 import AutomationWorkflowProjectConfigurationWorkflowList from './AutomationWorkflowProjectConfigurationWorkflowList';
 
@@ -42,6 +43,8 @@ const AutomationWorkflowProjectConfigurationListItem = ({
 }: AutomationWorkflowProjectConfigurationListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+
     const queryClient = useQueryClient();
 
     const enableConfigurationMutation = useEnableAutomationWorkflowProjectConfigurationMutation();
@@ -55,79 +58,142 @@ const AutomationWorkflowProjectConfigurationListItem = ({
 
     const workflowCount = configuration.workflows.length;
 
+    const lastExecutionDate = configuration.lastExecutionDate ? new Date(configuration.lastExecutionDate) : undefined;
+
+    const handleConfigurationListItemClick = useCallback((event: MouseEvent) => {
+        const target = event.target as HTMLElement;
+
+        const interactiveSelectors = [
+            '[data-interactive]',
+            '[role="menuitem"]',
+            '[role="menu"]',
+            '[role="switch"]',
+            '[data-radix-dropdown-menu-trigger]',
+            '[data-radix-collapsible-trigger]',
+        ].join(', ');
+
+        if (target.closest(interactiveSelectors) || workflowsCollapsibleTriggerRef.current?.contains(target)) {
+            return;
+        }
+
+        workflowsCollapsibleTriggerRef.current?.click();
+    }, []);
+
     return (
-        <Collapsible className="group rounded border border-border/50">
-            <div className="flex w-full items-center justify-between rounded-md px-3 py-3 hover:bg-surface-neutral-primary-hover">
-                <div className="flex flex-col gap-2">
-                    <span className="text-base font-semibold">{environmentName}</span>
+        <Collapsible className="rounded border border-border/50" defaultOpen={workflowCount > 0}>
+            <div
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
+                onClick={handleConfigurationListItemClick}
+            >
+                <div className="flex flex-1 items-center py-3">
+                    <div className="flex-1">
+                        <div className="flex min-h-8 items-center">
+                            <span className="text-base font-semibold text-content-neutral-primary">
+                                {environmentName}
+                            </span>
+                        </div>
 
-                    <CollapsibleTrigger
-                        className="group flex items-center text-xs font-semibold text-muted-foreground"
-                        disabled={workflowCount === 0}
-                    >
-                        <span className="mr-1">
-                            {workflowCount === 1 ? '1 workflow' : `${workflowCount} workflows`}
-                        </span>
+                        <div className="mt-2 flex min-h-7 items-center">
+                            <CollapsibleTrigger
+                                className="group/configuration mr-4 flex items-center text-xs font-semibold text-muted-foreground"
+                                disabled={workflowCount === 0}
+                                ref={workflowsCollapsibleTriggerRef}
+                            >
+                                <span className="mr-1">
+                                    {workflowCount === 1 ? '1 workflow' : `${workflowCount} workflows`}
+                                </span>
 
-                        <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
-                    </CollapsibleTrigger>
-                </div>
+                                <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]/configuration:rotate-180" />
+                            </CollapsibleTrigger>
+                        </div>
+                    </div>
 
-                <div className="flex items-center justify-end gap-x-4">
-                    {!configuration.automationHubVisible && (
-                        <Badge label="Hidden from hub" styleType="secondary-outline" />
-                    )}
+                    <div className="flex items-center justify-end gap-x-6">
+                        {!configuration.automationHubVisible && (
+                            <Badge label="Hidden from hub" styleType="secondary-outline" />
+                        )}
 
-                    {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-outline" />}
+                        {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-outline" />}
 
-                    <Badge label={`V${configuration.projectVersion}`} styleType="secondary-filled" weight="semibold" />
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge
+                                    label={`V${configuration.projectVersion}`}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            </TooltipTrigger>
 
-                    <Switch
-                        aria-label="Enable Configuration"
-                        checked={configuration.enabled}
-                        disabled={enableConfigurationMutation.isPending}
-                        onCheckedChange={(enable) =>
-                            enableConfigurationMutation.mutate(
-                                {enable, id: configuration.id},
-                                {
-                                    onSuccess: () => {
-                                        void queryClient.invalidateQueries({
-                                            queryKey: ['automationWorkflowProjectConfigurations'],
-                                        });
-                                        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
-                                    },
-                                }
-                            )
-                        }
-                    />
+                            <TooltipContent>The project version released to this environment</TooltipContent>
+                        </Tooltip>
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="Configuration Actions"
-                                icon={<EllipsisVerticalIcon />}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </DropdownMenuTrigger>
+                        <div className="flex min-w-52 flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center">
+                                <Switch
+                                    aria-label="Enable Configuration"
+                                    checked={configuration.enabled}
+                                    disabled={enableConfigurationMutation.isPending}
+                                    onCheckedChange={(enable) =>
+                                        enableConfigurationMutation.mutate(
+                                            {enable, id: configuration.id},
+                                            {
+                                                onSuccess: () => {
+                                                    void queryClient.invalidateQueries({
+                                                        queryKey: ['automationWorkflowProjectConfigurations'],
+                                                    });
+                                                    void queryClient.invalidateQueries({
+                                                        queryKey: ['automationWorkflowProjects'],
+                                                    });
+                                                },
+                                            }
+                                        )
+                                    }
+                                />
+                            </div>
 
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                aria-label="Edit Configuration"
-                                icon={<PencilIcon />}
-                                label="Edit"
-                                onClick={() => onEdit(configuration)}
-                            />
+                            <Tooltip>
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
+                                    {lastExecutionDate ? (
+                                        <span className="text-xs">
+                                            {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}
+                                        </span>
+                                    ) : (
+                                        <span className="text-xs">No executions</span>
+                                    )}
+                                </TooltipTrigger>
 
-                            <DropdownMenuItem
-                                aria-label="Delete Configuration"
-                                icon={<Trash2Icon />}
-                                label="Delete"
-                                onClick={() => setShowDeleteDialog(true)}
-                                variant="destructive"
-                            />
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                <TooltipContent side="left">Last Execution Date</TooltipContent>
+                            </Tooltip>
+                        </div>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    aria-label="Configuration Actions"
+                                    icon={<EllipsisVerticalIcon />}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    aria-label="Edit Configuration"
+                                    icon={<PencilIcon />}
+                                    label="Edit"
+                                    onClick={() => onEdit(configuration)}
+                                />
+
+                                <DropdownMenuItem
+                                    aria-label="Delete Configuration"
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                    variant="destructive"
+                                />
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
             </div>
 

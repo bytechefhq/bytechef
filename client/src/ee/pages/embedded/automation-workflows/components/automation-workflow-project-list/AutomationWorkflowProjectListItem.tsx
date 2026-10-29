@@ -9,6 +9,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import TagList from '@/shared/components/TagList';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {
@@ -68,6 +69,8 @@ const AutomationWorkflowProjectListItem = ({
         [onUpdateTags, project.id]
     );
 
+    const lastPublishedDate = project.lastPublishedDate ? new Date(project.lastPublishedDate) : undefined;
+
     const handleProjectListItemClick = useCallback((event: MouseEvent) => {
         const target = event.target as HTMLElement;
 
@@ -126,6 +129,14 @@ const AutomationWorkflowProjectListItem = ({
                                             : `${project.workflowTemplates.length} workflows`}
                                     </div>
 
+                                    <span className="mx-1">-</span>
+
+                                    <span className="mr-1">
+                                        {project.configurationCount === 1
+                                            ? '1 configuration'
+                                            : `${project.configurationCount} configurations`}
+                                    </span>
+
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
@@ -143,22 +154,38 @@ const AutomationWorkflowProjectListItem = ({
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex items-center space-x-2">
-                            {project.published ? (
-                                <Badge
-                                    className="flex space-x-1 border-transparent"
-                                    styleType="success-outline"
-                                    weight="semibold"
-                                >
-                                    <span>V{project.lastPublishedVersion}</span>
+                        <div className="flex min-w-52 flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center space-x-2">
+                                {project.published ? (
+                                    <Badge
+                                        className="flex space-x-1 border-transparent"
+                                        styleType="success-outline"
+                                        weight="semibold"
+                                    >
+                                        <span>V{project.lastPublishedVersion}</span>
 
-                                    <span>PUBLISHED</span>
-                                </Badge>
-                            ) : (
-                                <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
-                                    <span>DRAFT</span>
-                                </Badge>
-                            )}
+                                        <span>PUBLISHED</span>
+                                    </Badge>
+                                ) : (
+                                    <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
+                                        <span>DRAFT</span>
+                                    </Badge>
+                                )}
+                            </div>
+
+                            <Tooltip>
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
+                                    {lastPublishedDate ? (
+                                        <span className="text-xs">
+                                            {`Published at ${lastPublishedDate.toLocaleDateString()} ${lastPublishedDate.toLocaleTimeString()}`}
+                                        </span>
+                                    ) : (
+                                        <span className="text-xs">Not yet published</span>
+                                    )}
+                                </TooltipTrigger>
+
+                                <TooltipContent side="left">Last Published Date</TooltipContent>
+                            </Tooltip>
                         </div>
 
                         <DropdownMenu>

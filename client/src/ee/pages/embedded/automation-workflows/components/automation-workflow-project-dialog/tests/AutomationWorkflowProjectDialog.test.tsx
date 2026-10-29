@@ -5,8 +5,10 @@ import AutomationWorkflowProjectDialog from '../AutomationWorkflowProjectDialog'
 
 const existingProject = {
     categoryId: null,
+    configurationCount: 0,
     description: null,
     id: '1',
+    lastPublishedDate: null,
     lastPublishedVersion: null,
     name: 'Existing',
     permissionExpression: null,

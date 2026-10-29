@@ -43,8 +43,10 @@ vi.mock('@tanstack/react-query', async (importOriginal) => ({
 
 const project = {
     categoryId: null,
+    configurationCount: 0,
     description: null,
     id: 'project-1',
+    lastPublishedDate: null,
     lastPublishedVersion: 2,
     name: 'Mail Project',
     permissionExpression: null,
@@ -59,6 +61,7 @@ const configuration = {
     enabled: true,
     environmentId: '2',
     id: 'configuration-1',
+    lastExecutionDate: null,
     lastModifiedDate: null,
     projectId: 'project-1',
     projectVersion: 2,
