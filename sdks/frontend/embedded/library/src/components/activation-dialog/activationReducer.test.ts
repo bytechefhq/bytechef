@@ -4,6 +4,7 @@ import {TemplateComponentType} from './types';
 
 const slack: TemplateComponentType = {connectionRequired: true, integrationId: 5, name: 'slack', title: 'Slack'};
 const gmailNotSetUp: TemplateComponentType = {connectionRequired: true, integrationId: null, name: 'gmail'};
+const providedSlack: TemplateComponentType = {...slack, provided: true};
 const logger: TemplateComponentType = {connectionRequired: false, name: 'logger'};
 
 describe('initialActivationState', () => {
@@ -25,6 +26,25 @@ describe('initialActivationState', () => {
 
     it('records components whose integration is not set up', () => {
         expect(initialActivationState([slack, gmailNotSetUp], []).unavailableComponents).toEqual(['gmail']);
+    });
+});
+
+describe('provided values', () => {
+    it('leaves provided components out of the required components and the connect step', () => {
+        const state = initialActivationState([providedSlack, gmailNotSetUp], []);
+
+        expect(state.requiredComponents).toEqual(['gmail']);
+        expect(initialActivationState([providedSlack], []).step).toBe('activate');
+        expect(initialActivationState([providedSlack], []).unavailableComponents).toEqual([]);
+    });
+
+    it('skips configure when every input is provided and ignores them when proceeding', () => {
+        expect(initialActivationState([], [{name: 'region', provided: true, required: true}]).step).toBe('activate');
+
+        const state = initialActivationState([], [{name: 'region', provided: true, required: true}, {name: 'note'}]);
+
+        expect(state.step).toBe('configure');
+        expect(canProceed(state)).toBe(true);
     });
 });
 

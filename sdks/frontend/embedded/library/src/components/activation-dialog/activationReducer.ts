@@ -43,7 +43,7 @@ export function initialActivationState(
     const unavailableComponents: string[] = [];
 
     for (const component of components) {
-        if (!component.connectionRequired || requiredComponents.includes(component.name)) {
+        if (!component.connectionRequired || component.provided || requiredComponents.includes(component.name)) {
             continue;
         }
 
@@ -64,12 +64,16 @@ export function initialActivationState(
     };
 }
 
+export function hasEditableInputs(inputs: TemplateInputType[]): boolean {
+    return inputs.some((input) => !input.provided);
+}
+
 function getFirstStep(requiredComponents: string[], inputs: TemplateInputType[]): ActivationStepType {
     if (requiredComponents.length > 0) {
         return 'connect';
     }
 
-    return inputs.length > 0 ? 'configure' : 'activate';
+    return hasEditableInputs(inputs) ? 'configure' : 'activate';
 }
 
 export function canProceed(state: ActivationStateI): boolean {
@@ -78,7 +82,8 @@ export function canProceed(state: ActivationStateI): boolean {
             return true;
         case 'configure':
             return state.inputs.every(
-                (input) => !input.required || toInputValueText(state.inputValues[input.name]).trim() !== ''
+                (input) =>
+                    input.provided || !input.required || toInputValueText(state.inputValues[input.name]).trim() !== ''
             );
         case 'connect':
             return (
@@ -97,7 +102,7 @@ function getNextState(state: ActivationStateI): ActivationStateI {
     }
 
     if (state.step === 'connect') {
-        return {...state, error: undefined, step: state.inputs.length > 0 ? 'configure' : 'activate'};
+        return {...state, error: undefined, step: hasEditableInputs(state.inputs) ? 'configure' : 'activate'};
     }
 
     if (state.step === 'configure') {
@@ -108,7 +113,7 @@ function getNextState(state: ActivationStateI): ActivationStateI {
 }
 
 function getPreviousState(state: ActivationStateI): ActivationStateI {
-    if (state.step === 'activate' && state.inputs.length > 0) {
+    if (state.step === 'activate' && hasEditableInputs(state.inputs)) {
         return {...state, error: undefined, step: 'configure'};
     }
 
