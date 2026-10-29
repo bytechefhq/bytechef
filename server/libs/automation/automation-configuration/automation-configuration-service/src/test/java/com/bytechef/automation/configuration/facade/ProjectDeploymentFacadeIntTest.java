@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -42,6 +43,7 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
@@ -56,7 +58,12 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
@@ -81,6 +88,7 @@ import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -152,6 +160,12 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
+
+    @Autowired
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @AfterEach
     public void afterEach() {
@@ -565,6 +579,153 @@ public class ProjectDeploymentFacadeIntTest {
         verifyNoInteractions(triggerLifecycleFacade);
     }
 
+    @Test
+    public void testUpdateProjectDeploymentWorkflowWithStaleVersionKeepsEnabledTriggers() {
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?");
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(
+            projectDeploymentId, projectDeploymentWorkflow.getWorkflowId(), true);
+
+        ProjectDeploymentWorkflow staleProjectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        ProjectDeploymentWorkflow currentProjectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        currentProjectDeploymentWorkflow.setInputs(Map.of("cronExpression", "10/5 15 * * ?"));
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(currentProjectDeploymentWorkflow);
+
+        reset(triggerLifecycleFacade);
+
+        staleProjectDeploymentWorkflow.setInputs(Map.of("cronExpression", "5/5 16 * * ?"));
+
+        assertThatThrownBy(
+            () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(staleProjectDeploymentWorkflow))
+                .isInstanceOf(OptimisticLockingFailureException.class);
+
+        verifyNoInteractions(triggerLifecycleFacade);
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowRestoresPreviousTriggersWhenEnableFails() {
+        long projectDeploymentId = createCronInputProjectDeployment("0/5 15 * * ?");
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(
+            projectDeploymentId, projectDeploymentWorkflow.getWorkflowId(), true);
+
+        reset(triggerLifecycleFacade);
+
+        doThrow(new IllegalStateException("Trigger registration failed"))
+            .when(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), any(), any(),
+                argThat(parameters -> Objects.equals(parameters.get("expression"), "5/5 16 * * ?")), any(),
+                any(), anyLong());
+
+        ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        updatedProjectDeploymentWorkflow.setInputs(Map.of("cronExpression", "5/5 16 * * ?"));
+
+        assertThatThrownBy(
+            () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(updatedProjectDeploymentWorkflow))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Trigger registration failed");
+
+        InOrder inOrder = inOrder(triggerLifecycleFacade);
+
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerDisable(
+                any(), any(), any(),
+                argThat(parameters -> Objects.equals(parameters.get("expression"), "0/5 15 * * ?")), any());
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), any(), any(),
+                argThat(parameters -> Objects.equals(parameters.get("expression"), "5/5 16 * * ?")), any(),
+                any(), anyLong());
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerDisable(
+                any(), any(), any(),
+                argThat(parameters -> Objects.equals(parameters.get("expression"), "5/5 16 * * ?")), any());
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), any(), any(),
+                argThat(parameters -> Objects.equals(parameters.get("expression"), "0/5 15 * * ?")), any(),
+                any(), anyLong());
+
+        assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+            .first()
+            .satisfies(
+                workflow -> assertThat(workflow.getInputs()).isEqualTo(Map.of("cronExpression", "0/5 15 * * ?")));
+    }
+
+    @Test
+    public void testUpdateProjectDeploymentWorkflowConnectionDisablesTriggersWithPreviousConnection() {
+        long oldConnectionId = 1001L;
+        long newConnectionId = 1002L;
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "schedule", 1, "trigger_1", "connection", false);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+            .thenReturn(List.of(componentConnection));
+        when(componentConnectionFacade.getComponentConnection(anyString(), anyString(), anyString()))
+            .thenReturn(componentConnection);
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("schedule");
+
+        when(connectionService.getConnection(anyLong())).thenReturn(connection);
+
+        long projectDeploymentId = createCronInputProjectDeployment(
+            "0/5 15 * * ?",
+            List.of(new ProjectDeploymentWorkflowConnection(oldConnectionId, "connection", "trigger_1")));
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(
+            projectDeploymentId, projectDeploymentWorkflow.getWorkflowId(), true);
+
+        reset(triggerLifecycleFacade);
+
+        projectDeploymentWorkflow = projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+            projectDeploymentId)
+            .getFirst();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(newConnectionId, "connection", "trigger_1")));
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
+        InOrder inOrder = inOrder(triggerLifecycleFacade);
+
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerDisable(any(), any(), any(), any(), eq(oldConnectionId));
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(any(), any(), any(), any(), eq(newConnectionId), any(), anyLong());
+    }
+
     @Disabled
     @Test
     public void testUpdateProjectDeploymentTags() {
@@ -809,6 +970,12 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     private long createCronInputProjectDeployment(String cronExpression) {
+        return createCronInputProjectDeployment(cronExpression, List.of());
+    }
+
+    private long createCronInputProjectDeployment(
+        String cronExpression, List<ProjectDeploymentWorkflowConnection> connections) {
+
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
         projectDeploymentFacadeHelper.addTestWorkflow(
@@ -840,7 +1007,7 @@ public class ProjectDeploymentFacadeIntTest {
             .getFirst();
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of("cronExpression", cronExpression), true, null, null, null, null, null,
+            connections, null, null, Map.of("cronExpression", cronExpression), true, null, null, null, null, null,
             null, null, 0, publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
