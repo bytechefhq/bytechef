@@ -124,7 +124,9 @@ import org.springframework.beans.factory.ObjectProvider;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class AbstractAiAgentChatActionTest {
 
     private static final String TOOL_LOOP_CONVERSATION_ID = "tool-loop-conversation";
@@ -1488,7 +1490,6 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Nested
-    @ExtendWith(ObjectMapperSetupExtension.class)
     class ObservableToolCallbackTests {
 
         @Test

@@ -2081,6 +2081,20 @@ export type WorkflowNodeScriptInputQueryVariables = Exact<{
 
 export type WorkflowNodeScriptInputQuery = { workflowNodeScriptInput: any };
 
+export type GeneratePropertyValueMutationVariables = Exact<{
+  input: Types.GeneratePropertyValueInput;
+}>;
+
+
+export type GeneratePropertyValueMutation = { generatePropertyValue: { value: string, valid: boolean, message: string | null } };
+
+export type GenerateWorkflowDescriptionMutationVariables = Exact<{
+  input: Types.GenerateWorkflowDescriptionInput;
+}>;
+
+
+export type GenerateWorkflowDescriptionMutation = { generateWorkflowDescription: { value: string } };
+
 export type CustomComponentQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -2226,6 +2240,50 @@ export type UsersQueryVariables = Exact<{
 
 
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
+
+export type DeleteWebSearchProviderMutationVariables = Exact<{
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type DeleteWebSearchProviderMutation = { deleteWebSearchProvider: boolean | null };
+
+export type EnableWebSearchProviderMutationVariables = Exact<{
+  enabled: boolean;
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type EnableWebSearchProviderMutation = { enableWebSearchProvider: boolean | null };
+
+export type TestWebSearchProviderMutationVariables = Exact<{
+  apiKey?: string | null | undefined;
+  baseUrl?: string | null | undefined;
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type TestWebSearchProviderMutation = { testWebSearchProvider: { errorMessage: string | null, success: boolean } };
+
+export type UpdateWebSearchProviderMutationVariables = Exact<{
+  apiKey?: string | null | undefined;
+  baseUrl?: string | null | undefined;
+  environment: string | number;
+  name: string;
+}>;
+
+
+export type UpdateWebSearchProviderMutation = { updateWebSearchProvider: boolean | null };
+
+export type WebSearchProvidersQueryVariables = Exact<{
+  environment: string | number;
+}>;
+
+
+export type WebSearchProvidersQuery = { webSearchProviders: Array<{ apiKeyFromProperties: boolean, baseUrl: string, defaultBaseUrl: string, description: string, enabled: boolean, icon: string | null, label: string, maskedApiKey: string | null, name: string }> };
 
 
 export class TypedDocumentString<TResult, TVariables>
@@ -9907,6 +9965,50 @@ export const useWorkflowNodeScriptInputQuery = <
   }
     )};
 
+export const GeneratePropertyValueDocument = new TypedDocumentString(`
+    mutation generatePropertyValue($input: GeneratePropertyValueInput!) {
+  generatePropertyValue(input: $input) {
+    value
+    valid
+    message
+  }
+}
+    `);
+
+export const useGeneratePropertyValueMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GeneratePropertyValueMutation, TError, GeneratePropertyValueMutationVariables, TContext>) => {
+    
+    return useMutation<GeneratePropertyValueMutation, TError, GeneratePropertyValueMutationVariables, TContext>(
+      {
+    mutationKey: ['generatePropertyValue'],
+    mutationFn: (variables?: GeneratePropertyValueMutationVariables) => fetcher<GeneratePropertyValueMutation, GeneratePropertyValueMutationVariables>(GeneratePropertyValueDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GenerateWorkflowDescriptionDocument = new TypedDocumentString(`
+    mutation generateWorkflowDescription($input: GenerateWorkflowDescriptionInput!) {
+  generateWorkflowDescription(input: $input) {
+    value
+  }
+}
+    `);
+
+export const useGenerateWorkflowDescriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GenerateWorkflowDescriptionMutation, TError, GenerateWorkflowDescriptionMutationVariables, TContext>) => {
+    
+    return useMutation<GenerateWorkflowDescriptionMutation, TError, GenerateWorkflowDescriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['generateWorkflowDescription'],
+    mutationFn: (variables?: GenerateWorkflowDescriptionMutationVariables) => fetcher<GenerateWorkflowDescriptionMutation, GenerateWorkflowDescriptionMutationVariables>(GenerateWorkflowDescriptionDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const CustomComponentDocument = new TypedDocumentString(`
     query customComponent($id: ID!) {
   customComponent(id: $id) {
@@ -10501,6 +10603,131 @@ export const useUsersQuery = <
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
     queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteWebSearchProviderDocument = new TypedDocumentString(`
+    mutation deleteWebSearchProvider($environment: ID!, $name: String!) {
+  deleteWebSearchProvider(environment: $environment, name: $name)
+}
+    `);
+
+export const useDeleteWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWebSearchProviderMutation, TError, DeleteWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWebSearchProviderMutation, TError, DeleteWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWebSearchProvider'],
+    mutationFn: (variables?: DeleteWebSearchProviderMutationVariables) => fetcher<DeleteWebSearchProviderMutation, DeleteWebSearchProviderMutationVariables>(DeleteWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableWebSearchProviderDocument = new TypedDocumentString(`
+    mutation enableWebSearchProvider($enabled: Boolean!, $environment: ID!, $name: String!) {
+  enableWebSearchProvider(
+    enabled: $enabled
+    environment: $environment
+    name: $name
+  )
+}
+    `);
+
+export const useEnableWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableWebSearchProviderMutation, TError, EnableWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<EnableWebSearchProviderMutation, TError, EnableWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['enableWebSearchProvider'],
+    mutationFn: (variables?: EnableWebSearchProviderMutationVariables) => fetcher<EnableWebSearchProviderMutation, EnableWebSearchProviderMutationVariables>(EnableWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const TestWebSearchProviderDocument = new TypedDocumentString(`
+    mutation testWebSearchProvider($apiKey: String, $baseUrl: String, $environment: ID!, $name: String!) {
+  testWebSearchProvider(
+    apiKey: $apiKey
+    baseUrl: $baseUrl
+    environment: $environment
+    name: $name
+  ) {
+    errorMessage
+    success
+  }
+}
+    `);
+
+export const useTestWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<TestWebSearchProviderMutation, TError, TestWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<TestWebSearchProviderMutation, TError, TestWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['testWebSearchProvider'],
+    mutationFn: (variables?: TestWebSearchProviderMutationVariables) => fetcher<TestWebSearchProviderMutation, TestWebSearchProviderMutationVariables>(TestWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWebSearchProviderDocument = new TypedDocumentString(`
+    mutation updateWebSearchProvider($apiKey: String, $baseUrl: String, $environment: ID!, $name: String!) {
+  updateWebSearchProvider(
+    apiKey: $apiKey
+    baseUrl: $baseUrl
+    environment: $environment
+    name: $name
+  )
+}
+    `);
+
+export const useUpdateWebSearchProviderMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWebSearchProviderMutation, TError, UpdateWebSearchProviderMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWebSearchProviderMutation, TError, UpdateWebSearchProviderMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWebSearchProvider'],
+    mutationFn: (variables?: UpdateWebSearchProviderMutationVariables) => fetcher<UpdateWebSearchProviderMutation, UpdateWebSearchProviderMutationVariables>(UpdateWebSearchProviderDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WebSearchProvidersDocument = new TypedDocumentString(`
+    query webSearchProviders($environment: ID!) {
+  webSearchProviders(environment: $environment) {
+    apiKeyFromProperties
+    baseUrl
+    defaultBaseUrl
+    description
+    enabled
+    icon
+    label
+    maskedApiKey
+    name
+  }
+}
+    `);
+
+export const useWebSearchProvidersQuery = <
+      TData = WebSearchProvidersQuery,
+      TError = unknown
+    >(
+      variables: WebSearchProvidersQueryVariables,
+      options?: Omit<UseQueryOptions<WebSearchProvidersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WebSearchProvidersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WebSearchProvidersQuery, TError, TData>(
+      {
+    queryKey: ['webSearchProviders', variables],
+    queryFn: fetcher<WebSearchProvidersQuery, WebSearchProvidersQueryVariables>(WebSearchProvidersDocument, variables),
     ...options
   }
     )};

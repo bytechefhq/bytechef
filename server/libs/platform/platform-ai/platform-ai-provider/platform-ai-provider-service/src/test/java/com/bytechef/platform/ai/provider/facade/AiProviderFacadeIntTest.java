@@ -35,6 +35,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.configuration.service.PropertyServiceImpl;
+import com.bytechef.platform.connection.aiprovider.AiProviderConnectionSource;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.sun.net.httpserver.HttpServer;
@@ -76,6 +77,9 @@ class AiProviderFacadeIntTest {
           {"name":"qwen3:8b","capabilities":["completion","tools","thinking"]}
         ]}
         """;
+
+    @MockitoBean
+    private AiProviderConnectionSource aiProviderConnectionSource;
 
     @Autowired
     private AiProviderFacade aiProviderFacade;
@@ -134,6 +138,8 @@ class AiProviderFacadeIntTest {
 
                 when(componentDefinition.getName()).thenReturn(provider.getName());
                 when(componentDefinition.getActions()).thenReturn(List.of());
+                when(componentDefinitionService.getComponentDefinition(provider.getName(), 0))
+                    .thenReturn(componentDefinition);
 
                 return componentDefinition;
             })

@@ -17,20 +17,14 @@
 package com.bytechef.ai.copilot.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
-import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
-import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
-import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,13 +32,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -87,41 +76,6 @@ class CopilotToolContextUtilsTest {
         Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(new HashMap<>()));
 
         assertThat(toolContext).doesNotContainKey(ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY);
-    }
-
-    @Test
-    void testToToolContextDisablesTheConnectionFallbackForAScopedRun() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).containsEntry(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, true);
-    }
-
-    @Test
-    void testToToolContextDisablesTheConnectionFallbackForARunThatSkipsAuthorization() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(
-            CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("1234567890", null));
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).containsEntry(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, true);
-    }
-
-    @Test
-    void testToToolContextKeepsTheConnectionFallbackForAWorkspaceRun() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 1L);
-        stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, 1L);
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).doesNotContainKey(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY);
     }
 
     @Test
@@ -208,88 +162,41 @@ class CopilotToolContextUtilsTest {
         assertThat(toolContext)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_AUTHENTICATION_KEY, authentication)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_TENANT_ID_KEY, "acme")
-            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY, Boolean.TRUE);
+            .doesNotContainKey("bytechef.agentTool.skipAutomationAuthorization");
     }
 
     @Test
-    void testDoesNotSkipAutomationAuthorizationForAPlatformUser() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 42L);
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("user", ""));
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY);
-    }
-
-    @Test
-    void testConnectedUserToolCallSkipsChecksOnAPooledWorker() throws Exception {
+    void testCarriesNoSkipModeForAConnectedUserRunOnAPooledWorker() throws Exception {
         Map<String, Object> stateMap = new HashMap<>();
 
         stateMap.put(CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("cu", ""));
 
-        assertThat(callProbeOnPooledWorker(CopilotToolContextUtils.toToolContext(new State(stateMap)))).isTrue();
-    }
-
-    @Test
-    void testPlatformUserToolCallDoesNotSkipChecksOnAPooledWorker() throws Throwable {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 42L);
-
-        Map<String, Object> toolContext = AutomationAuthorizationContext.callSkippingChecks(
-            () -> CopilotToolContextUtils.toToolContext(new State(stateMap)));
-
-        assertThat(toolContext).doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY);
-        assertThat(callProbeOnPooledWorker(toolContext)).isFalse();
-    }
-
-    private static boolean callProbeOnPooledWorker(Map<String, Object> toolContext) throws Exception {
-        AtomicBoolean skipChecksSeenInside = new AtomicBoolean();
-
-        ToolCallback probe = new ToolCallback() {
-
-            @Override
-            public ToolDefinition getToolDefinition() {
-                return ToolDefinition.builder()
-                    .name("probe")
-                    .description("probe")
-                    .inputSchema("{\"type\":\"object\"}")
-                    .build();
-            }
-
-            @Override
-            public String call(String toolInput) {
-                return call(toolInput, null);
-            }
-
-            @Override
-            public String call(String toolInput, @Nullable ToolContext toolContext) {
-                skipChecksSeenInside.set(AutomationAuthorizationContext.isSkipChecks());
-
-                return "ok";
-            }
-        };
-
-        SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
-
-        when(securityContextRehydrator.withUserSecurityContext(any(), any())).thenAnswer(
-            invocation -> invocation.<Supplier<?>>getArgument(1)
-                .get());
-
-        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, securityContextRehydrator);
-
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         try {
-            executorService.submit(() -> wrapped.call("{}", new ToolContext(toolContext)))
+            Map<String, Object> toolContext = executorService.submit(
+                () -> CopilotToolContextUtils.toToolContext(new State(stateMap)))
                 .get(10, TimeUnit.SECONDS);
+
+            assertThat(toolContext).doesNotContainKey("bytechef.agentTool.skipAutomationAuthorization");
         } finally {
             executorService.shutdownNow();
         }
+    }
 
-        return skipChecksSeenInside.get();
+    @Test
+    void testCarriesNoSkipModeEvenWhenTheThreadLocalIsArmed() throws Throwable {
+        Map<String, Object> stateMap = new HashMap<>();
+
+        stateMap.put(CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("cu", ""));
+
+        Map<String, Object> unarmed = CopilotToolContextUtils.toToolContext(new State(stateMap));
+
+        Map<String, Object> armed = AutomationAuthorizationContext.callSkippingChecks(
+            () -> CopilotToolContextUtils.toToolContext(new State(stateMap)));
+
+        assertThat(armed.keySet()).isEqualTo(unarmed.keySet());
+        assertThat(armed).doesNotContainKey("bytechef.agentTool.skipAutomationAuthorization");
     }
 
     @Test
@@ -304,5 +211,34 @@ class CopilotToolContextUtilsTest {
         assertThat(toolContext)
             .containsEntry(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack"))
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L);
+    }
+
+    @Test
+    void testPropagatesTheUserSelectedModel() {
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, 1L);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, "anthropic");
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, "claude-opus-4");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(state);
+
+        assertThat(toolContext)
+            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_LLM_PROVIDER_KEY, "anthropic")
+            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_LLM_MODEL_KEY, "claude-opus-4");
+    }
+
+    @Test
+    void testOmitsTheModelKeysWhenHalfSet() {
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, 1L);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, "anthropic");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(state);
+
+        assertThat(toolContext)
+            .doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_LLM_PROVIDER_KEY)
+            .doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_LLM_MODEL_KEY);
     }
 }

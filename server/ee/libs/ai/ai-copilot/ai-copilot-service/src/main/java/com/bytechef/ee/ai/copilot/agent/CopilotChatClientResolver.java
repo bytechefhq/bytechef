@@ -8,18 +8,14 @@
 package com.bytechef.ee.ai.copilot.agent;
 
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.IncompleteChatModelSelectionException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
-// Gateway resolver path disabled for now — see the commented block at the bottom of this class.
-// import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
-// import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
-// import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
-// import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
-// import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
-// import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
@@ -32,9 +28,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Resolves a per-request override {@link ChatClient} for Copilot conversations that carry a user-selected (provider,
- * model) pair, supplied by the chat-toolbar picker via AG-UI state keys {@code userSelectedLlmProvider} +
- * {@code userSelectedLlmModel}.
+ * Resolves the per-request {@link ChatClient} for Copilot conversations from the provider catalog: the user-selected
+ * (provider, model) pair supplied by the chat-toolbar picker via AG-UI state keys {@code userSelectedLlmProvider} +
+ * {@code userSelectedLlmModel}, otherwise the environment default. Never falls back to the startup model; an
+ * unresolvable model fails the run with a {@link ChatModelUnavailableException}.
  *
  * @version ee
  *
@@ -46,6 +43,9 @@ import org.springframework.stereotype.Component;
 public class CopilotChatClientResolver implements OverrideChatClientResolver {
 
     private static final Logger log = LoggerFactory.getLogger(CopilotChatClientResolver.class);
+
+    private static final String NO_ENVIRONMENT_MESSAGE =
+        "The Copilot run carries no environment, so no AI provider can be resolved for it.";
 
     private final CatalogChatClientResolver catalogChatClientResolver;
     private final String defaultProvider;
@@ -60,110 +60,104 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
     }
 
     @Override
-    public @Nullable ChatClient resolve(State state) {
+    public ChatClient resolve(@Nullable State state) {
         if (state == null) {
-            return null;
+            throw new ChatModelUnavailableException(NO_ENVIRONMENT_MESSAGE);
         }
 
         Long environmentId = NumberUtils.asLong(state.get(CopilotConstants.STATE_ENVIRONMENT_ID));
 
         if (environmentId == null) {
-            return null;
+            throw new ChatModelUnavailableException(NO_ENVIRONMENT_MESSAGE);
         }
 
         String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
         String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
 
         if (llmProvider != null && llmModel != null) {
-            return catalogChatClientResolver.resolve(llmProvider, llmModel, environmentId.intValue());
+            return resolveSelected(llmProvider, llmModel, environmentId);
         }
 
-        if ((llmProvider == null) != (llmModel == null)) {
+        if (llmProvider != null || llmModel != null) {
             log.warn(
-                "Copilot user-selected LLM half-set (provider={}, model={}); using the environment default",
-                llmProvider, llmModel);
+                "Copilot user-selected LLM half-set (provider={}, model={}) in environment {}", llmProvider, llmModel,
+                environmentId);
+
+            throw new IncompleteChatModelSelectionException(llmProvider, llmModel);
         }
 
-        if (defaultProvider != null && !defaultProvider.isBlank()) {
-            ChatClient preferred =
-                catalogChatClientResolver.resolvePreferred(defaultProvider, environmentId.intValue());
-
-            if (preferred != null) {
-                return preferred;
-            }
-
-            log.warn(
-                "Copilot default provider '{}' (bytechef.ai.copilot.provider) is not usable in environment {} "
-                    + "(disabled or no configured chat model); falling back to the first enabled chat provider",
-                defaultProvider, environmentId);
-        }
-
-        return catalogChatClientResolver.resolveDefault(environmentId.intValue());
+        return resolveEnvironmentDefault(environmentId);
     }
 
     @Override
-    public @Nullable ChatModel resolveDefaultChatModel(int environmentId) {
-        return catalogChatClientResolver.resolveDefaultChatModel(defaultProvider, environmentId);
+    public ChatModel resolveDefaultChatModel(int environmentId) {
+        ChatModel chatModel;
+
+        try {
+            chatModel = catalogChatClientResolver.resolveDefaultChatModel(defaultProvider, environmentId);
+        } catch (RuntimeException exception) {
+            throw unresolvable(environmentId, exception);
+        }
+
+        if (chatModel == null) {
+            throw ChatModelUnavailableException.noProviderEnabled(environmentId);
+        }
+
+        return chatModel;
     }
 
-    // ---------------------------------------------------------------------------------------------------------------
-    // AI Gateway fallback path — disabled for now. Restore by re-adding the gateway imports/fields/constructor params
-    // and inlining the block below after the catalog attempt in resolve(...).
-    // ---------------------------------------------------------------------------------------------------------------
-    //
-    // private final WorkspaceAiGatewayProviderService workspaceAiGatewayProviderService;
-    // private final AiGatewayProviderService aiGatewayProviderService;
-    // private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
-    //
-    // Long workspaceId = NumberUtils.asLong(state.get(WORKSPACE_ID_KEY));
-    //
-    // if (workspaceId == null) {
-    // log.warn(
-    // "Copilot user-selected LLM override skipped: state has no parseable workspaceId. Falling back to "
-    // + "workspace default for this turn.");
-    //
-    // return null;
-    // }
-    //
-    // AiGatewayProvider provider = resolveProvider(workspaceId, llmProvider);
-    //
-    // if (provider == null) {
-    // log.warn(
-    // "Copilot user-selected LLM override skipped: workspace {} has no enabled provider matching '{}'. "
-    // + "Falling back to workspace default for this turn.",
-    // workspaceId, llmProvider);
-    //
-    // return null;
-    // }
-    //
-    // ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
-    //
-    // return ChatClient.builder(chatModel)
-    // .defaultOptions(
-    // ChatOptions.builder()
-    // .model(llmModel))
-    // .build();
-    //
-    // private @Nullable AiGatewayProvider resolveProvider(long workspaceId, String llmProvider) {
-    // for (WorkspaceAiGatewayProvider workspaceProvider : workspaceAiGatewayProviderService
-    // .getWorkspaceProviders(workspaceId)) {
-    //
-    // AiGatewayProvider aiGatewayProvider = aiGatewayProviderService.getProvider(
-    // workspaceProvider.getProviderId());
-    //
-    // if (aiGatewayProvider == null || !aiGatewayProvider.isEnabled()) {
-    // continue;
-    // }
-    //
-    // AiGatewayProviderType type = aiGatewayProvider.getType();
-    //
-    // String name = type.name();
-    //
-    // if (name.equalsIgnoreCase(llmProvider)) {
-    // return aiGatewayProvider;
-    // }
-    // }
-    //
-    // return null;
-    // }
+    private ChatClient resolveSelected(String llmProvider, String llmModel, long environmentId) {
+        ChatClient selected;
+
+        try {
+            selected = catalogChatClientResolver.resolve(llmProvider, llmModel, Math.toIntExact(environmentId));
+        } catch (RuntimeException exception) {
+            throw unresolvable(environmentId, exception);
+        }
+
+        if (selected == null) {
+            log.warn(
+                "Copilot user-selected LLM (provider={}, model={}) is not usable in environment {}", llmProvider,
+                llmModel, environmentId);
+
+            throw new SelectedChatModelUnavailableException(llmProvider, llmModel, environmentId);
+        }
+
+        return selected;
+    }
+
+    private ChatClient resolveEnvironmentDefault(long environmentId) {
+        int environment = Math.toIntExact(environmentId);
+
+        try {
+            if (defaultProvider != null && !defaultProvider.isBlank()) {
+                ChatClient preferred = catalogChatClientResolver.resolvePreferred(defaultProvider, environment);
+
+                if (preferred != null) {
+                    return preferred;
+                }
+
+                log.warn(
+                    "Copilot default provider '{}' (bytechef.ai.copilot.provider) is not usable in environment {} "
+                        + "(disabled or no configured chat model); using the first enabled chat provider",
+                    defaultProvider, environmentId);
+            }
+
+            ChatClient environmentDefault = catalogChatClientResolver.resolveDefault(environment);
+
+            if (environmentDefault != null) {
+                return environmentDefault;
+            }
+        } catch (RuntimeException exception) {
+            throw unresolvable(environmentId, exception);
+        }
+
+        throw ChatModelUnavailableException.noProviderEnabled(environmentId);
+    }
+
+    private static ChatModelUnavailableException unresolvable(long environmentId, RuntimeException exception) {
+        return new ChatModelUnavailableException(
+            "Could not resolve the AI model in environment %d: %s".formatted(environmentId, exception.getMessage()),
+            exception);
+    }
 }

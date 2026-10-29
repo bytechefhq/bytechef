@@ -5,10 +5,12 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-ai-provider"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")

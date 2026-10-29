@@ -18,6 +18,8 @@ package com.bytechef.platform.ai.provider.facade;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.model.catalog.CatalogModel;
+import com.bytechef.platform.ai.model.catalog.ModelCatalog;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
@@ -30,6 +32,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.connection.aiprovider.AiProviderConnectionSource;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -39,6 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,17 +56,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AiProviderFacadeImpl implements AiProviderFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(AiProviderFacadeImpl.class);
+
+    private final AiProviderConnectionSource aiProviderConnectionSource;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ObjectProvider<ModelCatalog> modelCatalogProvider;
     private final OllamaModelClient ollamaModelClient;
     private final PropertyService propertyService;
     private final ApplicationProperties applicationProperties;
 
     @SuppressFBWarnings("EI")
     public AiProviderFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, OllamaModelClient ollamaModelClient,
+        AiProviderConnectionSource aiProviderConnectionSource,
+        ComponentDefinitionService componentDefinitionService, ObjectProvider<ModelCatalog> modelCatalogProvider,
+        OllamaModelClient ollamaModelClient,
         PropertyService propertyService, ApplicationProperties applicationProperties) {
 
+        this.aiProviderConnectionSource = aiProviderConnectionSource;
         this.componentDefinitionService = componentDefinitionService;
+        this.modelCatalogProvider = modelCatalogProvider;
         this.ollamaModelClient = ollamaModelClient;
         this.propertyService = propertyService;
         this.applicationProperties = applicationProperties;
@@ -108,16 +122,21 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     .findFirst()
                     .orElse(null);
 
-                boolean enabled =
-                    property != null ? property.isEnabled() : isConfiguredInApplicationProperties(provider);
+                boolean enabled = aiProviderConnectionSource.getSupportedProviders()
+                    .contains(provider)
+                        ? aiProviderConnectionSource.isEnabled(provider, environment)
+                        : ((property != null && property.isEnabled()) || isConfiguredInApplicationProperties(provider));
+
+                ComponentDefinition fullComponentDefinition = resolveFullComponentDefinition(componentDefinition);
 
                 List<AiProviderCatalogItemDTO.Model> models = enabled && provider == Provider.OLLAMA
-                    ? readOllamaChatModels(componentDefinition, environment)
-                    : readChatModels(componentDefinition);
+                    ? readOllamaChatModels(fullComponentDefinition, environment)
+                    : labelModels(
+                        modelCatalogProvider.getIfAvailable(), provider, readChatModels(fullComponentDefinition));
 
                 return new AiProviderCatalogItemDTO(
-                    provider.getKey(), provider.getLabel(), componentDefinition.getIcon(), enabled,
-                    models.isEmpty(), models);
+                    provider.getKey(), provider.getLabel(), componentDefinition.getIcon(),
+                    enabled && fullComponentDefinition != null, models.isEmpty(), models);
             })
             .filter(Objects::nonNull)
             .toList();
@@ -331,13 +350,79 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .equalsIgnoreCase(docsProvider.name());
     }
 
-    private static List<AiProviderCatalogItemDTO.Model> readChatModels(ComponentDefinition componentDefinition) {
+    private @Nullable ComponentDefinition resolveFullComponentDefinition(ComponentDefinition componentDefinition) {
+        try {
+            return componentDefinitionService.getComponentDefinition(
+                componentDefinition.getName(), componentDefinition.getVersion());
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to load the full component definition for '{}' v{}; serving the provider as not enabled",
+                componentDefinition.getName(), componentDefinition.getVersion(), exception);
+
+            return null;
+        }
+    }
+
+    private static List<AiProviderCatalogItemDTO.Model> readChatModels(
+        @Nullable ComponentDefinition componentDefinition) {
+
+        if (componentDefinition == null) {
+            return List.of();
+        }
+
         return componentDefinition.getActions()
             .stream()
             .filter(actionDefinition -> "ask".equals(actionDefinition.getName()))
             .findFirst()
             .map(AiProviderFacadeImpl::extractModelOptions)
             .orElse(List.of());
+    }
+
+    private static List<AiProviderCatalogItemDTO.Model> labelModels(
+        @Nullable ModelCatalog modelCatalog, Provider provider, List<AiProviderCatalogItemDTO.Model> models) {
+
+        String modelsDevProviderId = resolveModelsDevProviderId(provider);
+
+        return models.stream()
+            .map(model -> new AiProviderCatalogItemDTO.Model(
+                model.name(), resolveLabel(modelCatalog, modelsDevProviderId, model)))
+            .toList();
+    }
+
+    private static String resolveLabel(
+        @Nullable ModelCatalog modelCatalog, @Nullable String modelsDevProviderId,
+        AiProviderCatalogItemDTO.Model model) {
+
+        if (modelCatalog != null && modelsDevProviderId != null) {
+            String displayName = modelCatalog.fetchModel(modelsDevProviderId, model.name())
+                .map(CatalogModel::name)
+                .orElse(null);
+
+            if (displayName != null && !displayName.isBlank()) {
+                return displayName;
+            }
+        }
+
+        String label = model.label();
+
+        return label != null && !label.isBlank() ? label : model.name();
+    }
+
+    private static @Nullable String resolveModelsDevProviderId(Provider provider) {
+        return switch (provider) {
+            case ANTHROPIC -> "anthropic";
+            case AZURE_OPEN_AI -> "azure";
+            case DEEPSEEK -> "deepseek";
+            case GROQ -> "groq";
+            case HUGGING_FACE -> null;
+            case MISTRAL -> "mistral";
+            case NVIDIA -> "nvidia";
+            case OLLAMA -> null;
+            case OPEN_AI -> "openai";
+            case PERPLEXITY -> "perplexity";
+            case STABILITY -> null;
+            case VERTEX_GEMINI -> "google-vertex";
+        };
     }
 
     private List<AiProviderCatalogItemDTO.Model> readOllamaChatModels(
@@ -347,7 +432,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             resolveUrl(Provider.OLLAMA, environment), resolveApiKey(Provider.OLLAMA, environment));
 
         if (installedModels.isEmpty()) {
-            return readChatModels(componentDefinition);
+            return labelModels(
+                modelCatalogProvider.getIfAvailable(), Provider.OLLAMA, readChatModels(componentDefinition));
         }
 
         return installedModels.stream()

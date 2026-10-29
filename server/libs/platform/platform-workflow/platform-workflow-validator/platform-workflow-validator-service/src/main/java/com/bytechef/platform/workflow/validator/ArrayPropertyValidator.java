@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
@@ -57,6 +58,8 @@ class ArrayPropertyValidator {
         }
 
         List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
+
+        validateArrayOptionValues(valueJsonNode, propertyInfo, nestedPropertyInfos, propertyPath, errors, warnings);
 
         if (nestedPropertyInfos == null || nestedPropertyInfos.isEmpty()) {
             return;
@@ -235,7 +238,7 @@ class ArrayPropertyValidator {
                 simplifiedPropertyInfos.add(new PropertyInfo(
                     propertyInfo.name(), propertyInfo.type(), propertyInfo.description(), propertyInfo.required(),
                     propertyInfo.expressionEnabled(), simplifiedDisplayCondition, propertyInfo.options(),
-                    propertyInfo.nestedProperties()));
+                    propertyInfo.nestedProperties(), null, propertyInfo.optionValues()));
             } else {
                 simplifiedPropertyInfos.add(propertyInfo);
             }
@@ -383,13 +386,64 @@ class ArrayPropertyValidator {
         for (int i = 0; i < arrayJsonNode.size(); i++) {
             JsonNode valueJsonNode = arrayJsonNode.get(i);
 
-            boolean matchesAnyType = allowedTypePropertyInfos.stream()
-                .anyMatch(typeInfo -> TypeValidator.isTypeValid(valueJsonNode, typeInfo.type()));
+            if (isDataPillOrFormula(valueJsonNode)) {
+                continue;
+            }
+
+            boolean matchesAnyType = matchesAnyType(valueJsonNode, allowedTypePropertyInfos);
 
             if (!matchesAnyType) {
                 addUnionTypeError(valueJsonNode, allowedTypePropertyInfos, propertyPath, errors);
             }
         }
+    }
+
+    /**
+     * Validates the scalar items of an array against the array's fixed options, or against the fixed options of its
+     * single item type when the array itself declares none. Data pills, formulas and items of the wrong type are
+     * skipped.
+     */
+    private static void validateArrayOptionValues(
+        JsonNode arrayJsonNode, PropertyInfo propertyInfo, @Nullable List<PropertyInfo> nestedPropertyInfos,
+        String propertyPath, StringBuilder errors, StringBuilder warnings) {
+
+        List<Object> optionValues = propertyInfo.optionValues();
+
+        if (optionValues == null && nestedPropertyInfos != null && nestedPropertyInfos.size() == 1) {
+            PropertyInfo itemPropertyInfo = nestedPropertyInfos.getFirst();
+
+            optionValues = itemPropertyInfo.optionValues();
+        }
+
+        if (optionValues == null || optionValues.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            JsonNode itemJsonNode = arrayJsonNode.get(i);
+
+            if (itemJsonNode.isContainer() || isDataPillOrFormula(itemJsonNode)) {
+                continue;
+            }
+
+            if (nestedPropertyInfos != null && !nestedPropertyInfos.isEmpty() &&
+                !matchesAnyType(itemJsonNode, nestedPropertyInfos)) {
+
+                continue;
+            }
+
+            TypeValidator.validateOptionValue(
+                itemJsonNode, optionValues, propertyPath + "[" + i + "]", errors, warnings);
+        }
+    }
+
+    private static boolean isDataPillOrFormula(JsonNode valueJsonNode) {
+        return valueJsonNode.isString() && TypeValidator.isDataPillOrFormula(valueJsonNode.asString());
+    }
+
+    private static boolean matchesAnyType(JsonNode valueJsonNode, List<PropertyInfo> typePropertyInfos) {
+        return typePropertyInfos.stream()
+            .anyMatch(typePropertyInfo -> TypeValidator.isTypeValid(valueJsonNode, typePropertyInfo.type()));
     }
 
     /**

@@ -1,10 +1,10 @@
 dependencies {
-    api(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
     api(project(":server:libs:platform:platform-component:platform-component-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     api(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
 
     api("org.springframework:spring-expression")
+    api("org.springframework.ai:spring-ai-client-chat")
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")

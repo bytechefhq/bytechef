@@ -114,6 +114,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-jdbc"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-service"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-model-catalog:platform-ai-model-catalog-service"))
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server"))
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-configuration:ai-mcp-server-configuration-graphql"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
@@ -268,6 +270,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:suspend"))
     implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 
+    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-graphql"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
@@ -294,6 +297,7 @@ dependencies {
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl"))
     implementation(project(":server:ee:libs:core:message:message-broker:message-broker-aws"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-copilot"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-server"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))
@@ -373,6 +377,7 @@ dependencies {
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
 
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))

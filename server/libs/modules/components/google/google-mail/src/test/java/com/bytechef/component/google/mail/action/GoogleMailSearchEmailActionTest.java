@@ -24,6 +24,7 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LA
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MAX_RESULTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.QUERY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,7 +60,7 @@ class GoogleMailSearchEmailActionTest {
     private final Parameters mockedInputParameters = MockParametersFactory.create(
         Map.of(FROM, "from@mail.com", TO, "to@mail.com", SUBJECT, "subject", BODY, "body", MAX_RESULTS, 1L,
             PAGE_TOKEN, "pageToken", CATEGORY, "social", LABEL_IDS, List.of("id1", "id2"),
-            INCLUDE_SPAM_TRASH, true));
+            INCLUDE_SPAM_TRASH, true, QUERY, " has:attachment filename:pdf newer_than:1d "));
     private final Gmail.Users.Messages.List mockedList = mock(Gmail.Users.Messages.List.class);
     private final ListMessagesResponse mockedListMessagesResponse = mock(ListMessagesResponse.class);
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
@@ -99,7 +100,8 @@ class GoogleMailSearchEmailActionTest {
             assertEquals(mockedListMessagesResponse, response);
             assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
             assertEquals(
-                List.of(ME, "pageToken", " from:from@mail.com to:to@mail.com subject:subject category:social"),
+                List.of(ME, "pageToken",
+                    " from:from@mail.com to:to@mail.com subject:subject category:social has:attachment filename:pdf newer_than:1d"),
                 stringArgumentCaptor.getAllValues());
             assertEquals(1, longArgumentCaptor.getValue());
             assertEquals(List.of("id1", "id2"), listArgumentCaptor.getValue());

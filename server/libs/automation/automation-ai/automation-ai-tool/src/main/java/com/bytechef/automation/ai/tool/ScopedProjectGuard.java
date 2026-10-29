@@ -18,66 +18,88 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
-import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
-import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Decides which projects, workflows and connections an automation tool call may touch. A run that carries a scoped
- * project is confined to that project and its caller's connections; a confined run without one is rejected; any other
- * run is limited to its resolved workspace.
+ * Confines a run that carries a scoped project to that project, its workflows and its caller's connections, and keeps
+ * such a run from creating, changing, deleting or publishing projects.
  *
  * @author Ivica Cardic
  */
 @Component
 public class ScopedProjectGuard {
 
-    static final String OUT_OF_SCOPE_MESSAGE = "This chat can only work with the projects and workflows of its own " +
-        "project.";
-    static final String PROJECT_CHANGE_MESSAGE = "This chat cannot create, change, delete or publish projects.";
-    static final String UNSCOPED_MESSAGE = "This chat is not bound to a project, so it cannot work with projects or " +
+    static final String OUT_OF_SCOPE_MESSAGE = "This chat can only work with its own project and that project's " +
         "workflows.";
+    static final String PROJECT_CHANGE_MESSAGE = "This chat cannot create, change, delete or publish projects.";
+
+    public static final String WORKFLOW_CREATE = "WORKFLOW_CREATE";
+    public static final String WORKFLOW_DELETE = "WORKFLOW_DELETE";
+    public static final String WORKFLOW_EDIT = "WORKFLOW_EDIT";
+    public static final String WORKFLOW_VIEW = "WORKFLOW_VIEW";
 
     private static final Logger log = LoggerFactory.getLogger(ScopedProjectGuard.class);
 
-    private final ProjectService projectService;
-    private final ProjectWorkflowService projectWorkflowService;
+    private final @Nullable PermissionService permissionService;
+    private final @Nullable ProjectWorkflowService projectWorkflowService;
     private final ScopedConnectionGuard scopedConnectionGuard;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
+
+    @Autowired
+    @SuppressFBWarnings("EI")
+    public ScopedProjectGuard(
+        ObjectProvider<PermissionService> permissionServiceProvider,
+        ObjectProvider<ProjectWorkflowService> projectWorkflowServiceProvider,
+        ScopedConnectionGuard scopedConnectionGuard) {
+
+        this(
+            permissionServiceProvider.getIfAvailable(), projectWorkflowServiceProvider.getIfAvailable(),
+            scopedConnectionGuard);
+    }
 
     @SuppressFBWarnings("EI")
     public ScopedProjectGuard(
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        ScopedConnectionGuard scopedConnectionGuard, WorkspaceScopeResolver workspaceScopeResolver) {
+        @Nullable PermissionService permissionService, @Nullable ProjectWorkflowService projectWorkflowService,
+        ScopedConnectionGuard scopedConnectionGuard) {
 
-        this.projectService = projectService;
+        this.permissionService = permissionService;
         this.projectWorkflowService = projectWorkflowService;
         this.scopedConnectionGuard = scopedConnectionGuard;
-        this.workspaceScopeResolver = workspaceScopeResolver;
     }
 
     public void checkWorkflow(
-        String workflowId, @Nullable Long workspaceId, @Nullable ToolContext toolContext, ErrorType errorType) {
+        String workflowId, String scope, @Nullable ToolContext toolContext, ErrorType errorType) {
 
-        Long scopedProjectId = getScopedProjectIdOrNullIfUnconfined(toolContext, errorType);
+        Long scopedProjectId = ScopedProjectToolContext.fetchScopedProjectId(toolContext);
 
         if (scopedProjectId == null) {
-            ProjectWorkspaceScope.checkWorkspaceWorkflow(
-                projectService, projectWorkflowService, workflowId,
-                resolveWorkspaceId(workspaceId, toolContext, errorType), errorType);
+            if (!AutomationAuthorizationContext.isSkipChecks() &&
+                (permissionService == null || !permissionService.hasWorkflowScope(workflowId, scope))) {
+
+                log.warn("Rejected workflow {}: the caller lacks the {} scope", workflowId, scope);
+
+                throw new ExecutionException(getWorkflowNotAccessibleMessage(workflowId), errorType);
+            }
 
             return;
+        }
+
+        if (projectWorkflowService == null) {
+            log.error("Rejected workflow {}: no project workflow lookup is available", workflowId);
+
+            throw new ExecutionException(getWorkflowUnverifiedMessage(workflowId), errorType);
         }
 
         ProjectWorkflow projectWorkflow;
@@ -87,9 +109,9 @@ public class ScopedProjectGuard {
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new ExecutionException(getWorkflowNotFoundMessage(workflowId), errorType);
         } catch (RuntimeException exception) {
-            log.warn("Rejected workflow {}: looking up its project failed", workflowId, exception);
+            log.error("Rejected workflow {}: looking up its project failed", workflowId, exception);
 
-            throw new ExecutionException(getWorkflowNotFoundMessage(workflowId), exception, errorType);
+            throw new ExecutionException(getWorkflowUnverifiedMessage(workflowId), exception, errorType);
         }
 
         if (projectWorkflow.getProjectId() != scopedProjectId.longValue()) {
@@ -99,49 +121,26 @@ public class ScopedProjectGuard {
         }
     }
 
-    public Project getProject(
-        long projectId, @Nullable Long workspaceId, @Nullable ToolContext toolContext, ErrorType errorType) {
-
-        Long scopedProjectId = getScopedProjectIdOrNullIfUnconfined(toolContext, errorType);
+    public void checkProject(long projectId, String scope, @Nullable ToolContext toolContext, ErrorType errorType) {
+        Long scopedProjectId = ScopedProjectToolContext.fetchScopedProjectId(toolContext);
 
         if (scopedProjectId == null) {
-            return ProjectWorkspaceScope.getWorkspaceProject(
-                projectService, projectId, resolveWorkspaceId(workspaceId, toolContext, errorType), errorType);
+            if (!AutomationAuthorizationContext.isSkipChecks() &&
+                (permissionService == null || !permissionService.hasWorkspaceScopeForProject(projectId, scope))) {
+
+                log.warn("Rejected project {}: the caller lacks the {} scope", projectId, scope);
+
+                throw new ExecutionException(getProjectNotAccessibleMessage(projectId), errorType);
+            }
+
+            return;
         }
 
-        if (projectId != scopedProjectId) {
+        if (scopedProjectId != projectId) {
             log.warn("Rejected project {}: it is not the scoped project {}", projectId, scopedProjectId);
 
             throw new ExecutionException(OUT_OF_SCOPE_MESSAGE, errorType);
         }
-
-        return projectService.getProject(projectId);
-    }
-
-    public Set<Long> getAccessibleProjectIds(
-        @Nullable Long workspaceId, @Nullable ToolContext toolContext, ErrorType errorType) {
-
-        Long scopedProjectId = getScopedProjectIdOrNullIfUnconfined(toolContext, errorType);
-
-        if (scopedProjectId == null) {
-            return Set.copyOf(
-                projectService.getWorkspaceProjectIds(resolveWorkspaceId(workspaceId, toolContext, errorType)));
-        }
-
-        return Set.of(scopedProjectId);
-    }
-
-    public List<Project> getAccessibleProjects(
-        @Nullable Long workspaceId, @Nullable ToolContext toolContext, ErrorType errorType) {
-
-        Long scopedProjectId = getScopedProjectIdOrNullIfUnconfined(toolContext, errorType);
-
-        if (scopedProjectId == null) {
-            return ProjectWorkspaceScope.getWorkspaceProjects(
-                projectService, resolveWorkspaceId(workspaceId, toolContext, errorType));
-        }
-
-        return List.of(projectService.getProject(scopedProjectId));
     }
 
     public void checkProjectChangeAllowed(@Nullable ToolContext toolContext, ErrorType errorType) {
@@ -152,16 +151,6 @@ public class ScopedProjectGuard {
         }
     }
 
-    public long resolveWorkspaceId(@Nullable Long workspaceId, @Nullable ToolContext toolContext, ErrorType errorType) {
-        if (ScopedProjectToolContext.isConfined(toolContext)) {
-            log.warn("Rejected workspace resolution for a confined run");
-
-            throw new ExecutionException(OUT_OF_SCOPE_MESSAGE, errorType);
-        }
-
-        return ProjectWorkspaceScope.resolveWorkspaceId(workspaceScopeResolver, workspaceId, toolContext, errorType);
-    }
-
     public void checkConnection(long connectionId, @Nullable ToolContext toolContext, ErrorType errorType) {
         String denialMessage = scopedConnectionGuard.fetchDenialMessage(null, connectionId, toolContext);
 
@@ -170,21 +159,23 @@ public class ScopedProjectGuard {
         }
     }
 
-    private static @Nullable Long getScopedProjectIdOrNullIfUnconfined(
-        @Nullable ToolContext toolContext, ErrorType errorType) {
+    public @Nullable Long fetchScopedProjectId(@Nullable ToolContext toolContext) {
+        return ScopedProjectToolContext.fetchScopedProjectId(toolContext);
+    }
 
-        Long scopedProjectId = ScopedProjectToolContext.fetchScopedProjectId(toolContext);
+    private static String getProjectNotAccessibleMessage(long projectId) {
+        return "Project " + projectId + " was not found or you do not have access to it.";
+    }
 
-        if (scopedProjectId == null && ScopedProjectToolContext.isConfined(toolContext)) {
-            log.warn("Rejected a tool call: the run skips automation authorization but carries no scoped project");
-
-            throw new ExecutionException(UNSCOPED_MESSAGE, errorType);
-        }
-
-        return scopedProjectId;
+    private static String getWorkflowNotAccessibleMessage(String workflowId) {
+        return "Workflow " + workflowId + " was not found or you do not have access to it.";
     }
 
     private static String getWorkflowNotFoundMessage(String workflowId) {
         return "Workflow " + workflowId + " was not found in this chat's project. Check the workflow id.";
+    }
+
+    private static String getWorkflowUnverifiedMessage(String workflowId) {
+        return "This chat could not verify that workflow " + workflowId + " belongs to its project. Try again later.";
     }
 }

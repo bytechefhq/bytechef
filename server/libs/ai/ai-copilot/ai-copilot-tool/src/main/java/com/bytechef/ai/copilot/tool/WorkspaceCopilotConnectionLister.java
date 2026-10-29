@@ -25,8 +25,8 @@ import java.util.Objects;
 
 /**
  * Lists a workspace's connections for a component, scoped to the current environment. Serves the copilot
- * {@code listConnectionsForComponent} tool for the in-editor / AI Hub surfaces, which carry a workspace context. The
- * lookup runs inside the calling user's rehydrated security context so workspace authorization is enforced.
+ * {@code listConnectionsForComponent} tool for the in-editor surfaces, which carry a workspace context. The lookup runs
+ * inside the calling user's rehydrated security context so workspace authorization is enforced.
  *
  * @author Ivica Cardic
  */

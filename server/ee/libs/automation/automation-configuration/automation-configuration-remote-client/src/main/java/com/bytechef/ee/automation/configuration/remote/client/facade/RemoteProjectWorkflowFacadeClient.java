@@ -67,6 +67,11 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
     }
 
     @Override
+    public long getWorkflowProjectId(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ProjectWorkflowDTO> getProjectWorkflows() {
         throw new UnsupportedOperationException();
     }
@@ -100,6 +105,13 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
 
     @Override
     public WorkflowTemplateDTO getWorkflowTemplate(String id, boolean sharedWorkflow) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void saveWorkflowTestConnection(
+        String workflowId, String workflowNodeName, String connectionKey, long connectionId, long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 

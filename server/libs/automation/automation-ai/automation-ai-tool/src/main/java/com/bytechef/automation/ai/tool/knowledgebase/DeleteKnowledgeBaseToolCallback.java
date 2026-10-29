@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.knowledgebase;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -28,7 +29,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -53,7 +53,6 @@ public class DeleteKnowledgeBaseToolCallback implements ToolCallback {
         }""";
 
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public DeleteKnowledgeBaseToolCallback(WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
@@ -77,7 +76,7 @@ public class DeleteKnowledgeBaseToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            DeleteKnowledgeBaseToolInput input = jsonMapper.readValue(toolInput, DeleteKnowledgeBaseToolInput.class);
+            DeleteKnowledgeBaseToolInput input = JsonUtils.read(toolInput, DeleteKnowledgeBaseToolInput.class);
 
             if (input.id() == null) {
                 return toolError("id is required");
@@ -103,13 +102,13 @@ public class DeleteKnowledgeBaseToolCallback implements ToolCallback {
 
             workspaceKnowledgeBaseFacade.deleteWorkspaceKnowledgeBase(input.id());
 
-            return jsonMapper.writeValueAsString(Map.of("deleted", true, "id", input.id()));
+            return JsonUtils.write(Map.of("deleted", true, "id", input.id()));
         } catch (JacksonException exception) {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(jsonMapper, DeleteKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(DeleteKnowledgeBaseToolCallback.class, TOOL_NAME, exception);
         }
     }
 
@@ -132,7 +131,7 @@ public class DeleteKnowledgeBaseToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record DeleteKnowledgeBaseToolInput(Long id) {

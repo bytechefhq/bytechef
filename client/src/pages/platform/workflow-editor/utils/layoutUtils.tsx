@@ -450,7 +450,15 @@ export const getClusterElementsLayoutElements = ({
     const labelOverhang = 40;
 
     // Returns the maximum Y extent of the subtree (relative to the parent)
+    const laidOutParentIds = new Set<string>();
+
     const positionChildrenOfParent = (parentId: string): number => {
+        if (laidOutParentIds.has(parentId)) {
+            return NODE_HEIGHT + labelOverhang;
+        }
+
+        laidOutParentIds.add(parentId);
+
         const children = workflowNodes.filter((node) => node.parentId === parentId && node.id !== parentId);
 
         if (children.length === 0) {

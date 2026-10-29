@@ -24,12 +24,12 @@ import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
-import org.springframework.ai.chat.model.ToolContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -38,6 +38,8 @@ import org.springframework.security.core.Authentication;
  * @author Ivica Cardic
  */
 public final class CopilotToolContextUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(CopilotToolContextUtils.class);
 
     private CopilotToolContextUtils() {
     }
@@ -62,6 +64,21 @@ public final class CopilotToolContextUtils {
         Authentication authentication = state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
 
+        String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
+        String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
+
+        if (llmProvider == null || llmModel == null) {
+            if ((llmProvider == null) != (llmModel == null)) {
+                log.warn(
+                    "Copilot user-selected LLM half-set (provider={}, model={}); not propagating a model override "
+                        + "into the tool context",
+                    llmProvider, llmModel);
+            }
+
+            llmProvider = null;
+            llmModel = null;
+        }
+
         toolContext.putAll(
             AgentToolInvocationContext.builder()
                 .workspaceId(workspaceId)
@@ -69,7 +86,8 @@ public final class CopilotToolContextUtils {
                 .environmentId(environmentId)
                 .tenantId(tenantId)
                 .authentication(authentication)
-                .skipAutomationAuthorization(authentication != null && userId == null)
+                .llmProvider(llmProvider)
+                .llmModel(llmModel)
                 .build()
                 .toToolContext());
 
@@ -78,10 +96,6 @@ public final class CopilotToolContextUtils {
         putIfNotNull(
             toolContext, ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY,
             NumberUtils.asLong(state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID)));
-
-        if (ScopedProjectToolContext.isConfined(new ToolContext(toolContext))) {
-            toolContext.put(ComponentTools.TOOL_CONTEXT_CONNECTION_FALLBACK_DISABLED_KEY, Boolean.TRUE);
-        }
 
         if (!toolContext.isEmpty()) {
             LookupPropertyTracker.install(toolContext);

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.ClusterElementDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
@@ -388,6 +390,95 @@ class ClusterElementDefinitionServiceTest {
             chatMemoryType, "CHAT_MEMORY", Optional.of(List.of(string("url"))));
 
         assertEquals(List.of("url"), getPropertyNames(result));
+    }
+
+    @Test
+    void testPropertyHasOptionsDataSourceForAClusterElementPropertyWithDynamicOptions() {
+        mockClusterElementWithProperties(
+            List.of(
+                string("knowledgeBaseId")
+                    .options((OptionsFunction<String>) (
+                        inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> List.of())
+                    .optionsLookupDependsOn("workspace"),
+                string("topK")));
+
+        assertTrue(
+            clusterElementDefinitionService.propertyHasOptionsDataSource(
+                COMPONENT_NAME, COMPONENT_VERSION, "vectorStore", "knowledgeBaseId"));
+        assertFalse(
+            clusterElementDefinitionService.propertyHasOptionsDataSource(
+                COMPONENT_NAME, COMPONENT_VERSION, "vectorStore", "topK"));
+        assertEquals(
+            List.of("workspace"),
+            clusterElementDefinitionService.getPropertyLookupDependsOn(
+                COMPONENT_NAME, COMPONENT_VERSION, "vectorStore", "knowledgeBaseId"));
+        assertEquals(
+            List.of(),
+            clusterElementDefinitionService.getPropertyLookupDependsOn(
+                COMPONENT_NAME, COMPONENT_VERSION, "vectorStore", "topK"));
+    }
+
+    @Test
+    void testPropertyHasOptionsDataSourceIsFalseForAnUnknownComponent() {
+        when(componentDefinitionRegistry.hasComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION)).thenReturn(false);
+
+        assertFalse(
+            clusterElementDefinitionService.propertyHasOptionsDataSource(
+                COMPONENT_NAME, COMPONENT_VERSION, "vectorStore", "knowledgeBaseId"));
+        assertFalse(
+            clusterElementDefinitionService.clusterElementDefinesConnection(
+                COMPONENT_NAME, COMPONENT_VERSION, "vectorStore"));
+    }
+
+    @Test
+    void testClusterElementDefinesConnectionFollowsTheComponentConnection() {
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinitionRegistry.hasComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION)).thenReturn(true);
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+        when(componentDefinition.getConnection()).thenReturn(Optional.empty());
+
+        assertFalse(
+            clusterElementDefinitionService.clusterElementDefinesConnection(
+                COMPONENT_NAME, COMPONENT_VERSION, "vectorStore"));
+    }
+
+    @Test
+    void testGetClusterElementDefinitionsOfAComponentReturnsEveryType() {
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(
+            List.of(
+                createMatchableClusterElementDefinition(
+                    "vectorStore", new ClusterElementType("VECTOR_STORE", "vectorStore", "Vector Store")),
+                createMatchableClusterElementDefinition(
+                    "search", new ClusterElementType("TOOLS", "tools", "Tools"))));
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        List<String> clusterElementNames = clusterElementDefinitionService.getClusterElementDefinitions(
+            COMPONENT_NAME, COMPONENT_VERSION)
+            .stream()
+            .map(ClusterElementDefinition::getName)
+            .toList();
+
+        assertEquals(List.of("vectorStore", "search"), clusterElementNames);
+    }
+
+    private void mockClusterElementWithProperties(
+        List<? extends com.bytechef.component.definition.Property> properties) {
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            mock(com.bytechef.component.definition.ClusterElementDefinition.class);
+
+        when(elementDefinition.getName()).thenReturn("vectorStore");
+        when(elementDefinition.getProperties()).thenReturn(Optional.of(properties));
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForError(List.of(elementDefinition));
+
+        when(componentDefinitionRegistry.hasComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION)).thenReturn(true);
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
     }
 
     private ClusterElementDefinition getToolClusterElementDefinition(

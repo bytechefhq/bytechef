@@ -28,7 +28,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for the dotted-path traversal used by the AI Hub lookup-options precondition gate.
+ * Unit tests for the dotted-path traversal used by the lookup-options precondition gate.
  *
  * @author Ivica Cardic
  */

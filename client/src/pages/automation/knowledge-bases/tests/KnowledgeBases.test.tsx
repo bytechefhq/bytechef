@@ -320,7 +320,7 @@ describe('KnowledgeBases embedding banner', () => {
         render(<KnowledgeBases />);
 
         expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
-        expect(screen.getByText('Go to AI Providers')).toBeInTheDocument();
+        expect(screen.getByText('Open AI Providers')).toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-list')).not.toBeInTheDocument();
         expect(screen.queryByTestId('empty-list')).not.toBeInTheDocument();
         expect(screen.queryByTestId('filter-title')).not.toBeInTheDocument();

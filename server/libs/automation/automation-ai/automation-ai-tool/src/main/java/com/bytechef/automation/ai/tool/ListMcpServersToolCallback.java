@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -26,7 +27,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -48,7 +48,6 @@ public class ListMcpServersToolCallback implements ToolCallback {
         }""";
 
     private final WorkspaceMcpServerFacade workspaceMcpServerFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ListMcpServersToolCallback(WorkspaceMcpServerFacade workspaceMcpServerFacade) {
@@ -76,20 +75,19 @@ public class ListMcpServersToolCallback implements ToolCallback {
                 AutomationToolInvocationContext.fromToolContext(toolContext);
 
             if (context == null || context.workspaceId() == null) {
-                return ToolErrors.toolError(
-                    jsonMapper,
-                    "Workspace context unavailable — open this chat from the AI Hub of a workspace.");
+                return ToolErrors
+                    .toolError("Workspace context unavailable — open this chat from the AI Hub of a workspace.");
             }
 
             List<McpServer> servers = workspaceMcpServerFacade.getWorkspaceMcpServers(context.workspaceId());
 
-            return jsonMapper.writeValueAsString(servers.stream()
+            return JsonUtils.write(servers.stream()
                 .map(ListMcpServersToolCallback::toSummary)
                 .toList());
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Serialization error: " + exception.getMessage());
+            return ToolErrors.toolError("Serialization error: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(jsonMapper, ListMcpServersToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(ListMcpServersToolCallback.class, TOOL_NAME, exception);
         }
     }
 

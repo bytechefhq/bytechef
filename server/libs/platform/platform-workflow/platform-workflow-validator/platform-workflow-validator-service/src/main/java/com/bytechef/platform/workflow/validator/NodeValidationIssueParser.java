@@ -53,6 +53,9 @@ class NodeValidationIssueParser {
         new MessageTemplate(
             Pattern.compile("^Property '([^']+)' has incorrect type\\..*$"), WorkflowIssueKind.TYPE_MISMATCH),
         new MessageTemplate(
+            Pattern.compile("^Property '([^']+)' has value .* that is not one of the allowed options: .*$"),
+            WorkflowIssueKind.TYPE_MISMATCH),
+        new MessageTemplate(
             Pattern.compile("^Property '([^']+)' in output of '[^']+' is of type .*$"),
             WorkflowIssueKind.TYPE_MISMATCH),
         new MessageTemplate(

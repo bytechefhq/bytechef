@@ -243,6 +243,10 @@ export const DATA_PILL_PANEL_WIDTH = 400;
 export const NODE_DETAILS_PANEL_WIDTH = 460;
 export const WORKFLOW_NODES_SIDEBAR_WIDTH = 384;
 export const ISSUES_SIDEBAR_EXIT_DURATION = 300;
+
+export const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
+
+export const AI_PROVIDERS_LINK_LABEL = 'Open AI Providers';
 export const PROJECT_LEFT_SIDEBAR_WIDTH = 355;
 
 export const CANVAS_BACKGROUND_COLOR = 'hsl(var(--content-canvas_dot))';

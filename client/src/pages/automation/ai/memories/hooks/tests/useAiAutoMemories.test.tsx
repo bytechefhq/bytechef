@@ -149,6 +149,18 @@ describe('useAiAutoMemoriesQuery', () => {
         );
     });
 
+    it('does not fetch while the current workspace id is unset', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockUseGeneratedMemoriesQuery.mockReturnValue({data: [], error: null} as any);
+
+        renderHook(() => useAiAutoMemoriesQuery(undefined, 0), {wrapper: wrap(makeQueryClient())});
+
+        expect(mockUseGeneratedMemoriesQuery).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({enabled: false})
+        );
+    });
+
     it('forwards the principal to the generated query', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         mockUseGeneratedMemoriesQuery.mockReturnValue({data: [], error: null} as any);
@@ -228,6 +240,18 @@ describe('useAiAutoMemoryPrincipalsQuery', () => {
             {label: 'My memories', memoryCount: 2, principalId: 42, principalType: 'USER'},
             {label: 'Support triage deployment', memoryCount: 5, principalId: 9, principalType: 'PROJECT_DEPLOYMENT'},
         ]);
+    });
+
+    it('does not fetch principals while the current workspace id is unset', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockUseGeneratedPrincipalsQuery.mockReturnValue({data: [], error: null} as any);
+
+        renderHook(() => useAiAutoMemoryPrincipalsQuery(undefined, 0), {wrapper: wrap(makeQueryClient())});
+
+        expect(mockUseGeneratedPrincipalsQuery).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({enabled: false})
+        );
     });
 
     it('disables the query when workspaceId is 0', () => {

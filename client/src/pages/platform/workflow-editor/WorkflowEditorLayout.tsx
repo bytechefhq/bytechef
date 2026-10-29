@@ -2,6 +2,7 @@ import {ReactFlowProvider} from '@xyflow/react';
 
 import './WorkflowEditorLayout.css';
 
+import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
@@ -18,12 +19,14 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import useCopilotWorkflowEditorBinding from '@/shared/components/copilot/hooks/useCopilotWorkflowEditorBinding';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ISSUES_SIDEBAR_EXIT_DURATION} from '@/shared/constants';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Suspense, lazy, useCallback, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
@@ -139,7 +142,15 @@ const WorkflowEditorLayout = ({
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
-    const {projectId, projectWorkflowId} = useParams();
+    const {integrationId, integrationWorkflowId, projectId, projectWorkflowId} = useParams();
+
+    useCopilotWorkflowEditorBinding(
+        integrationWorkflowId
+            ? `integration:${integrationId}:${integrationWorkflowId}`
+            : projectWorkflowId
+              ? `project:${projectId}:${projectWorkflowId}`
+              : undefined
+    );
 
     const handleClosePlayground = useCallback(() => {
         setTestingPanelOpen(false);
@@ -169,12 +180,26 @@ const WorkflowEditorLayout = ({
     }, []);
 
     useEffect(() => {
+        if (integrationId) {
+            return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR_EMBEDDED, () => {
+                if (integrationWorkflowId) {
+                    queryClient.invalidateQueries({
+                        queryKey: IntegrationWorkflowKeys.integrationWorkflow(+integrationId, +integrationWorkflowId),
+                    });
+                }
+
+                queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
+            });
+        }
+
         return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR, () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
+
+            queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
         });
-    }, [projectId, projectWorkflowId, queryClient]);
+    }, [integrationId, integrationWorkflowId, projectId, projectWorkflowId, queryClient]);
 
     useEffect(() => {
         if (clusterElementsCanvasOpen) {

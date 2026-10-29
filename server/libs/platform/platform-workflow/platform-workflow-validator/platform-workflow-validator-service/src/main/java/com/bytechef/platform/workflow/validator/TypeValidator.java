@@ -17,6 +17,11 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 
@@ -27,7 +32,60 @@ import tools.jackson.databind.JsonNode;
  */
 class TypeValidator {
 
+    private static final Pattern DATA_PILL_PATTERN = Pattern.compile("\\$\\{[^}]+}");
+
     private TypeValidator() {
+    }
+
+    /**
+     * Validates a value against the property's expected type and, for a value of the right type, against the property's
+     * fixed options.
+     */
+    static void validateType(
+        JsonNode valueJsonNode, PropertyInfo propertyInfo, String propertyPath, StringBuilder errors,
+        StringBuilder warnings) {
+
+        int errorsLength = errors.length();
+
+        validateType(valueJsonNode, propertyInfo.type(), propertyPath, errors);
+
+        if (errors.length() == errorsLength) {
+            validateOptionValue(valueJsonNode, propertyInfo.optionValues(), propertyPath, errors, warnings);
+        }
+    }
+
+    /**
+     * Validates that a scalar value is one of the fixed option values. Data pills and formulas are not checked. A
+     * string outside the options is reported as a warning, any other type as an error.
+     */
+    static void validateOptionValue(
+        JsonNode valueJsonNode, @Nullable List<Object> optionValues, String propertyPath, StringBuilder errors,
+        StringBuilder warnings) {
+
+        if (optionValues == null || optionValues.isEmpty() || valueJsonNode.isNull() ||
+            valueJsonNode.isContainer()) {
+
+            return;
+        }
+
+        if (valueJsonNode.isString() && isDataPillOrFormula(valueJsonNode.asString())) {
+            return;
+        }
+
+        for (Object optionValue : optionValues) {
+            if (matchesOptionValue(valueJsonNode, optionValue)) {
+                return;
+            }
+        }
+
+        String message = ValidationErrorUtils.invalidOptionValue(propertyPath, valueJsonNode.toString(), optionValues);
+
+        StringUtils.appendWithNewline(message, valueJsonNode.isString() ? warnings : errors);
+    }
+
+    static boolean isDataPillOrFormula(@Nullable String value) {
+        return value != null && (value.startsWith("=") || DATA_PILL_PATTERN.matcher(value)
+            .find());
     }
 
     /**
@@ -76,6 +134,24 @@ class TypeValidator {
 
     static boolean isExpression(@Nullable String value) {
         return value != null && (value.startsWith("=") || value.matches("\\$\\{[^}]+}"));
+    }
+
+    private static boolean matchesOptionValue(JsonNode valueJsonNode, @Nullable Object optionValue) {
+        if (optionValue == null) {
+            return false;
+        }
+
+        if (valueJsonNode.isNumber() && optionValue instanceof Number number) {
+            BigDecimal value = valueJsonNode.decimalValue();
+
+            return value.compareTo(new BigDecimal(number.toString())) == 0;
+        }
+
+        if (valueJsonNode.isBoolean() && optionValue instanceof Boolean booleanValue) {
+            return valueJsonNode.booleanValue() == booleanValue;
+        }
+
+        return Objects.equals(String.valueOf(optionValue), valueJsonNode.asString());
     }
 
     private static boolean isDateTimeType(String expectedType) {

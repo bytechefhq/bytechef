@@ -124,7 +124,7 @@ public class ConnectedUserCopilotApiController {
             stateMap.put(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
         }
 
-        String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
+        String agentId = Source.WORKFLOW_EDITOR.agentId(Mode.BUILD);
 
         LocalAgent localAgent = localAgentMap.get(agentId);
 

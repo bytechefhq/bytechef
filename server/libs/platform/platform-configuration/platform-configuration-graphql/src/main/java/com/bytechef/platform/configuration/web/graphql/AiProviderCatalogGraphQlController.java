@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
-import com.bytechef.platform.ai.provider.facade.AiProviderCatalogFacade;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -30,7 +30,9 @@ import org.springframework.stereotype.Controller;
  * GraphQL controller for reading the AI provider catalog.
  *
  * <p>
- * Authorization is enforced on {@link AiProviderCatalogFacade}, not here.
+ * Authentication is enforced by the {@code /graphql} security filter chain, which requires an authenticated principal
+ * before any query reaches this controller. The facade's catalog and default-model reads are ungated because the
+ * Copilot/agent catalog resolvers call them on threads without a SecurityContext; neither returns an API key.
  *
  * @author Ivica Cardic
  */
@@ -38,20 +40,20 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 class AiProviderCatalogGraphQlController {
 
-    private final AiProviderCatalogFacade aiProviderCatalogFacade;
+    private final AiProviderFacade aiProviderFacade;
 
     @SuppressFBWarnings("EI")
-    AiProviderCatalogGraphQlController(AiProviderCatalogFacade aiProviderCatalogFacade) {
-        this.aiProviderCatalogFacade = aiProviderCatalogFacade;
+    AiProviderCatalogGraphQlController(AiProviderFacade aiProviderFacade) {
+        this.aiProviderFacade = aiProviderFacade;
     }
 
     @QueryMapping
     public List<AiProviderCatalogItemDTO> aiProviderCatalog(@Argument Long environment) {
-        return aiProviderCatalogFacade.getAiProviderCatalog(environment.intValue());
+        return aiProviderFacade.getAiChatProviderCatalog(environment.intValue());
     }
 
     @QueryMapping
     public AiDefaultModelDTO aiDefaultModel(@Argument Long environment) {
-        return aiProviderCatalogFacade.getAiDefaultModel(environment.intValue());
+        return aiProviderFacade.getAiDefaultChatModel(environment.intValue());
     }
 }

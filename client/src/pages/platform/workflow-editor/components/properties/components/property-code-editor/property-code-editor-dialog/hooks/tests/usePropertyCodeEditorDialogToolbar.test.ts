@@ -20,7 +20,6 @@ const hoisted = vi.hoisted(() => {
             currentNode: undefined as {clusterElementType?: string; name: string} | undefined,
             dirty: false,
             editorValue: 'const x = 1;',
-            ff_1570: true,
             rootClusterElementNodeData: undefined as {workflowNodeName: string} | undefined,
             saving: false,
             scriptIsRunning: false,
@@ -76,10 +75,6 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
         }),
 }));
 
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => hoisted.storeState.ff_1570,
-}));
-
 vi.mock('@/shared/middleware/graphql', () => ({
     useTestClusterElementScriptMutation: () => ({
         mutateAsync: hoisted.mockMutateAsyncClusterElement,
@@ -118,7 +113,6 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
         hoisted.storeState.editorValue = 'const x = 1;';
         hoisted.storeState.currentEnvironmentId = 1;
         hoisted.storeState.ai = {copilot: {enabled: true}};
-        hoisted.storeState.ff_1570 = true;
         hoisted.storeState.currentNode = undefined;
         hoisted.storeState.rootClusterElementNodeData = undefined;
         hoisted.mockMutateAsyncWorkflowNode.mockResolvedValue({
@@ -165,9 +159,8 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
     });
 
     describe('copilotEnabled', () => {
-        it('should be true when both ai.copilot.enabled and feature flag are true', async () => {
+        it('should be true when ai.copilot.enabled is true', async () => {
             hoisted.storeState.ai = {copilot: {enabled: true}};
-            hoisted.storeState.ff_1570 = true;
 
             const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
             const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
@@ -177,7 +170,6 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
 
         it('should be false when ai.copilot.enabled is false', async () => {
             hoisted.storeState.ai = {copilot: {enabled: false}};
-            hoisted.storeState.ff_1570 = true;
 
             const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
             const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));

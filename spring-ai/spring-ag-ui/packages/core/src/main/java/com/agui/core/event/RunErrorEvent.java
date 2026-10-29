@@ -23,6 +23,8 @@ public class RunErrorEvent extends BaseEvent {
 
     private String error;
 
+    private String code;
+
     /**
      * Creates a new RunErrorEvent with type set to {@link EventType#RUN_ERROR}.
      * <p>
@@ -50,5 +52,23 @@ public class RunErrorEvent extends BaseEvent {
      */
     public String getError() {
         return this.error;
+    }
+
+    /**
+     * Sets the optional machine-readable error code the AG-UI protocol defines for RUN_ERROR.
+     *
+     * @param code the error code. Can be null.
+     */
+    public void setCode(final String code) {
+        this.code = code;
+    }
+
+    /**
+     * Returns the optional machine-readable error code associated with this event.
+     *
+     * @return the error code, can be null
+     */
+    public String getCode() {
+        return this.code;
     }
 }

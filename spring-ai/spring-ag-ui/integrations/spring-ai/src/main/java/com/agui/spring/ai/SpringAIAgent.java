@@ -4,6 +4,7 @@ import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.event.BaseEvent;
+import com.agui.core.event.RunErrorEvent;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.function.FunctionCall;
 import com.agui.core.message.*;
@@ -25,7 +26,10 @@ import org.springframework.ai.model.tool.ToolExecutionResult;
 import org.springframework.ai.tool.ToolCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.json.JsonMapper;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -138,16 +142,16 @@ public class SpringAIAgent extends LocalAgent {
         var runId = input.runId();
         var state = input.state();
 
-        input.messages().forEach((message) -> {
-            if (messages.stream().filter((m) -> m.equals(message)).findAny().isEmpty()) {
-                messages.add(message);
-            }
-        });
+        List<BaseMessage> runMessages = new ArrayList<>(this.messages);
+
+        if (Objects.nonNull(input.messages())) {
+            runMessages.addAll(input.messages());
+        }
 
         String content;
 
         try {
-            var userMessage = this.getLatestUserMessage(messages);
+            var userMessage = this.getLatestUserMessage(runMessages);
             content = userMessage.getContent();
         } catch (AGUIException e) {
             log.error("Agent '{}' could not resolve the latest user message for threadId={} runId={}",
@@ -168,7 +172,7 @@ public class SpringAIAgent extends LocalAgent {
             subscriber
         );
 
-        final List<BaseEvent> deferredEvents = new ArrayList<>();
+        final List<BaseEvent> deferredEvents = Collections.synchronizedList(new ArrayList<>());
 
         var textMessageStream = new TextMessageStream(messageId, subscriber);
 
@@ -204,22 +208,77 @@ public class SpringAIAgent extends LocalAgent {
 
     private void onError(RunAgentInput input, Throwable throwable, AgentSubscriber subscriber) {
         try {
-            this.emitEvent(runErrorEvent(this.runErrorMessage(input, throwable)), subscriber);
+            RunErrorEvent runErrorEvent = runErrorEvent(this.runErrorMessage(input, throwable));
+
+            try {
+                runErrorEvent.setCode(this.runErrorCode(input, throwable));
+            } catch (RuntimeException codeException) {
+                log.warn("Agent '{}' could not resolve a RUN_ERROR code; emitting it without one", this.agentId, codeException);
+            }
+
+            this.emitEvent(runErrorEvent, subscriber);
         } finally {
-            subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
+            subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), input.state(), this, input));
         }
     }
 
     /**
-     * Hook for subclasses to choose the message a RUN_ERROR event carries to the client. Default returns the
-     * throwable's message.
+     * Hook for subclasses to choose the message a RUN_ERROR event carries to the client. Default returns the most
+     * specific message in the throwable's cause chain, so a wrapper such as Spring AI's "Stream processing failed"
+     * does not hide the provider's own error.
      *
      * @param input     the current run input
      * @param throwable the failure that ended the run
      * @return the message sent to the client
      */
     protected String runErrorMessage(RunAgentInput input, Throwable throwable) {
-        return throwable.getMessage();
+        return mostSpecificMessage(throwable);
+    }
+
+    /**
+     * Returns the message of the deepest throwable in the cause chain that has a non-blank message, or {@code null}
+     * when none has one.
+     *
+     * @param throwable the failure to inspect
+     * @return the most specific message, or {@code null}
+     */
+    protected static String mostSpecificMessage(Throwable throwable) {
+        String message = null;
+        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        for (Throwable current = throwable; current != null && visited.add(current); current = current.getCause()) {
+            String currentMessage = current.getMessage();
+
+            if (currentMessage != null && !currentMessage.isBlank()) {
+                message = currentMessage;
+            }
+        }
+
+        return message;
+    }
+
+    /**
+     * Hook for subclasses to choose the error text the TOOL_CALL_RESULT of a failed tool call carries to the client.
+     * Default returns the throwable's message, or its simple class name when it has none.
+     *
+     * @param input     the current run input
+     * @param throwable the failure the tool threw
+     * @return the error text sent to the client
+     */
+    protected String toolErrorMessage(RunAgentInput input, Throwable throwable) {
+        return throwable.getMessage() == null ? throwable.getClass().getSimpleName() : throwable.getMessage();
+    }
+
+    /**
+     * Hook for subclasses to attach the optional AG-UI error code to a RUN_ERROR event. Default returns null, so the
+     * event carries no code.
+     *
+     * @param input     the current run input
+     * @param throwable the failure that ended the run
+     * @return the error code sent to the client, or null for none
+     */
+    protected String runErrorCode(RunAgentInput input, Throwable throwable) {
+        return null;
     }
 
     /**
@@ -241,6 +300,19 @@ public class SpringAIAgent extends LocalAgent {
     }
 
     protected void prepareChatMemory(RunAgentInput input, ChatMemory chatMemory, String conversationId) {
+    }
+
+    /**
+     * Hook for subclasses to wrap the chat memory a run reads and writes, both in
+     * {@link #prepareChatMemory(RunAgentInput, ChatMemory, String)} and in the memory advisor. Default returns the
+     * builder-supplied chat memory.
+     *
+     * @param input      the current run input
+     * @param chatMemory the builder-supplied chat memory
+     * @return the chat memory this run uses
+     */
+    protected ChatMemory chatMemoryForRun(RunAgentInput input, ChatMemory chatMemory) {
+        return chatMemory;
     }
 
     /**
@@ -342,7 +414,7 @@ public class SpringAIAgent extends LocalAgent {
         subscriber.onNewMessage(assistantMessage);
 
         this.emitEvent(runFinishedEvent(input.threadId(), input.runId()), subscriber);
-        subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
+        subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), input.state(), this, input));
     }
 
     /**
@@ -360,7 +432,7 @@ public class SpringAIAgent extends LocalAgent {
      * @param input the current run input (state, messages, tools, context)
      * @return the {@link ChatClient} to use for this request; must not be {@code null}
      */
-    protected ChatClient resolveChatClient(RunAgentInput input) {
+    protected ChatClient resolveChatClient(RunAgentInput input) throws AGUIException {
         return this.chatClient;
     }
 
@@ -427,15 +499,11 @@ public class SpringAIAgent extends LocalAgent {
                 chatRequest = chatRequest.toolCallbacks(
                     mergedCallbacks
                         .stream()
-                        .map(toolCallback -> new AgUiFunctionToolCallback(toolCallback, (AgUiToolCallbackParams params) -> {
-                            var toolCallId = UUID.randomUUID().toString();
-                            var parentMessageId = textMessageStream.messageId();
-                            toolEventConsumer.accept(toolCallStartEvent(parentMessageId, toolCallback.getToolDefinition().name(), toolCallId));
-                            toolEventConsumer.accept(toolCallArgsEvent(params.arguments(), toolCallId));
-                            toolEventConsumer.accept(toolCallEndEvent(toolCallId));
-                            toolEventConsumer.accept(toolCallResultEvent(toolCallId, params.result(), parentMessageId, Role.tool));
-
-                        }))
+                        .map(toolCallback -> new AgUiFunctionToolCallback(
+                            toolCallback,
+                            new ToolCallEventEmitter(
+                                textMessageStream, toolEventConsumer,
+                                throwable -> this.toolErrorMessage(input, throwable))))
                         .collect(toList())
                 );
             } catch (RuntimeException e) {
@@ -469,10 +537,12 @@ public class SpringAIAgent extends LocalAgent {
 
         if (Objects.nonNull(this.chatMemory)) {
             try {
-                this.prepareChatMemory(input, this.chatMemory, this.conversationId(input));
+                ChatMemory runChatMemory = this.chatMemoryForRun(input, this.chatMemory);
+
+                this.prepareChatMemory(input, runChatMemory, this.conversationId(input));
 
                 chatRequest.advisors(
-                    MessageChatMemoryAdvisor.builder(chatMemory).build()
+                    MessageChatMemoryAdvisor.builder(runChatMemory).build()
                 );
 
                 chatRequest.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, this.conversationId(input)));
@@ -506,6 +576,55 @@ public class SpringAIAgent extends LocalAgent {
                 new TurnEndingToolCallingManager(ToolCallingManager.builder().build(), this::endsTurn))
             .conversationHistoryEnabled(!hasDownstreamMemoryAdvisor)
             .build();
+    }
+
+    private static final class ToolCallEventEmitter implements AgUiToolCallListener {
+
+        private static final JsonMapper ERROR_JSON_MAPPER = JsonMapper.builder().build();
+
+        private final TextMessageStream textMessageStream;
+        private final Consumer<BaseEvent> toolEventConsumer;
+        private final Function<Throwable, String> toolErrorMessage;
+        private final Map<String, String> parentMessageIds = new ConcurrentHashMap<>();
+
+        private ToolCallEventEmitter(
+            TextMessageStream textMessageStream, Consumer<BaseEvent> toolEventConsumer,
+            Function<Throwable, String> toolErrorMessage) {
+
+            this.textMessageStream = textMessageStream;
+            this.toolEventConsumer = toolEventConsumer;
+            this.toolErrorMessage = toolErrorMessage;
+        }
+
+        @Override
+        public void onToolCallStarted(String toolCallId, String toolName, String arguments) {
+            var parentMessageId = textMessageStream.messageId();
+
+            parentMessageIds.put(toolCallId, parentMessageId);
+
+            toolEventConsumer.accept(toolCallStartEvent(parentMessageId, toolName, toolCallId));
+            toolEventConsumer.accept(toolCallArgsEvent(arguments, toolCallId));
+            toolEventConsumer.accept(toolCallEndEvent(toolCallId));
+        }
+
+        @Override
+        public void onToolCallFinished(String toolCallId, String result) {
+            emitResult(toolCallId, result);
+        }
+
+        @Override
+        public void onToolCallFailed(String toolCallId, Throwable throwable) {
+            emitResult(
+                toolCallId, ERROR_JSON_MAPPER.writeValueAsString(Map.of("error", toolErrorMessage.apply(throwable))));
+        }
+
+        private void emitResult(String toolCallId, String content) {
+            var parentMessageId = parentMessageIds.remove(toolCallId);
+
+            toolEventConsumer.accept(toolCallResultEvent(
+                toolCallId, content, parentMessageId == null ? textMessageStream.messageId() : parentMessageId,
+                Role.tool));
+        }
     }
 
     private final class TextMessageStream {

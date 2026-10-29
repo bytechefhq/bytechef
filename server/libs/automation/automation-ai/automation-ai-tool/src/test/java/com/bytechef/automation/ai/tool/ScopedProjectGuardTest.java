@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.ai.tool;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -24,21 +23,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
-import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
-import com.bytechef.automation.ai.tool.exception.ProjectWorkflowToolErrorType;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.exception.ProjectErrorType;
+import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 /**
  * @author Ivica Cardic
@@ -49,16 +46,13 @@ class ScopedProjectGuardTest {
     private static final long OWN_PROJECT_ID = 7L;
 
     @Mock
-    private ProjectService projectService;
-
-    @Mock
     private ProjectWorkflowService projectWorkflowService;
 
     @Mock
-    private ScopedConnectionGuard scopedConnectionGuard;
+    private PermissionService permissionService;
 
     @Mock
-    private WorkspaceScopeResolver workspaceScopeResolver;
+    private ScopedConnectionGuard scopedConnectionGuard;
 
     @Test
     void testCheckWorkflowAllowsAWorkflowOfTheScopedProject() {
@@ -66,11 +60,37 @@ class ScopedProjectGuardTest {
             .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-1"));
 
         assertThatCode(
-            () -> newGuard().checkWorkflow(
-                "wf-1", null, scopedToolContext(), ProjectWorkflowToolErrorType.GET_WORKFLOW))
+            () -> newGuard().checkWorkflow("wf-1", ScopedProjectGuard.WORKFLOW_VIEW, scopedToolContext(),
+                ProjectWorkflowErrorType.GET_WORKFLOW))
                     .doesNotThrowAnyException();
+    }
 
-        verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
+    @Test
+    void testCheckWorkflowRejectsAWorkflowOfAnotherProject() {
+        when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
+            .thenReturn(new ProjectWorkflow(9L, 1, "wf-1"));
+
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkWorkflow(
+                "wf-1", ScopedProjectGuard.WORKFLOW_VIEW, scopedToolContext(), ProjectWorkflowErrorType.GET_WORKFLOW))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage("Workflow wf-1 was not found in this chat's project. Check the workflow id.");
+    }
+
+    @Test
+    void testCheckWorkflowRejectsAnUnknownWorkflow() {
+        when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
+            .thenThrow(new IllegalArgumentException("not found"));
+
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkWorkflow(
+                "wf-1", ScopedProjectGuard.WORKFLOW_VIEW, scopedToolContext(), ProjectWorkflowErrorType.GET_WORKFLOW))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessageContaining("was not found in this chat's project");
     }
 
     @Test
@@ -82,57 +102,120 @@ class ScopedProjectGuardTest {
 
         assertThatCode(
             () -> scopedProjectGuard.checkWorkflow(
-                "wf-1", null, scopedToolContext(), ProjectWorkflowToolErrorType.GET_WORKFLOW))
+                "wf-1", ScopedProjectGuard.WORKFLOW_VIEW, scopedToolContext(), ProjectWorkflowErrorType.GET_WORKFLOW))
                     .isInstanceOf(ExecutionException.class)
-                    .hasMessageContaining("was not found in this chat's project");
+                    .hasMessage(
+                        "This chat could not verify that workflow wf-1 belongs to its project. Try again later.")
+                    .hasRootCauseInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void testGetAccessibleProjectIdsReturnsOnlyTheScopedProject() {
-        assertThat(
-            newGuard().getAccessibleProjectIds(
-                null, scopedToolContext(), ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS))
-                    .containsExactly(OWN_PROJECT_ID);
-
-        verify(projectService, never()).getWorkspaceProjectIds(any(Long.class));
-    }
-
-    @Test
-    void testResolveWorkspaceIdRejectsAConfinedRun() {
-        ScopedProjectGuard scopedProjectGuard = newGuard();
+    void testCheckWorkflowFailsClosedWithoutAProjectWorkflowLookup() {
+        ScopedProjectGuard scopedProjectGuard = new ScopedProjectGuard(
+            permissionService, (ProjectWorkflowService) null, scopedConnectionGuard);
 
         assertThatCode(
-            () -> scopedProjectGuard.resolveWorkspaceId(
-                null, scopedToolContext(), ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS))
+            () -> scopedProjectGuard.checkWorkflow(
+                "wf-1", ScopedProjectGuard.WORKFLOW_VIEW, scopedToolContext(), ProjectWorkflowErrorType.GET_WORKFLOW))
                     .isInstanceOf(ExecutionException.class)
-                    .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
-
-        verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
+                    .hasMessageContaining("could not verify that workflow wf-1 belongs to its project");
     }
 
     @Test
-    void testRunThatSkipsAuthorizationWithoutAScopedProjectIsRejected() {
-        ToolContext toolContext = new ToolContext(
-            AgentToolInvocationContext.builder()
-                .authentication(new UsernamePasswordAuthenticationToken("1234567890", null, List.of()))
-                .skipAutomationAuthorization(true)
-                .build()
-                .toToolContext());
-
-        ScopedProjectGuard scopedProjectGuard = newGuard();
+    void testCheckWorkflowAllowsAnUnconfinedRunWhoseCallerHoldsTheScope() {
+        when(permissionService.hasWorkflowScope("wf-1", ScopedProjectGuard.WORKFLOW_EDIT)).thenReturn(true);
 
         assertThatCode(
-            () -> scopedProjectGuard.checkWorkflow("wf-1", null, toolContext,
-                ProjectWorkflowToolErrorType.GET_WORKFLOW))
-                    .isInstanceOf(ExecutionException.class)
-                    .hasMessage(ScopedProjectGuard.UNSCOPED_MESSAGE);
+            () -> newGuard().checkWorkflow(
+                "wf-1", ScopedProjectGuard.WORKFLOW_EDIT, new ToolContext(Map.of()),
+                ProjectWorkflowErrorType.UPDATE_WORKFLOW))
+                    .doesNotThrowAnyException();
 
         verify(projectWorkflowService, never()).getWorkflowProjectWorkflow(any());
-        verify(workspaceScopeResolver, never()).resolveWorkspace(any(), any());
     }
 
     @Test
-    void testCheckConnectionRejectsWithTheGuardsDenialMessage() {
+    void testCheckWorkflowRejectsAnUnconfinedRunWhoseCallerLacksTheScope() {
+        when(permissionService.hasWorkflowScope("wf-1", ScopedProjectGuard.WORKFLOW_EDIT)).thenReturn(false);
+
+        assertThatCode(
+            () -> newGuard().checkWorkflow(
+                "wf-1", ScopedProjectGuard.WORKFLOW_EDIT, new ToolContext(Map.of()),
+                ProjectWorkflowErrorType.UPDATE_WORKFLOW))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage("Workflow wf-1 was not found or you do not have access to it.");
+    }
+
+    @Test
+    void testCheckProjectAllowsAnUnconfinedRunWhoseCallerHoldsTheScope() {
+        when(permissionService.hasWorkspaceScopeForProject(9L, ScopedProjectGuard.WORKFLOW_VIEW)).thenReturn(true);
+
+        assertThatCode(
+            () -> newGuard().checkProject(
+                9L, ScopedProjectGuard.WORKFLOW_VIEW, new ToolContext(Map.of()), ProjectErrorType.GET_PROJECT))
+                    .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testCheckProjectRejectsAnUnconfinedRunWhoseCallerLacksTheScope() {
+        when(permissionService.hasWorkspaceScopeForProject(9L, ScopedProjectGuard.WORKFLOW_VIEW)).thenReturn(false);
+
+        assertThatCode(
+            () -> newGuard().checkProject(
+                9L, ScopedProjectGuard.WORKFLOW_VIEW, new ToolContext(Map.of()), ProjectErrorType.GET_PROJECT))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage("Project 9 was not found or you do not have access to it.");
+    }
+
+    @Test
+    void testCheckProjectRejectsAnotherProject() {
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkProject(9L, ScopedProjectGuard.WORKFLOW_VIEW, scopedToolContext(),
+                ProjectErrorType.GET_PROJECT))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage(ScopedProjectGuard.OUT_OF_SCOPE_MESSAGE);
+        assertThatCode(
+            () -> scopedProjectGuard.checkProject(OWN_PROJECT_ID, ScopedProjectGuard.WORKFLOW_VIEW, scopedToolContext(),
+                ProjectErrorType.GET_PROJECT))
+                    .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testCheckProjectChangeAllowedRejectsAConfinedRun() {
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkProjectChangeAllowed(scopedToolContext(), ProjectErrorType.CREATE_PROJECT))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedProjectGuard.PROJECT_CHANGE_MESSAGE);
+    }
+
+    @Test
+    void testCheckProjectChangeAllowedAllowsAnUnconfinedRun() {
+        assertThatCode(
+            () -> newGuard().checkProjectChangeAllowed(new ToolContext(Map.of()), ProjectErrorType.CREATE_PROJECT))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testCheckConnectionRejectsAConnectionTheUserIsNotEntitledTo() {
+        ToolContext toolContext = scopedToolContext();
+
+        when(scopedConnectionGuard.fetchDenialMessage(null, 900L, toolContext))
+            .thenReturn(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkConnection(900L, toolContext, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+    }
+
+    @Test
+    void testCheckConnectionReportsAConnectionItCouldNotVerifyAsUnverified() {
         ToolContext toolContext = scopedToolContext();
 
         when(scopedConnectionGuard.fetchDenialMessage(null, 900L, toolContext))
@@ -141,15 +224,24 @@ class ScopedProjectGuardTest {
         ScopedProjectGuard scopedProjectGuard = newGuard();
 
         assertThatCode(
-            () -> scopedProjectGuard.checkConnection(900L, toolContext,
-                ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION))
-                    .isInstanceOf(ExecutionException.class)
-                    .hasMessage(ScopedConnectionGuard.UNVERIFIED_MESSAGE);
+            () -> scopedProjectGuard.checkConnection(900L, toolContext, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage(ScopedConnectionGuard.UNVERIFIED_MESSAGE);
+    }
+
+    @Test
+    void testCheckConnectionAllowsAConnectionTheUserIsEntitledTo() {
+        ToolContext toolContext = scopedToolContext();
+
+        assertThatCode(
+            () -> newGuard().checkConnection(42L, toolContext, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION))
+                .doesNotThrowAnyException();
+
+        verify(scopedConnectionGuard).fetchDenialMessage(null, 42L, toolContext);
     }
 
     private ScopedProjectGuard newGuard() {
-        return new ScopedProjectGuard(
-            projectService, projectWorkflowService, scopedConnectionGuard, workspaceScopeResolver);
+        return new ScopedProjectGuard(permissionService, projectWorkflowService, scopedConnectionGuard);
     }
 
     private static ToolContext scopedToolContext() {
