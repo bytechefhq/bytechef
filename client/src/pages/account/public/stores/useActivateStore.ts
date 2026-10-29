@@ -41,19 +41,25 @@ export const useActivateStore = create<ActivateI>()(
                     loading: true,
                 }));
 
-                const response = await fetchActivate(key);
+                try {
+                    const response = await fetchActivate(key);
 
-                if (response.status === 200) {
-                    set(() => ({
-                        activationSuccess: true,
-                        loading: false,
-                    }));
-                } else {
-                    set(() => ({
-                        activationFailure: true,
-                        loading: false,
-                    }));
+                    if (response.status === 200) {
+                        set(() => ({
+                            activationSuccess: true,
+                            loading: false,
+                        }));
+
+                        return;
+                    }
+                } catch {
+                    // A network failure rejects the fetch; fall through so the page leaves the loading state.
                 }
+
+                set(() => ({
+                    activationFailure: true,
+                    loading: false,
+                }));
             },
         }),
         {
