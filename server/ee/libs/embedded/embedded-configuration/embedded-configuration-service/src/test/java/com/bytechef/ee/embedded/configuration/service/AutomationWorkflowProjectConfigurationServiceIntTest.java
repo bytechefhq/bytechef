@@ -83,6 +83,25 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
     }
 
     @Test
+    void testFetchConfigurationForUpdateReturnsTheConfigurationWithItsWorkflows() {
+        long projectId = insertProject(insertWorkspace());
+        UUID workflowUuid = UUID.randomUUID();
+
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 3, true, true);
+
+        automationWorkflowProjectConfigurationService.updateWorkflowEnabled(configuration.getId(), workflowUuid, false);
+
+        assertThat(automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(projectId, ENVIRONMENT_ID))
+            .hasValueSatisfying(fetchedConfiguration -> {
+                assertThat(fetchedConfiguration.getId()).isEqualTo(configuration.getId());
+                assertThat(fetchedConfiguration.getProjectVersion()).isEqualTo(3);
+                assertThat(fetchedConfiguration.isWorkflowEnabled(workflowUuid)).isFalse();
+            });
+        assertThat(automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(projectId, 1L)).isEmpty();
+    }
+
+    @Test
     void testIsWorkflowEnabledDefaultsToTrueWithoutARow() {
         long projectId = insertProject(insertWorkspace());
 

@@ -130,7 +130,7 @@ class AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest {
     void testUpdatedEventHandsTheRolloutToTheListenerAfterCommit() {
         applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4001L, 2L));
 
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOut(4001L, 2L);
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4001L, 2L);
     }
 
     @Test
@@ -142,17 +142,17 @@ class AutomationWorkflowProjectConfigurationUpdatedEventListenerIntTest {
 
             return null;
         }).when(connectedUserReferenceRolloutManager)
-            .rollOut(4002L, 2L);
+            .rollOutAndApply(4002L, 2L);
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
             applicationEventPublisher.publishEvent(new AutomationWorkflowProjectConfigurationUpdatedEvent(4002L, 2L));
 
-            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOut(4002L, 2L);
+            verify(connectedUserReferenceRolloutManager, after(500).never()).rollOutAndApply(4002L, 2L);
         });
 
-        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOut(4002L, 2L);
+        verify(connectedUserReferenceRolloutManager, timeout(5000)).rollOutAndApply(4002L, 2L);
 
         assertThat(rolloutThread.get()).isNotSameAs(Thread.currentThread());
     }

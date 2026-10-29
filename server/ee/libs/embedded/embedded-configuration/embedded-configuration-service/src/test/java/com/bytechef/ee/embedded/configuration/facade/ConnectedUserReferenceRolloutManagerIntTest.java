@@ -104,6 +104,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -116,6 +120,8 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @version ee
@@ -154,6 +160,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String EXTERNAL_USER_ID = "rollout-user-1";
+    private static final long ROLLOUT_COMPLETION_TIMEOUT_SECONDS = 60;
+    private static final long ROLLOUT_LOCK_WAIT_SECONDS = 5;
     private static final long RUNNING_FIRST_TEMPLATE_JOB_ID = 4242L;
 
     private static final String SLACK_AND_JIRA_WORKFLOW_DEFINITION = """
@@ -225,6 +233,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     @Autowired
     private JobFacade jobFacade;
+
+    @Autowired
+    private PlatformTransactionManager platformTransactionManager;
 
     @Autowired
     private PrincipalJobService principalJobService;
@@ -760,6 +771,143 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .getProjectVersion()).isEqualTo(2);
         assertThat(projectDeploymentService.getProjectDeployment(developmentReference.getProjectDeploymentId())
             .getProjectVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testConcurrentRolloutsForTheSamePairEndInTheNewerState() throws InterruptedException {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Concurrent Rollouts");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow firstReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            createConnectedUser(), workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 3);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch finishedLatch = new CountDownLatch(2);
+        AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
+
+        for (int index = 0; index < 2; index++) {
+            startRolloutThread(automationWorkflowProjectId, startLatch, finishedLatch, rolloutFailure);
+        }
+
+        startLatch.countDown();
+
+        boolean finished = finishedLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+        assertThat(finished).isTrue();
+        assertThat(rolloutFailure.get()).isNull();
+        assertThat(List.of(firstReference.getProjectDeploymentId(), secondReference.getProjectDeploymentId()))
+            .allSatisfy(projectDeploymentId -> assertThat(
+                projectDeploymentService.getProjectDeployment(projectDeploymentId)
+                    .getProjectVersion()).isEqualTo(3));
+        assertThat(
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(firstReference.getProjectDeploymentId()))
+                .singleElement()
+                .extracting(ProjectDeploymentWorkflow::getWorkflowId)
+                .isEqualTo(getWorkflowId(automationWorkflowProjectId, 3, workflowUuid));
+    }
+
+    @Test
+    void testRolloutWaitsForAConfigurationChangeInFlightAndRollsOutTheNewerState() throws InterruptedException {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Waits On Lock");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch finishedLatch = new CountDownLatch(1);
+        AtomicBoolean finishedWhileTheChangeWasInFlight = new AtomicBoolean();
+        AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            updateProductionConfigurationVersion(automationWorkflowProjectId, 3);
+
+            startRolloutThread(automationWorkflowProjectId, startLatch, finishedLatch, rolloutFailure);
+
+            startLatch.countDown();
+
+            finishedWhileTheChangeWasInFlight.set(awaitQuietly(finishedLatch, ROLLOUT_LOCK_WAIT_SECONDS));
+        });
+
+        boolean finished = finishedLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+        assertThat(finished).isTrue();
+        assertThat(rolloutFailure.get()).isNull();
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(3);
+        assertThat(finishedWhileTheChangeWasInFlight.get()).isFalse();
+    }
+
+    @Test
+    void testRolloutsForDifferentPairsDoNotWaitOnEachOther() throws InterruptedException {
+        long lockedAutomationWorkflowProjectId = createAutomationWorkflowProject("Locked Pair");
+
+        addWorkflow(lockedAutomationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(lockedAutomationWorkflowProjectId);
+
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Free Pair");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch finishedLatch = new CountDownLatch(1);
+        AtomicBoolean finishedWhileTheOtherPairWasLocked = new AtomicBoolean();
+        AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        transactionTemplate.executeWithoutResult(status -> {
+            automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(
+                lockedAutomationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+            startRolloutThread(automationWorkflowProjectId, startLatch, finishedLatch, rolloutFailure);
+
+            startLatch.countDown();
+
+            finishedWhileTheOtherPairWasLocked.set(awaitQuietly(finishedLatch, ROLLOUT_COMPLETION_TIMEOUT_SECONDS));
+        });
+
+        assertThat(finishedWhileTheOtherPairWasLocked.get()).isTrue();
+        assertThat(rolloutFailure.get()).isNull();
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
     }
 
     @Test
@@ -1522,6 +1670,17 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         logger.detachAppender(appender);
     }
 
+    private static boolean awaitQuietly(CountDownLatch latch, long timeoutSeconds) {
+        try {
+            return latch.await(timeoutSeconds, TimeUnit.SECONDS);
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException(interruptedException);
+        }
+    }
+
     private long createAutomationWorkflowProject(String name) {
         return automationWorkflowProjectFacade.createProject(name + " " + UUID.randomUUID(), "", null, List.of(), null);
     }
@@ -1542,6 +1701,34 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         return projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, projectVersion, workflowUuid)
             .map(ProjectWorkflow::getWorkflowId)
             .orElseThrow();
+    }
+
+    private void startRolloutThread(
+        long automationWorkflowProjectId, CountDownLatch startLatch, CountDownLatch finishedLatch,
+        AtomicReference<Throwable> rolloutFailure) {
+
+        Thread rolloutThread = new Thread(() -> {
+            try {
+                if (!startLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("The rollout was never released");
+                }
+
+                connectedUserReferenceRolloutManager.rollOutAndApply(
+                    automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+
+                rolloutFailure.compareAndSet(null, interruptedException);
+            } catch (RuntimeException | AssertionError throwable) {
+                rolloutFailure.compareAndSet(null, throwable);
+            } finally {
+                finishedLatch.countDown();
+            }
+        });
+
+        rolloutThread.setDaemon(true);
+        rolloutThread.start();
     }
 
     private void stubEntitledSlackConnection(long connectionId) {

@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflo
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -34,6 +35,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -52,6 +54,7 @@ public class ConnectedUserReferenceRolloutManager {
     private static final String NOT_IN_RELEASED_VERSION_DANGLING_REASON =
         "Not in the version released to this environment";
 
+    private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
     private final ConnectedUserProjectService connectedUserProjectService;
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
@@ -61,12 +64,14 @@ public class ConnectedUserReferenceRolloutManager {
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceRolloutManager(
+        AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
         ConnectedUserProjectService connectedUserProjectService,
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         PlatformTransactionManager platformTransactionManager, ProjectDeploymentService projectDeploymentService,
         ProjectWorkflowService projectWorkflowService) {
 
+        this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
         this.connectedUserProjectService = connectedUserProjectService;
         this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
@@ -164,6 +169,21 @@ public class ConnectedUserReferenceRolloutManager {
                 logRolloutFailure(automationWorkflowProjectId, projectDeployment.getId(), exception);
             }
         }
+    }
+
+    /**
+     * Rolls the configuration of a project in an environment out to its reference deployments while holding a row lock
+     * on that configuration, so rollouts for the same project and environment run one after the other and a later one
+     * reads the newer committed configuration. Each deployment and reference is still processed in its own
+     * {@code REQUIRES_NEW} transaction, so one failure does not undo the others.
+     */
+    @Transactional
+    public void rollOutAndApply(long automationWorkflowProjectId, long environmentId) {
+        automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(
+            automationWorkflowProjectId, environmentId);
+
+        rollOut(automationWorkflowProjectId, environmentId);
+        applyConfigurationState(automationWorkflowProjectId, environmentId);
     }
 
     public boolean rollOutDeploymentIfBehind(long projectDeploymentId) {

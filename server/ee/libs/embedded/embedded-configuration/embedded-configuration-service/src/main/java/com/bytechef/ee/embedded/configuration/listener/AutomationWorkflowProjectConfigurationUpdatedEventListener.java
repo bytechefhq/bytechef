@@ -39,10 +39,7 @@ public class AutomationWorkflowProjectConfigurationUpdatedEventListener {
     public void onAutomationWorkflowProjectConfigurationUpdated(
         AutomationWorkflowProjectConfigurationUpdatedEvent automationWorkflowProjectConfigurationUpdatedEvent) {
 
-        connectedUserReferenceRolloutManager.rollOut(
-            automationWorkflowProjectConfigurationUpdatedEvent.projectId(),
-            automationWorkflowProjectConfigurationUpdatedEvent.environmentId());
-        connectedUserReferenceRolloutManager.applyConfigurationState(
+        connectedUserReferenceRolloutManager.rollOutAndApply(
             automationWorkflowProjectConfigurationUpdatedEvent.projectId(),
             automationWorkflowProjectConfigurationUpdatedEvent.environmentId());
     }

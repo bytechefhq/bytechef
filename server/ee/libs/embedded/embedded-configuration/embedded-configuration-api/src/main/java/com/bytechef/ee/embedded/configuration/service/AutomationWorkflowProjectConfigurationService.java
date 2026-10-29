@@ -27,6 +27,12 @@ public interface AutomationWorkflowProjectConfigurationService {
 
     Optional<AutomationWorkflowProjectConfiguration> fetchConfiguration(long projectId, long environmentId);
 
+    /**
+     * Fetches the configuration and locks its row until the caller's transaction ends, so concurrent callers for the
+     * same project and environment run one after the other. Must be called inside a transaction.
+     */
+    Optional<AutomationWorkflowProjectConfiguration> fetchConfigurationForUpdate(long projectId, long environmentId);
+
     AutomationWorkflowProjectConfiguration getConfiguration(long id);
 
     List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId);

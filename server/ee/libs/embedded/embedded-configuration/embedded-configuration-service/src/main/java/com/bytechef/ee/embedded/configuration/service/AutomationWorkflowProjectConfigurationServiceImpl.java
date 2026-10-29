@@ -63,6 +63,14 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
     }
 
     @Override
+    public Optional<AutomationWorkflowProjectConfiguration> fetchConfigurationForUpdate(
+        long projectId, long environmentId) {
+
+        return automationWorkflowProjectConfigurationRepository.findByProjectIdAndEnvironmentIdForUpdate(
+            projectId, environmentId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public AutomationWorkflowProjectConfiguration getConfiguration(long id) {
         return automationWorkflowProjectConfigurationRepository.findById(id)
