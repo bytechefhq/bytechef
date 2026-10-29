@@ -27,4 +27,6 @@ public interface IntegrationCodeWorkflowService {
     Optional<IntegrationCodeWorkflow> fetchIntegrationCodeWorkflow(long integrationId);
 
     List<Long> getCodeWorkflowIntegrationIds();
+
+    List<IntegrationCodeWorkflow> getIntegrationCodeWorkflows(long integrationId);
 }
