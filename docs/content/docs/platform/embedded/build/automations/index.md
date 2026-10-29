@@ -79,7 +79,7 @@ Expand a row to list the workflows of that version, each with its own switch. Tu
 - **Environment** -- only environments that do not have a configuration yet. It is fixed when you edit a configuration.
 - **Version** -- the published versions of the project. Pointing a configuration at an older version is allowed, which is how you roll an environment back.
 - **Enabled** -- whether the configuration is on.
-- **Show in Automation Hub** -- list the project in the [Automation Hub](/platform/embedded/build/automation-hub) for this environment. Turn it off for flows you only activate through the API.
+- **Show in Automation Hub** -- list the project through the API for this environment, and so in the [Automation Hub](/platform/embedded/build/automation-hub) and in custom UIs. Turn it off for flows you only activate by UUID; they can still be provisioned. Turning off the configuration or a workflow is what stops provisioning and running.
 
 The **New Configuration** button is disabled, with the tooltip "Publish the project first", until the project has a published version.
 
