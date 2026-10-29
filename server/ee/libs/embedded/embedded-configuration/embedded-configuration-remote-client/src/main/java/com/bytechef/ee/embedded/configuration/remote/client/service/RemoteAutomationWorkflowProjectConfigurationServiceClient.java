@@ -44,6 +44,13 @@ public class RemoteAutomationWorkflowProjectConfigurationServiceClient
     }
 
     @Override
+    public Optional<AutomationWorkflowProjectConfiguration> fetchConfigurationForUpdate(
+        long projectId, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public AutomationWorkflowProjectConfiguration getConfiguration(long id) {
         throw new UnsupportedOperationException();
     }
