@@ -236,6 +236,11 @@ class ConnectedUserReferenceDeploymentManager {
         projectDeploymentFacade.updateProjectDeployment(projectDeployment, rows, List.of());
     }
 
+    public void putWorkflow(long projectDeploymentId, String automationWorkflowUuid, RowSpec rowSpec) {
+        putWorkflow(projectDeploymentService.getProjectDeployment(projectDeploymentId), automationWorkflowUuid,
+            rowSpec);
+    }
+
     public void setRowEnabled(long projectDeploymentId, ProjectDeploymentWorkflow row, boolean enabled) {
         if (row.isEnabled() != enabled) {
             projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, row.getWorkflowId(), enabled);

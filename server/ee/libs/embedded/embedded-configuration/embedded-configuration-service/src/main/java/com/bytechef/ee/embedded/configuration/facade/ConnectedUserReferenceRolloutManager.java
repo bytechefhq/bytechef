@@ -241,10 +241,18 @@ public class ConnectedUserReferenceRolloutManager {
             return;
         }
 
-        boolean enabled = reference.isEnabled() && connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid);
+        if (!reference.isEnabled() || !connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
+            projectDeployment.getProjectId(), projectDeployment.getEnvironment(), automationWorkflowUuid)) {
 
-        connectedUserReferenceDeploymentManager.setRowEnabled(projectDeploymentId, row.get(), enabled);
+            connectedUserReferenceDeploymentManager.setRowEnabled(projectDeploymentId, row.get(), false);
+
+            return;
+        }
+
+        RowSpec rowSpec = resolveRowSpec(
+            reference, projectDeployment.getProjectId(), projectDeploymentId, projectDeployment.getProjectVersion());
+
+        connectedUserReferenceDeploymentManager.putWorkflow(projectDeploymentId, automationWorkflowUuid, rowSpec);
     }
 
     private List<ConnectedUserProjectWorkflow> getReferences(long projectDeploymentId) {
@@ -328,16 +336,11 @@ public class ConnectedUserReferenceRolloutManager {
             RowSpec rowSpec = resolveRowSpec(
                 reference, automationWorkflowProjectId, projectDeploymentId, releasedVersion);
 
-            rowSpecsByAutomationWorkflowUuid.put(automationWorkflowUuid, rowSpec);
+            boolean rowEnabled = rowSpec.enabled() && connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
+                automationWorkflowProjectId, projectDeployment.getEnvironment(), automationWorkflowUuid);
 
-            reference.setEnabled(rowSpec.enabled());
-
-            if (!connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-                automationWorkflowProjectId, projectDeployment.getEnvironment(), automationWorkflowUuid)) {
-
-                rowSpecsByAutomationWorkflowUuid.put(
-                    automationWorkflowUuid, new RowSpec(rowSpec.resolved(), false, rowSpec.inputs()));
-            }
+            rowSpecsByAutomationWorkflowUuid.put(
+                automationWorkflowUuid, new RowSpec(rowSpec.resolved(), rowEnabled, rowSpec.inputs()));
         }
 
         if (rowSpecsByAutomationWorkflowUuid.isEmpty()) {

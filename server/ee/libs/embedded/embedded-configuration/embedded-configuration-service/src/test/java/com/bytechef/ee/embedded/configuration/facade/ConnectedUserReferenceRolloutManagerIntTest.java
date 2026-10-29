@@ -217,6 +217,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
 
     @Autowired
+    private ConnectedUserReferenceAttentionResolver connectedUserReferenceAttentionResolver;
+
+    @Autowired
     private ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
 
     @Autowired
@@ -999,14 +1002,74 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
 
+        assertThat(fetchDeploymentRow(slackReference).isEnabled()).isFalse();
+        assertThat(fetchDeploymentRow(otherReference).isEnabled()).isTrue();
         assertThat(connectedUserProjectWorkflowRepository.findById(slackReference.getId()))
             .get()
             .extracting(ConnectedUserProjectWorkflow::isEnabled)
-            .isEqualTo(false);
-        assertThat(connectedUserProjectWorkflowRepository.findById(otherReference.getId()))
-            .get()
-            .extracting(ConnectedUserProjectWorkflow::isEnabled)
             .isEqualTo(true);
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(slackReference))
+            .attentionReason()).isEqualTo("MISSING_CONNECTION:jira");
+    }
+
+    @Test
+    void testRolloutAddingRequiredInputPausesButKeepsIntent() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Adds Input");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+
+        publishWithRequiredChannelInput(automationWorkflowProjectId, workflowUuid);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isEqualTo("INPUT_REQUIRED:channel");
+    }
+
+    @Test
+    void testUserDisabledWorkflowStaysDisabledAfterRolloutAndInputs() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout User Off");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        connectedUserWorkflowReferenceFacade.enableReference(
+            EXTERNAL_USER_ID, workflowUuid, false, Environment.PRODUCTION);
+
+        publishWithRequiredChannelInput(automationWorkflowProjectId, workflowUuid);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(getStoredReference(reference).isEnabled()).isFalse();
+
+        connectedUserWorkflowReferenceFacade.updateReferenceInputs(
+            EXTERNAL_USER_ID, workflowUuid, Map.of("channel", "#alerts"), Environment.PRODUCTION);
+
+        connectedUserReferenceRolloutManager.rollOutAndApply(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#alerts"));
+        assertThat(getStoredReference(reference).isEnabled()).isFalse();
     }
 
     @Test
@@ -1674,6 +1737,21 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                 assertThat(storedReference.isDangling()).isTrue();
                 assertThat(storedReference.isEnabled()).isFalse();
             });
+    }
+
+    private ConnectedUserProjectWorkflow getStoredReference(ConnectedUserProjectWorkflow reference) {
+        return connectedUserProjectWorkflowRepository.findById(reference.getId())
+            .orElseThrow();
+    }
+
+    private void publishWithRequiredChannelInput(long automationWorkflowProjectId, String workflowUuid) {
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        publishAndPinProject(automationWorkflowProjectId);
     }
 
     private ProjectDeploymentWorkflow fetchDeploymentRow(ConnectedUserProjectWorkflow reference) {
