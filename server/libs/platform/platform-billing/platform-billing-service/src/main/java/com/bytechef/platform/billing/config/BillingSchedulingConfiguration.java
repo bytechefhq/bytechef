@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnExpression("${billing.enabled:false} " +
-    "and '${bytechef.scheduler.provider:quartz}'.equals('quartz')")
+    "and '${bytechef.scheduler.provider:quartz}'.equalsIgnoreCase('quartz')")
 public class BillingSchedulingConfiguration {
 
     @Bean
