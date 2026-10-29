@@ -152,6 +152,16 @@ class IntegrationInstanceServiceIntTest {
     }
 
     @Test
+    void testExistsByConnectionIdReportsWhetherAnIntegrationInstanceUsesTheConnection() {
+        long configurationId = createConfiguration(createIntegration(), 1);
+
+        integrationInstanceService.create(USER_A_ID, CONNECTION_ID, configurationId);
+
+        assertThat(integrationInstanceService.existsByConnectionId(CONNECTION_ID)).isTrue();
+        assertThat(integrationInstanceService.existsByConnectionId(CONNECTION_ID + 1)).isFalse();
+    }
+
+    @Test
     void testGetIntegrationInstancesByWorkflowUuidReturnsEmptyForAMalformedUuid() {
         assertThat(
             integrationInstanceService.getIntegrationInstancesByWorkflowUuid(

@@ -10,7 +10,9 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -120,17 +122,28 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
         }
 
         for (Map.Entry<String, Object> providedConnection : providedConnections.entrySet()) {
+            String componentName = providedConnection.getKey();
             Object connectionId = providedConnection.getValue();
 
             if (connectionId == null) {
-                connectionIds.put(providedConnection.getKey(), null);
+                connectionIds.put(componentName, null);
             } else if (connectionId instanceof Number number) {
-                connectionIds.put(providedConnection.getKey(), number.longValue());
+                connectionIds.put(componentName, number.longValue());
             } else {
-                connectionIds.put(providedConnection.getKey(), Long.parseLong(String.valueOf(connectionId)));
+                connectionIds.put(componentName, parseConnectionId(componentName, String.valueOf(connectionId)));
             }
         }
 
         return connectionIds;
+    }
+
+    private static long parseConnectionId(String componentName, String connectionId) {
+        try {
+            return Long.parseLong(connectionId);
+        } catch (NumberFormatException numberFormatException) {
+            throw new ConfigurationException(
+                "Connection id '%s' for component %s is not a number".formatted(connectionId, componentName),
+                numberFormatException, AutomationWorkflowProjectConfigurationErrorType.INVALID_PROVIDED_VALUE);
+        }
     }
 }

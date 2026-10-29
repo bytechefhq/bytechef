@@ -60,6 +60,16 @@ public class ConnectedUserConnectionMembership {
         return filterByEnvironment(getUnfilteredOwnedConnectionIds(connectedUserId, environment), environment);
     }
 
+    /**
+     * Returns whether a connected user owns the connection: it was created for one of their integration instances or
+     * recorded as theirs in {@code connected_user_connection}. Shared connections are not owned.
+     */
+    @Transactional(readOnly = true)
+    public boolean isOwnedByConnectedUser(long connectionId) {
+        return connectedUserConnectionService.existsByConnectionId(connectionId) ||
+            integrationInstanceService.existsByConnectionId(connectionId);
+    }
+
     private Set<Long> filterByEnvironment(Set<Long> connectionIds, Environment environment) {
         Set<Long> filteredConnectionIds = new LinkedHashSet<>();
 

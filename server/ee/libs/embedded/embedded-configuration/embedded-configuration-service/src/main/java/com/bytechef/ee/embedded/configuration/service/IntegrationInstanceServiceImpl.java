@@ -70,6 +70,12 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
 
     @Override
     @Transactional(readOnly = true)
+    public boolean existsByConnectionId(long connectionId) {
+        return integrationInstanceRepository.existsByConnectionId(connectionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId) {
         return integrationInstanceRepository.findAllByConnectedUserId(connectedUserId);
     }

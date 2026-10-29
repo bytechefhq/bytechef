@@ -61,6 +61,11 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
+    public boolean existsByConnectionId(long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId, boolean enabled) {
         throw new UnsupportedOperationException();
     }
