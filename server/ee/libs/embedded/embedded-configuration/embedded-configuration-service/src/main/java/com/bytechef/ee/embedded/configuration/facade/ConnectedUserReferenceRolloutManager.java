@@ -249,8 +249,7 @@ public class ConnectedUserReferenceRolloutManager {
             return;
         }
 
-        RowSpec rowSpec = resolveRowSpec(
-            reference, projectDeployment.getProjectId(), projectDeploymentId, projectDeployment.getProjectVersion());
+        RowSpec rowSpec = resolveRowSpec(reference, projectDeployment, projectDeployment.getProjectVersion());
 
         connectedUserReferenceDeploymentManager.putWorkflow(projectDeploymentId, automationWorkflowUuid, rowSpec);
     }
@@ -333,8 +332,7 @@ public class ConnectedUserReferenceRolloutManager {
                 continue;
             }
 
-            RowSpec rowSpec = resolveRowSpec(
-                reference, automationWorkflowProjectId, projectDeploymentId, releasedVersion);
+            RowSpec rowSpec = resolveRowSpec(reference, projectDeployment, releasedVersion);
 
             boolean rowEnabled = rowSpec.enabled() && connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
                 automationWorkflowProjectId, projectDeployment.getEnvironment(), automationWorkflowUuid);
@@ -354,20 +352,22 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     private RowSpec resolveRowSpec(
-        ConnectedUserProjectWorkflow reference, long automationWorkflowProjectId, long projectDeploymentId,
-        int releasedVersion) {
+        ConnectedUserProjectWorkflow reference, ProjectDeployment projectDeployment, int projectVersion) {
+
+        long automationWorkflowProjectId = projectDeployment.getProjectId();
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
 
         ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserProject(
             reference.getConnectedUserProjectId());
         Optional<ProjectDeploymentWorkflow> currentRow = connectedUserReferenceDeploymentManager.fetchRow(
-            projectDeploymentId, automationWorkflowUuid);
+            projectDeployment.getId(), automationWorkflowUuid);
 
         String workflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
-            automationWorkflowProjectId, releasedVersion, automationWorkflowUuid);
+            automationWorkflowProjectId, projectVersion, automationWorkflowUuid);
 
         ReferenceResolution referenceResolution = connectedUserReferenceDeploymentManager.resolveReference(
-            connectedUserProject.getConnectedUserId(), workflowId, reference.isEnabled(), Map.of(),
+            connectedUserProject.getConnectedUserId(), automationWorkflowProjectId, projectDeployment.getEnvironment(),
+            automationWorkflowUuid, workflowId, reference.isEnabled(), Map.of(),
             currentRow.map(ProjectDeploymentWorkflow::getConnections)
                 .orElse(List.of()),
             currentRow.<Map<String, ?>>map(ProjectDeploymentWorkflow::getInputs)
