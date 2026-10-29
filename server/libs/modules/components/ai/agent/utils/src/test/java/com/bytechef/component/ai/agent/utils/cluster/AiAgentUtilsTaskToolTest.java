@@ -49,6 +49,18 @@ class AiAgentUtilsTaskToolTest {
     }
 
     @Test
+    void testRejectsAnApprovalGateAttachedToASubagent() {
+        List<ClusterElement> subagentClusterElements = subagentClusterElements(
+            tool("approvalGate_1", "aiAgentUtils/v1/approvalGate"));
+
+        assertThatThrownBy(() -> AiAgentUtilsTaskTool.checkSubagentTools(subagentClusterElements))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("approvalGate_1")
+            .hasMessageContaining("subagent_1")
+            .hasMessageContaining("cannot pause for an approval");
+    }
+
+    @Test
     void testRejectsRequestApprovalAttachedToASubagent() {
         List<ClusterElement> subagentClusterElements = subagentClusterElements(
             tool("requestApproval_1", "approval/v1/requestApproval"));
@@ -59,18 +71,17 @@ class AiAgentUtilsTaskToolTest {
     }
 
     @Test
-    void testRejectsRequestApprovalInASubagentOfANestedTaskTool() {
+    void testRejectsAnApprovalGateInASubagentOfANestedTaskTool() {
         Map<String, Object> nestedTaskTool = Map.of(
             "name", "taskTool_2", "type", "aiAgentUtils/v1/taskTool",
             "clusterElements", Map.of(
-                "subagent",
-                List.of(subagent("subagent_2", tool("requestApproval_2", "approval/v1/requestApproval")))));
+                "subagent", List.of(subagent("subagent_2", tool("approvalGate_2", "aiAgentUtils/v1/approvalGate")))));
 
         List<ClusterElement> subagentClusterElements = subagentClusterElements(nestedTaskTool);
 
         assertThatThrownBy(() -> AiAgentUtilsTaskTool.checkSubagentTools(subagentClusterElements))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("requestApproval_2")
+            .hasMessageContaining("approvalGate_2")
             .hasMessageContaining("subagent_2");
     }
 

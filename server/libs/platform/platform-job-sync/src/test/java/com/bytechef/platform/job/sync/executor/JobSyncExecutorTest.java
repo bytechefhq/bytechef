@@ -37,6 +37,7 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -365,12 +366,31 @@ class JobSyncExecutorTest {
 
     @Test
     void testWorkerTaskExecutionEventForStartedJobIsExecuted() {
-        long jobId = 605L;
+        sendWorkerTaskExecutionEvent(605L, Job.Status.STARTED, Map.of());
 
+        verify(jobService).fetchTaskExecutionJob(1L);
+    }
+
+    @Test
+    void testWorkerTaskExecutionEventForSuspendedJobIsExecuted() {
+        sendWorkerTaskExecutionEvent(610L, Job.Status.STOPPED, Map.of(SuspendedJobs.JOB_RESUME_ID, "resume-id"));
+
+        verify(jobService).fetchTaskExecutionJob(1L);
+    }
+
+    @Test
+    void testWorkerTaskExecutionEventForStoppedJobIsSkipped() {
+        sendWorkerTaskExecutionEvent(611L, Job.Status.STOPPED, Map.of());
+
+        verify(jobService, never()).fetchTaskExecutionJob(anyLong());
+    }
+
+    private void sendWorkerTaskExecutionEvent(long jobId, Job.Status jobStatus, Map<String, Object> jobMetadata) {
         Job job = new Job();
 
         job.setId(jobId);
-        job.setStatus(Job.Status.STARTED);
+        job.setMetadata(jobMetadata);
+        job.setStatus(jobStatus);
 
         when(jobService.fetchJob(jobId)).thenReturn(Optional.of(job));
         when(jobService.fetchTaskExecutionJob(1L)).thenReturn(Optional.empty());
@@ -386,8 +406,6 @@ class JobSyncExecutorTest {
         taskExecutionEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
 
         memoryMessageBroker.send(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecutionEvent);
-
-        verify(jobService).fetchTaskExecutionJob(1L);
     }
 
     @Test
@@ -474,6 +492,24 @@ class JobSyncExecutorTest {
 
         // This should not throw an exception because it's caught in handleCoordinatorJobStopEvent
         memoryMessageBroker.send(TaskCoordinatorMessageRoute.JOB_STOP_EVENTS, stopJobEvent);
+    }
+
+    @Test
+    void testDeleteJobDeletesTheJobAndItsTaskExecutions() {
+        long jobId = 606L;
+
+        Job job = new Job(jobId);
+
+        job.setMetadata(Map.of(MetadataConstants.SYNC_EXECUTION, true));
+
+        when(jobService.getChildJobIds(jobId)).thenReturn(List.of());
+        when(jobService.getJob(jobId)).thenReturn(job);
+        when(taskExecutionService.getJobTaskExecutions(jobId)).thenReturn(List.of());
+
+        jobSyncExecutor.deleteJob(jobId);
+
+        verify(taskExecutionService).deleteJobTaskExecutions(jobId);
+        verify(jobService).deleteJob(jobId);
     }
 
     @Test

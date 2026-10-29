@@ -21,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +50,7 @@ import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -165,6 +168,63 @@ class SuspendTaskCompletionHandlerTest {
 
         assertEquals(Job.Status.STOPPED, jobStatusApplicationEvent.getStatus());
         assertTrue(jobStatusApplicationEvent.isSuspended());
+    }
+
+    @Test
+    void testHandleQueuesTheSuspendWhileTheJobWaitsOnAnotherTasksSuspend() {
+        String firstJobResumeIdString = createJobResumeIdString(100L);
+        String secondJobResumeIdString = createJobResumeIdString(100L);
+        Suspend suspend = new Suspend(Map.of(MetadataConstants.APPROVAL_RESUME, true), null);
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(WorkflowConstants.NAME, "secondApproval", WorkflowConstants.TYPE, "suspend/v1")))
+            .build();
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(100L);
+        taskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, secondJobResumeIdString);
+        taskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(100L, 1L, suspend));
+
+        when(taskExecutionService.update(any(TaskExecution.class)))
+            .thenReturn(taskExecution);
+
+        Job job = new Job();
+
+        job.setId(100L);
+        job.setMetadata(
+            Map.of(
+                MetadataConstants.JOB_RESUME_ID, firstJobResumeIdString,
+                MetadataConstants.TASK_EXECUTION_RESUME_ID, 7L));
+        job.setStatus(Job.Status.STOPPED);
+
+        when(jobService.getTaskExecutionJob(1L))
+            .thenReturn(job);
+        when(jobService.getJob(100L))
+            .thenReturn(job);
+        when(contextService.peek(100L, Context.Classname.JOB))
+            .thenReturn(taskFileStorage.storeContextValue(100L, Context.Classname.JOB, Map.of()));
+
+        suspendTaskCompletionHandler.handle(taskExecution);
+
+        ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+
+        verify(jobService).update(jobCaptor.capture());
+        verify(jobService, never()).setStatusToStopped(anyLong());
+        verify(eventPublisher, never()).publishEvent(any());
+        verify(taskStateService).save(any(JobResumeId.class), any(Suspend.class));
+
+        Job updatedJob = jobCaptor.getValue();
+
+        assertEquals(firstJobResumeIdString, updatedJob.getMetadata(MetadataConstants.JOB_RESUME_ID));
+        assertEquals(7L, updatedJob.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID));
+        assertEquals(
+            List.of(
+                Map.of(
+                    MetadataConstants.JOB_RESUME_ID, secondJobResumeIdString,
+                    MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L)),
+            updatedJob.getMetadata(MetadataConstants.QUEUED_SUSPENDS));
     }
 
     @Test

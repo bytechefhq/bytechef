@@ -36,7 +36,7 @@ import reactor.core.publisher.Flux;
  * The tool calls a resumed turn runs before the model is asked again. When the model called several tools in one round
  * and one of them suspended the agent, {@link SuspendableToolCallingManager} did not execute the others; on resume
  * their results are replaced with {@link #DEFERRED_TOOL_RESULT} and the calls are issued again, as the model's next
- * round, so they run without depending on the model to repeat them.
+ * round, so they run (and a gated one raises its own approval) without depending on the model to repeat them.
  *
  * @author Ivica Cardic
  */
