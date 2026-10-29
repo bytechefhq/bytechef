@@ -29,6 +29,9 @@ public class AutomationWorkflowProjectConfigurationErrorType extends AbstractErr
     public static final AutomationWorkflowProjectConfigurationErrorType VERSION_LACKS_REFERENCED_WORKFLOWS =
         new AutomationWorkflowProjectConfigurationErrorType(103);
 
+    public static final AutomationWorkflowProjectConfigurationErrorType INVALID_PROVIDED_VALUE =
+        new AutomationWorkflowProjectConfigurationErrorType(104);
+
     private AutomationWorkflowProjectConfigurationErrorType(int errorKey) {
         super(AutomationWorkflowProjectConfiguration.class, errorKey);
     }

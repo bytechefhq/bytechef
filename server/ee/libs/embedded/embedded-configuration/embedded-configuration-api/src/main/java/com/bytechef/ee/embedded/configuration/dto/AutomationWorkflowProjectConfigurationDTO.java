@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.dto;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -26,6 +27,12 @@ public record AutomationWorkflowProjectConfigurationDTO(
      * @version ee
      */
     public record Workflow(
-        String workflowUuid, String workflowId, String label, boolean enabled, @Nullable Instant lastExecutionDate) {
+        String workflowUuid, String workflowId, String label, boolean enabled, @Nullable Instant lastExecutionDate,
+        Map<String, Long> providedConnections, Map<String, Object> providedInputs) {
+
+        public Workflow {
+            providedConnections = providedConnections == null ? Map.of() : providedConnections;
+            providedInputs = providedInputs == null ? Map.of() : providedInputs;
+        }
     }
 }

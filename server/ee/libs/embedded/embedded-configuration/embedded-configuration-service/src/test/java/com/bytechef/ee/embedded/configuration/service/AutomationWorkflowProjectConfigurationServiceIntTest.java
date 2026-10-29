@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -159,6 +160,86 @@ class AutomationWorkflowProjectConfigurationServiceIntTest {
 
         assertThat(automationWorkflowProjectConfigurationService.isWorkflowEnabled(reloadedConfiguration, workflowUuid))
             .isTrue();
+    }
+
+    @Test
+    void testUpdateWorkflowProvidedValuesPersistsBothColumnsAndCreatesAnEnabledRow() {
+        long projectId = insertProject(insertWorkspace());
+        UUID workflowUuid = UUID.randomUUID();
+
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+
+        automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
+            configuration.getId(), workflowUuid, Map.of("openai", 42L),
+            Map.of("channel", "general", "limit", 3));
+
+        assertThat(countWorkflowRows()).isEqualTo(1);
+
+        AutomationWorkflowProjectConfiguration reloadedConfiguration =
+            automationWorkflowProjectConfigurationService.getConfiguration(configuration.getId());
+
+        assertThat(reloadedConfiguration.isWorkflowEnabled(workflowUuid)).isTrue();
+        assertThat(reloadedConfiguration.fetchWorkflow(workflowUuid))
+            .hasValueSatisfying(workflow -> {
+                assertThat(workflow.getProvidedConnections()).isEqualTo(Map.of("openai", 42L));
+                assertThat(workflow.getProvidedInputs()).isEqualTo(Map.of("channel", "general", "limit", 3));
+            });
+
+        automationWorkflowProjectConfigurationService.updateWorkflowEnabled(configuration.getId(), workflowUuid, false);
+
+        reloadedConfiguration = automationWorkflowProjectConfigurationService.getConfiguration(configuration.getId());
+
+        assertThat(reloadedConfiguration.fetchWorkflow(workflowUuid))
+            .hasValueSatisfying(workflow -> {
+                assertThat(workflow.isEnabled()).isFalse();
+                assertThat(workflow.getProvidedConnections()).isEqualTo(Map.of("openai", 42L));
+            });
+    }
+
+    @Test
+    void testUpdateWorkflowProvidedValuesWithEmptyMapsClearsThem() {
+        long projectId = insertProject(insertWorkspace());
+        UUID workflowUuid = UUID.randomUUID();
+
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+
+        automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
+            configuration.getId(), workflowUuid, Map.of("openai", 42L), Map.of("channel", "general"));
+        automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
+            configuration.getId(), workflowUuid, Map.of(), Map.of());
+
+        assertThat(
+            automationWorkflowProjectConfigurationService.getConfiguration(configuration.getId())
+                .fetchWorkflow(workflowUuid))
+                    .hasValueSatisfying(workflow -> {
+                        assertThat(workflow.getProvidedConnections()).isEmpty();
+                        assertThat(workflow.getProvidedInputs()).isEmpty();
+                    });
+    }
+
+    @Test
+    void testWorkflowRowWithoutProvidedValuesReadsEmptyMaps() {
+        long projectId = insertProject(insertWorkspace());
+        UUID workflowUuid = UUID.randomUUID();
+
+        AutomationWorkflowProjectConfiguration configuration =
+            automationWorkflowProjectConfigurationService.create(projectId, ENVIRONMENT_ID, 1, true, true);
+
+        automationWorkflowProjectConfigurationService.updateWorkflowEnabled(configuration.getId(), workflowUuid, false);
+
+        jdbcTemplate.update(
+            "UPDATE automation_workflow_project_configuration_workflow SET provided_connections = NULL, " +
+                "provided_inputs = NULL");
+
+        assertThat(
+            automationWorkflowProjectConfigurationService.getConfiguration(configuration.getId())
+                .fetchWorkflow(workflowUuid))
+                    .hasValueSatisfying(workflow -> {
+                        assertThat(workflow.getProvidedConnections()).isEmpty();
+                        assertThat(workflow.getProvidedInputs()).isEmpty();
+                    });
     }
 
     @Test

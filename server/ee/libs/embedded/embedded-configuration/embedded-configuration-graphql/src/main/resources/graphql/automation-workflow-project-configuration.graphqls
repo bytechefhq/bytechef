@@ -16,6 +16,8 @@ type AutomationWorkflowProjectConfigurationWorkflow {
     label: String
     enabled: Boolean!
     lastExecutionDate: String
+    providedConnections: Map
+    providedInputs: Map
 }
 
 type AutomationWorkflowProjectConfigurationVersionImpact {
@@ -41,4 +43,5 @@ extend type Mutation {
     deleteAutomationWorkflowProjectConfiguration(id: ID!): Boolean!
     enableAutomationWorkflowProjectConfiguration(id: ID!, enable: Boolean!): Boolean!
     enableAutomationWorkflowProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, enable: Boolean!): Boolean!
+    updateAutomationWorkflowProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, providedConnections: Map, providedInputs: Map): Boolean
 }

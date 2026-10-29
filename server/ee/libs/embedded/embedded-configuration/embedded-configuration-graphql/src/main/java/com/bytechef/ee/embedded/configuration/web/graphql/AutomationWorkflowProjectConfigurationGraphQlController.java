@@ -13,7 +13,9 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfi
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -96,5 +98,39 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
             Long.parseLong(id), projectVersion, enabled, automationHubVisible);
 
         return true;
+    }
+
+    @MutationMapping
+    public boolean updateAutomationWorkflowProjectConfigurationWorkflow(
+        @Argument String id, @Argument String workflowUuid, @Argument Map<String, Object> providedConnections,
+        @Argument Map<String, Object> providedInputs) {
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            Long.parseLong(id), workflowUuid, toConnectionIds(providedConnections),
+            providedInputs == null ? Map.of() : providedInputs);
+
+        return true;
+    }
+
+    private static Map<String, Long> toConnectionIds(Map<String, Object> providedConnections) {
+        Map<String, Long> connectionIds = new HashMap<>();
+
+        if (providedConnections == null) {
+            return connectionIds;
+        }
+
+        for (Map.Entry<String, Object> providedConnection : providedConnections.entrySet()) {
+            Object connectionId = providedConnection.getValue();
+
+            if (connectionId == null) {
+                connectionIds.put(providedConnection.getKey(), null);
+            } else if (connectionId instanceof Number number) {
+                connectionIds.put(providedConnection.getKey(), number.longValue());
+            } else {
+                connectionIds.put(providedConnection.getKey(), Long.parseLong(String.valueOf(connectionId)));
+            }
+        }
+
+        return connectionIds;
     }
 }

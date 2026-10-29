@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectCo
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -82,6 +83,13 @@ public class RemoteAutomationWorkflowProjectConfigurationServiceClient
 
     @Override
     public AutomationWorkflowProjectConfiguration updateWorkflowEnabled(long id, UUID workflowUuid, boolean enabled) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AutomationWorkflowProjectConfiguration updateWorkflowProvidedValues(
+        long id, UUID workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs) {
+
         throw new UnsupportedOperationException();
     }
 }
