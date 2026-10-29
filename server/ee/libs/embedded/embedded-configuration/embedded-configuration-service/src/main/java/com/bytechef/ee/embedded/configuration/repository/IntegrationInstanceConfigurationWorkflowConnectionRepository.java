@@ -43,7 +43,7 @@ public interface IntegrationInstanceConfigurationWorkflowConnectionRepository
             WHERE integration_instance_configuration_workflow.integration_instance_configuration_id = :integrationInstanceConfigurationId
             AND integration_instance_configuration_workflow.workflow_id = :workflowId
             AND integration_instance_configuration_workflow_connection.workflow_node_name = :workflowNodeName
-            AND integration_instance_configuration_workflow_connection.key = :workflowConnectionKey
+            AND integration_instance_configuration_workflow_connection.workflow_connection_key = :workflowConnectionKey
         """)
     Optional<IntegrationInstanceConfigurationWorkflowConnection>
         findByIntegrationInstanceConfigurationIdAndWorkflowIdAndWorkflowNodeNameAndKey(
