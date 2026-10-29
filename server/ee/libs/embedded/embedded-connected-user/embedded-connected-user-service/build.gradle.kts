@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
 
+    testImplementation("io.grpc:grpc-inprocess")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
@@ -18,6 +19,9 @@ dependencies {
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-grpc"))
+    testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
 
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
