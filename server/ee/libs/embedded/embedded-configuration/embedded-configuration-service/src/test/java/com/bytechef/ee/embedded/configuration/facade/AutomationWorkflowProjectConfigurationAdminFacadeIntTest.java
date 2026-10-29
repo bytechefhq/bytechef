@@ -84,6 +84,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -811,6 +812,46 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
 
         assertInvalidProvidedValue(
             fixture, Map.of("slack", 13L), Map.of(), "Connection id=13 for component slack belongs to environment");
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowNamesTheInputsItStopsProvidingInTheUpdatedEvent() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Input Removed");
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
+
+        applicationEvents.clear();
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of());
+
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationUpdatedEvent.class)
+            .toList())
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(fixture.projectId(), ENVIRONMENT_ID),
+                    new AutomationWorkflowProjectConfigurationUpdatedEvent(
+                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
+    }
+
+    @Test
+    void testDeleteConfigurationNamesEveryProvidedInputInTheDeletedEvent() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Input Deleted");
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of(), Map.of("channel", "general"));
+
+        applicationEvents.clear();
+
+        automationWorkflowProjectConfigurationAdminFacade.deleteConfiguration(fixture.configurationId());
+
+        assertThat(applicationEvents.stream(AutomationWorkflowProjectConfigurationDeletedEvent.class)
+            .toList())
+                .containsExactly(
+                    new AutomationWorkflowProjectConfigurationDeletedEvent(
+                        fixture.projectId(), ENVIRONMENT_ID, Map.of(fixture.workflowUuid(), Set.of("channel"))));
     }
 
     @Test

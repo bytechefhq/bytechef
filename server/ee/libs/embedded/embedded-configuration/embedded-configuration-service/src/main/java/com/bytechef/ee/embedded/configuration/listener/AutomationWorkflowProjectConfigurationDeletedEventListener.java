@@ -39,8 +39,9 @@ public class AutomationWorkflowProjectConfigurationDeletedEventListener {
     public void onAutomationWorkflowProjectConfigurationDeleted(
         AutomationWorkflowProjectConfigurationDeletedEvent automationWorkflowProjectConfigurationDeletedEvent) {
 
-        connectedUserReferenceRolloutManager.applyConfigurationState(
+        connectedUserReferenceRolloutManager.rollOutAndApply(
             automationWorkflowProjectConfigurationDeletedEvent.projectId(),
-            automationWorkflowProjectConfigurationDeletedEvent.environmentId());
+            automationWorkflowProjectConfigurationDeletedEvent.environmentId(),
+            automationWorkflowProjectConfigurationDeletedEvent.removedProvidedInputNames());
     }
 }

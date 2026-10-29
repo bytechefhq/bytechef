@@ -23,19 +23,25 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectServic
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -61,6 +67,7 @@ public class ConnectedUserReferenceRolloutManager {
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TransactionTemplate requiresNewTransactionTemplate;
+    private final ConcurrentMap<RolloutKey, PendingRollout> rolloutsInFlight = new ConcurrentHashMap<>();
 
     @SuppressFBWarnings("EI")
     public ConnectedUserReferenceRolloutManager(
@@ -106,6 +113,17 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     public void applyConfigurationState(long automationWorkflowProjectId, long environmentId) {
+        applyConfigurationState(automationWorkflowProjectId, environmentId, Map.of());
+    }
+
+    /**
+     * Applies the configuration of a project in an environment to every reference of its reference deployments there.
+     * The inputs named in {@code removedProvidedInputNames} (keyed by workflow uuid) are first removed from each
+     * reference's stored inputs: their values were the administrator's, provided by the configuration until now.
+     */
+    public void applyConfigurationState(
+        long automationWorkflowProjectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
+
         List<ProjectDeployment> projectDeployments;
 
         try {
@@ -125,11 +143,17 @@ public class ConnectedUserReferenceRolloutManager {
                 continue;
             }
 
-            applyConfigurationState(projectDeployment);
+            applyConfigurationState(projectDeployment, removedProvidedInputNames);
         }
     }
 
     public void rollOut(long automationWorkflowProjectId, long environmentId) {
+        rollOut(automationWorkflowProjectId, environmentId, Map.of());
+    }
+
+    private void rollOut(
+        long automationWorkflowProjectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
+
         int releasedVersion;
         List<ProjectDeployment> projectDeployments;
 
@@ -164,26 +188,80 @@ public class ConnectedUserReferenceRolloutManager {
 
             try {
                 requiresNewTransactionTemplate.executeWithoutResult(
-                    status -> rollOutDeploymentWithReferences(projectDeployment, releasedVersion));
+                    status -> rollOutDeploymentWithReferences(
+                        projectDeployment, releasedVersion, removedProvidedInputNames));
             } catch (RuntimeException exception) {
                 logRolloutFailure(automationWorkflowProjectId, projectDeployment.getId(), exception);
             }
         }
     }
 
-    /**
-     * Rolls the configuration of a project in an environment out to its reference deployments while holding a
-     * transaction-scoped advisory lock for that pair, so rollouts for the same project and environment run one after
-     * the other without blocking administrator writes to the configuration. Each deployment and reference is still
-     * processed in its own {@code REQUIRES_NEW} transaction, so one failure does not undo the others.
-     */
-    @Transactional
     public void rollOutAndApply(long automationWorkflowProjectId, long environmentId) {
-        automationWorkflowProjectConfigurationService.lockRollout(automationWorkflowProjectId, environmentId);
+        rollOutAndApply(automationWorkflowProjectId, environmentId, Map.of());
+    }
 
-        // rollOut reads the configuration only now, so it sees the newest state committed before the lock was acquired
-        rollOut(automationWorkflowProjectId, environmentId);
-        applyConfigurationState(automationWorkflowProjectId, environmentId);
+    /**
+     * Rolls the configuration of a project in an environment out to its reference deployments and applies it to their
+     * references.
+     *
+     * <p>
+     * Requests for the same project and environment are coalesced on this node: when a rollout for the pair is already
+     * running here, the request only marks it pending (merging its removed provided input names) and returns at once,
+     * so queued saves never hold a worker thread or a database connection. The running rollout, once a pass finishes,
+     * runs exactly one more pass while a request arrived during the previous one; each pass reads the newest committed
+     * configuration. Marking and finishing both go through an atomic compute on the in-flight map, so a request that
+     * arrives while the rollout is finishing either joins it or starts a new one, and is never lost.
+     *
+     * <p>
+     * Each pass runs in its own transaction holding a transaction-scoped advisory lock for the pair, so rollouts
+     * started on different nodes still run one after the other without blocking administrator writes to the
+     * configuration. Each deployment and reference is processed in its own {@code REQUIRES_NEW} transaction, so one
+     * failure does not undo the others. Different pairs run in parallel.
+     *
+     * @param removedProvidedInputNames the inputs, keyed by workflow uuid, the configuration stopped providing; they
+     *                                  are removed from every reference's stored inputs
+     */
+    public void rollOutAndApply(
+        long automationWorkflowProjectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
+
+        RolloutKey rolloutKey = new RolloutKey(automationWorkflowProjectId, environmentId);
+        AtomicBoolean startedRollout = new AtomicBoolean();
+
+        rolloutsInFlight.compute(rolloutKey, (key, pendingRollout) -> {
+            PendingRollout requestedRollout = pendingRollout;
+
+            if (requestedRollout == null) {
+                requestedRollout = new PendingRollout();
+
+                startedRollout.set(true);
+            }
+
+            requestedRollout.request(removedProvidedInputNames);
+
+            return requestedRollout;
+        });
+
+        if (!startedRollout.get()) {
+            return;
+        }
+
+        boolean finished = false;
+
+        try {
+            Map<String, Set<String>> passRemovedProvidedInputNames = takePendingPass(rolloutKey);
+
+            while (passRemovedProvidedInputNames != null) {
+                runRolloutPass(automationWorkflowProjectId, environmentId, passRemovedProvidedInputNames);
+
+                passRemovedProvidedInputNames = takePendingPass(rolloutKey);
+            }
+
+            finished = true;
+        } finally {
+            if (!finished) {
+                rolloutsInFlight.remove(rolloutKey);
+            }
+        }
     }
 
     public boolean rollOutDeploymentIfBehind(long projectDeploymentId) {
@@ -200,7 +278,52 @@ public class ConnectedUserReferenceRolloutManager {
         return rollOutDeploymentWithReferences(projectDeployment, releasedVersion.get());
     }
 
-    private void applyConfigurationState(ProjectDeployment projectDeployment) {
+    private void runRolloutPass(
+        long automationWorkflowProjectId, long environmentId, Map<String, Set<String>> removedProvidedInputNames) {
+
+        log.debug(
+            "Running a rollout pass of automation workflow project id={} in environment id={}",
+            automationWorkflowProjectId, environmentId);
+
+        try {
+            requiresNewTransactionTemplate.executeWithoutResult(status -> {
+                automationWorkflowProjectConfigurationService.lockRollout(automationWorkflowProjectId, environmentId);
+
+                // rollOut reads the configuration only now, so it sees the newest state committed before the lock
+                rollOut(automationWorkflowProjectId, environmentId, removedProvidedInputNames);
+                applyConfigurationState(automationWorkflowProjectId, environmentId, removedProvidedInputNames);
+            });
+        } catch (RuntimeException exception) {
+            log.error(
+                "Rolling out automation workflow project id={} in environment id={} failed",
+                automationWorkflowProjectId, environmentId, exception);
+        }
+    }
+
+    /**
+     * Returns the removed provided input names of the next pass and clears the pending mark, or, when no request
+     * arrived since the last pass, removes the in-flight entry and returns {@code null}; both happen atomically with
+     * {@link #rollOutAndApply(long, long, Map)}'s marking.
+     */
+    private @Nullable Map<String, Set<String>> takePendingPass(RolloutKey rolloutKey) {
+        AtomicReference<Map<String, Set<String>>> passRemovedProvidedInputNames = new AtomicReference<>();
+
+        rolloutsInFlight.compute(rolloutKey, (key, pendingRollout) -> {
+            if (pendingRollout == null || !pendingRollout.isPending()) {
+                return null;
+            }
+
+            passRemovedProvidedInputNames.set(pendingRollout.take());
+
+            return pendingRollout;
+        });
+
+        return passRemovedProvidedInputNames.get();
+    }
+
+    private void applyConfigurationState(
+        ProjectDeployment projectDeployment, Map<String, Set<String>> removedProvidedInputNames) {
+
         long projectDeploymentId = projectDeployment.getId();
 
         List<ConnectedUserProjectWorkflow> references;
@@ -221,7 +344,7 @@ public class ConnectedUserReferenceRolloutManager {
 
             try {
                 requiresNewTransactionTemplate.executeWithoutResult(
-                    status -> applyConfigurationState(projectDeployment, reference));
+                    status -> applyConfigurationState(projectDeployment, reference, removedProvidedInputNames));
             } catch (RuntimeException exception) {
                 log.error(
                     "Applying the configuration state to reference id={} of deployment id={} failed",
@@ -230,9 +353,13 @@ public class ConnectedUserReferenceRolloutManager {
         }
     }
 
-    private void applyConfigurationState(ProjectDeployment projectDeployment, ConnectedUserProjectWorkflow reference) {
+    private void applyConfigurationState(
+        ProjectDeployment projectDeployment, ConnectedUserProjectWorkflow reference,
+        Map<String, Set<String>> removedProvidedInputNames) {
+
         long projectDeploymentId = projectDeployment.getId();
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
+        Set<String> removedInputNames = removedProvidedInputNames.getOrDefault(automationWorkflowUuid, Set.of());
 
         Optional<ProjectDeploymentWorkflow> row = connectedUserReferenceDeploymentManager.fetchRow(
             projectDeploymentId, automationWorkflowUuid);
@@ -246,10 +373,14 @@ public class ConnectedUserReferenceRolloutManager {
 
             connectedUserReferenceDeploymentManager.setRowEnabled(projectDeploymentId, row.get(), false);
 
+            connectedUserReferenceDeploymentManager.removeInputs(
+                projectDeploymentId, automationWorkflowUuid, removedInputNames);
+
             return;
         }
 
-        RowSpec rowSpec = resolveRowSpec(reference, projectDeployment, projectDeployment.getProjectVersion());
+        RowSpec rowSpec = resolveRowSpec(
+            reference, projectDeployment, projectDeployment.getProjectVersion(), removedInputNames);
 
         connectedUserReferenceDeploymentManager.putWorkflow(projectDeploymentId, automationWorkflowUuid, rowSpec);
     }
@@ -291,6 +422,12 @@ public class ConnectedUserReferenceRolloutManager {
     }
 
     private boolean rollOutDeploymentWithReferences(ProjectDeployment projectDeployment, int releasedVersion) {
+        return rollOutDeploymentWithReferences(projectDeployment, releasedVersion, Map.of());
+    }
+
+    private boolean rollOutDeploymentWithReferences(
+        ProjectDeployment projectDeployment, int releasedVersion, Map<String, Set<String>> removedProvidedInputNames) {
+
         long projectDeploymentId = projectDeployment.getId();
 
         if (!connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeploymentId)) {
@@ -305,13 +442,15 @@ public class ConnectedUserReferenceRolloutManager {
             return true;
         }
 
-        rollOutDeployment(projectDeployment, releasedVersion, references);
+        rollOutDeployment(projectDeployment, releasedVersion, references, removedProvidedInputNames);
 
         return true;
     }
 
     private void rollOutDeployment(
-        ProjectDeployment projectDeployment, int releasedVersion, List<ConnectedUserProjectWorkflow> references) {
+        ProjectDeployment projectDeployment, int releasedVersion, List<ConnectedUserProjectWorkflow> references,
+        Map<String, Set<String>> removedProvidedInputNames) {
+
         long automationWorkflowProjectId = projectDeployment.getProjectId();
         long projectDeploymentId = projectDeployment.getId();
 
@@ -332,7 +471,9 @@ public class ConnectedUserReferenceRolloutManager {
                 continue;
             }
 
-            RowSpec rowSpec = resolveRowSpec(reference, projectDeployment, releasedVersion);
+            RowSpec rowSpec = resolveRowSpec(
+                reference, projectDeployment, releasedVersion,
+                removedProvidedInputNames.getOrDefault(automationWorkflowUuid, Set.of()));
 
             boolean rowEnabled = rowSpec.enabled() && connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
                 automationWorkflowProjectId, projectDeployment.getEnvironment(), automationWorkflowUuid);
@@ -351,8 +492,14 @@ public class ConnectedUserReferenceRolloutManager {
         connectedUserProjectWorkflowRepository.saveAll(references);
     }
 
+    /**
+     * Resolves the reference against the given version, starting from its current row's connections and inputs; the
+     * inputs named in {@code removedInputNames} are left out, so a value the configuration no longer provides does not
+     * stay on the row.
+     */
     private RowSpec resolveRowSpec(
-        ConnectedUserProjectWorkflow reference, ProjectDeployment projectDeployment, int projectVersion) {
+        ConnectedUserProjectWorkflow reference, ProjectDeployment projectDeployment, int projectVersion,
+        Set<String> removedInputNames) {
 
         long automationWorkflowProjectId = projectDeployment.getProjectId();
         String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
@@ -365,14 +512,64 @@ public class ConnectedUserReferenceRolloutManager {
         String workflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             automationWorkflowProjectId, projectVersion, automationWorkflowUuid);
 
+        Map<String, Object> userInputs = new LinkedHashMap<>(
+            currentRow.<Map<String, ?>>map(ProjectDeploymentWorkflow::getInputs)
+                .orElse(Map.of()));
+
+        for (String removedInputName : removedInputNames) {
+            userInputs.remove(removedInputName);
+        }
+
         ReferenceResolution referenceResolution = connectedUserReferenceDeploymentManager.resolveReference(
             connectedUserProject.getConnectedUserId(), automationWorkflowProjectId, projectDeployment.getEnvironment(),
             automationWorkflowUuid, workflowId, reference.isEnabled(), Map.of(),
             currentRow.map(ProjectDeploymentWorkflow::getConnections)
                 .orElse(List.of()),
-            currentRow.<Map<String, ?>>map(ProjectDeploymentWorkflow::getInputs)
-                .orElse(Map.of()));
+            userInputs);
 
         return referenceResolution.rowSpec();
+    }
+
+    private record RolloutKey(long automationWorkflowProjectId, long environmentId) {
+    }
+
+    /**
+     * A rollout running on this node for one project and environment, with whether another pass was requested while it
+     * ran and the provided input names those requests removed. Only read and written inside an atomic compute on the
+     * in-flight map for its key.
+     */
+    private static final class PendingRollout {
+
+        private final Map<String, Set<String>> removedProvidedInputNames = new HashMap<>();
+        private boolean pending;
+
+        boolean isPending() {
+            return pending;
+        }
+
+        void request(Map<String, Set<String>> requestedRemovedProvidedInputNames) {
+            pending = true;
+
+            for (Map.Entry<String, Set<String>> entry : requestedRemovedProvidedInputNames.entrySet()) {
+                Set<String> inputNames = removedProvidedInputNames.computeIfAbsent(
+                    entry.getKey(), workflowUuid -> new HashSet<>());
+
+                inputNames.addAll(entry.getValue());
+            }
+        }
+
+        Map<String, Set<String>> take() {
+            pending = false;
+
+            Map<String, Set<String>> takenRemovedProvidedInputNames = new HashMap<>();
+
+            for (Map.Entry<String, Set<String>> entry : removedProvidedInputNames.entrySet()) {
+                takenRemovedProvidedInputNames.put(entry.getKey(), Set.copyOf(entry.getValue()));
+            }
+
+            removedProvidedInputNames.clear();
+
+            return takenRemovedProvidedInputNames;
+        }
     }
 }
