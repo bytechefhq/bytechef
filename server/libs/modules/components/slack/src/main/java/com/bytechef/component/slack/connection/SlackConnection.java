@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.slack.constant.SlackConstants.SIGNING_SECRET;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.LinkedHashMap;
@@ -44,7 +45,15 @@ public class SlackConnection {
                         .required(true),
                     string(CLIENT_SECRET)
                         .label("Client Secret")
-                        .required(true))
+                        .required(true),
+                    string(SIGNING_SECRET)
+                        .label("Signing Secret")
+                        .description(
+                            "The Slack app's signing secret. When set, approval request messages use in-place " +
+                                "Approve/Discard buttons resolved directly in Slack — configure the app's " +
+                                "Interactivity Request URL to <public-url>/slack/interactivity. When unset, " +
+                                "buttons link to the hosted approval form.")
+                        .required(false))
                 .authorizationUrl((connection, context) -> "https://slack.com/oauth/authorize")
                 .scopes((connection, context) -> {
                     Map<String, Boolean> scopeMap = new LinkedHashMap<>();

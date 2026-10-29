@@ -291,7 +291,7 @@ const config: NextConfig = {
       },
       {
         source: '/platform/enterprise/scale-reliability/crash-recovery',
-        destination: '/platform/use-bytechef/self-hosted/management/crash-recovery',
+        destination: '/platform/use-bytechef/self-hosted/management/monitoring',
         permanent: true,
       },
       {

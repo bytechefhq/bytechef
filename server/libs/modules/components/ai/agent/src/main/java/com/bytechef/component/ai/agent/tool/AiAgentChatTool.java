@@ -183,5 +183,10 @@ public class AiAgentChatTool {
         public @Nullable Long getEnvironmentId() {
             return context.getEnvironmentId();
         }
+
+        @Override
+        public @Nullable Long getJobId() {
+            return context.getJobId();
+        }
     }
 }

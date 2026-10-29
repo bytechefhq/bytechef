@@ -20,16 +20,26 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public interface ComponentHandlerLoader {
 
+    ComponentHandlerLoaderKind getKind();
+
     List<ComponentHandlerEntry> loadComponentHandlers();
+
+    Optional<ComponentHandlerEntry> loadComponentHandler(String providerClassName);
+
+    List<ProviderEntry> loadProviderEntries();
 
     record ComponentHandlerEntry(
         ComponentHandler componentHandler, ComponentTaskHandlerFunction componentTaskHandlerFunction) {
+    }
+
+    record ProviderEntry(String providerClassName, ComponentHandlerEntry componentHandlerEntry) {
     }
 
     @FunctionalInterface

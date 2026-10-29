@@ -18,7 +18,9 @@ package com.bytechef.automation.task.listener;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
 import com.bytechef.automation.task.service.ApprovalTaskService;
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -40,16 +42,19 @@ public class ApprovalTaskCompletionListener {
     private static final Logger log = LoggerFactory.getLogger(ApprovalTaskCompletionListener.class);
 
     private final ApprovalTaskService approvalTaskService;
+    private final ApprovalTokens approvalTokens;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskCompletionListener(ApprovalTaskService approvalTaskService) {
+    public ApprovalTaskCompletionListener(ApprovalTaskService approvalTaskService, ApprovalTokens approvalTokens) {
         this.approvalTaskService = approvalTaskService;
+        this.approvalTokens = approvalTokens;
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onJobResumed(JobResumedEvent event) {
-        Optional<ApprovalTask> approvalTaskOptional = approvalTaskService.fetchApprovalTaskByJobResumeId(
-            event.jobResumeId());
+        Optional<ApprovalTask> approvalTaskOptional = approvalTaskService
+            .fetchApprovalTaskByJobResumeId(event.jobResumeId())
+            .or(() -> fetchUnresolvedApprovalTaskWithTheSameJobResumeId(event.jobResumeId()));
 
         if (approvalTaskOptional.isEmpty()) {
             return;
@@ -57,16 +62,34 @@ public class ApprovalTaskCompletionListener {
 
         ApprovalTask approvalTask = approvalTaskOptional.get();
 
-        if (approvalTask.getStatus() == ApprovalTask.Status.COMPLETED) {
+        if (approvalTask.isResolved()) {
             return;
         }
 
-        approvalTask.setStatus(ApprovalTask.Status.COMPLETED);
+        approvalTask.complete();
 
-        approvalTaskService.update(approvalTask);
+        approvalTaskService.resolve(approvalTask);
 
         if (log.isDebugEnabled()) {
             log.debug("Marked approval task id={} as COMPLETED after job resume", approvalTask.getId());
         }
+    }
+
+    private Optional<ApprovalTask> fetchUnresolvedApprovalTaskWithTheSameJobResumeId(String token) {
+        Optional<JobResumeId> jobResumeIdOptional = approvalTokens.resolveJobResumeId(token);
+
+        if (jobResumeIdOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        JobResumeId jobResumeId = jobResumeIdOptional.get();
+
+        return approvalTaskService.getUnresolvedApprovalTasks()
+            .stream()
+            .filter(approvalTask -> approvalTask.getJobResumeId() != null)
+            .filter(approvalTask -> approvalTokens.resolveJobResumeId(approvalTask.getJobResumeId())
+                .filter(jobResumeId::equals)
+                .isPresent())
+            .findFirst();
     }
 }

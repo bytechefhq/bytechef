@@ -31,6 +31,7 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public final class TaskDispatcherDefinition {
 
+    private boolean deprecated;
     private String description;
     private Help help;
     private String icon;
@@ -58,6 +59,7 @@ public final class TaskDispatcherDefinition {
     public TaskDispatcherDefinition(
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition) {
 
+        this.deprecated = OptionalUtils.orElse(taskDispatcherDefinition.getDeprecated(), false);
         this.description = OptionalUtils.orElse(taskDispatcherDefinition.getDescription(), null);
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
@@ -95,7 +97,7 @@ public final class TaskDispatcherDefinition {
             return false;
         }
 
-        return Objects.equals(description, that.description) &&
+        return deprecated == that.deprecated && Objects.equals(description, that.description) &&
             Objects.equals(help, that.help) && Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
             outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
             Objects.equals(outputResponse, that.outputResponse) && outputSchemaDefined == that.outputSchemaDefined &&
@@ -107,8 +109,13 @@ public final class TaskDispatcherDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            description, help, icon, name, outputDefined, outputFunctionDefined, outputResponse, outputSchemaDefined,
+            deprecated, description, help, icon, name, outputDefined, outputFunctionDefined, outputResponse,
+            outputSchemaDefined,
             properties, resources, taskProperties, title, variablePropertiesDefined, version);
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
     }
 
     public boolean isOutputDefined() {
@@ -175,7 +182,8 @@ public final class TaskDispatcherDefinition {
     @Override
     public String toString() {
         return "TaskDispatcherDefinition{" +
-            "description='" + description + '\'' +
+            "deprecated=" + deprecated +
+            ", description='" + description + '\'' +
             ", help=" + help +
             ", icon='" + icon + '\'' +
             ", name='" + name + '\'' +

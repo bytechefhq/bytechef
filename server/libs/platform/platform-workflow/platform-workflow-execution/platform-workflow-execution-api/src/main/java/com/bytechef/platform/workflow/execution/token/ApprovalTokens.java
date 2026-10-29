@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.token;
 
+import com.bytechef.platform.workflow.execution.JobResumeId;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -27,6 +28,15 @@ public interface ApprovalTokens {
     String toSignedToken(String innerToken, Duration ttl);
 
     Optional<String> toSignedTokenIfConfigured(String innerToken);
+
+    /**
+     * Signs the token with the given time-to-live when a signing secret is configured.
+     *
+     * @param innerToken the token to sign
+     * @param ttl        the time-to-live of the signed token
+     * @return the signed token, or empty when no signing secret is configured
+     */
+    Optional<String> toSignedTokenIfConfigured(String innerToken, Duration ttl);
 
     Optional<String> parseSignedToken(String token);
 
@@ -46,5 +56,25 @@ public interface ApprovalTokens {
         }
 
         return Optional.ofNullable(token);
+    }
+
+    /**
+     * Unwraps a possibly signed resume token and parses the job resume id it carries.
+     *
+     * @param token the possibly signed resume token
+     * @return the job resume id, or empty when the token is invalid
+     */
+    default Optional<JobResumeId> resolveJobResumeId(String token) {
+        Optional<String> innerTokenOptional = resolveInnerToken(token);
+
+        if (innerTokenOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(JobResumeId.parse(innerTokenOptional.get()));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return Optional.empty();
+        }
     }
 }

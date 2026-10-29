@@ -1,0 +1,17 @@
+---
+label: "Sub-workflow with a suspending step"
+inputs:
+- name: "amount"
+  type: "integer"
+  required: false
+tasks:
+- name: "beforeSuspend"
+  type: "var/v1/set"
+  parameters:
+    value: "reached the suspending step"
+- name: "requestApproval"
+  type: "suspend/v1"
+- name: "afterResume"
+  type: "var/v1/set"
+  parameters:
+    value: "the human approved"

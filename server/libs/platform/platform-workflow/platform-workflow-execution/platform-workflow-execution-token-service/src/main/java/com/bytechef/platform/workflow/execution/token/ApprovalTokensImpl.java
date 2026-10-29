@@ -102,11 +102,16 @@ public final class ApprovalTokensImpl implements ApprovalTokens {
 
     @Override
     public Optional<String> toSignedTokenIfConfigured(String innerToken) {
+        return toSignedTokenIfConfigured(innerToken, defaultTtl);
+    }
+
+    @Override
+    public Optional<String> toSignedTokenIfConfigured(String innerToken, Duration ttl) {
         if (activeSecret == null) {
             return Optional.empty();
         }
 
-        return Optional.of(toSignedToken(innerToken, defaultTtl));
+        return Optional.of(toSignedToken(innerToken, ttl));
     }
 
     @Override

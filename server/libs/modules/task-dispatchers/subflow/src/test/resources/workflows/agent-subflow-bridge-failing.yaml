@@ -1,0 +1,11 @@
+---
+label: "Sub-workflow whose task fails"
+inputs:
+- name: "amount"
+  type: "integer"
+  required: false
+tasks:
+- name: "failingTask"
+  type: "var/v1/fail"
+  parameters:
+    value: "boom"

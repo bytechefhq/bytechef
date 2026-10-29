@@ -35,6 +35,16 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
     }
 
     @Override
+    public boolean cancelApproval(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isApprovalResumeId(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public JobResumeOutcome resumeExpiredJob(String id) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
@@ -45,7 +55,17 @@ public class RemoteJobResumeFacadeClient implements JobResumeFacade {
     }
 
     @Override
+    public JobResumeOutcome resumeApproval(String token) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public JobResumeOutcome resumeJob(String id, Map<String, Object> data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public JobResumeOutcome resumeJob(String id, Map<String, Object> data, String approvedBy) {
         throw new UnsupportedOperationException();
     }
 

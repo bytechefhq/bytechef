@@ -11,3 +11,5 @@ export {
 } from './workflowImport';
 export type {ImportWorkflowFixturesType} from './workflowImport';
 export {mergeTests} from '@playwright/test';
+export {workflowDeploymentTest} from './workflowDeployment';
+export type {WorkflowDeployerI, WorkflowDeploymentFixturesType} from './workflowDeployment';

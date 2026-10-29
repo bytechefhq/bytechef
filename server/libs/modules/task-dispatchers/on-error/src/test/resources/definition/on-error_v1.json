@@ -1,4 +1,5 @@
 {
+  "deprecated": null,
   "description": "Triggers an error branch with an error object if an exception occurs in the main branch.",
   "help": null,
   "icon": "path:assets/onError.svg",

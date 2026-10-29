@@ -9,7 +9,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {CheckCircle2Icon, CheckIcon, CircleIcon, ClockIcon, SlidersHorizontalIcon, UserIcon, XIcon} from 'lucide-react';
+import {
+    CheckCircle2Icon,
+    CheckIcon,
+    CircleIcon,
+    ClockIcon,
+    SlidersHorizontalIcon,
+    UserIcon,
+    XCircleIcon,
+    XIcon,
+} from 'lucide-react';
 
 import {useApprovalTaskFilters} from './hooks/useApprovalTaskFilters';
 
@@ -109,6 +118,21 @@ export default function ApprovalTaskFilters() {
                         <span className="ml-auto text-xs text-content-neutral-secondary">
                             ({approvalTaskCounts.completed})
                         </span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                        className="flex items-center justify-between"
+                        onClick={() => handleStatusChange('expired')}
+                    >
+                        <div className="flex items-center">
+                            <XCircleIcon className="mr-2 size-3 text-gray-400" />
+
+                            <span>Expired</span>
+                        </div>
+
+                        {filters.status === 'expired' && <CheckIcon className="size-4" />}
+
+                        <span className="ml-auto text-xs text-muted-foreground">({approvalTaskCounts.expired})</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 

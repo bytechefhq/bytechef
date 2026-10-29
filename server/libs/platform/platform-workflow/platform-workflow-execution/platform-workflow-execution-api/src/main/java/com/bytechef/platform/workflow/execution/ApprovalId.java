@@ -21,6 +21,7 @@ import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -29,15 +30,18 @@ import java.util.UUID;
 public class ApprovalId implements Serializable {
 
     private final boolean approved;
+    private final @Nullable Long issuingTaskExecutionId;
     private final long jobId;
     private final String tenantId;
     private final String uuid;
 
-    private ApprovalId(String tenantId, long jobId, String uuid, boolean approved) {
+    private ApprovalId(
+        String tenantId, long jobId, String uuid, boolean approved, @Nullable Long issuingTaskExecutionId) {
+
         this.approved = approved;
+        this.issuingTaskExecutionId = issuingTaskExecutionId;
         this.jobId = jobId;
         this.tenantId = tenantId;
-
         this.uuid = uuid;
     }
 
@@ -48,7 +52,13 @@ public class ApprovalId implements Serializable {
     public static ApprovalId of(String tenantId, long jobId, boolean approved) {
         UUID uuid = UUID.randomUUID();
 
-        return new ApprovalId(tenantId, jobId, uuid.toString(), approved);
+        return new ApprovalId(tenantId, jobId, uuid.toString(), approved, null);
+    }
+
+    public static ApprovalId of(
+        String tenantId, long jobId, String uuid, boolean approved, @Nullable Long issuingTaskExecutionId) {
+
+        return new ApprovalId(tenantId, jobId, uuid, approved, issuingTaskExecutionId);
     }
 
     public static ApprovalId parse(String id) {
@@ -56,7 +66,14 @@ public class ApprovalId implements Serializable {
 
         String[] items = id.split(":");
 
-        return new ApprovalId(items[0], Long.parseLong(items[1]), items[2], Boolean.parseBoolean(items[3]));
+        Long issuingTaskExecutionId = items.length > 4 ? Long.valueOf(items[4]) : null;
+
+        return new ApprovalId(
+            items[0], Long.parseLong(items[1]), items[2], Boolean.parseBoolean(items[3]), issuingTaskExecutionId);
+    }
+
+    public @Nullable Long getIssuingTaskExecutionId() {
+        return issuingTaskExecutionId;
     }
 
     public long getJobId() {
@@ -84,6 +101,7 @@ public class ApprovalId implements Serializable {
                 ":" +
                 uuid +
                 ":" +
-                approved);
+                approved +
+                (issuingTaskExecutionId == null ? "" : ":" + issuingTaskExecutionId));
     }
 }

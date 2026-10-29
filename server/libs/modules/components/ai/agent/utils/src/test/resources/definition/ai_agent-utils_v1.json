@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "appendFilesToAiSkill": [ ],
-    "createAiSkill": [ ],
-    "deleteAiSkill": [ ],
     "updateAiSkill": [ ],
+    "deleteAiSkill": [ ],
+    "createAiSkill": [ ],
+    "appendFilesToAiSkill": [ ],
     "removeFileFromAiSkill": [ ]
   },
   "actions": [ {
@@ -1286,22 +1286,23 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "braveWebSearchTool": [ ],
-    "fileSystemTools": [ ],
-    "appendFilesToAiSkill": [ ],
-    "todoWriteTool": [ ],
+    "listDirectoryTool": [ ],
+    "subagentTool": [ "MODEL", "TOOLS" ],
+    "removeFileFromAiSkill": [ ],
+    "askUserQuestionTool": [ ],
+    "shellTools": [ ],
+    "taskTool": [ "MODEL", "SUBAGENT" ],
+    "smartWebFetchTool": [ "MODEL" ],
     "globTool": [ ],
+    "todoWriteTool": [ ],
+    "updateAiSkill": [ ],
+    "appendFilesToAiSkill": [ ],
     "grepTool": [ ],
     "createAiSkill": [ ],
-    "shellTools": [ ],
-    "autoMemoryTool": [ ],
-    "smartWebFetchTool": [ "MODEL" ],
-    "askUserQuestionTool": [ ],
-    "subagentTool": [ "MODEL", "TOOLS" ],
-    "updateAiSkill": [ ],
-    "removeFileFromAiSkill": [ ],
+    "braveWebSearchTool": [ ],
+    "fileSystemTools": [ ],
     "deleteAiSkill": [ ],
-    "taskTool": [ "MODEL", "SUBAGENT" ]
+    "autoMemoryTool": [ ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -1349,9 +1350,9 @@
     "properties": null,
     "title": "File System Tools",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1366,9 +1367,9 @@
     "properties": null,
     "title": "Shell Tools",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1383,9 +1384,9 @@
     "properties": null,
     "title": "Grep Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1400,9 +1401,26 @@
     "properties": null,
     "title": "Glob Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "listDirectoryTool",
+    "description": "List files and directories within a path.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "List Directory Tool",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1417,9 +1435,9 @@
     "properties": null,
     "title": "Smart Web Fetch Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1434,9 +1452,9 @@
     "properties": null,
     "title": "Brave Web Search Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },

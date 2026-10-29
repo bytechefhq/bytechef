@@ -35,6 +35,11 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     implementation(project(":server:libs:core:rest:rest-impl"))
+    // The approval expiry, reminder and escalation monitors sweep per tenant, so this app needs a TenantService.
+    // Single-tenant is served locally; multi-tenant is served by the remote client (below) rather than
+    // tenant-multi-service, because that impl requires a DataSource and this app is deliberately datasource-less.
+    // The two are mutually exclusive by bytechef.tenant.mode.
+    implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:platform:platform-coordinator"))
@@ -47,6 +52,7 @@ dependencies {
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
+    implementation(project(":server:ee:libs:core:tenant:tenant-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
@@ -69,5 +75,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:suspend"))
 
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
+    testImplementation(project(":server:libs:core:tenant:tenant-api"))
+    testImplementation(project(":server:ee:libs:core:tenant:tenant-remote-client"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

@@ -1,0 +1,9 @@
+query pendingApprovals($environmentId: Int) {
+    pendingApprovals(environmentId: $environmentId) {
+        createdDate
+        expiresAt
+        formUrl
+        jobId
+        workflowLabel
+    }
+}

@@ -27,6 +27,7 @@ import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.workflow.execution.service.ApprovalShortTokenService;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 class ClusterElementContextImpl extends ContextImpl implements ClusterElementContextAware {
 
+    private final @Nullable ApprovalShortTokenService approvalShortTokenService;
     private final @Nullable ApprovalTokens approvalTokens;
     private final CacheManager cacheManager;
     private final @Nullable ClusterElementResolverFunction clusterElementResolver;
@@ -68,6 +70,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             builder.jobId, builder.taskExecutionId, builder.editorEnvironment, builder.httpClientExecutor,
             builder.tempFileStorage, builder.logFileStorageWriter, false, null);
 
+        this.approvalShortTokenService = builder.approvalShortTokenService;
         this.approvalTokens = builder.approvalTokens;
         this.cacheManager = builder.cacheManager;
         this.clusterElementResolver = builder.clusterElementResolver;
@@ -116,6 +119,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             .builder(
                 componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
                 eventPublisher, httpClientExecutor, tempFileStorage, approvalTokens)
+            .approvalShortTokenService(approvalShortTokenService)
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobId(jobId)
@@ -138,6 +142,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         return builder(
             componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
             eventPublisher, httpClientExecutor, tempFileStorage)
+                .approvalShortTokenService(approvalShortTokenService)
                 .approvalTokens(approvalTokens)
                 .componentConnection(componentConnection)
                 .environmentId(environmentId)
@@ -156,6 +161,11 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
     @Override
     public @Nullable Long getEnvironmentId() {
         return environmentId;
+    }
+
+    @Override
+    public @Nullable Long getJobId() {
+        return jobId;
     }
 
     @Override
@@ -300,6 +310,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
 
     static final class Builder {
 
+        private @Nullable ApprovalShortTokenService approvalShortTokenService;
         private @Nullable ApprovalTokens approvalTokens;
         private final CacheManager cacheManager;
         private final String clusterElementName;
@@ -337,6 +348,12 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             this.eventPublisher = eventPublisher;
             this.httpClientExecutor = httpClientExecutor;
             this.tempFileStorage = tempFileStorage;
+        }
+
+        Builder approvalShortTokenService(@Nullable ApprovalShortTokenService approvalShortTokenService) {
+            this.approvalShortTokenService = approvalShortTokenService;
+
+            return this;
         }
 
         Builder approvalTokens(@Nullable ApprovalTokens approvalTokens) {

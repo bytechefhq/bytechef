@@ -1,5 +1,10 @@
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
-import {useSSE} from '@/shared/hooks/useSSE';
+import {
+    ApprovalResolutionContextI,
+    ResumeError,
+    useApprovalResolution,
+} from '@/shared/components/ai-chat/approvalResolutionContext';
+import {SSERequestType, UseSSEOptionsType, useSSE} from '@/shared/hooks/useSSE';
 import {
     AskUserQuestionEventI,
     formatAskUserQuestionMessage,
@@ -336,6 +341,66 @@ describe('ChatRuntimeProvider resume', () => {
         });
     });
 
+    it('explains how to fix a non-streaming chat whose workflow would pause', async () => {
+        fetchSpy.mockResolvedValue(
+            Response.json(
+                {
+                    detail: "Workflows that return a synchronous response can't contain steps that pause the run",
+                    entityClass: 'WebhookErrorType',
+                    errorKey: 100,
+                },
+                {status: 400}
+            )
+        );
+
+        useChatsStore.setState({resumeUrl: null});
+
+        render(
+            <ChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
+                child
+            </ChatRuntimeProvider>
+        );
+
+        await act(async () => {
+            await getOnNew()(createTextMessage('Hello'));
+        });
+
+        const {isRunning, messages} = useChatsStore.getState();
+
+        expect(isRunning).toBe(false);
+        expect(messages[messages.length - 1]).toEqual({
+            content:
+                "This chat can't pause the run for an approval or wait step. A chat can only wait on one when it " +
+                'streams its reply, so add a step that streams, such as an AI Agent, after it.',
+            role: 'assistant',
+        });
+    });
+
+    it('shows the server detail for any other failed non-streaming message', async () => {
+        fetchSpy.mockResolvedValue(
+            Response.json({detail: 'Workflow not found', entityClass: 'Workflow', errorKey: 100}, {status: 400})
+        );
+
+        useChatsStore.setState({resumeUrl: null});
+
+        render(
+            <ChatRuntimeProvider environmentName="test" workflowExecutionId="workflow-123">
+                child
+            </ChatRuntimeProvider>
+        );
+
+        await act(async () => {
+            await getOnNew()(createTextMessage('Hello'));
+        });
+
+        const {messages} = useChatsStore.getState();
+
+        expect(messages[messages.length - 1]).toEqual({
+            content: 'An error occurred\nWorkflow not found',
+            role: 'assistant',
+        });
+    });
+
     it('restores the resume URL when the non-streamed answer arrived before the workflow finished suspending', async () => {
         fetchSpy.mockResolvedValue(new Response(null, {status: 409}));
 
@@ -639,6 +704,114 @@ describe('ChatRuntimeProvider resume', () => {
         });
     });
 
+    it('shows only the approval card when the approval request arrives before any text and the stream closes and suspends', async () => {
+        let connectionState: 'CLOSED' | 'CONNECTED' = 'CLOSED';
+
+        vi.mocked(useSSE).mockImplementation(() => ({
+            close: vi.fn(),
+            connectionState,
+            data: null,
+            error: null,
+            errorStatus: null,
+        }));
+
+        useChatsStore.setState({resumeUrl: null});
+
+        render(
+            <ChatRuntimeProvider environmentName="test" sseStreamResponse={true} workflowExecutionId="workflow-123">
+                child
+            </ChatRuntimeProvider>
+        );
+
+        await act(async () => {
+            await getOnNew()(createTextMessage('Delete the customer record'));
+        });
+
+        connectionState = 'CONNECTED';
+
+        const sseOptions = vi.mocked(useSSE).mock.lastCall![1]!;
+
+        act(() => {
+            sseOptions.eventHandlers!.approval_request({formTitle: 'Approve deletion', resumeId: 'resume-1'});
+        });
+
+        connectionState = 'CLOSED';
+
+        act(() => {
+            useChatsStore.setState({isRunning: true});
+        });
+
+        act(() => {
+            sseOptions.eventHandlers!.suspended?.('');
+        });
+
+        const {isRunning, messages} = useChatsStore.getState();
+
+        expect(isRunning).toBe(false);
+        expect(messages).toHaveLength(2);
+        expect(messages[0]).toMatchObject({content: 'Delete the customer record', role: 'user'});
+        expect(messages[1]).toEqual({
+            content: [
+                {
+                    data: {
+                        expiresAt: undefined,
+                        formDescription: undefined,
+                        formTitle: 'Approve deletion',
+                        formUrl: undefined,
+                        hasInputs: false,
+                        kind: 'approval-request',
+                        resumeId: 'resume-1',
+                    },
+                    type: 'data-approval-request',
+                },
+            ],
+            role: 'assistant',
+        });
+    });
+
+    it('keeps the streamed text and adds the approval card after it', async () => {
+        let connectionState: 'CLOSED' | 'CONNECTED' = 'CLOSED';
+
+        vi.mocked(useSSE).mockImplementation(() => ({
+            close: vi.fn(),
+            connectionState,
+            data: null,
+            error: null,
+            errorStatus: null,
+        }));
+
+        useChatsStore.setState({resumeUrl: null});
+
+        render(
+            <ChatRuntimeProvider environmentName="test" sseStreamResponse={true} workflowExecutionId="workflow-123">
+                child
+            </ChatRuntimeProvider>
+        );
+
+        await act(async () => {
+            await getOnNew()(createTextMessage('Delete the customer record'));
+        });
+
+        connectionState = 'CONNECTED';
+
+        const sseOptions = vi.mocked(useSSE).mock.lastCall![1]!;
+
+        act(() => {
+            sseOptions.eventHandlers!.stream('I need approval first.');
+            sseOptions.eventHandlers!.approval_request({resumeId: 'resume-1'});
+            sseOptions.eventHandlers!.suspended?.('');
+        });
+
+        const {messages} = useChatsStore.getState();
+
+        expect(messages).toHaveLength(3);
+        expect(messages[1]).toEqual({content: 'I need approval first.', role: 'assistant'});
+        expect(messages[2]).toMatchObject({
+            content: [{data: {kind: 'approval-request', resumeId: 'resume-1'}, type: 'data-approval-request'}],
+            role: 'assistant',
+        });
+    });
+
     it('shows an error when the ask_user_question event is malformed', async () => {
         useChatsStore.setState({resumeUrl: null});
 
@@ -844,5 +1017,196 @@ describe('ChatRuntimeProvider resume', () => {
         expect(isRunning).toBe(true);
         expect(resumeUrl).toBeNull();
         expect(messages[messages.length - 1]).toEqual({content: '', role: 'assistant'});
+    });
+});
+
+describe('ChatRuntimeProvider approval resolution', () => {
+    const APPROVAL_CARD_MESSAGE = {
+        content: [{data: {kind: 'approval-request', resumeId: 'first'}, type: 'data-approval-request'}],
+        role: 'assistant',
+    } as const;
+
+    const stream: {
+        connectionState: 'CLOSED' | 'CONNECTED' | 'ERROR';
+        error: string | null;
+        errorStatus: number | null;
+    } = {connectionState: 'CLOSED', error: null, errorStatus: null};
+
+    let approvalResolution: ApprovalResolutionContextI | null = null;
+
+    function ApprovalResolutionCapture({label}: {label: string}) {
+        approvalResolution = useApprovalResolution();
+
+        return <span>{label}</span>;
+    }
+
+    function getLastSseCall(): [SSERequestType, UseSSEOptionsType] {
+        const lastCall = vi.mocked(useSSE).mock.lastCall!;
+
+        return [lastCall[0], lastCall[1]!];
+    }
+
+    function renderProvider() {
+        const renderResult = render(
+            <ChatRuntimeProvider environmentName="test" sseStreamResponse={true} workflowExecutionId="workflow-123">
+                <ApprovalResolutionCapture label="first render" />
+            </ChatRuntimeProvider>
+        );
+
+        return () =>
+            renderResult.rerender(
+                <ChatRuntimeProvider environmentName="test" sseStreamResponse={true} workflowExecutionId="workflow-123">
+                    <ApprovalResolutionCapture label="next render" />
+                </ChatRuntimeProvider>
+            );
+    }
+
+    beforeEach(() => {
+        stream.connectionState = 'CLOSED';
+        stream.error = null;
+        stream.errorStatus = null;
+
+        vi.mocked(useSSE).mockImplementation(() => ({
+            close: vi.fn(),
+            connectionState: stream.connectionState,
+            data: null,
+            error: stream.error,
+            errorStatus: stream.errorStatus,
+        }));
+
+        useChatsStore.setState({isRunning: false, messages: [APPROVAL_CARD_MESSAGE], resumeUrl: null});
+    });
+
+    afterEach(() => {
+        approvalResolution = null;
+
+        vi.clearAllMocks();
+    });
+
+    it('refuses a second decision while the first one is being submitted', async () => {
+        renderProvider();
+
+        let firstDecision: Promise<void> | undefined;
+
+        act(() => {
+            firstDecision = approvalResolution!.resolveApproval('first', {approved: true});
+        });
+
+        const [firstRequest] = getLastSseCall();
+
+        let secondDecision: Promise<void> | undefined;
+
+        act(() => {
+            secondDecision = approvalResolution!.resolveApproval('second', {approved: true});
+        });
+
+        await expect(secondDecision).rejects.toThrow('Another decision is being submitted');
+
+        const [currentRequest, sseOptions] = getLastSseCall();
+
+        expect(currentRequest).toBe(firstRequest);
+        expect(currentRequest?.url).toBe('/job/resume/first');
+
+        act(() => {
+            sseOptions.onRequestSuccess?.(firstRequest);
+        });
+
+        await expect(firstDecision).resolves.toBeUndefined();
+    });
+
+    it('settles the decision when its request is aborted', async () => {
+        renderProvider();
+
+        let decision: Promise<void> | undefined;
+
+        act(() => {
+            decision = approvalResolution!.resolveApproval('first', {approved: true});
+        });
+
+        const [request, sseOptions] = getLastSseCall();
+
+        act(() => {
+            sseOptions.onRequestAbort?.(request);
+        });
+
+        await expect(decision).rejects.toBeInstanceOf(ResumeError);
+    });
+
+    it('ignores the abort of a request other than the decision being submitted', async () => {
+        renderProvider();
+
+        let decision: Promise<void> | undefined;
+
+        act(() => {
+            decision = approvalResolution!.resolveApproval('first', {approved: true});
+        });
+
+        const [request, sseOptions] = getLastSseCall();
+
+        act(() => {
+            sseOptions.onRequestAbort?.({url: '/webhooks/workflow-123/sse'});
+            sseOptions.onRequestSuccess?.(request);
+        });
+
+        await expect(decision).resolves.toBeUndefined();
+    });
+
+    it('adds the assistant bubble for the resumed run only once the request succeeds', async () => {
+        renderProvider();
+
+        let decision: Promise<void> | undefined;
+
+        act(() => {
+            decision = approvalResolution!.resolveApproval('first', {approved: true});
+        });
+
+        expect(useChatsStore.getState().messages).toEqual([APPROVAL_CARD_MESSAGE]);
+
+        const [request, sseOptions] = getLastSseCall();
+
+        act(() => {
+            sseOptions.onRequestSuccess?.(request);
+        });
+
+        await expect(decision).resolves.toBeUndefined();
+
+        expect(useChatsStore.getState().messages).toEqual([APPROVAL_CARD_MESSAGE, {content: '', role: 'assistant'}]);
+    });
+
+    it('leaves the chat untouched when a decision is refused, however often it is retried', async () => {
+        const rerenderProvider = renderProvider();
+
+        for (let attempt = 0; attempt < 2; attempt++) {
+            stream.connectionState = 'CLOSED';
+            stream.error = null;
+            stream.errorStatus = null;
+
+            let decision: Promise<void> | undefined;
+
+            act(() => {
+                decision = approvalResolution!.resolveApproval('first', {approved: true});
+            });
+
+            const [request, sseOptions] = getLastSseCall();
+
+            act(() => {
+                sseOptions.onRequestError?.(410, request);
+            });
+
+            await expect(decision).rejects.toMatchObject({status: 410});
+
+            stream.connectionState = 'ERROR';
+            stream.error = 'HTTP 410';
+            stream.errorStatus = 410;
+
+            act(() => {
+                rerenderProvider();
+            });
+        }
+
+        const {isRunning, messages} = useChatsStore.getState();
+
+        expect(isRunning).toBe(false);
+        expect(messages).toEqual([APPROVAL_CARD_MESSAGE]);
     });
 });

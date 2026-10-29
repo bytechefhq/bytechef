@@ -1,4 +1,5 @@
 {
+  "deprecated": null,
   "description": "Stops a job execution with specified status and message.",
   "help": null,
   "icon": "path:assets/terminate.svg",

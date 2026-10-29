@@ -11,6 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
+import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -31,10 +34,12 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -49,6 +54,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -106,6 +112,28 @@ class EmbeddedMcpServerConfigurationIntTest {
                 .contains("syncWorkerExecutor")
                 .doesNotContain("workerExecutor");
         });
+    }
+
+    @Test
+    void testTheFirstSyncTaskCompletionHandlerRejectsASuspendingStep() {
+        List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories =
+            new EmbeddedMcpServerConfiguration().getSyncTaskCompletionHandlerFactories(
+                mock(ContextService.class), mock(ApplicationEventPublisher.class), mock(CounterService.class),
+                mock(Evaluator.class), mock(JobService.class), mock(TaskExecutionService.class),
+                mock(TaskFileStorage.class));
+
+        TaskCompletionHandlerFactory taskCompletionHandlerFactory = taskCompletionHandlerFactories.getFirst();
+
+        TaskCompletionHandler taskCompletionHandler = taskCompletionHandlerFactory.createTaskCompletionHandler(
+            mock(TaskCompletionHandler.class), null);
+
+        assertThat(taskCompletionHandler).isInstanceOf(SyncExecutionSuspendRejectingTaskCompletionHandler.class);
+
+        TaskExecution suspendedTaskExecution = new TaskExecution();
+
+        suspendedTaskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, "resume-id");
+
+        assertThat(taskCompletionHandler.canHandle(suspendedTaskExecution)).isTrue();
     }
 
     @Test

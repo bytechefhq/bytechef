@@ -9,6 +9,7 @@ Name | Type
 ------------ | -------------
 `componentName` | string
 `componentVersion` | number
+`deprecated` | boolean
 `description` | string
 `help` | [Help](Help.md)
 `name` | string
@@ -31,6 +32,7 @@ import type { ActionDefinition } from ''
 const example = {
   "componentName": null,
   "componentVersion": null,
+  "deprecated": null,
   "description": null,
   "help": null,
   "name": null,
