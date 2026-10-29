@@ -23,6 +23,7 @@ import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
+import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -32,6 +33,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -300,6 +302,64 @@ public class ConnectedUserMcpServerFacadeIntTest {
             anyLong(), anyString(), eq(true));
     }
 
+    @Test
+    public void testGetProvisionableMcpServersReportsCoverageFromComponentsAndConfigurations() {
+        List<ProvisionableConnectedUserMcpServerDTO> provisionableMcpServers =
+            connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId);
+
+        assertThat(provisionableMcpServers)
+            .extracting(
+                ProvisionableConnectedUserMcpServerDTO::name,
+                ProvisionableConnectedUserMcpServerDTO::coveredComponentNames,
+                ProvisionableConnectedUserMcpServerDTO::missingComponentNames)
+            .containsExactly(
+                tuple("Google", List.of("gmail"), List.of()), tuple("Workflows only", List.of("gmail"), List.of()));
+    }
+
+    @Test
+    public void testGetProvisionableMcpServersListsMissingComponentsForUncoveredServer() {
+        McpServer uncoveredMcpServer = mcpServerRepository.save(
+            new McpServer("Chat", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
+
+        mcpComponentRepository.save(new McpComponent("slack", 1, uncoveredMcpServer.getId(), null));
+        mcpComponentRepository.save(new McpComponent("gmail", 1, uncoveredMcpServer.getId(), null));
+
+        ProvisionableConnectedUserMcpServerDTO provisionableMcpServer =
+            connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId)
+                .stream()
+                .filter(candidate -> candidate.id() == uncoveredMcpServer.getId())
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(provisionableMcpServer.provisioned()).isFalse();
+        assertThat(provisionableMcpServer.coveredComponentNames()).containsExactly("gmail");
+        assertThat(provisionableMcpServer.missingComponentNames()).containsExactly("slack");
+    }
+
+    @Test
+    public void testGetProvisionableMcpServersSkipsDisabledServersAndOtherEnvironments() {
+        mcpServerRepository.save(new McpServer("Disabled", PlatformType.EMBEDDED, Environment.DEVELOPMENT, false));
+        mcpServerRepository.save(new McpServer("Production", PlatformType.EMBEDDED, Environment.PRODUCTION));
+
+        assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
+            .extracting(ProvisionableConnectedUserMcpServerDTO::name)
+            .containsExactly("Google", "Workflows only");
+    }
+
+    @Test
+    public void testGetProvisionableMcpServersMarksProvisionedServers() {
+        assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
+            .extracting(ProvisionableConnectedUserMcpServerDTO::provisioned)
+            .containsExactly(true, true);
+
+        connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
+            .extracting(ProvisionableConnectedUserMcpServerDTO::name,
+                ProvisionableConnectedUserMcpServerDTO::provisioned)
+            .containsExactly(tuple("Google", false), tuple("Workflows only", true));
+    }
+
     private void insertMcpWorkflow(
         String workflowId, String label, String description, String toolParameters, boolean configurationEnabled,
         boolean userEnabled, long integrationInstanceConfigurationId, long mcpIntegrationInstanceConfigurationId) {
@@ -352,7 +412,8 @@ public class ConnectedUserMcpServerFacadeIntTest {
     @Configuration
     @EnableCaching
     @Import({
-        ConnectedUserMcpServerFacadeImpl.class, IntegrationInstanceConfigurationServiceImpl.class,
+        ConnectedUserMcpServerFacadeImpl.class, ConnectedUserServiceImpl.class,
+        IntegrationInstanceConfigurationServiceImpl.class,
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class,

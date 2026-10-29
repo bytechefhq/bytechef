@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
+import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
 import java.util.List;
 
 /**
@@ -24,4 +25,6 @@ public interface ConnectedUserMcpServerFacade {
     void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable);
 
     List<ConnectedUserMcpServerDTO> getConnectedUserMcpServers(long connectedUserId);
+
+    List<ProvisionableConnectedUserMcpServerDTO> getProvisionableMcpServers(long connectedUserId);
 }
