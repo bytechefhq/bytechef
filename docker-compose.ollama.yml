@@ -1,0 +1,66 @@
+---
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - storage_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: bytechef
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  ollama:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    restart: unless-stopped
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-30m}
+    healthcheck:
+      test: [ "CMD", "ollama", "list" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  ollama-pull:
+    image: ${OLLAMA_IMAGE:-ollama/ollama:latest}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: [ "ollama pull \"$$OLLAMA_CHAT_MODEL\" && ollama pull \"$$OLLAMA_EMBEDDING_MODEL\"" ]
+    environment:
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-qwen3:8b}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      OLLAMA_HOST: http://ollama:11434
+    restart: "on-failure:5"
+  bytechef:
+    image: ${BYTECHEF_IMAGE:-docker.bytechef.io/bytechef/bytechef:latest}
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL: ${OLLAMA_CHAT_MODEL:-qwen3:8b}
+      BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      BYTECHEF_AI_PROVIDER_OLLAMA_URL: http://ollama:11434
+      BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
+      BYTECHEF_DATASOURCE_USERNAME: postgres
+      BYTECHEF_FEATURE_FLAGS: ${BYTECHEF_FEATURE_FLAGS:-}
+      BYTECHEF_SECURITY_REMEMBER_ME_KEY: e48keep1this1safe3ffb2
+    volumes:
+      - ~/.bytechef:/root/.bytechef
+    ports:
+      - "8080:8080"
+volumes:
+  ollama_models:
+    driver: "local"
+  storage_db:
+    driver: "local"
