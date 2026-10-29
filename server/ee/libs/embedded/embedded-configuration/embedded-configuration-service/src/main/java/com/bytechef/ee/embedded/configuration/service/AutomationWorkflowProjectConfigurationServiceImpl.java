@@ -12,13 +12,19 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectCo
 import com.bytechef.ee.embedded.configuration.repository.AutomationWorkflowProjectConfigurationRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -32,13 +38,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class AutomationWorkflowProjectConfigurationServiceImpl
     implements AutomationWorkflowProjectConfigurationService {
 
+    private static final String ROLLOUT_LOCK_KEY_PREFIX = "automation-workflow-project-configuration-rollout:";
+
     private final AutomationWorkflowProjectConfigurationRepository automationWorkflowProjectConfigurationRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectConfigurationServiceImpl(
-        AutomationWorkflowProjectConfigurationRepository automationWorkflowProjectConfigurationRepository) {
+        AutomationWorkflowProjectConfigurationRepository automationWorkflowProjectConfigurationRepository,
+        JdbcTemplate jdbcTemplate) {
 
         this.automationWorkflowProjectConfigurationRepository = automationWorkflowProjectConfigurationRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -63,14 +74,6 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
     }
 
     @Override
-    public Optional<AutomationWorkflowProjectConfiguration> fetchConfigurationForUpdate(
-        long projectId, long environmentId) {
-
-        return automationWorkflowProjectConfigurationRepository.findByProjectIdAndEnvironmentIdForUpdate(
-            projectId, environmentId);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public AutomationWorkflowProjectConfiguration getConfiguration(long id) {
         return automationWorkflowProjectConfigurationRepository.findById(id)
@@ -87,6 +90,12 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
     @Override
     public List<AutomationWorkflowProjectConfiguration> getConfigurations(Set<Long> projectIds) {
         return automationWorkflowProjectConfigurationRepository.findAllByProjectIdIn(projectIds);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void lockRollout(long projectId, long environmentId) {
+        jdbcTemplate.queryForList("SELECT pg_advisory_xact_lock(?)", getRolloutLockKey(projectId, environmentId));
     }
 
     @Override
@@ -137,5 +146,23 @@ public class AutomationWorkflowProjectConfigurationServiceImpl
         configuration.setWorkflows(workflows);
 
         return automationWorkflowProjectConfigurationRepository.save(configuration);
+    }
+
+    static long getRolloutLockKey(long projectId, long environmentId) {
+        MessageDigest messageDigest;
+
+        try {
+            messageDigest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+            throw new IllegalStateException(noSuchAlgorithmException);
+        }
+
+        String lockName = ROLLOUT_LOCK_KEY_PREFIX + projectId + ":" + environmentId;
+
+        byte[] digest = messageDigest.digest(lockName.getBytes(StandardCharsets.UTF_8));
+
+        ByteBuffer digestBuffer = ByteBuffer.wrap(digest);
+
+        return digestBuffer.getLong();
     }
 }

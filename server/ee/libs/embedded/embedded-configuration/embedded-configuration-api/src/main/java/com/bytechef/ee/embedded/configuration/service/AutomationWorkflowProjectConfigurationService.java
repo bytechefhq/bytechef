@@ -27,17 +27,18 @@ public interface AutomationWorkflowProjectConfigurationService {
 
     Optional<AutomationWorkflowProjectConfiguration> fetchConfiguration(long projectId, long environmentId);
 
-    /**
-     * Fetches the configuration and locks its row until the caller's transaction ends, so concurrent callers for the
-     * same project and environment run one after the other. Must be called inside a transaction.
-     */
-    Optional<AutomationWorkflowProjectConfiguration> fetchConfigurationForUpdate(long projectId, long environmentId);
-
     AutomationWorkflowProjectConfiguration getConfiguration(long id);
 
     List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId);
 
     List<AutomationWorkflowProjectConfiguration> getConfigurations(Set<Long> projectIds);
+
+    /**
+     * Takes a transaction-scoped lock that serializes configuration rollouts for one project and environment; it is
+     * released when the caller's transaction ends. It never blocks writes to the configuration itself. Must be called
+     * inside a transaction.
+     */
+    void lockRollout(long projectId, long environmentId);
 
     boolean isWorkflowEnabled(AutomationWorkflowProjectConfiguration configuration, UUID workflowUuid);
 

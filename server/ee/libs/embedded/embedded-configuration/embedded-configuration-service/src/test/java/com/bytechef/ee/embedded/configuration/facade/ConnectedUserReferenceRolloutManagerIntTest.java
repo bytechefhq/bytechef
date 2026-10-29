@@ -55,6 +55,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeplo
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
+import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
@@ -107,6 +108,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -119,6 +121,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -204,6 +207,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     @MockitoBean
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;
 
+    @MockitoBean
+    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
+
     @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
 
@@ -230,6 +236,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     @Autowired
     private EnvironmentService environmentService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private JobFacade jobFacade;
@@ -774,7 +783,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testConcurrentRolloutsForTheSamePairEndInTheNewerState() throws InterruptedException {
+    void testConcurrentRolloutsForTheSamePairCompleteWithoutRolloutFailures() throws InterruptedException {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Concurrent Rollouts");
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -798,16 +807,25 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         CountDownLatch finishedLatch = new CountDownLatch(2);
         AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
 
-        for (int index = 0; index < 2; index++) {
-            startRolloutThread(automationWorkflowProjectId, startLatch, finishedLatch, rolloutFailure);
+        ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
+
+        try {
+            for (int index = 0; index < 2; index++) {
+                startRolloutThread(automationWorkflowProjectId, startLatch, finishedLatch, rolloutFailure);
+            }
+
+            startLatch.countDown();
+
+            boolean finished = finishedLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            assertThat(finished).isTrue();
+        } finally {
+            detachAppenderFromRolloutManagerLogger(appender);
         }
 
-        startLatch.countDown();
-
-        boolean finished = finishedLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-
-        assertThat(finished).isTrue();
         assertThat(rolloutFailure.get()).isNull();
+        assertThat(appender.list)
+            .noneSatisfy(event -> assertThat(event.getLevel()).isEqualTo(Level.ERROR));
         assertThat(List.of(firstReference.getProjectDeploymentId(), secondReference.getProjectDeploymentId()))
             .allSatisfy(projectDeploymentId -> assertThat(
                 projectDeploymentService.getProjectDeployment(projectDeploymentId)
@@ -820,7 +838,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testRolloutWaitsForAConfigurationChangeInFlightAndRollsOutTheNewerState() throws InterruptedException {
+    void testRolloutWaitsForTheRolloutLockWhileAdministratorSavesDoNot() throws InterruptedException {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Waits On Lock");
 
         String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -837,30 +855,63 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         updateProductionConfigurationVersion(automationWorkflowProjectId, 2);
 
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .orElseThrow();
+
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch finishedLatch = new CountDownLatch(1);
-        AtomicBoolean finishedWhileTheChangeWasInFlight = new AtomicBoolean();
+        CountDownLatch saveFinishedLatch = new CountDownLatch(1);
+        AtomicInteger heldAdvisoryLockCount = new AtomicInteger();
+        AtomicBoolean rolloutFinishedWhileLocked = new AtomicBoolean();
+        AtomicBoolean rolloutFinishedAfterTheSave = new AtomicBoolean();
+        AtomicBoolean saveFinishedWhileLocked = new AtomicBoolean();
         AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
+        AtomicReference<Throwable> saveFailure = new AtomicReference<>();
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
-            updateProductionConfigurationVersion(automationWorkflowProjectId, 3);
+            automationWorkflowProjectConfigurationService.lockRollout(
+                automationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+            heldAdvisoryLockCount.set(countAdvisoryLocksHeldByThisSession());
 
             startRolloutThread(automationWorkflowProjectId, startLatch, finishedLatch, rolloutFailure);
 
             startLatch.countDown();
 
-            finishedWhileTheChangeWasInFlight.set(awaitQuietly(finishedLatch, ROLLOUT_LOCK_WAIT_SECONDS));
+            rolloutFinishedWhileLocked.set(awaitQuietly(finishedLatch, ROLLOUT_LOCK_WAIT_SECONDS));
+
+            Thread saveThread = new Thread(() -> {
+                try {
+                    automationWorkflowProjectConfigurationAdminFacade.updateConfiguration(
+                        configuration.getId(), 3, true, true);
+                } catch (RuntimeException | AssertionError throwable) {
+                    saveFailure.set(throwable);
+                } finally {
+                    saveFinishedLatch.countDown();
+                }
+            });
+
+            saveThread.setDaemon(true);
+            saveThread.start();
+
+            saveFinishedWhileLocked.set(awaitQuietly(saveFinishedLatch, ROLLOUT_COMPLETION_TIMEOUT_SECONDS));
+            rolloutFinishedAfterTheSave.set(finishedLatch.getCount() == 0);
         });
 
         boolean finished = finishedLatch.await(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
+        assertThat(heldAdvisoryLockCount.get()).isEqualTo(1);
+        assertThat(saveFinishedWhileLocked.get()).isTrue();
+        assertThat(saveFailure.get()).isNull();
         assertThat(finished).isTrue();
         assertThat(rolloutFailure.get()).isNull();
         assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
             .getProjectVersion()).isEqualTo(3);
-        assertThat(finishedWhileTheChangeWasInFlight.get()).isFalse();
+        assertThat(rolloutFinishedWhileLocked.get()).isFalse();
+        assertThat(rolloutFinishedAfterTheSave.get()).isFalse();
     }
 
     @Test
@@ -888,14 +939,17 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch finishedLatch = new CountDownLatch(1);
+        AtomicInteger heldAdvisoryLockCount = new AtomicInteger();
         AtomicBoolean finishedWhileTheOtherPairWasLocked = new AtomicBoolean();
         AtomicReference<Throwable> rolloutFailure = new AtomicReference<>();
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {
-            automationWorkflowProjectConfigurationService.fetchConfigurationForUpdate(
+            automationWorkflowProjectConfigurationService.lockRollout(
                 lockedAutomationWorkflowProjectId, PRODUCTION_ENVIRONMENT_ID);
+
+            heldAdvisoryLockCount.set(countAdvisoryLocksHeldByThisSession());
 
             startRolloutThread(automationWorkflowProjectId, startLatch, finishedLatch, rolloutFailure);
 
@@ -904,6 +958,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             finishedWhileTheOtherPairWasLocked.set(awaitQuietly(finishedLatch, ROLLOUT_COMPLETION_TIMEOUT_SECONDS));
         });
 
+        assertThat(heldAdvisoryLockCount.get()).isEqualTo(1);
         assertThat(finishedWhileTheOtherPairWasLocked.get()).isTrue();
         assertThat(rolloutFailure.get()).isNull();
         assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
@@ -1679,6 +1734,13 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
             throw new IllegalStateException(interruptedException);
         }
+    }
+
+    private int countAdvisoryLocksHeldByThisSession() {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_locks WHERE locktype = 'advisory' AND granted AND pid = pg_backend_pid()",
+                Integer.class));
     }
 
     private long createAutomationWorkflowProject(String name) {
