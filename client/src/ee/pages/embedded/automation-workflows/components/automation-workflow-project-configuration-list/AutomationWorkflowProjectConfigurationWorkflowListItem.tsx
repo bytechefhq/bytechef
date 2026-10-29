@@ -92,17 +92,11 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
 
     return (
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-            <div
+            <button
                 aria-label={workflowLabel}
-                className="flex flex-1 cursor-pointer items-center"
+                className="flex flex-1 cursor-pointer items-center text-left"
                 onClick={handleOpenExecutions}
-                onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        handleOpenExecutions();
-                    }
-                }}
-                role="button"
-                tabIndex={0}
+                type="button"
             >
                 <div
                     className={twMerge(
@@ -124,7 +118,7 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                         />
                     </div>
                 )}
-            </div>
+            </button>
 
             <div className="flex items-center gap-x-4">
                 {lastExecutionDate ? (

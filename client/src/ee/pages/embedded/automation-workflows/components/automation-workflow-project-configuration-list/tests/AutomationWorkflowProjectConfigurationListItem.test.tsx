@@ -1,5 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
+import {AutomationWorkflowProjectConfigurationsQuery} from '@/shared/middleware/graphql';
 import {resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -38,7 +39,10 @@ const environments = [
     {id: 2, name: 'Staging'},
 ];
 
-const configuration = {
+type AutomationWorkflowProjectConfigurationType =
+    AutomationWorkflowProjectConfigurationsQuery['automationWorkflowProjectConfigurations'][number];
+
+const configuration: AutomationWorkflowProjectConfigurationType = {
     automationHubVisible: true,
     enabled: false,
     environmentId: '2',
@@ -231,6 +235,18 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         await waitFor(() => expect(onDelete).toHaveBeenCalledWith(configuration));
         await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    });
+
+    it('shows when the configuration last executed', () => {
+        const lastExecutionDate = new Date('2026-10-01T10:15:00Z');
+
+        renderItem({configuration: {...configuration, lastExecutionDate: lastExecutionDate.toISOString()}});
+
+        expect(
+            screen.getByText(
+                `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+            )
+        ).toBeInTheDocument();
     });
 
     it('toggles a workflow of the configuration', async () => {
