@@ -537,6 +537,20 @@ export type AutomationWorkflowProjectConfiguration = {
   workflows: Array<AutomationWorkflowProjectConfigurationWorkflow>;
 };
 
+export type AutomationWorkflowProjectConfigurationVersionImpact = {
+  __typename?: 'AutomationWorkflowProjectConfigurationVersionImpact';
+  workflows: Array<AutomationWorkflowProjectConfigurationVersionImpactWorkflow>;
+};
+
+export type AutomationWorkflowProjectConfigurationVersionImpactWorkflow = {
+  __typename?: 'AutomationWorkflowProjectConfigurationVersionImpactWorkflow';
+  affectedConnectedUserCount: Scalars['Int']['output'];
+  label: Scalars['String']['output'];
+  newRequiredConnections: Array<Scalars['String']['output']>;
+  newRequiredInputs: Array<Scalars['String']['output']>;
+  workflowUuid: Scalars['ID']['output'];
+};
+
 export type AutomationWorkflowProjectConfigurationWorkflow = {
   __typename?: 'AutomationWorkflowProjectConfigurationWorkflow';
   enabled: Scalars['Boolean']['output'];
@@ -3138,6 +3152,7 @@ export type Query = {
   authorities: Array<Scalars['String']['output']>;
   automationSearch: Array<SearchResult>;
   automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
+  automationWorkflowProjectConfigurationVersionImpact: AutomationWorkflowProjectConfigurationVersionImpact;
   automationWorkflowProjectConfigurations: Array<AutomationWorkflowProjectConfiguration>;
   automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
   automationWorkflowProjectVersions: Array<AutomationWorkflowProjectVersion>;
@@ -3417,6 +3432,12 @@ export type QueryApprovalTasksByIdsArgs = {
 export type QueryAutomationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectConfigurationVersionImpactArgs = {
+  id: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
 };
 
 
