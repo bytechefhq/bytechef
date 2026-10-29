@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation(project(":cli:commands:component:init:openapi"))
     implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:config:cache-config"))
     implementation(project(":sdks:backend:java:component-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-api"))
@@ -22,4 +23,5 @@ dependencies {
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }
