@@ -38,7 +38,7 @@ public class SingleCoordinatorCheck {
     static final String ANOTHER_COORDINATOR_MESSAGE =
         "Another coordinator is running against this database. The Community Edition supports one coordinator: with " +
             "more, caches go stale and sessions are not shared. Running more than one coordinator requires ByteChef " +
-            "Enterprise Edition (bytechef.edition=ee, BYTECHEF_EDITION=ee).";
+            "Enterprise Edition (bytechef.edition=EE, BYTECHEF_EDITION=EE).";
 
     private static final long CHECKIN_GRACE_MILLIS = 7_500;
     private static final String OTHER_SCHEDULER_INSTANCE_EXISTS = "SELECT EXISTS (SELECT 1 FROM QRTZ_SCHEDULER_STATE " +
