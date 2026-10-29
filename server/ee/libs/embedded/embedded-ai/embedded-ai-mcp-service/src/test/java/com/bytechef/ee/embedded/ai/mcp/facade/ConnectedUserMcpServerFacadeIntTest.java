@@ -451,8 +451,8 @@ public class ConnectedUserMcpServerFacadeIntTest {
 
         verify(integrationInstanceFacade).enableIntegrationInstanceWorkflow(
             integrationInstanceId, ARCHIVE_EMAIL_WORKFLOW_ID, true);
-        verify(integrationInstanceFacade).enableIntegrationInstanceWorkflow(
-            integrationInstanceId, SEND_EMAIL_WORKFLOW_ID, true);
+        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
+            anyLong(), eq(SEND_EMAIL_WORKFLOW_ID), eq(true));
         verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
             anyLong(), eq(HIDDEN_WORKFLOW_ID), eq(true));
     }
