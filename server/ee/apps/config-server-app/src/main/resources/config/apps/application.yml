@@ -152,6 +152,8 @@ bytechef:
   ai:
     copilot:
       enabled: false
+      # Default LLM provider of the Copilot when the user has not selected one; empty uses the catalog default
+      provider:
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
@@ -267,6 +269,9 @@ bytechef:
     # SMTP host; empty disables the mail health check and logs that mail is not configured
     host:
   message-broker:
+    aws:
+      # Transport for CONTROL routes, which must reach every node (REDIS | SQS) default: SQS
+      control-provider: SQS
     # Messaging provider between Coordinator and Workers (AMQP | JMS | KAFKA | REDIS) default: REDIS
     provider: REDIS
   oauth2:
@@ -280,6 +285,8 @@ bytechef:
       aws:
         # Sign OTLP log export requests with AWS SigV4 (CloudWatch OTLP endpoint https://logs.{region}.amazonaws.com/v1/logs).
         enabled: false
+        # AWS service name used in the SigV4 signature scope
+        service: logs
       enabled: false
       endpoint: http://localhost:4318/v1/logs
     metrics:
