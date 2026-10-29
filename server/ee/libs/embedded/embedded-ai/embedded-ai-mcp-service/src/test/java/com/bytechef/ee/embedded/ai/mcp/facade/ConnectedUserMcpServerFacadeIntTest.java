@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -24,6 +25,7 @@ import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
+import com.bytechef.ee.embedded.ai.mcp.exception.ConnectedUserMcpServerErrorType;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -35,6 +37,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflo
 import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -358,6 +361,135 @@ public class ConnectedUserMcpServerFacadeIntTest {
             .extracting(ProvisionableConnectedUserMcpServerDTO::name,
                 ProvisionableConnectedUserMcpServerDTO::provisioned)
             .containsExactly(tuple("Google", false), tuple("Workflows only", true));
+    }
+
+    @Test
+    public void testProvisionMcpServerCreatesToolRowsOnlyForMatchingInstances() {
+        connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        long otherIntegrationId = insert(
+            """
+                INSERT INTO integration (name, component_name, allow_multiple_instances, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES ('slack', 'slack', false, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """);
+        long otherConfigurationId = insert(
+            """
+                INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
+                    environment, connection_parameters, authorization_type, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, 1, 'slack', true, 0, ?, 0, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            otherIntegrationId, encryption.encrypt("{}"));
+        long otherConnectionId = insert(
+            """
+                INSERT INTO connection (name, component_name, environment, connection_version, parameters,
+                    credential_status, type, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES ('slack', 'slack', 0, 1, '{}', 0, 0, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """);
+        long otherInstanceId = insert(
+            """
+                INSERT INTO integration_instance (integration_instance_configuration_id, connected_user_id,
+                    connection_id, enabled, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES (?, ?, ?, true, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            otherConfigurationId, connectedUserId, otherConnectionId);
+
+        connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .hasSize(2)
+            .allSatisfy(mcpIntegrationInstanceTool -> assertThat(mcpIntegrationInstanceTool.isEnabled()).isTrue());
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(otherInstanceId)).isEmpty();
+    }
+
+    @Test
+    public void testProvisionMcpServerReEnablesExistingRows() {
+        connectedUserMcpServerFacade.enableConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId(), false);
+
+        connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .hasSize(2)
+            .allSatisfy(mcpIntegrationInstanceTool -> assertThat(mcpIntegrationInstanceTool.isEnabled()).isTrue());
+    }
+
+    @Test
+    public void testProvisionMcpServerSkipsGloballyDisabledTools() {
+        connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        McpTool getEmailTool = mcpToolRepository.findAll()
+            .stream()
+            .filter(mcpTool -> "getEmail".equals(mcpTool.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        getEmailTool.setEnabled(false);
+
+        mcpToolRepository.save(getEmailTool);
+
+        connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .extracting(mcpIntegrationInstanceTool -> mcpIntegrationInstanceTool.getMcpToolId())
+            .containsExactly(Objects.requireNonNull(
+                mcpToolRepository.findAll()
+                    .stream()
+                    .filter(mcpTool -> "searchEmail".equals(mcpTool.getName()))
+                    .findFirst()
+                    .orElseThrow()
+                    .getId()));
+    }
+
+    @Test
+    public void testProvisionMcpServerEnablesConfigurationWorkflows() {
+        connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, workflowsMcpServer.getId());
+
+        verify(integrationInstanceFacade).enableIntegrationInstanceWorkflow(
+            integrationInstanceId, ARCHIVE_EMAIL_WORKFLOW_ID, true);
+        verify(integrationInstanceFacade).enableIntegrationInstanceWorkflow(
+            integrationInstanceId, SEND_EMAIL_WORKFLOW_ID, true);
+        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
+            anyLong(), eq(HIDDEN_WORKFLOW_ID), eq(true));
+    }
+
+    @Test
+    public void testProvisionMcpServerRejectsServerWithoutCoveredIntegration() {
+        McpServer uncoveredMcpServer = mcpServerRepository.save(
+            new McpServer("Chat", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
+
+        mcpComponentRepository.save(new McpComponent("slack", 1, uncoveredMcpServer.getId(), null));
+
+        assertThatThrownBy(
+            () -> connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, uncoveredMcpServer.getId()))
+                .isInstanceOfSatisfying(
+                    ConfigurationException.class,
+                    configurationException -> assertThat(configurationException.getErrorKey())
+                        .isEqualTo(ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION.getErrorKey()));
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .hasSize(2);
+        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
+            anyLong(), anyString(), eq(true));
+    }
+
+    @Test
+    public void testProvisionMcpServerMakesTheServerAppearForTheUser() {
+        connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        assertThat(connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId))
+            .extracting(ConnectedUserMcpServerDTO::name)
+            .containsExactly("Workflows only");
+
+        connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, toolsMcpServer.getId());
+
+        assertThat(connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId))
+            .extracting(ConnectedUserMcpServerDTO::name)
+            .containsExactly("Google", "Workflows only");
     }
 
     private void insertMcpWorkflow(

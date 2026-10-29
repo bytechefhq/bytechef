@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
+import com.bytechef.ee.embedded.ai.mcp.exception.ConnectedUserMcpServerErrorType;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -34,6 +35,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflo
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -318,6 +320,71 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             Comparator.comparing(ProvisionableConnectedUserMcpServerDTO::name, String.CASE_INSENSITIVE_ORDER));
 
         return provisionableMcpServers;
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void provisionMcpServer(long connectedUserId, long mcpServerId) {
+        McpServerCoverage mcpServerCoverage = getMcpServerCoverage(
+            mcpServerId, getUserInstanceCoverage(connectedUserId));
+
+        boolean provisionable = getProvisionableMcpServers(connectedUserId)
+            .stream()
+            .anyMatch(candidate -> candidate.id() == mcpServerId);
+
+        if (!provisionable || mcpServerCoverage.coveredComponentNames()
+            .isEmpty()) {
+
+            throw new ConfigurationException(
+                "MCP server %d has no integration covered by connected user %d".formatted(
+                    mcpServerId, connectedUserId),
+                ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION);
+        }
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUserId);
+
+        Map<Long, String> componentNamesByInstanceConfigurationId = new HashMap<>();
+
+        for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
+            for (McpTool mcpTool : mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())) {
+                if (!mcpTool.isEnabled()) {
+                    continue;
+                }
+
+                for (IntegrationInstance integrationInstance : integrationInstances) {
+                    String componentName = componentNamesByInstanceConfigurationId.computeIfAbsent(
+                        integrationInstance.getIntegrationInstanceConfigurationId(), this::getComponentName);
+
+                    if (!componentName.equals(mcpComponent.getComponentName())) {
+                        continue;
+                    }
+
+                    enableMcpIntegrationInstanceTool(integrationInstance.getId(),
+                        Objects.requireNonNull(mcpTool.getId()));
+                }
+            }
+        }
+
+        Map<Long, List<ConnectedUserMcpServerWorkflowDTO>> workflowsByServerId = getWorkflowsByMcpServerId(
+            integrationInstances);
+
+        for (ConnectedUserMcpServerWorkflowDTO workflow : workflowsByServerId.getOrDefault(mcpServerId, List.of())) {
+            integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+                workflow.integrationInstanceId(), workflow.workflowId(), true);
+        }
+    }
+
+    private void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId) {
+        Optional<McpIntegrationInstanceTool> mcpIntegrationInstanceToolOptional = mcpIntegrationInstanceToolService
+            .fetchMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId);
+
+        if (mcpIntegrationInstanceToolOptional.isPresent()) {
+            mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolOptional.get()
+                .getId(), true);
+        } else {
+            mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, true);
+        }
     }
 
     private McpServerCoverage getMcpServerCoverage(long mcpServerId, UserInstanceCoverage userInstanceCoverage) {
