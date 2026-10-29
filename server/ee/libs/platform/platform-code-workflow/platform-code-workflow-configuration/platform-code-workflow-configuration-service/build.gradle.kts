@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
 
+    testImplementation("io.grpc:grpc-inprocess")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:config:liquibase-config"))
@@ -16,5 +17,9 @@ dependencies {
     testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 
+    testImplementation(project(":server:ee:libs:core:remote:remote-grpc"))
+    testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-remote-client"))
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-remote-grpc"))
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
 }
