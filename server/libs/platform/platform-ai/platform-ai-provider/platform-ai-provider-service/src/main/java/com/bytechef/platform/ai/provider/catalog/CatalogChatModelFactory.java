@@ -1,11 +1,20 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the ByteChef Enterprise license (the "Enterprise License");
- * you may not use this file except in compliance with the Enterprise License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.bytechef.ee.platform.ai.agent.catalog;
+package com.bytechef.platform.ai.provider.catalog;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
@@ -24,7 +33,6 @@ import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
 import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.llm.Provider;
-import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,12 +44,9 @@ import org.springframework.stereotype.Component;
  * Builds a Spring-AI {@link ChatModel} for a catalog {@link Provider} + model name + platform API key, by reusing each
  * component's existing {@code CHAT_MODEL} lambda fed synthetic {@link Parameters}.
  *
- * @version ee
- *
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnEEVersion
 public class CatalogChatModelFactory {
 
     public @Nullable ChatModel createChatModel(

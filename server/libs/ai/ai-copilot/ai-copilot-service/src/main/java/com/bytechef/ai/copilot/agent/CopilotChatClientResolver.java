@@ -1,22 +1,26 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the ByteChef Enterprise license (the "Enterprise License");
- * you may not use this file except in compliance with the Enterprise License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.bytechef.ee.ai.copilot.agent;
+package com.bytechef.ai.copilot.agent;
 
 import com.agui.core.state.State;
-import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
-import com.bytechef.ai.copilot.agent.IncompleteChatModelSelectionException;
-import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
-import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
-import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.ai.provider.catalog.CatalogChatClientResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,12 +37,9 @@ import org.springframework.stereotype.Component;
  * {@code userSelectedLlmModel}, otherwise the environment default. Never falls back to the startup model; an
  * unresolvable model fails the run with a {@link ChatModelUnavailableException}.
  *
- * @version ee
- *
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnEEVersion
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class CopilotChatClientResolver implements OverrideChatClientResolver {
 
