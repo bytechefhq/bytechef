@@ -62,7 +62,7 @@ class CacheInvalidationConfigurationIntTest {
 
     @Test
     void testWrapsCacheManagerInEeWithAmqpBroker() {
-        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=amqp")
+        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=AMQP")
             .run(context -> assertThat(context.getBean(CacheManager.class))
                 .isInstanceOf(ClusterInvalidatingCacheManager.class));
     }
@@ -76,15 +76,15 @@ class CacheInvalidationConfigurationIntTest {
 
     @Test
     void testLeavesCacheManagerWithMemoryBroker() {
-        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=memory")
+        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=MEMORY")
             .run(context -> assertThat(context.getBean(CacheManager.class)).isInstanceOf(CaffeineCacheManager.class));
     }
 
     @Test
     void testWrapsCacheManagerWithAwsBrokerAndRedisControlProvider() {
         contextRunner(
-            "bytechef.edition=ee", "bytechef.message-broker.provider=aws",
-            "bytechef.message-broker.aws.control-provider=redis")
+            "bytechef.edition=EE", "bytechef.message-broker.provider=AWS",
+            "bytechef.message-broker.aws.control-provider=REDIS")
                 .run(context -> assertThat(context.getBean(CacheManager.class))
                     .isInstanceOf(ClusterInvalidatingCacheManager.class));
     }
@@ -92,28 +92,28 @@ class CacheInvalidationConfigurationIntTest {
     @Test
     void testLeavesCacheManagerWithAwsBrokerAndSqsControlProvider() {
         contextRunner(
-            "bytechef.edition=ee", "bytechef.message-broker.provider=aws",
-            "bytechef.message-broker.aws.control-provider=sqs")
+            "bytechef.edition=EE", "bytechef.message-broker.provider=AWS",
+            "bytechef.message-broker.aws.control-provider=SQS")
                 .run(context -> assertThat(context.getBean(CacheManager.class))
                     .isInstanceOf(CaffeineCacheManager.class));
     }
 
     @Test
     void testLeavesCacheManagerWithAwsBrokerWhenControlProviderIsUnset() {
-        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=aws")
+        contextRunner("bytechef.edition=EE", "bytechef.message-broker.provider=AWS")
             .run(context -> assertThat(context.getBean(CacheManager.class)).isInstanceOf(CaffeineCacheManager.class));
     }
 
     @Test
     void testLeavesCacheManagerInCe() {
-        contextRunner("bytechef.edition=ce", "bytechef.message-broker.provider=amqp")
+        contextRunner("bytechef.edition=CE", "bytechef.message-broker.provider=AMQP")
             .run(context -> assertThat(context.getBean(CacheManager.class))
                 .isNotInstanceOf(ClusterInvalidatingCacheManager.class));
     }
 
     @Test
     void testEvictPublishesOnCacheInvalidationRoute() {
-        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=amqp")
+        contextRunner("bytechef.edition=EE", "bytechef.message-broker.provider=AMQP")
             .run(context -> {
                 CacheManager cacheManager = context.getBean(CacheManager.class);
 
@@ -127,7 +127,7 @@ class CacheInvalidationConfigurationIntTest {
     @Test
     @SuppressWarnings("unchecked")
     void testRegistersListenerOnCacheInvalidationRoute() {
-        contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=amqp")
+        contextRunner("bytechef.edition=EE", "bytechef.message-broker.provider=AMQP")
             .run(context -> {
                 MessageBrokerConfigurer<Object> messageBrokerConfigurer =
                     (MessageBrokerConfigurer<Object>) context.getBean("cacheInvalidationMessageBrokerConfigurer");
@@ -146,7 +146,7 @@ class CacheInvalidationConfigurationIntTest {
     @SuppressWarnings("unchecked")
     void testWrapsCacheManagerAndRegistersListenerOnAWebhookNode() {
         contextRunner(
-            "bytechef.edition=ee", "bytechef.message-broker.provider=amqp", "bytechef.coordinator.enabled=false",
+            "bytechef.edition=EE", "bytechef.message-broker.provider=AMQP", "bytechef.coordinator.enabled=false",
             "bytechef.worker.enabled=false")
                 .run(context -> {
                     assertThat(context.getBean(CacheManager.class)).isInstanceOf(ClusterInvalidatingCacheManager.class);
@@ -269,7 +269,7 @@ class CacheInvalidationConfigurationIntTest {
         }
 
         private ApplicationContextRunner redisContextRunner() {
-            return contextRunner("bytechef.edition=ee", "bytechef.message-broker.provider=redis")
+            return contextRunner("bytechef.edition=EE", "bytechef.message-broker.provider=REDIS")
                 .withBean(
                     RedisConnectionFactory.class,
                     () -> new LettuceConnectionFactory(redis.getHost(), redis.getMappedPort(6379)))
