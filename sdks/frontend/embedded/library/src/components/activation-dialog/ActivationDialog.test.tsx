@@ -44,6 +44,14 @@ const projects = [
                 ],
                 label: 'Provided automation',
             },
+            {
+                components: [
+                    {connectionRequired: true, integrationId: 5, name: 'slack', provided: true, title: 'Slack'},
+                ],
+                id: 'wf-provided-only',
+                inputs: [],
+                label: 'Provided connection only',
+            },
         ],
     },
     {
@@ -279,6 +287,11 @@ describe('ActivationDialog', () => {
 
         await userEvent.type(screen.getByLabelText(/Note/), 'hello');
         await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+
+        expect(
+            within(screen.getByTestId('provided-row-slack')).getByText('Provided by your administrator')
+        ).toBeInTheDocument();
+
         await userEvent.click(screen.getByRole('button', {name: 'Activate'}));
 
         await waitFor(() => expect(onActivated).toHaveBeenCalledWith('wf-provided'));
@@ -289,6 +302,16 @@ describe('ActivationDialog', () => {
 
         expect(JSON.parse(provision!.body!)).toEqual({connections: {}, inputs: {note: 'hello'}});
         expect(calls.some((call) => call.url.includes('/components/slack/connections'))).toBe(false);
+    });
+
+    it('starts on activate and lists a provided connection when nothing else needs the user', async () => {
+        renderDialog({workflowTemplateId: 'wf-provided-only'});
+
+        const row = await screen.findByTestId('provided-row-slack');
+
+        expect(within(row).getByText('Provided by your administrator')).toBeInTheDocument();
+        expect(screen.getByText(/Everything is ready/)).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Activate'})).toBeEnabled();
     });
 
     it('explains a locked provided value instead of the generic failure', async () => {
