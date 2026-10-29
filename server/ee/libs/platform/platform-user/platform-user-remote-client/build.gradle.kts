@@ -9,5 +9,10 @@ dependencies {
     testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
 
     testImplementation("io.grpc:grpc-inprocess")
+    testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-core")
+    testImplementation("org.springframework.security:spring-security-crypto")
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }
