@@ -36,7 +36,7 @@ class BillingSchedulingConfigurationTest {
     @Test
     void testRegistersUsageReportingJobForLowercaseQuartzProvider() {
         applicationContextRunner
-            .withPropertyValues("billing.enabled=true", "bytechef.scheduler.provider=quartz")
+            .withPropertyValues("billing.enabled=true", "bytechef.scheduler.provider=QUARTZ")
             .run(context -> assertThat(context).hasBean("stripeUsageReportingJobDetail"));
     }
 
