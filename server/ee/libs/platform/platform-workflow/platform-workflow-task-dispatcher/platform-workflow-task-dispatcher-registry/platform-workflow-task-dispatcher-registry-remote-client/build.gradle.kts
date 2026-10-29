@@ -8,7 +8,10 @@ dependencies {
 
     testImplementation("io.grpc:grpc-inprocess")
     testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
+    testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:modules:task-dispatchers:condition"))
     testImplementation(project(":server:libs:modules:task-dispatchers:loop"))
+    testImplementation(project(":server:libs:modules:task-dispatchers:subflow"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-service"))
     testImplementation(project(":server:libs:test:test-support"))
 }
