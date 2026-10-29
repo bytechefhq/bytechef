@@ -7,6 +7,7 @@ import {useShallow} from 'zustand/react/shallow';
 interface UsePillTargetPropsI {
     acceptsPill: () => boolean;
     insertPill: (mentionId: string) => void;
+    onFocusTarget?: () => void;
 }
 
 const DATA_PILL_MIME_TYPE = 'application/bytechef-datapill';
@@ -71,13 +72,15 @@ function originatesInTextEntry(event: SyntheticEvent<HTMLElement>): boolean {
     return !!textEntryElement && currentTarget.contains(textEntryElement);
 }
 
-export default function usePillTarget({acceptsPill, insertPill}: UsePillTargetPropsI) {
+export default function usePillTarget({acceptsPill, insertPill, onFocusTarget}: UsePillTargetPropsI) {
     const acceptsPillRef = useRef(acceptsPill);
     const insertPillRef = useRef(insertPill);
+    const onFocusTargetRef = useRef(onFocusTarget);
     const ownerTokenRef = useRef<object>({});
 
     acceptsPillRef.current = acceptsPill;
     insertPillRef.current = insertPill;
+    onFocusTargetRef.current = onFocusTarget;
 
     const {clearPillTarget, setPillTarget} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
@@ -112,6 +115,8 @@ export default function usePillTarget({acceptsPill, insertPill}: UsePillTargetPr
         (event: FocusEvent<HTMLElement>) => {
             if (originatesInOwnTarget(event)) {
                 register();
+
+                onFocusTargetRef.current?.();
             }
         },
         [register]

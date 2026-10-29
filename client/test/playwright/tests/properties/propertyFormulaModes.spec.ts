@@ -483,6 +483,27 @@ test.describe('Property formula modes', () => {
         });
     });
 
+    test.describe('Data pill panel', () => {
+        for (const propertyName of ['numberPrecision', 'bool', 'optionsNoMultiselect']) {
+            test(`should open the data pill panel when ${propertyName} gets focus`, async ({
+                authenticatedPage: page,
+            }) => {
+                const dataPillPanel = getDataPillPanel(page);
+
+                await expect(dataPillPanel).toBeHidden();
+
+                const field = getProperty(configurationPanel, propertyName)
+                    .locator('input, button[role="combobox"]')
+                    .first();
+
+                await field.scrollIntoViewIfNeeded();
+                await field.focus();
+
+                await expect(dataPillPanel).toBeVisible();
+            });
+        }
+    });
+
     test.describe('Pill target', () => {
         test('should put a clicked data pill into the focused select instead of the editor focused before', async ({
             authenticatedPage: page,

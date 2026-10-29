@@ -4,9 +4,14 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const outerInsertPill = vi.fn();
+const outerFocusTarget = vi.fn();
 
 const PillTargetHarness = ({onOuterDrop}: {onOuterDrop?: (defaultPrevented: boolean) => void}) => {
-    const {targetProps} = usePillTarget({acceptsPill: () => true, insertPill: outerInsertPill});
+    const {targetProps} = usePillTarget({
+        acceptsPill: () => true,
+        insertPill: outerInsertPill,
+        onFocusTarget: outerFocusTarget,
+    });
 
     return (
         <div onDrop={(event) => onOuterDrop?.(event.defaultPrevented)}>
@@ -28,6 +33,7 @@ const dataPillTransfer = {
 
 describe('usePillTarget', () => {
     beforeEach(() => {
+        outerFocusTarget.mockReset();
         outerInsertPill.mockReset();
 
         useWorkflowNodeDetailsPanelStore.setState({pillTarget: null});
@@ -43,6 +49,22 @@ describe('usePillTarget', () => {
         fireEvent.focus(screen.getByLabelText('own field'));
 
         expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget).not.toBeNull();
+    });
+
+    it('reports a focus on its own field to onFocusTarget', () => {
+        render(<PillTargetHarness />);
+
+        fireEvent.focus(screen.getByLabelText('own field'));
+
+        expect(outerFocusTarget).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not report a focus inside a nested pill target to onFocusTarget', () => {
+        render(<PillTargetHarness />);
+
+        fireEvent.focus(screen.getByLabelText('nested field'));
+
+        expect(outerFocusTarget).not.toHaveBeenCalled();
     });
 
     it('ignores a drop that originates inside a nested pill target', () => {
