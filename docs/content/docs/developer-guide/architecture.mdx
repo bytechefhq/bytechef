@@ -267,7 +267,7 @@ Fan-out constructs (`parallel`, `fork-join`, `each`, `map`) additionally use the
 
 ### The message broker
 
-The broker abstraction lives in `core/message`: a `MessageRoute` (name + exchange), a `MessageBroker.send(route, message)`, and per-provider implementations selected by `bytechef.message-broker.provider` - `memory` (default), `amqp` (RabbitMQ), `jms`, `kafka`, `redis`, and AWS SQS (EE).
+The broker abstraction lives in `core/message`: a `MessageRoute` (name + exchange), a `MessageBroker.send(route, message)`, and per-provider implementations selected by `bytechef.message-broker.provider` - `MEMORY` (default), `AMQP` (RabbitMQ), `JMS`, `KAFKA`, `REDIS`, and `AWS` (SQS, EE).
 
 <Mermaid
   chart={`

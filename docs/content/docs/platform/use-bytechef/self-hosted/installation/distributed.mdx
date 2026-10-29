@@ -103,8 +103,8 @@ flowchart TB
   instance.
 - **Redis** - required regardless of broker choice: it backs **service discovery** (apps register
   under their `spring.application.name`) and is the default message broker.
-- **Message broker** - `bytechef.message-broker.provider` set to one of `redis` (default in the EE
-  config), `amqp` (RabbitMQ), `kafka`, or `jms`/`aws`. The `memory` provider is in-process only and
+- **Message broker** - `bytechef.message-broker.provider` set to one of `REDIS` (default in the EE
+  config), `AMQP` (RabbitMQ), `KAFKA`, or `JMS`/`AWS`. The `MEMORY` provider is in-process only and
   **cannot** be used in distributed mode. All broker starters are on the worker/coordinator
   classpath, so the provider is switched purely by configuration.
 
@@ -140,11 +140,11 @@ Key properties served to all apps:
 | Property | Value / purpose |
 |---|---|
 | `bytechef.edition` | `EE` |
-| `bytechef.message-broker.provider` | `redis` (or `amqp`, `kafka`, `jms`, `aws`) |
-| `bytechef.cache.provider` | `caffeine` |
-| `bytechef.discovery-service.provider` | `redis` - the only supported discovery backend |
-| `bytechef.data-storage.provider` / `bytechef.workflow.output-storage.provider` | `jdbc` |
-| `bytechef.scheduler.provider` | `quartz` |
+| `bytechef.message-broker.provider` | `REDIS` (or `AMQP`, `KAFKA`, `JMS`, `AWS`) |
+| `bytechef.cache.provider` | `CAFFEINE` |
+| `bytechef.discovery-service.provider` | `REDIS` - the only supported discovery backend |
+| `bytechef.data-storage.provider` / `bytechef.workflow.output-storage.provider` | `JDBC` |
+| `bytechef.scheduler.provider` | `QUARTZ` |
 | `bytechef.internal.service-token` | `${BYTECHEF_INTERNAL_SERVICE_TOKEN}` - shared secret for internal `/remote` calls. **Fail-closed**: internal calls are rejected when unset. |
 | `bytechef.worker.task.subscriptions.*` | per-queue worker consumer counts (see below) |
 

@@ -36,7 +36,7 @@ image:
 
 env:
   normal:
-    BYTECHEF_ENCRYPTION_PROVIDER: property
+    BYTECHEF_ENCRYPTION_PROVIDER: PROPERTY
     BYTECHEF_PUBLIC_URL: "https://bytechef.example.com"
     SERVER_PORT: 8080
 
@@ -48,7 +48,7 @@ env:
     BYTECHEF_SECURITY_REMEMBER_ME_KEY: "<stable-remember-me-key>"
 ```
 
-Use `BYTECHEF_ENCRYPTION_PROVIDER: property` with a fixed `BYTECHEF_ENCRYPTION_PROPERTY_KEY` on Kubernetes. The default `filesystem` provider writes a key to the pod's local disk, which does not survive pod restarts and is not shared across replicas - either would leave stored connection credentials undecryptable. See [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#the-key) for the full reasoning.
+Use `BYTECHEF_ENCRYPTION_PROVIDER: PROPERTY` with a fixed `BYTECHEF_ENCRYPTION_PROPERTY_KEY` on Kubernetes. The default `FILESYSTEM` provider writes a key to the pod's local disk, which does not survive pod restarts and is not shared across replicas - either would leave stored connection credentials undecryptable. See [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#the-key) for the full reasoning.
 
 ## 3. Install
 

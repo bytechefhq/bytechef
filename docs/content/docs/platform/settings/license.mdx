@@ -64,7 +64,7 @@ A key the platform does not recognise is logged and ignored rather than treated 
 
 There is one distribution and one database schema. Liquibase filters changelogs by deployment topology (`mono`, `configuration`, `coordinator`, `multitenant`), never by edition, so the Enterprise-owned tables exist either way. Switching editions is therefore configuration plus a license, not a data migration:
 
-1. Set `bytechef.edition=ee` and restart. Enterprise beans register on that property alone.
+1. Set `bytechef.edition=EE` and restart. Enterprise beans register on that property alone.
 2. Activate a license - upload the `.lic` file on this page, or seed it at boot through `bytechef.licence.path` or `BYTECHEF_LICENSE`.
 
 Until a license is active, Enterprise endpoints answer `402` (see the callout above); the Community surface is unaffected throughout.
@@ -77,7 +77,7 @@ Going the other way, **Remove License** on this page reverts the platform to Com
 
 | Property | Default | Purpose |
 |---|---|---|
-| `bytechef.edition` | `ee` | Selects the edition at startup. Enterprise beans register only when this is `ee`. |
+| `bytechef.edition` | `EE` | Selects the edition at startup. Enterprise beans register only when this is `EE`. |
 | `bytechef.licence.public-key` | *(baked-in key)* | Ed25519 public key used to verify licence signatures, as raw 32-byte hex. Overrides the default. |
 | `bytechef.licence.path` | *(unset)* | Path to a bootstrap `.lic` file. Seeds the database on first boot if the licence table is empty. |
 | `bytechef.licence.grace-period-days` | `14` | Days the instance keeps running after expiry before enforcement kicks in. |

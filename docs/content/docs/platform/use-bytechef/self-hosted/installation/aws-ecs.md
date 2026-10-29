@@ -35,7 +35,7 @@ Define a single container that runs the image and exposes port `8080`:
       "environment": [
         { "name": "BYTECHEF_DATASOURCE_URL", "value": "jdbc:postgresql://<rds-endpoint>:5432/bytechef" },
         { "name": "BYTECHEF_DATASOURCE_USERNAME", "value": "bytechef" },
-        { "name": "BYTECHEF_ENCRYPTION_PROVIDER", "value": "property" },
+        { "name": "BYTECHEF_ENCRYPTION_PROVIDER", "value": "PROPERTY" },
         { "name": "BYTECHEF_PUBLIC_URL", "value": "https://bytechef.example.com" }
       ],
       "secrets": [
@@ -135,5 +135,5 @@ Browse to the ALB URL and click **Create account** to register the first user.
 
 ## Storage note
 
-Fargate tasks have ephemeral local storage, and file storage defaults to **`filesystem`** - so you must change it, not leave it alone. Set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` to keep files in the database, or `BYTECHEF_FILE_STORAGE_PROVIDER=aws` with `BYTECHEF_CLOUD_PROVIDER=aws` and `BYTECHEF_FILE_STORAGE_AWS_BUCKET` to store them in S3. Write `aws` in lowercase - the S3 client is enabled by a case-sensitive comparison against that literal, and `AWS` silently leaves it off. See [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage).
+Fargate tasks have ephemeral local storage, and file storage defaults to **`FILESYSTEM`** - so you must change it, not leave it alone. Set `BYTECHEF_FILE_STORAGE_PROVIDER=JDBC` to keep files in the database, or `BYTECHEF_FILE_STORAGE_PROVIDER=AWS` with `BYTECHEF_CLOUD_PROVIDER=AWS` and `BYTECHEF_FILE_STORAGE_AWS_BUCKET` to store them in S3. See [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage).
 

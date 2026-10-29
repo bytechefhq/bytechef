@@ -24,7 +24,7 @@ Every name below is the property path uppercased with dots **and dashes** replac
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` | Where AI agent [Auto Memory](/platform/automation/ai/memories#storage-providers) entries are stored (`jdbc`, `filesystem`, `aws`). `filesystem` and `aws` use the configured file storage; `aws` requires the Enterprise Edition AWS file-storage module, and selecting a file-backed provider whose storage is not configured fails at startup. The JDBC store is used when unset | `jdbc` |
+| `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` | Where AI agent [Auto Memory](/platform/automation/ai/memories#storage-providers) entries are stored (`JDBC`, `FILESYSTEM`, `AWS`). `FILESYSTEM` and `AWS` use the configured file storage; `AWS` requires the Enterprise Edition AWS file-storage module, and selecting a file-backed provider whose storage is not configured fails at startup. The JDBC store is used when unset | `JDBC` |
 
 ## AI Brave Configuration
 
@@ -71,7 +71,7 @@ fragment while this heading was hidden - give it back.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_MEMORY_PROVIDER` | Where AI agent chat memory is stored (`in_memory`, `jdbc`, `redis`, `aws`). `BYTECHEF_DATABASE=h2` defaults this to `in_memory` because the `spring_ai_chat_memory` table used by the Chat Memory component is created only on PostgreSQL; the session tables of Chat Memory v2 (`ai_session`, `ai_session_event`) are created on both PostgreSQL and H2 | `jdbc` (`in_memory` on H2) |
+| `BYTECHEF_AI_MEMORY_PROVIDER` | Where AI agent chat memory is stored (`IN_MEMORY`, `JDBC`, `REDIS`, `AWS`). `BYTECHEF_DATABASE=h2` defaults this to `IN_MEMORY` because the `spring_ai_chat_memory` table used by the Chat Memory component is created only on PostgreSQL; the session tables of Chat Memory v2 (`ai_session`, `ai_session_event`) are created on both PostgreSQL and H2 | `JDBC` (`IN_MEMORY` on H2) |
 | `BYTECHEF_AI_MEMORY_AWS_ACCESS_KEY_ID` | AWS access key ID of the S3 client used when the provider is `aws` (sensitive). Must be set together with `BYTECHEF_AI_MEMORY_AWS_SECRET_ACCESS_KEY`; when both are unset, `BYTECHEF_CLOUD_AWS_ACCESS_KEY_ID`/`BYTECHEF_CLOUD_AWS_SECRET_ACCESS_KEY` are used, and when those are unset too, the AWS default credentials provider chain | - |
 | `BYTECHEF_AI_MEMORY_AWS_BUCKET_PREFIX` | Prefix of the per-tenant S3 bucket (`<prefix>-<tenantId>`) that stores chat memory when the provider is `aws`. S3 bucket names are global, so pick a prefix no other AWS account uses | `bytechef-chat-memory` |
 | `BYTECHEF_AI_MEMORY_AWS_KEY_PREFIX` | Key prefix prepended to every object Chat Memory v1 and v2 store in S3 when the provider is `aws` | - |
