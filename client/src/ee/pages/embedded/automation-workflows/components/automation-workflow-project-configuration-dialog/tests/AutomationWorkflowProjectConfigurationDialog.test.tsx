@@ -5,7 +5,15 @@ import AutomationWorkflowProjectConfigurationDialog from '../AutomationWorkflowP
 
 const mocks = vi.hoisted(() => ({
     createMutate: vi.fn(),
+    impactData: {current: {automationWorkflowProjectConfigurationVersionImpact: {workflows: []}} as unknown},
+    impactQuery: vi.fn(),
     updateMutate: vi.fn(),
+}));
+
+vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
+    useGetComponentDefinitionsQuery: () => ({
+        data: [{name: 'slack', title: 'Slack'}],
+    }),
 }));
 
 vi.mock('@/shared/queries/platform/environments.queries', () => ({
@@ -19,6 +27,11 @@ vi.mock('@/shared/queries/platform/environments.queries', () => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAutomationWorkflowProjectConfigurationVersionImpactQuery: (variables: unknown, options: {enabled: boolean}) => {
+        mocks.impactQuery(variables, options);
+
+        return {data: options.enabled ? mocks.impactData.current : undefined};
+    },
     useAutomationWorkflowProjectConfigurationsQuery: () => ({
         data: {automationWorkflowProjectConfigurations: []},
     }),
@@ -72,6 +85,8 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
     });
 
     afterEach(() => {
+        mocks.impactData.current = {automationWorkflowProjectConfigurationVersionImpact: {workflows: []}};
+
         resetAll();
         vi.clearAllMocks();
     });
@@ -186,5 +201,103 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
         await user.click(await screen.findByRole('option', {name: 'V1'}));
 
         expect(await screen.findByText(warningText)).toBeInTheDocument();
+    });
+
+    describe('version impact', () => {
+        const impactWorkflows = [
+            {
+                affectedConnectedUserCount: 4,
+                label: 'Sync Contacts',
+                newRequiredConnections: ['slack'],
+                newRequiredInputs: ['apiKey', 'region'],
+                workflowUuid: 'workflow-1',
+            },
+        ];
+
+        it('lists the workflows a version change will pause', async () => {
+            const user = userEvent.setup();
+
+            mocks.impactData.current = {
+                automationWorkflowProjectConfigurationVersionImpact: {workflows: impactWorkflows},
+            };
+
+            render(
+                <AutomationWorkflowProjectConfigurationDialog
+                    configuration={{...existingConfiguration, projectVersion: 1}}
+                    onClose={vi.fn()}
+                    project={project}
+                />
+            );
+
+            await user.click(screen.getByRole('combobox', {name: 'Version'}));
+            await user.click(await screen.findByRole('option', {name: 'V3'}));
+
+            expect(
+                await screen.findByText(
+                    'Version 3 adds required input apiKey to Sync Contacts: 4 connected users will pause until they fill it.'
+                )
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    'Version 3 adds required input region to Sync Contacts: 4 connected users will pause until they fill it.'
+                )
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    'Version 3 adds a required Slack connection to Sync Contacts: connected users without a Slack integration will pause.'
+                )
+            ).toBeInTheDocument();
+        });
+
+        it('renders nothing when the impact list is empty', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <AutomationWorkflowProjectConfigurationDialog
+                    configuration={{...existingConfiguration, projectVersion: 1}}
+                    onClose={vi.fn()}
+                    project={project}
+                />
+            );
+
+            await user.click(screen.getByRole('combobox', {name: 'Version'}));
+            await user.click(await screen.findByRole('option', {name: 'V3'}));
+
+            expect(screen.queryByText(/will pause/)).not.toBeInTheDocument();
+        });
+
+        it('renders nothing and does not query when creating a configuration', () => {
+            mocks.impactData.current = {
+                automationWorkflowProjectConfigurationVersionImpact: {workflows: impactWorkflows},
+            };
+
+            render(<AutomationWorkflowProjectConfigurationDialog onClose={vi.fn()} project={project} />);
+
+            expect(screen.queryByText(/will pause/)).not.toBeInTheDocument();
+            expect(mocks.impactQuery).toHaveBeenCalledWith(expect.anything(), {enabled: false});
+        });
+
+        it('does not enable the query while the version equals the current one', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <AutomationWorkflowProjectConfigurationDialog
+                    configuration={existingConfiguration}
+                    onClose={vi.fn()}
+                    project={project}
+                />
+            );
+
+            expect(mocks.impactQuery).toHaveBeenCalled();
+            expect(mocks.impactQuery).not.toHaveBeenCalledWith(expect.anything(), {enabled: true});
+
+            await user.click(screen.getByRole('combobox', {name: 'Version'}));
+            await user.click(await screen.findByRole('option', {name: 'V1'}));
+
+            expect(mocks.impactQuery).toHaveBeenLastCalledWith(
+                {id: 'configuration-1', projectVersion: 1},
+                {enabled: true}
+            );
+        });
     });
 });
