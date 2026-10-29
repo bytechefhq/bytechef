@@ -1072,6 +1072,14 @@ export type AutomationWorkflowProjectCategoriesQueryVariables = Exact<{ [key: st
 
 export type AutomationWorkflowProjectCategoriesQuery = { automationWorkflowProjectCategories: Array<{ id: string, name: string }> };
 
+export type AutomationWorkflowProjectConfigurationVersionImpactQueryVariables = Exact<{
+  id: string | number;
+  projectVersion: number;
+}>;
+
+
+export type AutomationWorkflowProjectConfigurationVersionImpactQuery = { automationWorkflowProjectConfigurationVersionImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }> } };
+
 export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
   projectId: string | number;
 }>;
@@ -5968,6 +5976,39 @@ export const useAutomationWorkflowProjectCategoriesQuery = <
       {
     queryKey: variables === undefined ? ['automationWorkflowProjectCategories'] : ['automationWorkflowProjectCategories', variables],
     queryFn: fetcher<AutomationWorkflowProjectCategoriesQuery, AutomationWorkflowProjectCategoriesQueryVariables>(AutomationWorkflowProjectCategoriesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationWorkflowProjectConfigurationVersionImpactDocument = new TypedDocumentString(`
+    query automationWorkflowProjectConfigurationVersionImpact($id: ID!, $projectVersion: Int!) {
+  automationWorkflowProjectConfigurationVersionImpact(
+    id: $id
+    projectVersion: $projectVersion
+  ) {
+    workflows {
+      workflowUuid
+      label
+      newRequiredInputs
+      newRequiredConnections
+      affectedConnectedUserCount
+    }
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectConfigurationVersionImpactQuery = <
+      TData = AutomationWorkflowProjectConfigurationVersionImpactQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectConfigurationVersionImpactQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectConfigurationVersionImpactQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectConfigurationVersionImpactQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectConfigurationVersionImpactQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectConfigurationVersionImpact', variables],
+    queryFn: fetcher<AutomationWorkflowProjectConfigurationVersionImpactQuery, AutomationWorkflowProjectConfigurationVersionImpactQueryVariables>(AutomationWorkflowProjectConfigurationVersionImpactDocument, variables),
     ...options
   }
     )};
