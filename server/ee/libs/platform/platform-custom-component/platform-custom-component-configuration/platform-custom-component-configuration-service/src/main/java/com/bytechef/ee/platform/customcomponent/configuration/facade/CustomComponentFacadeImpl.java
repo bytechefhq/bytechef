@@ -26,7 +26,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.cache.CacheManager;
@@ -81,13 +80,11 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 
         List<ActionDefinitionRecord> actions = componentDefinition.getActions()
-            .orElse(Collections.emptyList())
             .stream()
             .map(this::toActionDefinitionRecord)
             .toList();
 
         List<TriggerDefinitionRecord> triggers = componentDefinition.getTriggers()
-            .orElse(Collections.emptyList())
             .stream()
             .map(this::toTriggerDefinitionRecord)
             .toList();

@@ -23,6 +23,7 @@ import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -34,7 +35,8 @@ public class WorkflowComponentHandlerTest {
         JsonFileAssert.assertEquals(
             "definition/workflow_v1.json",
             new WorkflowComponentHandler(
-                mock(SubflowDataSource.class), mock(SubflowResolver.class), mock(SubflowSyncExecutor.class))
+                mock(SubflowDataSource.class), mock(SubflowResolver.class), mock(SubflowSyncExecutor.class),
+                mock(ObjectProvider.class))
                     .getDefinition());
     }
 }

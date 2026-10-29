@@ -69,7 +69,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component("aiAgentUtils_v1_ComponentHandler")
-public class AiAgentUtilsComponentHandler implements ComponentHandler {
+public final class AiAgentUtilsComponentHandler implements ComponentHandler {
 
     private static final String APPROVAL_GATE = "approvalGate";
     private static final String SMART_WEB_FETCH_TOOL = "smartWebFetchTool";

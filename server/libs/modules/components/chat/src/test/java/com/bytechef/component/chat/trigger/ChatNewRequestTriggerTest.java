@@ -16,11 +16,15 @@
 
 package com.bytechef.component.chat.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannelRequest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +34,15 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 class ChatNewRequestTriggerTest {
+
+    @Test
+    void testOutputSchemaIsTheSharedAgentChannelRequestContract() {
+        OutputResponse outputResponse = ChatNewRequestTrigger.TRIGGER_DEFINITION.getOutputDefinition()
+            .flatMap(OutputDefinition::getOutputResponse)
+            .orElseThrow();
+
+        assertEquals(agentChannelRequest(), outputResponse.getOutputSchema());
+    }
 
     @Test
     void getWebhookResultPreservesEmptyAttachmentsFromJsonPayload() {

@@ -282,7 +282,7 @@ class ClusterElementDefinitionServiceTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(componentDefinition.getClusterElements()).thenReturn(List.of(elementDefinition));
         when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
             .thenReturn(componentDefinition);
 
@@ -324,7 +324,7 @@ class ClusterElementDefinitionServiceTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(componentDefinition.getClusterElements()).thenReturn(List.of(elementDefinition));
         when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
             .thenReturn(componentDefinition);
 
@@ -349,14 +349,14 @@ class ClusterElementDefinitionServiceTest {
 
     @Test
     void testToolClusterElementDefinitionGetsTheToolNameAndDescriptionProperties() {
-        ClusterElementDefinition result = getToolClusterElementDefinition(Optional.empty());
+        ClusterElementDefinition result = getToolClusterElementDefinition(List.of());
 
         assertEquals(List.of("toolName", "toolDescription"), getPropertyNames(result));
     }
 
     @Test
     void testTheContributedToolPropertiesAreOptional() {
-        ClusterElementDefinition result = getToolClusterElementDefinition(Optional.empty());
+        ClusterElementDefinition result = getToolClusterElementDefinition(List.of());
 
         List<? extends Property> properties = result.getProperties();
 
@@ -369,7 +369,7 @@ class ClusterElementDefinitionServiceTest {
 
     @Test
     void testTheContributedToolPropertiesArePrependedToTheDeclaredOnes() {
-        ClusterElementDefinition result = getToolClusterElementDefinition(Optional.of(List.of(string("url"))));
+        ClusterElementDefinition result = getToolClusterElementDefinition(List.of(string("url")));
 
         assertEquals(List.of("toolName", "toolDescription", "url"), getPropertyNames(result));
     }
@@ -377,7 +377,7 @@ class ClusterElementDefinitionServiceTest {
     @Test
     void testADeclaredToolPropertyIsNotContributedTwice() {
         ClusterElementDefinition result = getToolClusterElementDefinition(
-            Optional.of(List.of(string("toolName"), string("url"))));
+            List.of(string("toolName"), string("url")));
 
         assertEquals(List.of("toolDescription", "toolName", "url"), getPropertyNames(result));
     }
@@ -387,7 +387,7 @@ class ClusterElementDefinitionServiceTest {
         ClusterElementType chatMemoryType = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Chat Memory");
 
         ClusterElementDefinition result = getClusterElementDefinition(
-            chatMemoryType, "CHAT_MEMORY", Optional.of(List.of(string("url"))));
+            chatMemoryType, "CHAT_MEMORY", List.of(string("url")));
 
         assertEquals(List.of("url"), getPropertyNames(result));
     }
@@ -472,7 +472,7 @@ class ClusterElementDefinitionServiceTest {
             mock(com.bytechef.component.definition.ClusterElementDefinition.class);
 
         when(elementDefinition.getName()).thenReturn("vectorStore");
-        when(elementDefinition.getProperties()).thenReturn(Optional.of(properties));
+        when(elementDefinition.getProperties()).thenAnswer(ignored -> properties);
 
         ComponentDefinition componentDefinition = createComponentDefinitionForError(List.of(elementDefinition));
 
@@ -482,7 +482,7 @@ class ClusterElementDefinitionServiceTest {
     }
 
     private ClusterElementDefinition getToolClusterElementDefinition(
-        Optional<List<? extends com.bytechef.component.definition.Property>> properties) {
+        List<? extends com.bytechef.component.definition.Property> properties) {
 
         return getClusterElementDefinition(
             new ClusterElementType("TOOLS", "tools", "Tools"), "TOOLS", properties);
@@ -490,7 +490,7 @@ class ClusterElementDefinitionServiceTest {
 
     private ClusterElementDefinition getClusterElementDefinition(
         ClusterElementType clusterElementType, String clusterElementTypeName,
-        Optional<List<? extends com.bytechef.component.definition.Property>> properties) {
+        List<? extends com.bytechef.component.definition.Property> properties) {
 
         com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
             mock(com.bytechef.component.definition.ClusterElementDefinition.class);
@@ -500,7 +500,7 @@ class ClusterElementDefinitionServiceTest {
         when(elementDefinition.getDescription()).thenReturn(Optional.empty());
         when(elementDefinition.getHelp()).thenReturn(Optional.empty());
         when(elementDefinition.getTitle()).thenReturn(Optional.of("post"));
-        when(elementDefinition.getProperties()).thenReturn(properties);
+        when(elementDefinition.getProperties()).thenReturn((List) properties);
         when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
 
         ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
@@ -530,7 +530,6 @@ class ClusterElementDefinitionServiceTest {
         when(elementDefinition.getDescription()).thenReturn(Optional.empty());
         when(elementDefinition.getHelp()).thenReturn(Optional.empty());
         when(elementDefinition.getTitle()).thenReturn(Optional.of(name));
-        when(elementDefinition.getProperties()).thenReturn(Optional.empty());
         when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
 
         return elementDefinition;
@@ -554,7 +553,7 @@ class ClusterElementDefinitionServiceTest {
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
         when(componentDefinition.getName()).thenReturn(COMPONENT_NAME);
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(clusterElementDefinitions));
+        when(componentDefinition.getClusterElements()).thenReturn(clusterElementDefinitions);
         when(componentDefinition.getIcon()).thenReturn(Optional.empty());
 
         return componentDefinition;
@@ -580,7 +579,7 @@ class ClusterElementDefinitionServiceTest {
 
         lenient().when(componentDefinition.getName())
             .thenReturn(COMPONENT_NAME);
-        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(clusterElementDefinitions));
+        when(componentDefinition.getClusterElements()).thenReturn(clusterElementDefinitions);
 
         return componentDefinition;
     }

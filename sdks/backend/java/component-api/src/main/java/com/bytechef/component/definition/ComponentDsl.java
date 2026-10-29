@@ -27,10 +27,13 @@ import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.definition.BaseOutputDefinition.Placeholder;
 import com.bytechef.definition.BaseOutputDefinition.SampleOutput;
 import com.bytechef.definition.BaseOutputFunction;
+import com.bytechef.definition.BaseProperty;
+import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Constructor;
 import java.time.LocalDate;
@@ -40,12 +43,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -53,10 +59,44 @@ import java.util.stream.Collectors;
  */
 public final class ComponentDsl {
 
-    private static final int VERSION_1 = 1;
+    private static final String UNVERIFIED_PATHS_HINT =
+        "; declare agentRequest().unverifiedPaths(reason) if the declared output schema is known to contradict the "
+            + "real payload";
 
     public static ModifiableActionDefinition action(String name) {
         return new ModifiableActionDefinition(name);
+    }
+
+    public static ModifiableAgentChannelDefinition agentChannel(String name, TriggerDefinition trigger) {
+        return new ModifiableAgentChannelDefinition(name, trigger, null);
+    }
+
+    public static ModifiableAgentChannelDefinition agentChannel(
+        String name, TriggerDefinition trigger, ActionDefinition replyAction) {
+
+        return new ModifiableAgentChannelDefinition(
+            name, trigger, Objects.requireNonNull(replyAction, "'replyAction' must not be null"));
+    }
+
+    public static ModifiableObjectProperty agentChannelRequest() {
+        return object()
+            .properties(
+                string(AgentChannelDefinition.CONVERSATION_ID)
+                    .description("Identifier of the conversation the message was posted to.")
+                    .required(true),
+                string(AgentChannelDefinition.MESSAGE)
+                    .description("Text of the message."),
+                array(AgentChannelDefinition.ATTACHMENTS)
+                    .description("Files that arrived with the message.")
+                    .items(fileEntry()));
+    }
+
+    public static ModifiableAgentReplyDefinition agentReply() {
+        return new ModifiableAgentReplyDefinition();
+    }
+
+    public static ModifiableAgentRequestDefinition agentRequest() {
+        return new ModifiableAgentRequestDefinition();
     }
 
     public static ModifiableArrayProperty array() {
@@ -252,7 +292,7 @@ public final class ComponentDsl {
 
         Optional<String> title = actionDefinition.getTitle();
         Optional<String> description = actionDefinition.getDescription();
-        Optional<List<? extends Property>> properties = actionDefinition.getProperties();
+        List<? extends Property> properties = actionDefinition.getProperties();
         Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
 
         ModifiableClusterElementDefinition<ToolFunction> clusterElementDefinition =
@@ -260,7 +300,7 @@ public final class ComponentDsl {
                 .title(title.orElse(null))
                 .description(description.orElse(null))
                 .type(TOOLS)
-                .properties(properties.orElse(List.of()));
+                .properties(properties);
 
         outputDefinition.ifPresent(definition -> {
             Optional<? extends BaseOutputFunction> outputFunction = definition.getOutput();
@@ -297,21 +337,165 @@ public final class ComponentDsl {
         return new ModifiableUnifiedApiDefinition(category);
     }
 
+    private static String getFirstSegment(String name) {
+        int index = name.indexOf('.');
+
+        return index < 0 ? name : name.substring(0, index);
+    }
+
+    private static Set<String> getPropertyNames(List<? extends Property> properties) {
+        return properties.stream()
+            .map(Property::getName)
+            .collect(Collectors.toSet());
+    }
+
+    private static void validateAgentReplyProperties(
+        ActionDefinition actionDefinition, AgentReplyDefinition agentReplyDefinition) {
+
+        Set<String> propertyNames = getPropertyNames(actionDefinition.getProperties());
+
+        validateAgentReplyProperty(actionDefinition, propertyNames, agentReplyDefinition.getMessageProperty());
+
+        agentReplyDefinition.getConversationIdProperty()
+            .ifPresent(property -> validateAgentReplyProperty(actionDefinition, propertyNames, property));
+        agentReplyDefinition.getAttachmentsProperty()
+            .ifPresent(property -> validateAgentReplyProperty(actionDefinition, propertyNames, property));
+
+        Map<String, String> channelParameters = agentReplyDefinition.getChannelParameters();
+
+        for (String property : channelParameters.values()) {
+            validateAgentReplyProperty(actionDefinition, propertyNames, property);
+        }
+
+        Map<String, Object> fixedParameters = agentReplyDefinition.getFixedParameters();
+
+        for (String property : fixedParameters.keySet()) {
+            validateAgentReplyProperty(actionDefinition, propertyNames, property);
+        }
+    }
+
+    private static void validateAgentReplyProperty(
+        ActionDefinition actionDefinition, Set<String> propertyNames, String property) {
+
+        if (!propertyNames.contains(getFirstSegment(property))) {
+            throw new IllegalArgumentException(
+                "Agent reply property '%s' is not declared by action '%s'".formatted(
+                    property, actionDefinition.getName()));
+        }
+    }
+
+    private static void validateAgentRequestPaths(
+        String channelName, TriggerDefinition trigger, AgentRequestDefinition agentRequestDefinition) {
+
+        BaseObjectProperty<?> outputSchema = trigger.getOutputDefinition()
+            .flatMap(OutputDefinition::getOutputResponse)
+            .map(OutputResponse::getOutputSchema)
+            .filter(BaseObjectProperty.class::isInstance)
+            .map(property -> (BaseObjectProperty<?>) property)
+            .filter(objectProperty -> !objectProperty.getProperties()
+                .isEmpty())
+            .orElse(null);
+
+        if (outputSchema == null) {
+            return;
+        }
+
+        Optional<String> unverifiedPathsReason = agentRequestDefinition.getUnverifiedPathsReason();
+
+        boolean deep = unverifiedPathsReason.isEmpty();
+
+        validateAgentRequestPath(channelName, outputSchema, agentRequestDefinition.getConversationIdPath(), deep);
+        validateAgentRequestPath(channelName, outputSchema, agentRequestDefinition.getMessagePath(), deep);
+
+        agentRequestDefinition.getAttachmentsPath()
+            .ifPresent(path -> validateAgentRequestPath(channelName, outputSchema, path, deep));
+    }
+
+    private static void validateAgentRequestPath(
+        String channelName, BaseObjectProperty<?> outputSchema, String path, boolean deep) {
+
+        List<? extends BaseProperty> properties = outputSchema.getProperties();
+        String[] segments = path.split("\\.");
+
+        for (int index = 0; index < segments.length; index++) {
+            BaseProperty property = findProperty(properties, segments[index]);
+
+            if (property == null) {
+                throw new IllegalArgumentException(
+                    ("Agent request path '%s' of agent channel '%s' addresses '%s', which the trigger's output schema "
+                        + "does not declare%s").formatted(
+                            path, channelName, segments[index], deep ? UNVERIFIED_PATHS_HINT : ""));
+            }
+
+            if (!deep || index == segments.length - 1) {
+                return;
+            }
+
+            properties = getObjectProperties(property);
+
+            if (properties == null) {
+                throw new IllegalArgumentException(
+                    ("Agent request path '%s' of agent channel '%s' descends into '%s', which the trigger's output "
+                        + "schema does not declare as an object%s").formatted(
+                            path, channelName, segments[index], UNVERIFIED_PATHS_HINT));
+            }
+
+            if (properties.isEmpty()) {
+                return;
+            }
+        }
+    }
+
+    private static BaseProperty findProperty(List<? extends BaseProperty> properties, String name) {
+        for (BaseProperty property : properties) {
+            if (Objects.equals(property.getName(), name)) {
+                return property;
+            }
+        }
+
+        return null;
+    }
+
+    private static List<? extends BaseProperty> getObjectProperties(BaseProperty property) {
+        if (property instanceof BaseObjectProperty<?> objectProperty) {
+            return objectProperty.getProperties();
+        }
+
+        return null;
+    }
+
+    private static void validateChannelParameterKeys(
+        String channelName, TriggerDefinition trigger, AgentReplyDefinition agentReplyDefinition) {
+
+        Set<String> triggerPropertyNames = getPropertyNames(trigger.getProperties());
+
+        Map<String, String> channelParameters = agentReplyDefinition.getChannelParameters();
+
+        for (String rowKey : channelParameters.keySet()) {
+            if (!triggerPropertyNames.contains(rowKey)) {
+                throw new IllegalArgumentException(
+                    "Channel parameter '%s' of agent channel '%s' is not a property of trigger '%s'".formatted(
+                        rowKey, channelName, trigger.getName()));
+            }
+        }
+    }
+
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
-        private Boolean batch;
+        private AgentReplyDefinition agentReplyDefinition;
+        private Boolean batch = Boolean.FALSE;
         private BeforeSuspendConsumer beforeSuspendConsumer;
         private BeforeResumeFunction beforeResumeFunction;
         private BeforeTimeoutResumeFunction beforeTimeoutResumeFunction;
-        private Boolean deprecated;
+        private Boolean deprecated = Boolean.FALSE;
         private String description;
         private Help help;
-        private Map<String, Object> metadata;
+        private Map<String, Object> metadata = new HashMap<>();
         private String name;
         private OutputDefinition outputDefinition;
         private BasePerformFunction performFunction;
         private ProcessErrorResponseFunction processErrorResponseFunction;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = List.of();
         private BaseResumePerformFunction resumePerformFunction;
         private String title;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
@@ -321,6 +505,16 @@ public final class ComponentDsl {
 
         private ModifiableActionDefinition(String name) {
             this.name = Objects.requireNonNull(name);
+        }
+
+        public ModifiableActionDefinition agentReply(AgentReplyDefinition agentReply) {
+            Objects.requireNonNull(agentReply, "'agentReply' must not be null");
+
+            validateAgentReplyProperties(this, agentReply);
+
+            this.agentReplyDefinition = agentReply;
+
+            return this;
         }
 
         public ModifiableActionDefinition batch(boolean batch) {
@@ -347,7 +541,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition deprecated(Boolean deprecated) {
+        public ModifiableActionDefinition deprecated(boolean deprecated) {
             this.deprecated = deprecated;
 
             return this;
@@ -527,7 +721,8 @@ public final class ComponentDsl {
                 return false;
             }
 
-            return Objects.equals(description, that.description) &&
+            return Objects.equals(agentReplyDefinition, that.agentReplyDefinition) &&
+                Objects.equals(description, that.description) &&
                 Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help) &&
                 Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name) &&
                 Objects.equals(outputDefinition, that.outputDefinition) &&
@@ -538,13 +733,18 @@ public final class ComponentDsl {
         @Override
         public int hashCode() {
             return Objects.hash(
-                batch, deprecated, description, performFunction, help, metadata, name, outputDefinition, properties,
-                title, workflowNodeDescriptionFunction);
+                agentReplyDefinition, batch, deprecated, description, performFunction, help, metadata, name,
+                outputDefinition, properties, title, workflowNodeDescriptionFunction);
         }
 
         @Override
-        public Optional<Boolean> getBatch() {
-            return Optional.ofNullable(batch);
+        public Optional<AgentReplyDefinition> getAgentReplyDefinition() {
+            return Optional.ofNullable(agentReplyDefinition);
+        }
+
+        @Override
+        public boolean getBatch() {
+            return batch;
         }
 
         @Override
@@ -563,8 +763,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getDeprecated() {
-            return Optional.ofNullable(deprecated);
+        public boolean getDeprecated() {
+            return deprecated;
         }
 
         @Override
@@ -578,8 +778,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
+        public Map<String, Object> getMetadata() {
+            return metadata == null ? Map.of() : new HashMap<>(metadata);
         }
 
         @Override
@@ -603,8 +803,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : properties;
         }
 
         @Override
@@ -640,6 +840,367 @@ public final class ComponentDsl {
                 ", properties=" + properties +
                 ", outputDefinition=" + outputDefinition +
                 ", metadata=" + metadata +
+                ", agentReplyDefinition=" + agentReplyDefinition +
+                '}';
+        }
+    }
+
+    public static final class ModifiableAgentChannelDefinition implements AgentChannelDefinition {
+
+        private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9]+");
+
+        private String approvalChannelName;
+        private String description;
+        private final String name;
+        private final ActionDefinition replyAction;
+        private String title;
+        private final TriggerDefinition trigger;
+        private Map<String, Object> triggerParameters = Map.of();
+
+        private ModifiableAgentChannelDefinition(
+            String name, TriggerDefinition trigger, ActionDefinition replyAction) {
+
+            Objects.requireNonNull(name, "'name' must not be null");
+            Objects.requireNonNull(trigger, "'trigger' must not be null");
+
+            if (!NAME_PATTERN.matcher(name)
+                .matches()) {
+
+                throw new IllegalArgumentException(
+                    "Agent channel name '%s' is invalid, the name must match %s".formatted(name, NAME_PATTERN));
+            }
+
+            this.name = name;
+            this.replyAction = replyAction;
+            this.trigger = trigger;
+
+            AgentRequestDefinition agentRequestDefinition = trigger.getAgentRequestDefinition()
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Trigger '%s' paired into agent channel '%s' does not declare an agentRequest descriptor"
+                        .formatted(trigger.getName(), name)));
+
+            validateAgentRequestPaths(name, trigger, agentRequestDefinition);
+
+            if (replyAction != null) {
+                AgentReplyDefinition agentReplyDefinition = replyAction.getAgentReplyDefinition()
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Reply action '%s' paired into agent channel '%s' does not declare an agentReply descriptor"
+                            .formatted(replyAction.getName(), name)));
+
+                validateChannelParameterKeys(name, trigger, agentReplyDefinition);
+            }
+        }
+
+        public ModifiableAgentChannelDefinition approvalChannel(String approvalChannelName) {
+            this.approvalChannelName = approvalChannelName;
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition title(String title) {
+            this.title = title;
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition triggerParameter(String key, Object value) {
+            Objects.requireNonNull(key, "'key' must not be null");
+            Objects.requireNonNull(value, "'value' must not be null");
+
+            Map<String, Object> map = new LinkedHashMap<>(triggerParameters);
+
+            map.put(key, value);
+
+            this.triggerParameters = Collections.unmodifiableMap(map);
+
+            return this;
+        }
+
+        public ModifiableAgentChannelDefinition triggerParameters(Map<String, Object> triggerParameters) {
+            this.triggerParameters = triggerParameters == null
+                ? Map.of()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(triggerParameters));
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getApprovalChannelName() {
+            return Optional.ofNullable(approvalChannelName);
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Optional<ActionDefinition> getReplyAction() {
+            return Optional.ofNullable(replyAction);
+        }
+
+        @Override
+        public Optional<String> getTitle() {
+            return Optional.ofNullable(title);
+        }
+
+        @Override
+        public TriggerDefinition getTrigger() {
+            return trigger;
+        }
+
+        @SuppressFBWarnings("EI")
+        @Override
+        public Map<String, Object> getTriggerParameters() {
+            return triggerParameters;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableAgentChannelDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(approvalChannelName, that.approvalChannelName) &&
+                Objects.equals(description, that.description) && Objects.equals(name, that.name) &&
+                Objects.equals(replyAction, that.replyAction) && Objects.equals(title, that.title) &&
+                Objects.equals(trigger, that.trigger) && Objects.equals(triggerParameters, that.triggerParameters);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                approvalChannelName, description, name, replyAction, title, trigger, triggerParameters);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableAgentChannelDefinition{" +
+                "name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", trigger=" + trigger +
+                ", replyAction=" + replyAction +
+                ", approvalChannelName='" + approvalChannelName + '\'' +
+                ", triggerParameters=" + triggerParameters +
+                '}';
+        }
+    }
+
+    public static final class ModifiableAgentReplyDefinition implements AgentReplyDefinition {
+
+        private String attachmentsProperty;
+        private Map<String, String> channelParameters = Map.of();
+        private String conversationIdProperty;
+        private Map<String, Object> fixedParameters = Map.of();
+        private String messageProperty = AgentChannelDefinition.MESSAGE;
+
+        private ModifiableAgentReplyDefinition() {
+        }
+
+        public ModifiableAgentReplyDefinition attachments(String attachmentsProperty) {
+            this.attachmentsProperty = attachmentsProperty;
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition channelParameter(String rowKey, String property) {
+            Objects.requireNonNull(rowKey, "'rowKey' must not be null");
+            Objects.requireNonNull(property, "'property' must not be null");
+
+            Map<String, String> map = new LinkedHashMap<>(channelParameters);
+
+            map.put(rowKey, property);
+
+            this.channelParameters = Collections.unmodifiableMap(map);
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition conversationId(String conversationIdProperty) {
+            this.conversationIdProperty = conversationIdProperty;
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition fixedParameter(String property, Object value) {
+            Objects.requireNonNull(property, "'property' must not be null");
+            Objects.requireNonNull(value, "'value' must not be null");
+
+            Map<String, Object> map = new LinkedHashMap<>(fixedParameters);
+
+            map.put(property, value);
+
+            this.fixedParameters = Collections.unmodifiableMap(map);
+
+            return this;
+        }
+
+        public ModifiableAgentReplyDefinition message(String messageProperty) {
+            this.messageProperty = Objects.requireNonNull(messageProperty, "'messageProperty' must not be null");
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getAttachmentsProperty() {
+            return Optional.ofNullable(attachmentsProperty);
+        }
+
+        @Override
+        public Map<String, String> getChannelParameters() {
+            return channelParameters;
+        }
+
+        @Override
+        public Optional<String> getConversationIdProperty() {
+            return Optional.ofNullable(conversationIdProperty);
+        }
+
+        @Override
+        public Map<String, Object> getFixedParameters() {
+            return fixedParameters;
+        }
+
+        @Override
+        public String getMessageProperty() {
+            return messageProperty;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableAgentReplyDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(attachmentsProperty, that.attachmentsProperty) &&
+                Objects.equals(channelParameters, that.channelParameters) &&
+                Objects.equals(conversationIdProperty, that.conversationIdProperty) &&
+                Objects.equals(fixedParameters, that.fixedParameters) &&
+                Objects.equals(messageProperty, that.messageProperty);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                attachmentsProperty, channelParameters, conversationIdProperty, fixedParameters, messageProperty);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableAgentReplyDefinition{" +
+                "messageProperty='" + messageProperty + '\'' +
+                ", conversationIdProperty='" + conversationIdProperty + '\'' +
+                ", attachmentsProperty='" + attachmentsProperty + '\'' +
+                ", channelParameters=" + channelParameters +
+                ", fixedParameters=" + fixedParameters +
+                '}';
+        }
+    }
+
+    public static final class ModifiableAgentRequestDefinition implements AgentRequestDefinition {
+
+        private String attachmentsPath;
+        private String conversationIdPath = AgentChannelDefinition.CONVERSATION_ID;
+        private String messagePath = AgentChannelDefinition.MESSAGE;
+        private String unverifiedPathsReason;
+
+        private ModifiableAgentRequestDefinition() {
+        }
+
+        public ModifiableAgentRequestDefinition attachments(String attachmentsPath) {
+            this.attachmentsPath = attachmentsPath;
+
+            return this;
+        }
+
+        public ModifiableAgentRequestDefinition conversationId(String conversationIdPath) {
+            this.conversationIdPath = Objects.requireNonNull(
+                conversationIdPath, "'conversationIdPath' must not be null");
+
+            return this;
+        }
+
+        public ModifiableAgentRequestDefinition message(String messagePath) {
+            this.messagePath = Objects.requireNonNull(messagePath, "'messagePath' must not be null");
+
+            return this;
+        }
+
+        public ModifiableAgentRequestDefinition unverifiedPaths(String unverifiedPathsReason) {
+            this.unverifiedPathsReason = Objects.requireNonNull(
+                unverifiedPathsReason, "'unverifiedPathsReason' must not be null");
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getAttachmentsPath() {
+            return Optional.ofNullable(attachmentsPath);
+        }
+
+        @Override
+        public String getConversationIdPath() {
+            return conversationIdPath;
+        }
+
+        @Override
+        public String getMessagePath() {
+            return messagePath;
+        }
+
+        @Override
+        public Optional<String> getUnverifiedPathsReason() {
+            return Optional.ofNullable(unverifiedPathsReason);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableAgentRequestDefinition that)) {
+                return false;
+            }
+
+            return Objects.equals(attachmentsPath, that.attachmentsPath) &&
+                Objects.equals(conversationIdPath, that.conversationIdPath) &&
+                Objects.equals(messagePath, that.messagePath) &&
+                Objects.equals(unverifiedPathsReason, that.unverifiedPathsReason);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(attachmentsPath, conversationIdPath, messagePath, unverifiedPathsReason);
+        }
+
+        @Override
+        public String toString() {
+            return "ModifiableAgentRequestDefinition{" +
+                "conversationIdPath='" + conversationIdPath + '\'' +
+                ", messagePath='" + messagePath + '\'' +
+                ", attachmentsPath='" + attachmentsPath + '\'' +
+                ", unverifiedPathsReason='" + unverifiedPathsReason + '\'' +
                 '}';
         }
     }
@@ -647,12 +1208,12 @@ public final class ComponentDsl {
     public static final class ModifiableArrayProperty
         extends ModifiableValueProperty<List<?>, ModifiableArrayProperty> implements Property.ArrayProperty {
 
-        private List<? extends ValueProperty<?>> items;
-        private List<String> optionsLookupDependsOn;
+        private List<? extends ValueProperty<?>> items = List.of();
+        private List<String> optionsLookupDependsOn = List.of();
         private Long maxItems;
         private Long minItems;
-        private Boolean multipleValues;
-        private List<? extends Option<Object>> options;
+        private Boolean multipleValues = Boolean.TRUE;
+        private List<? extends Option<Object>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableArrayProperty() {
@@ -812,7 +1373,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.ARRAY_BUILDER;
             } else {
                 return ControlType.MULTI_SELECT;
@@ -820,8 +1381,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getItems() {
-            return Optional.ofNullable(items);
+        public List<? extends ValueProperty<?>> getItems() {
+            return List.copyOf(items);
         }
 
         @Override
@@ -835,13 +1396,13 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getMultipleValues() {
-            return Optional.ofNullable(multipleValues);
+        public boolean getMultipleValues() {
+            return multipleValues;
         }
 
         @Override
-        public Optional<List<? extends Option<Object>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Object>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Object>> options) {
@@ -906,14 +1467,14 @@ public final class ComponentDsl {
         private ClientIdFunction clientIdFunction;
         private ClientSecretFunction clientSecretFunction;
         private RefreshTokenFunction refreshTokenFunction;
-        private List<String> detectOn;
+        private List<String> detectOn = List.of();
         private String description;
         private String name;
         private OAuth2AuthorizationExtraQueryParametersFunction oAuth2AuthorizationExtraQueryParametersFunction;
         private PkceFunction pkceFunction;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = List.of();
         private RefreshFunction refreshFunction;
-        private List<Object> refreshOn;
+        private List<Object> refreshOn = DEFAULT_REFRESH_ON;
         private RefreshUrlFunction refreshUrlFunction;
         private ScopesFunction scopesFunction;
         private String title;
@@ -1097,8 +1658,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<String>> getDetectOn() {
-            return Optional.ofNullable(detectOn);
+        public List<String> getDetectOn() {
+            return detectOn;
         }
 
         @Override
@@ -1122,8 +1683,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties;
         }
 
         @Override
@@ -1132,8 +1693,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<Object>> getRefreshOn() {
-            return Optional.ofNullable(refreshOn);
+        public List<Object> getRefreshOn() {
+            return List.copyOf(refreshOn);
         }
 
         @Override
@@ -1259,8 +1820,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<Boolean>>> getOptions() {
-            return Optional.of(options);
+        public List<? extends Option<Boolean>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Boolean>> options) {
@@ -1299,22 +1860,23 @@ public final class ComponentDsl {
 
     public static final class ModifiableComponentDefinition implements ComponentDefinition {
 
-        private List<ActionDefinition> actions;
-        private List<ComponentCategory> componentCategories;
+        private List<ActionDefinition> actions = List.of();
+        private List<AgentChannelDefinition> agentChannels = List.of();
+        private List<ComponentCategory> componentCategories = List.of();
         private ConnectionDefinition connection;
-        private Boolean customAction;
+        private Boolean customAction = Boolean.FALSE;
         private Help customActionHelp;
-        private List<ClusterElementDefinition<?>> clusterElements;
+        private List<ClusterElementDefinition<?>> clusterElements = List.of();
         private String description;
         private String icon;
-        private List<String> tags;
-        private Map<String, Object> metadata;
+        private List<String> tags = List.of();
+        private Map<String, Object> metadata = new HashMap<>();
         private String name;
-        private List<ModifiablePropertyGroup> inputs;
+        private List<ModifiablePropertyGroup> inputs = List.of();
         private Resources resources;
         private int version = VERSION_1;
         private String title;
-        private List<TriggerDefinition> triggers;
+        private List<TriggerDefinition> triggers = List.of();
         private UnifiedApiDefinition unifiedApi;
 
         private ModifiableComponentDefinition() {
@@ -1331,6 +1893,18 @@ public final class ComponentDsl {
 
         public <A extends ActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
             this.actions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition agentChannels(AgentChannelDefinition... agentChannelDefinitions) {
+            return agentChannels(List.of(Objects.requireNonNull(agentChannelDefinitions)));
+        }
+
+        public <C extends AgentChannelDefinition> ModifiableComponentDefinition agentChannels(
+            List<C> agentChannelDefinitions) {
+
+            this.agentChannels = List.copyOf(Objects.requireNonNull(agentChannelDefinitions));
 
             return this;
         }
@@ -1481,18 +2055,23 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<ActionDefinition>> getActions() {
-            return Optional.ofNullable(actions == null ? null : actions);
+        public List<ActionDefinition> getActions() {
+            return actions == null ? List.of() : actions;
         }
 
         @Override
-        public Optional<List<? extends PropertyGroup>> getInputs() {
-            return Optional.ofNullable(inputs);
+        public List<AgentChannelDefinition> getAgentChannels() {
+            return agentChannels == null ? List.of() : agentChannels;
         }
 
         @Override
-        public Optional<List<ComponentCategory>> getComponentCategories() {
-            return Optional.ofNullable(componentCategories);
+        public List<? extends PropertyGroup> getInputs() {
+            return inputs == null ? List.of() : inputs;
+        }
+
+        @Override
+        public List<ComponentCategory> getComponentCategories() {
+            return componentCategories == null ? List.of() : componentCategories;
         }
 
         @Override
@@ -1501,8 +2080,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getCustomAction() {
-            return Optional.ofNullable(customAction);
+        public boolean getCustomAction() {
+            return customAction;
         }
 
         @Override
@@ -1511,8 +2090,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<ClusterElementDefinition<?>>> getClusterElements() {
-            return Optional.ofNullable(clusterElements);
+        public List<ClusterElementDefinition<?>> getClusterElements() {
+            return clusterElements == null ? List.of() : clusterElements;
         }
 
         @Override
@@ -1526,8 +2105,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Map<String, Object>> getMetadata() {
-            return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
+        public Map<String, Object> getMetadata() {
+            return metadata == null ? Map.of() : new HashMap<>(metadata);
         }
 
         @Override
@@ -1541,8 +2120,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<String>> getTags() {
-            return Optional.ofNullable(tags == null ? null : Collections.unmodifiableList(tags));
+        public List<String> getTags() {
+            return tags == null ? List.of() : Collections.unmodifiableList(tags);
         }
 
         @Override
@@ -1551,8 +2130,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<TriggerDefinition>> getTriggers() {
-            return Optional.ofNullable(triggers == null ? null : triggers);
+        public List<TriggerDefinition> getTriggers() {
+            return triggers == null ? List.of() : triggers;
         }
 
         @Override
@@ -1575,7 +2154,7 @@ public final class ComponentDsl {
                 return false;
             }
 
-            return Objects.equals(actions, that.actions) &&
+            return Objects.equals(actions, that.actions) && Objects.equals(agentChannels, that.agentChannels) &&
                 Objects.equals(componentCategories, that.componentCategories) &&
                 Objects.equals(connection, that.connection) &&
                 Objects.equals(customAction, that.customAction) &&
@@ -1591,8 +2170,8 @@ public final class ComponentDsl {
         @Override
         public int hashCode() {
             return Objects.hash(
-                actions, componentCategories, connection, customAction, customActionHelp, description, icon, tags,
-                metadata, name, resources, version, title, triggers, inputs);
+                actions, agentChannels, componentCategories, connection, customAction, customActionHelp, description,
+                icon, tags, metadata, name, resources, version, title, triggers, inputs);
         }
 
         @Override
@@ -1614,6 +2193,7 @@ public final class ComponentDsl {
                 ", triggerDefinitions=" + triggers +
                 ", inputs=" + inputs +
                 ", icon='" + icon + '\'' +
+                ", agentChannels=" + agentChannels +
                 '}';
         }
     }
@@ -1680,13 +2260,13 @@ public final class ComponentDsl {
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
-        private List<? extends ModifiableAuthorization> authorizations;
+        private List<? extends ModifiableAuthorization> authorizations = List.of();
         private BaseUriFunction baseUriFunction;
         private Help help;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = new ArrayList<>();
         private TestConsumer testConsumer;
-        private int version = 1;
-        private Boolean authorizationRequired;
+        private int version = VERSION_1;
+        private Boolean authorizationRequired = Boolean.TRUE;
         private ProcessErrorResponseFunction processErrorResponseFunction;
 
         private ModifiableConnectionDefinition() {
@@ -1787,13 +2367,13 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getAuthorizationRequired() {
-            return Optional.ofNullable(authorizationRequired);
+        public boolean getAuthorizationRequired() {
+            return authorizationRequired;
         }
 
         @Override
-        public Optional<List<? extends Authorization>> getAuthorizations() {
-            return Optional.ofNullable(authorizations == null ? null : new ArrayList<>(authorizations));
+        public List<? extends Authorization> getAuthorizations() {
+            return authorizations == null ? List.of() : new ArrayList<>(authorizations);
         }
 
         @Override
@@ -1812,8 +2392,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : List.copyOf(properties);
         }
 
         @Override
@@ -1847,7 +2427,7 @@ public final class ComponentDsl {
         private final String name;
         private OutputDefinition outputDefinition;
         private ProcessErrorResponseFunction processErrorResponseFunction;
-        private List<? extends Property> properties;
+        private List<? extends Property> properties = List.of();
         private String title;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
@@ -2037,8 +2617,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : properties;
         }
 
         @Override
@@ -2082,8 +2662,8 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<LocalDate, ModifiableDateProperty>
         implements Property.DateProperty {
 
-        private List<String> optionsLookupDependsOn;
-        private List<? extends Option<LocalDate>> options;
+        private List<String> optionsLookupDependsOn = List.of();
+        private List<? extends Option<LocalDate>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableDateProperty() {
@@ -2154,7 +2734,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.DATE;
             } else {
                 return ControlType.SELECT;
@@ -2162,8 +2742,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<LocalDate>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<LocalDate>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<LocalDate>> options) {
@@ -2192,8 +2772,8 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty>
         implements Property.DateTimeProperty {
 
-        private List<String> optionsLookupDependsOn;
-        private List<? extends Option<LocalDateTime>> options;
+        private List<String> optionsLookupDependsOn = List.of();
+        private List<? extends Option<LocalDateTime>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableDateTimeProperty() {
@@ -2264,7 +2844,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.DATE_TIME;
             } else {
                 return ControlType.SELECT;
@@ -2272,8 +2852,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<LocalDateTime>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<LocalDateTime>> options) {
@@ -2303,7 +2883,7 @@ public final class ComponentDsl {
         implements Property.DynamicPropertiesProperty {
 
         private String header;
-        private List<String> propertiesLookupDependsOn;
+        private List<String> propertiesLookupDependsOn = List.of();
         private PropertiesDataSource.BasePropertiesFunction propertiesFunction;
 
         public ModifiableDynamicPropertiesProperty(String name) {
@@ -2453,10 +3033,10 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<Long, ModifiableIntegerProperty>
         implements Property.IntegerProperty {
 
-        private List<String> optionsLookupDependsOn;
+        private List<String> optionsLookupDependsOn = List.of();
         private Long maxValue;
         private Long minValue;
-        private List<? extends Option<Long>> options;
+        private List<? extends Option<Long>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableIntegerProperty() {
@@ -2548,7 +3128,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.INTEGER;
             } else {
                 return ControlType.SELECT;
@@ -2566,8 +3146,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<Long>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Long>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Long>> options) {
@@ -2621,13 +3201,13 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<Double, ModifiableNumberProperty>
         implements Property.NumberProperty {
 
-        private List<String> optionsLookupDependsOn;
+        private List<String> optionsLookupDependsOn = List.of();
         private Integer maxNumberPrecision;
         private Double maxValue;
         private Integer minNumberPrecision;
         private Double minValue;
         private Integer numberPrecision;
-        private List<? extends Option<Double>> options;
+        private List<? extends Option<Double>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableNumberProperty() {
@@ -2769,7 +3349,7 @@ public final class ComponentDsl {
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.NUMBER;
             } else {
                 return ControlType.SELECT;
@@ -2802,8 +3382,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<Double>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Double>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Double>> options) {
@@ -2837,12 +3417,12 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<Map<String, ?>, ModifiableObjectProperty>
         implements ObjectProperty {
 
-        private List<? extends ValueProperty<?>> additionalProperties;
-        private List<String> optionsLookupDependsOn;
-        private Boolean multipleValues;
-        private List<? extends Option<Object>> options;
+        private List<? extends ValueProperty<?>> additionalProperties = List.of();
+        private List<String> optionsLookupDependsOn = List.of();
+        private Boolean multipleValues = Boolean.TRUE;
+        private List<? extends Option<Object>> options = List.of();
         private BaseOptionsFunction optionsFunction;
-        private List<? extends ValueProperty<?>> properties;
+        private List<? extends ValueProperty<?>> properties = List.of();
 
         private ModifiableObjectProperty() {
             this(null);
@@ -2958,26 +3538,26 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
-            return Optional.ofNullable(additionalProperties);
+        public List<? extends ValueProperty<?>> getAdditionalProperties() {
+            return List.copyOf(additionalProperties);
         }
 
         @Override
         public ControlType getControlType() {
-            if (options == null && optionsFunction == null) {
+            if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.OBJECT_BUILDER;
             } else {
                 return ControlType.SELECT;
             }
         }
 
-        public Optional<Boolean> getMultipleValues() {
-            return Optional.ofNullable(multipleValues);
+        public boolean getMultipleValues() {
+            return multipleValues;
         }
 
         @Override
-        public Optional<List<? extends Option<Object>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<Object>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<Object>> options) {
@@ -2993,8 +3573,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends ValueProperty<?>> getProperties() {
+            return properties;
         }
 
         @Override
@@ -3082,11 +3662,11 @@ public final class ComponentDsl {
 
     public abstract static class ModifiableProperty<M extends ModifiableProperty<M>> implements Property {
 
-        private Boolean advancedOption;
+        private Boolean advancedOption = Boolean.FALSE;
         private String description;
         private String displayCondition;
-        private Boolean expressionEnabled; // Defaults to true
-        private Boolean hidden;
+        private Boolean expressionEnabled = Boolean.TRUE;
+        private Boolean hidden = Boolean.FALSE;
         private Map<String, Object> metadata = new HashMap<>();
         private Boolean required = Boolean.FALSE;
         private final String name;
@@ -3188,8 +3768,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getAdvancedOption() {
-            return Optional.ofNullable(advancedOption);
+        public boolean getAdvancedOption() {
+            return advancedOption;
         }
 
         @Override
@@ -3203,23 +3783,23 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getExpressionEnabled() {
-            return Optional.ofNullable(expressionEnabled);
+        public boolean getExpressionEnabled() {
+            return expressionEnabled;
         }
 
         @Override
-        public Optional<Boolean> getHidden() {
-            return Optional.ofNullable(hidden);
+        public boolean getHidden() {
+            return hidden;
         }
 
         @Override
-        public Boolean getRequired() {
+        public boolean getRequired() {
             return required;
         }
 
         @Override
         public Map<String, Object> getMetadata() {
-            return Collections.unmodifiableMap(metadata);
+            return new HashMap<>(metadata);
         }
 
         @Override
@@ -3254,13 +3834,13 @@ public final class ComponentDsl {
 
         private ControlType controlType;
         private String languageId;
-        private List<String> optionsLookupDependsOn;
+        private List<String> optionsLookupDependsOn = List.of();
         private Integer maxLength;
         private Integer minLength;
         private String regex;
-        private List<? extends Option<String>> options;
+        private List<? extends Option<String>> options = List.of();
         private BaseOptionsFunction optionsFunction;
-        private Boolean optionsLoadedDynamically;
+        private Boolean optionsLoadedDynamically = Boolean.FALSE;
 
         private ModifiableStringProperty() {
             this(null);
@@ -3379,7 +3959,7 @@ public final class ComponentDsl {
         @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
-                if (options == null && optionsFunction == null) {
+                if ((options == null || options.isEmpty()) && optionsFunction == null) {
                     return ControlType.TEXT;
                 } else {
                     return ControlType.SELECT;
@@ -3410,8 +3990,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<String>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<String>> getOptions() {
+            return options == null ? List.of() : List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<String>> options) {
@@ -3427,8 +4007,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getOptionsLoadedDynamically() {
-            return Optional.ofNullable(optionsLoadedDynamically);
+        public boolean getOptionsLoadedDynamically() {
+            return optionsLoadedDynamically;
         }
 
         @Override
@@ -3451,8 +4031,8 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<LocalTime, ModifiableTimeProperty>
         implements Property.TimeProperty {
 
-        private List<String> optionsLookupDependsOn;
-        private List<? extends Option<LocalTime>> options;
+        private List<String> optionsLookupDependsOn = List.of();
+        private List<? extends Option<LocalTime>> options = List.of();
         private BaseOptionsFunction optionsFunction;
 
         private ModifiableTimeProperty() {
@@ -3527,8 +4107,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Option<LocalTime>>> getOptions() {
-            return Optional.ofNullable(options);
+        public List<? extends Option<LocalTime>> getOptions() {
+            return List.copyOf(options);
         }
 
         void setOptions(List<ModifiableOption<LocalTime>> options) {
@@ -3555,9 +4135,10 @@ public final class ComponentDsl {
 
     public static final class ModifiableTriggerDefinition implements TriggerDefinition {
 
-        private Boolean batch;
+        private AgentRequestDefinition agentRequestDefinition;
+        private Boolean batch = Boolean.FALSE;
         private DeduplicateFunction deduplicateFunction;
-        private Boolean deprecated;
+        private Boolean deprecated = Boolean.FALSE;
         private String description;
         private WebhookDisableConsumer webhookDisableConsumer;
         private WebhookEnableFunction webhookEnableFunction;
@@ -3570,20 +4151,26 @@ public final class ComponentDsl {
         private String name;
         private OutputDefinition outputDefinition;
         private PollFunction pollFunction;
-        private List<Property> properties;
+        private List<Property> properties = List.of();
         private String title;
         private TriggerType type;
-        private Boolean webhookRawBody;
+        private Boolean webhookRawBody = Boolean.FALSE;
         private WebhookValidateFunction webhookValidateFunction;
         private WebhookValidateOnEnableFunction webhookValidateOnEnableFunction;
         private WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
-        private Boolean workflowSyncExecution;
+        private Boolean workflowSyncExecution = Boolean.FALSE;
 
         public ModifiableTriggerDefinition() {
         }
 
         private ModifiableTriggerDefinition(String name) {
             this.name = Objects.requireNonNull(name);
+        }
+
+        public ModifiableTriggerDefinition agentRequest(AgentRequestDefinition agentRequest) {
+            this.agentRequestDefinition = Objects.requireNonNull(agentRequest, "'agentRequest' must not be null");
+
+            return this;
         }
 
         public ModifiableTriggerDefinition batch(boolean batch) {
@@ -3598,7 +4185,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableTriggerDefinition deprecated(Boolean deprecated) {
+        public ModifiableTriggerDefinition deprecated(boolean deprecated) {
             this.deprecated = deprecated;
 
             return this;
@@ -3781,7 +4368,8 @@ public final class ComponentDsl {
                 return false;
             }
 
-            return Objects.equals(batch, that.batch) &&
+            return Objects.equals(agentRequestDefinition, that.agentRequestDefinition) &&
+                Objects.equals(batch, that.batch) &&
                 Objects.equals(deduplicateFunction, that.deduplicateFunction) &&
                 Objects.equals(deprecated, that.deprecated) && Objects.equals(description, that.description) &&
                 Objects.equals(webhookDisableConsumer, that.webhookDisableConsumer) &&
@@ -3803,7 +4391,8 @@ public final class ComponentDsl {
 
         @Override
         public int hashCode() {
-            return Objects.hash(batch, deduplicateFunction, deprecated, description, webhookDisableConsumer,
+            return Objects.hash(agentRequestDefinition, batch, deduplicateFunction, deprecated, description,
+                webhookDisableConsumer,
                 webhookEnableFunction, dynamicWebhookRefreshFunction, webhookRequestFunction, help,
                 listenerDisableConsumer, listenerEnableConsumer, name, outputDefinition, pollFunction, properties,
                 title, type, webhookRawBody, webhookValidateFunction,
@@ -3812,13 +4401,18 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getBatch() {
-            return Optional.ofNullable(batch);
+        public Optional<AgentRequestDefinition> getAgentRequestDefinition() {
+            return Optional.ofNullable(agentRequestDefinition);
         }
 
         @Override
-        public Optional<Boolean> getDeprecated() {
-            return Optional.ofNullable(deprecated);
+        public boolean getBatch() {
+            return batch;
+        }
+
+        @Override
+        public boolean getDeprecated() {
+            return deprecated;
         }
 
         @Override
@@ -3882,8 +4476,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public List<? extends Property> getProperties() {
+            return properties == null ? List.of() : properties;
         }
 
         @Override
@@ -3897,8 +4491,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getWebhookRawBody() {
-            return Optional.ofNullable(webhookRawBody);
+        public boolean getWebhookRawBody() {
+            return webhookRawBody;
         }
 
         @Override
@@ -3922,8 +4516,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getWorkflowSyncExecution() {
-            return Optional.ofNullable(workflowSyncExecution);
+        public boolean getWorkflowSyncExecution() {
+            return workflowSyncExecution;
         }
 
         @Override
@@ -3940,6 +4534,7 @@ public final class ComponentDsl {
                 ", outputDefinition=" + outputDefinition +
                 ", webhookRawBody=" + webhookRawBody +
                 ", workflowSyncExecution=" + workflowSyncExecution +
+                ", agentRequestDefinition=" + agentRequestDefinition +
                 '}';
         }
     }
@@ -3948,8 +4543,8 @@ public final class ComponentDsl {
 
         private final UnifiedApiCategory category;
 
-        private List<? extends ProviderModelAdapter<?, ?>> providerAdapters;
-        private List<? extends ProviderModelMapper<?, ?, ?, ?>> providerMappers;
+        private List<? extends ProviderModelAdapter<?, ?>> providerAdapters = List.of();
+        private List<? extends ProviderModelMapper<?, ?, ?, ?>> providerMappers = List.of();
 
         public ModifiableUnifiedApiDefinition(UnifiedApiCategory category) {
             this.category = category;
@@ -4123,11 +4718,15 @@ public final class ComponentDsl {
         }
     }
 
-    private record ResourcesImpl(String documentationUrl, Map<String, String> additionalUrls) implements Resources {
+    private record ResourcesImpl(String getDocumentationUrl, Map<String, String> additionalUrls) implements Resources {
+
+        private ResourcesImpl {
+            additionalUrls = additionalUrls == null ? Map.of() : additionalUrls;
+        }
 
         @Override
-        public Optional<Map<String, String>> getAdditionalUrls() {
-            return Optional.ofNullable(additionalUrls == null ? null : new HashMap<>(additionalUrls));
+        public Map<String, String> getAdditionalUrls() {
+            return new HashMap<>(additionalUrls);
         }
     }
 

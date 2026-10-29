@@ -37,6 +37,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
@@ -132,6 +133,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         Map<String, Object> inputs = new java.util.HashMap<>(inputMap);
 
         inputs.put(workflowExecutionId.getTriggerName(), triggerOutput.value());
+        inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, workflowExecutionId.getTriggerName());
 
         long jobId = TenantContext.callWithTenantId(
             workflowExecutionId.getTenantId(),
@@ -368,7 +370,10 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         Object triggerOutputValue) {
 
         Map<String, Object> concat = MapUtils.concat(
-            (Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), triggerOutputValue));
+            (Map<String, Object>) inputMap,
+            Map.of(
+                workflowExecutionId.getTriggerName(), triggerOutputValue,
+                JobInputConstants.TRIGGER_NAME_INPUT, workflowExecutionId.getTriggerName()));
 
         return new JobParametersDTO(workflowId, concat);
     }

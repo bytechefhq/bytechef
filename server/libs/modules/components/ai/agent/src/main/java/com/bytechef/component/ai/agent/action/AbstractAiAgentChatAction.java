@@ -90,6 +90,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
@@ -694,9 +695,22 @@ public abstract class AbstractAiAgentChatAction {
 
         advisors.add(toolCallingAdvisor);
 
-        clusterElementMap.fetchClusterElement(RAG)
+        List<Advisor> ragAdvisors = clusterElementMap.getClusterElements(RAG)
+            .stream()
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
-            .ifPresent(advisors::add);
+            .toList();
+
+        if (ragAdvisors.size() > 1 && ragAdvisors.stream()
+            .allMatch(ragAdvisor -> ragAdvisor instanceof BaseAdvisor)) {
+
+            advisors.add(
+                new CombinedRagAdvisor(
+                    ragAdvisors.stream()
+                        .map(ragAdvisor -> (BaseAdvisor) ragAdvisor)
+                        .toList()));
+        } else {
+            advisors.addAll(ragAdvisors);
+        }
 
         advisors.add(new ContextLoggerAdvisor(context));
 

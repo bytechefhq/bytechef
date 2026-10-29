@@ -399,8 +399,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             componentName, componentVersion);
 
         List<com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
-            componentDefinition.getClusterElements()
-                .orElse(List.of());
+            componentDefinition.getClusterElements();
 
         com.bytechef.component.definition.ClusterElementDefinition<?> matchedDefinition =
             clusterElementDefinitions.stream()
@@ -423,19 +422,13 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     public List<ClusterElementDefinition> getClusterElementDefinitions(ClusterElementType clusterElementType) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
-            .filter(componentDefinition -> componentDefinition.getClusterElements()
-                .isPresent())
-            .flatMap(componentDefinition -> CollectionUtils.stream(
-                componentDefinition.getClusterElements()
-                    .orElseThrow(() -> new IllegalArgumentException(
-                        "Cluster elements not found in component %s".formatted(componentDefinition.getName())))
-                    .stream()
-                    .filter(clusterElementDefinition -> isSameClusterElementType(
-                        clusterElementType, clusterElementDefinition.getType()))
-                    .map(clusterElementDefinition -> toClusterElementDefinition(
-                        clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
-                        getIcon(componentDefinition)))
-                    .toList()))
+            .flatMap(componentDefinition -> componentDefinition.getClusterElements()
+                .stream()
+                .filter(clusterElementDefinition -> isSameClusterElementType(
+                    clusterElementType, clusterElementDefinition.getType()))
+                .map(clusterElementDefinition -> toClusterElementDefinition(
+                    clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
+                    getIcon(componentDefinition))))
             .distinct()
             .toList();
     }
@@ -448,7 +441,6 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         String icon = getIcon(componentDefinition);
 
         return componentDefinition.getClusterElements()
-            .orElse(List.of())
             .stream()
             .map(clusterElementDefinition -> toClusterElementDefinition(
                 clusterElementDefinition, componentDefinition.getName(), componentVersion, icon))
@@ -465,7 +457,6 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         String icon = getIcon(componentDefinition);
 
         return componentDefinition.getClusterElements()
-            .orElse(List.of())
             .stream()
             .filter(clusterElementDefinition -> isSameClusterElementType(
                 clusterElementType, clusterElementDefinition.getType()))
@@ -476,7 +467,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     private static ClusterElementDefinition toClusterElementDefinition(
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition, String componentName,
-        int componentVersion, String icon) {
+        int componentVersion, @Nullable String icon) {
 
         return injectToolOverrideProperties(
             new ClusterElementDefinition(clusterElementDefinition, componentName, componentVersion, icon));
@@ -604,8 +595,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
             result.clusterElementDefinition;
 
-        List<? extends BaseProperty> properties = clusterElementDefinition.getProperties()
-            .orElse(List.of());
+        List<? extends BaseProperty> properties = clusterElementDefinition.getProperties();
 
         BaseProperty property = PropertyUtils.findPropertyByPath(properties, propertyName);
 
@@ -793,8 +783,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             componentName, componentVersion);
 
         List<com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
-            componentDefinition.getClusterElements()
-                .orElse(List.of());
+            componentDefinition.getClusterElements();
 
         return new ComponentClusterElementDefinitionResult(
             componentDefinition,

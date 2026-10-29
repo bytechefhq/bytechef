@@ -1,13 +1,16 @@
 import {Collapsible} from '@/components/ui/collapsible';
+import useAgents from '@/pages/automation/agents/hooks/useAgents';
 import ProjectDeploymentsPanel from '@/pages/automation/project/components/ProjectDeploymentsPanel';
 import ProjectListItem from '@/pages/automation/projects/components/project-list/ProjectListItem';
 import {ProjectListItemTabType} from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {ProjectGitConfigurationI} from '@/shared/edition/project-git/projectGitApi';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 
+import ProjectAgentCreationActions from '../project-agent-list/ProjectAgentCreationActions';
+import ProjectAgentList from '../project-agent-list/ProjectAgentList';
 import ProjectWorkflowList from '../project-workflow-list/ProjectWorkflowList';
 
 interface OpenProjectI {
@@ -30,8 +33,11 @@ const getInitialOpenProjects = (searchParams: URLSearchParams, locationState: un
     return openProjects;
 };
 
+export type ProjectListTabType = 'agents' | 'workflows';
+
 const ProjectList = ({
     componentDefinitions,
+    defaultActiveTab = 'workflows',
     isRefetchingProjects,
     newlyCreatedProjectId,
     projectGitConfigurations,
@@ -40,6 +46,7 @@ const ProjectList = ({
     taskDispatcherDefinitions,
 }: {
     componentDefinitions?: ComponentDefinitionBasic[];
+    defaultActiveTab?: ProjectListTabType;
     isRefetchingProjects?: boolean;
     newlyCreatedProjectId?: number;
     projectGitConfigurations: ProjectGitConfigurationI[];
@@ -55,7 +62,22 @@ const ProjectList = ({
         getInitialOpenProjects(searchParams, location.state)
     );
 
+    const defaultActiveTabRef = useRef(defaultActiveTab);
     const scrollToProjectIdRef = useRef<number | undefined>(openProjects.keys().next().value);
+
+    const {agents} = useAgents();
+
+    const agentCountsByProjectId = useMemo(() => {
+        const counts = new Map<number, number>();
+
+        for (const agent of agents) {
+            const agentProjectId = +agent.projectId;
+
+            counts.set(agentProjectId, (counts.get(agentProjectId) ?? 0) + 1);
+        }
+
+        return counts;
+    }, [agents]);
 
     const handleTabChange = useCallback(
         (projectId: number, tab?: ProjectListItemTabType, expandedProjectDeploymentId?: number) => {
@@ -73,6 +95,19 @@ const ProjectList = ({
         },
         []
     );
+
+    useEffect(() => {
+        if (defaultActiveTabRef.current === defaultActiveTab) {
+            return;
+        }
+
+        defaultActiveTabRef.current = defaultActiveTab;
+
+        setOpenProjects(
+            (previousOpenProjects) =>
+                new Map([...previousOpenProjects.keys()].map((projectId) => [projectId, {tab: defaultActiveTab}]))
+        );
+    }, [defaultActiveTab]);
 
     useEffect(() => {
         if (!searchParams.has('projectId') && !searchParams.has('tab')) {
@@ -110,17 +145,26 @@ const ProjectList = ({
             {projects.map((project) => {
                 const openProject = openProjects.get(project.id!);
                 const projectTagIds = project.tags?.map((tag) => tag.id);
+                const agentCount = agentCountsByProjectId.get(project.id!) || 0;
 
                 return (
                     <Collapsible
                         className="group/project mb-2 rounded border border-border/50"
                         data-project-id={project.id}
                         key={project.id}
-                        onOpenChange={(open) => handleTabChange(project.id!, open ? 'workflows' : undefined)}
+                        onOpenChange={(open) => handleTabChange(project.id!, open ? defaultActiveTab : undefined)}
                         open={!!openProject}
                     >
                         <ProjectListItem
                             activeTab={openProject?.tab}
+                            agentCount={agentCount}
+                            agentsActions={
+                                agentCount > 0 ? (
+                                    <ProjectAgentCreationActions placement="tabRow" project={project} />
+                                ) : undefined
+                            }
+                            agentsContent={<ProjectAgentList project={project} />}
+                            defaultTab={defaultActiveTab}
                             deploymentsContent={
                                 <ProjectDeploymentsPanel
                                     enabled

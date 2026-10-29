@@ -84,8 +84,7 @@ class NewFormRequestTriggerTest {
 
         BaseObjectProperty<?> objectProperty = (BaseObjectProperty<?>) outputSchema;
 
-        List<? extends BaseProperty> properties = objectProperty.getProperties()
-            .orElseThrow();
+        List<? extends BaseProperty> properties = objectProperty.getProperties();
 
         assertEquals(2, properties.size());
 
@@ -99,8 +98,7 @@ class NewFormRequestTriggerTest {
 
         BaseObjectProperty<?> bodyProperty = (BaseObjectProperty<?>) property2;
 
-        List<? extends BaseProperty> bodyProperties = bodyProperty.getProperties()
-            .orElseThrow();
+        List<? extends BaseProperty> bodyProperties = bodyProperty.getProperties();
 
         assertEquals(8, bodyProperties.size());
 
