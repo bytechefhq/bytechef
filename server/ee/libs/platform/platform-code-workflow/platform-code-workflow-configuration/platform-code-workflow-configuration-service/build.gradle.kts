@@ -10,6 +10,11 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:commons:commons-data"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
 }
