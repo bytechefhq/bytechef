@@ -512,6 +512,20 @@ const ActivationBody = ({
         };
     }, [fetch, state.requiredComponents]);
 
+    const providedRows = providedComponents.map((component) => (
+        <div className={styles.componentRow} data-testid={`provided-row-${component.name}`} key={component.name}>
+            <div className={styles.componentTitle}>
+                {component.icon && (
+                    <span className={styles.componentIcon} dangerouslySetInnerHTML={{__html: component.icon}} />
+                )}
+
+                <span>{component.title || component.name}</span>
+            </div>
+
+            <span className={styles.notice}>{PROVIDED_BY_ADMINISTRATOR_LABEL}</span>
+        </div>
+    ));
+
     return (
         <>
             <main className={dialogStyles.dialogContent}>
@@ -546,26 +560,7 @@ const ActivationBody = ({
                             />
                         ))}
 
-                        {providedComponents.map((component) => (
-                            <div
-                                className={styles.componentRow}
-                                data-testid={`provided-row-${component.name}`}
-                                key={component.name}
-                            >
-                                <div className={styles.componentTitle}>
-                                    {component.icon && (
-                                        <span
-                                            className={styles.componentIcon}
-                                            dangerouslySetInnerHTML={{__html: component.icon}}
-                                        />
-                                    )}
-
-                                    <span>{component.title || component.name}</span>
-                                </div>
-
-                                <span className={styles.notice}>{PROVIDED_BY_ADMINISTRATOR_LABEL}</span>
-                            </div>
-                        ))}
+                        {providedRows}
                     </div>
                 )}
 
@@ -607,7 +602,11 @@ const ActivationBody = ({
                 )}
 
                 {state.step === 'activate' && (
-                    <p className={styles.notice}>Everything is ready. Activate to switch this automation on.</p>
+                    <div className={styles.steps}>
+                        {providedRows}
+
+                        <p className={styles.notice}>Everything is ready. Activate to switch this automation on.</p>
+                    </div>
                 )}
             </main>
 
