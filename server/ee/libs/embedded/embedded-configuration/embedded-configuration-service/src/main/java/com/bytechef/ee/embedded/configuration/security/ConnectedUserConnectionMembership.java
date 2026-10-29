@@ -70,6 +70,19 @@ public class ConnectedUserConnectionMembership {
             integrationInstanceService.existsByConnectionId(connectionId);
     }
 
+    /**
+     * Returns the subset of the given connection ids owned by connected users, using the same rule as
+     * {@link #isOwnedByConnectedUser(long)} in two set-based lookups.
+     */
+    @Transactional(readOnly = true)
+    public Set<Long> getConnectedUserOwnedConnectionIds(Set<Long> connectionIds) {
+        Set<Long> ownedConnectionIds = new HashSet<>(connectedUserConnectionService.getConnectionIdsIn(connectionIds));
+
+        ownedConnectionIds.addAll(integrationInstanceService.getConnectionIdsIn(connectionIds));
+
+        return ownedConnectionIds;
+    }
+
     private Set<Long> filterByEnvironment(Set<Long> connectionIds, Environment environment) {
         Set<Long> filteredConnectionIds = new LinkedHashSet<>();
 

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -43,4 +44,11 @@ public interface ConnectedUserConnectionRepository extends ListCrudRepository<Co
         WHERE connection_id = :connectionId
         """)
     boolean existsByConnectionId(@Param("connectionId") long connectionId);
+
+    @Query("""
+        SELECT connection_id
+        FROM connected_user_connection
+        WHERE connection_id IN (:connectionIds)
+        """)
+    List<Long> findConnectionIdsIn(@Param("connectionIds") Collection<Long> connectionIds);
 }

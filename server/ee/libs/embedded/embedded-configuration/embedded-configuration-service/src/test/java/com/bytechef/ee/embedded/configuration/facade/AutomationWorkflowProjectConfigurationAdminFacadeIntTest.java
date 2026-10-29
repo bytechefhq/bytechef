@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -34,6 +35,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationWorkflowProjectConfigurationUpdatedEvent;
@@ -637,6 +639,105 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     @Test
+    void testGetProvidableValuesExposesTheSlotsAndInputsOfThePinnedVersionNotTheDraft() {
+        long projectId = createProject("Pinned Slots");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_CHANNEL_DEFINITION, "Pinned Slots"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(NO_INPUT_DEFINITION, "Pinned Slots"));
+
+        givenSlots(new ComponentConnection("slack", 1, "postMessage1", "slack", true));
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO providableValues =
+            automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
+                configurationId, workflowUuid);
+
+        assertThat(providableValues.connectionSlots()).extracting(
+            AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot::componentName)
+            .containsExactly("slack");
+        assertThat(providableValues.inputs()).containsExactly(
+            new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                "channel", "Channel", "string", true));
+    }
+
+    @Test
+    void testGetProvidableValuesExposesAClusterElementSlotOnceWithItsRequiredFlag() {
+        long projectId = createProject("Cluster Slots");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_DEFINITION, "Cluster Slots"));
+
+        publish(projectId);
+
+        givenSlots(
+            new ComponentConnection("slack", 1, "postMessage1", "slack", false),
+            new ComponentConnection("openai", 1, "postMessage1", "openai", true),
+            new ComponentConnection("slack", 1, "postMessage1", "slack2", true));
+
+        long configurationId = automationWorkflowProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, 1, true, true);
+
+        List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> connectionSlots =
+            automationWorkflowProjectConfigurationAdminFacade
+                .getConfigurationWorkflowProvidableValues(configurationId, workflowUuid)
+                .connectionSlots();
+
+        assertThat(connectionSlots).extracting(
+            AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot::componentName)
+            .containsExactly("slack", "openai");
+        assertThat(connectionSlots)
+            .extracting(AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot::required)
+            .containsExactly(true, true);
+    }
+
+    @Test
+    void testGetProvidableValuesExcludesConnectedUserAndOtherEnvironmentConnectionsFromTheProvidableOnes() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Providable Connections");
+
+        givenConnections(
+            "slack", newConnection(21L, "slack", ENVIRONMENT_ID, "Company Slack"),
+            newConnection(22L, "slack", ENVIRONMENT_ID, "Customer Slack"),
+            newConnection(23L, "slack", ENVIRONMENT_ID + 1, "Production Slack"));
+
+        connectedUserConnectionService.create(9002L, 22L);
+
+        try {
+            List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection> providable =
+                automationWorkflowProjectConfigurationAdminFacade
+                    .getConfigurationWorkflowProvidableValues(fixture.configurationId(), fixture.workflowUuid())
+                    .connectionSlots()
+                    .getFirst()
+                    .providableConnections();
+
+            assertThat(providable).containsExactly(
+                new AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection(
+                    21L, "Company Slack"));
+        } finally {
+            connectedUserConnectionService.deleteByConnectionId(22L);
+        }
+    }
+
+    @Test
+    void testGetProvidableValuesReturnsTheStoredProvidedValues() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Providable Stored Values");
+
+        givenConnection(11L, "slack", ENVIRONMENT_ID);
+
+        automationWorkflowProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            fixture.configurationId(), fixture.workflowUuid(), Map.of("slack", 11L), Map.of("channel", "general"));
+
+        AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO providableValues =
+            automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
+                fixture.configurationId(), fixture.workflowUuid());
+
+        assertThat(providableValues.providedConnections()).isEqualTo(Map.of("slack", 11L));
+        assertThat(providableValues.providedInputs()).isEqualTo(Map.of("channel", "general"));
+    }
+
+    @Test
     void testUpdateConfigurationWorkflowProvidesValuesVisibleInTheListing() {
         ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Values");
 
@@ -817,6 +918,31 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
             projectId, ENVIRONMENT_ID, 1, true, true);
 
         return new ProvidedValuesFixture(projectId, configurationId, workflowUuid);
+    }
+
+    private void givenSlots(ComponentConnection... componentConnections) {
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(componentConnections));
+    }
+
+    private static Connection newConnection(long id, String componentName, long environmentId, String name) {
+        Connection connection = new Connection();
+
+        connection.setId(id);
+        connection.setComponentName(componentName);
+        connection.setEnvironmentId((int) environmentId);
+        connection.setName(name);
+
+        return connection;
+    }
+
+    private void givenConnections(String componentName, Connection... connections) {
+        when(connectionService.getConnections(eq(componentName), any(), any(), any(), any()))
+            .thenAnswer(invocation -> List.of(connections)
+                .stream()
+                .filter(connection -> Long.valueOf(connection.getEnvironmentId())
+                    .equals(invocation.getArgument(3)))
+                .toList());
     }
 
     private void givenConnection(long connectionId, String componentName, long environmentId) {

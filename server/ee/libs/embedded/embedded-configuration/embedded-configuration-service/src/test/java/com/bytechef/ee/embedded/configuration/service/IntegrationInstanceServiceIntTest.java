@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -159,6 +160,17 @@ class IntegrationInstanceServiceIntTest {
 
         assertThat(integrationInstanceService.existsByConnectionId(CONNECTION_ID)).isTrue();
         assertThat(integrationInstanceService.existsByConnectionId(CONNECTION_ID + 1)).isFalse();
+    }
+
+    @Test
+    void testGetConnectionIdsInReturnsOnlyTheConnectionsAnIntegrationInstanceUses() {
+        long configurationId = createConfiguration(createIntegration(), 1);
+
+        integrationInstanceService.create(USER_A_ID, CONNECTION_ID, configurationId);
+
+        assertThat(integrationInstanceService.getConnectionIdsIn(Set.of(CONNECTION_ID, CONNECTION_ID + 1)))
+            .containsExactly(CONNECTION_ID);
+        assertThat(integrationInstanceService.getConnectionIdsIn(Set.of())).isEmpty();
     }
 
     @Test

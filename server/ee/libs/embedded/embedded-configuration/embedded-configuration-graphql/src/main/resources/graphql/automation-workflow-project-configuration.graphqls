@@ -20,6 +20,32 @@ type AutomationWorkflowProjectConfigurationWorkflow {
     providedInputs: Map
 }
 
+type AutomationWorkflowProjectConfigurationWorkflowProvidableValues {
+    connectionSlots: [AutomationWorkflowProjectConfigurationConnectionSlot!]!
+    inputs: [AutomationWorkflowProjectConfigurationInput!]!
+    providedConnections: Map
+    providedInputs: Map
+}
+
+type AutomationWorkflowProjectConfigurationConnectionSlot {
+    componentName: String!
+    title: String!
+    required: Boolean!
+    providableConnections: [AutomationWorkflowProjectConfigurationProvidableConnection!]!
+}
+
+type AutomationWorkflowProjectConfigurationProvidableConnection {
+    id: ID!
+    name: String!
+}
+
+type AutomationWorkflowProjectConfigurationInput {
+    name: String!
+    label: String
+    type: String
+    required: Boolean!
+}
+
 type AutomationWorkflowProjectConfigurationVersionImpact {
     workflows: [AutomationWorkflowProjectConfigurationVersionImpactWorkflow!]!
 }
@@ -34,6 +60,7 @@ type AutomationWorkflowProjectConfigurationVersionImpactWorkflow {
 
 extend type Query {
     automationWorkflowProjectConfigurations(projectId: ID!): [AutomationWorkflowProjectConfiguration!]!
+    automationWorkflowProjectConfigurationWorkflowProvidableValues(id: ID!, workflowUuid: ID!): AutomationWorkflowProjectConfigurationWorkflowProvidableValues!
     automationWorkflowProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!): AutomationWorkflowProjectConfigurationVersionImpact!
 }
 

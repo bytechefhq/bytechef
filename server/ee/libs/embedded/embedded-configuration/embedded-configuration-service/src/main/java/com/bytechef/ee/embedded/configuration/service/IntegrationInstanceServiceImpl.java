@@ -13,8 +13,10 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepo
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +74,16 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     @Transactional(readOnly = true)
     public boolean existsByConnectionId(long connectionId) {
         return integrationInstanceRepository.existsByConnectionId(connectionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> getConnectionIdsIn(Set<Long> connectionIds) {
+        if (connectionIds.isEmpty()) {
+            return Set.of();
+        }
+
+        return new LinkedHashSet<>(integrationInstanceRepository.findConnectionIdsIn(connectionIds));
     }
 
     @Override

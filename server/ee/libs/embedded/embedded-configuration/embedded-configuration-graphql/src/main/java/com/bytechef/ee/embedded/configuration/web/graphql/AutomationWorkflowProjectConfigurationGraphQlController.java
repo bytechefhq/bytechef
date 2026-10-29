@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectConfigurationAdminFacade;
 import com.bytechef.exception.ConfigurationException;
@@ -47,6 +48,15 @@ public class AutomationWorkflowProjectConfigurationGraphQlController {
         @Argument String projectId) {
 
         return automationWorkflowProjectConfigurationAdminFacade.getConfigurations(Long.parseLong(projectId));
+    }
+
+    @QueryMapping
+    public AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO
+        automationWorkflowProjectConfigurationWorkflowProvidableValues(
+            @Argument String id, @Argument String workflowUuid) {
+
+        return automationWorkflowProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
+            Long.parseLong(id), workflowUuid);
     }
 
     @QueryMapping
