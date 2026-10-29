@@ -10,17 +10,19 @@ package com.bytechef.ee.platform.apiconnector.configuration.service;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob.Status;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.scheduling.annotation.Scheduled;
+import java.util.function.Consumer;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of ApiConnectorGenerationJobService using in-memory storage.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -29,9 +31,23 @@ import org.springframework.stereotype.Service;
 @ConditionalOnEEVersion
 public class ApiConnectorGenerationJobServiceImpl implements ApiConnectorGenerationJobService {
 
-    private static final int JOB_RETENTION_MINUTES = 5;
+    public static final String JOBS_CACHE = ApiConnectorGenerationJobService.class.getName() + ".jobs";
 
-    private final Map<String, ApiConnectorGenerationJob> jobs = new ConcurrentHashMap<>();
+    private static final String CANCELLATION_REQUESTED = "cancellationRequested";
+    private static final String COMPLETED_DATE = "completedDate";
+    private static final String CREATED_DATE = "createdDate";
+    private static final String DOCUMENTATION_URL = "documentationUrl";
+    private static final String ERROR_MESSAGE = "errorMessage";
+    private static final String ID = "id";
+    private static final String SPECIFICATION = "specification";
+    private static final String STATUS = "status";
+
+    private final CacheManager cacheManager;
+
+    @SuppressFBWarnings("EI")
+    public ApiConnectorGenerationJobServiceImpl(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @Override
     public ApiConnectorGenerationJob create(String documentationUrl) {
@@ -40,77 +56,129 @@ public class ApiConnectorGenerationJobServiceImpl implements ApiConnectorGenerat
 
         ApiConnectorGenerationJob job = new ApiConnectorGenerationJob(jobId, documentationUrl);
 
-        jobs.put(jobId, job);
+        put(job);
 
         return job;
     }
 
     @Override
     public Optional<ApiConnectorGenerationJob> get(String jobId) {
-        return Optional.ofNullable(jobs.get(jobId));
+        Cache.ValueWrapper valueWrapper = getCache().get(jobId);
+
+        if (valueWrapper == null || !(valueWrapper.get() instanceof Map<?, ?> jobMap)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(toJob(jobMap));
     }
 
     @Override
     public void markAsProcessing(String jobId) {
-        ApiConnectorGenerationJob job = jobs.get(jobId);
-
-        if (job != null) {
-            job.setStatus(Status.PROCESSING);
-        }
+        update(jobId, job -> job.setStatus(Status.PROCESSING));
     }
 
     @Override
     public void markAsCompleted(String jobId, String specification) {
-        ApiConnectorGenerationJob job = jobs.get(jobId);
-
-        if (job != null) {
+        update(jobId, job -> {
             job.setStatus(Status.COMPLETED);
             job.setSpecification(specification);
-        }
+        });
     }
 
     @Override
     public void markAsFailed(String jobId, String errorMessage) {
-        ApiConnectorGenerationJob job = jobs.get(jobId);
-
-        if (job != null) {
+        update(jobId, job -> {
             job.setStatus(Status.FAILED);
             job.setErrorMessage(errorMessage);
-        }
+        });
     }
 
     @Override
     public boolean requestCancellation(String jobId) {
-        ApiConnectorGenerationJob job = jobs.get(jobId);
+        Optional<ApiConnectorGenerationJob> jobOptional = get(jobId);
 
-        if (job != null) {
-            job.setCancellationRequested(true);
-            job.setStatus(Status.CANCELLED);
-
-            return true;
+        if (jobOptional.isEmpty()) {
+            return false;
         }
 
-        return false;
+        ApiConnectorGenerationJob job = jobOptional.get();
+
+        job.setCancellationRequested(true);
+        job.setStatus(Status.CANCELLED);
+
+        put(job);
+
+        return true;
     }
 
     @Override
     public boolean isCancellationRequested(String jobId) {
-        ApiConnectorGenerationJob job = jobs.get(jobId);
-
-        return job != null && job.isCancellationRequested();
+        return get(jobId)
+            .map(ApiConnectorGenerationJob::isCancellationRequested)
+            .orElse(false);
     }
 
-    @Scheduled(fixedRate = 60000)
-    void cleanupOldJobs() {
-        LocalDateTime cutoffTime = LocalDateTime.now()
-            .minusMinutes(JOB_RETENTION_MINUTES);
+    private Cache getCache() {
+        return Objects.requireNonNull(cacheManager.getCache(JOBS_CACHE));
+    }
 
-        jobs.entrySet()
-            .removeIf(entry -> {
-                ApiConnectorGenerationJob job = entry.getValue();
-                LocalDateTime completedDate = job.getCompletedDate();
+    private void put(ApiConnectorGenerationJob job) {
+        Cache cache = getCache();
 
-                return completedDate != null && completedDate.isBefore(cutoffTime);
-            });
+        cache.put(job.getId(), toMap(job));
+    }
+
+    private void update(String jobId, Consumer<ApiConnectorGenerationJob> jobConsumer) {
+        get(jobId).ifPresent(job -> {
+            jobConsumer.accept(job);
+
+            put(job);
+        });
+    }
+
+    private static Map<String, Object> toMap(ApiConnectorGenerationJob job) {
+        Map<String, Object> jobMap = new HashMap<>();
+
+        jobMap.put(CANCELLATION_REQUESTED, job.isCancellationRequested());
+        jobMap.put(ID, job.getId());
+        jobMap.put(STATUS, job.getStatus()
+            .name());
+
+        putIfNotNull(jobMap, COMPLETED_DATE, job.getCompletedDate());
+        putIfNotNull(jobMap, CREATED_DATE, job.getCreatedDate());
+        putIfNotNull(jobMap, DOCUMENTATION_URL, job.getDocumentationUrl());
+        putIfNotNull(jobMap, ERROR_MESSAGE, job.getErrorMessage());
+        putIfNotNull(jobMap, SPECIFICATION, job.getSpecification());
+
+        return jobMap;
+    }
+
+    private static ApiConnectorGenerationJob toJob(Map<?, ?> jobMap) {
+        ApiConnectorGenerationJob job = new ApiConnectorGenerationJob();
+
+        job.setId((String) jobMap.get(ID));
+        job.setStatus(Status.valueOf((String) jobMap.get(STATUS)));
+        job.setCancellationRequested(Boolean.TRUE.equals(jobMap.get(CANCELLATION_REQUESTED)));
+        job.setCompletedDate(toLocalDateTime(jobMap.get(COMPLETED_DATE)));
+        job.setCreatedDate(toLocalDateTime(jobMap.get(CREATED_DATE)));
+        job.setDocumentationUrl((String) jobMap.get(DOCUMENTATION_URL));
+        job.setErrorMessage((String) jobMap.get(ERROR_MESSAGE));
+        job.setSpecification((String) jobMap.get(SPECIFICATION));
+
+        return job;
+    }
+
+    private static void putIfNotNull(Map<String, Object> jobMap, String key, Object value) {
+        if (value != null) {
+            jobMap.put(key, value.toString());
+        }
+    }
+
+    private static LocalDateTime toLocalDateTime(Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        return LocalDateTime.parse((String) value);
     }
 }
