@@ -1077,7 +1077,7 @@ export type AutomationWorkflowProjectConfigurationsQueryVariables = Exact<{
 }>;
 
 
-export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean }> }> };
+export type AutomationWorkflowProjectConfigurationsQuery = { automationWorkflowProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, lastExecutionDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean, lastExecutionDate: string | null }> }> };
 
 export type AutomationWorkflowProjectTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1094,7 +1094,7 @@ export type AutomationWorkflowProjectVersionsQuery = { automationWorkflowProject
 export type AutomationWorkflowProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AutomationWorkflowProjectsQuery = { automationWorkflowProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, permissionExpression: string | null, workflowTemplates: Array<{ workflowUuid: string, workflowId: string, label: string | null, description: string | null, permissionExpression: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
+export type AutomationWorkflowProjectsQuery = { automationWorkflowProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, permissionExpression: string | null, configurationCount: number, lastPublishedDate: string | null, workflowTemplates: Array<{ workflowUuid: string, workflowId: string, label: string | null, description: string | null, permissionExpression: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
 
 export type CreateAutomationWorkflowProjectMutationVariables = Exact<{
   name: string;
@@ -5982,11 +5982,13 @@ export const AutomationWorkflowProjectConfigurationsDocument = new TypedDocument
     enabled
     automationHubVisible
     lastModifiedDate
+    lastExecutionDate
     workflows {
       workflowUuid
       workflowId
       label
       enabled
+      lastExecutionDate
     }
   }
 }
@@ -6072,6 +6074,8 @@ export const AutomationWorkflowProjectsDocument = new TypedDocumentString(`
     version
     lastPublishedVersion
     permissionExpression
+    configurationCount
+    lastPublishedDate
     workflowTemplates {
       workflowUuid
       workflowId

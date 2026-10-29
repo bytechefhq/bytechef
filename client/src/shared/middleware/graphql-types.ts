@@ -498,8 +498,10 @@ export enum AuthorizationType {
 export type AutomationWorkflowProject = {
   __typename?: 'AutomationWorkflowProject';
   categoryId?: Maybe<Scalars['ID']['output']>;
+  configurationCount: Scalars['Int']['output'];
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  lastPublishedDate?: Maybe<Scalars['String']['output']>;
   lastPublishedVersion?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   permissionExpression?: Maybe<Scalars['String']['output']>;
@@ -528,6 +530,7 @@ export type AutomationWorkflowProjectConfiguration = {
   enabled: Scalars['Boolean']['output'];
   environmentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectId: Scalars['ID']['output'];
   projectVersion: Scalars['Int']['output'];
@@ -538,6 +541,7 @@ export type AutomationWorkflowProjectConfigurationWorkflow = {
   __typename?: 'AutomationWorkflowProjectConfigurationWorkflow';
   enabled: Scalars['Boolean']['output'];
   label?: Maybe<Scalars['String']['output']>;
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
   workflowId: Scalars['ID']['output'];
   workflowUuid: Scalars['ID']['output'];
 };
