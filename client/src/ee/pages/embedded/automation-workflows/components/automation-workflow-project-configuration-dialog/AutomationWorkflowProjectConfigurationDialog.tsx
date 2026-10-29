@@ -10,9 +10,11 @@ import {
 } from '@/components/Dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectsQuery,
+    useAutomationWorkflowProjectConfigurationVersionImpactQuery,
     useAutomationWorkflowProjectConfigurationsQuery,
     useAutomationWorkflowProjectVersionsQuery,
     useCreateAutomationWorkflowProjectConfigurationMutation,
@@ -49,6 +51,15 @@ const AutomationWorkflowProjectConfigurationDialog = ({
     const {data: environments} = useGetEnvironmentsQuery();
     const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery({projectId: project.id});
     const {data: versionsData} = useAutomationWorkflowProjectVersionsQuery({id: project.id});
+
+    const changesVersion =
+        !!configuration && projectVersion !== '' && Number(projectVersion) !== configuration.projectVersion;
+
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true}, changesVersion);
+    const {data: impactData} = useAutomationWorkflowProjectConfigurationVersionImpactQuery(
+        {id: configuration?.id ?? '', projectVersion: Number(projectVersion)},
+        {enabled: changesVersion}
+    );
 
     const onSuccess = () => {
         void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurations']});
@@ -87,6 +98,41 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
     const movesToOlderVersion =
         !!configuration && projectVersion !== '' && Number(projectVersion) < configuration.projectVersion;
+
+    const impactWarnings = useMemo(() => {
+        if (!changesVersion) {
+            return [];
+        }
+
+        const componentTitles = new Map(
+            (componentDefinitions ?? []).map((componentDefinition) => [
+                componentDefinition.name,
+                componentDefinition.title || componentDefinition.name,
+            ])
+        );
+
+        const warnings: {key: string; text: string}[] = [];
+
+        for (const impactWorkflow of impactData?.automationWorkflowProjectConfigurationVersionImpact.workflows ?? []) {
+            for (const inputName of impactWorkflow.newRequiredInputs) {
+                warnings.push({
+                    key: `${impactWorkflow.workflowUuid}-input-${inputName}`,
+                    text: `Version ${projectVersion} adds required input ${inputName} to ${impactWorkflow.label}: ${impactWorkflow.affectedConnectedUserCount} connected users will pause until they fill it.`,
+                });
+            }
+
+            for (const componentName of impactWorkflow.newRequiredConnections) {
+                const componentTitle = componentTitles.get(componentName) ?? componentName;
+
+                warnings.push({
+                    key: `${impactWorkflow.workflowUuid}-connection-${componentName}`,
+                    text: `Version ${projectVersion} adds a required ${componentTitle} connection to ${impactWorkflow.label}: connected users without a ${componentTitle} integration will pause.`,
+                });
+            }
+        }
+
+        return warnings;
+    }, [changesVersion, componentDefinitions, impactData, projectVersion]);
 
     const handleSubmit = () => {
         if (configuration) {
@@ -185,6 +231,12 @@ const AutomationWorkflowProjectConfigurationDialog = ({
                                         Versions that lack workflows connected users still use cannot be selected.
                                     </p>
                                 )}
+
+                                {impactWarnings.map((impactWarning) => (
+                                    <p className="text-sm text-content-warning-primary" key={impactWarning.key}>
+                                        {impactWarning.text}
+                                    </p>
+                                ))}
                             </fieldset>
 
                             <Switch checked={enabled} label="Enabled" onCheckedChange={setEnabled} />
