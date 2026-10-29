@@ -27,4 +27,6 @@ public interface ConnectedUserMcpServerFacade {
     List<ConnectedUserMcpServerDTO> getConnectedUserMcpServers(long connectedUserId);
 
     List<ProvisionableConnectedUserMcpServerDTO> getProvisionableMcpServers(long connectedUserId);
+
+    void provisionMcpServer(long connectedUserId, long mcpServerId);
 }
