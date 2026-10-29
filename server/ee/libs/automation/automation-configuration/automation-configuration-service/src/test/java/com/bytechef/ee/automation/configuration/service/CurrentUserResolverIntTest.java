@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ee.automation.configuration.config.EmbeddedOwnerContributorsTestConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.callback.UserCallback;
 import com.bytechef.platform.user.repository.AuthorityRepository;
@@ -107,7 +108,8 @@ class CurrentUserResolverIntTest {
 
     @EnableAutoConfiguration
     @Import({
-        LiquibaseConfiguration.class, UserCallback.class, CurrentUserResolverIntTest.Config.UserJdbcConfiguration.class
+        EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, UserCallback.class,
+        CurrentUserResolverIntTest.Config.UserJdbcConfiguration.class
     })
     @SpringBootConfiguration
     static class Config {
