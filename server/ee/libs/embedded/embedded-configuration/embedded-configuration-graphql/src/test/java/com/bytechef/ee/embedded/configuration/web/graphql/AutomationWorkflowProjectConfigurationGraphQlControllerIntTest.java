@@ -54,9 +54,11 @@ class AutomationWorkflowProjectConfigurationGraphQlControllerIntTest {
         AutomationWorkflowProjectConfigurationDTO configuration = new AutomationWorkflowProjectConfigurationDTO(
             5L, 7L, 0L, 2, true, false,
             List.of(
-                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-one", "workflow-id-one", "One", true),
-                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-two", "workflow-id-two", "Two", false)),
-            Instant.parse("2026-10-28T10:00:00Z"));
+                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-one", "workflow-id-one", "One", true,
+                    null),
+                new AutomationWorkflowProjectConfigurationDTO.Workflow("uuid-two", "workflow-id-two", "Two", false,
+                    null)),
+            Instant.parse("2026-10-28T10:00:00Z"), null);
 
         when(automationWorkflowProjectConfigurationAdminFacade.getConfigurations(7L))
             .thenReturn(List.of(configuration));

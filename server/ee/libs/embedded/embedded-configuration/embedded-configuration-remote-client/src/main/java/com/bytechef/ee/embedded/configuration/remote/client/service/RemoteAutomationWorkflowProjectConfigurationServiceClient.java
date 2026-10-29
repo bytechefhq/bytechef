@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectC
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +50,11 @@ public class RemoteAutomationWorkflowProjectConfigurationServiceClient
 
     @Override
     public List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<AutomationWorkflowProjectConfiguration> getConfigurations(Set<Long> projectIds) {
         throw new UnsupportedOperationException();
     }
 

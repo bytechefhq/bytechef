@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
@@ -38,15 +40,17 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
     private final ConnectedUserProjectService connectedUserProjectService;
     private final ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
     private final ConnectedUserService connectedUserService;
+    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserWorkflowReferenceAdminFacadeImpl(
         ConnectedUserProjectService connectedUserProjectService,
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
-        ConnectedUserService connectedUserService) {
+        ConnectedUserService connectedUserService, ProjectWorkflowService projectWorkflowService) {
         this.connectedUserProjectService = connectedUserProjectService;
         this.connectedUserProjectWorkflowRepository = connectedUserProjectWorkflowRepository;
         this.connectedUserService = connectedUserService;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
@@ -74,14 +78,24 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
             .stream()
             .collect(Collectors.toMap(ConnectedUser::getId, Function.identity()));
 
+        List<Long> projectIds = connectedUserProjectMap.values()
+            .stream()
+            .map(ConnectedUserProject::getProjectId)
+            .distinct()
+            .toList();
+
+        Map<Long, String> workflowIds = projectWorkflowService.getProjectWorkflows(projectIds)
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getId, ProjectWorkflow::getWorkflowId));
+
         return references.stream()
-            .map(reference -> toDTO(reference, connectedUserProjectMap, connectedUserMap))
+            .map(reference -> toDTO(reference, connectedUserProjectMap, connectedUserMap, workflowIds))
             .toList();
     }
 
     private ConnectedUserWorkflowReferenceDTO toDTO(
         ConnectedUserProjectWorkflow reference, Map<Long, ConnectedUserProject> connectedUserProjectMap,
-        Map<Long, ConnectedUser> connectedUserMap) {
+        Map<Long, ConnectedUser> connectedUserMap, Map<Long, String> workflowIds) {
         ConnectedUserProject connectedUserProject = connectedUserProjectMap.get(
             reference.getConnectedUserProjectId());
 
@@ -91,6 +105,7 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
 
         return new ConnectedUserWorkflowReferenceDTO(
             reference.getAutomationWorkflowUuid(), connectedUser.getExternalId(), environment.name(),
-            reference.isEnabled(), reference.isDangling(), reference.getDanglingReason());
+            reference.isEnabled(), reference.isDangling(), reference.getDanglingReason(),
+            workflowIds.get(reference.getProjectWorkflowId()));
     }
 }

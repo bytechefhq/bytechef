@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -29,6 +30,8 @@ public interface AutomationWorkflowProjectConfigurationService {
     AutomationWorkflowProjectConfiguration getConfiguration(long id);
 
     List<AutomationWorkflowProjectConfiguration> getConfigurations(long projectId);
+
+    List<AutomationWorkflowProjectConfiguration> getConfigurations(Set<Long> projectIds);
 
     boolean isWorkflowEnabled(AutomationWorkflowProjectConfiguration configuration, UUID workflowUuid);
 

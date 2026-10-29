@@ -6,6 +6,7 @@ type AutomationWorkflowProjectConfiguration {
     enabled: Boolean!
     automationHubVisible: Boolean!
     lastModifiedDate: String
+    lastExecutionDate: String
     workflows: [AutomationWorkflowProjectConfigurationWorkflow!]!
 }
 
@@ -14,6 +15,7 @@ type AutomationWorkflowProjectConfigurationWorkflow {
     workflowId: ID!
     label: String
     enabled: Boolean!
+    lastExecutionDate: String
 }
 
 extend type Query {
