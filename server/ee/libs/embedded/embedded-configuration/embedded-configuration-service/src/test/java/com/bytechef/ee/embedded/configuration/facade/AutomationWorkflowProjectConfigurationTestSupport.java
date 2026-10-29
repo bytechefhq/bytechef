@@ -18,7 +18,7 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-final class AutomationWorkflowProjectConfigurationTestSupport {
+public final class AutomationWorkflowProjectConfigurationTestSupport {
 
     private AutomationWorkflowProjectConfigurationTestSupport() {
     }
@@ -27,7 +27,7 @@ final class AutomationWorkflowProjectConfigurationTestSupport {
      * Publishes the project and pins an enabled production configuration to the version just published, so that the
      * production environment keeps seeing the latest published version.
      */
-    static void publishAndPinProject(
+    public static void publishAndPinProject(
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService, long projectId) {
 
