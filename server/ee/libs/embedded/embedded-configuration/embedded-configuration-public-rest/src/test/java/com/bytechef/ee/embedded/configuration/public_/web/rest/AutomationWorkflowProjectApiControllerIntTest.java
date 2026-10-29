@@ -303,4 +303,93 @@ class AutomationWorkflowProjectApiControllerIntTest {
             .jsonPath("$[0].id")
             .isEqualTo(PROJECT_ID);
     }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetFrontendWorkflowTemplateReturnsATemplateOfAProjectHiddenFromTheHub() {
+        givenPublishedProject(false);
+
+        webTestClient
+            .get()
+            .uri("/v1/automation/workflow-templates/" + WORKFLOW_UUID)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.id")
+            .isEqualTo(WORKFLOW_UUID)
+            .jsonPath("$.label")
+            .isEqualTo("Summarize Email")
+            .jsonPath("$.components[0].name")
+            .isEqualTo("openAi")
+            .jsonPath("$.components[0].provided")
+            .isEqualTo(true)
+            .jsonPath("$.inputs[0].name")
+            .isEqualTo("model")
+            .jsonPath("$.inputs[0].provided")
+            .isEqualTo(true);
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetWorkflowTemplateReturnsATemplateOfAProjectListedInTheHub() {
+        givenPublishedProject(true);
+
+        webTestClient
+            .get()
+            .uri("/v1/" + EXTERNAL_USER_ID + "/automation/workflow-templates/" + WORKFLOW_UUID)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.id")
+            .isEqualTo(WORKFLOW_UUID)
+            .jsonPath("$.inputs[1].name")
+            .isEqualTo("channel")
+            .jsonPath("$.inputs[1].provided")
+            .isEqualTo(false);
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetWorkflowTemplatesAnswerNotFoundForATemplateThatIsNotAvailableToTheConnectedUser() {
+        givenPublishedProject(true);
+
+        webTestClient
+            .get()
+            .uri("/v1/automation/workflow-templates/another-workflow-uuid")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
+
+        webTestClient
+            .get()
+            .uri("/v1/" + EXTERNAL_USER_ID + "/automation/workflow-templates/another-workflow-uuid")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
+    }
+
+    private void givenPublishedProject(boolean automationHubVisible) {
+        ConnectedUserWorkflowTemplateDTO.Component openAiComponent =
+            new ConnectedUserWorkflowTemplateDTO.Component("openAi", "OpenAI", "openai-icon-svg", true, null, true);
+
+        ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
+            WORKFLOW_UUID, "Summarize Email", null, null, List.of(), List.of(openAiComponent),
+            List.of(
+                new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true, true),
+                new ConnectedUserWorkflowTemplateDTO.Input("channel", "Channel", "STRING", true, false)),
+            null);
+
+        AutomationWorkflowProjectDTO projectDTO = new AutomationWorkflowProjectDTO(
+            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null,
+            automationHubVisible, 0, null);
+
+        when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
+            .thenReturn(List.of(projectDTO));
+    }
 }
