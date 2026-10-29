@@ -755,6 +755,45 @@ class ConnectedUserProjectFacadeIntTest {
     }
 
     @Test
+    void testEnableProjectWorkflowOnAReferenceTurnedOffByTheAdministratorReturnsTheAttentionReason() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Turned Off");
+
+        String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+
+        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
+            .fetchConfiguration(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+            .orElseThrow();
+
+        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
+
+        assertThat(connectedUserProjectFacade.enableProjectWorkflow(externalUserId, automationWorkflowUuid, true, null))
+            .isEqualTo(ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR);
+    }
+
+    @Test
+    void testEnableProjectWorkflowOnAReferenceReturnsNoAttentionReasonWhenNothingBlocksIt() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Without Attention");
+
+        String automationWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationWorkflowProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectFacade.enableProjectWorkflow(externalUserId, automationWorkflowUuid, true, null))
+            .isNull();
+        assertThat(
+            connectedUserProjectFacade.enableProjectWorkflow(externalUserId, automationWorkflowUuid, false, null))
+                .isNull();
+    }
+
+    @Test
     void testEnableProjectWorkflowOnAReferenceUuidTogglesTheReference() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Reference");
 

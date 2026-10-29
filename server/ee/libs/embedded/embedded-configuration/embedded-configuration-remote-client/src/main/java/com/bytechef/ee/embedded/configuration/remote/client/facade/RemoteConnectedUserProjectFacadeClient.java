@@ -81,7 +81,7 @@ public class RemoteConnectedUserProjectFacadeClient implements ConnectedUserProj
     }
 
     @Override
-    public void enableProjectWorkflow(
+    public @Nullable String enableProjectWorkflow(
         String externalUserId, String workflowUuid, boolean enable, Long environmentId) {
 
         throw new UnsupportedOperationException();

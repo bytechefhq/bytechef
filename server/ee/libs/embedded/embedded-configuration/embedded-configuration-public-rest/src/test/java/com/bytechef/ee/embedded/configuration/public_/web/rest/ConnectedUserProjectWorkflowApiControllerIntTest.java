@@ -14,7 +14,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -505,16 +504,20 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testEnableReferenceSucceeds() {
-        doNothing()
-            .when(connectedUserProjectFacade)
-            .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
+        when(connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any()))
+            .thenReturn(null);
 
         webTestClient
             .post()
             .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
             .exchange()
             .expectStatus()
-            .isNoContent();
+            .isOk()
+            .expectBody()
+            .jsonPath("$.enabled")
+            .isEqualTo(true)
+            .jsonPath("$.attentionReason")
+            .isEmpty();
 
         verify(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
@@ -522,10 +525,48 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
+    void testEnableReferenceTurnedOffByAdministratorReportsTheAttentionReason() {
+        when(connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any()))
+            .thenReturn("TURNED_OFF_BY_ADMINISTRATOR");
+
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.enabled")
+            .isEqualTo(true)
+            .jsonPath("$.attentionReason")
+            .isEqualTo("TURNED_OFF_BY_ADMINISTRATOR");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testExternalUserEnableReferenceTurnedOffByAdministratorReportsTheAttentionReason() {
+        when(connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any()))
+            .thenReturn("TURNED_OFF_BY_ADMINISTRATOR");
+
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable", EXTERNAL_USER_ID, WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.enabled")
+            .isEqualTo(true)
+            .jsonPath("$.attentionReason")
+            .isEqualTo("TURNED_OFF_BY_ADMINISTRATOR");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
     void testDisableReferenceSucceeds() {
-        doNothing()
-            .when(connectedUserProjectFacade)
-            .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(false), any());
+        when(
+            connectedUserProjectFacade.enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(false), any()))
+                .thenReturn(null);
 
         webTestClient
             .delete()

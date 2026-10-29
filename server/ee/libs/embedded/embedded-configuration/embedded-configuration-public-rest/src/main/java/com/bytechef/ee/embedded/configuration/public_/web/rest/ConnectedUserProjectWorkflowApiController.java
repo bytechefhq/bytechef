@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseIns
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnableConnectedUserWorkflowResponseModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ProvisionWorkflowReferenceRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
@@ -121,40 +122,49 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     @Override
     public ResponseEntity<Void> disableFrontendProjectWorkflow(
         String workflowUuid, EnvironmentModel xEnvironment) {
-        return doEnableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, false,
-            xEnvironment);
+        return doDisableProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, xEnvironment);
     }
 
     @Override
     public ResponseEntity<Void> disableProjectWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
-        return doEnableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, false,
-            xEnvironment);
+        return doDisableProjectWorkflow(
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, xEnvironment);
     }
 
     @Override
     @CrossOrigin
-    public ResponseEntity<Void> enableFrontendProjectWorkflow(
+    public ResponseEntity<EnableConnectedUserWorkflowResponseModel> enableFrontendProjectWorkflow(
         String workflowUuid, EnvironmentModel xEnvironment) {
         return doEnableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, true,
-            xEnvironment);
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, xEnvironment);
     }
 
     @Override
-    public ResponseEntity<Void> enableProjectWorkflow(
+    public ResponseEntity<EnableConnectedUserWorkflowResponseModel> enableProjectWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
         return doEnableProjectWorkflow(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, true,
-            xEnvironment);
+            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid, xEnvironment);
     }
 
-    private ResponseEntity<Void> doEnableProjectWorkflow(
-        String externalUserId, String workflowUuid, boolean enable, EnvironmentModel xEnvironment) {
+    private ResponseEntity<EnableConnectedUserWorkflowResponseModel> doEnableProjectWorkflow(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+        String attentionReason = connectedUserProjectFacade.enableProjectWorkflow(
+            externalUserId, workflowUuid, true, (long) getEnvironment(xEnvironment).ordinal());
+
+        EnableConnectedUserWorkflowResponseModel enableConnectedUserWorkflowResponseModel =
+            new EnableConnectedUserWorkflowResponseModel(true);
+
+        enableConnectedUserWorkflowResponseModel.setAttentionReason(attentionReason);
+
+        return ResponseEntity.ok(enableConnectedUserWorkflowResponseModel);
+    }
+
+    private ResponseEntity<Void> doDisableProjectWorkflow(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
         connectedUserProjectFacade.enableProjectWorkflow(
-            externalUserId, workflowUuid, enable, (long) getEnvironment(xEnvironment).ordinal());
+            externalUserId, workflowUuid, false, (long) getEnvironment(xEnvironment).ordinal());
 
         return ResponseEntity.noContent()
             .build();
