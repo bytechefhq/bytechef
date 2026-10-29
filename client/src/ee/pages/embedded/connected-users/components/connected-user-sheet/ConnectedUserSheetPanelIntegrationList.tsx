@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import ConnectedUserSheetPanelIntegrationListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationListItem';
 import ProvisionIntegrationDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-integration-dialog/ProvisionIntegrationDialog';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
+import {PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import type {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
@@ -25,10 +26,11 @@ const ConnectedUserSheetPanelIntegrationList = ({
                 <h3 className="text-sm font-semibold">Integrations</h3>
 
                 <Button
-                    label="Add integration"
+                    icon={<PlusIcon />}
+                    label="New Integration"
                     onClick={() => setShowProvisionDialog(true)}
                     size="sm"
-                    variant="outline"
+                    variant="secondary"
                 />
             </div>
 

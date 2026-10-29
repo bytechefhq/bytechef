@@ -25,7 +25,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {format} from 'date-fns';
-import {CalendarIcon, PlusIcon, UploadIcon, UsersIcon} from 'lucide-react';
+import {CalendarIcon, UploadIcon, UsersIcon} from 'lucide-react';
 import {HTMLAttributes, useState} from 'react';
 import {DateRange} from 'react-day-picker';
 import {useForm} from 'react-hook-form';
@@ -222,11 +222,7 @@ const ConnectedUsers = () => {
                                 variant="outline"
                             />
 
-                            <Button
-                                icon={<PlusIcon />}
-                                label="New connected user"
-                                onClick={() => setCreateDialogOpen(true)}
-                            />
+                            <Button label="New connected user" onClick={() => setCreateDialogOpen(true)} />
                         </div>
                     }
                     title={
