@@ -1400,6 +1400,36 @@ export type McpIntegrationInstanceConfigurationsByServerIdQueryVariables = Exact
 
 export type McpIntegrationInstanceConfigurationsByServerIdQuery = { mcpIntegrationInstanceConfigurationsByServerId: Array<{ id: string, integrationInstanceConfigurationId: string, integrationInstanceConfigurationName: string | null, integrationVersion: number | null, lastModifiedDate: any, mcpServerId: string, integration: { componentName: string, id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows: Array<{ id: string, enabled: boolean, integrationInstanceConfigurationWorkflowId: any, mcpIntegrationInstanceConfigurationId: any, parameters: any, integrationInstanceConfigurationWorkflow: { id: string, enabled: boolean, inputs: any, integrationInstanceConfigurationId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
 
+export type ProvisionConnectedUserMcpServerMutationVariables = Exact<{
+  connectedUserId: string | number;
+  mcpServerId: string | number;
+}>;
+
+
+export type ProvisionConnectedUserMcpServerMutation = { provisionConnectedUserMcpServer: boolean | null };
+
+export type ProvisionConnectedUserProjectWorkflowsMutationVariables = Exact<{
+  connectedUserId: string | number;
+  workflows: Array<Types.ProvisionConnectedUserProjectWorkflowInput> | Types.ProvisionConnectedUserProjectWorkflowInput;
+}>;
+
+
+export type ProvisionConnectedUserProjectWorkflowsMutation = { provisionConnectedUserProjectWorkflows: boolean | null };
+
+export type ProvisionableConnectedUserMcpServersQueryVariables = Exact<{
+  connectedUserId: string | number;
+}>;
+
+
+export type ProvisionableConnectedUserMcpServersQuery = { provisionableConnectedUserMcpServers: Array<{ id: string, name: string, provisioned: boolean, coveredComponentNames: Array<string>, missingComponentNames: Array<string> }> };
+
+export type ProvisionableConnectedUserProjectsQueryVariables = Exact<{
+  connectedUserId: string | number;
+}>;
+
+
+export type ProvisionableConnectedUserProjectsQuery = { provisionableConnectedUserProjects: Array<{ projectId: string, name: string, projectVersion: number, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> }> }> };
+
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
 }>;
@@ -7198,6 +7228,116 @@ export const useMcpIntegrationInstanceConfigurationsByServerIdQuery = <
       {
     queryKey: variables === undefined ? ['mcpIntegrationInstanceConfigurationsByServerId'] : ['mcpIntegrationInstanceConfigurationsByServerId', variables],
     queryFn: fetcher<McpIntegrationInstanceConfigurationsByServerIdQuery, McpIntegrationInstanceConfigurationsByServerIdQueryVariables>(McpIntegrationInstanceConfigurationsByServerIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const ProvisionConnectedUserMcpServerDocument = new TypedDocumentString(`
+    mutation provisionConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!) {
+  provisionConnectedUserMcpServer(
+    connectedUserId: $connectedUserId
+    mcpServerId: $mcpServerId
+  )
+}
+    `);
+
+export const useProvisionConnectedUserMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ProvisionConnectedUserMcpServerMutation, TError, ProvisionConnectedUserMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<ProvisionConnectedUserMcpServerMutation, TError, ProvisionConnectedUserMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['provisionConnectedUserMcpServer'],
+    mutationFn: (variables?: ProvisionConnectedUserMcpServerMutationVariables) => fetcher<ProvisionConnectedUserMcpServerMutation, ProvisionConnectedUserMcpServerMutationVariables>(ProvisionConnectedUserMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ProvisionConnectedUserProjectWorkflowsDocument = new TypedDocumentString(`
+    mutation provisionConnectedUserProjectWorkflows($connectedUserId: ID!, $workflows: [ProvisionConnectedUserProjectWorkflowInput!]!) {
+  provisionConnectedUserProjectWorkflows(
+    connectedUserId: $connectedUserId
+    workflows: $workflows
+  )
+}
+    `);
+
+export const useProvisionConnectedUserProjectWorkflowsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ProvisionConnectedUserProjectWorkflowsMutation, TError, ProvisionConnectedUserProjectWorkflowsMutationVariables, TContext>) => {
+    
+    return useMutation<ProvisionConnectedUserProjectWorkflowsMutation, TError, ProvisionConnectedUserProjectWorkflowsMutationVariables, TContext>(
+      {
+    mutationKey: ['provisionConnectedUserProjectWorkflows'],
+    mutationFn: (variables?: ProvisionConnectedUserProjectWorkflowsMutationVariables) => fetcher<ProvisionConnectedUserProjectWorkflowsMutation, ProvisionConnectedUserProjectWorkflowsMutationVariables>(ProvisionConnectedUserProjectWorkflowsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ProvisionableConnectedUserMcpServersDocument = new TypedDocumentString(`
+    query provisionableConnectedUserMcpServers($connectedUserId: ID!) {
+  provisionableConnectedUserMcpServers(connectedUserId: $connectedUserId) {
+    id
+    name
+    provisioned
+    coveredComponentNames
+    missingComponentNames
+  }
+}
+    `);
+
+export const useProvisionableConnectedUserMcpServersQuery = <
+      TData = ProvisionableConnectedUserMcpServersQuery,
+      TError = unknown
+    >(
+      variables: ProvisionableConnectedUserMcpServersQueryVariables,
+      options?: Omit<UseQueryOptions<ProvisionableConnectedUserMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProvisionableConnectedUserMcpServersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProvisionableConnectedUserMcpServersQuery, TError, TData>(
+      {
+    queryKey: ['provisionableConnectedUserMcpServers', variables],
+    queryFn: fetcher<ProvisionableConnectedUserMcpServersQuery, ProvisionableConnectedUserMcpServersQueryVariables>(ProvisionableConnectedUserMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const ProvisionableConnectedUserProjectsDocument = new TypedDocumentString(`
+    query provisionableConnectedUserProjects($connectedUserId: ID!) {
+  provisionableConnectedUserProjects(connectedUserId: $connectedUserId) {
+    projectId
+    name
+    projectVersion
+    workflows {
+      workflowUuid
+      label
+      inputs {
+        name
+        label
+        type
+        required
+      }
+      provisioned
+      dangling
+    }
+  }
+}
+    `);
+
+export const useProvisionableConnectedUserProjectsQuery = <
+      TData = ProvisionableConnectedUserProjectsQuery,
+      TError = unknown
+    >(
+      variables: ProvisionableConnectedUserProjectsQueryVariables,
+      options?: Omit<UseQueryOptions<ProvisionableConnectedUserProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProvisionableConnectedUserProjectsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProvisionableConnectedUserProjectsQuery, TError, TData>(
+      {
+    queryKey: ['provisionableConnectedUserProjects', variables],
+    queryFn: fetcher<ProvisionableConnectedUserProjectsQuery, ProvisionableConnectedUserProjectsQueryVariables>(ProvisionableConnectedUserProjectsDocument, variables),
     ...options
   }
     )};
