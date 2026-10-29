@@ -3,19 +3,20 @@ import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
-import {Job, TaskExecution} from '@/shared/middleware/platform/workflow/execution';
+import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
 
 interface WorkflowTaskExecutionItemProps {
     attemptLabel?: string;
-    jobStatus?: Job['status'];
+    jobEnded?: boolean;
     taskExecution: TaskExecution;
 }
 
-const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: WorkflowTaskExecutionItemProps) => {
+const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: WorkflowTaskExecutionItemProps) => {
     const {endDate, icon, startDate, status, title, workflowTask} = taskExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
-    const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobStatus));
+    const durationLabel = duration == null && jobEnded ? '-' : `${duration ?? 0}ms`;
+    const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobEnded));
 
     return (
         <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">
@@ -42,7 +43,7 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobStatus, taskExecution}: Wor
                     </span>
                 )}
 
-                <span className="p-1 text-xs">{duration ?? 0}ms</span>
+                <span className="p-1 text-xs">{durationLabel}</span>
             </div>
         </li>
     );

@@ -11,6 +11,7 @@ import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
+import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {RefreshCwIcon, RefreshCwOffIcon, WorkflowIcon, XIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
@@ -159,13 +160,13 @@ const WorkflowExecutionsTestOutput = ({
                                                     <WorkflowExecutionsAccordionItem
                                                         defaultValue={deepestFailedExecution?.path}
                                                         execution={taskExecution}
-                                                        jobStatus={job?.status}
+                                                        jobEnded={isJobEnded(job)}
                                                         key={taskExecution.id}
                                                         onExecutionClick={handleExecutionClick}
                                                         selectedExecutionId={selectedExecution?.id || ''}
                                                     >
                                                         <WorkflowTaskExecutionItem
-                                                            jobStatus={job?.status}
+                                                            jobEnded={isJobEnded(job)}
                                                             taskExecution={taskExecution}
                                                         />
                                                     </WorkflowExecutionsAccordionItem>

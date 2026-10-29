@@ -19,14 +19,20 @@ export function getExecutionStatusIcon(status: ExecutionStatusType) {
     }
 }
 
-export function getTaskExecutionDisplayStatus(
-    status: ExecutionStatusType,
-    jobStatus?: Job['status']
-): ExecutionStatusType {
+export function getTaskExecutionDisplayStatus(status: ExecutionStatusType, jobEnded?: boolean): ExecutionStatusType {
     const taskUnfinished = status === 'STARTED' || status === 'CREATED';
-    const jobEnded = jobStatus === 'COMPLETED' || jobStatus === 'FAILED';
 
     return taskUnfinished && jobEnded ? 'CANCELLED' : status;
+}
+
+export function isJobEnded(job?: Job): boolean {
+    const jobStatus = job?.status;
+
+    if (jobStatus === 'STOPPED') {
+        return job?.metadata?.jobResumeId == null;
+    }
+
+    return jobStatus === 'COMPLETED' || jobStatus === 'FAILED';
 }
 
 export function getWorkflowStatusType(job?: Job, triggerExecution?: TriggerExecution): WorkflowStatusType {

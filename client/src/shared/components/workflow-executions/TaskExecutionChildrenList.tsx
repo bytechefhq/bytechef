@@ -6,7 +6,6 @@ import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workfl
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import {
-    Job,
     TaskExecution,
     TaskExecutionFromJSON,
     TriggerExecution,
@@ -31,7 +30,7 @@ interface TaskExecutionChildrenListProps {
     hasMore: boolean;
     indexOffset?: number;
     iterations?: TaskExecution[][];
-    jobStatus?: Job['status'];
+    jobEnded?: boolean;
     lazy?: LazyTaskExecutionChildrenOptionsI;
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
     onLoadMore: () => void;
@@ -46,7 +45,7 @@ const TaskExecutionChildrenList = ({
     hasMore,
     indexOffset = 0,
     iterations,
-    jobStatus,
+    jobEnded,
     lazy,
     onExecutionClick,
     onLoadMore,
@@ -152,14 +151,14 @@ const TaskExecutionChildrenList = ({
                                                 <WorkflowExecutionsAccordionItem
                                                     defaultValue={defaultValue}
                                                     execution={convertedIterationItem}
-                                                    jobStatus={jobStatus}
+                                                    jobEnded={jobEnded}
                                                     key={convertedIterationItem.id}
                                                     lazy={lazy}
                                                     onExecutionClick={onExecutionClick}
                                                     selectedExecutionId={selectedExecutionId}
                                                 >
                                                     <WorkflowTaskExecutionItem
-                                                        jobStatus={jobStatus}
+                                                        jobEnded={jobEnded}
                                                         taskExecution={convertedIterationItem}
                                                     />
                                                 </WorkflowExecutionsAccordionItem>
@@ -194,13 +193,13 @@ const TaskExecutionChildrenList = ({
                 <WorkflowExecutionsAccordionItem
                     defaultValue={defaultValue}
                     execution={childTaskExecution}
-                    jobStatus={jobStatus}
+                    jobEnded={jobEnded}
                     key={childTaskExecution.id}
                     lazy={lazy}
                     onExecutionClick={onExecutionClick}
                     selectedExecutionId={selectedExecutionId}
                 >
-                    <WorkflowTaskExecutionItem jobStatus={jobStatus} taskExecution={childTaskExecution} />
+                    <WorkflowTaskExecutionItem jobEnded={jobEnded} taskExecution={childTaskExecution} />
                 </WorkflowExecutionsAccordionItem>
             ))}
 

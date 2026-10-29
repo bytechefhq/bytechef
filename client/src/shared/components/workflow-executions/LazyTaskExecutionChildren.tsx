@@ -4,7 +4,6 @@ import TaskExecutionChildrenList from '@/shared/components/workflow-executions/T
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {
     FocusPathElement,
-    Job,
     TaskExecution,
     TaskExecutionChildrenPage,
     TaskExecutionStatusEnum,
@@ -24,7 +23,7 @@ export interface LazyTaskExecutionChildrenOptionsI {
 
 interface LazyTaskExecutionChildrenProps {
     defaultValue?: string[];
-    jobStatus?: Job['status'];
+    jobEnded?: boolean;
     lazy: LazyTaskExecutionChildrenOptionsI;
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
     parentTaskExecution: TaskExecution;
@@ -89,7 +88,7 @@ const measurePageOffsets = (listElement: HTMLElement | null, pages: TaskExecutio
 
 const LazyTaskExecutionChildren = ({
     defaultValue,
-    jobStatus,
+    jobEnded,
     lazy,
     onExecutionClick,
     parentTaskExecution,
@@ -397,7 +396,7 @@ const LazyTaskExecutionChildren = ({
                     hasMore={!!hasNextPage && !isFetchNextPageError}
                     indexOffset={startIndex}
                     iterations={iterations}
-                    jobStatus={jobStatus}
+                    jobEnded={jobEnded}
                     lazy={lazy}
                     onExecutionClick={onExecutionClick}
                     onLoadMore={handleLoadMore}

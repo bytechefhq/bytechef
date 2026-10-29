@@ -164,12 +164,12 @@ describe('WorkflowExecutionsAccordionItem', () => {
                 <Accordion type="multiple">
                     <WorkflowExecutionsAccordionItem
                         execution={execution}
-                        jobStatus="FAILED"
+                        jobEnded
                         onExecutionClick={vi.fn()}
                         previousTaskExecutions={previousTaskExecutions}
                         selectedExecutionId=""
                     >
-                        <WorkflowTaskExecutionItem jobStatus="FAILED" taskExecution={execution} />
+                        <WorkflowTaskExecutionItem jobEnded taskExecution={execution} />
                     </WorkflowExecutionsAccordionItem>
                 </Accordion>
             );

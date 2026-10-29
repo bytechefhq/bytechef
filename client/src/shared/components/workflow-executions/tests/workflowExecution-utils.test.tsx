@@ -7,6 +7,7 @@ import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
     getWorkflowStatusType,
+    isJobEnded,
 } from '../util/workflowExecution-utils';
 
 function createJob(overrides: Partial<Job> = {}): Job {
@@ -257,29 +258,45 @@ describe('workflowExecution-utils', () => {
     });
 
     describe('getTaskExecutionDisplayStatus', () => {
-        it.each(['COMPLETED', 'FAILED'] as const)(
-            'should show an unfinished task as cancelled when the job is %s',
-            (jobStatus) => {
-                expect(getTaskExecutionDisplayStatus('STARTED', jobStatus)).toBe('CANCELLED');
-                expect(getTaskExecutionDisplayStatus('CREATED', jobStatus)).toBe('CANCELLED');
-            }
-        );
+        it('should show an unfinished task as cancelled when the job has ended', () => {
+            expect(getTaskExecutionDisplayStatus('STARTED', true)).toBe('CANCELLED');
+            expect(getTaskExecutionDisplayStatus('CREATED', true)).toBe('CANCELLED');
+        });
 
-        it.each(['CREATED', 'STARTED', 'STOPPED'] as const)(
-            'should keep an unfinished task running while the job is %s',
-            (jobStatus) => {
-                expect(getTaskExecutionDisplayStatus('STARTED', jobStatus)).toBe('STARTED');
-                expect(getTaskExecutionDisplayStatus('CREATED', jobStatus)).toBe('CREATED');
-            }
-        );
+        it('should keep an unfinished task running while the job has not ended', () => {
+            expect(getTaskExecutionDisplayStatus('STARTED', false)).toBe('STARTED');
+            expect(getTaskExecutionDisplayStatus('CREATED', false)).toBe('CREATED');
+        });
 
-        it('should keep the task status when the job status is unknown', () => {
+        it('should keep the task status when it is unknown whether the job has ended', () => {
             expect(getTaskExecutionDisplayStatus('STARTED')).toBe('STARTED');
         });
 
-        it('should keep a finished task status when the job has failed', () => {
-            expect(getTaskExecutionDisplayStatus('COMPLETED', 'FAILED')).toBe('COMPLETED');
-            expect(getTaskExecutionDisplayStatus('FAILED', 'FAILED')).toBe('FAILED');
+        it('should keep a finished task status when the job has ended', () => {
+            expect(getTaskExecutionDisplayStatus('COMPLETED', true)).toBe('COMPLETED');
+            expect(getTaskExecutionDisplayStatus('FAILED', true)).toBe('FAILED');
+        });
+    });
+
+    describe('isJobEnded', () => {
+        it.each(['COMPLETED', 'FAILED'] as const)('should treat a %s job as ended', (status) => {
+            expect(isJobEnded(createJob({status}))).toBe(true);
+        });
+
+        it('should treat a job stopped by a user as ended', () => {
+            expect(isJobEnded(createJob({metadata: {projectVersion: 2}, status: 'STOPPED'}))).toBe(true);
+        });
+
+        it('should not treat a suspended job as ended', () => {
+            expect(isJobEnded(createJob({metadata: {jobResumeId: 'resume-id'}, status: 'STOPPED'}))).toBe(false);
+        });
+
+        it.each(['CREATED', 'STARTED'] as const)('should not treat a %s job as ended', (status) => {
+            expect(isJobEnded(createJob({status}))).toBe(false);
+        });
+
+        it('should not treat a job that is not loaded yet as ended', () => {
+            expect(isJobEnded(undefined)).toBe(false);
         });
     });
 });

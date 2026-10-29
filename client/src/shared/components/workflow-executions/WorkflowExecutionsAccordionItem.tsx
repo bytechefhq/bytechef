@@ -5,7 +5,7 @@ import LazyTaskExecutionChildren, {
 } from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import TaskExecutionChildrenList from '@/shared/components/workflow-executions/TaskExecutionChildrenList';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
-import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {type ReactNode, useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -18,7 +18,7 @@ interface WorkflowExecutionsAccordionItemProps {
     children: ReactNode;
     defaultValue?: string[];
     execution: TaskExecution | TriggerExecution;
-    jobStatus?: Job['status'];
+    jobEnded?: boolean;
     lazy?: LazyTaskExecutionChildrenOptionsI;
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
     previousTaskExecutions?: TaskExecution[];
@@ -29,7 +29,7 @@ const WorkflowExecutionsAccordionItem = ({
     children,
     defaultValue,
     execution,
-    jobStatus,
+    jobEnded,
     lazy,
     onExecutionClick,
     previousTaskExecutions = [],
@@ -106,7 +106,7 @@ const WorkflowExecutionsAccordionItem = ({
                     hasLazyChildren && (
                         <LazyTaskExecutionChildren
                             defaultValue={defaultValue}
-                            jobStatus={jobStatus}
+                            jobEnded={jobEnded}
                             lazy={lazy}
                             onExecutionClick={onExecutionClick}
                             parentTaskExecution={taskExecution}
@@ -118,7 +118,7 @@ const WorkflowExecutionsAccordionItem = ({
                         defaultValue={defaultValue}
                         hasMore={hasMoreIterations}
                         iterations={visibleIterations}
-                        jobStatus={jobStatus}
+                        jobEnded={jobEnded}
                         onExecutionClick={onExecutionClick}
                         onLoadMore={handleLoadMoreIterations}
                         parentTaskExecution={taskExecution}
@@ -135,7 +135,7 @@ const WorkflowExecutionsAccordionItem = ({
                             <WorkflowExecutionsAccordionItem
                                 defaultValue={defaultValue}
                                 execution={previousTaskExecution}
-                                jobStatus={jobStatus}
+                                jobEnded={jobEnded}
                                 key={previousTaskExecution.id}
                                 lazy={lazy}
                                 onExecutionClick={onExecutionClick}
@@ -143,7 +143,7 @@ const WorkflowExecutionsAccordionItem = ({
                             >
                                 <WorkflowTaskExecutionItem
                                     attemptLabel={`Attempt ${index + 1}`}
-                                    jobStatus={jobStatus}
+                                    jobEnded={jobEnded}
                                     taskExecution={previousTaskExecution}
                                 />
                             </WorkflowExecutionsAccordionItem>
