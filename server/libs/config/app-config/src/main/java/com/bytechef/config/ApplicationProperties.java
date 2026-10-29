@@ -635,7 +635,7 @@ public class ApplicationProperties {
                 /**
                  * AWS service name used in the signature scope
                  */
-                private String service = "logs";
+                private String service;
 
                 public String getLogGroup() {
                     return logGroup;
@@ -2433,9 +2433,9 @@ public class ApplicationProperties {
                          */
                         private Double temperature;
 
-                        private Setting reasoningEffect = Setting.NONE;
+                        private Setting reasoningEffect;
 
-                        private Setting verbosity = Setting.LOW;
+                        private Setting verbosity;
 
                         public String getModel() {
                             return model;
@@ -3445,7 +3445,7 @@ public class ApplicationProperties {
         /**
          * Data storage provider
          */
-        private Provider provider = Provider.JDBC;
+        private Provider provider;
 
         public Provider getProvider() {
             return provider;
@@ -3534,7 +3534,7 @@ public class ApplicationProperties {
         /**
          * File storage provider
          */
-        private Provider provider = Provider.FILESYSTEM;
+        private Provider provider;
 
         public Aws getAws() {
             return aws;
@@ -3621,7 +3621,7 @@ public class ApplicationProperties {
         /**
          * Encryption provider
          */
-        private Provider provider = Provider.FILESYSTEM;
+        private Provider provider;
 
         /**
          * Property-based encryption configuration
