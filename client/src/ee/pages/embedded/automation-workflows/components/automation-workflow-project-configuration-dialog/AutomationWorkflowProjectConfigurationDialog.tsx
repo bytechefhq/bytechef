@@ -228,7 +228,7 @@ const AutomationWorkflowProjectConfigurationDialog = ({
 
                                 {movesToOlderVersion && (
                                     <p className="text-sm text-content-warning-primary">
-                                        Versions that lack workflows connected users still use cannot be selected.
+                                        Versions that lack workflows connected users still use cannot be saved.
                                     </p>
                                 )}
 

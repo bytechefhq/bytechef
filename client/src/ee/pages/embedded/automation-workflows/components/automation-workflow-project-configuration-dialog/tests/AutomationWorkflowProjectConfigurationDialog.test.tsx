@@ -193,7 +193,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             />
         );
 
-        const warningText = 'Versions that lack workflows connected users still use cannot be selected.';
+        const warningText = 'Versions that lack workflows connected users still use cannot be saved.';
 
         expect(screen.queryByText(warningText)).not.toBeInTheDocument();
 
