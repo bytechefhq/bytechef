@@ -178,7 +178,7 @@ describe('AutomationWorkflowProjectConfigurationDialog', () => {
             />
         );
 
-        const warningText = 'Connected users whose automations are not in this version will be disconnected from them.';
+        const warningText = 'Versions that lack workflows connected users still use cannot be selected.';
 
         expect(screen.queryByText(warningText)).not.toBeInTheDocument();
 
