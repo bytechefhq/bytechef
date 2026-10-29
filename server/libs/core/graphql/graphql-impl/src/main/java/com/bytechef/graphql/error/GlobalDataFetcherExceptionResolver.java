@@ -20,8 +20,11 @@ import com.bytechef.exception.AbstractException;
 import com.bytechef.exception.ConfigurationException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
+import graphql.execution.ResultPath;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -47,8 +50,8 @@ import org.springframework.stereotype.Component;
  * <li>{@link GraphQlBadRequestException} \u2192 {@code BAD_REQUEST} \u2014 controller-thrown input-shape
  * validation.</li>
  * <li>{@link IllegalArgumentException} \u2192 {@code BAD_REQUEST}, matching the REST handler.</li>
- * <li>{@link AccessDeniedException} \u2192 {@code FORBIDDEN}. Returns a generic message (never the detail) so error
- * shape cannot be used to enumerate resources the caller does not own.</li>
+ * <li>{@link AccessDeniedException}, directly or anywhere in the cause chain \u2192 {@code FORBIDDEN}. Returns a
+ * generic message (never the detail) so error shape cannot be used to enumerate resources the caller does not own.</li>
  * <li>{@link AuthenticationCredentialsNotFoundException} \u2192 {@code UNAUTHORIZED} \u2014 protected mutation invoked
  * without a SecurityContext; distinct from {@code FORBIDDEN} so clients can prompt for re-authentication.</li>
  * </ul>
@@ -127,7 +130,14 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
                 .build();
         }
 
-        if (throwable instanceof AccessDeniedException) {
+        AccessDeniedException accessDeniedException = findAccessDeniedException(throwable);
+
+        if (accessDeniedException != null) {
+            ResultPath resultPath = environment.getExecutionStepInfo()
+                .getPath();
+
+            log.warn("Access denied at {}: {}", resultPath, accessDeniedException.getMessage());
+
             return GraphqlErrorBuilder
                 .newError(environment)
                 .message("Access denied")
@@ -142,6 +152,27 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
                 .getName(),
             throwable.getMessage(),
             throwable);
+
+        return null;
+    }
+
+    /**
+     * Returns the {@link AccessDeniedException} in the cause chain, or {@code null} when there is none. A denial can
+     * reach this resolver wrapped, for example by an asynchronous data fetcher, and must still map to FORBIDDEN rather
+     * than fall through as an unmapped error.
+     */
+    private static @Nullable AccessDeniedException findAccessDeniedException(Throwable throwable) {
+        Set<Throwable> visitedThrowables = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        Throwable currentThrowable = throwable;
+
+        while (currentThrowable != null && visitedThrowables.add(currentThrowable)) {
+            if (currentThrowable instanceof AccessDeniedException accessDeniedException) {
+                return accessDeniedException;
+            }
+
+            currentThrowable = currentThrowable.getCause();
+        }
 
         return null;
     }

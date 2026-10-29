@@ -18,6 +18,8 @@ package com.bytechef.graphql.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.ErrorType;
 import graphql.GraphQLError;
 import graphql.Scalars;
 import graphql.execution.ExecutionStepInfo;
@@ -26,72 +28,166 @@ import graphql.execution.ResultPath;
 import graphql.language.Field;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.List;
 import java.util.Map;
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.graphql.execution.ErrorType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 /**
  * @author Ivica Cardic
  */
 class GlobalDataFetcherExceptionResolverTest {
 
-    private final GlobalDataFetcherExceptionResolver globalDataFetcherExceptionResolver =
-        new GlobalDataFetcherExceptionResolver();
+    private DataFetchingEnvironment environment;
+    private GlobalDataFetcherExceptionResolver resolver;
+
+    @BeforeEach
+    void setUp() {
+        resolver = new GlobalDataFetcherExceptionResolver();
+
+        ResultPath resultPath = ResultPath.rootPath()
+            .segment("workspaceConnection");
+
+        ExecutionStepInfo executionStepInfo = ExecutionStepInfo.newExecutionStepInfo()
+            .type(Scalars.GraphQLString)
+            .path(resultPath)
+            .build();
+
+        MergedField mergedField = MergedField.newMergedField(Field.newField("workspaceConnection")
+            .build())
+            .build();
+
+        environment = DataFetchingEnvironmentImpl.newDataFetchingEnvironment()
+            .executionStepInfo(executionStepInfo)
+            .mergedField(mergedField)
+            .build();
+    }
+
+    @Test
+    void testAccessDeniedMapsToForbiddenWithAGenericMessage() {
+        GraphQLError graphQLError = resolver.resolveToSingleError(
+            new AccessDeniedException("Connection 42 in workspace 1051 is not accessible"), environment);
+
+        assertThat(graphQLError).isNotNull();
+        assertThat(graphQLError.getErrorType()).isEqualTo(org.springframework.graphql.execution.ErrorType.FORBIDDEN);
+        assertThat(graphQLError.getMessage()).isEqualTo("Access denied");
+        assertThat(graphQLError.getExtensions()).containsEntry("errorCode", "ACCESS_DENIED");
+        assertThat(graphQLError.getPath()).isEqualTo(List.of("workspaceConnection"));
+        assertThat(graphQLError.toSpecification())
+            .extractingByKey("extensions", InstanceOfAssertFactories.MAP)
+            .containsEntry("classification", "FORBIDDEN")
+            .containsEntry("errorCode", "ACCESS_DENIED");
+    }
+
+    @Test
+    void testAccessDeniedSubclassMapsToForbidden() {
+        AccessDeniedException accessDeniedException = new AccessDeniedException("Project 9 denied") {};
+
+        GraphQLError graphQLError = resolver.resolveToSingleError(accessDeniedException, environment);
+
+        assertThat(graphQLError).isNotNull();
+        assertThat(graphQLError.getErrorType()).isEqualTo(org.springframework.graphql.execution.ErrorType.FORBIDDEN);
+        assertThat(graphQLError.getMessage()).isEqualTo("Access denied");
+        assertThat(graphQLError.getExtensions()).containsEntry("errorCode", "ACCESS_DENIED");
+    }
+
+    @Test
+    void testWrappedAccessDeniedMapsToForbidden() {
+        // An asynchronous data fetcher can deliver the denial as the cause of another exception.
+        RuntimeException wrappedException = new IllegalStateException(
+            "fetch failed", new AccessDeniedException("Connection 42 in workspace 1051 is not accessible"));
+
+        GraphQLError graphQLError = resolver.resolveToSingleError(wrappedException, environment);
+
+        assertThat(graphQLError).isNotNull();
+        assertThat(graphQLError.getErrorType()).isEqualTo(org.springframework.graphql.execution.ErrorType.FORBIDDEN);
+        assertThat(graphQLError.getMessage()).isEqualTo("Access denied");
+        assertThat(graphQLError.getExtensions()).containsEntry("errorCode", "ACCESS_DENIED");
+    }
+
+    @Test
+    void testAnExceptionWithoutADenialInItsCauseChainIsNotMapped() {
+        assertThat(resolver.resolveToSingleError(new IllegalStateException("unrelated"), environment)).isNull();
+    }
+
+    @Test
+    void testMissingCredentialsMapToUnauthorized() {
+        GraphQLError graphQLError = resolver.resolveToSingleError(
+            new AuthenticationCredentialsNotFoundException("No SecurityContext for user 7"), environment);
+
+        assertThat(graphQLError).isNotNull();
+        assertThat(graphQLError.getErrorType())
+            .isEqualTo(org.springframework.graphql.execution.ErrorType.UNAUTHORIZED);
+        assertThat(graphQLError.getMessage()).isEqualTo("Authentication required");
+        assertThat(graphQLError.getExtensions()).containsEntry("errorCode", "AUTHENTICATION_REQUIRED");
+    }
+
+    @Test
+    void testConfigurationExceptionMapsToBadRequestWithErrorKey() {
+        ErrorType errorType = new TestErrorType();
+
+        GraphQLError graphQLError = resolver.resolveToSingleError(
+            new ConfigurationException("Already a member", errorType), environment);
+
+        assertThat(graphQLError).isNotNull();
+        assertThat(graphQLError.getErrorType())
+            .isEqualTo(org.springframework.graphql.execution.ErrorType.BAD_REQUEST);
+        assertThat(graphQLError.getMessage()).isEqualTo("Already a member");
+        assertThat(graphQLError.getExtensions())
+            .containsEntry("errorKey", 123)
+            .containsEntry("entityClass", "TestErrorType")
+            .containsEntry("errorCode", "error.testErrorType.123");
+    }
 
     @Test
     void testIllegalArgumentExceptionResolvesToBadRequestWithItsMessage() {
-        GraphQLError graphQLError = globalDataFetcherExceptionResolver.resolveToSingleError(
+        GraphQLError graphQLError = resolver.resolveToSingleError(
             new IllegalArgumentException(
                 "The component 'infobip' does not contain the 'sendViberBotTextMessage' action."),
-            createDataFetchingEnvironment());
+            environment);
 
         assertThat(graphQLError).isNotNull();
-        assertThat(graphQLError.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        assertThat(graphQLError.getErrorType())
+            .isEqualTo(org.springframework.graphql.execution.ErrorType.BAD_REQUEST);
         assertThat(graphQLError.getMessage())
             .isEqualTo("The component 'infobip' does not contain the 'sendViberBotTextMessage' action.");
     }
 
     @Test
     void testIllegalArgumentExceptionSubclassResolvesToBadRequest() {
-        GraphQLError graphQLError = globalDataFetcherExceptionResolver.resolveToSingleError(
-            new NumberFormatException("For input string: \"abc\""), createDataFetchingEnvironment());
+        GraphQLError graphQLError = resolver.resolveToSingleError(
+            new NumberFormatException("For input string: \"abc\""), environment);
 
         assertThat(graphQLError).isNotNull();
-        assertThat(graphQLError.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        assertThat(graphQLError.getErrorType())
+            .isEqualTo(org.springframework.graphql.execution.ErrorType.BAD_REQUEST);
         assertThat(graphQLError.getMessage()).isEqualTo("For input string: \"abc\"");
     }
 
     @Test
     void testGraphQlBadRequestExceptionKeepsItsCodeExtension() {
-        GraphQLError graphQLError = globalDataFetcherExceptionResolver.resolveToSingleError(
-            new GraphQlBadRequestException("ENUM_OUT_OF_RANGE", "Unknown value", Map.of()),
-            createDataFetchingEnvironment());
+        GraphQLError graphQLError = resolver.resolveToSingleError(
+            new GraphQlBadRequestException("ENUM_OUT_OF_RANGE", "Unknown value", Map.of()), environment);
 
         assertThat(graphQLError).isNotNull();
-        assertThat(graphQLError.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        assertThat(graphQLError.getErrorType())
+            .isEqualTo(org.springframework.graphql.execution.ErrorType.BAD_REQUEST);
         assertThat(graphQLError.getExtensions()).containsEntry("code", "ENUM_OUT_OF_RANGE");
     }
 
-    @Test
-    void testUnmappedExceptionIsLeftToTheDefaultHandler() {
-        GraphQLError graphQLError = globalDataFetcherExceptionResolver.resolveToSingleError(
-            new IllegalStateException("internal detail"), createDataFetchingEnvironment());
+    private static final class TestErrorType implements ErrorType {
 
-        assertThat(graphQLError).isNull();
-    }
+        @Override
+        public Class<?> getErrorClass() {
+            return TestErrorType.class;
+        }
 
-    private static DataFetchingEnvironment createDataFetchingEnvironment() {
-        MergedField mergedField = MergedField.newMergedField(new Field("workflowNodeParameterDisplayConditions"))
-            .build();
-
-        ExecutionStepInfo executionStepInfo = ExecutionStepInfo.newExecutionStepInfo()
-            .type(Scalars.GraphQLString)
-            .path(ResultPath.rootPath())
-            .build();
-
-        return DataFetchingEnvironmentImpl.newDataFetchingEnvironment()
-            .mergedField(mergedField)
-            .executionStepInfo(executionStepInfo)
-            .build();
+        @Override
+        public int getErrorKey() {
+            return 123;
+        }
     }
 }
