@@ -79,7 +79,7 @@ const response = await fetch(`${baseUrl}/api/embedded/v1/automation/projects`, {
 const projects = await response.json();
 ```
 
-Each project has a `workflowTemplates` array. The `id` of a template is the `workflowTemplateId`.
+Each project has a `workflowTemplates` array. The `id` of a template is the `workflowTemplateId`. The listing leaves out projects whose **Show in Automation Hub** switch is off; copy the UUID of such a workflow from the administrator's Automation Workflows page. The dialog itself reads the template with `GET /api/embedded/v1/automation/workflow-templates/{workflowTemplateId}`, which also returns templates of hidden projects.
 
 ## One Connect dialog per page
 
