@@ -370,17 +370,16 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .isPresent();
 
         if (isReference) {
-            connectedUserWorkflowReferenceFacade.enableReference(externalUserId, workflowUuid, enable, environment);
+            ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.enableReference(
+                externalUserId, workflowUuid, enable, environment);
 
             if (!enable) {
                 return null;
             }
 
-            return connectedUserProjectWorkflowRepository
-                .findByConnectedUserProjectIdAndAutomationWorkflowUuid(connectedUserProject.getId(), workflowUuid)
-                .map(connectedUserReferenceAttentionResolver::resolve)
-                .map(ReferenceState::attentionReason)
-                .orElse(null);
+            ReferenceState referenceState = connectedUserReferenceAttentionResolver.resolve(reference);
+
+            return referenceState.attentionReason();
         }
 
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(

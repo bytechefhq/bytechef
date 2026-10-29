@@ -99,18 +99,18 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         DanglingReferenceException.class, InvalidWorkflowException.class, MissingConnectionException.class,
         MissingInputException.class
     })
-    public void enableReference(
+    public ConnectedUserProjectWorkflow enableReference(
         String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment) {
         ConnectedUserProjectWorkflow reference = requireReference(externalUserId, automationWorkflowUuid, environment);
 
         if (!enable) {
             if (reference.isDangling()) {
                 removeRow(reference);
-            } else {
-                applyWorkflow(reference, externalUserId, environment, false, ApplyMode.EXPLICIT, Map.of(), null);
+
+                return reference;
             }
 
-            return;
+            return applyWorkflow(reference, externalUserId, environment, false, ApplyMode.EXPLICIT, Map.of(), null);
         }
 
         if (reference.isDangling()) {
@@ -123,7 +123,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
             throw new DanglingReferenceException(automationWorkflowUuid);
         }
 
-        applyWorkflow(reference, externalUserId, environment, true, ApplyMode.EXPLICIT, Map.of(), null);
+        return applyWorkflow(reference, externalUserId, environment, true, ApplyMode.EXPLICIT, Map.of(), null);
     }
 
     @Override

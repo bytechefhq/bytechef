@@ -31,7 +31,7 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
     }
 
     @Override
-    public void enableReference(
+    public ConnectedUserProjectWorkflow enableReference(
         String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment) {
 
         throw new UnsupportedOperationException();

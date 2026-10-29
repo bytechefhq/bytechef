@@ -22,7 +22,11 @@ public interface ConnectedUserWorkflowReferenceFacade {
 
     void deleteReference(String externalUserId, String automationWorkflowUuid, Environment environment);
 
-    void enableReference(String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment);
+    /**
+     * Turns the connected user's workflow on or off and returns the stored reference after the change.
+     */
+    ConnectedUserProjectWorkflow enableReference(
+        String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment);
 
     List<ConnectedUserProjectWorkflow> getConnectedUserWorkflows(long connectedUserId);
 
