@@ -218,6 +218,38 @@ paths:
                 type: "string"
       security:
         - bearerAuth: [ ]
+  /automation/workflow-templates/{workflowUuid}:
+    get:
+      description: "Get an automation workflow template available to the connected user by its workflow uuid. Unlike\
+        \ the project listing, it also returns a template of a project not listed in the Automation Hub."
+      summary: "Get an automation workflow template available to the connected user"
+      tags:
+        - "automation-workflow-project"
+      operationId: "getFrontendWorkflowTemplate"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowUuid"
+          description: "The workflow template uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The automation workflow template."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationWorkflowProjectWorkflowTemplate"
+        "404":
+          description: "The template does not exist or is not available to the connected user."
+      security:
+        - jwtBearerAuth: [ ]
   /automation/workflow-templates/{workflowUuid}/copy:
     post:
       description: "Copy an automation workflow template into a new user workflow."
@@ -1163,6 +1195,45 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/AutomationWorkflowProject"
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/automation/workflow-templates/{workflowUuid}:
+    get:
+      description: "Get an automation workflow template available to a connected user identified by external user id\
+        \ by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the\
+        \ Automation Hub."
+      summary: "Get an automation workflow template available to a connected user identified by external user id"
+      tags:
+        - "automation-workflow-project"
+      operationId: "getWorkflowTemplate"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowUuid"
+          description: "The workflow template uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The automation workflow template."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationWorkflowProjectWorkflowTemplate"
+        "404":
+          description: "The template does not exist or is not available to the connected user."
       security:
         - bearerAuth: [ ]
   /{externalUserId}/automation/workflow-templates/{workflowUuid}/copy:
@@ -2583,8 +2654,8 @@ components:
           description: "The description of the automation workflow project."
           type: "string"
         automationHubVisible:
-          description: "Whether the project is listed in the Automation Hub. The API returns hidden projects too, so\
-            \ a custom UI can offer them."
+          description: "Whether the project is listed in the Automation Hub. The project listing leaves out hidden\
+            \ projects; a workflow of a hidden project is still available by its workflow uuid."
           type: "boolean"
         workflowTemplates:
           description: "The list of automation workflow templates belonging to this project."
