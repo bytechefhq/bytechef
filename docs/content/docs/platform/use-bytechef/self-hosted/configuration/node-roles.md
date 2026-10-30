@@ -130,9 +130,6 @@ This avoids concurrent migration attempts when many nodes start together.
 [`docker-compose.cluster.yml`](https://github.com/bytechefhq/bytechef/blob/master/docker-compose.cluster.yml) covers every topology on this page through variables: coordinator, worker and webhook replicas behind nginx, RabbitMQ or Redis, PostgreSQL, and a `migrate` service that runs Liquibase once. The `migrate` service waits for PostgreSQL, RabbitMQ and Redis, and every node starts after it completes.
 
 ```bash
-export POSTGRES_PASSWORD=... RABBITMQ_PASSWORD=... BYTECHEF_ENCRYPTION_KEY=$(openssl rand -base64 16)
-export BYTECHEF_SECURITY_REMEMBER_ME_KEY=...
-
 # CE: 1 coordinator (also serving webhooks), 3 workers
 docker compose -f docker-compose.cluster.yml up -d
 
@@ -146,7 +143,7 @@ BYTECHEF_EDITION=EE BYTECHEF_COORDINATORS=2 docker compose -f docker-compose.clu
 BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker-compose.cluster.yml up -d
 ```
 
-`POSTGRES_PASSWORD`, `RABBITMQ_PASSWORD`, `BYTECHEF_ENCRYPTION_KEY` and `BYTECHEF_SECURITY_REMEMBER_ME_KEY` have no defaults, and every node gets the same values. The other variables and their defaults:
+Like `docker-compose.yml`, the file uses fixed credentials (PostgreSQL `postgres`, RabbitMQ `bytechef`) and a fixed remember-me key, and every node mounts `~/.bytechef`, where the first node to start generates the encryption key that all of them share. That makes it a one-command evaluation cluster; for anything internet-reachable, change the credentials and the remember-me key, and back up `~/.bytechef/key` with the database. The variables and their defaults:
 
 | Variable | Default | Values |
 | -------- | ------- | ------ |
@@ -160,7 +157,7 @@ BYTECHEF_WEBHOOKS=2 BYTECHEF_COORDINATOR_WEBHOOKS=false docker compose -f docker
 | `BYTECHEF_TENANT_MODE` | `SINGLE` | `SINGLE`, `MULTI` (`EE` only) |
 | `BYTECHEF_IMAGE` | `docker.bytechef.io/bytechef/bytechef:latest` | a locally built image |
 | `BYTECHEF_PORT` | `8080` | published port of the load balancer |
-| `RABBITMQ_MANAGEMENT_PORT` | `15672` | published port of the RabbitMQ management UI (user `bytechef`, password `RABBITMQ_PASSWORD`) |
+| `RABBITMQ_MANAGEMENT_PORT` | `15672` | port of the RabbitMQ management UI on `127.0.0.1` (user `bytechef`, password `bytechef`) |
 
 With `BYTECHEF_EDITION=CE` and more than one coordinator, every coordinator starts and logs the warning above. The file storage is a volume all nodes mount; in production, mount shared storage (NFS, EFS) or use the `AWS` provider.
 
