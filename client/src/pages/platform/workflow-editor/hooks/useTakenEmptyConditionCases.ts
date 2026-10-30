@@ -6,13 +6,6 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 
 const NO_TAKEN_EMPTY_CONDITION_CASES = new Set<string>();
 
-/**
- * The empty condition cases the displayed run took (see `collectTakenEmptyConditionCases`), read from the stored
- * execution under a read-only overlay and from the editor's last test run otherwise.
- *
- * `enabled` is false for anything that is not a condition's plumbing: those callers get a constant empty set and
- * do not subscribe to the run's execution tree, which a streaming test run replaces on every progress snapshot.
- */
 export default function useTakenEmptyConditionCases(enabled: boolean): Set<string> {
     const testTaskExecutions = useWorkflowEditorStore((state) =>
         enabled ? state.workflowTestExecution?.job?.taskExecutions : undefined

@@ -45,10 +45,6 @@ function computeDurationMillis(startDate?: string, endDate?: string): number | u
     return endMillis - startMillis;
 }
 
-/**
- * Drops every node still marked RUNNING. A run that ends without a `result` event -- stopped by the user, aborted,
- * or failed -- has no execution to backfill from, so its in-flight nodes would otherwise keep spinning.
- */
 function clearRunningNodeStates() {
     const {removeWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
 
@@ -59,10 +55,6 @@ function clearRunningNodeStates() {
     }
 }
 
-/**
- * Drops a `progress` snapshot left behind by a run that ends without a `result` event. Such a snapshot still reads as
- * running, so keeping it would show a stopped run as in flight; a finished result is left alone.
- */
 function clearProgressSnapshot() {
     const {setWorkflowTestExecution, workflowTestExecution} = useWorkflowEditorStore.getState();
 
@@ -73,13 +65,6 @@ function clearProgressSnapshot() {
     }
 }
 
-/**
- * Backfills node states from the final execution result. A task dispatcher (condition, loop, ...) whose body ran
- * completes coordinator-side and never emits a task lifecycle SSE event, so without this pass its node -- and every
- * edge touching it -- would stay uncolored after a run even though it executed. The whole execution tree is walked,
- * not just the top level: a condition inside a loop iteration or another condition's branch is exactly such a
- * dispatcher. Streamed states win — only missing (or still-RUNNING) entries are filled in.
- */
 function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecution) {
     const {setWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
 
@@ -95,9 +80,6 @@ function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecuti
         setWorkflowTestNodeState(name, nodeState);
     }
 
-    // A nested child that neither streamed a task_completed event nor made it into the result tree has no
-    // backfill source. A COMPLETED job proves every started task finished — sweep any node still marked RUNNING
-    // to COMPLETED so no spinner outlives the run.
     const jobStatus = workflowTestExecution.job?.status;
 
     if (jobStatus === 'COMPLETED') {
@@ -211,8 +193,6 @@ export function useWorkflowTestStream({
                 }
             },
             progress: (data) => {
-                // A snapshot that lands after the run was stopped (or already finished) must not repaint the panel
-                // as running.
                 if (!useWorkflowEditorStore.getState().workflowIsRunning) {
                     return;
                 }

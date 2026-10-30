@@ -17,7 +17,6 @@ let mockWorkflowTestExecution: {job?: {status?: string}} | undefined;
 let mockWorkflowTestNodeStates: Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}> = {};
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
-    // Lazy: the mock* consts are hoisted below this factory, so they must only be dereferenced at call time.
     const getStoreState = () => ({
         removeWorkflowTestNodeState: mockRemoveWorkflowTestNodeState,
         resetWorkflowTestNodeStates: mockResetWorkflowTestNodeStates,

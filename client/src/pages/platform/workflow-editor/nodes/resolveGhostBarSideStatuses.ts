@@ -21,7 +21,6 @@ interface ResolveGhostBarSideStatusesProps {
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>;
 }
 
-/** Resolves the executed status of each half of a task dispatcher ghost bar. */
 export default function resolveGhostBarSideStatuses({
     disabledTaskNames = new Set(),
     edges,

@@ -8,7 +8,6 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import resolveGhostBarSideStatuses, {GhostBarSideStatusesI} from './resolveGhostBarSideStatuses';
 import useTaskDispatcherGhostStatus from './useTaskDispatcherGhostStatus';
 
-/** Per-half executed status of a task dispatcher ghost bar. */
 export default function useTaskDispatcherGhostBarStatuses(
     id: string,
     data: unknown,

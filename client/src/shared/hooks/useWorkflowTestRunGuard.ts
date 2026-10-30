@@ -24,9 +24,6 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
     const latestRunningRef = useRef<boolean>(workflowIsRunning);
     const navConfirmedRef = useRef(false);
     const suppressBeforeUnloadPromptRef = useRef(false);
-    // Read through a ref, never as an effect dependency: the listener effect below stops the job in its cleanup, and a
-    // running test streams progress snapshots that set the job id mid-run -- as a dependency, the first snapshot re-ran
-    // the effect and its cleanup stopped the very run it was guarding.
     const workflowTestJobIdRef = useRef<string | undefined>(workflowTestExecution?.job?.id);
 
     const blocker = useBlocker(workflowIsRunning);

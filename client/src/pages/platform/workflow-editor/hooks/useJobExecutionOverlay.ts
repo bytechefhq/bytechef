@@ -9,10 +9,6 @@ interface OverlaidJobI {
     taskExecutions?: TaskExecution[];
 }
 
-/**
- * The overlay a read-only canvas draws for one job. Recomputed only when the job's task executions change,
- * which a polled, still-running job does on every refresh — so its nodes turn green as they finish.
- */
 export default function useJobExecutionOverlay(
     job: OverlaidJobI | undefined,
     triggerName?: string

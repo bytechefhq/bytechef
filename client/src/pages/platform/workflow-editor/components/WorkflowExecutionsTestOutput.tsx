@@ -141,8 +141,6 @@ const WorkflowExecutionsTestOutput = ({
                                                         ? [triggerExecution?.id || '']
                                                         : [selectedExecution?.id || ''])
                                                 }
-                                                // Uncontrolled, so a failure that shows up in a later snapshot of the
-                                                // same run only gets expanded by remounting.
                                                 key={`${job?.id}-${deepestFailedExecution?.path.join('/') ?? ''}`}
                                                 type="multiple"
                                             >

@@ -19,15 +19,10 @@ function formatTestNodeDuration(durationMillis: number): string {
 }
 
 interface WorkflowTestNodeStatusProps {
-    /** The corner badge gives way to another one sitting in the same corner (the node's issue badge). */
     hideStatusBadge?: boolean;
     testNodeState: WorkflowTestNodeStateI;
 }
 
-/**
- * How a node ran: a status badge in the box's top-right corner and, once it finished, its duration
- * beneath the box. Positioned absolutely, so the box it sits in must be `relative`.
- */
 const WorkflowTestNodeStatus = ({hideStatusBadge, testNodeState}: WorkflowTestNodeStatusProps) => (
     <>
         {!hideStatusBadge && (

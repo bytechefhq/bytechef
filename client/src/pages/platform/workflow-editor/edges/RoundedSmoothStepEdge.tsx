@@ -80,10 +80,6 @@ export default function RoundedSmoothStepEdge({
             <BaseEdge
                 className={twMerge(
                     'fill-none stroke-stroke-neutral-tertiary stroke-2',
-                    // The same canvas-wide running dash WorkflowEdge draws. A dispatcher's plumbing shares
-                    // its path with the lane edges beside it (a "+" placeholder's edge leaves the bar from
-                    // the lane's own handle), so a solid line here shows through the gaps of the lane's
-                    // dashes and makes one side of the frame read as not running.
                     workflowIsRunning && styles.runningPath,
                     executedEdgeStatus === 'COMPLETED' && 'stroke-green-500',
                     executedEdgeStatus === 'FAILED' && 'stroke-red-500'
