@@ -11,6 +11,7 @@ import {
 import {
     TASK_EXECUTION_CHILDREN_MAX_PAGES,
     TASK_EXECUTION_CHILDREN_PAGE_SIZE,
+    getTaskExecutionStaleTime,
 } from '@/shared/queries/automation/workflowExecutions.queries';
 
 /* eslint-disable sort-keys */
@@ -72,6 +73,7 @@ export const useGetWorkflowExecutionTaskExecutionQuery = (
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionTaskExecution(request),
         enabled,
         refetchInterval,
+        staleTime: getTaskExecutionStaleTime,
     });
 
 export const useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery = (

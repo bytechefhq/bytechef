@@ -9,6 +9,7 @@ import {
     getWorkflowExecutionsRefetchInterval,
     useGetProjectWorkflowExecutionQuery,
     useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
+    useGetWorkflowExecutionTaskExecutionQuery,
     useGetWorkspaceProjectWorkflowExecutionsQuery,
 } from '../workflowExecutions.queries';
 
@@ -16,11 +17,13 @@ const {
     getTriggerExecutionWorkflowExecutionMock,
     getWorkflowExecutionMock,
     getWorkflowExecutionTaskExecutionChildrenMock,
+    getWorkflowExecutionTaskExecutionMock,
     getWorkflowExecutionsPageMock,
 } = vi.hoisted(() => ({
     getTriggerExecutionWorkflowExecutionMock: vi.fn(),
     getWorkflowExecutionMock: vi.fn(),
     getWorkflowExecutionTaskExecutionChildrenMock: vi.fn(),
+    getWorkflowExecutionTaskExecutionMock: vi.fn(),
     getWorkflowExecutionsPageMock: vi.fn(),
 }));
 
@@ -28,6 +31,7 @@ vi.mock('@/shared/middleware/automation/workflow/execution', () => ({
     WorkflowExecutionApi: class {
         getTriggerExecutionWorkflowExecution = getTriggerExecutionWorkflowExecutionMock;
         getWorkflowExecution = getWorkflowExecutionMock;
+        getWorkflowExecutionTaskExecution = getWorkflowExecutionTaskExecutionMock;
         getWorkflowExecutionTaskExecutionChildren = getWorkflowExecutionTaskExecutionChildrenMock;
         getWorkflowExecutionsPage = getWorkflowExecutionsPageMock;
     },
@@ -214,6 +218,55 @@ describe('workflowExecutions.queries', () => {
 
             expect(getWorkflowExecutionsPageMock).toHaveBeenCalledTimes(1);
         });
+    });
+});
+
+describe('useGetWorkflowExecutionTaskExecutionQuery', () => {
+    beforeEach(() => {
+        getWorkflowExecutionTaskExecutionMock.mockReset();
+    });
+
+    const renderTwoObserversOneAfterTheOther = async () => {
+        const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+
+        const sharedWrapper = ({children}: {children: ReactNode}) =>
+            createElement(QueryClientProvider, {client: queryClient}, children);
+
+        const {result: firstResult} = renderHook(
+            () => useGetWorkflowExecutionTaskExecutionQuery({id: 3291, taskExecutionId: 351583}, true),
+            {wrapper: sharedWrapper}
+        );
+
+        await waitFor(() => expect(firstResult.current.isSuccess).toBe(true));
+
+        const {result: secondResult} = renderHook(
+            () => useGetWorkflowExecutionTaskExecutionQuery({id: 3291, taskExecutionId: 351583}, true),
+            {wrapper: sharedWrapper}
+        );
+
+        await waitFor(() => expect(secondResult.current.isFetching).toBe(false));
+
+        return secondResult;
+    };
+
+    it.each(['CANCELLED', 'COMPLETED', 'FAILED'])(
+        'does not refetch a %s task execution for a second observer',
+        async (status) => {
+            getWorkflowExecutionTaskExecutionMock.mockResolvedValue({id: '351583', status});
+
+            const secondResult = await renderTwoObserversOneAfterTheOther();
+
+            expect(getWorkflowExecutionTaskExecutionMock).toHaveBeenCalledTimes(1);
+            expect(secondResult.current.data?.status).toBe(status);
+        }
+    );
+
+    it('refetches a started task execution for a second observer', async () => {
+        getWorkflowExecutionTaskExecutionMock.mockResolvedValue({id: '351583', status: 'STARTED'});
+
+        await renderTwoObserversOneAfterTheOther();
+
+        await waitFor(() => expect(getWorkflowExecutionTaskExecutionMock).toHaveBeenCalledTimes(2));
     });
 });
 
