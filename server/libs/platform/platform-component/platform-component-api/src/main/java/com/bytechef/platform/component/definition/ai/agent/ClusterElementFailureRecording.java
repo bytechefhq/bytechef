@@ -29,20 +29,19 @@ final class ClusterElementFailureRecording {
     static void record(
         ClusterElementCallTarget target, String workflowNodeName, String componentName, Throwable throwable) {
 
-        if (!target.recorder()
-            .claimFailure(target.taskExecutionId(), throwable)) {
+        ClusterElementCallRecorder recorder = target.recorder();
 
+        if (!recorder.claimFailure(target.taskExecutionId(), throwable)) {
             return;
         }
 
         ClusterElementCallRef parent = ClusterElementCallScope.current();
+        Class<?> throwableClass = throwable.getClass();
         String message = throwable.getMessage();
 
-        target.recorder()
-            .recordOutcome(
-                target.jobId(), target.taskExecutionId(), workflowNodeName, componentName,
-                parent == null ? null : parent.id(), Status.FAILED, null,
-                message == null ? throwable.getClass()
-                    .getSimpleName() : message);
+        recorder.recordOutcome(
+            target.jobId(), target.taskExecutionId(), workflowNodeName, componentName,
+            parent == null ? null : parent.id(), Status.FAILED, null,
+            message == null ? throwableClass.getSimpleName() : message);
     }
 }

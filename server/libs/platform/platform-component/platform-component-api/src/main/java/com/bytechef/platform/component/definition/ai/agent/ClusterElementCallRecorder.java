@@ -132,8 +132,7 @@ public final class ClusterElementCallRecorder {
             throw new IllegalArgumentException("Not an outcome status: " + status);
         }
 
-        ClusterElementCallRef ref = new ClusterElementCallRef(UUID.randomUUID()
-            .toString(), workflowNodeName);
+        ClusterElementCallRef ref = new ClusterElementCallRef(String.valueOf(UUID.randomUUID()), workflowNodeName);
 
         TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.get(
             TenantCacheKeyUtils.getKey(taskExecutionId), key -> new TaskExecutionCalls());
