@@ -17,10 +17,22 @@ export interface GetDataPillIconSourceProps {
     workflow: Workflow;
 }
 
-function getNodeName(mentionDisplay: string): string {
+function getExpressionSegments(mentionDisplay: string): Array<string> {
     const expression = mentionDisplay.startsWith('${') ? mentionDisplay.substring(2) : mentionDisplay;
 
-    return expression.split(/[.[]/)[0] ?? '';
+    return expression.replace(/}$/, '').split(/[.[]/);
+}
+
+function getTypeIconSource(type: keyof typeof TYPE_ICONS): string {
+    const svgString = renderToStaticMarkup(TYPE_ICONS[type]);
+
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+}
+
+function getWorkflowInputType(workflow: Workflow, inputName: string | undefined): keyof typeof TYPE_ICONS | undefined {
+    const inputType = workflow.inputs?.find((input) => input.name === inputName)?.type?.toUpperCase();
+
+    return inputType && inputType in TYPE_ICONS ? (inputType as keyof typeof TYPE_ICONS) : undefined;
 }
 
 function findTaskType(tasks: Array<WorkflowTask> | undefined, nodeName: string): string | undefined {
@@ -66,7 +78,11 @@ export function getDataPillIconSource({
     const definitions = componentDefinitions ?? [];
     const dispatchers = taskDispatcherDefinitions ?? [];
 
-    const nodeName = getNodeName(mentionDisplay ?? '');
+    const [nodeName = '', inputName] = getExpressionSegments(mentionDisplay ?? '');
+
+    if (nodeName === 'inputs') {
+        return getTypeIconSource(getWorkflowInputType(workflow, inputName) ?? 'STRING');
+    }
 
     let componentName =
         getWorkflowNodeComponentNameFromDefinition(workflow, nodeName) ?? getWorkflowNodeComponentName(nodeName);
@@ -89,7 +105,5 @@ export function getDataPillIconSource({
         return componentIcon;
     }
 
-    const svgString = renderToStaticMarkup(TYPE_ICONS.STRING);
-
-    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+    return getTypeIconSource('STRING');
 }

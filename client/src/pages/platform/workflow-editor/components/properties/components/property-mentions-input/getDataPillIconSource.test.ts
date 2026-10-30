@@ -135,6 +135,44 @@ describe('getDataPillIconSource', () => {
         );
     });
 
+    it('returns the type icon of a workflow input', () => {
+        const inputsWorkflow = {
+            inputs: [
+                {name: 'interval', type: 'integer'},
+                {name: 'label', type: 'string'},
+            ],
+        } as Workflow;
+
+        const integerIconSource = getDataPillIconSource({
+            mentionDisplay: '${inputs.interval}',
+            workflow: inputsWorkflow,
+        });
+        const stringIconSource = getDataPillIconSource({mentionDisplay: '${inputs.label}', workflow: inputsWorkflow});
+
+        expect(decodeURIComponent(integerIconSource)).toContain('lucide-hash');
+        expect(decodeURIComponent(stringIconSource)).toContain('lucide-case-upper');
+    });
+
+    it('returns the type icon of a workflow input with a multi-word type', () => {
+        const inputsWorkflow = {
+            inputs: [{name: 'startedAt', type: 'date_time'}],
+        } as Workflow;
+
+        expect(
+            decodeURIComponent(getDataPillIconSource({mentionDisplay: '${inputs.startedAt}', workflow: inputsWorkflow}))
+        ).toContain('lucide-calendar-clock');
+    });
+
+    it('falls back to the string type icon for an undeclared workflow input', () => {
+        const inputsWorkflow = {
+            inputs: [{name: 'interval', type: 'integer'}],
+        } as Workflow;
+
+        expect(
+            decodeURIComponent(getDataPillIconSource({mentionDisplay: '${inputs.missing}', workflow: inputsWorkflow}))
+        ).toContain('lucide-case-upper');
+    });
+
     it('falls back to the node name prefix when no task in the definition matches', () => {
         const otherTasksWorkflow = {
             tasks: [
