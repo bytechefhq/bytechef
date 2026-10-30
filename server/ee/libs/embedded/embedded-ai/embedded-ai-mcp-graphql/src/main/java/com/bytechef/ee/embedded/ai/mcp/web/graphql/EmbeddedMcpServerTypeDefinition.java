@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.mcp.web.McpServerPathResolver;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,11 +19,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-class EmbeddedMcpServerPathResolver implements McpServerPathResolver {
+class EmbeddedMcpServerTypeDefinition implements McpServerTypeDefinition {
 
     @Override
     public PlatformType getType() {
         return PlatformType.EMBEDDED;
+    }
+
+    @Override
+    public boolean isSharedAdministration() {
+        return false;
     }
 
     @Override
