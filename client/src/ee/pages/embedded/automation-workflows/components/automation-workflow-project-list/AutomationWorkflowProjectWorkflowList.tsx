@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
@@ -11,6 +12,7 @@ type AutomationWorkflowProjectWorkflowTemplateType =
     AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
 
 interface AutomationWorkflowProjectWorkflowListProps {
+    onCreateWorkflow: (projectId: string) => void;
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditWorkflow: (workflow: AutomationWorkflowProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
@@ -18,6 +20,7 @@ interface AutomationWorkflowProjectWorkflowListProps {
 }
 
 const AutomationWorkflowProjectWorkflowList = ({
+    onCreateWorkflow,
     onDeleteWorkflow,
     onEditWorkflow,
     onSelectWorkflow,
@@ -52,6 +55,7 @@ const AutomationWorkflowProjectWorkflowList = ({
             ) : (
                 <div className="flex justify-center py-8">
                     <EmptyList
+                        button={<Button label="Create Workflow" onClick={() => onCreateWorkflow(project.id)} />}
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new workflow."
                         title="No Workflows"

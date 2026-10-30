@@ -7,7 +7,6 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectTagsQuery,
@@ -112,66 +111,59 @@ const AutomationWorkflowProjectList = ({
                     <CollapsibleContent className="mx-3 mt-1 mb-3">
                         <AutomationWorkflowProjectListItemTabs
                             actions={
-                                (activeTabs[project.id] || 'workflows') === 'workflows' ? (
-                                    <ButtonGroup aria-label="Workflow Creation Actions">
-                                        <Button
-                                            aria-label="Create Workflow"
-                                            onClick={() => onCreateWorkflow(project.id)}
-                                            size="sm"
-                                            variant="secondary"
-                                        >
-                                            <PlusIcon />
-                                            New Workflow
-                                        </Button>
+                                (activeTabs[project.id] || 'workflows') === 'workflows'
+                                    ? project.workflowTemplates.length > 0 && (
+                                          <ButtonGroup aria-label="Workflow Creation Actions">
+                                              <Button
+                                                  aria-label="Create Workflow"
+                                                  onClick={() => onCreateWorkflow(project.id)}
+                                                  size="sm"
+                                                  variant="secondary"
+                                              >
+                                                  <PlusIcon />
+                                                  New Workflow
+                                              </Button>
 
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    aria-label="More Workflow Creation Actions"
-                                                    icon={<ChevronDownIcon />}
-                                                    size="sm"
-                                                    variant="secondary"
-                                                >
-                                                    <> </>
-                                                </Button>
-                                            </DropdownMenuTrigger>
+                                              <DropdownMenu>
+                                                  <DropdownMenuTrigger asChild>
+                                                      <Button
+                                                          aria-label="More Workflow Creation Actions"
+                                                          icon={<ChevronDownIcon />}
+                                                          size="sm"
+                                                          variant="secondary"
+                                                      >
+                                                          <> </>
+                                                      </Button>
+                                                  </DropdownMenuTrigger>
 
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem
-                                                    aria-label="Import Workflow"
-                                                    icon={<UploadIcon />}
-                                                    label="Import Workflow"
-                                                    onClick={() => onImportWorkflow(project.id)}
-                                                />
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </ButtonGroup>
-                                ) : (
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <span>
-                                                <Button
-                                                    aria-label="New Configuration"
-                                                    disabled={!project.published}
-                                                    onClick={() => setConfigurationDialog({project})}
-                                                    size="sm"
-                                                    variant="secondary"
-                                                >
-                                                    <PlusIcon />
-                                                    New Configuration
-                                                </Button>
-                                            </span>
-                                        </TooltipTrigger>
-
-                                        {!project.published && (
-                                            <TooltipContent>Publish the project first</TooltipContent>
-                                        )}
-                                    </Tooltip>
-                                )
+                                                  <DropdownMenuContent align="end">
+                                                      <DropdownMenuItem
+                                                          aria-label="Import Workflow"
+                                                          icon={<UploadIcon />}
+                                                          label="Import Workflow"
+                                                          onClick={() => onImportWorkflow(project.id)}
+                                                      />
+                                                  </DropdownMenuContent>
+                                              </DropdownMenu>
+                                          </ButtonGroup>
+                                      )
+                                    : project.published &&
+                                      project.configurationCount > 0 && (
+                                          <Button
+                                              aria-label="New Configuration"
+                                              onClick={() => setConfigurationDialog({project})}
+                                              size="sm"
+                                              variant="secondary"
+                                          >
+                                              <PlusIcon />
+                                              New Configuration
+                                          </Button>
+                                      )
                             }
                             activeTab={activeTabs[project.id] || 'workflows'}
                             configurationsContent={
                                 <AutomationWorkflowProjectConfigurationList
+                                    onCreate={() => setConfigurationDialog({project})}
                                     onEdit={(configuration) => setConfigurationDialog({configuration, project})}
                                     project={project}
                                 />
@@ -181,6 +173,7 @@ const AutomationWorkflowProjectList = ({
                             }
                             workflowsContent={
                                 <AutomationWorkflowProjectWorkflowList
+                                    onCreateWorkflow={onCreateWorkflow}
                                     onDeleteWorkflow={onDeleteWorkflow}
                                     onEditWorkflow={onEditWorkflow}
                                     onSelectWorkflow={onSelectWorkflow}

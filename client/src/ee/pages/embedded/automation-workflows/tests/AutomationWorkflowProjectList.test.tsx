@@ -243,12 +243,18 @@ describe('AutomationWorkflowProjectList', () => {
         expect(onImportWorkflow).toHaveBeenCalledWith('project-4');
     });
 
-    it('shows the New Configuration button disabled until the project is published', async () => {
+    it('offers configuration creation only once the project is published and has configurations', async () => {
         const user = userEvent.setup();
 
         const projects = [
             makeProject({id: 'draft', name: 'Draft Project'}),
-            makeProject({id: 'live', lastPublishedVersion: 1, name: 'Live Project', published: true}),
+            makeProject({
+                configurationCount: 1,
+                id: 'live',
+                lastPublishedVersion: 1,
+                name: 'Live Project',
+                published: true,
+            }),
         ];
 
         renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
@@ -258,7 +264,8 @@ describe('AutomationWorkflowProjectList', () => {
         await user.click(draftTrigger);
         await user.click(screen.getByRole('tab', {name: 'Configurations'}));
 
-        expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeDisabled();
+        expect(await screen.findByText('Publish the project to configure it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
 
         await user.click(liveTrigger);
 
@@ -266,9 +273,7 @@ describe('AutomationWorkflowProjectList', () => {
 
         await user.click(liveTabs[liveTabs.length - 1]);
 
-        const buttons = await screen.findAllByRole('button', {name: 'New Configuration'});
-
-        expect(buttons[buttons.length - 1]).toBeEnabled();
+        expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeEnabled();
     });
 
     it('expands a project to show its workflows and navigates on click', async () => {
