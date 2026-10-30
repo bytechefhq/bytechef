@@ -212,28 +212,6 @@ export const highlightText = (text: string, query: string): ReactNode => {
     });
 };
 
-export const getHeaderText = (filters: {status: string; priority: string; assignee: string}): string => {
-    const parts = [];
-
-    if (filters.status !== 'all') {
-        parts.push(filters.status.charAt(0).toUpperCase() + filters.status.slice(1).replace('-', ' '));
-    }
-
-    if (filters.priority !== 'all') {
-        parts.push(filters.priority.charAt(0).toUpperCase() + filters.priority.slice(1) + ' priority');
-    }
-
-    if (filters.assignee !== 'all') {
-        parts.push(`by ${filters.assignee}`);
-    }
-
-    if (parts.length === 0) {
-        return 'All approval tasks';
-    }
-
-    return `${parts.join(', ')} approval tasks`;
-};
-
 export const sortApprovalTasks = (
     approvalTasks: ApprovalTaskI[],
     sortBy: SortOptionType,

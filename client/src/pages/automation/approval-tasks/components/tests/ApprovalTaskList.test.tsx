@@ -29,7 +29,6 @@ vi.mock('../hooks/useApprovalTaskList', () => ({
         handleSelectApprovalTask: vi.fn(),
         handleSortChange: vi.fn(),
         handleStatusToggle: vi.fn(),
-        headerText: 'Open approval tasks',
         sortBy: 'created',
         sortDirection: 'desc',
         totalApprovalTaskCount: 0,

@@ -4,7 +4,7 @@ import {MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useApprovalTasksStore} from '../../stores/useApprovalTasksStore';
-import {getHeaderText, sortApprovalTasks, toServerPriority, toServerStatus} from '../../utils/approval-task-utils';
+import {sortApprovalTasks, toServerPriority, toServerStatus} from '../../utils/approval-task-utils';
 
 import type {ApprovalTaskI, SortDirectionType, SortOptionType} from '../../types/types';
 
@@ -15,7 +15,6 @@ export interface UseApprovalTaskListReturnI {
     handleSelectApprovalTask: (approvalTaskId: string) => void;
     handleSortChange: (sortBy: SortOptionType, direction: SortDirectionType) => void;
     handleStatusToggle: (approvalTaskId: string, event: MouseEvent) => void;
-    headerText: string;
     sortBy: SortOptionType;
     sortDirection: SortDirectionType;
     totalApprovalTaskCount: number;
@@ -92,8 +91,6 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
 
         return 'You will see here approval tasks assigned to you';
     }, [searchQuery, hasActiveFilters]);
-
-    const headerText = getHeaderText(filters);
 
     const handleClearFilters = useCallback(() => {
         setSearchQuery('');
@@ -173,7 +170,6 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
         handleSelectApprovalTask,
         handleSortChange,
         handleStatusToggle,
-        headerText,
         sortBy,
         sortDirection,
         totalApprovalTaskCount: approvalTasks.length,
