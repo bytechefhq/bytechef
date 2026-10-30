@@ -69,6 +69,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -120,6 +121,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     @Nullable
     public ClusterElementOutputDTO getClusterElementOutput(
@@ -184,6 +186,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowId, lastWorkflowNodeName, environmentId, true, new HashMap<>());
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     @Cacheable(value = PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE)
     public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(
@@ -192,6 +195,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         return doGetPreviousWorkflowNodeSampleOutputs(workflowId, lastWorkflowNodeName, environmentId, new HashMap<>());
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public void checkWorkflowCache(String workflowId, String lastWorkflowNodeName, long environmentId) {
         long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);

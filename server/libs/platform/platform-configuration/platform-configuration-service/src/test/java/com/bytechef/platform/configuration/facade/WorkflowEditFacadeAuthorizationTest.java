@@ -44,6 +44,11 @@ class WorkflowEditFacadeAuthorizationTest {
             + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)";
     private static final String IN_REQUESTED_ENVIRONMENT =
         "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)";
+    private static final String VIEW_IN_DEVELOPMENT =
+        "hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+            + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)";
+    private static final String VIEW_IN_REQUESTED_ENVIRONMENT =
+        "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)";
 
     @ParameterizedTest
     @MethodSource("guardedFacades")
@@ -88,11 +93,17 @@ class WorkflowEditFacadeAuthorizationTest {
                 Map.of(
                     "deleteClusterElementParameter", IN_DEVELOPMENT,
                     "deleteWorkflowNodeParameter", IN_DEVELOPMENT,
+                    "getClusterElementDisplayConditions", VIEW_IN_REQUESTED_ENVIRONMENT,
+                    "getClusterElementMissingRequiredProperties", VIEW_IN_DEVELOPMENT,
+                    "getWorkflowNodeDisplayConditions", VIEW_IN_REQUESTED_ENVIRONMENT,
+                    "getWorkflowNodeMissingRequiredProperties", VIEW_IN_DEVELOPMENT,
                     "updateClusterElementParameter", IN_DEVELOPMENT,
                     "updateWorkflowNodeParameter", IN_DEVELOPMENT)),
             Arguments.of(
                 WorkflowNodeScriptFacadeImpl.class,
                 Map.of(
+                    "getClusterElementScriptInput", VIEW_IN_REQUESTED_ENVIRONMENT,
+                    "getWorkflowNodeScriptInput", VIEW_IN_REQUESTED_ENVIRONMENT,
                     "testClusterElementScript", IN_REQUESTED_ENVIRONMENT,
                     "testWorkflowNodeScript", IN_REQUESTED_ENVIRONMENT)),
             Arguments.of(

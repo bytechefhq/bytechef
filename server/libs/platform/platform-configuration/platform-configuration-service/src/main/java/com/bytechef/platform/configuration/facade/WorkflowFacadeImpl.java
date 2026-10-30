@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,6 +71,8 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
         return toWorkflowDTO(workflowService.getWorkflow(id));
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public boolean hasSseStreamResponse(String workflowId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
