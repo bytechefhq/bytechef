@@ -4,11 +4,6 @@ import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getExecutedEdgeStatus, {bypassDisabledEdgeEndpoints, isConditionPlaceholderNode} from './getExecutedEdgeStatus';
 
-/**
- * Resolves the executed-path status for an edge by its `source=>target` id. Shared by every edge
- * component so plumbing edges (dispatcher ghosts, labeled case edges) color the same way the main
- * workflow edges do after a test run.
- */
 export default function useExecutedEdgeStatus(edgeId: string): 'COMPLETED' | 'FAILED' | undefined {
     const edges = useWorkflowDataStore((state) => state.edges);
     const nodes = useWorkflowDataStore((state) => state.nodes);

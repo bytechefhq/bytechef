@@ -2,10 +2,6 @@ import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 
 type ConditionCaseType = typeof CONDITION_CASE_TRUE | typeof CONDITION_CASE_FALSE;
 
-/**
- * The fields of a task execution this reads. Structural rather than a generated model because loop
- * `iterations` are left as raw JSON by the generated converters.
- */
 export interface ConditionCaseTaskExecutionI {
     children?: ConditionCaseTaskExecutionI[];
     iterations?: ConditionCaseTaskExecutionI[][];
@@ -23,17 +19,6 @@ function isEmptyCase(parameters: {[key: string]: unknown}, conditionCase: Condit
     return !Array.isArray(caseTasks) || caseTasks.length === 0;
 }
 
-/**
- * The empty condition cases the run took, as `toConditionCaseKey` keys.
- *
- * An empty case leaves no child execution behind, so it cannot be found the way a case with tasks is
- * (by one of its tasks having run). What gives it away is a completed condition visit with no
- * children: the case that visit took had nothing to run. When exactly one of its two cases is empty,
- * that is the one it took. When both are empty the visit cannot say which, and nothing is recorded.
- *
- * Every visit counts, so a condition in a loop can have taken its empty case in one iteration and its
- * other case in the next.
- */
 export default function collectTakenEmptyConditionCases(
     taskExecutions: ConditionCaseTaskExecutionI[] | undefined
 ): Set<string> {

@@ -152,8 +152,6 @@ describe('getExecutedEdgeStatus', () => {
     });
 
     it('colors plumbing out of a dispatcher that failed through a nested child', () => {
-        // A condition whose branch child failed is itself reported FAILED, so every edge leaving it --
-        // its own edge into the top ghost, and the ghost's edge into the child -- has a FAILED source.
         const states = {condition_1: {status: 'FAILED' as const}, condition_2: {status: 'FAILED' as const}};
 
         expect(
@@ -190,8 +188,6 @@ describe('getExecutedEdgeStatus', () => {
     });
 
     it('colors a completed branch into the join green even when a sibling branch failed the dispatcher', () => {
-        // A parallel whose other branch failed is itself reported FAILED, and its bottom ghost borrows
-        // that status. The branch that finished still joined cleanly, so its edge must not turn red.
         const states = {dataStorage_2: {status: 'COMPLETED' as const}, parallel_1: {status: 'FAILED' as const}};
 
         expect(
@@ -204,8 +200,6 @@ describe('getExecutedEdgeStatus', () => {
     });
 
     it('keeps the edge from a failed last child into the join neutral', () => {
-        // The failure stopped the branch, so nothing flowed on into the join -- the same as the gray edge
-        // after a failed node anywhere else on the canvas.
         const states = {http_1: {status: 'FAILED' as const}, parallel_1: {status: 'FAILED' as const}};
 
         expect(
@@ -241,7 +235,6 @@ describe('getExecutedEdgeStatus', () => {
 });
 
 describe('bypassDisabledEdgeEndpoints', () => {
-    // firecrawl_7 -> openAi_2 (disabled) -> anthropic_1, the left branch of a parallel.
     const nodes = [
         ghostNode('parallel_1', 'parallel-top-ghost'),
         disabledTaskNode('firecrawl_4'),

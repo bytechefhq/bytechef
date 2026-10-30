@@ -4,11 +4,6 @@ import {type Edge, type Node} from '@xyflow/react';
 
 import {toConditionCaseKey} from './collectTakenEmptyConditionCases';
 
-/**
- * Resolves the workflow-node name a canvas node contributes to test-run node states. Structural ghost nodes
- * (task dispatcher top/bottom ghosts, case ghosts) carry their owning dispatcher's id as `taskDispatcherId`,
- * so the dispatcher's executed state flows through its plumbing edges.
- */
 export function resolveTestStateNodeName(node?: Node): string | undefined {
     if (!node) {
         return undefined;
@@ -71,16 +66,6 @@ function skipDisabledNodes(
     return currentNode;
 }
 
-/**
- * A disabled task is skipped at run time, so it never gets a test state and every edge touching it would drop out of
- * the executed path -- a single disabled step left a gray gap in the middle of a red or green trail. The run did pass
- * through that spot, so each endpoint that is a disabled task is replaced by the nearest enabled node beyond it: the
- * source walks upstream, the target downstream. Both edges around a disabled node then resolve to the same enabled
- * pair and color alike.
- *
- * The walk only follows a single edge. A disabled node with several edges on that side has no one path through it,
- * so it is kept as-is and the edge stays neutral.
- */
 export function bypassDisabledEdgeEndpoints(
     sourceNode: Node | undefined,
     targetNode: Node | undefined,
@@ -92,20 +77,6 @@ export function bypassDisabledEdgeEndpoints(
     };
 }
 
-/**
- * An edge is part of the executed path when BOTH endpoints resolve to nodes that ran. Requiring both ends keeps
- * the untaken side of a condition gray: its bottom-ghost resolves to the (executed) dispatcher, but the untaken
- * branch child never ran, so child->ghost edges stay neutral.
- *
- * "Ran" means COMPLETED **or** FAILED on the source side, not COMPLETED alone. A task dispatcher whose nested
- * child fails is itself reported FAILED, and its ghost nodes borrow that status, so demanding COMPLETED there
- * broke the trail at the dispatcher's own boundary: `condition_1 -> top ghost -> condition_2` went gray between
- * two executed nodes. Widening the source cannot light an untaken branch, because the target still has to have
- * run.
- *
- * An edge into a FAILED node is COMPLETED, not FAILED: the data reached that node fine, and it was the node that
- * failed. Red belongs to the node alone, so the green trail runs right up to the step that broke.
- */
 function resolveNodeStatus(
     node: Node | undefined,
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>
@@ -122,7 +93,6 @@ function resolveNodeStatus(
 const isPlaceholderNode = (node: Node | undefined): boolean =>
     node?.type === 'placeholder' || node?.type === 'readonlyPlaceholder';
 
-/** A "+" placeholder standing in for a condition's empty case. */
 export function isConditionPlaceholderNode(node: Node | undefined): boolean {
     return isPlaceholderNode(node) && Boolean((node?.data as {conditionId?: string} | undefined)?.conditionId);
 }
@@ -155,30 +125,18 @@ export default function getExecutedEdgeStatus(
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>,
     takenEmptyConditionCases?: Set<string>
 ): 'COMPLETED' | 'FAILED' | undefined {
-    // A "+" placeholder is an insertion point, not a step: nothing runs there and no data passes through it. It
-    // carries its dispatcher's id as `taskDispatcherId`, so without this the edges around a parallel's or
-    // fork-join's add-a-branch slot would borrow the dispatcher's status and paint a path the run never took.
-    //
-    // The exception is a condition's empty case: a condition takes exactly one case per visit, so an empty case it
-    // took is a path the run did follow. `takenEmptyConditionCases` says which ones it took.
     if (isPlaceholderNode(sourceNode) || isPlaceholderNode(targetNode)) {
         const placeholderNode = isPlaceholderNode(sourceNode) ? sourceNode : targetNode;
 
         return isTakenEmptyConditionCase(placeholderNode, takenEmptyConditionCases) ? 'COMPLETED' : undefined;
     }
 
-    // A condition whose two cases are both empty never records which one it took (see
-    // `collectTakenEmptyConditionCases`), so neither half of its bar can light up. Coloring the stem into that bar
-    // anyway would draw a trail that leads nowhere.
     if (targetNode?.type === 'taskDispatcherTopGhostNode' && hasOnlyEmptyConditionCases(sourceNode)) {
         return undefined;
     }
 
     const sourceStatus = resolveNodeStatus(sourceNode, workflowTestNodeStates);
 
-    // A bottom ghost is a join, and the status it borrows is the dispatcher's aggregate: one failed branch makes
-    // it FAILED for every branch. What an edge into the join shows is whether ITS branch got there, which only the
-    // source can say -- a completed branch joined, a failed one stopped short of the join.
     if (targetNode?.type === 'taskDispatcherBottomGhostNode') {
         return sourceStatus === 'COMPLETED' ? 'COMPLETED' : undefined;
     }

@@ -1,9 +1,5 @@
 import {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
 
-/**
- * The fields of a task execution this reads. Structural rather than a generated model because loop
- * `iterations` are left as raw JSON by the generated converters: their dates are still ISO strings.
- */
 export interface ExecutedTaskI {
     children?: ExecutedTaskI[];
     endDate?: Date | string;
@@ -31,8 +27,6 @@ function toNodeStatus(status: string | undefined, running: boolean): NodeStatusT
             return 'FAILED';
         case 'CREATED':
         case 'STARTED':
-            // A finished job leaves nothing running: a task still marked started there was abandoned,
-            // and a spinner would claim otherwise.
             return running ? 'RUNNING' : undefined;
         default:
             return undefined;
@@ -74,15 +68,6 @@ function mergeNodeState(
     };
 }
 
-/**
- * Turns a job's task execution tree into the per-node states the canvas colors itself from, keyed by
- * workflow node name — the same shape a streamed test run produces. Walks nested `children` (condition,
- * branch, fork-join, graph members) and every loop `iterations` entry; a subflow's `childJob` belongs to
- * another workflow and is left alone.
- *
- * A node that ran more than once (a loop body, a revisited graph member) gets one merged state: failed
- * wins over running, running over completed, and the durations add up to the node's total time.
- */
 export default function buildNodeStatesFromTaskExecutions(
     taskExecutions: ExecutedTaskI[] | undefined,
     running: boolean

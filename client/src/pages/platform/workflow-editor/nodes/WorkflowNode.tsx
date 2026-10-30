@@ -55,13 +55,6 @@ import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
 type EffectiveDirectionType = Parameters<typeof mapHandlePosition>[1];
 type NodePositionType = {x: number; y: number} | undefined;
 
-/**
- * Advisory tooltip for a node whose parameters reference a disabled node. Deliberately names the
- * cause rather than a runtime outcome: a bare `${disabledName}` resolves to null, while
- * `${disabledName.field}` is left as the raw expression string (SpEL cannot read a property off
- * null and the evaluator returns the value unchanged), so "will resolve to null" would be wrong
- * for half the cases.
- */
 function getDisabledReferenceWarning(referencedDisabledNames: Array<string>): string {
     if (referencedDisabledNames.length > 1) {
         return `References disabled nodes ${referencedDisabledNames.join(', ')} — they will not run, so this value will not resolve`;
@@ -256,11 +249,6 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                     'border-surface-brand-secondary-hover bg-surface-brand-secondary-hover hover:bg-surface-brand-secondary-hover',
                                 testNodeState && 'relative',
                                 getTestNodeStateBorderClassName(testNodeState),
-                                // Last, so it wins the twMerge conflict against the test-run border above:
-                                // a node that has been run keeps a status colour for the rest of the
-                                // session, and while selected the selection is what the border has to
-                                // say. The status is still on the badge in the corner, which nothing here
-                                // touches.
                                 isSelected &&
                                     workflowNodeDetailsPanelOpen &&
                                     'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary'
@@ -530,10 +518,6 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         />
                     )}
 
-                    {/* Hidden anchors for `graphTransition` overlay edges — used when this node
-                        is a graph lane's first task (the lane's entry point). Kept separate from
-                        the default (id-less) handles above so the overlay edge never binds to the
-                        same connection point as the structural lane-chain edge. */}
                     <Handle
                         className={styles.handle}
                         id={`${id}-graph-transition-target`}

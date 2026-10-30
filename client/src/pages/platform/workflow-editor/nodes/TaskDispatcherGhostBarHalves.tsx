@@ -11,7 +11,6 @@ interface TaskDispatcherGhostBarHalvesProps extends GhostBarSideStatusesI {
     isFlippedRingBar: boolean;
 }
 
-/** The two halves of a ghost bar, each painted with the status of the side that hangs off its own handle. */
 export default function TaskDispatcherGhostBarHalves({
     isFlippedRingBar,
     leftStatus,

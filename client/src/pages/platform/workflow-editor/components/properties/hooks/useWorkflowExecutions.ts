@@ -34,10 +34,6 @@ type UseWorkflowExecutionsReturnType = {
 
 const RUNNING_JOB_STATUSES: JobStatusEnum[] = [JobStatusEnum.Created, JobStatusEnum.Started];
 
-/**
- * Finds the task execution with the given id anywhere in the tree -- condition/loop children, loop iterations and
- * subflow child jobs included.
- */
 function findTaskExecution(taskExecutions: TaskExecution[], id: string): TaskExecution | undefined {
     for (const taskExecution of taskExecutions) {
         if (taskExecution.id === id) {
@@ -60,7 +56,6 @@ function findTaskExecution(taskExecutions: TaskExecution[], id: string): TaskExe
     return undefined;
 }
 
-/** Finds the subflow child job with the given id anywhere in the tree. */
 function findChildJob(taskExecutions: TaskExecution[], jobId: string): Job | undefined {
     for (const taskExecution of taskExecutions) {
         if (taskExecution.childJob?.id === jobId) {
@@ -104,9 +99,6 @@ const useWorkflowExecutions = ({
 
     const rootJobFinished = !!job?.status && !RUNNING_JOB_STATUSES.includes(job.status);
 
-    // While a test run is in flight the execution is replaced by a fresh snapshot every few hundred milliseconds, so
-    // the subflow stack and the selection are re-resolved by id against the latest one -- holding on to the objects
-    // would freeze them at whatever state they had when they were clicked.
     const currentSubflowStack = useMemo(
         () =>
             subflowStack.map((entry) => ({
@@ -229,8 +221,6 @@ const useWorkflowExecutions = ({
 
         const jobFailed = jobFailedWithNoExecutions || !!deepestFailedExecution?.execution.error;
 
-        // Later snapshots of the same run keep whatever the user picked; only a new job, a run that has just finished
-        // with a failure to point at, or a first task appearing in a run that had none moves the selection.
         if (!jobChanged && !(jobJustFinished && jobFailed) && selectedExecution) {
             return;
         }
