@@ -5,9 +5,9 @@ import {
     NON_ADMIN_USER,
     auditEventData,
     auditEventRows,
-    filterAuditEvents,
     openAuditEventsPage,
     queryAuditEvents,
+    searchAuditEvents,
     selectAuditEventType,
 } from '../../utils/auditUtils';
 
@@ -34,7 +34,7 @@ test.describe('Audit Events authentication', () => {
         await expect(async () => {
             const failures = await queryAuditEvents(authenticatedPage, {
                 eventType: 'AUTHENTICATION_FAILURE',
-                principal: NON_ADMIN_USER.email,
+                search: NON_ADMIN_USER.email,
             });
 
             expect(failures.totalElements).toBeGreaterThan(0);
@@ -46,7 +46,7 @@ test.describe('Audit Events authentication', () => {
         await openAuditEventsPage(authenticatedPage);
 
         await selectAuditEventType(authenticatedPage, 'AUTHENTICATION_FAILURE');
-        await filterAuditEvents(authenticatedPage, {principal: NON_ADMIN_USER.email});
+        await searchAuditEvents(authenticatedPage, NON_ADMIN_USER.email);
 
         const firstRow = auditEventRows(authenticatedPage).first();
 
@@ -62,7 +62,7 @@ test.describe('Audit Events authentication', () => {
         await openAuditEventsPage(authenticatedPage);
 
         await selectAuditEventType(authenticatedPage, 'AUTHENTICATION_SUCCESS');
-        await filterAuditEvents(authenticatedPage, {principal: 'admin'});
+        await searchAuditEvents(authenticatedPage, 'admin');
 
         const firstRow = auditEventRows(authenticatedPage).first();
 

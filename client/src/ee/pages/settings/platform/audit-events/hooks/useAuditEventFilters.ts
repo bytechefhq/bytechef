@@ -5,7 +5,7 @@ import {AuditEventDateRangePresetType, AuditEventFiltersI} from '../types';
 
 const CLEARED_FILTERS: AuditEventFiltersI = {dateRange: 'all'};
 
-const TYPED_FILTER_DEBOUNCE_MILLISECONDS = 300;
+const SEARCH_DEBOUNCE_MILLISECONDS = 300;
 
 const toStartOfDay = (date: Date) =>
     new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0).getTime();
@@ -14,18 +14,12 @@ const toEndOfDay = (date: Date) =>
     new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999).getTime();
 
 export const useAuditEventFilters = () => {
-    const [dataSearchInput, setDataSearchInput] = useState('');
     const [filters, setFilters] = useState<AuditEventFiltersI>(CLEARED_FILTERS);
     const [page, setPage] = useState(0);
-    const [principalInput, setPrincipalInput] = useState('');
+    const [search, setSearch] = useState<string>();
+    const [searchInput, setSearchInput] = useState('');
 
-    const hasActiveFilters = !!(
-        filters.dataSearch ||
-        filters.eventType ||
-        filters.fromDate ||
-        filters.principal ||
-        filters.toDate
-    );
+    const hasActiveFilters = !!(filters.eventType || filters.fromDate || filters.toDate);
 
     const updateFilters = useCallback((updater: (previousFilters: AuditEventFiltersI) => AuditEventFiltersI) => {
         setFilters(updater);
@@ -48,12 +42,6 @@ export const useAuditEventFilters = () => {
         [updateFilters]
     );
 
-    const handleClearDataSearch = useCallback(() => {
-        setDataSearchInput('');
-
-        updateFilters((previousFilters) => ({...previousFilters, dataSearch: undefined}));
-    }, [updateFilters]);
-
     const handleClearDateRange = useCallback(
         () =>
             updateFilters((previousFilters) => ({
@@ -74,12 +62,6 @@ export const useAuditEventFilters = () => {
         () => updateCustomDateRange({fromDate: undefined}),
         [updateCustomDateRange]
     );
-
-    const handleClearPrincipal = useCallback(() => {
-        setPrincipalInput('');
-
-        updateFilters((previousFilters) => ({...previousFilters, principal: undefined}));
-    }, [updateFilters]);
 
     const handleClearToDate = useCallback(() => updateCustomDateRange({toDate: undefined}), [updateCustomDateRange]);
 
@@ -118,37 +100,28 @@ export const useAuditEventFilters = () => {
         [updateFilters]
     );
 
-    const handleResetFilters = useCallback(() => {
-        setDataSearchInput('');
-        setPrincipalInput('');
-
-        updateFilters(() => CLEARED_FILTERS);
-    }, [updateFilters]);
+    const handleResetFilters = useCallback(() => updateFilters(() => CLEARED_FILTERS), [updateFilters]);
 
     useEffect(() => {
-        const dataSearch = dataSearchInput.trim() || undefined;
-        const principal = principalInput.trim() || undefined;
+        const trimmedSearch = searchInput.trim() || undefined;
 
-        if (dataSearch === filters.dataSearch && principal === filters.principal) {
+        if (trimmedSearch === search) {
             return;
         }
 
-        const timeoutId = window.setTimeout(
-            () => updateFilters((previousFilters) => ({...previousFilters, dataSearch, principal})),
-            TYPED_FILTER_DEBOUNCE_MILLISECONDS
-        );
+        const timeoutId = window.setTimeout(() => {
+            setSearch(trimmedSearch);
+            setPage(0);
+        }, SEARCH_DEBOUNCE_MILLISECONDS);
 
         return () => window.clearTimeout(timeoutId);
-    }, [dataSearchInput, filters.dataSearch, filters.principal, principalInput, updateFilters]);
+    }, [search, searchInput]);
 
     return {
-        dataSearchInput,
         filters,
-        handleClearDataSearch,
         handleClearDateRange,
         handleClearEventType,
         handleClearFromDate,
-        handleClearPrincipal,
         handleClearToDate,
         handleCustomFromDateChange,
         handleCustomToDateChange,
@@ -157,9 +130,9 @@ export const useAuditEventFilters = () => {
         handleResetFilters,
         hasActiveFilters,
         page,
-        principalInput,
-        setDataSearchInput,
+        search,
+        searchInput,
         setPage,
-        setPrincipalInput,
+        setSearchInput,
     };
 };

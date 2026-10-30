@@ -8,11 +8,9 @@ import {AuditEventFiltersI} from '../types';
 interface AuditEventsActiveFilterBadgesProps {
     filters: AuditEventFiltersI;
     hasActiveFilters: boolean;
-    onClearDataSearch: () => void;
     onClearDateRange: () => void;
     onClearEventType: () => void;
     onClearFromDate: () => void;
-    onClearPrincipal: () => void;
     onClearToDate: () => void;
     onResetFilters: () => void;
 }
@@ -43,11 +41,9 @@ const ActiveFilterBadge = ({clearLabel, label, onClear}: ActiveFilterBadgeProps)
 const AuditEventsActiveFilterBadges = ({
     filters,
     hasActiveFilters,
-    onClearDataSearch,
     onClearDateRange,
     onClearEventType,
     onClearFromDate,
-    onClearPrincipal,
     onClearToDate,
     onResetFilters,
 }: AuditEventsActiveFilterBadgesProps) => {
@@ -55,7 +51,7 @@ const AuditEventsActiveFilterBadges = ({
         return null;
     }
 
-    const {dataSearch, dateRange, eventType, fromDate, principal, toDate} = filters;
+    const {dateRange, eventType, fromDate, toDate} = filters;
 
     const dateRangePreset = AUDIT_EVENT_DATE_RANGE_PRESETS.find(
         (dateRangePresetItem) => dateRangePresetItem.value === dateRange
@@ -92,22 +88,6 @@ const AuditEventsActiveFilterBadges = ({
                     clearLabel="Clear to date filter"
                     label={`To: ${formatDate(toDate)}`}
                     onClear={onClearToDate}
-                />
-            )}
-
-            {principal && (
-                <ActiveFilterBadge
-                    clearLabel="Clear principal filter"
-                    label={`Principal: ${principal}`}
-                    onClear={onClearPrincipal}
-                />
-            )}
-
-            {dataSearch && (
-                <ActiveFilterBadge
-                    clearLabel="Clear data filter"
-                    label={`Data: ${dataSearch}`}
-                    onClear={onClearDataSearch}
                 />
             )}
 

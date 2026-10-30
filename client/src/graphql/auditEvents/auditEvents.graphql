@@ -1,18 +1,16 @@
 query AuditEvents(
-    $principal: String
     $eventType: String
     $fromDate: Long
     $toDate: Long
-    $dataSearch: String
+    $search: String
     $page: Int
     $size: Int
 ) {
     auditEvents(
-        principal: $principal
         eventType: $eventType
         fromDate: $fromDate
         toDate: $toDate
-        dataSearch: $dataSearch
+        search: $search
         page: $page
         size: $size
     ) {
