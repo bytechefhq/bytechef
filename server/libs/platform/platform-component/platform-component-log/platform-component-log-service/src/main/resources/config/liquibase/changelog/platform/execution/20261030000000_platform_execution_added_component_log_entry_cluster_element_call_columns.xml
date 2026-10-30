@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261030000000" author="Ivica Cardic">
+        <addColumn tableName="component_log_entry">
+            <column name="cluster_element_call_id" type="VARCHAR(256)"/>
+            <column name="cluster_element_workflow_node_name" type="VARCHAR(256)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
