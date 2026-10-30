@@ -18,6 +18,16 @@ dependencies {
 
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-oauth2-resource-server")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-service"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
