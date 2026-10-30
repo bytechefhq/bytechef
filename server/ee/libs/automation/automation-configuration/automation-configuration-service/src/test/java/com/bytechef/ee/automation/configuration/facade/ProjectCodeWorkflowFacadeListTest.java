@@ -18,8 +18,10 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
@@ -31,6 +33,7 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
 
@@ -40,6 +43,8 @@ import org.springframework.cache.CacheManager;
  * @author Ivica Cardic
  */
 class ProjectCodeWorkflowFacadeListTest {
+
+    private final ProjectOwnershipService projectOwnershipService = mock(ProjectOwnershipService.class);
 
     @Test
     void testGetCodeWorkflowProjectsReturnsProjectsForDistinctIds() {
@@ -82,7 +87,11 @@ class ProjectCodeWorkflowFacadeListTest {
         Project bridgeCatalogProject = new Project();
 
         bridgeCatalogProject.setId(2L);
-        bridgeCatalogProject.setName("__EMBEDDED_AUTOMATION__catalog-project");
+        bridgeCatalogProject.setName("catalog-project");
+
+        when(projectOwnershipService.getOwnedProjectIds(List.of(1L, 2L),
+            Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT)))
+                .thenReturn(Set.of(2L));
 
         ProjectService projectService = mock(ProjectService.class);
 
@@ -112,7 +121,7 @@ class ProjectCodeWorkflowFacadeListTest {
         verify(projectService, never()).getProjects(anyList());
     }
 
-    private static ProjectCodeWorkflowFacadeImpl newFacade(
+    private ProjectCodeWorkflowFacadeImpl newFacade(
         ProjectService projectService, ProjectCodeWorkflowService projectCodeWorkflowService) {
 
         return new ProjectCodeWorkflowFacadeImpl(
@@ -124,7 +133,7 @@ class ProjectCodeWorkflowFacadeListTest {
                 projectCodeWorkflowService, mock(ProjectWorkflowService.class), mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), projectOwnershipService);
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

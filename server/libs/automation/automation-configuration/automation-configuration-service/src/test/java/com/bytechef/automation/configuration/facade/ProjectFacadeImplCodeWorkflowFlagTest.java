@@ -33,6 +33,7 @@ import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupp
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowSource;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
@@ -100,7 +101,8 @@ class ProjectFacadeImplCodeWorkflowFlagTest {
         projectFacade = new ProjectFacadeImpl(
             applicationProperties, mock(CategoryService.class), componentDefinitionHelper, preBuiltTemplateService,
             projectCodeWorkflowInfoSupplierProvider, projectWorkflowService, mock(ProjectDeploymentService.class),
-            projectService, mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowFacade.class),
+            mock(ProjectOwnershipService.class), projectService, mock(ProjectDeploymentFacade.class),
+            mock(ProjectWorkflowFacade.class),
             mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), tagService,
             mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
             mock(WorkflowNodeTestOutputService.class), List.of());
