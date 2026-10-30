@@ -22,8 +22,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
+import com.bytechef.platform.security.web.mcp.TestMcpEndpoint;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -55,6 +57,8 @@ class TenantAwareJwtAuthenticationFilterTest {
 
     private static final String CANONICAL_MANAGEMENT_PATH = "/api/management/mcp";
     private static final String ISSUER_URI = "https://as.bytechef.test";
+    private static final List<McpEndpoint> MCP_ENDPOINTS = List.of(
+        TestMcpEndpoint.automation(), TestMcpEndpoint.management());
     private static final SelfIssuedTokenRevocationChecker NOT_REVOKED_CHECKER = (tokenValue, tenantId) -> false;
 
     private final List<String> mcpServerSecretVerificationTenantIds = new ArrayList<>();
@@ -69,7 +73,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     private final TenantAwareJwtAuthenticationFilter tenantAwareJwtAuthenticationFilter =
         new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
-            List.of(mcpServerSecretVerifier), null);
+            MCP_ENDPOINTS, List.of(mcpServerSecretVerifier), null);
 
     @AfterEach
     void afterEach() {
@@ -225,7 +229,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testRejectsSelfIssuerTokenWhenByteChefUserIsNotActive() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
-            List.of(mcpServerSecretVerifier), null);
+            MCP_ENDPOINTS, List.of(mcpServerSecretVerifier), null);
 
         when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.empty());
 
@@ -247,7 +251,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testAllowsSelfIssuerTokenWhenByteChefUserIsActive() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
-            List.of(mcpServerSecretVerifier), NOT_REVOKED_CHECKER);
+            MCP_ENDPOINTS, List.of(mcpServerSecretVerifier), NOT_REVOKED_CHECKER);
 
         User user = mock(User.class);
 
@@ -354,7 +358,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testRejectsForgedMcpServerSecret() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
-            List.of(request -> Optional.of(false)), null);
+            MCP_ENDPOINTS, List.of(request -> Optional.of(false)), null);
 
         String path = managementPath("victim");
 
@@ -374,7 +378,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testRejectsMcpServerSecretNoVerifierClaims() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
-            List.of(request -> Optional.empty()), null);
+            MCP_ENDPOINTS, List.of(request -> Optional.empty()), null);
 
         String path = automationPath("acme");
 
@@ -394,7 +398,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testRespondsServiceUnavailableWhenMcpServerSecretVerifierFails() throws Exception {
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
-            List.of(request -> {
+            MCP_ENDPOINTS, List.of(request -> {
                 throw new IllegalStateException("lookup failed");
             }), null);
 
@@ -533,7 +537,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
-            List.of(request -> Optional.of(false)), null);
+            MCP_ENDPOINTS, List.of(request -> Optional.of(false)), null);
 
         authenticate(
             jwtWithTenant("acme", "mcp:management", endpointUrl(CANONICAL_MANAGEMENT_PATH)), "SCOPE_mcp:management");
@@ -574,7 +578,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         return new TenantAwareJwtAuthenticationFilter(
             new McpAudienceValidator(), new McpJwtIdentityMapper(), selfIssuerProperties(), userService,
-            List.of(mcpServerSecretVerifier), selfIssuedTokenRevocationChecker);
+            MCP_ENDPOINTS, List.of(mcpServerSecretVerifier), selfIssuedTokenRevocationChecker);
     }
 
     private int doSelfIssuerRequest(TenantAwareJwtAuthenticationFilter filter) throws Exception {

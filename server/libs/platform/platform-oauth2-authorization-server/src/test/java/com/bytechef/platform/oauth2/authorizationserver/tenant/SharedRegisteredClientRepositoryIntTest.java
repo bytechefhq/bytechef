@@ -23,7 +23,6 @@ import static com.bytechef.platform.oauth2.authorizationserver.config.MultiTenan
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.oauth2.authorizationserver.config.MultiTenantSchemaIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestConfiguration;
 import com.bytechef.tenant.TenantContext;
@@ -64,9 +63,6 @@ class SharedRegisteredClientRepositoryIntTest {
 
     @Autowired
     private DataSource dataSource;
-
-    @MockitoBean
-    private McpServerService mcpServerService;
 
     @Autowired
     private RegisteredClientRepository registeredClientRepository;

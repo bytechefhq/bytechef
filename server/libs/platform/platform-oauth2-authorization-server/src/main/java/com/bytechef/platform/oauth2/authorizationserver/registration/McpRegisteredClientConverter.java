@@ -18,8 +18,8 @@ package com.bytechef.platform.oauth2.authorizationserver.registration;
 
 import static com.bytechef.platform.oauth2.authorizationserver.constant.OAuth2AuthorizationServerConstants.MCP_ACCESS_TOKEN_TIME_TO_LIVE;
 import static com.bytechef.platform.oauth2.authorizationserver.constant.OAuth2AuthorizationServerConstants.MCP_REFRESH_TOKEN_TIME_TO_LIVE;
-import static com.bytechef.platform.oauth2.authorizationserver.constant.OAuth2AuthorizationServerConstants.MCP_SCOPES;
 
+import java.util.List;
 import java.util.Set;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.oauth2.server.authorization.OAuth2ClientRegistration;
@@ -34,6 +34,11 @@ public class McpRegisteredClientConverter implements Converter<OAuth2ClientRegis
 
     private final OAuth2ClientRegistrationRegisteredClientConverter delegate =
         new OAuth2ClientRegistrationRegisteredClientConverter();
+    private final List<String> mcpScopes;
+
+    public McpRegisteredClientConverter(List<String> mcpScopes) {
+        this.mcpScopes = List.copyOf(mcpScopes);
+    }
 
     @Override
     public RegisteredClient convert(OAuth2ClientRegistration clientRegistration) {
@@ -52,7 +57,7 @@ public class McpRegisteredClientConverter implements Converter<OAuth2ClientRegis
         Set<String> scopes = registeredClient.getScopes();
 
         if (scopes.isEmpty()) {
-            builder.scopes(registeredScopes -> registeredScopes.addAll(MCP_SCOPES));
+            builder.scopes(registeredScopes -> registeredScopes.addAll(mcpScopes));
         }
 
         return builder.build();

@@ -19,29 +19,27 @@ package com.bytechef.platform.oauth2.authorizationserver.service;
 import static com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestFixtures.MANAGEMENT_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.mcp.domain.McpServer;
-import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestFixtures;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2AuthorizationGrant;
 import com.bytechef.platform.oauth2.authorizationserver.exception.RegisteredClientErrorType;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
+import com.bytechef.platform.security.web.mcp.TestMcpEndpoint;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
@@ -56,19 +54,20 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     properties = {
         "bytechef.oauth2.authorization-server.enabled=true", "bytechef.edition=ee"
     })
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    OAuth2AuthorizationGrantServiceIntTest.ResourceNamingMcpEndpointConfiguration.class,
+    PostgreSQLContainerConfiguration.class
+})
 class OAuth2AuthorizationGrantServiceIntTest {
 
-    private static final String AUTOMATION_SECRET = "sales-automation-secret";
+    private static final String AUTOMATION_URL = "http://localhost/api/automation/sales-automation-secret/mcp";
+    private static final String UNKNOWN_URL = "http://localhost/api/automation/unknown-secret/mcp";
 
     @Autowired
     private OAuth2AuthorizationConsentService authorizationConsentService;
 
     @Autowired
     private DataSource dataSource;
-
-    @MockitoBean
-    private McpServerService mcpServerService;
 
     @Autowired
     private OAuth2AuthorizationGrantService oAuth2AuthorizationGrantService;
@@ -88,12 +87,6 @@ class OAuth2AuthorizationGrantServiceIntTest {
 
         fixtures.deleteAll();
         fixtures.saveClient("client-1");
-
-        doThrow(new IllegalArgumentException("Unknown MCP server")).when(mcpServerService)
-            .getMcpServer(anyString());
-        doReturn(new McpServer("Sales Automation", PlatformType.AUTOMATION, Environment.DEVELOPMENT))
-            .when(mcpServerService)
-            .getMcpServer(AUTOMATION_SECRET);
     }
 
     @AfterEach
@@ -104,9 +97,7 @@ class OAuth2AuthorizationGrantServiceIntTest {
     @Test
     void testGrantsAreGroupedByPrincipal() {
         fixtures.saveAuthorization("client-1", "alice", MANAGEMENT_URL, Instant.parse("2026-10-01T00:00:00Z"));
-        fixtures.saveAuthorization(
-            "client-1", "alice", "http://localhost/api/automation/" + AUTOMATION_SECRET + "/mcp",
-            Instant.parse("2026-10-02T00:00:00Z"));
+        fixtures.saveAuthorization("client-1", "alice", AUTOMATION_URL, Instant.parse("2026-10-02T00:00:00Z"));
         fixtures.saveAuthorization("client-1", "bob", MANAGEMENT_URL, Instant.parse("2026-10-03T00:00:00Z"));
 
         List<OAuth2AuthorizationGrant> grants = oAuth2AuthorizationGrantService.getGrants("client-1");
@@ -124,16 +115,14 @@ class OAuth2AuthorizationGrantServiceIntTest {
     }
 
     @Test
-    void testUnresolvableAutomationResourceIsShownAsRawUrl() {
-        String unknownResource = "http://localhost/api/automation/unknown-secret/mcp";
-
-        fixtures.saveAuthorization("client-1", "alice", unknownResource, Instant.parse("2026-10-01T00:00:00Z"));
+    void testUnresolvableResourceIsShownAsRawUrl() {
+        fixtures.saveAuthorization("client-1", "alice", UNKNOWN_URL, Instant.parse("2026-10-01T00:00:00Z"));
 
         List<OAuth2AuthorizationGrant> grants = oAuth2AuthorizationGrantService.getGrants("client-1");
 
         assertThat(grants).singleElement()
             .extracting(OAuth2AuthorizationGrant::mcpServers)
-            .isEqualTo(List.of(unknownResource));
+            .isEqualTo(List.of(UNKNOWN_URL));
     }
 
     @Test
@@ -242,5 +231,42 @@ class OAuth2AuthorizationGrantServiceIntTest {
 
         assertThat(fixtures.countAuthorizations()).isZero();
         assertThat(fixtures.countConsents()).isZero();
+    }
+
+    @TestConfiguration
+    static class ResourceNamingMcpEndpointConfiguration {
+
+        @Bean
+        McpEndpoint resourceNamingMcpEndpoint() {
+            McpEndpoint delegate = TestMcpEndpoint.automation();
+
+            return new McpEndpoint() {
+
+                @Override
+                public boolean matches(String path) {
+                    return delegate.matches(path);
+                }
+
+                @Override
+                public String getScope() {
+                    return delegate.getScope();
+                }
+
+                @Override
+                public Optional<String> resolveTenantId(String path) {
+                    return delegate.resolveTenantId(path);
+                }
+
+                @Override
+                public Optional<String> resolveResourceName(String resource) {
+                    return switch (resource) {
+                        case MANAGEMENT_URL -> Optional.of("Management");
+                        case AUTOMATION_URL -> Optional.of("Sales Automation");
+                        case UNKNOWN_URL -> throw new IllegalArgumentException("Unknown MCP server");
+                        default -> Optional.empty();
+                    };
+                }
+            };
+        }
     }
 }

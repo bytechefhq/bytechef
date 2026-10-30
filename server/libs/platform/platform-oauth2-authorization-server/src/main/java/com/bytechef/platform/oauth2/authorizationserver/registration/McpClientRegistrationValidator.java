@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.oauth2.authorizationserver.registration;
 
-import static com.bytechef.platform.oauth2.authorizationserver.constant.OAuth2AuthorizationServerConstants.MCP_SCOPES;
-
 import java.util.List;
 import java.util.function.Consumer;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -35,6 +33,12 @@ public class McpClientRegistrationValidator implements Consumer<OAuth2ClientRegi
 
     private static final String ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.2";
 
+    private final List<String> mcpScopes;
+
+    public McpClientRegistrationValidator(List<String> mcpScopes) {
+        this.mcpScopes = List.copyOf(mcpScopes);
+    }
+
     @Override
     public void accept(OAuth2ClientRegistrationAuthenticationContext authenticationContext) {
         OAuth2ClientRegistrationAuthenticationValidator.DEFAULT_REDIRECT_URI_VALIDATOR.accept(authenticationContext);
@@ -47,7 +51,7 @@ public class McpClientRegistrationValidator implements Consumer<OAuth2ClientRegi
 
         List<String> scopes = clientRegistration.getScopes();
 
-        if (scopes != null && !MCP_SCOPES.containsAll(scopes)) {
+        if (scopes != null && !mcpScopes.containsAll(scopes)) {
             throw new OAuth2AuthenticationException(
                 new OAuth2Error(OAuth2ErrorCodes.INVALID_SCOPE, "Invalid Client Registration: scope", ERROR_URI));
         }

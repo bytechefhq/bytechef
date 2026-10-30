@@ -17,8 +17,10 @@
 package com.bytechef.platform.security.web.config;
 
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.oauth2.IssuerLocationMcpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.McpBearerTokenResolver;
+import com.bytechef.platform.security.web.mcp.oauth2.McpEndpointRequestMatcher;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.MultiIssuerJwtDecoder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -30,7 +32,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
  * @author Ivica Cardic
@@ -39,21 +40,23 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 @EnableConfigurationProperties(McpResourceServerProperties.class)
 public class McpOAuth2ResourceServerSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
-    private static final String MCP_PATH_REGEX = "^/api/(automation/.+|management(/[^/]+)?)/mcp$";
     private static final String RESOURCE_PATH = "/api";
 
     private final McpJwtDecoderFactory mcpJwtDecoderFactory;
+    private final ObjectProvider<McpEndpoint> mcpEndpointProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
 
     @SuppressFBWarnings({
         "EI2", "CT_CONSTRUCTOR_THROW"
     })
     public McpOAuth2ResourceServerSecurityConfigurerContributor(
+        ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpJwtDecoderFactory> mcpJwtDecoderFactoryProvider,
         McpResourceServerProperties mcpResourceServerProperties) {
 
         this.mcpJwtDecoderFactory = mcpJwtDecoderFactoryProvider.getIfAvailable(
             () -> new IssuerLocationMcpJwtDecoderFactory(trustedIssuerUris(mcpResourceServerProperties)));
+        this.mcpEndpointProvider = mcpEndpointProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
     }
 
@@ -61,8 +64,10 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
         List<Issuer> issuers = mcpResourceServerProperties.getIssuers();
+        List<McpEndpoint> mcpEndpoints = mcpEndpointProvider.orderedStream()
+            .toList();
 
-        if (issuers.isEmpty()) {
+        if (issuers.isEmpty() || mcpEndpoints.isEmpty()) {
             return (T) new DisabledMcpOAuth2ResourceServerConfigurer();
         }
 
@@ -70,7 +75,7 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
 
         MultiIssuerJwtDecoder multiIssuerJwtDecoder = new MultiIssuerJwtDecoder(mcpJwtDecoderFactory);
         McpBearerTokenResolver mcpBearerTokenResolver =
-            new McpBearerTokenResolver(RegexRequestMatcher.regexMatcher(MCP_PATH_REGEX));
+            new McpBearerTokenResolver(new McpEndpointRequestMatcher(mcpEndpoints));
 
         return (T) McpServerOAuth2Configurer.mcpServerOAuth2()
             .authorizationServer(primaryIssuer.getUri())

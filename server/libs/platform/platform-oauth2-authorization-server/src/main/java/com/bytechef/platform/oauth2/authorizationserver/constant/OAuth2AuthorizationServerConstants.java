@@ -17,7 +17,6 @@
 package com.bytechef.platform.oauth2.authorizationserver.constant;
 
 import java.time.Duration;
-import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -25,10 +24,7 @@ import java.util.List;
 public final class OAuth2AuthorizationServerConstants {
 
     public static final Duration MCP_ACCESS_TOKEN_TIME_TO_LIVE = Duration.ofHours(1);
-    public static final String MCP_AUTOMATION_SCOPE = "mcp:automation";
-    public static final String MCP_MANAGEMENT_SCOPE = "mcp:management";
     public static final Duration MCP_REFRESH_TOKEN_TIME_TO_LIVE = Duration.ofDays(30);
-    public static final List<String> MCP_SCOPES = List.of(MCP_AUTOMATION_SCOPE, MCP_MANAGEMENT_SCOPE);
     public static final String TENANT_ID_CLAIM = "tenant_id";
 
     private OAuth2AuthorizationServerConstants() {

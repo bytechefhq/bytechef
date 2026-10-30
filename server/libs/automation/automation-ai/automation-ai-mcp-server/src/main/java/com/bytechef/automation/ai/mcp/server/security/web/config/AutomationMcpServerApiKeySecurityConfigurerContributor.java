@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.mcp.server.security.web.config;
 
 import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpAuthenticationRequiredResolver;
+import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpEndpoint;
 import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpServerSecretVerifier;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -24,6 +25,7 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
@@ -68,6 +70,11 @@ public class AutomationMcpServerApiKeySecurityConfigurerContributor implements S
     @Bean
     McpAuthenticationRequiredResolver automationMcpAuthenticationRequiredResolver() {
         return new AutomationMcpAuthenticationRequiredResolver(mcpServerService);
+    }
+
+    @Bean
+    McpEndpoint automationMcpEndpoint() {
+        return new AutomationMcpEndpoint(mcpServerService);
     }
 
     @Bean

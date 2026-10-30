@@ -35,6 +35,7 @@ import com.bytechef.platform.oauth2.authorizationserver.tenant.TenantKeyedRefres
 import com.bytechef.platform.oauth2.authorizationserver.tenant.TenantRoutingOAuth2AuthorizationService;
 import com.bytechef.platform.oauth2.authorizationserver.token.McpResourceAudienceTokenCustomizer;
 import com.bytechef.platform.oauth2.authorizationserver.web.LoginRedirectAuthenticationEntryPoint;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.tenant.TenantContext;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -44,6 +45,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.springaicommunity.mcp.security.authorizationserver.config.McpAuthorizationServerConfigurer;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -99,7 +101,13 @@ public class Oauth2AuthorizationServerConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityFilterChain oauth2AuthorizationServerSecurityFilterChain(
         HttpSecurity http, AuthorizationServerSettings authorizationServerSettings, JwtDecoder jwtDecoder,
-        RegisteredClientRepository registeredClientRepository) throws Exception {
+        RegisteredClientRepository registeredClientRepository, ObjectProvider<McpEndpoint> mcpEndpointProvider)
+        throws Exception {
+
+        List<String> mcpScopes = mcpEndpointProvider.orderedStream()
+            .map(McpEndpoint::getScope)
+            .distinct()
+            .toList();
 
         http
             .authorizeHttpRequests(authorize -> authorize.anyRequest()
@@ -108,7 +116,8 @@ public class Oauth2AuthorizationServerConfiguration {
                 McpAuthorizationServerConfigurer.mcpAuthorizationServer(),
                 mcpAuthorizationServer -> {
                     mcpAuthorizationServer.dynamicClientRegistration(true);
-                    mcpAuthorizationServer.dynamicClientRegistrationValidator(new McpClientRegistrationValidator());
+                    mcpAuthorizationServer.dynamicClientRegistrationValidator(
+                        new McpClientRegistrationValidator(mcpScopes));
 
                     mcpAuthorizationServer.authorizationServer(authorizationServer -> {
                         authorizationServer.addObjectPostProcessor(McpAuthorizationConsentRequired.postProcessor());
@@ -121,7 +130,8 @@ public class Oauth2AuthorizationServerConfiguration {
                         authorizationServer.clientRegistrationEndpoint(
                             clientRegistrationEndpoint -> clientRegistrationEndpoint.authenticationProviders(
                                 authenticationProviders -> authenticationProviders.forEach(
-                                    Oauth2AuthorizationServerConfiguration::setRegisteredClientConverter)));
+                                    authenticationProvider -> setRegisteredClientConverter(
+                                        authenticationProvider, mcpScopes))));
 
                         http.securityMatcher(
                             new OrRequestMatcher(
@@ -260,9 +270,11 @@ public class Oauth2AuthorizationServerConfiguration {
         }
     }
 
-    private static void setRegisteredClientConverter(AuthenticationProvider authenticationProvider) {
+    private static void setRegisteredClientConverter(
+        AuthenticationProvider authenticationProvider, List<String> mcpScopes) {
+
         if (authenticationProvider instanceof OAuth2ClientRegistrationAuthenticationProvider registrationProvider) {
-            registrationProvider.setRegisteredClientConverter(new McpRegisteredClientConverter());
+            registrationProvider.setRegisteredClientConverter(new McpRegisteredClientConverter(mcpScopes));
         }
     }
 

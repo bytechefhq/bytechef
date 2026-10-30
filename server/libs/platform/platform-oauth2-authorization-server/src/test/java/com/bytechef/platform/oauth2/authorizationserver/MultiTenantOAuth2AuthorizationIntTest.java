@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.oauth2.authorizationserver.config.MultiTenantSchemaIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestFixtures;
@@ -90,9 +89,6 @@ class MultiTenantOAuth2AuthorizationIntTest {
 
     @Autowired
     private DataSource dataSource;
-
-    @MockitoBean
-    private McpServerService mcpServerService;
 
     @Autowired
     private OAuth2AuthorizationGrantService oAuth2AuthorizationGrantService;

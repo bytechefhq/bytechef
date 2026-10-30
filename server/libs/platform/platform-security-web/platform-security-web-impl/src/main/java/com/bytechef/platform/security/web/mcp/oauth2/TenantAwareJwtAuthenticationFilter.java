@@ -18,12 +18,12 @@ package com.bytechef.platform.security.web.mcp.oauth2;
 
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,8 +32,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -46,8 +44,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.util.UrlUtils;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
@@ -57,17 +53,10 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(TenantAwareJwtAuthenticationFilter.class);
 
-    private static final String AUTOMATION_SCOPE = "mcp:automation";
-    private static final Pattern CANONICAL_MANAGEMENT_PATTERN = Pattern.compile("^/api/management/mcp$");
-    private static final String MANAGEMENT_SCOPE = "mcp:management";
-    private static final Pattern MCP_SECRET_PATTERN = Pattern.compile("/api/(?:automation|management)/(.+)/mcp");
     private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
 
-    private final RequestMatcher automationRequestMatcher =
-        RegexRequestMatcher.regexMatcher("^/api/automation/.+/mcp");
-    private final RequestMatcher managementRequestMatcher =
-        RegexRequestMatcher.regexMatcher("^/api/management(/[^/]+)?/mcp$");
     private final McpAudienceValidator mcpAudienceValidator;
+    private final McpEndpointRequestMatcher mcpEndpointRequestMatcher;
     private final McpJwtIdentityMapper mcpJwtIdentityMapper;
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final List<McpServerSecretVerifier> mcpServerSecretVerifiers;
@@ -78,10 +67,11 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     public TenantAwareJwtAuthenticationFilter(
         McpAudienceValidator mcpAudienceValidator, McpJwtIdentityMapper mcpJwtIdentityMapper,
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
-        List<McpServerSecretVerifier> mcpServerSecretVerifiers,
+        List<McpEndpoint> mcpEndpoints, List<McpServerSecretVerifier> mcpServerSecretVerifiers,
         @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker) {
 
         this.mcpAudienceValidator = mcpAudienceValidator;
+        this.mcpEndpointRequestMatcher = new McpEndpointRequestMatcher(mcpEndpoints);
         this.mcpJwtIdentityMapper = mcpJwtIdentityMapper;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpServerSecretVerifiers = List.copyOf(mcpServerSecretVerifiers);
@@ -102,16 +92,24 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        Optional<McpEndpoint> mcpEndpoint = mcpEndpointRequestMatcher.findMcpEndpoint(request);
+
+        if (mcpEndpoint.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+
+            return;
+        }
+
         Jwt jwt = jwtAuthenticationToken.getToken();
 
         String issuerUri = String.valueOf(jwt.getIssuer());
 
         Optional<Issuer> staticIssuer = mcpResourceServerProperties.findIssuer(issuerUri);
 
-        String urlTenantId;
+        String tenantId;
 
         try {
-            urlTenantId = resolveUrlTenantId(request, jwt, staticIssuer.orElse(null));
+            tenantId = resolveTenantId(request, mcpEndpoint.get(), jwt, staticIssuer.orElse(null));
         } catch (IllegalArgumentException illegalArgumentException) {
             log.warn(
                 "Rejecting MCP JWT for {}: {}", request.getServletPath(), illegalArgumentException.getMessage(),
@@ -133,11 +131,11 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         boolean mcpServerSecretVerified;
 
         try {
-            mcpServerSecretVerified = isMcpServerSecretVerified(request, urlTenantId);
+            mcpServerSecretVerified = isMcpServerSecretVerified(request, tenantId);
         } catch (RuntimeException runtimeException) {
             log.error(
                 "Rejecting MCP JWT for {}: MCP server secret verification failed in tenant {}",
-                request.getServletPath(), urlTenantId, runtimeException);
+                request.getServletPath(), tenantId, runtimeException);
 
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 
@@ -157,7 +155,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         McpJwtIdentity mcpJwtIdentity = authenticateStaticIssuer(
-            request, response, jwtAuthenticationToken, jwt, staticIssuer.get(), urlTenantId);
+            request, response, jwtAuthenticationToken, jwt, staticIssuer.get(), mcpEndpoint.get(), tenantId);
 
         if (mcpJwtIdentity == null) {
             return;
@@ -177,11 +175,9 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     @Nullable
     private McpJwtIdentity authenticateStaticIssuer(
         HttpServletRequest request, HttpServletResponse response, JwtAuthenticationToken jwtAuthenticationToken,
-        Jwt jwt, Issuer issuer, String urlTenantId) throws IOException {
+        Jwt jwt, Issuer issuer, McpEndpoint mcpEndpoint, String tenantId) throws IOException {
 
-        String requiredScope = getRequiredScope(request);
-
-        if (requiredScope == null || !hasScope(jwtAuthenticationToken, requiredScope)) {
+        if (!hasScope(jwtAuthenticationToken, mcpEndpoint.getScope())) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
@@ -193,14 +189,14 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return null;
         }
 
-        if (issuer.isSelf() && !isActiveByteChefUser(jwt.getSubject(), urlTenantId)) {
+        if (issuer.isSelf() && !isActiveByteChefUser(jwt.getSubject(), tenantId)) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 
             return null;
         }
 
         if (issuer.isSelf()) {
-            Integer revocationErrorStatus = getRevocationErrorStatus(jwt, urlTenantId);
+            Integer revocationErrorStatus = getRevocationErrorStatus(jwt, tenantId);
 
             if (revocationErrorStatus != null) {
                 response.sendError(revocationErrorStatus);
@@ -210,7 +206,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            return mcpJwtIdentityMapper.map(jwt, issuer, jwtAuthenticationToken.getAuthorities(), urlTenantId);
+            return mcpJwtIdentityMapper.map(jwt, issuer, jwtAuthenticationToken.getAuthorities(), tenantId);
         } catch (OAuth2AuthenticationException oAuth2AuthenticationException) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 
@@ -226,21 +222,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         return queryIndex >= 0 ? url.substring(0, queryIndex) : url;
     }
 
-    private String resolveUrlTenantId(HttpServletRequest request, Jwt jwt, @Nullable Issuer issuer) {
-        Matcher canonicalManagementMatcher = CANONICAL_MANAGEMENT_PATTERN.matcher(request.getServletPath());
+    private static String resolveTenantId(
+        HttpServletRequest request, McpEndpoint mcpEndpoint, Jwt jwt, @Nullable Issuer issuer) {
 
-        if (canonicalManagementMatcher.matches()) {
-            return resolveClaimTenantId(jwt, issuer);
-        }
+        Optional<String> pathTenantId = mcpEndpoint.resolveTenantId(McpEndpointRequestMatcher.getPath(request));
 
-        Matcher matcher = MCP_SECRET_PATTERN.matcher(request.getRequestURI());
-
-        if (!matcher.find()) {
-            throw new IllegalArgumentException("MCP endpoint secret not found");
-        }
-
-        return TenantKey.parse(matcher.group(1))
-            .getTenantId();
+        return pathTenantId.orElseGet(() -> resolveClaimTenantId(jwt, issuer));
     }
 
     private static String resolveClaimTenantId(Jwt jwt, @Nullable Issuer issuer) {
@@ -263,9 +250,9 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         return claimTenantId;
     }
 
-    private boolean isMcpServerSecretVerified(HttpServletRequest request, String urlTenantId) {
+    private boolean isMcpServerSecretVerified(HttpServletRequest request, String tenantId) {
         return TenantContext.callWithTenantId(
-            urlTenantId,
+            tenantId,
             () -> mcpServerSecretVerifiers.stream()
                 .map(mcpServerSecretVerifier -> mcpServerSecretVerifier.verifyMcpServerSecret(request))
                 .flatMap(Optional::stream)
@@ -301,19 +288,6 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return revoked ? Integer.valueOf(HttpServletResponse.SC_UNAUTHORIZED) : null;
-    }
-
-    @Nullable
-    private String getRequiredScope(HttpServletRequest request) {
-        if (automationRequestMatcher.matches(request)) {
-            return AUTOMATION_SCOPE;
-        }
-
-        if (managementRequestMatcher.matches(request)) {
-            return MANAGEMENT_SCOPE;
-        }
-
-        return null;
     }
 
     @Nullable

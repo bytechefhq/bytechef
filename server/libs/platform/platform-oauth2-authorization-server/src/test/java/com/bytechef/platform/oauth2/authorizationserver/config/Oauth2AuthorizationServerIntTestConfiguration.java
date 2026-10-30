@@ -18,6 +18,8 @@ package com.bytechef.platform.oauth2.authorizationserver.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
+import com.bytechef.platform.security.web.mcp.TestMcpEndpoint;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -47,6 +49,16 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @SuppressFBWarnings("SPRING_CSRF_PROTECTION_DISABLED")
 public class Oauth2AuthorizationServerIntTestConfiguration {
+
+    @Bean
+    McpEndpoint automationMcpEndpoint() {
+        return TestMcpEndpoint.automation();
+    }
+
+    @Bean
+    McpEndpoint managementMcpEndpoint() {
+        return TestMcpEndpoint.management();
+    }
 
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
