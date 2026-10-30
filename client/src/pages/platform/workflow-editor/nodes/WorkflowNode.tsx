@@ -381,7 +381,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         'ml-2 flex w-full min-w-max flex-col items-start',
                         ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
                             'absolute top-full ml-0 items-center text-center',
-                        isClusterElement && !isNestedClusterRoot && 'w-auto max-w-[130px] min-w-0',
+                        isClusterElement && !isNestedClusterRoot && 'mt-2 w-auto max-w-[130px] min-w-0',
                         isHorizontal && isRegularNode && 'w-auto max-w-[150px] min-w-0'
                     )}
                 >
