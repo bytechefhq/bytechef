@@ -32,15 +32,15 @@ import org.springframework.context.annotation.Bean;
 @TestConfiguration
 public class TestOwnerContributors {
 
-    private final Set<Long> catalogIds = ConcurrentHashMap.newKeySet();
+    private final Set<Long> automationWorkflowProjectIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> connectedUserIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> apiCollectionIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> a2aServerIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> embeddedIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> mcpServerIds = ConcurrentHashMap.newKeySet();
 
-    public void addCatalogId(long projectId) {
-        catalogIds.add(projectId);
+    public void addAutomationWorkflowProjectId(long projectId) {
+        automationWorkflowProjectIds.add(projectId);
     }
 
     public void addConnectedUserId(long projectId) {
@@ -59,7 +59,7 @@ public class TestOwnerContributors {
     }
 
     public void clear() {
-        catalogIds.clear();
+        automationWorkflowProjectIds.clear();
         connectedUserIds.clear();
         apiCollectionIds.clear();
         a2aServerIds.clear();
@@ -68,13 +68,13 @@ public class TestOwnerContributors {
     }
 
     @Bean
-    ProjectOwnerContributor catalogProjectOwnerContributor() {
-        return projectContributor(ProjectOwner.EMBEDDED_CATALOG, catalogIds);
+    ProjectOwnerContributor automationWorkflowProjectOwnerContributor() {
+        return projectContributor(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, automationWorkflowProjectIds);
     }
 
     @Bean
     ProjectOwnerContributor connectedUserProjectOwnerContributor() {
-        return projectContributor(ProjectOwner.EMBEDDED_CONNECTED_USER, connectedUserIds);
+        return projectContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, connectedUserIds);
     }
 
     @Bean

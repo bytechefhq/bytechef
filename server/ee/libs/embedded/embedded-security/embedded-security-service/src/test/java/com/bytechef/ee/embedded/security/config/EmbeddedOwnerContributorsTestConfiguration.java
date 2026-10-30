@@ -25,13 +25,13 @@ public class EmbeddedOwnerContributorsTestConfiguration {
     private static final String MATCH_NOTHING = "%1$s = 0";
 
     @Bean
-    ProjectOwnerContributor embeddedCatalogProjectOwnerContributor() {
-        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CATALOG, MATCH_NOTHING);
+    ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, MATCH_NOTHING);
     }
 
     @Bean
     ProjectOwnerContributor embeddedConnectedUserProjectOwnerContributor() {
-        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CONNECTED_USER, MATCH_NOTHING);
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, MATCH_NOTHING);
     }
 
     @Bean

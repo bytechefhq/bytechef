@@ -201,8 +201,9 @@ class ProjectWorkflowToolsTest {
         void testSearchWorkflowsScopesToTheResolvedWorkspace() {
             resolveWorkspace(WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
-                .thenReturn(List.of(10L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID,
+                EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+                    .thenReturn(List.of(10L));
             when(projectWorkflowFacade.getProjectWorkflows(10L)).thenReturn(List.of(buildDto("wf-1", 1L, 1)));
 
             ProjectWorkflowTools tools = newTools();
@@ -218,8 +219,9 @@ class ProjectWorkflowToolsTest {
         void testSearchWorkflowsRejectsAProjectOutsideTheWorkspace() {
             resolveWorkspace(WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
-                .thenReturn(List.of(10L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID,
+                EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+                    .thenReturn(List.of(10L));
 
             ProjectWorkflowTools tools = newTools();
 
@@ -729,11 +731,11 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testGetWorkflowReadsAWorkflowOfAnEmbeddedCatalogProject() {
+        void testGetWorkflowReadsAWorkflowOfAnEmbeddedAutomationWorkflowProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
 
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
             when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-1")).thenReturn(buildDto("wf-uuid-1", 55L, 1));
 
             WorkflowInfo workflowInfo = newTools().getWorkflow("wf-uuid-1", null, toolContext);
@@ -746,7 +748,7 @@ class ProjectWorkflowToolsTest {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
 
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CONNECTED_USER);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -815,10 +817,10 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testListWorkflowsListsAnEmbeddedCatalogProject() {
+        void testListWorkflowsListsAnEmbeddedAutomationWorkflowProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
 
             when(projectWorkflowFacade.getProjectWorkflows(7L)).thenReturn(List.of(buildDto("wf-1", 1L, 1)));
 
@@ -831,7 +833,7 @@ class ProjectWorkflowToolsTest {
         void testListWorkflowsRejectsAConnectedUserProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CONNECTED_USER);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -843,10 +845,10 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testCreateProjectWorkflowCreatesAWorkflowInAnEmbeddedCatalogProject() {
+        void testCreateProjectWorkflowCreatesAWorkflowInAnEmbeddedAutomationWorkflowProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
 
             when(projectWorkflowFacade.addWorkflow(7L, DEFINITION))
                 .thenReturn(buildProjectWorkflow(55L, 7L, "wf-uuid-1"));
@@ -857,10 +859,10 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testUpdateWorkflowUpdatesAWorkflowOfAnEmbeddedCatalogProject() {
+        void testUpdateWorkflowUpdatesAWorkflowOfAnEmbeddedAutomationWorkflowProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_CATALOG);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
 
             when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-1")).thenReturn(buildDto("wf-uuid-1", 55L, 3));
 

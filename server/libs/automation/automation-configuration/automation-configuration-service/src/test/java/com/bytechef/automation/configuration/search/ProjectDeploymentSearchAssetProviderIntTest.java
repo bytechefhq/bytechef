@@ -111,11 +111,11 @@ class ProjectDeploymentSearchAssetProviderIntTest {
 
     @Test
     void testHidesDeploymentsOfProjectsOwnedByAnyEmbeddedOwner() {
-        long catalogDeploymentId = createDeployment();
+        long automationWorkflowProjectDeploymentId = createDeployment();
         long connectedUserDeploymentId = createDeployment();
         long plainDeploymentId = createDeployment();
 
-        testOwnerContributors.addCatalogId(getProjectId(catalogDeploymentId));
+        testOwnerContributors.addAutomationWorkflowProjectId(getProjectId(automationWorkflowProjectDeploymentId));
         testOwnerContributors.addConnectedUserId(getProjectId(connectedUserDeploymentId));
 
         assertThat(search()).containsExactly(plainDeploymentId);

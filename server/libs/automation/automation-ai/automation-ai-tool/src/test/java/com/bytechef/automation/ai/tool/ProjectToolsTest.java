@@ -172,8 +172,9 @@ class ProjectToolsTest {
 
             Project project = project(7L, WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
-                .thenReturn(List.of(7L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID,
+                EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+                    .thenReturn(List.of(7L));
             when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project));
 
             List<ProjectInfo> projectInfos = newTools().listProjects(null, toolContext);
@@ -202,8 +203,9 @@ class ProjectToolsTest {
         void testSearchProjectsSearchesOnlyTheResolvedWorkspaceProjects() {
             resolveWorkspace(WORKSPACE_ID);
 
-            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID, EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
-                .thenReturn(List.of(7L));
+            when(projectService.getWorkspaceProjectIds(WORKSPACE_ID,
+                EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+                    .thenReturn(List.of(7L));
             when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project(7L, WORKSPACE_ID)));
 
             List<ProjectInfo> projectInfos = newTools().searchProjects("project", null, toolContext);

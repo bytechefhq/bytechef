@@ -325,19 +325,19 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @Test
-    public void testGetWorkspaceProjectDeploymentsHidesDeploymentsOfEmbeddedCatalogProjects() {
-        ProjectDTO catalogProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+    public void testGetWorkspaceProjectDeploymentsHidesDeploymentsOfEmbeddedAutomationWorkflowProjects() {
+        ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
-        ProjectDeploymentDTO catalogDeploymentDTO =
-            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), catalogProjectDTO);
+        ProjectDeploymentDTO automationWorkflowProjectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), automationWorkflowProjectDTO);
         ProjectDeploymentDTO plainDeploymentDTO =
             projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), plainProjectDTO);
 
-        renameProjectDeployment(catalogDeploymentDTO.id(), "admin");
+        renameProjectDeployment(automationWorkflowProjectDeploymentDTO.id(), "admin");
         renameProjectDeployment(plainDeploymentDTO.id(), "plain");
 
-        testOwnerContributors.addCatalogId(catalogProjectDTO.id());
+        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
 
         List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
             workspace.getId(), null, null, null, false);
