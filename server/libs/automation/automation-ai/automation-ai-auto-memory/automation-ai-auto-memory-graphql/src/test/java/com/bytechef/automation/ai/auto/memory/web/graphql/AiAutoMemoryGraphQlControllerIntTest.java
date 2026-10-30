@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.ai.auto.memory.web.graphql;
+package com.bytechef.automation.ai.auto.memory.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
