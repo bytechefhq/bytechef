@@ -1,23 +1,21 @@
 x-bytechef-environment: &bytechef-environment
-  BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+  BYTECHEF_DATASOURCE_PASSWORD: postgres
   BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
   BYTECHEF_DATASOURCE_USERNAME: postgres
   BYTECHEF_EDITION: ${BYTECHEF_EDITION:-CE}
-  BYTECHEF_ENCRYPTION_PROPERTY_KEY: ${BYTECHEF_ENCRYPTION_KEY:?Set BYTECHEF_ENCRYPTION_KEY, e.g. openssl rand -base64 16}
-  BYTECHEF_ENCRYPTION_PROVIDER: PROPERTY
   BYTECHEF_FEATURE_FLAGS: ${BYTECHEF_FEATURE_FLAGS:-}
   BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR: /opt/bytechef/data/file-storage
   BYTECHEF_FILE_STORAGE_PROVIDER: FILESYSTEM
   BYTECHEF_MESSAGE_BROKER_PROVIDER: ${BYTECHEF_MESSAGE_BROKER_PROVIDER:-AMQP}
   BYTECHEF_PUBLIC_URL: ${BYTECHEF_PUBLIC_URL:-http://localhost:8080}
   BYTECHEF_RABBITMQ_HOST: rabbitmq
-  BYTECHEF_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+  BYTECHEF_RABBITMQ_PASSWORD: bytechef
   BYTECHEF_RABBITMQ_PORT: 5672
   BYTECHEF_RABBITMQ_USERNAME: bytechef
   BYTECHEF_REDIS_HOST: redis
   BYTECHEF_REDIS_PORT: 6379
   BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED: "true"
-  BYTECHEF_SECURITY_REMEMBER_ME_KEY: ${BYTECHEF_SECURITY_REMEMBER_ME_KEY:?Set BYTECHEF_SECURITY_REMEMBER_ME_KEY}
+  BYTECHEF_SECURITY_REMEMBER_ME_KEY: e48keep1this1safe3ffb2
   BYTECHEF_SESSION_STORE: ${BYTECHEF_SESSION_STORE:-REDIS}
   BYTECHEF_TENANT_MODE: ${BYTECHEF_TENANT_MODE:-SINGLE}
   BYTECHEF_UPGRADE_ENABLED: "false"
@@ -43,6 +41,7 @@ x-bytechef-node: &bytechef-node
     start_period: 60s
   mem_limit: 2g
   volumes:
+    - ~/.bytechef:/root/.bytechef
     - file-storage:/opt/bytechef/data/file-storage
 
 services:
@@ -50,7 +49,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: bytechef
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
@@ -63,7 +62,7 @@ services:
   rabbitmq:
     image: rabbitmq:4-management-alpine
     environment:
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_PASS: bytechef
       RABBITMQ_DEFAULT_USER: bytechef
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
@@ -71,7 +70,7 @@ services:
       timeout: 10s
       retries: 20
     ports:
-      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+      - "127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
 
   redis:
     image: redis:8-alpine
