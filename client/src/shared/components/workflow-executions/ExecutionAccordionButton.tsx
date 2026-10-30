@@ -1,14 +1,15 @@
 import Button from '@/components/Button/Button';
-import {type ReactNode} from 'react';
+import {type ReactNode, type Ref} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface ExecutionAccordionButtonProps {
     children: ReactNode;
     isSelected: boolean;
     onClick: () => void;
+    ref?: Ref<HTMLButtonElement>;
 }
 
-const ExecutionAccordionButton = ({children, isSelected, onClick}: ExecutionAccordionButtonProps) => (
+const ExecutionAccordionButton = ({children, isSelected, onClick, ref}: ExecutionAccordionButtonProps) => (
     <Button
         className={twMerge(
             'active:text-content-primary h-auto w-full justify-between rounded-md border border-stroke-neutral-primary p-2 text-left transition-colors hover:border-stroke-brand-primary hover:bg-transparent focus-visible:ring-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-stroke-brand-focus focus-visible:transition-colors focus-visible:outline-solid active:bg-transparent [&_svg]:size-5',
@@ -16,6 +17,7 @@ const ExecutionAccordionButton = ({children, isSelected, onClick}: ExecutionAcco
                 'border-stroke-brand-primary bg-surface-neutral-secondary hover:bg-surface-neutral-secondary active:bg-surface-neutral-secondary'
         )}
         onClick={onClick}
+        ref={ref}
         type="button"
         variant="ghost"
     >

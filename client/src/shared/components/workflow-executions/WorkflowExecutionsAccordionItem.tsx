@@ -6,13 +6,30 @@ import LazyTaskExecutionChildren, {
 import TaskExecutionChildrenList from '@/shared/components/workflow-executions/TaskExecutionChildrenList';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
-import {type ReactNode, useCallback, useMemo, useState} from 'react';
+import {type ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ITERATIONS_PAGE_SIZE = 100;
 
 const isTaskExecution = (execution: TaskExecution | TriggerExecution): execution is TaskExecution =>
     'jobId' in execution;
+
+const scrollIntoScrollAreaView = (element: HTMLElement, viewport: Element | null) => {
+    if (!viewport) {
+        element.scrollIntoView({block: 'nearest'});
+
+        return;
+    }
+
+    const elementRect = element.getBoundingClientRect();
+    const viewportRect = viewport.getBoundingClientRect();
+
+    if (elementRect.top < viewportRect.top) {
+        viewport.scrollTop += elementRect.top - viewportRect.top;
+    } else if (elementRect.bottom > viewportRect.bottom) {
+        viewport.scrollTop += Math.min(elementRect.bottom - viewportRect.bottom, elementRect.top - viewportRect.top);
+    }
+};
 
 interface WorkflowExecutionsAccordionItemProps {
     children: ReactNode;
@@ -36,6 +53,8 @@ const WorkflowExecutionsAccordionItem = ({
     selectedExecutionId,
 }: WorkflowExecutionsAccordionItemProps) => {
     const [visibleIterationCount, setVisibleIterationCount] = useState(ITERATIONS_PAGE_SIZE);
+
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     const taskExecution = isTaskExecution(execution) ? execution : undefined;
 
@@ -62,6 +81,38 @@ const WorkflowExecutionsAccordionItem = ({
         []
     );
 
+    useEffect(() => {
+        const button = buttonRef.current;
+
+        if (!isSelected || !button) {
+            return;
+        }
+
+        const viewport = button.closest('[data-radix-scroll-area-viewport]');
+
+        scrollIntoScrollAreaView(button, viewport);
+
+        const runningAnimations = (viewport?.getAnimations?.({subtree: true}) || []).filter(
+            (animation) => animation.effect?.getComputedTiming().endTime !== Infinity
+        );
+
+        if (runningAnimations.length === 0) {
+            return;
+        }
+
+        let cancelled = false;
+
+        void Promise.allSettled(runningAnimations.map((animation) => animation.finished)).then(() => {
+            if (!cancelled) {
+                scrollIntoScrollAreaView(button, viewport);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isSelected]);
+
     if (!isExpandable) {
         return (
             <ExecutionAccordionButton
@@ -71,6 +122,7 @@ const WorkflowExecutionsAccordionItem = ({
                         onExecutionClick(execution);
                     }
                 }}
+                ref={buttonRef}
             >
                 {children}
             </ExecutionAccordionButton>
@@ -94,6 +146,7 @@ const WorkflowExecutionsAccordionItem = ({
                         onExecutionClick(execution);
                     }
                 }}
+                ref={buttonRef}
             >
                 {children}
             </AccordionTrigger>

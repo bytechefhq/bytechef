@@ -79,6 +79,149 @@ describe('WorkflowExecutionsAccordionItem', () => {
         expect(onExecutionClick).toHaveBeenLastCalledWith(firstAttempt);
     });
 
+    describe('selection', () => {
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        const renderSelectable = (selectedExecutionId: string, previousTaskExecutions?: TaskExecution[]) =>
+            render(
+                <Accordion type="multiple">
+                    <WorkflowExecutionsAccordionItem
+                        execution={latestAttempt}
+                        onExecutionClick={vi.fn()}
+                        previousTaskExecutions={previousTaskExecutions}
+                        selectedExecutionId={selectedExecutionId}
+                    >
+                        <WorkflowTaskExecutionItem taskExecution={latestAttempt} />
+                    </WorkflowExecutionsAccordionItem>
+                </Accordion>
+            );
+
+        it('scrolls a selected task into view', () => {
+            const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+
+            renderSelectable('13');
+
+            expect(scrollIntoView).toHaveBeenCalledTimes(1);
+            expect(scrollIntoView).toHaveBeenCalledWith({block: 'nearest'});
+            expect(scrollIntoView.mock.contexts[0]).toBe(screen.getByRole('button'));
+        });
+
+        it('scrolls a selected expandable task into view', () => {
+            const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+
+            renderSelectable('13', [firstAttempt]);
+
+            expect(scrollIntoView).toHaveBeenCalledTimes(1);
+            expect(scrollIntoView.mock.contexts[0]).toBe(screen.getByRole('button'));
+        });
+
+        it('does not scroll a task that is not selected', () => {
+            const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+
+            renderSelectable('99');
+
+            expect(scrollIntoView).not.toHaveBeenCalled();
+        });
+
+        describe('inside a scroll area', () => {
+            let finishAccordionAnimation: () => void;
+            let scrollTopWrites: number[];
+
+            beforeEach(() => {
+                scrollTopWrites = [];
+
+                vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+                    return (
+                        this.hasAttribute('data-radix-scroll-area-viewport')
+                            ? {bottom: 500, top: 100}
+                            : {bottom: 950, top: 900}
+                    ) as DOMRect;
+                });
+
+                Object.defineProperty(Element.prototype, 'scrollTop', {
+                    configurable: true,
+                    get: () => 0,
+                    set: (value: number) => scrollTopWrites.push(value),
+                });
+
+                const accordionAnimationFinished = new Promise<void>((resolve) => {
+                    finishAccordionAnimation = resolve;
+                });
+
+                Object.defineProperty(Element.prototype, 'getAnimations', {
+                    configurable: true,
+                    value: () => [
+                        {effect: {getComputedTiming: () => ({endTime: 200})}, finished: accordionAnimationFinished},
+                        {effect: {getComputedTiming: () => ({endTime: Infinity})}, finished: new Promise(() => {})},
+                    ],
+                });
+            });
+
+            afterEach(() => {
+                delete (Element.prototype as unknown as Record<string, unknown>).scrollTop;
+                delete (Element.prototype as unknown as Record<string, unknown>).getAnimations;
+            });
+
+            const renderInScrollArea = () =>
+                render(
+                    <div data-radix-scroll-area-viewport="">
+                        <Accordion type="multiple">
+                            <WorkflowExecutionsAccordionItem
+                                execution={latestAttempt}
+                                onExecutionClick={vi.fn()}
+                                selectedExecutionId="13"
+                            >
+                                <WorkflowTaskExecutionItem taskExecution={latestAttempt} />
+                            </WorkflowExecutionsAccordionItem>
+                        </Accordion>
+                    </div>
+                );
+
+            it('scrolls only the scroll area viewport to the selected task', () => {
+                const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+
+                renderInScrollArea();
+
+                expect(scrollIntoView).not.toHaveBeenCalled();
+                expect(scrollTopWrites).toEqual([450]);
+            });
+
+            it('scrolls again once the finite animations in the viewport have finished', async () => {
+                renderInScrollArea();
+
+                expect(scrollTopWrites).toHaveLength(1);
+
+                await act(async () => {
+                    finishAccordionAnimation();
+                });
+
+                expect(scrollTopWrites).toEqual([450, 450]);
+            });
+        });
+
+        it('scrolls a task into view when it becomes selected', () => {
+            const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+
+            const {rerender} = renderSelectable('99');
+
+            rerender(
+                <Accordion type="multiple">
+                    <WorkflowExecutionsAccordionItem
+                        execution={latestAttempt}
+                        onExecutionClick={vi.fn()}
+                        selectedExecutionId="13"
+                    >
+                        <WorkflowTaskExecutionItem taskExecution={latestAttempt} />
+                    </WorkflowExecutionsAccordionItem>
+                </Accordion>
+            );
+
+            expect(scrollIntoView).toHaveBeenCalledTimes(1);
+        });
+    });
+
     it('is not expandable when the task ran once', () => {
         renderAccordionItem(vi.fn());
 
