@@ -9,7 +9,6 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
@@ -65,8 +64,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements AutomationWorkflowProjectCodeWorkflowFacade {
 
     private static final Logger log = LoggerFactory.getLogger(AutomationWorkflowProjectCodeWorkflowFacadeImpl.class);
-
-    private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
 
     private final AutomationWorkflowProjectConfigurationAdminFacade automationWorkflowProjectConfigurationAdminFacade;
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -227,8 +224,7 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
 
         Project project = projectService.getProject(automationWorkflowProjectId);
 
-        String expectedName = project.getName()
-            .substring(MARKER.length());
+        String expectedName = project.getName();
 
         if (!Objects.equals(projectDefinition.getName(), expectedName)) {
             throw new ConfigurationException(

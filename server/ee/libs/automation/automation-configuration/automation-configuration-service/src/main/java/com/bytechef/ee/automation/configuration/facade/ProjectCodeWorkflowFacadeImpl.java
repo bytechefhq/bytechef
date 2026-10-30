@@ -13,11 +13,12 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
@@ -73,9 +74,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade {
 
-    private static final String EMBEDDED_AUTOMATION_MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
+    private static final Set<ProjectOwner> EMBEDDED_PROJECT_OWNERS =
+        Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
 
     private final CacheManager cacheManager;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectFacade projectFacade;
@@ -101,9 +104,11 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService, TagService tagService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
+        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
+        ProjectOwnershipService projectOwnershipService) {
 
         this.cacheManager = cacheManager;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.projectFacade = projectFacade;
@@ -178,9 +183,12 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             return List.of();
         }
 
+        Set<Long> embeddedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            projectIds, EMBEDDED_PROJECT_OWNERS);
+
         return projectService.getProjects(projectIds)
             .stream()
-            .filter(project -> !isEmbeddedBridgeProject(project))
+            .filter(project -> !embeddedProjectIds.contains(project.getId()))
             .toList();
     }
 
@@ -487,10 +495,11 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         return codeWorkflowContainerService.getCodeWorkflowContainer(projectCodeWorkflow.getCodeWorkflowContainerId());
     }
 
-    private static boolean isEmbeddedBridgeProject(Project project) {
-        String name = project.getName();
+    private boolean isEmbeddedBridgeProject(Project project) {
+        Set<Long> embeddedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            List.of(project.getId()), EMBEDDED_PROJECT_OWNERS);
 
-        return name != null && name.startsWith(EMBEDDED_AUTOMATION_MARKER);
+        return !embeddedProjectIds.isEmpty();
     }
 
     private Project createProject(long workspaceId, ProjectDefinition projectDefinition) {

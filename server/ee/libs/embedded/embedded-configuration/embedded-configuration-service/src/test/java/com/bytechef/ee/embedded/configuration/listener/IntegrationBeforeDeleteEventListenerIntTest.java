@@ -17,6 +17,7 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationCodeWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
@@ -139,7 +140,7 @@ class IntegrationBeforeDeleteEventListenerIntTest {
 
     @EnableAutoConfiguration
     @Import({
-        IntegrationBeforeDeleteEventListener.class,
+        EmbeddedOwnerContributorConfiguration.class, IntegrationBeforeDeleteEventListener.class,
         IntegrationBeforeDeleteEventListenerIntTest.Config.IntegrationBeforeDeleteEventListenerIntTestJdbcConfiguration.class,
         LiquibaseConfiguration.class
     })

@@ -128,8 +128,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -1377,7 +1377,7 @@ class AutomationWorkflowProjectFacadeIntTest {
         ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
         ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
         ComponentConnectionFacade.class,
-        ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
+        ComponentDefinitionService.class, ConnectionDefinitionService.class,
         ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
         EmbeddedPermissionEvaluator.class, EnvironmentService.class,
         GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -1674,7 +1674,9 @@ class AutomationWorkflowProjectFacadeIntTest {
         }
 
         @Configuration
-        @Import(AutomationWorkflowProjectFacadeIntTestConfiguration.class)
+        @Import({
+            AutomationWorkflowProjectFacadeIntTestConfiguration.class, ConnectedUserServiceConfiguration.class
+        })
         static class CodeProjectLifecycleConfiguration {
 
             @Bean
