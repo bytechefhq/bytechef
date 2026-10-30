@@ -17,7 +17,6 @@ const DataTableHeader = () => {
 
     return (
         <Header
-            centerTitle
             position="main"
             right={
                 <div className="flex items-center gap-2">
