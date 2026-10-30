@@ -5,7 +5,8 @@ import {
     AUDIT_EVENTS_ROUTE,
     NON_ADMIN_USER,
     auditEventData,
-    auditEventsFilterBar,
+    auditEventsDataSearchInput,
+    auditEventsFilterButton,
     openAuditEventsPage,
     postGraphQl,
     queryAuditEvents,
@@ -23,7 +24,8 @@ test.describe('Audit Events access', () => {
         await authenticatedPage.getByRole('link', {exact: true, name: 'Audit Events'}).click();
 
         await expect(authenticatedPage).toHaveURL(new RegExp(`${AUDIT_EVENTS_ROUTE}$`));
-        await expect(auditEventsFilterBar(authenticatedPage)).toBeVisible();
+        await expect(auditEventsDataSearchInput(authenticatedPage)).toBeVisible();
+        await expect(auditEventsFilterButton(authenticatedPage)).toBeVisible();
 
         for (const columnName of ['Date', 'Principal', 'Event Type', 'Result']) {
             await expect(authenticatedPage.getByRole('columnheader', {exact: true, name: columnName})).toBeVisible();
@@ -43,7 +45,8 @@ test.describe('Audit Events access', () => {
         await nonAdminPage.goto(AUDIT_EVENTS_ROUTE);
 
         await expect(nonAdminPage.getByText('You are not authorized to access this page.')).toBeVisible();
-        await expect(auditEventsFilterBar(nonAdminPage)).toHaveCount(0);
+        await expect(auditEventsDataSearchInput(nonAdminPage)).toHaveCount(0);
+        await expect(auditEventsFilterButton(nonAdminPage)).toHaveCount(0);
         await expect(nonAdminPage.getByRole('table')).toHaveCount(0);
 
         await nonAdminContext.close();

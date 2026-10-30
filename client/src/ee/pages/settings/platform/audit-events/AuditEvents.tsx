@@ -2,21 +2,43 @@ import {Button} from '@/components/ui/button';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useAuditEventsQuery} from '@/shared/middleware/graphql';
-import {useCallback, useState} from 'react';
+import {useState} from 'react';
 
 import AuditEventDetailSheet from './components/AuditEventDetailSheet';
-import AuditEventsFilterBar from './components/AuditEventsFilterBar';
-import AuditEventsFilterTitle from './components/AuditEventsFilterTitle';
+import AuditEventsActiveFilterBadges from './components/AuditEventsActiveFilterBadges';
+import AuditEventsFilters from './components/AuditEventsFilters';
+import AuditEventsSearch from './components/AuditEventsSearch';
 import AuditEventsTable from './components/AuditEventsTable';
-import {AuditEventFiltersI, AuditEventItemType} from './types';
+import {useAuditEventFilters} from './hooks/useAuditEventFilters';
+import {AuditEventItemType} from './types';
 
 const PAGE_SIZE = 25;
 
 const AuditEvents = () => {
-    const [filters, setFilters] = useState<AuditEventFiltersI>({});
-    const [page, setPage] = useState(0);
     const [selected, setSelected] = useState<AuditEventItemType | undefined>();
     const [sheetOpen, setSheetOpen] = useState(false);
+
+    const {
+        dataSearchInput,
+        filters,
+        handleClearDataSearch,
+        handleClearDateRange,
+        handleClearEventType,
+        handleClearFromDate,
+        handleClearPrincipal,
+        handleClearToDate,
+        handleCustomFromDateChange,
+        handleCustomToDateChange,
+        handleDateRangePresetChange,
+        handleEventTypeChange,
+        handleResetFilters,
+        hasActiveFilters,
+        page,
+        principalInput,
+        setDataSearchInput,
+        setPage,
+        setPrincipalInput,
+    } = useAuditEventFilters();
 
     const {data, isError, isLoading, refetch} = useAuditEventsQuery({
         dataSearch: filters.dataSearch,
@@ -28,24 +50,51 @@ const AuditEvents = () => {
         toDate: filters.toDate,
     });
 
-    const handleFilterChange = useCallback((next: AuditEventFiltersI) => {
-        setFilters(next);
-        setPage(0);
-    }, []);
-
     const content = data?.auditEvents.content || [];
     const totalPages = data?.auditEvents.totalPages || 0;
 
     return (
-        <LayoutContainer header={<Header centerTitle position="main" title="Audit Events" />} leftSidebarOpen={false}>
+        <LayoutContainer
+            header={
+                <Header
+                    centerTitle
+                    position="main"
+                    right={
+                        <AuditEventsFilters
+                            filters={filters}
+                            hasActiveFilters={hasActiveFilters}
+                            onClearDateRange={handleClearDateRange}
+                            onCustomFromDateChange={handleCustomFromDateChange}
+                            onCustomToDateChange={handleCustomToDateChange}
+                            onDateRangePresetChange={handleDateRangePresetChange}
+                            onEventTypeChange={handleEventTypeChange}
+                            onResetFilters={handleResetFilters}
+                        />
+                    }
+                    title="Audit Events"
+                />
+            }
+            leftSidebarOpen={false}
+        >
             <div className="flex w-full flex-1 flex-col gap-4 p-6">
-                <AuditEventsFilterBar
-                    fromDate={filters.fromDate}
-                    onChange={handleFilterChange}
-                    toDate={filters.toDate}
+                <AuditEventsActiveFilterBadges
+                    filters={filters}
+                    hasActiveFilters={hasActiveFilters}
+                    onClearDataSearch={handleClearDataSearch}
+                    onClearDateRange={handleClearDateRange}
+                    onClearEventType={handleClearEventType}
+                    onClearFromDate={handleClearFromDate}
+                    onClearPrincipal={handleClearPrincipal}
+                    onClearToDate={handleClearToDate}
+                    onResetFilters={handleResetFilters}
                 />
 
-                <AuditEventsFilterTitle filterData={filters} />
+                <AuditEventsSearch
+                    dataSearch={dataSearchInput}
+                    onDataSearchChange={setDataSearchInput}
+                    onPrincipalChange={setPrincipalInput}
+                    principal={principalInput}
+                />
 
                 {isLoading && <p className="p-8 text-center text-sm text-muted-foreground">Loading…</p>}
 
