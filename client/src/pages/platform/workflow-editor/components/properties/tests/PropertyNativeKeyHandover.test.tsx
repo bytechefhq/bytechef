@@ -425,6 +425,63 @@ describe('the Dynamic switch', () => {
         expect(screen.getByRole('switch', {name: 'Text'})).toBeChecked();
     });
 
+    it.each(temporalProperties)('on an empty %s field opens an empty editor', async (controlType, inputType) => {
+        const {container} = renderEmptyTemporal(controlType);
+
+        const dynamicSwitch = screen.getByRole('switch', {name: 'Text'});
+
+        expect(dynamicSwitch).not.toBeChecked();
+
+        fireEvent.click(dynamicSwitch);
+
+        await settle();
+
+        const editorElement = container.querySelector('.ProseMirror');
+
+        expect(editorElement).not.toBeNull();
+        expect(editorElement!.textContent).toBe('');
+        expect(container.querySelector(`input[type=${inputType}]`)).toBeNull();
+        expect(screen.getByRole('switch', {name: 'Text'})).toBeChecked();
+    });
+
+    it.each(temporalProperties)(
+        'on a %s field takes the data pill picked after it is turned on',
+        async (controlType) => {
+            const {container} = renderEmptyTemporal(controlType);
+
+            fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+            await settle();
+
+            act(() => useWorkflowNodeDetailsPanelStore.getState().pillTarget?.insertPill('trigger_1.postAt'));
+
+            await waitFor(() =>
+                expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({value: '${trigger_1.postAt}'}))
+            );
+
+            expect(container.querySelector('.ProseMirror [data-id="trigger_1.postAt"]')).not.toBeNull();
+        }
+    );
+
+    it.each(temporalProperties)(
+        'turned off on a %s field brings the native input back',
+        async (controlType, inputType) => {
+            const {container} = renderEmptyTemporal(controlType);
+
+            fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+            await settle();
+
+            fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+            await settle();
+
+            expect(container.querySelector('.ProseMirror')).toBeNull();
+            expect(container.querySelector(`input[type=${inputType}]`)).not.toBeNull();
+            expect(screen.getByRole('switch', {name: 'Text'})).not.toBeChecked();
+        }
+    );
+
     it('keeps the editor when focus moves to the data pill panel, and takes the pill picked there', async () => {
         const {container} = renderSelect(enabledProperty, true);
 

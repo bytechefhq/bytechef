@@ -1080,6 +1080,7 @@ const Property = ({
                         <PropertyInput
                             deletePropertyButton={deletePropertyButton}
                             description={description}
+                            dynamicSwitch={dynamicSwitch}
                             error={hasError}
                             errorMessage={errorMessage}
                             fieldsetClassName={objectName && arrayName && 'ml-2'}

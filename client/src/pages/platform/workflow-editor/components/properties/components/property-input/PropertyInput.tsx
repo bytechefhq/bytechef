@@ -11,6 +11,7 @@ import {twMerge} from 'tailwind-merge';
 interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     deletePropertyButton?: ReactNode;
     description?: string;
+    dynamicSwitch?: ReactNode;
     error?: boolean;
     errorMessage?: string;
     expressionPrefix?: boolean;
@@ -34,6 +35,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             deletePropertyButton,
             description,
             disabled,
+            dynamicSwitch,
             error,
             errorMessage,
             expressionPrefix = false,
@@ -102,7 +104,9 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         </div>
                     )}
 
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-1">
+                        {dynamicSwitch}
+
                         {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
                             <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
                         )}
