@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.mcp.config;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpEndpoint;
 import com.bytechef.ai.mcp.server.security.web.authentication.ManagementMcpServerSecretVerifier;
 import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -31,6 +32,7 @@ import com.bytechef.platform.security.web.config.McpOAuth2ResourceServerSecurity
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
@@ -131,27 +133,34 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
 
     @Bean
     McpOAuth2ResourceServerSecurityConfigurerContributor mcpOAuth2ResourceServerSecurityConfigurerContributor(
+        ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpJwtDecoderFactory> mcpJwtDecoderFactoryProvider,
         McpResourceServerProperties mcpResourceServerProperties) {
 
         return new McpOAuth2ResourceServerSecurityConfigurerContributor(
-            mcpJwtDecoderFactoryProvider, mcpResourceServerProperties);
+            mcpEndpointProvider, mcpJwtDecoderFactoryProvider, mcpResourceServerProperties);
     }
 
     @Bean
     McpJwtSecurityConfigurerContributor mcpJwtSecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
+        ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider,
         ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider) {
 
         return new McpJwtSecurityConfigurerContributor(
-            mcpResourceServerProperties, userService, mcpServerSecretVerifierProvider,
+            mcpResourceServerProperties, userService, mcpEndpointProvider, mcpServerSecretVerifierProvider,
             selfIssuedTokenRevocationCheckerProvider);
     }
 
     @Bean
     SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker() {
         return (tokenValue, tenantId) -> false;
+    }
+
+    @Bean
+    McpEndpoint managementMcpEndpoint() {
+        return new ManagementMcpEndpoint();
     }
 
     @Bean
@@ -162,10 +171,11 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
     @Bean
     McpDiscoverySecurityConfigurerContributor mcpDiscoverySecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties,
-        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider) {
+        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider,
+        ObjectProvider<McpEndpoint> mcpEndpointProvider) {
 
         return new McpDiscoverySecurityConfigurerContributor(
-            mcpResourceServerProperties, mcpAuthenticationRequiredResolverProvider);
+            mcpResourceServerProperties, mcpAuthenticationRequiredResolverProvider, mcpEndpointProvider);
     }
 
     @Bean

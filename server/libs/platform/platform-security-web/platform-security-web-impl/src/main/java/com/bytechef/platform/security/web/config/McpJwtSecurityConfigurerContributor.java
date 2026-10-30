@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.config;
 
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
@@ -35,6 +36,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @Configuration
 public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
+    private final ObjectProvider<McpEndpoint> mcpEndpointProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider;
     private final ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider;
@@ -43,9 +45,11 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
     @SuppressFBWarnings("EI2")
     public McpJwtSecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
+        ObjectProvider<McpEndpoint> mcpEndpointProvider,
         ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider,
         ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider) {
 
+        this.mcpEndpointProvider = mcpEndpointProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpServerSecretVerifierProvider = mcpServerSecretVerifierProvider;
         this.selfIssuedTokenRevocationCheckerProvider = selfIssuedTokenRevocationCheckerProvider;
@@ -55,7 +59,10 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
-        if (mcpResourceServerProperties.getIssuers()
+        List<McpEndpoint> mcpEndpoints = mcpEndpointProvider.orderedStream()
+            .toList();
+
+        if (mcpEndpoints.isEmpty() || mcpResourceServerProperties.getIssuers()
             .isEmpty()) {
 
             return (T) new DisabledMcpOAuth2ResourceServerConfigurer();
@@ -73,6 +80,7 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
         return (T) new McpJwtSecurityConfigurer(
             new TenantAwareJwtAuthenticationFilter(
                 new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties, userService,
+                mcpEndpoints,
                 mcpServerSecretVerifierProvider.orderedStream()
                     .toList(),
                 selfIssuedTokenRevocationChecker));

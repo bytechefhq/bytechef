@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestFixtures;
 import com.bytechef.platform.oauth2.authorizationserver.domain.RegisteredClientInfo;
@@ -62,9 +61,6 @@ class RegisteredClientServiceIntTest {
 
     @Autowired
     private DataSource dataSource;
-
-    @MockitoBean
-    private McpServerService mcpServerService;
 
     @Autowired
     private RegisteredClientRepository registeredClientRepository;

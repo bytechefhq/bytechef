@@ -18,15 +18,17 @@ package com.bytechef.platform.security.web.config;
 
 import com.bytechef.platform.security.web.mcp.McpAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.McpAuthenticationRequiredResolver;
+import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAuthenticationRequiredPredicate;
 import com.bytechef.platform.security.web.mcp.oauth2.McpDiscoveryAuthenticationFilter;
+import com.bytechef.platform.security.web.mcp.oauth2.McpEndpointRequestMatcher;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataAuthenticationEntryPoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
  * @author Ivica Cardic
@@ -34,24 +36,28 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 @Configuration
 public class McpDiscoverySecurityConfigurerContributor implements SecurityConfigurerContributor {
 
-    private static final String MCP_PATH_REGEX = "^/api/(automation/.+|management(/[^/]+)?)/mcp$";
-
     private final ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider;
+    private final ObjectProvider<McpEndpoint> mcpEndpointProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
 
     @SuppressFBWarnings("EI2")
     public McpDiscoverySecurityConfigurerContributor(
         McpResourceServerProperties mcpResourceServerProperties,
-        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider) {
+        ObjectProvider<McpAuthenticationRequiredResolver> mcpAuthenticationRequiredResolverProvider,
+        ObjectProvider<McpEndpoint> mcpEndpointProvider) {
 
         this.mcpAuthenticationRequiredResolverProvider = mcpAuthenticationRequiredResolverProvider;
+        this.mcpEndpointProvider = mcpEndpointProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T getSecurityConfigurerAdapter() {
-        if (mcpResourceServerProperties.getIssuers()
+        List<McpEndpoint> mcpEndpoints = mcpEndpointProvider.orderedStream()
+            .toList();
+
+        if (mcpEndpoints.isEmpty() || mcpResourceServerProperties.getIssuers()
             .isEmpty()) {
 
             return (T) new DisabledMcpOAuth2ResourceServerConfigurer();
@@ -65,7 +71,7 @@ public class McpDiscoverySecurityConfigurerContributor implements SecurityConfig
                 .toList());
 
         McpDiscoveryAuthenticationFilter mcpDiscoveryAuthenticationFilter = new McpDiscoveryAuthenticationFilter(
-            RegexRequestMatcher.regexMatcher(MCP_PATH_REGEX), mcpAuthenticationEntryPoint,
+            new McpEndpointRequestMatcher(mcpEndpoints), mcpAuthenticationEntryPoint,
             mcpAuthenticationRequiredPredicate);
 
         return (T) new McpDiscoverySecurityConfigurer(mcpDiscoveryAuthenticationFilter, mcpAuthenticationEntryPoint);
