@@ -16,12 +16,12 @@
 
 package com.bytechef.automation.configuration.service;
 
-import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditEvent;
-import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditPublisher;
+import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditEvents;
+import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditMapper;
 import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import com.bytechef.automation.configuration.repository.WorkspaceApiKeyRepository;
+import com.bytechef.platform.audit.Audited;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,36 +33,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceApiKeyServiceImpl implements WorkspaceApiKeyService {
 
-    private final WorkspaceApiKeyAuditPublisher workspaceApiKeyAuditPublisher;
     private final WorkspaceApiKeyRepository workspaceApiKeyRepository;
 
-    public WorkspaceApiKeyServiceImpl(
-        WorkspaceApiKeyAuditPublisher workspaceApiKeyAuditPublisher,
-        WorkspaceApiKeyRepository workspaceApiKeyRepository) {
-
-        this.workspaceApiKeyAuditPublisher = workspaceApiKeyAuditPublisher;
+    public WorkspaceApiKeyServiceImpl(WorkspaceApiKeyRepository workspaceApiKeyRepository) {
         this.workspaceApiKeyRepository = workspaceApiKeyRepository;
     }
 
     @Override
+    @Audited(event = WorkspaceApiKeyAuditEvents.WORKSPACE_API_KEY_CREATED, mapper = WorkspaceApiKeyAuditMapper.class)
     public WorkspaceApiKey create(long apiKeyId, long workspaceId) {
-        WorkspaceApiKey workspaceApiKey = workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
-
-        workspaceApiKeyAuditPublisher.publish(
-            WorkspaceApiKeyAuditEvent.WORKSPACE_API_KEY_CREATED, workspaceApiKey.getId(),
-            Map.of("workspaceId", String.valueOf(workspaceId)));
-
-        return workspaceApiKey;
+        return workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
     }
 
     @Override
+    @Audited(event = WorkspaceApiKeyAuditEvents.WORKSPACE_API_KEY_DELETED, mapper = WorkspaceApiKeyAuditMapper.class)
     public void delete(long id) {
         workspaceApiKeyRepository.findById(id)
-            .ifPresent(workspaceApiKey -> {
-                workspaceApiKeyRepository.deleteById(id);
-
-                workspaceApiKeyAuditPublisher.publish(WorkspaceApiKeyAuditEvent.WORKSPACE_API_KEY_DELETED, id, null);
-            });
+            .ifPresent(workspaceApiKey -> workspaceApiKeyRepository.deleteById(id));
     }
 
     @Override
@@ -78,15 +65,9 @@ public class WorkspaceApiKeyServiceImpl implements WorkspaceApiKeyService {
     }
 
     @Override
+    @Audited(event = WorkspaceApiKeyAuditEvents.WORKSPACE_API_KEY_DELETED, mapper = WorkspaceApiKeyAuditMapper.class)
     public void deleteWorkspaceApiKey(long apiKeyId) {
         workspaceApiKeyRepository.findByApiKeyId(apiKeyId)
-            .ifPresent(workspaceApiKey -> {
-                long workspaceApiKeyId = workspaceApiKey.getId();
-
-                workspaceApiKeyRepository.deleteById(workspaceApiKeyId);
-
-                workspaceApiKeyAuditPublisher.publish(
-                    WorkspaceApiKeyAuditEvent.WORKSPACE_API_KEY_DELETED, workspaceApiKeyId, null);
-            });
+            .ifPresent(workspaceApiKey -> workspaceApiKeyRepository.deleteById(workspaceApiKey.getId()));
     }
 }

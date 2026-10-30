@@ -25,22 +25,14 @@ import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import com.bytechef.automation.configuration.repository.WorkspaceApiKeyRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.audit.AuditEvent;
-import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -49,14 +41,9 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = ProjectIntTestConfiguration.class)
-@Import({
-    PostgreSQLContainerConfiguration.class, WorkspaceApiKeyServiceIntTest.AuditEventCollectorConfiguration.class
-})
+@Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
 class WorkspaceApiKeyServiceIntTest {
-
-    @Autowired
-    private AuditEventCollector auditEventCollector;
 
     @Autowired
     private DataSource dataSource;
@@ -91,8 +78,6 @@ class WorkspaceApiKeyServiceIntTest {
             Long.class));
 
         apiKeyId = insertedApiKeyId;
-
-        auditEventCollector.clear();
     }
 
     @AfterEach
@@ -106,21 +91,18 @@ class WorkspaceApiKeyServiceIntTest {
     }
 
     @Test
-    void testCreatePublishesCreatedEventAfterCommit() {
+    void testCreate() {
         WorkspaceApiKey workspaceApiKey = workspaceApiKeyService.create(apiKeyId, workspaceId);
 
-        assertThat(auditEventCollector.getAuditEvents())
-            .singleElement()
-            .satisfies(auditEvent -> {
-                assertThat(auditEvent.getType()).isEqualTo("WORKSPACE_API_KEY_CREATED");
-                assertThat(auditEvent.getData()).containsOnly(
-                    Map.entry("workspaceApiKeyId", String.valueOf(workspaceApiKey.getId())),
-                    Map.entry("workspaceId", String.valueOf(workspaceId)));
+        assertThat(workspaceApiKeyRepository.findById(workspaceApiKey.getId()))
+            .hasValueSatisfying(savedWorkspaceApiKey -> {
+                assertThat(savedWorkspaceApiKey.getApiKeyId()).isEqualTo(apiKeyId);
+                assertThat(savedWorkspaceApiKey.getWorkspaceId()).isEqualTo(workspaceId);
             });
     }
 
     @Test
-    void testCreateInRolledBackTransactionPublishesNothing() {
+    void testCreateInRolledBackTransactionPersistsNothing() {
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(transactionStatus -> {
@@ -130,75 +112,32 @@ class WorkspaceApiKeyServiceIntTest {
         });
 
         assertThat(workspaceApiKeyRepository.findAll()).isEmpty();
-        assertThat(auditEventCollector.getAuditEvents()).isEmpty();
     }
 
     @Test
-    void testDeletePublishesDeletedEvent() {
+    void testDelete() {
         WorkspaceApiKey workspaceApiKey = workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
 
         workspaceApiKeyService.delete(workspaceApiKey.getId());
 
         assertThat(workspaceApiKeyRepository.findById(workspaceApiKey.getId())).isEmpty();
-        assertThat(auditEventCollector.getAuditEvents())
-            .singleElement()
-            .satisfies(auditEvent -> {
-                assertThat(auditEvent.getType()).isEqualTo("WORKSPACE_API_KEY_DELETED");
-                assertThat(auditEvent.getData())
-                    .containsOnly(Map.entry("workspaceApiKeyId", String.valueOf(workspaceApiKey.getId())));
-            });
     }
 
     @Test
-    void testDeleteOfMissingWorkspaceApiKeyPublishesNothing() {
+    void testDeleteOfMissingWorkspaceApiKeyIsNoOp() {
+        WorkspaceApiKey workspaceApiKey = workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
+
         workspaceApiKeyService.delete(Long.MAX_VALUE);
 
-        assertThat(auditEventCollector.getAuditEvents()).isEmpty();
+        assertThat(workspaceApiKeyRepository.findById(workspaceApiKey.getId())).isPresent();
     }
 
     @Test
-    void testDeleteWorkspaceApiKeyPublishesDeletedEventForBinding() {
+    void testDeleteWorkspaceApiKeyDeletesBinding() {
         WorkspaceApiKey workspaceApiKey = workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
 
         workspaceApiKeyService.deleteWorkspaceApiKey(apiKeyId);
 
         assertThat(workspaceApiKeyRepository.findById(workspaceApiKey.getId())).isEmpty();
-        assertThat(auditEventCollector.getAuditEvents())
-            .extracting(AuditEvent::getType)
-            .containsExactly("WORKSPACE_API_KEY_DELETED");
-    }
-
-    @Test
-    void testDeleteWorkspaceApiKeyWithoutBindingPublishesNothing() {
-        workspaceApiKeyService.deleteWorkspaceApiKey(apiKeyId);
-
-        assertThat(auditEventCollector.getAuditEvents()).isEmpty();
-    }
-
-    static class AuditEventCollector {
-
-        private final List<AuditEvent> auditEvents = new CopyOnWriteArrayList<>();
-
-        @EventListener
-        void onAuditApplicationEvent(AuditApplicationEvent auditApplicationEvent) {
-            auditEvents.add(auditApplicationEvent.getAuditEvent());
-        }
-
-        void clear() {
-            auditEvents.clear();
-        }
-
-        List<AuditEvent> getAuditEvents() {
-            return List.copyOf(auditEvents);
-        }
-    }
-
-    @TestConfiguration
-    static class AuditEventCollectorConfiguration {
-
-        @Bean
-        AuditEventCollector auditEventCollector() {
-            return new AuditEventCollector();
-        }
     }
 }

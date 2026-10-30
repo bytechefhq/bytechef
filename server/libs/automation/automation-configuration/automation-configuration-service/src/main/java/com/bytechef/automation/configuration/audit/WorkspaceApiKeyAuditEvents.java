@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.audit;
+package com.bytechef.automation.configuration.audit;
 
 /**
  * @author Ivica Cardic
  */
-public enum ApiKeyAuditEvent {
+public final class WorkspaceApiKeyAuditEvents {
 
-    API_KEY_CREATED,
+    public static final String WORKSPACE_API_KEY_CREATED = "WORKSPACE_API_KEY_CREATED";
+    public static final String WORKSPACE_API_KEY_DELETED = "WORKSPACE_API_KEY_DELETED";
 
-    API_KEY_DELETED
+    private WorkspaceApiKeyAuditEvents() {
+    }
 }

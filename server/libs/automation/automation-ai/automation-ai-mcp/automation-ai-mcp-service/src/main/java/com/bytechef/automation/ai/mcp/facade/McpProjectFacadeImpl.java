@@ -19,8 +19,8 @@ package com.bytechef.automation.ai.mcp.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvent;
-import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
+import com.bytechef.automation.ai.mcp.audit.McpProjectAuditMapper;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
@@ -38,6 +38,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
@@ -74,7 +75,6 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     private final ComponentConnectionFacade componentConnectionFacade;
     private final ConnectionService connectionService;
-    private final McpProjectAuditPublisher mcpProjectAuditPublisher;
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final McpServerService mcpServerService;
@@ -90,9 +90,9 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
         ComponentConnectionFacade componentConnectionFacade, ConnectionService connectionService,
-        McpProjectAuditPublisher mcpProjectAuditPublisher, McpProjectService mcpProjectService,
-        McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
-        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
+        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
+        McpServerService mcpServerService, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
@@ -100,7 +100,6 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
         this.componentConnectionFacade = componentConnectionFacade;
         this.connectionService = connectionService;
-        this.mcpProjectAuditPublisher = mcpProjectAuditPublisher;
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.mcpServerService = mcpServerService;
@@ -117,6 +116,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     @Override
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
         "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_CREATED, mapper = McpProjectAuditMapper.class)
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
@@ -126,6 +126,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     @Override
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
         "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_CREATED, mapper = McpProjectAuditMapper.class)
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
         List<WorkflowConfigurationDTO> workflowConfigurations) {
@@ -167,24 +168,17 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             mcpProjectWorkflowService.create(mcpProject.getId(), projectDeploymentWorkflow.getId());
         }
 
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("projectId", String.valueOf(projectId));
-
-        mcpProjectAuditPublisher.publish(McpProjectAuditEvent.MCP_PROJECT_CREATED, mcpProject.getId(), data);
-
         return mcpProject;
     }
 
     @Override
     @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_DELETED, mapper = McpProjectAuditMapper.class)
     public void deleteMcpProject(long mcpProjectId) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
 
         projectDeploymentFacade.deleteProjectDeployment(Objects.requireNonNull(mcpProject.getProjectDeploymentId()));
-
-        mcpProjectAuditPublisher.publish(McpProjectAuditEvent.MCP_PROJECT_DELETED, mcpProjectId);
     }
 
     @Override

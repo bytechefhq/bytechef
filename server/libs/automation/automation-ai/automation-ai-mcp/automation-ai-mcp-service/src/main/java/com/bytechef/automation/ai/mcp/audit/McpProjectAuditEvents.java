@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.audit;
+package com.bytechef.automation.ai.mcp.audit;
 
 /**
  * @author Ivica Cardic
  */
-public enum WorkspaceApiKeyAuditEvent {
+public final class McpProjectAuditEvents {
 
-    WORKSPACE_API_KEY_CREATED,
+    public static final String MCP_PROJECT_CREATED = "MCP_PROJECT_CREATED";
+    public static final String MCP_PROJECT_DELETED = "MCP_PROJECT_DELETED";
 
-    WORKSPACE_API_KEY_DELETED
+    private McpProjectAuditEvents() {
+    }
 }
