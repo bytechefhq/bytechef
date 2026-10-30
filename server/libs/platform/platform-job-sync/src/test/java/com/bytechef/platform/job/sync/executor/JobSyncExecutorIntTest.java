@@ -24,6 +24,7 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -78,6 +79,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -641,6 +643,34 @@ class JobSyncExecutorIntTest {
             .withMessageContaining(EXECUTOR_CLOSED_MESSAGE);
         assertThat(observedMessageBroker.awaitReceiverFailure(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, jobId))
             .hasRootCauseInstanceOf(TaskRejectedException.class);
+    }
+
+    @Test
+    void testAwaitJobWaitsWhileTheJobIsStartedWithATerminatedLastTaskExecution() throws Exception {
+        long jobId = jobSyncExecutor.startJob(new JobParametersDTO(GATE_THEN_OUTPUT_WORKFLOW_ID, Map.of()));
+
+        taskGates.awaitStarted(jobId);
+
+        TaskExecution completedTaskExecution = new TaskExecution();
+
+        completedTaskExecution.setStatus(TaskExecution.Status.COMPLETED);
+
+        doReturn(Optional.of(completedTaskExecution))
+            .when(recordingTaskExecutionService)
+            .fetchLastJobTaskExecution(jobId);
+
+        CompletableFuture<Job> awaitedJobFuture = CompletableFuture.supplyAsync(
+            () -> jobSyncExecutor.awaitJob(jobId, true));
+
+        assertThatThrownBy(() -> awaitedJobFuture.get(500, TimeUnit.MILLISECONDS))
+            .isInstanceOf(TimeoutException.class);
+
+        taskGates.release(jobId);
+
+        assertThat(awaitedJobFuture)
+            .succeedsWithin(EVENT_TIMEOUT)
+            .extracting(Job::getStatus)
+            .isEqualTo(Job.Status.COMPLETED);
     }
 
     @Test
