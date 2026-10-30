@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.userdetails.User;

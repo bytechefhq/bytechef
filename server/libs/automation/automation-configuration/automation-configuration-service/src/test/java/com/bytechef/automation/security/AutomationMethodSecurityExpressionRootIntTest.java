@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -131,10 +131,8 @@ class AutomationMethodSecurityExpressionRootIntTest {
     }
 
     @Test
-    void testConnectedUserIsDeniedUnderSkipChecks() throws Throwable {
-        authenticate(TestConnectedUserAuthentication.of("external-user"));
-
-        assertThat(callSkippingChecks(guardedOperations::connectedUserOperation)).isEqualTo(GRANTED);
+    void testNonPlatformUserIsDeniedUnderSkipChecks() throws Throwable {
+        authenticate(TestNonPlatformUserAuthentication.of("external-user"));
 
         assertThatThrownBy(() -> callSkippingChecks(() -> guardedOperations.currentUserOperation(7L)))
             .isInstanceOf(AccessDeniedException.class);
@@ -147,12 +145,12 @@ class AutomationMethodSecurityExpressionRootIntTest {
     }
 
     @Test
-    void testConnectedUserIsDeniedWithoutConsultingPermissionService() {
+    void testNonPlatformUserIsDeniedWithoutConsultingPermissionService() {
         when(permissionService.isCurrentUser(anyLong())).thenReturn(true);
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(permissionService.isResourceOwner(anyString(), anyLong())).thenReturn(true);
 
-        authenticate(TestConnectedUserAuthentication.of("external-user"));
+        authenticate(TestNonPlatformUserAuthentication.of("external-user"));
 
         assertThatThrownBy(() -> guardedOperations.currentUserOperation(7L))
             .isInstanceOf(AccessDeniedException.class);
@@ -162,47 +160,6 @@ class AutomationMethodSecurityExpressionRootIntTest {
             .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(permissionService);
-    }
-
-    @Test
-    void testIsCurrentConnectedUserMatchesOnlyTheTokensConnectedUserId() {
-        authenticate(new TestConnectedUserAuthentication("external-user", 5L, 2L, true));
-
-        assertThat(guardedOperations.currentConnectedUserOperation(5L)).isEqualTo(GRANTED);
-
-        assertThatThrownBy(() -> guardedOperations.currentConnectedUserOperation(6L))
-            .isInstanceOf(AccessDeniedException.class);
-
-        verifyNoInteractions(permissionService);
-    }
-
-    @Test
-    void testIsCurrentConnectedUserIsNotBypassedUnderSkipChecks() {
-        authenticate(new TestConnectedUserAuthentication("external-user", 5L, 2L, true));
-
-        assertThatThrownBy(() -> callSkippingChecks(() -> guardedOperations.currentConnectedUserOperation(6L)))
-            .isInstanceOf(AccessDeniedException.class);
-    }
-
-    @Test
-    void testIsCurrentConnectedUserIsFalseForAnUnauthenticatedConnectedUserOrOtherPrincipals() {
-        authenticate(new TestConnectedUserAuthentication("external-user", 5L, 2L, false));
-
-        assertThatThrownBy(() -> guardedOperations.currentConnectedUserOperation(5L))
-            .isInstanceOf(AccessDeniedException.class);
-
-        authenticate(
-            new UsernamePasswordAuthenticationToken(
-                "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
-
-        assertThatThrownBy(() -> guardedOperations.currentConnectedUserOperation(5L))
-            .isInstanceOf(AccessDeniedException.class);
-    }
-
-    @Test
-    void testIsConnectedUserIsFalseForOtherPrincipals() {
-        assertThatThrownBy(() -> guardedOperations.connectedUserOperation())
-            .isInstanceOf(AccessDeniedException.class);
     }
 
     private static void authenticate(Authentication authentication) {
@@ -244,17 +201,6 @@ class AutomationMethodSecurityExpressionRootIntTest {
         @PreAuthorize("isResourceOwner(#id, 'ApiKey')")
         @SuppressWarnings("PMD.UnusedFormalParameter")
         public String resourceOwnerOperation(long id) {
-            return grant();
-        }
-
-        @PreAuthorize("isConnectedUser()")
-        public String connectedUserOperation() {
-            return grant();
-        }
-
-        @PreAuthorize("isCurrentConnectedUser(#connectedUserId)")
-        @SuppressWarnings("PMD.UnusedFormalParameter")
-        public String currentConnectedUserOperation(long connectedUserId) {
             return grant();
         }
 
