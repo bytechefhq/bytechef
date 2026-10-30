@@ -20,13 +20,17 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowNotCopyableException;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -40,20 +44,26 @@ class ConnectedUserProjectFacadeTest {
     private static final String EXTERNAL_USER_ID = "ext-user-1";
     private static final String WORKFLOW_UUID = "7d3c1a52-9b0e-4f7a-8c61-2e5f4b9d0a13";
 
+    private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver =
+        mock(AutomationWorkflowProjectConfigurationResolver.class);
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade =
         mock(AutomationWorkflowProjectFacade.class);
+    private final ConnectedUserProjectService connectedUserProjectService = mock(ConnectedUserProjectService.class);
     private final ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager =
         mock(ConnectedUserProjectWorkflowManager.class);
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService =
         mock(ConnectedUserProjectWorkflowService.class);
+    private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
 
     private final ConnectedUserProjectFacadeImpl connectedUserProjectFacade = new ConnectedUserProjectFacadeImpl(
-        null, automationWorkflowProjectFacade, null, null, null, connectedUserProjectWorkflowManager, null,
-        connectedUserProjectWorkflowService, null, null, null, null, null, null, null, null, null, null, null, null,
-        null, null, null, null, null, projectWorkflowService, null,
-        null, workflowService, null, null);
+        automationWorkflowProjectConfigurationResolver, null, automationWorkflowProjectFacade, null,
+        connectedUserProjectService, null,
+        connectedUserProjectWorkflowManager, null, connectedUserProjectWorkflowService, null, null,
+        connectedUserService,
+        null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, projectWorkflowService, null, null, workflowService, null, null);
 
     @Test
     void testCopyWorkflowTemplateCopiesAVisualTemplate() {
@@ -66,6 +76,13 @@ class ConnectedUserProjectFacadeTest {
         when(connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(EXTERNAL_USER_ID,
             Environment.PRODUCTION))
                 .thenReturn(connectedUserProject);
+        AutomationWorkflowProjectConfiguration configuration = new AutomationWorkflowProjectConfiguration();
+
+        configuration.setEnabled(true);
+        configuration.setProjectVersion(1);
+
+        when(automationWorkflowProjectConfigurationResolver.resolveAndAssign(any(), eq(1L)))
+            .thenReturn(Optional.of(configuration));
         when(projectWorkflowService.getProjectWorkflows(1L, 1))
             .thenReturn(List.of(new ProjectWorkflow(1L, 1, "workflow-1", UUID.fromString(WORKFLOW_UUID))));
         when(workflowService.getWorkflow("workflow-1"))
