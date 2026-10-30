@@ -602,6 +602,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             SNAPSHOT_INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
         private final long jobId;
         private final Object lock = new Object();
+        private final AtomicBoolean pending = new AtomicBoolean();
         private final AtomicBoolean scheduled = new AtomicBoolean();
         private final SseStreamBridge sseStreamBridge;
         private final String tenantId;
@@ -622,17 +623,34 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         }
 
         private void requestSnapshot() {
+            pending.set(true);
+
+            scheduleSnapshot();
+        }
+
+        private void scheduleSnapshot() {
             if (!scheduled.compareAndSet(false, true)) {
                 return;
             }
 
-            delayedExecutor.execute(() -> TenantContext.runWithTenantId(tenantId, this::publishSnapshot));
+            delayedExecutor.execute(() -> TenantContext.runWithTenantId(tenantId, this::publishPendingSnapshot));
+        }
+
+        private void publishPendingSnapshot() {
+            try {
+                pending.set(false);
+
+                publishSnapshot();
+            } finally {
+                scheduled.set(false);
+
+                if (pending.get()) {
+                    scheduleSnapshot();
+                }
+            }
         }
 
         private void publishSnapshot() {
-            // Cleared before building, so an event that lands while the snapshot is built schedules a trailing one.
-            scheduled.set(false);
-
             synchronized (lock) {
                 if (closed) {
                     return;

@@ -60,6 +60,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -617,6 +618,96 @@ public class TestWorkflowExecutorTest {
         assertThat(events.stream()
             .filter(event -> "progress".equals(event.get("event")))
             .count()).isEqualTo(1);
+    }
+
+    @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void executeAsyncBuildsOneProgressSnapshotAtATime() throws Exception {
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        Job job = mock(Job.class);
+        CountDownLatch jobReleaseLatch = new CountDownLatch(1);
+        CountDownLatch firstReadEnteredLatch = new CountDownLatch(1);
+        CountDownLatch firstReadReleaseLatch = new CountDownLatch(1);
+        CountDownLatch overlappingReadLatch = new CountDownLatch(1);
+        AtomicInteger activeReads = new AtomicInteger();
+        AtomicInteger reads = new AtomicInteger();
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenAnswer(invocation -> {
+            assertThat(jobReleaseLatch.await(10, TimeUnit.SECONDS)).isTrue();
+
+            return job;
+        });
+        when(job.getId()).thenReturn(1L);
+        when(jobService.getJob(1L)).thenAnswer(invocation -> {
+            if (activeReads.incrementAndGet() > 1) {
+                overlappingReadLatch.countDown();
+            }
+
+            try {
+                if (reads.incrementAndGet() == 1) {
+                    firstReadEnteredLatch.countDown();
+
+                    assertThat(firstReadReleaseLatch.await(10, TimeUnit.SECONDS)).isTrue();
+                }
+
+                return job;
+            } finally {
+                activeReads.decrementAndGet();
+            }
+        });
+        when(jobService.getChildJobIds(1L)).thenReturn(List.of());
+        when(jobService.getJobs(List.of())).thenReturn(List.of());
+        when(taskExecutionService.getJobTaskExecutions(1L)).thenReturn(List.of());
+
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
+        ArgumentCaptor<Consumer<TaskStartedApplicationEvent>> taskStartedListenerCaptor =
+            ArgumentCaptor.forClass(Consumer.class);
+
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), taskStartedListenerCaptor.capture()))
+            .thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        SseStreamBridge mockSseStreamBridge = mock(SseStreamBridge.class);
+        CompletableFuture<?>[] futures = new CompletableFuture<?>[1];
+
+        testWorkflowExecutor.executeAsync(
+            WORKFLOW_ID, Map.of(), ENVIRONMENT_ID, key -> {}, key -> mockSseStreamBridge,
+            (key, future) -> futures[0] = future, key -> {});
+
+        Consumer<TaskStartedApplicationEvent> taskStartedListener = taskStartedListenerCaptor.getValue();
+
+        taskStartedListener.accept(new TaskStartedApplicationEvent(1L, 5L));
+
+        assertThat(firstReadEnteredLatch.await(5, TimeUnit.SECONDS)).isTrue();
+
+        taskStartedListener.accept(new TaskStartedApplicationEvent(1L, 6L));
+
+        assertThat(overlappingReadLatch.await(1500, TimeUnit.MILLISECONDS)).isFalse();
+
+        firstReadReleaseLatch.countDown();
+
+        verify(mockSseStreamBridge, timeout(5000).times(2)).onEvent(
+            argThat(event -> event instanceof Map map && "progress".equals(map.get("event"))));
+
+        assertThat(reads.get()).isEqualTo(2);
+
+        jobReleaseLatch.countDown();
+
+        futures[0].join();
     }
 
     @Test
