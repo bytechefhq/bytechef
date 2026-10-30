@@ -2328,6 +2328,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ComponentCategory"
+        deprecated:
+          description: "Whether every action of the component is deprecated, so it is no longer offered for new tasks."
+          type: "boolean"
         description:
           description: "The description."
           type: "string"

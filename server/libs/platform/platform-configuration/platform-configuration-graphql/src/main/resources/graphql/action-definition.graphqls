@@ -6,6 +6,7 @@ extend type Query {
 type ActionDefinition {
     componentName: String!
     componentVersion: Int!
+    deprecated: Boolean
     description: String
     help: Help
     name: String!
