@@ -158,6 +158,10 @@ class ArrayPropertyValidator {
         return jsonNode.isString() ? "'" + jsonNode.asString() + "'" : jsonNode.toString();
     }
 
+    private static boolean isExpressionElement(JsonNode elementJsonNode) {
+        return elementJsonNode.isString() && TypeValidator.isExpression(elementJsonNode.asString());
+    }
+
     private static boolean isFreeFormObjectArray(List<PropertyInfo> nestedPropertyInfos) {
         return nestedPropertyInfos.stream()
             .allMatch(propertyInfo -> "OBJECT".equalsIgnoreCase(propertyInfo.type()) &&
@@ -261,6 +265,11 @@ class ArrayPropertyValidator {
 
         for (int i = 0; i < valueJsonNode.size(); i++) {
             JsonNode elementJsonNode = valueJsonNode.get(i);
+
+            if (isExpressionElement(elementJsonNode)) {
+                continue;
+            }
+
             String elementPath = propertyPath + "[" + i + "]";
 
             PropertyInfo elementInfo = new PropertyInfo(
@@ -330,6 +339,10 @@ class ArrayPropertyValidator {
         JsonNode elementJsonNode, List<PropertyInfo> elementPropertyInfos, String propertyPath, int index,
         JsonNode rootParametersJsonNode, StringBuilder errors, StringBuilder warnings) {
 
+        if (isExpressionElement(elementJsonNode)) {
+            return;
+        }
+
         String elementPath = propertyPath + "[" + index + "]";
 
         if (!elementJsonNode.isObject()) {
@@ -383,6 +396,10 @@ class ArrayPropertyValidator {
         for (int i = 0; i < arrayJsonNode.size(); i++) {
             JsonNode valueJsonNode = arrayJsonNode.get(i);
 
+            if (isExpressionElement(valueJsonNode)) {
+                continue;
+            }
+
             boolean matchesAnyType = allowedTypePropertyInfos.stream()
                 .anyMatch(typeInfo -> TypeValidator.isTypeValid(valueJsonNode, typeInfo.type()));
 
@@ -401,6 +418,11 @@ class ArrayPropertyValidator {
 
         for (int i = 0; i < arrayJsonNode.size(); i++) {
             JsonNode elementJsonNode = arrayJsonNode.get(i);
+
+            if (isExpressionElement(elementJsonNode)) {
+                continue;
+            }
+
             String elementPath = propertyPath + "[" + i + "]";
 
             if (!elementJsonNode.isObject()) {
