@@ -9,29 +9,22 @@ comingSoon: true
 
 ---
 
-{/* TODO screenshot: Settings → Audit Events page - the header with the filter button on the right, a row of active filter chips, the Principal and Search data inputs, and the results table with columns Date, Principal, Event Type, Result and a per-row chevron */}
+{/* TODO screenshot: Settings → Audit Events page - the header with the Search box and the filter button on the right, a row of active filter chips, and the results table with columns Date, Principal, Event Type, Result and a per-row chevron */}
 
 ## Finding an event
 
-The filter button on the right of the page header opens the **Filter Audit Events** menu. The button is highlighted while any filter is active.
+The **Search** box on the right of the page header matches events whose principal or any recorded event data value contains the text you type, ignoring case, e.g. `admin` or `createProject`. It applies shortly after you stop typing, surrounding spaces are ignored, and `%`, `_` and `\` are matched literally. When [principals are masked](#masking-principals), Search matches event data values only.
+
+The filter button next to it opens the **Filter Audit Events** menu. The button is highlighted while any menu filter is active.
 
 | Menu group | What it does |
 |---|---|
 | **Event type** | Restrict to one event type; **All** clears it. A check mark shows the active choice. |
 | **Date** | **All time**, **Last 24 hours**, **Last 7 days**, **Last 30 days**, or **Custom range**. The presets count back from the moment you pick them. **Custom range** opens a small panel with **From** and **To** date pickers; a range starts at the beginning of the **From** day and ends at the end of the **To** day, in your local time. |
 
-**Clear all filters** at the bottom of the menu resets everything. It is disabled when no filter is active.
+**Clear all filters** at the bottom of the menu resets the menu filters and leaves the search text as it is. It is disabled when no menu filter is active.
 
-Two inputs sit below the header:
-
-| Input | What it does |
-|---|---|
-| **Principal** | Match a single actor by exact login, e.g. `admin`. A failed sign-in is recorded under the name that was typed. |
-| **Search data** | Free-text match against any recorded event data value. |
-
-Both apply shortly after you stop typing, and surrounding spaces are ignored.
-
-Each active filter appears as a chip above the inputs, e.g. **Event type: JOB_FAILED**, **Last 7 days**, **From:** / **To:** for a custom range, **Principal: admin**, or **Data: createProject**. Click the **×** on a chip to remove that filter, or **Clear all** to remove every filter. Changing a filter always returns to the first page of results. With no matches the table reads "No audit events match the current filters."
+Each active menu filter appears as a chip above the table, e.g. **Event type: JOB_FAILED**, **Last 7 days**, or **From:** / **To:** for a custom range. Click the **×** on a chip to remove that filter, or **Clear all** to remove every menu filter. The search text has no chip; clear the Search box to remove it. Changing the search or a filter always returns to the first page of results. A failed sign-in is recorded under the name that was typed, so searching that name finds it. With no matches the table reads "No audit events match the current filters."
 
 The results table lists **Date**, **Principal**, and **Event Type**. Clicking a row opens the **Audit Event Details** panel, showing the event type with its timestamp, the **Principal**, the **Event ID**, and the event's recorded **Data** as key/value pairs. When results span multiple pages, **Previous** / **Next** page through them.
 
@@ -47,7 +40,7 @@ Each entry is a row in `persistent_audit_event` plus its data map in `persistent
 - **Event date** - when it happened.
 - **Data** - a string-to-string map of whatever the emitting site chose to record, typically the affected resource's id and name. Null values are dropped rather than stored.
 
-Anything you want to filter on later has to be in the **Data** map - that is what **Search data** searches.
+Anything you want to filter on later has to be in the **Data** map - that is what **Search** matches besides the principal.
 
 ### Correlation IDs for bulk operations
 
@@ -102,4 +95,4 @@ A `retention-days` of zero or less disables the purge rather than deleting the w
 
 ## Masking principals
 
-Set `bytechef.audit.mask-principals` to `true` to mask principals when entries are read through the API, e.g. `a***@example.com`. The stored entries are unchanged, and the **Principal** filter still matches the full, unmasked value.
+Set `bytechef.audit.mask-principals` to `true` to mask principals when entries are read through the API, e.g. `a***@example.com`. The stored entries are unchanged. While masking is on, **Search** does not match principals at all, so it cannot be used to probe for logins; it matches event data values only.
