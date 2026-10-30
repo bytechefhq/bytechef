@@ -39,12 +39,12 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceWorkflowRepository;
-import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -141,9 +141,6 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     private static final long CONNECTED_USER_ID = 1L;
     private static final String NEW_CRON_EXPRESSION = "5/5 16 * * ?";
     private static final String OLD_CRON_EXPRESSION = "0/5 15 * * ?";
-
-    @Autowired
-    private ComponentConnectionFacade componentConnectionFacade;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;

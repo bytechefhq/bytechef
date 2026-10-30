@@ -304,10 +304,20 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public Optional<Long> fetchProjectIdByName(String name) {
-        return projectService.fetchProject(name, Workspace.DEFAULT_WORKSPACE_ID)
+        List<Long> projectIds = automationWorkflowProjectService.getAutomationWorkflowProjects()
+            .stream()
+            .map(AutomationWorkflowProject::getProjectId)
+            .toList();
+
+        if (projectIds.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return projectService.getProjects(projectIds)
+            .stream()
+            .filter(project -> Objects.equals(project.getName(), name))
             .map(Project::getId)
-            .filter(projectId -> automationWorkflowProjectService.fetchAutomationWorkflowProject(projectId)
-                .isPresent());
+            .findFirst();
     }
 
     @Override

@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
@@ -247,7 +248,7 @@ class ProjectCodeWorkflowFacadeDraftTest {
     void testCreateEmptyCodeWorkflowCreatesDraftWithoutPublishing() {
         ProjectService projectService = mock(ProjectService.class);
 
-        when(projectService.fetchProject("my-empty-project")).thenReturn(Optional.empty());
+        when(projectService.fetchProject(eq("my-empty-project"), anyLong())).thenReturn(Optional.empty());
 
         Project createdProject = new Project();
 
@@ -308,7 +309,7 @@ class ProjectCodeWorkflowFacadeDraftTest {
                 projectWorkflowService, workflowService, List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

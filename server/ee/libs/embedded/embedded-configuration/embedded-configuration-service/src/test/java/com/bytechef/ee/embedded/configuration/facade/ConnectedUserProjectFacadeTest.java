@@ -52,6 +52,7 @@ class ConnectedUserProjectFacadeTest {
     private final ConnectedUserProjectFacadeImpl connectedUserProjectFacade = new ConnectedUserProjectFacadeImpl(
         null, automationWorkflowProjectFacade, null, null, null, connectedUserProjectWorkflowManager, null,
         connectedUserProjectWorkflowService, null, null, null, null, null, null, null, null, null, null, null, null,
+        null,
         null, null, null, null, null, projectWorkflowService, null,
         null, workflowService, null, null);
 

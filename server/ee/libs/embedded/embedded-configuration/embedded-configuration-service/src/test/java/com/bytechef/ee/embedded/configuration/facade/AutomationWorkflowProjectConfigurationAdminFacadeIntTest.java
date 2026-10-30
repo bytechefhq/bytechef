@@ -1119,7 +1119,7 @@ class AutomationWorkflowProjectConfigurationAdminFacadeIntTest {
     }
 
     private void givenReferences(ConnectedUserWorkflowReferenceDTO... references) {
-        when(connectedUserWorkflowReferenceAdminFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceAdminFacade.getReferences(anySet(), any()))
             .thenReturn(List.of(references));
     }
 
