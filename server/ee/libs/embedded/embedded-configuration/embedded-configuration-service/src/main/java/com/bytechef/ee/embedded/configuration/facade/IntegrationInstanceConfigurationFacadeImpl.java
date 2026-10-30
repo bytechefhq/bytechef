@@ -501,7 +501,15 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
 
-        integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
+        IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                Validate.notNull(integrationInstanceConfigurationWorkflow.getId(), "id"));
+
+        IntegrationInstanceConfigurationWorkflow updatedIntegrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
+
+        integrationInstanceFacade.updateIntegrationInstanceConfigurationWorkflowTriggers(
+            previousIntegrationInstanceConfigurationWorkflow, updatedIntegrationInstanceConfigurationWorkflow);
     }
 
     private void checkIntegrationInstanceConfigurationWorkflows(

@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
@@ -191,9 +192,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             }
 
             if (enable) {
-                enableWorkflowTriggers(integrationInstanceWorkflow);
+                enableWorkflowTriggers(integrationInstanceWorkflow, integrationInstanceConfigurationWorkflow);
             } else {
-                disableWorkflowTriggers(integrationInstanceWorkflow);
+                disableWorkflowTriggers(integrationInstanceWorkflow, integrationInstanceConfigurationWorkflow);
             }
         }
     }
@@ -240,6 +241,39 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void updateIntegrationInstanceConfigurationWorkflowTriggers(
+        IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
+
+        List<IntegrationInstanceWorkflow> updatedIntegrationInstanceWorkflows = new ArrayList<>();
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : getActiveIntegrationInstanceWorkflows(
+            previousIntegrationInstanceConfigurationWorkflow)) {
+
+            try {
+                if (previousIntegrationInstanceConfigurationWorkflow.isEnabled()) {
+                    disableWorkflowTriggers(
+                        integrationInstanceWorkflow, previousIntegrationInstanceConfigurationWorkflow);
+                }
+
+                if (integrationInstanceConfigurationWorkflow.isEnabled()) {
+                    enableWorkflowTriggers(integrationInstanceWorkflow, integrationInstanceConfigurationWorkflow);
+                }
+            } catch (RuntimeException exception) {
+                restoreWorkflowTriggers(
+                    integrationInstanceWorkflow, updatedIntegrationInstanceWorkflows,
+                    previousIntegrationInstanceConfigurationWorkflow, integrationInstanceConfigurationWorkflow,
+                    exception);
+
+                throw exception;
+            }
+
+            updatedIntegrationInstanceWorkflows.add(integrationInstanceWorkflow);
+        }
+    }
+
+    @Override
     @PreAuthorize("isTenantAdmin() or isConnectedUser()")
     public void updateIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId, Map<String, Object> inputs) {
@@ -270,11 +304,17 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
     }
 
-    @SuppressWarnings("unchecked")
     private void disableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+        disableWorkflowTriggers(
+            integrationInstanceWorkflow,
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+                integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void disableWorkflowTriggers(
+        IntegrationInstanceWorkflow integrationInstanceWorkflow,
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(
@@ -300,16 +340,22 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                         (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
                     evaluator),
                 getConnectionId(
-                    integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
-                    integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(), workflowTrigger));
+                    integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfigurationWorkflow,
+                    integrationInstanceWorkflow.getIntegrationInstanceId(), workflowTrigger));
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void enableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+        enableWorkflowTriggers(
+            integrationInstanceWorkflow,
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+                integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void enableWorkflowTriggers(
+        IntegrationInstanceWorkflow integrationInstanceWorkflow,
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 
         Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
@@ -339,9 +385,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                             (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
                             (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
                         evaluator),
-                    getConnectionId(integrationInstanceConfiguration.getIntegrationId(),
-                        integrationInstanceConfiguration.getId(),
-                        integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(), workflowTrigger),
+                    getConnectionId(
+                        integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfigurationWorkflow,
+                        integrationInstanceWorkflow.getIntegrationInstanceId(), workflowTrigger),
                     getWebhookUrl(workflowExecutionId), integrationInstanceConfiguration.getEnvironmentId());
             } catch (RuntimeException exception) {
                 disableEnabledWorkflowTriggers(
@@ -377,18 +423,59 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                             (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
                         evaluator),
                     getConnectionId(
-                        integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
-                        integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(),
-                        enabledWorkflowTrigger));
+                        integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfigurationWorkflow,
+                        integrationInstanceWorkflow.getIntegrationInstanceId(), enabledWorkflowTrigger));
             } catch (RuntimeException exception) {
                 enableFailure.addSuppressed(exception);
             }
         }
     }
 
+    private List<IntegrationInstanceWorkflow> getActiveIntegrationInstanceWorkflows(
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());
+
+        if (!integrationInstanceConfiguration.isEnabled()) {
+            return List.of();
+        }
+
+        List<IntegrationInstanceWorkflow> activeIntegrationInstanceWorkflows = new ArrayList<>();
+
+        for (IntegrationInstance integrationInstance : integrationInstanceService.getIntegrationInstances(
+            integrationInstanceConfiguration.getId())) {
+
+            if (!integrationInstance.isEnabled()) {
+                continue;
+            }
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                integrationInstance.getConnectedUserId());
+
+            if (!connectedUser.isEnabled()) {
+                continue;
+            }
+
+            for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflowService
+                .getIntegrationInstanceWorkflows(integrationInstance.getId())) {
+
+                if (integrationInstanceWorkflow.isEnabled() && Objects.equals(
+                    integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId(),
+                    integrationInstanceConfigurationWorkflow.getId())) {
+
+                    activeIntegrationInstanceWorkflows.add(integrationInstanceWorkflow);
+                }
+            }
+        }
+
+        return activeIntegrationInstanceWorkflows;
+    }
+
     private Long getConnectionId(
-        long integrationId, long integrationInstanceConfigurationId, long integrationInstanceId, String workflowId,
-        WorkflowTrigger workflowTrigger) {
+        long integrationId, IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
+        long integrationInstanceId, WorkflowTrigger workflowTrigger) {
 
         Integration integration = integrationService.getIntegration(integrationId);
 
@@ -405,21 +492,25 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             .getComponentConnections(workflowTrigger)
             .stream()
             .findFirst()
-            .map(workflowConnection -> getConnectionId(
-                integrationInstanceConfigurationId, workflowId, workflowConnection.workflowNodeName(),
+            .flatMap(workflowConnection -> getConnectionId(
+                integrationInstanceConfigurationWorkflow, workflowConnection.workflowNodeName(),
                 workflowConnection.key()))
             .orElse(null);
     }
 
-    private Long getConnectionId(
-        long integrationInstanceConfigurationId, String workflowId, String workflowNodeName,
+    private static Optional<Long> getConnectionId(
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, String workflowNodeName,
         String workflowConnectionKey) {
 
-        return integrationInstanceConfigurationWorkflowService
-            .fetchIntegrationInstanceConfigurationWorkflowConnection(
-                integrationInstanceConfigurationId, workflowId, workflowNodeName, workflowConnectionKey)
-            .map(IntegrationInstanceConfigurationWorkflowConnection::getConnectionId)
-            .orElse(null);
+        return integrationInstanceConfigurationWorkflow.getConnections()
+            .stream()
+            .filter(integrationInstanceConfigurationWorkflowConnection -> Objects.equals(
+                integrationInstanceConfigurationWorkflowConnection.getWorkflowNodeName(), workflowNodeName) &&
+                Objects.equals(
+                    integrationInstanceConfigurationWorkflowConnection.getWorkflowConnectionKey(),
+                    workflowConnectionKey))
+            .findFirst()
+            .map(IntegrationInstanceConfigurationWorkflowConnection::getConnectionId);
     }
 
     private Instant getIntegrationInstanceLastExecutionDate(long integrationInstanceId) {
@@ -478,6 +569,46 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         }
 
         return integrationInstanceWorkflow.getId();
+    }
+
+    private void restoreWorkflowTriggers(
+        IntegrationInstanceWorkflow failedIntegrationInstanceWorkflow,
+        List<IntegrationInstanceWorkflow> updatedIntegrationInstanceWorkflows,
+        IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, RuntimeException exception) {
+
+        for (IntegrationInstanceWorkflow updatedIntegrationInstanceWorkflow : updatedIntegrationInstanceWorkflows) {
+            if (integrationInstanceConfigurationWorkflow.isEnabled()) {
+                try {
+                    disableWorkflowTriggers(
+                        updatedIntegrationInstanceWorkflow, integrationInstanceConfigurationWorkflow);
+                } catch (RuntimeException disableException) {
+                    exception.addSuppressed(disableException);
+                }
+            }
+
+            restorePreviousWorkflowTriggers(
+                updatedIntegrationInstanceWorkflow, previousIntegrationInstanceConfigurationWorkflow, exception);
+        }
+
+        restorePreviousWorkflowTriggers(
+            failedIntegrationInstanceWorkflow, previousIntegrationInstanceConfigurationWorkflow, exception);
+    }
+
+    private void restorePreviousWorkflowTriggers(
+        IntegrationInstanceWorkflow integrationInstanceWorkflow,
+        IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
+        RuntimeException exception) {
+
+        if (!previousIntegrationInstanceConfigurationWorkflow.isEnabled()) {
+            return;
+        }
+
+        try {
+            enableWorkflowTriggers(integrationInstanceWorkflow, previousIntegrationInstanceConfigurationWorkflow);
+        } catch (RuntimeException enableException) {
+            exception.addSuppressed(enableException);
+        }
     }
 
     private void validateCurrentPrincipalIntegrationInstanceOwnership(long integrationInstanceId) {

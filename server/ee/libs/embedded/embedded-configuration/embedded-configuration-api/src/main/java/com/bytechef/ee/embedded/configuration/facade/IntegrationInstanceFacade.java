@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceDTO;
 import java.util.Map;
 
@@ -29,6 +30,10 @@ public interface IntegrationInstanceFacade {
         long integrationInstanceId, String workflowId, boolean enable);
 
     IntegrationInstanceDTO getIntegrationInstance(long id);
+
+    void updateIntegrationInstanceConfigurationWorkflowTriggers(
+        IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);
 
     void updateIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId, Map<String, Object> inputs);

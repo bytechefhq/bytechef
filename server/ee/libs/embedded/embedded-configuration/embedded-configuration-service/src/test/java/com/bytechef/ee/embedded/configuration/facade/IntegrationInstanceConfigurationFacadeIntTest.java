@@ -10,11 +10,21 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
@@ -22,13 +32,25 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
@@ -37,23 +59,33 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -74,13 +106,43 @@ import org.springframework.security.core.userdetails.User;
         IntegrationIntTestConfiguration.class,
         IntegrationInstanceConfigurationFacadeIntTest.MethodSecurityConfiguration.class
     },
-    properties = "bytechef.workflow.repository.jdbc.enabled=true")
+    properties = {
+        "bytechef.workflow.repository.jdbc.enabled=true",
+        "bytechef.webhook-url=/webhooks/{id}"
+    })
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
 class IntegrationInstanceConfigurationFacadeIntTest {
 
+    private static final String CRON_WORKFLOW_DEFINITION = """
+        {
+            "label": "Cron Input Workflow",
+            "inputs": [
+                {"name": "cronExpression", "label": "Cron expression", "type": "string", "required": true}
+            ],
+            "triggers": [
+                {
+                    "label": "Cron",
+                    "name": "trigger_1",
+                    "type": "schedule/v1/cron",
+                    "parameters": {"expression": "${cronExpression}", "timezone": "Europe/Zagreb"}
+                }
+            ],
+            "tasks": []
+        }""";
+
+    private static final long CONNECTED_USER_ID = 1L;
+    private static final String NEW_CRON_EXPRESSION = "5/5 16 * * ?";
+    private static final String OLD_CRON_EXPRESSION = "0/5 15 * * ?";
+
+    @Autowired
+    private ComponentConnectionFacade componentConnectionFacade;
+
     @Autowired
     private ComponentDefinitionService componentDefinitionService;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private ConnectedUserService connectedUserService;
@@ -101,10 +163,40 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
 
     @Autowired
+    private IntegrationInstanceConfigurationWorkflowRepository integrationInstanceConfigurationWorkflowRepository;
+
+    @Autowired
+    private IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+
+    @Autowired
+    private IntegrationInstanceRepository integrationInstanceRepository;
+
+    @Autowired
+    private IntegrationInstanceService integrationInstanceService;
+
+    @Autowired
+    private IntegrationInstanceWorkflowRepository integrationInstanceWorkflowRepository;
+
+    @Autowired
+    private IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
+
+    @Autowired
     private IntegrationRepository integrationRepository;
 
     @Autowired
     private IntegrationService integrationService;
+
+    @Autowired
+    private IntegrationWorkflowRepository integrationWorkflowRepository;
+
+    @Autowired
+    private IntegrationWorkflowService integrationWorkflowService;
+
+    @Autowired
+    private TriggerLifecycleFacade triggerLifecycleFacade;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @BeforeEach
     void beforeEach() {
@@ -118,6 +210,10 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     void afterEach() {
         SecurityContextHolder.clearContext();
 
+        integrationInstanceWorkflowRepository.deleteAll();
+        integrationInstanceRepository.deleteAll();
+        integrationInstanceConfigurationWorkflowRepository.deleteAll();
+        integrationWorkflowRepository.deleteAll();
         integrationInstanceConfigurationRepository.deleteAll();
         integrationRepository.deleteAll();
     }
@@ -266,6 +362,174 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
     }
 
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowReschedulesEveryActiveIntegrationInstance() {
+        CronFixture cronFixture = createCronFixture(List.of());
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+            withCronExpression(getConfigurationWorkflow(cronFixture), NEW_CRON_EXPRESSION));
+
+        for (long integrationInstanceId : cronFixture.activeIntegrationInstanceIds()) {
+            InOrder inOrder = inOrder(triggerLifecycleFacade);
+
+            inOrder.verify(triggerLifecycleFacade)
+                .executeTriggerDisable(
+                    any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, integrationInstanceId)), any(),
+                    argThat(parameters -> hasExpression(parameters, OLD_CRON_EXPRESSION)), any());
+            inOrder.verify(triggerLifecycleFacade)
+                .executeTriggerEnable(
+                    any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, integrationInstanceId)), any(),
+                    argThat(parameters -> hasExpression(parameters, NEW_CRON_EXPRESSION)), any(), any(), anyLong());
+        }
+
+        verify(triggerLifecycleFacade, never()).executeTriggerDisable(
+            any(),
+            argThat(workflowExecutionId -> isFor(workflowExecutionId, cronFixture.inactiveIntegrationInstanceId())),
+            any(), any(), any());
+        verify(triggerLifecycleFacade, never()).executeTriggerEnable(
+            any(),
+            argThat(workflowExecutionId -> isFor(workflowExecutionId, cronFixture.inactiveIntegrationInstanceId())),
+            any(), any(), any(), any(), anyLong());
+
+        assertThat(getConfigurationWorkflow(cronFixture).getInputs())
+            .isEqualTo(Map.of("cronExpression", NEW_CRON_EXPRESSION));
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowWithDisabledConfigurationDoesNotTouchTriggers() {
+        CronFixture cronFixture = createCronFixture(List.of());
+
+        integrationInstanceConfigurationService.updateEnabled(cronFixture.integrationInstanceConfigurationId(), false);
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+            withCronExpression(getConfigurationWorkflow(cronFixture), NEW_CRON_EXPRESSION));
+
+        verifyNoInteractions(triggerLifecycleFacade);
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowWithStaleVersionKeepsEnabledTriggers() {
+        CronFixture cronFixture = createCronFixture(List.of());
+
+        IntegrationInstanceConfigurationWorkflow staleIntegrationInstanceConfigurationWorkflow =
+            getConfigurationWorkflow(cronFixture);
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+            withCronExpression(getConfigurationWorkflow(cronFixture), "10/5 15 * * ?"));
+
+        reset(triggerLifecycleFacade);
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+                withCronExpression(staleIntegrationInstanceConfigurationWorkflow, NEW_CRON_EXPRESSION)))
+                    .isInstanceOf(OptimisticLockingFailureException.class);
+
+        verifyNoInteractions(triggerLifecycleFacade);
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowRestoresPreviousTriggersWhenAnInstanceFailsToEnable() {
+        CronFixture cronFixture = createCronFixture(List.of());
+
+        long firstIntegrationInstanceId = cronFixture.activeIntegrationInstanceIds()
+            .getFirst();
+        long failingIntegrationInstanceId = cronFixture.activeIntegrationInstanceIds()
+            .getLast();
+
+        IllegalStateException enableFailure = new IllegalStateException("Trigger registration failed");
+
+        doThrow(enableFailure)
+            .when(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, failingIntegrationInstanceId)), any(),
+                argThat(parameters -> hasExpression(parameters, NEW_CRON_EXPRESSION)), any(), any(), anyLong());
+
+        authenticate(admin());
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+                withCronExpression(getConfigurationWorkflow(cronFixture), NEW_CRON_EXPRESSION)))
+                    .isSameAs(enableFailure);
+
+        InOrder firstInOrder = inOrder(triggerLifecycleFacade);
+
+        firstInOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, firstIntegrationInstanceId)), any(),
+                argThat(parameters -> hasExpression(parameters, NEW_CRON_EXPRESSION)), any(), any(), anyLong());
+        firstInOrder.verify(triggerLifecycleFacade)
+            .executeTriggerDisable(
+                any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, firstIntegrationInstanceId)), any(),
+                argThat(parameters -> hasExpression(parameters, NEW_CRON_EXPRESSION)), any());
+        firstInOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, firstIntegrationInstanceId)), any(),
+                argThat(parameters -> hasExpression(parameters, OLD_CRON_EXPRESSION)), any(), any(), anyLong());
+
+        verify(triggerLifecycleFacade).executeTriggerEnable(
+            any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, failingIntegrationInstanceId)), any(),
+            argThat(parameters -> hasExpression(parameters, OLD_CRON_EXPRESSION)), any(), any(), anyLong());
+
+        assertThat(getConfigurationWorkflow(cronFixture).getInputs())
+            .isEqualTo(Map.of("cronExpression", OLD_CRON_EXPRESSION));
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowDisablesTriggersWithThePreviousConnection() {
+        long oldConnectionId = 1001L;
+        long newConnectionId = 1002L;
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "schedule", 1, "trigger_1", "connection", false);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+            .thenReturn(List.of(componentConnection));
+        when(componentConnectionFacade.getComponentConnection(anyString(), anyString(), anyString()))
+            .thenReturn(componentConnection);
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("schedule");
+
+        when(connectionService.getConnection(anyLong())).thenReturn(connection);
+
+        CronFixture cronFixture = createCronFixture(
+            List.of(
+                new IntegrationInstanceConfigurationWorkflowConnection(oldConnectionId, "connection", "trigger_1")));
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow = getConfigurationWorkflow(
+            cronFixture);
+
+        integrationInstanceConfigurationWorkflow.setConnections(
+            List.of(
+                new IntegrationInstanceConfigurationWorkflowConnection(newConnectionId, "connection", "trigger_1")));
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+            integrationInstanceConfigurationWorkflow);
+
+        long integrationInstanceId = cronFixture.activeIntegrationInstanceIds()
+            .getFirst();
+
+        InOrder inOrder = inOrder(triggerLifecycleFacade);
+
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerDisable(
+                any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, integrationInstanceId)), any(),
+                any(), eq(oldConnectionId));
+        inOrder.verify(triggerLifecycleFacade)
+            .executeTriggerEnable(
+                any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, integrationInstanceId)), any(),
+                any(), eq(newConnectionId), any(), anyLong());
+    }
+
     private static Authentication admin() {
         return new UsernamePasswordAuthenticationToken(
             "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN)));
@@ -324,11 +588,15 @@ class IntegrationInstanceConfigurationFacadeIntTest {
 
         integration = integrationService.create(integration);
 
+        return createEnabledIntegrationInstanceConfiguration(integration.getId());
+    }
+
+    private long createEnabledIntegrationInstanceConfiguration(long integrationId) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setConnectionParameters(Map.of());
         integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
-        integrationInstanceConfiguration.setIntegrationId(integration.getId());
+        integrationInstanceConfiguration.setIntegrationId(integrationId);
         integrationInstanceConfiguration.setIntegrationVersion(1);
         integrationInstanceConfiguration.setName("instance-configuration-" + UUID.randomUUID());
 
@@ -370,9 +638,101 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             .build();
     }
 
+    private CronFixture createCronFixture(List<IntegrationInstanceConfigurationWorkflowConnection> connections) {
+        ConnectedUser connectedUser = new ConnectedUser();
+
+        connectedUser.setEnabled(true);
+
+        when(connectedUserService.getConnectedUser(CONNECTED_USER_ID)).thenReturn(connectedUser);
+
+        Integration integration = new Integration();
+
+        integration.setComponentName("componentName");
+        integration.setName("integration-" + UUID.randomUUID());
+
+        integration = integrationService.create(integration);
+
+        Workflow workflow = new Workflow(
+            String.valueOf(UUID.randomUUID()), CRON_WORKFLOW_DEFINITION, Workflow.Format.JSON);
+
+        when(workflowService.getWorkflow(workflow.getId())).thenReturn(workflow);
+
+        integrationWorkflowService.addWorkflow(integration.getId(), 1, workflow.getId());
+
+        long integrationInstanceConfigurationId = createEnabledIntegrationInstanceConfiguration(integration.getId());
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setConnections(connections);
+        integrationInstanceConfigurationWorkflow.setEnabled(true);
+        integrationInstanceConfigurationWorkflow.setInputs(Map.of("cronExpression", OLD_CRON_EXPRESSION));
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(workflow.getId());
+
+        integrationInstanceConfigurationWorkflow = integrationInstanceConfigurationWorkflowService.create(
+            integrationInstanceConfigurationWorkflow);
+
+        long firstIntegrationInstanceId = createIntegrationInstance(
+            integrationInstanceConfigurationId, integrationInstanceConfigurationWorkflow.getId(), true);
+        long secondIntegrationInstanceId = createIntegrationInstance(
+            integrationInstanceConfigurationId, integrationInstanceConfigurationWorkflow.getId(), true);
+        long inactiveIntegrationInstanceId = createIntegrationInstance(
+            integrationInstanceConfigurationId, integrationInstanceConfigurationWorkflow.getId(), false);
+
+        reset(triggerLifecycleFacade);
+
+        return new CronFixture(
+            integrationInstanceConfigurationId, integrationInstanceConfigurationWorkflow.getId(),
+            List.of(firstIntegrationInstanceId, secondIntegrationInstanceId), inactiveIntegrationInstanceId);
+    }
+
+    private long createIntegrationInstance(
+        long integrationInstanceConfigurationId, long integrationInstanceConfigurationWorkflowId,
+        boolean workflowEnabled) {
+
+        IntegrationInstance integrationInstance = integrationInstanceService.create(
+            CONNECTED_USER_ID, 41L, integrationInstanceConfigurationId);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow =
+            integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                integrationInstance.getId(), integrationInstanceConfigurationWorkflowId);
+
+        integrationInstanceWorkflowService.updateEnabled(integrationInstanceWorkflow.getId(), workflowEnabled);
+
+        return integrationInstance.getId();
+    }
+
+    private IntegrationInstanceConfigurationWorkflow getConfigurationWorkflow(CronFixture cronFixture) {
+        return integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+            cronFixture.integrationInstanceConfigurationWorkflowId());
+    }
+
+    private static boolean hasExpression(Map<String, ?> parameters, String expression) {
+        return parameters != null && Objects.equals(parameters.get("expression"), expression);
+    }
+
+    private static boolean isFor(WorkflowExecutionId workflowExecutionId, long integrationInstanceId) {
+        return workflowExecutionId != null && workflowExecutionId.getJobPrincipalId() == integrationInstanceId;
+    }
+
+    private static IntegrationInstanceConfigurationWorkflow withCronExpression(
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, String cronExpression) {
+
+        integrationInstanceConfigurationWorkflow.setInputs(Map.of("cronExpression", cronExpression));
+
+        return integrationInstanceConfigurationWorkflow;
+    }
+
     private static Authentication nonAdmin() {
         return new UsernamePasswordAuthenticationToken(
             "user", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER)));
+    }
+
+    private record CronFixture(
+        long integrationInstanceConfigurationId, long integrationInstanceConfigurationWorkflowId,
+        List<Long> activeIntegrationInstanceIds, long inactiveIntegrationInstanceId) {
     }
 
     @Configuration
