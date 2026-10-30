@@ -6,10 +6,6 @@ interface ClusterRootOutcomeBadgeProps {
     outcome: ClusterRootOutcomeType;
 }
 
-/**
- * Names the guardrail outcome on a cluster root card, in the box's top-left corner. Positioned absolutely, so the box
- * it sits in must be `relative`.
- */
 const ClusterRootOutcomeBadge = ({outcome}: ClusterRootOutcomeBadgeProps) => (
     <span
         className="absolute -top-3 left-3 z-10 flex items-center gap-1 rounded-full border border-amber-500 bg-surface-neutral-primary px-2 text-xs leading-5 text-amber-500 [&_svg.lucide]:size-3"

@@ -5,10 +5,6 @@ import {type WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
 
 export type ClusterRootOutcomeType = 'BLOCKED' | 'WITHHELD';
 
-/**
- * The guardrail outcome a cluster root card announces: blocked when any element, at any depth, was blocked, otherwise
- * withheld when any was withheld. Failed and redacted elements never count, the agent itself carries those.
- */
 export default function getClusterRootOutcome(
     clusterElements: ClusterElementsType | undefined,
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>
