@@ -32,6 +32,8 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class EmbeddedMcpServerApiKeyAuthenticationProvider implements AuthenticationProvider {
 
+    private static final String ANONYMOUS_PRINCIPAL_PREFIX = "mcp-anonymous:embedded:";
+
     private final ConnectedUserService connectedUserService;
     private final McpServerService mcpServerService;
 
@@ -62,7 +64,7 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
         if (!mcpServer.isAuthenticationRequired()) {
             checkEnabled(mcpServer);
 
-            return McpAnonymousAuthenticationToken.ofEmbeddedMcpServer(mcpServer.getId());
+            return McpAnonymousAuthenticationToken.of(ANONYMOUS_PRINCIPAL_PREFIX + mcpServer.getId());
         }
 
         String externalUserId = embeddedMcpServerApiKeyAuthenticationToken.getExternalUserId();

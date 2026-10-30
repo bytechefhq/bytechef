@@ -63,7 +63,7 @@ class McpAuthenticationGuardFilterTest {
         @Test
         void testMcpAnonymousAuthenticationPasses() throws Exception {
             MockFilterChain mockFilterChain =
-                filter(MCP_PATH, McpAnonymousAuthenticationToken.ofAutomationMcpServer(1L));
+                filter(MCP_PATH, McpAnonymousAuthenticationToken.of("mcp-anonymous:test:1"));
 
             assertThat(mockFilterChain.getRequest()).isNotNull();
         }

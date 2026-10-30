@@ -23,10 +23,12 @@ import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.web.McpServerPathResolver;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
@@ -48,15 +50,18 @@ public class McpServerGraphQlController {
     private static final String MASKED_SECRET_KEY = "********";
 
     private final McpServerFacade mcpServerFacade;
+    private final Map<PlatformType, McpServerPathResolver> mcpServerPathResolvers;
     private final McpServerService mcpServerService;
     private final String publicUrl;
 
     @SuppressFBWarnings("EI")
     public McpServerGraphQlController(
         ApplicationProperties applicationProperties, McpServerFacade mcpServerFacade,
-        McpServerService mcpServerService) {
+        List<McpServerPathResolver> mcpServerPathResolvers, McpServerService mcpServerService) {
 
         this.mcpServerFacade = mcpServerFacade;
+        this.mcpServerPathResolvers = mcpServerPathResolvers.stream()
+            .collect(Collectors.toMap(McpServerPathResolver::getType, Function.identity()));
         this.mcpServerService = mcpServerService;
         this.publicUrl = applicationProperties.getPublicUrl();
     }
@@ -152,11 +157,13 @@ public class McpServerGraphQlController {
     }
 
     private String buildMcpServerUrl(McpServer mcpServer, String secretKey) {
-        if (mcpServer.getType() == PlatformType.EMBEDDED) {
-            return publicUrl + "/api/embedded/" + secretKey + "/mcp";
+        McpServerPathResolver mcpServerPathResolver = mcpServerPathResolvers.get(mcpServer.getType());
+
+        if (mcpServerPathResolver == null) {
+            throw new IllegalStateException("No MCP server path resolver for type " + mcpServer.getType());
         }
 
-        return publicUrl + "/api/automation/" + secretKey + "/mcp";
+        return publicUrl + mcpServerPathResolver.resolvePath(secretKey);
     }
 
     public record TagInput(Long id, String name) {
