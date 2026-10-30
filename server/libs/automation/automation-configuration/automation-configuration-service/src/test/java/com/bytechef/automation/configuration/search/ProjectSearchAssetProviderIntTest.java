@@ -116,11 +116,11 @@ class ProjectSearchAssetProviderIntTest {
 
     @Test
     void testHidesEmbeddedOwnedProjects() {
-        long catalogProjectId = createProjectWithWorkflow(workspace);
+        long automationWorkflowProjectId = createProjectWithWorkflow(workspace);
         long connectedUserProjectId = createProjectWithWorkflow(workspace);
         long plainProjectId = createProjectWithWorkflow(workspace);
 
-        testOwnerContributors.addCatalogId(catalogProjectId);
+        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectId);
         testOwnerContributors.addConnectedUserId(connectedUserProjectId);
 
         assertThat(projectSearchAssetProvider.search("test project", 10, Set.of(workspace.getId())))

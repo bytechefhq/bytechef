@@ -157,7 +157,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public String createProjectWorkflow(long projectId, String definition, String permissionExpression) {
-        getCatalogProject(projectId);
+        getProjectOfAutomationWorkflowProject(projectId);
 
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
             projectId, StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
@@ -174,7 +174,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public void deleteProject(long projectId) {
-        getCatalogProject(projectId);
+        getProjectOfAutomationWorkflowProject(projectId);
 
         connectedUserReferenceRolloutManager.deleteReferenceDeployments(projectId);
 
@@ -212,7 +212,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow lastProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(lastWorkflowId);
 
-        Project project = getCatalogProject(lastProjectWorkflow.getProjectId());
+        Project project = getProjectOfAutomationWorkflowProject(lastProjectWorkflow.getProjectId());
 
         projectWorkflowService.fetchProjectWorkflow(project.getId(), project.getLastProjectVersion(), workflowUuid)
             .ifPresent(draftProjectWorkflow -> projectWorkflowFacade.deleteWorkflow(
@@ -227,7 +227,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         long projectId = sourceProjectWorkflow.getProjectId();
 
-        getCatalogProject(projectId);
+        getProjectOfAutomationWorkflowProject(projectId);
 
         Workflow sourceWorkflow = workflowService.getWorkflow(workflowId);
 
@@ -249,7 +249,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public long duplicateProject(long projectId) {
-        Project sourceProject = getCatalogProject(projectId);
+        Project sourceProject = getProjectOfAutomationWorkflowProject(projectId);
 
         Project newProject = new Project();
 
@@ -281,7 +281,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public List<AutomationWorkflowProjectVersionDTO> getProjectVersions(long projectId) {
-        Project project = getCatalogProject(projectId);
+        Project project = getProjectOfAutomationWorkflowProject(projectId);
 
         return project.getProjectVersions()
             .stream()
@@ -296,7 +296,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public AutomationWorkflowProjectDTO getProject(long projectId) {
-        Project project = getCatalogProject(projectId);
+        Project project = getProjectOfAutomationWorkflowProject(projectId);
 
         List<AutomationWorkflowProjectConfiguration> configurations =
             automationWorkflowProjectConfigurationService.getConfigurations(projectId);
@@ -368,7 +368,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     @Override
     public void publishProject(long projectId, @Nullable String description) {
-        Project project = getCatalogProject(projectId);
+        Project project = getProjectOfAutomationWorkflowProject(projectId);
 
         int oldProjectVersion = project.getLastProjectVersion();
 
@@ -397,7 +397,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
         String permissionExpression) {
-        Project project = getCatalogProject(projectId);
+        Project project = getProjectOfAutomationWorkflowProject(projectId);
 
         project.setName(name);
         project.setDescription(description);
@@ -418,7 +418,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        getCatalogProject(projectWorkflow.getProjectId());
+        getProjectOfAutomationWorkflowProject(projectWorkflow.getProjectId());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -437,7 +437,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
-        getCatalogProject(projectWorkflow.getProjectId());
+        getProjectOfAutomationWorkflowProject(projectWorkflow.getProjectId());
 
         automationWorkflowProjectService.updateWorkflowPermissionExpression(
             projectWorkflow.getProjectId(), projectWorkflow.getUuid(),
@@ -558,7 +558,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .collect(Collectors.toMap(AutomationWorkflowProject::getProjectId, Function.identity()));
     }
 
-    private Project getCatalogProject(long projectId) {
+    private Project getProjectOfAutomationWorkflowProject(long projectId) {
         Project project = projectService.getProject(projectId);
 
         Optional<AutomationWorkflowProject> automationWorkflowProject =

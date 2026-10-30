@@ -83,11 +83,11 @@ public class ProjectDeploymentRepositoryIntTest {
 
         @Test
         public void testEmbeddedFilterSelectsEmbeddedOwnedDeployments() {
-            Project catalogProject = projectRepository.save(getProject("Catalog"));
+            Project automationWorkflowProject = projectRepository.save(getProject("Automation Workflow Project"));
             Project connectedUserProject = projectRepository.save(getProject("ext"));
             Project project = projectRepository.save(getProject("project"));
 
-            ProjectDeployment referenceDeployment = saveProjectDeployment("ref", catalogProject);
+            ProjectDeployment referenceDeployment = saveProjectDeployment("ref", automationWorkflowProject);
             ProjectDeployment connectedUserDeployment = saveProjectDeployment("user", connectedUserProject);
 
             saveProjectDeployment("deployment", project);
@@ -158,14 +158,14 @@ public class ProjectDeploymentRepositoryIntTest {
         }
 
         @Test
-        public void testNonEmbeddedFilterExcludesPlainDeploymentsOfCatalogProjects() {
-            Project catalogProject = projectRepository.save(getProject("Catalog"));
+        public void testNonEmbeddedFilterExcludesPlainDeploymentsOfAutomationWorkflowProjects() {
+            Project automationWorkflowProject = projectRepository.save(getProject("Automation Workflow Project"));
             Project project = projectRepository.save(getProject("project"));
 
-            saveProjectDeployment("catalog", catalogProject);
+            saveProjectDeployment("automation-workflow-project", automationWorkflowProject);
             saveProjectDeployment("plain", project);
 
-            testOwnerContributors.addCatalogId(catalogProject.getId());
+            testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProject.getId());
 
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(false, null, null, null, workspace.getId()))
@@ -174,7 +174,7 @@ public class ProjectDeploymentRepositoryIntTest {
             assertThat(
                 projectDeploymentRepository.findAllProjectDeployments(null, null, null, null, workspace.getId()))
                     .extracting(ProjectDeployment::getName)
-                    .containsExactly("catalog", "plain");
+                    .containsExactly("automation-workflow-project", "plain");
         }
 
         @Test

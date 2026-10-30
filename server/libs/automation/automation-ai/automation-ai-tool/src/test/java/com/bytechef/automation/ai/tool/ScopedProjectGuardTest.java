@@ -127,7 +127,7 @@ class ScopedProjectGuardTest {
             .thenAnswer(invocation -> {
                 Set<ProjectOwner> projectOwners = invocation.getArgument(1);
 
-                return projectOwners.contains(ProjectOwner.EMBEDDED_CONNECTED_USER)
+                return projectOwners.contains(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)
                     ? Set.of(OWNED_PROJECT_ID) : Set.of();
             });
 

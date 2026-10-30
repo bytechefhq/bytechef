@@ -113,11 +113,12 @@ public class ProjectOwnershipServiceIntTest {
         long secondProjectId = saveProject("p2");
         long thirdProjectId = saveProject("p3");
 
-        testOwnerContributors.addCatalogId(firstProjectId);
+        testOwnerContributors.addAutomationWorkflowProjectId(firstProjectId);
         testOwnerContributors.addConnectedUserId(secondProjectId);
 
         String condition = projectOwnershipService.getExcludeProjectsCondition(
-            Set.of(ProjectOwner.EMBEDDED_CATALOG, ProjectOwner.EMBEDDED_CONNECTED_USER), "project.id");
+            Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT),
+            "project.id");
 
         List<Long> projectIds = jdbcClient.sql("SELECT id FROM project WHERE " + condition)
             .query(Long.class)
@@ -138,8 +139,9 @@ public class ProjectOwnershipServiceIntTest {
             jdbcClient, List.of(),
             List.of(
                 ProjectOwnerContributor.of(
-                    ProjectOwner.EMBEDDED_CATALOG, "%1$s = " + firstProjectId + " OR %1$s = " + secondProjectId),
-                ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CONNECTED_USER, "%1$s = " + thirdProjectId)));
+                    ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                    "%1$s = " + firstProjectId + " OR %1$s = " + secondProjectId),
+                ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, "%1$s = " + thirdProjectId)));
 
         List<Long> unownedProjectIds = jdbcClient
             .sql(
@@ -147,15 +149,17 @@ public class ProjectOwnershipServiceIntTest {
                     service.getExcludeProjectsCondition(EnumSet.allOf(ProjectOwner.class), "project.id"))
             .query(Long.class)
             .list();
-        List<Long> catalogOnlyUnownedProjectIds = jdbcClient
+        List<Long> automationWorkflowProjectOnlyUnownedProjectIds = jdbcClient
             .sql(
                 "SELECT id FROM project WHERE " +
-                    service.getExcludeProjectsCondition(Set.of(ProjectOwner.EMBEDDED_CATALOG), "project.id"))
+                    service.getExcludeProjectsCondition(Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT),
+                        "project.id"))
             .query(Long.class)
             .list();
 
         assertThat(unownedProjectIds).containsExactly(plainProjectId);
-        assertThat(catalogOnlyUnownedProjectIds).containsExactlyInAnyOrder(thirdProjectId, plainProjectId);
+        assertThat(automationWorkflowProjectOnlyUnownedProjectIds).containsExactlyInAnyOrder(thirdProjectId,
+            plainProjectId);
         assertThat(
             service.getOwnedProjectIds(
                 List.of(firstProjectId, secondProjectId, thirdProjectId, plainProjectId),
@@ -212,7 +216,8 @@ public class ProjectOwnershipServiceIntTest {
                 ProjectDeploymentOwnerContributor.of(
                     ProjectDeploymentOwner.MCP_SERVER, "%1$s IN (" + ownedDeploymentId + ", NULL)")),
             List.of(
-                ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_CATALOG, "%1$s IN (" + ownedProjectId + ", NULL)")));
+                ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                    "%1$s IN (" + ownedProjectId + ", NULL)")));
 
         List<Long> unownedProjectIds = jdbcClient
             .sql(
@@ -334,37 +339,37 @@ public class ProjectOwnershipServiceIntTest {
         long firstProjectId = saveProject("p1");
         long secondProjectId = saveProject("p2");
 
-        testOwnerContributors.addCatalogId(firstProjectId);
+        testOwnerContributors.addAutomationWorkflowProjectId(firstProjectId);
 
         assertThat(
             projectOwnershipService.getOwnedProjectIds(
-                List.of(firstProjectId, secondProjectId), Set.of(ProjectOwner.EMBEDDED_CATALOG)))
+                List.of(firstProjectId, secondProjectId), Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT)))
                     .isEqualTo(Set.of(firstProjectId));
     }
 
     @Test
     public void testGetOwnedProjectIdsForSeveralOwnersReturnsIdsClaimedByAny() {
-        long catalogProjectId = saveProject("p1");
+        long automationWorkflowProjectId = saveProject("p1");
         long connectedUserProjectId = saveProject("p2");
         long plainProjectId = saveProject("p3");
 
-        testOwnerContributors.addCatalogId(catalogProjectId);
+        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectId);
         testOwnerContributors.addConnectedUserId(connectedUserProjectId);
 
         assertThat(
             projectOwnershipService.getOwnedProjectIds(
-                List.of(catalogProjectId, connectedUserProjectId, plainProjectId),
+                List.of(automationWorkflowProjectId, connectedUserProjectId, plainProjectId),
                 EnumSet.allOf(ProjectOwner.class)))
-                    .isEqualTo(Set.of(catalogProjectId, connectedUserProjectId));
+                    .isEqualTo(Set.of(automationWorkflowProjectId, connectedUserProjectId));
         assertThat(
-            projectOwnershipService.getOwnedProjectIds(List.of(catalogProjectId), Set.of())).isEmpty();
+            projectOwnershipService.getOwnedProjectIds(List.of(automationWorkflowProjectId), Set.of())).isEmpty();
     }
 
     @Test
     public void testGetOwnedProjectIdsHandlesMoreIdsThanOneChunk() {
         long ownedProjectId = saveProject("p1");
 
-        testOwnerContributors.addCatalogId(ownedProjectId);
+        testOwnerContributors.addAutomationWorkflowProjectId(ownedProjectId);
 
         List<Long> projectIds = new ArrayList<>();
 
@@ -374,14 +379,16 @@ public class ProjectOwnershipServiceIntTest {
 
         projectIds.add(1500, ownedProjectId);
 
-        assertThat(projectOwnershipService.getOwnedProjectIds(projectIds, Set.of(ProjectOwner.EMBEDDED_CATALOG)))
-            .isEqualTo(Set.of(ownedProjectId));
+        assertThat(projectOwnershipService.getOwnedProjectIds(projectIds,
+            Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT)))
+                .isEqualTo(Set.of(ownedProjectId));
     }
 
     @Test
     public void testGetOwnedProjectIdsWithEmptyIdsReturnsEmpty() {
-        assertThat(projectOwnershipService.getOwnedProjectIds(List.of(), Set.of(ProjectOwner.EMBEDDED_CATALOG)))
-            .isEmpty();
+        assertThat(projectOwnershipService.getOwnedProjectIds(List.of(),
+            Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT)))
+                .isEmpty();
     }
 
     @Test
@@ -441,11 +448,12 @@ public class ProjectOwnershipServiceIntTest {
     public void testAfterSingletonsInstantiatedThrowsWhenTheEnterpriseEditionLacksEmbeddedContributors() {
         ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
             jdbcClient, List.of(deploymentOwnerContributor(ProjectDeploymentOwner.API_COLLECTION)),
-            List.of(projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)), true);
+            List.of(projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)), true);
 
         assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
             .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
-                assertThat(exception.getProjectOwners()).containsExactly(ProjectOwner.EMBEDDED_CATALOG);
+                assertThat(exception.getProjectOwners())
+                    .containsExactly(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
                 assertThat(exception.getProjectDeploymentOwners()).containsExactly(ProjectDeploymentOwner.EMBEDDED);
             });
     }
@@ -461,7 +469,8 @@ public class ProjectOwnershipServiceIntTest {
             assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
                 .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
                     assertThat(exception.getProjectOwners())
-                        .containsExactly(ProjectOwner.EMBEDDED_CATALOG, ProjectOwner.EMBEDDED_CONNECTED_USER);
+                        .containsExactly(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                            ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
                     assertThat(exception.getProjectDeploymentOwners())
                         .containsExactly(ProjectDeploymentOwner.EMBEDDED, ProjectDeploymentOwner.MCP_SERVER);
                 });
@@ -475,8 +484,8 @@ public class ProjectOwnershipServiceIntTest {
         ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
             jdbcClient, List.of(deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED)),
             List.of(
-                projectOwnerContributor(ProjectOwner.EMBEDDED_CATALOG),
-                projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)),
+                projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT),
+                projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
             true);
 
         assertThatCode(projectOwnershipServiceImpl::afterSingletonsInstantiated).doesNotThrowAnyException();
@@ -541,7 +550,8 @@ public class ProjectOwnershipServiceIntTest {
 
             assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
                 .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
-                    assertThat(exception.getProjectOwners()).containsExactly(ProjectOwner.EMBEDDED_CONNECTED_USER);
+                    assertThat(exception.getProjectOwners())
+                        .containsExactly(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
                     assertThat(exception.getProjectDeploymentOwners()).containsExactly(ProjectDeploymentOwner.EMBEDDED);
                 });
         } finally {
@@ -624,7 +634,7 @@ public class ProjectOwnershipServiceIntTest {
     public void testConstructorRejectsAContributorWhoseConditionShadowsAnIdColumnTable() {
         List<ProjectOwnerContributor> projectOwnerContributors = List.of(
             ProjectOwnerContributor.of(
-                ProjectOwner.EMBEDDED_CATALOG,
+                ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
                 "EXISTS (SELECT 1 FROM project_deployment WHERE project_deployment.project_id = %1$s)"));
 
         assertThatThrownBy(() -> new ProjectOwnershipServiceImpl(jdbcClient, List.of(), projectOwnerContributors))
@@ -658,8 +668,8 @@ public class ProjectOwnershipServiceIntTest {
                     deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED),
                     deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
                 List.of(
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CATALOG),
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
                 true);
 
             assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
@@ -685,8 +695,8 @@ public class ProjectOwnershipServiceIntTest {
                     deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED),
                     deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
                 List.of(
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CATALOG),
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
                 true);
 
             assertThatCode(projectOwnershipServiceImpl::afterSingletonsInstantiated).doesNotThrowAnyException();
@@ -706,8 +716,8 @@ public class ProjectOwnershipServiceIntTest {
                     deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED),
                     deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
                 List.of(
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CATALOG),
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER)),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
                 true)
                     .afterSingletonsInstantiated();
 

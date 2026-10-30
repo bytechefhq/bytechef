@@ -36,7 +36,7 @@ import org.springframework.ai.chat.model.ToolContext;
  */
 final class ProjectWorkspaceScope {
 
-    static final Set<ProjectOwner> HIDDEN_PROJECT_OWNERS = EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER);
+    static final Set<ProjectOwner> HIDDEN_PROJECT_OWNERS = EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
 
     static final String WORKSPACE_ID_DESCRIPTION =
         "The workspace ID. Optional when the account has exactly one workspace or the conversation is already " +

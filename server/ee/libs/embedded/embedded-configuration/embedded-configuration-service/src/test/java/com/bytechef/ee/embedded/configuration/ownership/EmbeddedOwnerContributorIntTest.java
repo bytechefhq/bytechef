@@ -224,16 +224,16 @@ class EmbeddedOwnerContributorIntTest {
     }
 
     @Test
-    void testEmbeddedCatalogProjectsAreHiddenFromWorkspaceProjects() {
-        long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Plain Catalog " + UUID.randomUUID(), "", null, List.of(), null);
+    void testEmbeddedAutomationWorkflowProjectsAreHiddenFromWorkspaceProjects() {
+        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+            "Plain Automation Workflow Project " + UUID.randomUUID(), "", null, List.of(), null);
 
         long plainProjectId = createPlainProject();
 
         assertThat(projectService.getProjects(null, null, null, null, null, null))
             .extracting(Project::getId)
             .contains(plainProjectId)
-            .doesNotContain(catalogProjectId);
+            .doesNotContain(automationWorkflowProjectId);
     }
 
     @Test
@@ -259,45 +259,46 @@ class EmbeddedOwnerContributorIntTest {
     }
 
     @Test
-    void testWorkspaceProjectIdsExcludingConnectedUserProjectsKeepCatalogProjects() {
-        long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Reachable Catalog " + UUID.randomUUID(), "", null, List.of(), null);
+    void testWorkspaceProjectIdsExcludingConnectedUserProjectsKeepAutomationWorkflowProjects() {
+        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+            "Reachable Automation Workflow Project " + UUID.randomUUID(), "", null, List.of(), null);
 
         String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
             externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
 
         connectedUserProjectFacade.publishProjectWorkflow(externalUserId, copyWorkflowUuid, "published", null);
 
-        Project catalogProject = projectService.getProject(catalogProjectId);
+        Project automationWorkflowProject = projectService.getProject(automationWorkflowProjectId);
         Project connectedUserProject = projectService.getProject(
             connectedUserProjectService.getConnectUserProject(externalUserId, Environment.PRODUCTION)
                 .getProjectId());
 
         assertThat(
             projectService.getWorkspaceProjectIds(
-                catalogProject.getWorkspaceId(), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
-                    .contains(catalogProjectId);
+                automationWorkflowProject.getWorkspaceId(), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+                    .contains(automationWorkflowProjectId);
         assertThat(
             projectService.getWorkspaceProjectIds(
-                connectedUserProject.getWorkspaceId(), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER)))
+                connectedUserProject.getWorkspaceId(), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
                     .doesNotContain(connectedUserProject.getId());
-        assertThat(projectService.getWorkspaceProjectIds(catalogProject.getWorkspaceId()))
-            .doesNotContain(catalogProjectId);
+        assertThat(projectService.getWorkspaceProjectIds(automationWorkflowProject.getWorkspaceId()))
+            .doesNotContain(automationWorkflowProjectId);
     }
 
     @Test
     void testEmbeddedFilterSelectsConnectedUserAndReferenceDeployments() {
-        long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Reference Catalog " + UUID.randomUUID(), "", null, List.of(), null);
+        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+            "Reference Automation Workflow Project " + UUID.randomUUID(), "", null, List.of(), null);
 
-        String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
-            catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
+        String automationWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
         AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, catalogProjectId);
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService,
+            automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            externalUserId, catalogWorkflowUuid, Environment.PRODUCTION);
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
 
         String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
             externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
@@ -334,17 +335,18 @@ class EmbeddedOwnerContributorIntTest {
 
     @Test
     void testOwnedProjectDeploymentIdsIncludeConnectedUserAndReferenceDeployments() {
-        long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Owned Deployments Catalog " + UUID.randomUUID(), "", null, List.of(), null);
+        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+            "Owned Deployments Automation Workflow Project " + UUID.randomUUID(), "", null, List.of(), null);
 
-        String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
-            catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
+        String automationWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
         AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, catalogProjectId);
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService,
+            automationWorkflowProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            externalUserId, catalogWorkflowUuid, Environment.PRODUCTION);
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
 
         String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
             externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
@@ -368,9 +370,9 @@ class EmbeddedOwnerContributorIntTest {
     }
 
     @Test
-    void testOwnedProjectIdsSeparateCatalogFromConnectedUserProjects() {
-        long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Owner Kinds Catalog " + UUID.randomUUID(), "", null, List.of(), null);
+    void testOwnedProjectIdsSeparateAutomationWorkflowProjectsFromConnectedUserProjects() {
+        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+            "Owner Kinds Automation Workflow Project " + UUID.randomUUID(), "", null, List.of(), null);
 
         String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
             externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
@@ -382,33 +384,36 @@ class EmbeddedOwnerContributorIntTest {
             .getProjectId();
 
         Set<Long> ownedProjectIds = projectFacade.getOwnedProjectIds(
-            List.of(catalogProjectId, connectedUserProjectId), Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER));
+            List.of(automationWorkflowProjectId, connectedUserProjectId),
+            Set.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT));
 
         assertThat(ownedProjectIds)
             .contains(connectedUserProjectId)
-            .doesNotContain(catalogProjectId);
+            .doesNotContain(automationWorkflowProjectId);
 
-        Set<Long> catalogProjectIds = projectFacade.getOwnedProjectIds(
-            List.of(catalogProjectId, connectedUserProjectId), Set.of(ProjectOwner.EMBEDDED_CATALOG));
+        Set<Long> automationWorkflowProjectIds = projectFacade.getOwnedProjectIds(
+            List.of(automationWorkflowProjectId, connectedUserProjectId),
+            Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT));
 
-        assertThat(catalogProjectIds)
-            .contains(catalogProjectId)
+        assertThat(automationWorkflowProjectIds)
+            .contains(automationWorkflowProjectId)
             .doesNotContain(connectedUserProjectId);
     }
 
     @Test
     void testStartupCheckFindsTheEmbeddedRowsInTheOwnerTables() {
-        long catalogProjectId = automationWorkflowProjectFacade.createProject(
-            "Startup Check Catalog " + UUID.randomUUID(), "", null, List.of(), null);
+        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+            "Startup Check Automation Workflow Project " + UUID.randomUUID(), "", null, List.of(), null);
 
-        String catalogWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
-            catalogProjectId, SLACK_WORKFLOW_DEFINITION, null);
+        String automationWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
+            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
         AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, catalogProjectId);
+            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService,
+            automationWorkflowProjectId);
 
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            externalUserId, catalogWorkflowUuid, Environment.PRODUCTION);
+            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
 
         String copyWorkflowUuid = connectedUserProjectFacade.createProjectWorkflow(
             externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
@@ -421,7 +426,8 @@ class EmbeddedOwnerContributorIntTest {
         assertThatThrownBy(projectOwnershipService::afterSingletonsInstantiated)
             .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
                 assertThat(exception.getProjectOwners())
-                    .containsExactly(ProjectOwner.EMBEDDED_CATALOG, ProjectOwner.EMBEDDED_CONNECTED_USER);
+                    .containsExactly(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                        ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
                 assertThat(exception.getProjectDeploymentOwners()).contains(ProjectDeploymentOwner.EMBEDDED);
             });
         assertThat(ProjectDeploymentOwner.EMBEDDED.getOwnerTables())

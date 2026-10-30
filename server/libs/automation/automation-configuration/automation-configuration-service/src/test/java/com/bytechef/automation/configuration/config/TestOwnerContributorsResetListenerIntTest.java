@@ -50,18 +50,19 @@ class TestOwnerContributorsResetListenerIntTest {
     @Test
     @Order(1)
     void testAnOwnedIdAddedByOneTest() {
-        testOwnerContributors.addCatalogId(OWNED_PROJECT_ID);
+        testOwnerContributors.addAutomationWorkflowProjectId(OWNED_PROJECT_ID);
 
-        assertThat(getExcludeCatalogProjectsCondition()).contains(String.valueOf(OWNED_PROJECT_ID));
+        assertThat(getExcludeAutomationWorkflowProjectsCondition()).contains(String.valueOf(OWNED_PROJECT_ID));
     }
 
     @Test
     @Order(2)
     void testIsGoneInTheNextTest() {
-        assertThat(getExcludeCatalogProjectsCondition()).doesNotContain(String.valueOf(OWNED_PROJECT_ID));
+        assertThat(getExcludeAutomationWorkflowProjectsCondition()).doesNotContain(String.valueOf(OWNED_PROJECT_ID));
     }
 
-    private String getExcludeCatalogProjectsCondition() {
-        return projectOwnershipService.getExcludeProjectsCondition(Set.of(ProjectOwner.EMBEDDED_CATALOG), "project.id");
+    private String getExcludeAutomationWorkflowProjectsCondition() {
+        return projectOwnershipService
+            .getExcludeProjectsCondition(Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT), "project.id");
     }
 }
