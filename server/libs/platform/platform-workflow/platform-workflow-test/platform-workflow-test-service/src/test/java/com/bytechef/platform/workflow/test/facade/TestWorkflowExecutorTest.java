@@ -548,7 +548,6 @@ public class TestWorkflowExecutorTest {
         "rawtypes", "unchecked"
     })
     void executeAsyncStreamsProgressSnapshotsBeforeResult() throws Exception {
-        // Given a workflow without triggers whose job keeps running until released
         when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
         when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
 
@@ -591,18 +590,15 @@ public class TestWorkflowExecutorTest {
             WORKFLOW_ID, Map.of(), ENVIRONMENT_ID, key -> {}, key -> mockSseStreamBridge,
             (key, future) -> futures[0] = future, key -> {});
 
-        // When a task starts, repeatedly -- the requests coalesce into a throttled snapshot
         Consumer<TaskStartedApplicationEvent> taskStartedListener = taskStartedListenerCaptor.getValue();
 
         taskStartedListener.accept(new TaskStartedApplicationEvent(1L, 5L));
         taskStartedListener.accept(new TaskStartedApplicationEvent(1L, 6L));
 
-        // Then a progress snapshot of the running job is streamed
         verify(mockSseStreamBridge, timeout(5000)).onEvent(
             argThat(event -> event instanceof Map map && "progress".equals(map.get("event")) &&
                 map.get("payload") instanceof WorkflowTestExecutionDTO));
 
-        // And once the job completes, the result is the last event -- a late snapshot never follows it
         jobReleaseLatch.countDown();
 
         futures[0].join();
