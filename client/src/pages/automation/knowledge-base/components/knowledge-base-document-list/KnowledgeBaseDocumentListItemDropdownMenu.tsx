@@ -3,7 +3,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import useKnowledgeBaseDocumentListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItemDropdownMenu';
@@ -28,8 +27,6 @@ const KnowledgeBaseDocumentListItemDropdownMenu = ({documentId}: KnowledgeBaseDo
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuSeparator />
-
                 <DropdownMenuItem
                     icon={<Trash2Icon />}
                     label="Delete"
