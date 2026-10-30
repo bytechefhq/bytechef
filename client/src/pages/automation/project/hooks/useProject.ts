@@ -247,11 +247,21 @@ export const useProject = () => {
                     newSearchParams.set('restoreExecutionPanel', 'true');
                 }
 
-                const {parentWorkflowTestExecution, setParentWorkflowTestExecution, workflowTestExecution} =
-                    useWorkflowEditorStore.getState();
+                const {
+                    parentWorkflowTestExecution,
+                    setParentWorkflowTestExecution,
+                    setParentWorkflowTestNodeStates,
+                    workflowTestExecution,
+                    workflowTestNodeStates,
+                    workflowTestNodeStatesWorkflowId,
+                } = useWorkflowEditorStore.getState();
 
                 if (!parentWorkflowTestExecution) {
                     setParentWorkflowTestExecution(workflowTestExecution);
+                    setParentWorkflowTestNodeStates({
+                        nodeStates: workflowTestNodeStates,
+                        workflowId: workflowTestNodeStatesWorkflowId,
+                    });
                 }
 
                 setShowBottomPanelOpen(false);
@@ -326,11 +336,23 @@ export const useProject = () => {
         const isReturningFromSubflow = restorePanelParam === 'true' && fromSubflowParam !== 'true';
 
         if (isReturningFromSubflow) {
-            const {parentWorkflowTestExecution, setParentWorkflowTestExecution, setWorkflowTestExecution} =
-                useWorkflowEditorStore.getState();
+            const {
+                parentWorkflowTestExecution,
+                parentWorkflowTestNodeStates,
+                resetWorkflowTestNodeStates,
+                setParentWorkflowTestExecution,
+                setParentWorkflowTestNodeStates,
+                setWorkflowTestExecution,
+            } = useWorkflowEditorStore.getState();
 
             setWorkflowTestExecution(parentWorkflowTestExecution);
             setParentWorkflowTestExecution(undefined);
+
+            resetWorkflowTestNodeStates(
+                parentWorkflowTestNodeStates?.workflowId,
+                parentWorkflowTestNodeStates?.nodeStates
+            );
+            setParentWorkflowTestNodeStates(undefined);
         } else {
             useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
         }

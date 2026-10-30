@@ -17,10 +17,12 @@ import {useProject} from '../useProject';
 
 const PROJECT_ID = 7;
 
+let mockSearchParams = new URLSearchParams('');
+
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
     useParams: () => ({projectId: String(PROJECT_ID), projectWorkflowId: '3'}),
-    useSearchParams: () => [new URLSearchParams(''), vi.fn()],
+    useSearchParams: () => [mockSearchParams, vi.fn()],
 }));
 
 vi.mock('@/shared/queries/automation/projectWorkflows.queries', async (importOriginal) => ({
@@ -90,6 +92,8 @@ function getCachedProjectWorkflows(queryClient: QueryClient) {
 
 describe('useProject', () => {
     afterEach(() => {
+        mockSearchParams = new URLSearchParams('');
+
         vi.clearAllMocks();
     });
 
@@ -103,6 +107,29 @@ describe('useProject', () => {
 
         expect(useWorkflowEditorStore.getState().workflowTestNodeStates).toEqual({});
         expect(useWorkflowEditorStore.getState().workflowTestNodeStatesWorkflowId).toBeUndefined();
+    });
+
+    it("restores the parent workflow's test run colours when returning from a subflow", () => {
+        mockSearchParams = new URLSearchParams('restoreExecutionPanel=true');
+
+        useWorkflowEditorStore.setState({
+            parentWorkflowTestExecution: {job: {priority: 0, startDate: new Date(0), status: 'COMPLETED'}},
+            parentWorkflowTestNodeStates: {
+                nodeStates: {subflow_1: {status: 'COMPLETED'}},
+                workflowId: 'workflow-b',
+            },
+            workflowTestNodeStates: {},
+            workflowTestNodeStatesWorkflowId: undefined,
+        });
+
+        renderUseProjectWithCachedWorkflows();
+
+        const {parentWorkflowTestNodeStates, workflowTestNodeStates, workflowTestNodeStatesWorkflowId} =
+            useWorkflowEditorStore.getState();
+
+        expect(workflowTestNodeStates).toEqual({subflow_1: {status: 'COMPLETED'}});
+        expect(workflowTestNodeStatesWorkflowId).toBe('workflow-b');
+        expect(parentWorkflowTestNodeStates).toBeUndefined();
     });
 
     it.each(parameterMutationHooks)(

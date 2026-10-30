@@ -16,6 +16,11 @@ export interface WorkflowTestNodeStateI {
     status: 'RUNNING' | 'COMPLETED' | 'FAILED';
 }
 
+interface ParentWorkflowTestNodeStatesI {
+    nodeStates: Record<string, WorkflowTestNodeStateI>;
+    workflowId: string | undefined;
+}
+
 export interface WorkflowEditorI {
     clusterElementsCanvasOpen: boolean;
     setClusterElementsCanvasOpen: (clusterElementsCanvasOpen: boolean) => void;
@@ -76,13 +81,19 @@ export interface WorkflowEditorI {
     parentWorkflowTestExecution?: WorkflowTestExecution;
     setParentWorkflowTestExecution: (parentWorkflowTestExecution?: WorkflowTestExecution) => void;
 
+    parentWorkflowTestNodeStates?: ParentWorkflowTestNodeStatesI;
+    setParentWorkflowTestNodeStates: (parentWorkflowTestNodeStates?: ParentWorkflowTestNodeStatesI) => void;
+
     workflowTestExecution?: WorkflowTestExecution;
     setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecution) => void;
 
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>;
     setWorkflowTestNodeState: (nodeName: string, nodeState: WorkflowTestNodeStateI) => void;
     removeWorkflowTestNodeState: (nodeName: string) => void;
-    resetWorkflowTestNodeStates: (workflowId: string | undefined) => void;
+    resetWorkflowTestNodeStates: (
+        workflowId: string | undefined,
+        workflowTestNodeStates?: Record<string, WorkflowTestNodeStateI>
+    ) => void;
     workflowTestNodeStatesWorkflowId: string | undefined;
 }
 
@@ -210,6 +221,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                     parentWorkflowTestExecution,
                 })),
 
+            parentWorkflowTestNodeStates: undefined,
+            setParentWorkflowTestNodeStates: (parentWorkflowTestNodeStates?: ParentWorkflowTestNodeStatesI) =>
+                set(() => ({
+                    parentWorkflowTestNodeStates,
+                })),
+
             workflowTestExecution: undefined,
             setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecution) =>
                 set(() => ({
@@ -229,9 +246,9 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
 
                     return {workflowTestNodeStates};
                 }),
-            resetWorkflowTestNodeStates: (workflowId) =>
+            resetWorkflowTestNodeStates: (workflowId, workflowTestNodeStates = {}) =>
                 set(() => ({
-                    workflowTestNodeStates: {},
+                    workflowTestNodeStates,
                     workflowTestNodeStatesWorkflowId: workflowId,
                 })),
 
