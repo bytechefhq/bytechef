@@ -141,15 +141,16 @@ public class JobSyncExecutor {
         long timeout, WorkflowService workflowService) {
 
         this(
-            contextService, evaluator, jobService, maxTaskExecutions, memoryMessageBroker, List.of(), List.of(),
-            List.of(), taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor,
+            contextService, evaluator, event -> {}, jobService, maxTaskExecutions, memoryMessageBroker, List.of(),
+            List.of(), List.of(), taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor,
             taskHandlerRegistry, taskFileStorage, timeout, workflowService);
     }
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        ContextService contextService, Evaluator evaluator, JobService jobService, int maxTaskExecutions,
-        MemoryMessageBroker memoryMessageBroker, List<ApplicationEventListener> coordinatorApplicationEventListeners,
+        ContextService contextService, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        JobService jobService, int maxTaskExecutions, MemoryMessageBroker memoryMessageBroker,
+        List<ApplicationEventListener> coordinatorApplicationEventListeners,
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
@@ -159,7 +160,7 @@ public class JobSyncExecutor {
 
         this.contextService = contextService;
 
-        this.coordinatorEventPublisher = createEventPublisher(memoryMessageBroker);
+        this.coordinatorEventPublisher = createEventPublisher(eventPublisher, memoryMessageBroker);
 
         this.jobFacade = new JobFacadeImpl(
             coordinatorEventPublisher, contextService, jobService, taskExecutionService, taskFileStorage,
@@ -203,9 +204,9 @@ public class JobSyncExecutor {
                     Stream.of(new StoppedJobTaskDispatcher(jobService, taskExecutionService)),
                     getTaskDispatcherResolverStream(taskDispatcherResolverFactories, taskDispatcherChain)),
                 Stream.of(
-                    new ControlTaskDispatcher(createEventPublisher(memoryMessageBroker)),
+                    new ControlTaskDispatcher(createEventPublisher(eventPublisher, memoryMessageBroker)),
                     new DefaultTaskDispatcher(
-                        createEventPublisher(memoryMessageBroker), taskDispatcherPreSendProcessors))));
+                        createEventPublisher(eventPublisher, memoryMessageBroker), taskDispatcherPreSendProcessors))));
 
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
             coordinatorEventPublisher, contextService, jobService, taskDispatcherChain, taskExecutionService,
@@ -541,9 +542,15 @@ public class JobSyncExecutor {
         coordinatorEventPublisher.publishEvent(new StopJobEvent(jobId));
     }
 
-    private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {
+    private static ApplicationEventPublisher createEventPublisher(
+        ApplicationEventPublisher eventPublisher, MessageBroker messageBroker) {
+
         return event -> {
-            MessageEvent<?> messageEvent = (MessageEvent<?>) event;
+            if (!(event instanceof MessageEvent<?> messageEvent)) {
+                eventPublisher.publishEvent(event);
+
+                return;
+            }
 
             messageEvent.putMetadata(CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
 

@@ -116,7 +116,7 @@ public class WorkflowTestConfiguration {
     @Bean
     TestWorkflowExecutor testWorkflowExecutor(
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
-        ObjectMapper objectMapper, SubflowResolver subflowResolver,
+        ApplicationEventPublisher eventPublisher, ObjectMapper objectMapper, SubflowResolver subflowResolver,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowNodeOutputFacade workflowNodeOutputFacade,
@@ -138,7 +138,7 @@ public class WorkflowTestConfiguration {
         return new TestWorkflowExecutorImpl(
             componentDefinitionService, contextService, evaluator, jobService,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, 1000, asyncMessageBroker,
+                contextService, evaluator, eventPublisher, jobService, 1000, asyncMessageBroker,
                 getApplicationEventListeners(
                     evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
                 getTaskCompletionHandlerFactories(

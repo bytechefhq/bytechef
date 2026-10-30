@@ -100,7 +100,7 @@ public class TaskDispatcherJobTestExecutor {
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, SpelEvaluator.create(), jobService, -1, asyncMessageBroker, List.of(),
+            contextService, SpelEvaluator.create(), event -> {}, jobService, -1, asyncMessageBroker, List.of(),
             taskCompletionHandlerFactoriesFunction.apply(contextService, counterService, taskExecutionService),
             List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(

@@ -112,7 +112,7 @@ public class WebhookConfiguration {
         return new WebhookWorkflowExecutorImpl(
             evaluator, eventPublisher, jobPrincipalAccessorRegistry,
             new JobSyncExecutor(
-                contextService, evaluator, jobService, -1, asyncMessageBroker,
+                contextService, evaluator, eventPublisher, jobService, -1, asyncMessageBroker,
                 getAdditionalApplicationEventListeners(
                     evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
                 getTaskCompletionHandlerFactories(
