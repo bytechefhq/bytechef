@@ -518,17 +518,18 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 }
             }));
 
-        handles.add(
-            ClusterElementCallRecorder.getInstance()
-                .addListener(
-                    jobId, (event) -> {
-                        sseStreamBridge.onEvent(
-                            Map.of(
-                                "event", getClusterElementEventName(event.type()),
-                                "payload", getClusterElementCallPayload(event)));
+        ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
 
-                        jobProgressPublisher.requestSnapshot();
-                    }));
+        handles.add(
+            clusterElementCallRecorder.addListener(
+                jobId, (event) -> {
+                    sseStreamBridge.onEvent(
+                        Map.of(
+                            "event", getClusterElementEventName(event.type()),
+                            "payload", getClusterElementCallPayload(event)));
+
+                    jobProgressPublisher.requestSnapshot();
+                }));
 
         handles.add(jobSyncExecutor.addSseStreamBridge(jobId, sseStreamBridge));
 
@@ -538,12 +539,13 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     private static Map<String, Object> getClusterElementCallPayload(ClusterElementCallEvent clusterElementCallEvent) {
         ClusterElementCall clusterElementCall = clusterElementCallEvent.call();
 
+        ClusterElementCall.Status status = clusterElementCall.status();
+
         Map<String, Object> payload = new HashMap<>();
 
         payload.put("name", clusterElementCall.workflowNodeName());
         payload.put("taskExecutionId", String.valueOf(clusterElementCallEvent.taskExecutionId()));
-        payload.put("status", clusterElementCall.status()
-            .name());
+        payload.put("status", status.name());
         payload.put("startDate", String.valueOf(clusterElementCall.startDate()));
 
         if (clusterElementCall.endDate() != null) {
