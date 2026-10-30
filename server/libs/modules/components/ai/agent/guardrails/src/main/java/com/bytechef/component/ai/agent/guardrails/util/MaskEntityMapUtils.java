@@ -70,10 +70,6 @@ public final class MaskEntityMapUtils {
         return Pattern.compile(regex.toString(), Pattern.UNICODE_CHARACTER_CLASS);
     }
 
-    /**
-     * Counts the masks {@link #applyTo} would place in the text for the given entities: every occurrence of a value,
-     * with overlapping matches counted once.
-     */
     public static int countMatches(String text, Map<String, List<String>> entities) {
         if (text == null || text.isEmpty() || entities == null || entities.isEmpty()) {
             return 0;

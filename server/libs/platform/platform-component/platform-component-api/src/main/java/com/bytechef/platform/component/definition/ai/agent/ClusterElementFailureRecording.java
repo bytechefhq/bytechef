@@ -19,8 +19,6 @@ package com.bytechef.platform.component.definition.ai.agent;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord.Status;
 
 /**
- * Records a failure on the cluster element that raised it, once per exception.
- *
  * @author Ivica Cardic
  */
 final class ClusterElementFailureRecording {

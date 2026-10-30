@@ -29,8 +29,6 @@ import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
 import reactor.core.publisher.Flux;
 
 /**
- * Records a failure raised by the wrapped advisor on the advisor's cluster element, then rethrows it unchanged.
- *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI_EXPOSE_REP2")
