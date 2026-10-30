@@ -28,6 +28,7 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.evaluator.Evaluator;
@@ -71,7 +72,7 @@ import tools.jackson.databind.ObjectMapper;
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class
+    ConnectedUserSecurity.class, JacksonConfiguration.class, LiquibaseConfiguration.class
 })
 @Configuration
 public class IntegrationIntTestConfiguration {
