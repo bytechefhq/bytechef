@@ -1,3 +1,4 @@
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {
     getCompletionContext,
     unregisterCompletionContext,
@@ -88,6 +89,8 @@ describe('PropertyCodeEditorDialogEditor', () => {
         hoisted.storeState.componentConnections = [];
         hoisted.storeState.inputParameters = undefined;
         hoisted.storeState.scriptInput = {};
+
+        useWorkflowNodeDetailsPanelStore.setState({currentNode: undefined});
     });
 
     afterEach(() => {
@@ -212,6 +215,38 @@ describe('PropertyCodeEditorDialogEditor', () => {
             await mountEditor();
 
             expect(getCompletionContext('inmemory://test')).toMatchObject({kind: 'script', language: 'javascript'});
+        });
+
+        it('registers a shell completion context with the task environment and input', async () => {
+            hoisted.storeState.scriptInput = {channel: '#general'};
+
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    componentName: 'script',
+                    label: 'Bash',
+                    name: 'script_1',
+                    parameters: {env: {API_TOKEN: 'secret', REGION: 'eu'}},
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="shell" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toEqual({
+                env: ['API_TOKEN', 'REGION'],
+                input: {channel: '#general'},
+                kind: 'shell',
+            });
+        });
+
+        it('registers a shell completion context without environment keys when the task sets none', async () => {
+            render(<PropertyCodeEditorDialogEditor language="shell" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({env: [], kind: 'shell'});
         });
 
         it('registers no context for a Java script', async () => {

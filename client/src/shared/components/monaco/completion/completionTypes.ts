@@ -92,6 +92,12 @@ export interface CodeWorkflowCompletionContextI {
     loadOptions?: OptionsLoaderType;
 }
 
+export interface ShellCompletionContextI {
+    env: string[];
+    input: Record<string, unknown>;
+    kind: 'shell';
+}
+
 export interface WorkflowDefinitionCompletionContextI {
     components: ComponentCatalogType;
     format: 'json' | 'yaml';
@@ -106,6 +112,7 @@ export type CompletionContextType =
     | ScriptCompletionContextI
     | CustomComponentCompletionContextI
     | CodeWorkflowCompletionContextI
+    | ShellCompletionContextI
     | WorkflowDefinitionCompletionContextI;
 
 export type PerformScopeType = {
