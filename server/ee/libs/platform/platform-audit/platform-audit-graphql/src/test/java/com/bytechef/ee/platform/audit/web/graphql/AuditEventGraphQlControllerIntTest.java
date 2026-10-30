@@ -209,7 +209,6 @@ public class AuditEventGraphQlControllerIntTest {
         persistentAuditEvent.setPrincipal("alice");
         persistentAuditEvent.setEventType("PERMISSION_CHECK");
 
-        // Stamped exactly as AuditAspect does it, in the JVM default zone
         persistentAuditEvent.setEventDate(LocalDateTime.now());
 
         when(auditEventFacade.fetchAuditEvents(any(), any()))
