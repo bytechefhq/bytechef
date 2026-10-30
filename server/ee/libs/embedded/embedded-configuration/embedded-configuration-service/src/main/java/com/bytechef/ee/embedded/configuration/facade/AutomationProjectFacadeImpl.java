@@ -348,11 +348,22 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public Optional<Long> fetchProjectIdByName(String name) {
-        return projectService.fetchProject(name, Workspace.DEFAULT_WORKSPACE_ID)
+        List<Long> projectIds = automationProjectService.getAutomationProjects()
+            .stream()
+            .map(AutomationProject::getProjectId)
+            .toList();
+
+        if (projectIds.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return projectService.getProjects(projectIds)
+            .stream()
+            .filter(project -> Objects.equals(project.getName(), name))
             .map(Project::getId)
-            .filter(projectId -> automationProjectService.fetchAutomationProject(projectId)
-                .isPresent());
+            .findFirst();
     }
 
     @Override
@@ -508,7 +519,6 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
 
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
-
         Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         List<AutomationProjectConfigurationReleaseDTO> releases = new ArrayList<>();

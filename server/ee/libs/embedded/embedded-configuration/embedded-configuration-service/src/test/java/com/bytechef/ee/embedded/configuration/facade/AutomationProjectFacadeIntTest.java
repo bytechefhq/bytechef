@@ -71,6 +71,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.repository.CodeWorkfl
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerServiceImpl;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
@@ -85,6 +86,9 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
+import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
@@ -131,8 +135,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -1589,7 +1593,7 @@ class AutomationProjectFacadeIntTest {
         ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
         ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
         ComponentConnectionFacade.class,
-        ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
+        ComponentDefinitionService.class, ConnectionDefinitionService.class,
         ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
         EmbeddedPermissionEvaluator.class, EnvironmentService.class,
         GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -1886,7 +1890,9 @@ class AutomationProjectFacadeIntTest {
         }
 
         @Configuration
-        @Import(AutomationProjectFacadeIntTestConfiguration.class)
+        @Import({
+            AutomationProjectFacadeIntTestConfiguration.class, ConnectedUserServiceConfiguration.class
+        })
         static class CodeProjectLifecycleConfiguration {
 
             @Bean

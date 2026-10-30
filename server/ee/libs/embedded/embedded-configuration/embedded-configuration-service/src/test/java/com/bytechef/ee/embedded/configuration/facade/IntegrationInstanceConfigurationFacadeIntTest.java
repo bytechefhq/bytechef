@@ -240,7 +240,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         when(componentDefinitionService.getComponentDefinition(anyString(), any()))
             .thenReturn(new ComponentDefinition("componentName"));
         when(connectionDefinitionService.getConnectionDefinition(anyString(), any()))
-            .thenReturn(new ConnectionDefinition(ComponentDsl.connection(), "componentName", null, null));
+            .thenReturn(new ConnectionDefinition(ComponentDsl.connection(), "componentName", "componentTitle", null));
         when(workflowService.getWorkflow(anyString()))
             .thenReturn(new Workflow("{\"tasks\":[]}", Workflow.Format.JSON));
     }
