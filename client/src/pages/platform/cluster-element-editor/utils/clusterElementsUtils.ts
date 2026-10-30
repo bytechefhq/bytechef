@@ -1,4 +1,9 @@
-import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
+import {
+    ROOT_CLUSTER_HANDLE_EDGE_BUFFER_RATIO,
+    ROOT_CLUSTER_HANDLE_STEP,
+    ROOT_CLUSTER_MIN_HANDLE_SPACING,
+    ROOT_CLUSTER_WIDTH,
+} from '@/shared/constants';
 import {ClusterElementType, ComponentDefinition, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     ClusterElementItemType,
@@ -346,11 +351,16 @@ export function calculateNodeWidth(handleCount: number): number {
     const baseWidth = ROOT_CLUSTER_WIDTH;
     const handleStep = ROOT_CLUSTER_HANDLE_STEP;
 
+    const minimumWidth =
+        handleCount > 1
+            ? ((handleCount - 1) * ROOT_CLUSTER_MIN_HANDLE_SPACING) / (1 - 2 * ROOT_CLUSTER_HANDLE_EDGE_BUFFER_RATIO)
+            : 0;
+
     if (!handleCount || handleCount <= 4) {
-        return baseWidth;
+        return Math.max(baseWidth, minimumWidth);
     }
 
-    return baseWidth + (handleCount - 4) * handleStep;
+    return Math.max(baseWidth + (handleCount - 4) * handleStep, minimumWidth);
 }
 
 interface GetHandlePositionProps {
@@ -360,7 +370,7 @@ interface GetHandlePositionProps {
 }
 
 export function getHandlePosition({handlesCount, index, nodeWidth}: GetHandlePositionProps): number {
-    const nodeEdgeBuffer = nodeWidth * 0.1;
+    const nodeEdgeBuffer = nodeWidth * ROOT_CLUSTER_HANDLE_EDGE_BUFFER_RATIO;
 
     const usableNodeWidth = nodeWidth - nodeEdgeBuffer * 2;
 

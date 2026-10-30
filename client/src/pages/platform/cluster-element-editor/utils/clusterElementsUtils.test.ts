@@ -1,4 +1,4 @@
-import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
+import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_MIN_HANDLE_SPACING, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
 import {ClusterElementsType} from '@/shared/types';
 import {describe, expect, it} from 'vitest';
 
@@ -17,12 +17,24 @@ describe('calculateNodeWidth', () => {
         expect(calculateNodeWidth(1)).toBe(ROOT_CLUSTER_WIDTH);
     });
 
-    it('should return base width for 4 handles', () => {
-        expect(calculateNodeWidth(4)).toBe(ROOT_CLUSTER_WIDTH);
+    it('should return base width for 3 handles', () => {
+        expect(calculateNodeWidth(3)).toBe(ROOT_CLUSTER_WIDTH);
     });
 
-    it('should increase width for 5 handles', () => {
-        expect(calculateNodeWidth(5)).toBe(ROOT_CLUSTER_WIDTH + ROOT_CLUSTER_HANDLE_STEP);
+    it('should widen 4 and 5 handles so adjacent handle labels do not overlap', () => {
+        expect(calculateNodeWidth(4)).toBe(360);
+        expect(calculateNodeWidth(5)).toBe(480);
+    });
+
+    it('should keep adjacent handles at least the minimum spacing apart', () => {
+        for (let handlesCount = 2; handlesCount <= 10; handlesCount++) {
+            const nodeWidth = calculateNodeWidth(handlesCount);
+
+            const firstHandlePosition = getHandlePosition({handlesCount, index: 0, nodeWidth});
+            const secondHandlePosition = getHandlePosition({handlesCount, index: 1, nodeWidth});
+
+            expect(secondHandlePosition - firstHandlePosition).toBeGreaterThanOrEqual(ROOT_CLUSTER_MIN_HANDLE_SPACING);
+        }
     });
 
     it('should increase width linearly for handles beyond 4', () => {
