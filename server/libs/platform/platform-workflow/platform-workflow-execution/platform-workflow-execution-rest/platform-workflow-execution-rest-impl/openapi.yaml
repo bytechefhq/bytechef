@@ -645,6 +645,7 @@ components:
       type: "object"
       required:
         - "children"
+        - "icons"
         - "iterations"
         - "number"
         - "numberOfElements"
@@ -657,6 +658,11 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/TaskExecution"
+        icons:
+          description: "The icons of the task executions on this page, keyed by task type. The task executions on a page carry no icon of their own."
+          type: "object"
+          additionalProperties:
+            type: "string"
         iterations:
           description: "The loop iterations or on-error branches on this page, each a list of task executions."
           type: "array"

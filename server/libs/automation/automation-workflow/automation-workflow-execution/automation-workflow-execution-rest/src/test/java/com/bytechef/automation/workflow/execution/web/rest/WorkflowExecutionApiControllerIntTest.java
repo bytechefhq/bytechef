@@ -167,7 +167,9 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(jsonPath("$.children[1].childJob.id").value(50))
             .andExpect(jsonPath("$.children[1].childJob.status").value("COMPLETED"))
             .andExpect(jsonPath("$.iterations").isArray())
-            .andExpect(jsonPath("$.iterations").isEmpty());
+            .andExpect(jsonPath("$.iterations").isEmpty())
+            .andExpect(jsonPath("$.icons['myComponent/v1/myAction']").value("<svg>myComponent</svg>"))
+            .andExpect(jsonPath("$.children[0].icon").doesNotExist());
     }
 
     @Test
@@ -188,7 +190,11 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(jsonPath("$.iterations[0][0].id").value(21))
             .andExpect(jsonPath("$.iterations[0][1].id").value(22))
             .andExpect(jsonPath("$.iterations[0][1].childCount").value(4))
-            .andExpect(jsonPath("$.iterations[1][0].id").value(23));
+            .andExpect(jsonPath("$.iterations[1][0].id").value(23))
+            .andExpect(jsonPath("$.icons.length()").value(1))
+            .andExpect(jsonPath("$.icons['myComponent/v1/myAction']").value("<svg>myComponent</svg>"))
+            .andExpect(jsonPath("$.iterations[0][0].icon").doesNotExist())
+            .andExpect(jsonPath("$.iterations[1][0].icon").doesNotExist());
     }
 
     @Test
@@ -221,7 +227,9 @@ class WorkflowExecutionApiControllerIntTest {
 
     private static TaskExecutionDTO createTaskExecutionDTO(long id, int childCount, @Nullable JobDTO childJob) {
         return new TaskExecutionDTO(
-            null, null, null, null, 0, null, id, null, 5L, null, null, 0, null, 9L, 0, 0, 0, null, 0, 0, null,
+            null, null, null, null, 0, "<svg>myComponent</svg>", id, null, 5L, null, null, 0, null, 9L, 0, 0, 0, null,
+            0, 0,
+            null,
             TaskExecution.Status.COMPLETED, 0, "Title", "myComponent/v1/myAction", null, List.of(), List.of(),
             childJob, childCount, List.of());
     }
