@@ -10,6 +10,7 @@ import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getLegacyEmbeddedWorkflowBuilderUrl} from '@/shared/util/legacyEmbeddedWorkflowBuilderUrl';
+import {registerStaleChunkReload} from '@/shared/util/reloadOnStaleChunk';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import {StrictMode} from 'react';
@@ -17,6 +18,8 @@ import {RouterProvider} from 'react-router-dom';
 
 import {initUserGuiding} from './hooks/useUserGuiding';
 import {getRouter as getMainRouter} from './routes';
+
+registerStaleChunkReload();
 
 const legacyEmbeddedWorkflowBuilderUrl = getLegacyEmbeddedWorkflowBuilderUrl(window.location);
 
