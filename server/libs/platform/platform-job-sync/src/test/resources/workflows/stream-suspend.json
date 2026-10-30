@@ -1,0 +1,7 @@
+{
+  "label": "Stream Suspend",
+  "tasks": [ {
+    "name": "stream",
+    "type": "test/v1/streamSuspend"
+  } ]
+}

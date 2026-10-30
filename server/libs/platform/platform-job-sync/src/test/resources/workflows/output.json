@@ -1,0 +1,14 @@
+{
+  "label": "Output",
+  "outputs": [ {
+    "name": "greeting",
+    "value": "${greeting}"
+  } ],
+  "tasks": [ {
+    "name": "greeting",
+    "type": "test/v1/output",
+    "parameters": {
+      "value": "hello"
+    }
+  } ]
+}

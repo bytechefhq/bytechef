@@ -1,0 +1,13 @@
+{
+  "label": "Gate Then Output",
+  "tasks": [ {
+    "name": "gate",
+    "type": "test/v1/gate"
+  }, {
+    "name": "greeting",
+    "type": "test/v1/output",
+    "parameters": {
+      "value": "hello"
+    }
+  } ]
+}
