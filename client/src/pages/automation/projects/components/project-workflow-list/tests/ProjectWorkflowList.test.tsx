@@ -115,6 +115,15 @@ describe('ProjectWorkflowList', () => {
         expect(screen.queryByRole('heading', {name: 'Workflows'})).not.toBeInTheDocument();
     });
 
+    it('should name the workflow creation menu button of an empty project', () => {
+        renderProjectWorkflowList();
+
+        expect(screen.getByRole('button', {name: 'More Workflow Creation Actions'})).toHaveAttribute(
+            'aria-haspopup',
+            'menu'
+        );
+    });
+
     it('should render with the design-system DropdownMenu', async () => {
         await openMenu();
 
