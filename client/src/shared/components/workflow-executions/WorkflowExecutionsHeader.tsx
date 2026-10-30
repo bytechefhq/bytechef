@@ -1,4 +1,8 @@
 import Badge from '@/components/Badge/Badge';
+import {
+    formatExecutionDuration,
+    useExecutionDuration,
+} from '@/shared/components/workflow-executions/hooks/useExecutionDuration';
 import {countTaskExecutions} from '@/shared/components/workflow-executions/util/countTaskExecutions';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
@@ -18,16 +22,13 @@ const WorkflowExecutionsHeader = ({
     taskExecutionCount,
     triggerExecution,
 }: WorkflowExecutionsHeaderProps) => {
-    const startTime = job?.startDate?.getTime();
-    const endTime = job?.endDate?.getTime();
-
     const workflowStatus = getWorkflowStatusType(job, triggerExecution);
 
-    let duration = 0;
-
-    if (startTime && endTime) {
-        duration = Math.round(endTime - startTime);
-    }
+    const duration = useExecutionDuration({
+        endDate: job?.endDate,
+        running: workflowStatus === 'running',
+        startDate: job?.startDate,
+    });
 
     const taskExecutionsCount = taskExecutionCount ?? countTaskExecutions(job?.taskExecutions || []);
 
@@ -76,7 +77,7 @@ const WorkflowExecutionsHeader = ({
                         `${job?.startDate?.toLocaleDateString()} ${job?.startDate?.toLocaleTimeString()}`}
                 </span>
 
-                <span>Duration: {duration}ms</span>
+                <span>Duration: {formatExecutionDuration(duration)}</span>
 
                 <span>{`${taskExecutionsCount} task${taskExecutionsCount > 1 ? 's' : ''} executed`}</span>
             </div>

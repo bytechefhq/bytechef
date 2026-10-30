@@ -1,6 +1,6 @@
 import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
-import {render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it} from 'vitest';
+import {act, render, screen} from '@/shared/util/test-utils';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowTaskExecutionItem from '../WorkflowTaskExecutionItem';
 
@@ -132,16 +132,44 @@ describe('WorkflowTaskExecutionItem', () => {
             expect(screen.getByText('5000ms')).toBeInTheDocument();
         });
 
-        it('should display 0ms when end date is not available', () => {
-            const taskExecution = createTaskExecution({
-                endDate: undefined,
-                startDate: new Date('2024-01-01T10:00:00'),
-                status: 'STARTED',
+        describe('while running', () => {
+            afterEach(() => {
+                vi.useRealTimers();
             });
 
-            render(<WorkflowTaskExecutionItem taskExecution={taskExecution} />);
+            it('should display the elapsed time of a started task and keep it ticking', () => {
+                vi.useFakeTimers({toFake: ['Date', 'setInterval', 'clearInterval']});
+                vi.setSystemTime(new Date('2024-01-01T10:00:01.500'));
 
-            expect(screen.getByText('0ms')).toBeInTheDocument();
+                const taskExecution = createTaskExecution({
+                    endDate: undefined,
+                    startDate: new Date('2024-01-01T10:00:00'),
+                    status: 'STARTED',
+                });
+
+                render(<WorkflowTaskExecutionItem jobEnded={false} taskExecution={taskExecution} />);
+
+                expect(screen.getByText('1500ms')).toBeInTheDocument();
+
+                act(() => {
+                    vi.advanceTimersByTime(1000);
+                });
+
+                expect(screen.getByText('2500ms')).toBeInTheDocument();
+            });
+        });
+
+        it('should display a dash for a task that has not started', () => {
+            const taskExecution = createTaskExecution({
+                endDate: undefined,
+                startDate: undefined,
+                status: 'CREATED',
+            });
+
+            render(<WorkflowTaskExecutionItem jobEnded={false} taskExecution={taskExecution} />);
+
+            expect(screen.getByText('-')).toBeInTheDocument();
+            expect(screen.queryByText('0ms')).not.toBeInTheDocument();
         });
     });
 

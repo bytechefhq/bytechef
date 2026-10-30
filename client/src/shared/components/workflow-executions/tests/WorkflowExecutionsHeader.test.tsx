@@ -1,6 +1,6 @@
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
-import {render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {act, render, screen} from '@/shared/util/test-utils';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionsHeader from '../WorkflowExecutionsHeader';
 import {countTaskExecutions} from '../util/countTaskExecutions';
@@ -30,6 +30,53 @@ function createTriggerExecution(overrides: Partial<TriggerExecution> = {}): Trig
 }
 
 describe('WorkflowExecutionsHeader', () => {
+    describe('duration', () => {
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it('should display the duration of a finished job', () => {
+            const job = createJob({
+                endDate: new Date('2024-01-01T10:00:05'),
+                startDate: new Date('2024-01-01T10:00:00'),
+                status: 'COMPLETED',
+            });
+
+            render(<WorkflowExecutionsHeader job={job} />);
+
+            expect(screen.getByText('Duration: 5000ms')).toBeInTheDocument();
+        });
+
+        it('should display the elapsed time of a running job and keep it ticking', () => {
+            vi.useFakeTimers({toFake: ['Date', 'setInterval', 'clearInterval']});
+            vi.setSystemTime(new Date('2024-01-01T10:00:03'));
+
+            const job = createJob({
+                endDate: undefined,
+                startDate: new Date('2024-01-01T10:00:00'),
+                status: 'STARTED',
+            });
+
+            render(<WorkflowExecutionsHeader job={job} />);
+
+            expect(screen.getByText('Duration: 3000ms')).toBeInTheDocument();
+
+            act(() => {
+                vi.advanceTimersByTime(2000);
+            });
+
+            expect(screen.getByText('Duration: 5000ms')).toBeInTheDocument();
+        });
+
+        it('should display a dash for a job without an end date that is not running', () => {
+            const job = createJob({endDate: undefined, startDate: new Date('2024-01-01T10:00:00'), status: 'STOPPED'});
+
+            render(<WorkflowExecutionsHeader job={job} />);
+
+            expect(screen.getByText('Duration: -')).toBeInTheDocument();
+        });
+    });
+
     describe('badge display', () => {
         it('should display DONE badge when workflow is completed', () => {
             const job = createJob({

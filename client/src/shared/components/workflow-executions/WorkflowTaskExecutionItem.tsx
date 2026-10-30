@@ -1,9 +1,13 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
+    formatExecutionDuration,
+    useExecutionDuration,
+} from '@/shared/components/workflow-executions/hooks/useExecutionDuration';
+import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
-import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
+import {TaskExecution, TaskExecutionStatusEnum} from '@/shared/middleware/platform/workflow/execution';
 
 interface WorkflowTaskExecutionItemProps {
     attemptLabel?: string;
@@ -14,8 +18,12 @@ interface WorkflowTaskExecutionItemProps {
 const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: WorkflowTaskExecutionItemProps) => {
     const {endDate, icon, startDate, status, title, workflowTask} = taskExecution;
 
-    const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
-    const durationLabel = duration == null && jobEnded ? '-' : `${duration ?? 0}ms`;
+    const duration = useExecutionDuration({
+        endDate,
+        running: !jobEnded && status === TaskExecutionStatusEnum.Started,
+        startDate,
+    });
+
     const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobEnded));
 
     return (
@@ -43,7 +51,7 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: Work
                     </span>
                 )}
 
-                <span className="p-1 text-xs">{durationLabel}</span>
+                <span className="p-1 text-xs">{formatExecutionDuration(duration)}</span>
             </div>
         </li>
     );

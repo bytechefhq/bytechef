@@ -1,6 +1,6 @@
 import {TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
-import {render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it} from 'vitest';
+import {act, render, screen} from '@/shared/util/test-utils';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowTriggerExecutionItem from '../WorkflowTriggerExecutionItem';
 
@@ -97,16 +97,44 @@ describe('WorkflowTriggerExecutionItem', () => {
             expect(screen.getByText('5000ms')).toBeInTheDocument();
         });
 
-        it('should display 0ms when end date is not available', () => {
+        describe('while running', () => {
+            afterEach(() => {
+                vi.useRealTimers();
+            });
+
+            it('should display the elapsed time of a started trigger and keep it ticking', () => {
+                vi.useFakeTimers({toFake: ['Date', 'setInterval', 'clearInterval']});
+                vi.setSystemTime(new Date('2024-01-01T10:00:00.750'));
+
+                const triggerExecution = createTriggerExecution({
+                    endDate: undefined,
+                    startDate: new Date('2024-01-01T10:00:00'),
+                    status: 'STARTED',
+                });
+
+                render(<WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />);
+
+                expect(screen.getByText('750ms')).toBeInTheDocument();
+
+                act(() => {
+                    vi.advanceTimersByTime(1000);
+                });
+
+                expect(screen.getByText('1750ms')).toBeInTheDocument();
+            });
+        });
+
+        it('should display a dash for a trigger without an end date that is not running', () => {
             const triggerExecution = createTriggerExecution({
                 endDate: undefined,
                 startDate: new Date('2024-01-01T10:00:00'),
-                status: 'STARTED',
+                status: 'FAILED',
             });
 
             render(<WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />);
 
-            expect(screen.getByText('0ms')).toBeInTheDocument();
+            expect(screen.getByText('-')).toBeInTheDocument();
+            expect(screen.queryByText('0ms')).not.toBeInTheDocument();
         });
     });
 });

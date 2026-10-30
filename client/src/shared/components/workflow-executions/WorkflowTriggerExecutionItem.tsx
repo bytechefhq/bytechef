@@ -1,11 +1,20 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {
+    formatExecutionDuration,
+    useExecutionDuration,
+} from '@/shared/components/workflow-executions/hooks/useExecutionDuration';
 import {getExecutionStatusIcon} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
-import {TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {TriggerExecution, TriggerExecutionStatusEnum} from '@/shared/middleware/automation/workflow/execution';
 
 const WorkflowTriggerExecutionItem = ({triggerExecution}: {triggerExecution: TriggerExecution}) => {
     const {endDate, icon, startDate, status, title, workflowTrigger} = triggerExecution;
 
-    const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
+    const duration = useExecutionDuration({
+        endDate,
+        running: status === TriggerExecutionStatusEnum.Started,
+        startDate,
+    });
+
     const statusIcon = getExecutionStatusIcon(status);
 
     return (
@@ -27,7 +36,7 @@ const WorkflowTriggerExecutionItem = ({triggerExecution}: {triggerExecution: Tri
             </div>
 
             <div className="flex items-center">
-                <span className="p-1 text-xs">{duration ?? 0}ms</span>
+                <span className="p-1 text-xs">{formatExecutionDuration(duration)}</span>
             </div>
         </li>
     );
