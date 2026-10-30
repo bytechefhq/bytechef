@@ -56,14 +56,14 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
             throw new AccessDeniedException("Only a tenant admin may create this API key");
         }
 
-        return createOwnedApiKey(apiKey, type);
+        return saveOwnedApiKey(apiKey, type);
     }
 
     @Override
-    public ApiKey createAutomationApiKey(ApiKey apiKey) {
+    public ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
         checkNotConnectedUser();
 
-        return createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
+        return saveOwnedApiKey(apiKey, type);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
         }
     }
 
-    private ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
+    private ApiKey saveOwnedApiKey(ApiKey apiKey, @Nullable PlatformType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);
