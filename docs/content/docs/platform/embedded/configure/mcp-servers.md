@@ -132,7 +132,7 @@ To switch a server's tools off for a single user, use the **MCP Servers** tab in
 
 ### Workflow tool runs
 
-Calling a workflow tool starts a run of the workflow and waits up to 300 seconds for it to finish. If it does not finish in time, the tool call fails with an error saying the job did not finish within that time (the message gives the limit in seconds or in milliseconds, depending on the workflow).
+Calling a workflow tool starts a run of the workflow and waits up to 300 seconds for it to finish. If it does not finish in time, the tool call fails with an error saying the job did not finish within 300 seconds.
 
 When the run finishes, the tool returns the workflow's output. A failed run returns its error. A run that stops before it finishes returns its `jobId` and a `status`:
 

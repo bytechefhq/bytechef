@@ -10,7 +10,6 @@ package com.bytechef.ee.embedded.ai.mcp.server.facade;
 import static com.bytechef.task.dispatcher.approval.constant.WaitForApprovalTaskDispatcherConstants.WAIT_FOR_APPROVAL;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -56,7 +55,6 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -98,7 +96,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private static final String APPROVAL = "approval";
     private static final Set<String> APPROVAL_COMPONENT_NAMES = Set.of(APPROVAL, WAIT_FOR_APPROVAL);
-    private static final Set<String> SUSPENDING_COMPONENT_NAMES = Set.of(APPROVAL, "wait", WAIT_FOR_APPROVAL);
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -110,7 +107,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final JobCompletionAwaiter jobCompletionAwaiter;
-    private final JobSyncExecutor jobSyncExecutor;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
@@ -131,7 +127,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        JobCompletionAwaiter jobCompletionAwaiter, JobSyncExecutor jobSyncExecutor, JwtTokenService jwtTokenService,
+        JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
         McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
@@ -150,7 +146,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.jobCompletionAwaiter = jobCompletionAwaiter;
-        this.jobSyncExecutor = jobSyncExecutor;
         this.mcpComponentService = mcpComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
@@ -270,7 +265,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                         externalUserId, integration.getComponentName(), integration.getId(),
                         integrationInstanceConfigurationWorkflow,
                         trigger.getName(), workflowParameters, mcpIntegrationInstanceConfiguration.getMcpServerId(),
-                        hasSuspendingTask(workflow), environment, tenantId))
+                        environment, tenantId))
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -379,8 +374,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private Function<Map<String, Object>, Object> getWorkflowToolCallbackFunction(
         @Nullable String externalUserId, String componentName, long integrationId,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, String triggerName,
-        Map<String, ?> workflowParameters, long mcpServerId, boolean suspendable, Environment environment,
-        String tenantId) {
+        Map<String, ?> workflowParameters, long mcpServerId, Environment environment, String tenantId) {
 
         return inputParameters -> {
             McpServer mcpServer = readMcpServerConfiguration(() -> mcpServerService.getMcpServer(mcpServerId));
@@ -416,9 +410,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             JobParametersDTO jobParametersDTO = new JobParametersDTO(
                 integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs);
 
-            Job job = suspendable
-                ? executeSuspendableJob(jobParametersDTO, integrationInstanceId)
-                : executeSyncJob(jobParametersDTO, integrationInstanceId);
+            Job job = executeJob(jobParametersDTO, integrationInstanceId);
 
             if (job.getStatus() == Job.Status.STOPPED) {
                 return describeStoppedJob(job);
@@ -436,15 +428,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         };
     }
 
-    private Job executeSyncJob(JobParametersDTO jobParametersDTO, long integrationInstanceId) {
-        return jobSyncExecutor.execute(
-            jobParametersDTO,
-            jobParameters -> principalJobFacade.createSyncJob(
-                jobParameters, integrationInstanceId, PlatformType.EMBEDDED),
-            false, taskExecutionCompleteEvent -> {});
-    }
-
-    private Job executeSuspendableJob(JobParametersDTO jobParametersDTO, long integrationInstanceId) {
+    private Job executeJob(JobParametersDTO jobParametersDTO, long integrationInstanceId) {
         long jobId = principalJobFacade.createJob(jobParametersDTO, integrationInstanceId, PlatformType.EMBEDDED);
 
         Duration timeout = JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
@@ -573,16 +557,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             componentDefinitionService.getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getConnection() != null;
-    }
-
-    private static boolean hasSuspendingTask(Workflow workflow) {
-        return workflow.getTasks(true)
-            .stream()
-            .map(WorkflowTask::getType)
-            .filter(Objects::nonNull)
-            .map(WorkflowNodeType::ofType)
-            .map(WorkflowNodeType::name)
-            .anyMatch(SUSPENDING_COMPONENT_NAMES::contains);
     }
 
     private static <T> T readMcpServerConfiguration(Supplier<T> read) {

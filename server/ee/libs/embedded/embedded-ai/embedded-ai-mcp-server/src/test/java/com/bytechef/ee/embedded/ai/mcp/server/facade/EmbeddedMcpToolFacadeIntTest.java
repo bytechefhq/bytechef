@@ -10,7 +10,6 @@ package com.bytechef.ee.embedded.ai.mcp.server.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -45,6 +44,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -55,8 +55,6 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
-import com.bytechef.platform.job.sync.executor.JobSyncExecutor.JobFactoryFunction;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -133,9 +131,6 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @MockitoBean
     private JobCompletionAwaiter jobCompletionAwaiter;
-
-    @MockitoBean
-    private JobSyncExecutor jobSyncExecutor;
 
     @MockitoBean
     private JwtTokenService jwtTokenService;
@@ -359,14 +354,16 @@ class EmbeddedMcpToolFacadeIntTest {
     void testCallOfWorkflowToolSeedsReservedTriggerNameInput() {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(List.of());
 
-        when(jobSyncExecutor.execute(any(), any(), anyBoolean(), any())).thenReturn(job(Job.Status.COMPLETED));
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any()))
+            .thenReturn(CompletableFuture.completedFuture(job(Job.Status.COMPLETED)));
 
         toolCallback.call("{}");
 
         ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
             ArgumentCaptor.forClass(JobParametersDTO.class);
 
-        verify(jobSyncExecutor).execute(jobParametersDTOArgumentCaptor.capture(), any(), anyBoolean(), any());
+        verify(principalJobFacade).createJob(jobParametersDTOArgumentCaptor.capture(), anyLong(), any());
 
         JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
 
@@ -376,28 +373,49 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Test
-    void testWorkflowToolRunsThroughTheSynchronousJobExecutor() {
+    void testWorkflowToolWithoutSuspendingTasksRunsAsAJobAwaitedOnTheMainCoordinator() {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(
             List.of(Map.of("name", "script_1", "type", "script/v1/java")));
 
-        when(jobSyncExecutor.execute(any(), any(), anyBoolean(), any())).thenReturn(job(Job.Status.COMPLETED));
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any()))
+            .thenReturn(CompletableFuture.completedFuture(job(Job.Status.COMPLETED)));
 
         toolCallback.call("{}");
 
-        ArgumentCaptor<JobFactoryFunction> jobFactoryFunctionArgumentCaptor =
-            ArgumentCaptor.forClass(JobFactoryFunction.class);
+        ArgumentCaptor<JobParametersDTO> jobParametersDTOArgumentCaptor =
+            ArgumentCaptor.forClass(JobParametersDTO.class);
 
-        verify(jobSyncExecutor).execute(any(), jobFactoryFunctionArgumentCaptor.capture(), anyBoolean(), any());
+        verify(principalJobFacade).createJob(
+            jobParametersDTOArgumentCaptor.capture(), eq(integrationInstanceId), eq(PlatformType.EMBEDDED));
+        verify(jobCompletionAwaiter).await(5L, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT);
+        verify(principalJobFacade, never()).createSyncJob(any(), anyLong(), any());
 
-        JobParametersDTO jobParametersDTO = new JobParametersDTO(workflowId, Map.of());
+        JobParametersDTO jobParametersDTO = jobParametersDTOArgumentCaptor.getValue();
 
-        JobFactoryFunction jobFactoryFunction = jobFactoryFunctionArgumentCaptor.getValue();
+        assertThat(jobParametersDTO.getWorkflowId()).isEqualTo(workflowId);
+    }
 
-        jobFactoryFunction.apply(jobParametersDTO);
+    @Test
+    void testCompletedWorkflowRunReturnsTheJobOutputsFromTaskFileStorage() {
+        ToolCallback toolCallback = getConnectedWorkflowToolCallback(
+            List.of(Map.of("name", "script_1", "type", "script/v1/java")));
 
-        verify(principalJobFacade).createSyncJob(jobParametersDTO, integrationInstanceId, PlatformType.EMBEDDED);
-        verify(principalJobFacade, never()).createJob(any(), anyLong(), any());
-        verify(jobCompletionAwaiter, never()).await(anyLong(), any());
+        Job job = job(Job.Status.COMPLETED);
+
+        FileEntry outputsFileEntry = new FileEntry("outputs.json", "memory://outputs.json");
+
+        job.setOutputs(outputsFileEntry);
+
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any())).thenReturn(CompletableFuture.completedFuture(job));
+        when(taskExecutionService.fetchLastJobTaskExecution(5L)).thenReturn(Optional.empty());
+        doAnswer(invocation -> Map.of("greeting", "hello")).when(taskFileStorage)
+            .readJobOutputs(outputsFileEntry);
+
+        Map<String, Object> result = readResult(toolCallback.call("{}"));
+
+        assertThat(result).containsEntry("greeting", "hello");
     }
 
     @Test
@@ -405,7 +423,9 @@ class EmbeddedMcpToolFacadeIntTest {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(
             List.of(Map.of("name", "script_1", "type", "script/v1/java")));
 
-        when(jobSyncExecutor.execute(any(), any(), anyBoolean(), any())).thenReturn(job(Job.Status.STARTED));
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any()))
+            .thenReturn(CompletableFuture.completedFuture(job(Job.Status.STARTED)));
 
         assertThatThrownBy(() -> toolCallback.call("{}"))
             .hasMessageContaining("Workflow run 5 ended in status STARTED without completing.");
@@ -434,7 +454,6 @@ class EmbeddedMcpToolFacadeIntTest {
             .containsEntry("jobId", 5);
 
         verify(principalJobFacade).createJob(any(), eq(integrationInstanceId), eq(PlatformType.EMBEDDED));
-        verify(jobSyncExecutor, never()).execute(any(), any(), anyBoolean(), any());
     }
 
     @Test
@@ -695,7 +714,7 @@ class EmbeddedMcpToolFacadeIntTest {
             IntegrationInstanceService integrationInstanceService,
             IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
             IntegrationService integrationService, JobCompletionAwaiter jobCompletionAwaiter,
-            JobSyncExecutor jobSyncExecutor, JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
+            JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
             McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
             McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
             PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
@@ -705,8 +724,8 @@ class EmbeddedMcpToolFacadeIntTest {
                 clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
                 connectedUserService, evaluator, integrationInstanceConfigurationService,
                 integrationInstanceConfigurationWorkflowService, integrationInstanceService,
-                integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jobSyncExecutor,
-                jwtTokenService, mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+                integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
+                mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
                 mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade, "http://localhost:8080",
                 taskExecutionService, taskFileStorage, workflowService);
         }
