@@ -27,11 +27,6 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller exposing read-only access to persistent audit events.
- *
- * <p>
- * Authorization is enforced on {@link AuditEventFacade}, not here.
- *
  * @version ee
  *
  * @author Ivica Cardic

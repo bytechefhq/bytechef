@@ -11,9 +11,6 @@ import java.time.LocalDateTime;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Optional criteria for reading audit events; a {@code null} component does not filter. Dates are inclusive and
- * {@code dataSearch} is a case-insensitive substring match on data values.
- *
  * @version ee
  *
  * @author Ivica Cardic

@@ -16,8 +16,6 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 
 /**
- * Spring Data JDBC repository for the PersistentAuditEvent entity.
- *
  * @version ee
  *
  * @author Ivica Cardic

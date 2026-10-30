@@ -27,14 +27,6 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Component;
 
 /**
- * Deletes audit events older than {@code bytechef.audit.retention-days} to reclaim space and limit growth of
- * {@code persistent_audit_event}. Scheduled by {@code bytechef.audit.retention-cron}, evaluated in the JVM default time
- * zone. A retention of zero or fewer days disables the purge rather than deleting the whole audit trail.
- *
- * <p>
- * The audit tables live in each tenant's schema, and a scheduler thread carries no tenant, so with multi-tenancy
- * enabled the purge runs once per tenant. A failure in one tenant is logged and does not stop the others.
- *
  * @version ee
  *
  * @author Ivica Cardic
