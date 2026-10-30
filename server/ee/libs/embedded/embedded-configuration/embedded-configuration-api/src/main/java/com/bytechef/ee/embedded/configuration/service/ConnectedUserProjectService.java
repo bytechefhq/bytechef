@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -41,7 +42,8 @@ public interface ConnectedUserProjectService {
 
     List<ConnectedUserProject> getConnectedUserConnectedUserProjects(long connectedUserId);
 
-    List<ConnectedUserProject> getConnectedUserProjects(Long connectedUserId, Environment environment);
+    List<ConnectedUserProject> getConnectedUserProjects(
+        @Nullable Long connectedUserId, @Nullable Environment environment);
 
     List<ConnectedUserProject> getConnectedUserProjects(List<Long> ids);
 }

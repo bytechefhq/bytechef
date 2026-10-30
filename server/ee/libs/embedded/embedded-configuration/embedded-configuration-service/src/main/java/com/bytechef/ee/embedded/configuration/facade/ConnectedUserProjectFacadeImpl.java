@@ -480,20 +480,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment) {
         return connectUserProjectService.getConnectedUserProjects(connectedUserId, environment)
             .stream()
-            .filter(connectedUserProject -> {
-                if (connectedUserId != null) {
-                    return Objects.equals(connectedUserProject.getConnectedUserId(), connectedUserId);
-                }
-
-                return true;
-            })
             .map(connectedUserProject -> Map.entry(
                 connectedUserProject, connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId())))
-            .filter(entry -> {
-                ConnectedUser connectedUser = entry.getValue();
-
-                return environment == null || connectedUser.getEnvironment() == environment;
-            })
             .map(entry -> {
                 ConnectedUserProject connectedUserProject = entry.getKey();
                 ConnectedUser connectedUser = entry.getValue();
