@@ -271,6 +271,7 @@ const Memories = () => {
         <LayoutContainer
             header={
                 <Header
+                    centerTitle
                     description="Facts the agent has stored while working in this workspace."
                     position="main"
                     right={
@@ -295,16 +296,16 @@ const Memories = () => {
             leftSidebarOpen={false}
         >
             <PageLoader className="min-h-full" loading={isLoading}>
-                <div className="flex w-full flex-1 flex-col">
+                <div className="flex w-full flex-1 flex-col p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                     {filtersActive && (
-                        <div className="flex flex-wrap items-center gap-2 px-6 pt-4">
+                        <div className="flex flex-wrap items-center gap-2 pb-4">
                             <FilterBadges groups={filterGroups} />
                         </div>
                     )}
 
                     {isPrincipalsError && (
                         <div
-                            className="mx-6 mt-4 flex items-center gap-3 rounded-md border px-4 py-2 text-sm text-muted-foreground"
+                            className="mb-4 flex items-center gap-3 rounded-md border px-4 py-2 text-sm text-muted-foreground"
                             role="alert"
                         >
                             <TriangleAlertIcon className="size-4 shrink-0" />
@@ -339,7 +340,7 @@ const Memories = () => {
                     )}
 
                     {!showLoadError && totalCount > 0 && (
-                        <div className="flex w-full flex-1 flex-col gap-4 p-6">
+                        <div className="flex w-full flex-1 flex-col gap-4">
                             {filteredMemories.length === 0 ? (
                                 <p className="p-8 text-center text-sm text-muted-foreground">
                                     No memories match your search.
