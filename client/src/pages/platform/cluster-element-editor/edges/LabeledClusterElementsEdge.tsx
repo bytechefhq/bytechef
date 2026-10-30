@@ -1,4 +1,5 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {CLUSTER_ELEMENT_EDGE_LABEL_GAP} from '@/shared/constants';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath} from '@xyflow/react';
 import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -54,7 +55,7 @@ export default function LabeledClusterElementsEdge({
     const nodeLabel = node?.data.clusterElementLabel;
 
     function getEdgeLabelPosition() {
-        const defaultPosition = `translate(-50%, 0%) translate(${sourceX}px,${sourceY}px)`;
+        const defaultPosition = `translate(-50%, 0%) translate(${sourceX}px,${sourceY + CLUSTER_ELEMENT_EDGE_LABEL_GAP}px)`;
 
         return defaultPosition;
     }
