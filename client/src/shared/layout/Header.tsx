@@ -25,8 +25,6 @@ const Header = ({
 }: HeaderProps) => {
     const {hasLeftSidebar, leftSidebarHidden, leftSidebarOpen} = useLeftSidebarToggle();
 
-    // An empty page has no title to sit beside, so the toggle would float alone. It stays while the sidebar is
-    // closed, since it is then the only way back to it.
     const showLeftSidebarToggle = position === 'main' && hasLeftSidebar && (!!title || !leftSidebarOpen);
 
     return (
@@ -39,8 +37,7 @@ const Header = ({
                 )}
             >
                 {/* The toggle sits beside the title-and-description block, top-aligned so it stays level with
-                    the title however tall the right slot is. Sidebar headers never carry it. A centered header
-                    pins it to the sidebar edge instead, so it does not drift into the page with the title. */}
+                    the title however tall the right slot is. Sidebar headers never carry it. */}
 
                 <div className="flex items-start gap-2 self-start">
                     {showLeftSidebarToggle && (
