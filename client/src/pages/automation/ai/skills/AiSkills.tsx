@@ -186,6 +186,7 @@ const AiSkills = () => {
         <LayoutContainer
             header={
                 <Header
+                    centerTitle
                     description={isDetailView ? undefined : 'Reusable instructions any AI agent can load.'}
                     position="main"
                     right={toolbarRight}
