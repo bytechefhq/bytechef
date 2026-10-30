@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -63,6 +64,8 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
         this.workflowService = workflowService;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public ComponentConnection getClusterElementComponentConnection(
         String workflowId, String workflowNodeName, String clusterElementType,
@@ -76,6 +79,8 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
                 .orElseThrow();
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public List<ComponentConnection> getClusterElementComponentConnections(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -124,6 +129,8 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
         return componentConnections;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public ComponentConnection getComponentConnection(String workflowId, String workflowNodeName, String key) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -152,6 +159,8 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
             workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions());
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public List<ComponentConnection> getWorkflowNodeComponentConnections(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
