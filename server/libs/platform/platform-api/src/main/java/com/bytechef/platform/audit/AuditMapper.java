@@ -17,17 +17,12 @@
 package com.bytechef.platform.audit;
 
 import java.util.Map;
-import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface AuditMapper {
-
-    default Set<String> events() {
-        return Set.of();
-    }
 
     default @Nullable Object capture(AuditInvocation auditInvocation) {
         return null;
