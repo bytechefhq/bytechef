@@ -147,7 +147,7 @@ public class EmbeddedMcpServerConfiguration {
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         ContextService contextService, CounterService counterService, TaskFileStorage durableTaskFileStorage,
-        Environment environment, Evaluator evaluator,
+        Environment environment, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
@@ -169,7 +169,7 @@ public class EmbeddedMcpServerConfiguration {
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, asyncMessageBroker,
+            contextService, evaluator, eventPublisher, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
