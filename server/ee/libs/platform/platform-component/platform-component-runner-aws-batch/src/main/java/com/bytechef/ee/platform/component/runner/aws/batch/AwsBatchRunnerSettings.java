@@ -59,8 +59,8 @@ record AwsBatchRunnerSettings(
     private static final Duration DEFAULT_COMPLETION_CHECK_INTERVAL = Duration.ofSeconds(5);
     private static final String DEFAULT_FILE_SIDECAR_IMAGE = "curlimages/curl:8.11.1";
     private static final Map<String, String> DEFAULT_IMAGES = Map.of(
-        "javascript", "node:22-alpine", "js", "node:22-alpine", "python", "python:3.12-slim", "shell",
-        "ubuntu:24.04");
+        "bash", "ubuntu:24.04", "javascript", "node:22-alpine", "js", "node:22-alpine", "python", "python:3.12-slim",
+        "shell", "ubuntu:24.04");
     private static final int DEFAULT_MEMORY = 2048;
     private static final BigDecimal DEFAULT_VCPU = BigDecimal.ONE;
     private static final BigDecimal MIN_MAIN_VCPU = new BigDecimal("0.25");

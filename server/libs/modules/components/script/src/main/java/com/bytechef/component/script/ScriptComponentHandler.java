@@ -22,6 +22,7 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.script.action.ScriptBashAction;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
 import com.bytechef.component.script.cluster.datastream.ScriptJavaScriptItemProcessor;
@@ -60,12 +61,13 @@ public class ScriptComponentHandler implements ComponentHandler {
                 component(SCRIPT)
                     .title("Script")
                     .description(
-                        "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python or R programming languages.")
+                        "Executes user-defined code. User can write custom workflow logic in Bash, Java, JavaScript, Python or R programming languages.")
                     .icon("path:assets/script.svg")
                     .categories(ComponentCategory.HELPERS, ComponentCategory.DEVELOPER_TOOLS)
                     .actions(
                         ScriptJavaScriptAction.of(taskRunnerRegistry),
-                        ScriptPythonAction.of(taskRunnerRegistry))
+                        ScriptPythonAction.of(taskRunnerRegistry),
+                        ScriptBashAction.of(taskRunnerRegistry))
                     .clusterElements(
                         ScriptJavaScriptTool.of(polyglotEngine),
                         ScriptPythonTool.of(polyglotEngine),

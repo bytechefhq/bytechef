@@ -84,6 +84,7 @@ class TaskRunnerBootstrapTest {
         assertThat(TaskRunnerBootstrap.sourceFileName("javascript")).isEqualTo("script.js");
         assertThat(TaskRunnerBootstrap.sourceFileName("python")).isEqualTo("script.py");
         assertThat(TaskRunnerBootstrap.sourceFileName("shell")).isEqualTo("commands.sh");
+        assertThat(TaskRunnerBootstrap.sourceFileName("bash")).isEqualTo("script.sh");
     }
 
     @Test
@@ -103,5 +104,6 @@ class TaskRunnerBootstrapTest {
     @Test
     void testShellNeedsNoBootstrap() {
         assertThat(TaskRunnerBootstrap.append("shell", "echo hi\n", "process")).isEqualTo("echo hi\n");
+        assertThat(TaskRunnerBootstrap.append("bash", "echo hi", "process")).isEqualTo("echo hi\n");
     }
 }

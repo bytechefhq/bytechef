@@ -33,7 +33,7 @@ public final class TaskRunnerBootstrap {
         return switch (ExternalLanguage.of(languageId)) {
             case JAVASCRIPT -> separated + javaScriptBootstrap(runnerType);
             case PYTHON -> separated + pythonBootstrap(runnerType);
-            case SHELL -> separated;
+            case BASH, SHELL -> separated;
         };
     }
 
@@ -47,6 +47,7 @@ public final class TaskRunnerBootstrap {
         return switch (ExternalLanguage.of(languageId)) {
             case JAVASCRIPT -> "script.js";
             case PYTHON -> "script.py";
+            case BASH -> "script.sh";
             case SHELL -> "commands.sh";
         };
     }
@@ -67,7 +68,9 @@ public final class TaskRunnerBootstrap {
                             'context.' + String(property) + ' is not available under the %s runner');
                     }
                 });
-                const bytechefResult = await perform(bytechefInput, bytechefContext);
+                const bytechefResult = perform.length >= 3
+                    ? await perform(bytechefInput, {}, bytechefContext)
+                    : await perform(bytechefInput, bytechefContext);
 
                 bytechefFs.writeFileSync(
                     bytechefPath.join(process.env.BYTECHEF_OUTPUT_DIR, 'output.json'),
@@ -96,7 +99,10 @@ public final class TaskRunnerBootstrap {
                 with open(os.environ["BYTECHEF_INPUT_FILE"], "r") as bytechef_input_file:
                     bytechef_input = json.load(bytechef_input_file)
 
-                bytechef_result = perform(bytechef_input, _BytechefContext())
+                if perform.__code__.co_argcount - len(perform.__defaults__ or ()) >= 3:
+                    bytechef_result = perform(bytechef_input, {}, _BytechefContext())
+                else:
+                    bytechef_result = perform(bytechef_input, _BytechefContext())
 
                 bytechef_output_path = os.path.join(os.environ["BYTECHEF_OUTPUT_DIR"], "output.json")
 

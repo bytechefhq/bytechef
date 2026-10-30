@@ -74,6 +74,7 @@ public class RemoteTaskRunner implements TaskRunner {
     private static final int STDERR_BUFFER_SIZE = 8 * 1024;
 
     private static final Map<ExternalLanguage, List<String>> DEFAULT_INTERPRETERS = Map.of(
+        ExternalLanguage.BASH, List.of("bash"),
         ExternalLanguage.JAVASCRIPT, List.of("node"),
         ExternalLanguage.PYTHON, List.of("python3"),
         ExternalLanguage.SHELL, List.of("/bin/sh"));
