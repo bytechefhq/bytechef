@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import java.util.List;
@@ -112,7 +113,9 @@ class AutomationMethodSecurityConfigurationIntTest {
     @SpringBootConfiguration
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
-    @Import(GatedOperations.class)
+    @Import({
+        ConnectedUserSecurity.class, GatedOperations.class
+    })
     static class Config {
 
         @Bean("permissionService")
@@ -140,7 +143,7 @@ class AutomationMethodSecurityConfigurationIntTest {
             return "granted";
         }
 
-        @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+        @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isConnectedUser()")
         public String connectedUserOperation() {
             return "granted";
         }
