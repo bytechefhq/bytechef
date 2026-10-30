@@ -22,8 +22,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 
 /**
- * The recorder, job and task execution a cluster element reports its calls and outcomes against.
- *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI_EXPOSE_REP")
