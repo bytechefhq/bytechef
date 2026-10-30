@@ -26,8 +26,9 @@ public interface TaskExecutionPostOutputProcessor {
     Object process(TaskExecution taskExecution, Object output);
 
     /**
-     * Called once the task execution has finished, whether it produced output, produced none or failed, after every
-     * {@link #process(TaskExecution, Object)} call and before the outcome is published.
+     * Called once the task execution has finished, before its outcome is published.
+     *
+     * @param taskExecution the finished task execution
      */
     default void onTaskExecutionFinished(TaskExecution taskExecution) {
     }

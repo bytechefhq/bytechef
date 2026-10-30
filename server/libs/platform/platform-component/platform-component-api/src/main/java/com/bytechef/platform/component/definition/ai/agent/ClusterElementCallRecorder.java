@@ -37,11 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Process-local record of the calls cluster roots make to their cluster elements, keyed by the task execution of the
- * root. Subscribers receive each call transition for a job while it runs; the accumulated calls of a task execution are
- * drained once it has finished, and calls nobody drains, such as those of a background sub-agent that outlived its
- * agent's task, expire an hour after they were last touched.
- *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings({

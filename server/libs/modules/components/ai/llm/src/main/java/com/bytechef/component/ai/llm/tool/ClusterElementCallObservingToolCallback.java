@@ -31,10 +31,6 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 
 /**
- * Reports every call of a cluster element's tool callback to the {@link ClusterElementCallRecorder} under the element's
- * workflow node name. A call that throws is failed, a suspended call has no outcome yet, and any other call completed,
- * whatever its result says.
- *
  * @author Ivica Cardic
  */
 public class ClusterElementCallObservingToolCallback implements ToolCallback {

@@ -24,10 +24,6 @@ import org.springaicommunity.agent.common.task.subagent.SubagentExecutor;
 import org.springaicommunity.agent.common.task.subagent.TaskCall;
 
 /**
- * Reports each run of a cluster element sub-agent to the {@link ClusterElementCallRecorder} under the sub-agent
- * element's workflow node name, against the job and task execution of the agent that owns the Task Tool, including runs
- * that execute in the background.
- *
  * @author Ivica Cardic
  */
 public class ClusterElementCallObservingSubagentExecutor implements SubagentExecutor {
