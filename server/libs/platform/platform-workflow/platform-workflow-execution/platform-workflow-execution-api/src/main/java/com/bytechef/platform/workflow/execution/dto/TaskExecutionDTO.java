@@ -83,6 +83,14 @@ public record TaskExecutionDTO(
         return new TaskExecutionDTO(this, children, iterations, childJob, childCount);
     }
 
+    public TaskExecutionDTO withoutIcon() {
+        return new TaskExecutionDTO(
+            createdBy, createdDate, endDate, error, executionTime, null, id, input, jobId, lastModifiedBy,
+            lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay,
+            retryDelayFactor, retryDelayMillis, startDate, status, taskNumber, title, type, workflowTask, children,
+            iterations, childJob, childCount, clusterElementCalls);
+    }
+
     public static boolean isLoopType(@Nullable String type) {
         return isTaskDispatcherType(type, "loop");
     }
