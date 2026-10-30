@@ -135,10 +135,22 @@ it('offers New Deployment on the deployments tab and opens the saved deployment'
     expect(onTabChange).toHaveBeenCalledWith('deployments', 42);
 });
 
-it('disables New Deployment until the project is published', () => {
+it('hides New Workflow while the project has no workflows', () => {
+    renderProjectListItem('workflows', {projectWorkflowIds: []});
+
+    expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
+});
+
+it('hides New Deployment while the project has no deployments', () => {
+    renderProjectListItem('deployments', {developmentDeploymentCount: 0});
+
+    expect(screen.queryByLabelText('Create Deployment')).not.toBeInTheDocument();
+});
+
+it('hides New Deployment until the project is published', () => {
     renderProjectListItem('deployments', {lastPublishedDate: undefined});
 
-    expect(screen.getByLabelText('Create Deployment')).toBeDisabled();
+    expect(screen.queryByLabelText('Create Deployment')).not.toBeInTheDocument();
 });
 
 it('opens the deployments tab on a saved development deployment', () => {

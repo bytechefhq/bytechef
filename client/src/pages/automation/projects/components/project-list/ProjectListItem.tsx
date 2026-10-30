@@ -526,7 +526,7 @@ const ProjectListItem = ({
             <CollapsibleContent className="mx-3 mt-1 mb-3">
                 <ProjectListItemTabs
                     actions={
-                        activeTab === 'workflows' ? (
+                        activeTab === 'workflows' && hasWorkflows ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
                                 <Button
                                     aria-label="Create Workflow"
@@ -611,42 +611,22 @@ const ProjectListItem = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
-                        ) : activeTab === 'deployments' ? (
-                            isPublished ? (
-                                <ProjectDeploymentDialog
-                                    onSuccess={(projectDeploymentId) => onTabChange('deployments', projectDeploymentId)}
-                                    projectDeployment={{
-                                        environmentId: DEVELOPMENT_ENVIRONMENT,
-                                        name: project.name,
-                                        projectId: project.id,
-                                    }}
-                                    redirectOnSubmit={false}
-                                    triggerNode={
-                                        <Button aria-label="Create Deployment" size="sm" variant="secondary">
-                                            <PlusIcon />
-                                            New Deployment
-                                        </Button>
-                                    }
-                                />
-                            ) : (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span className="inline-block">
-                                            <Button
-                                                aria-label="Create Deployment"
-                                                disabled
-                                                size="sm"
-                                                variant="secondary"
-                                            >
-                                                <PlusIcon />
-                                                New Deployment
-                                            </Button>
-                                        </span>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Publish the project first</TooltipContent>
-                                </Tooltip>
-                            )
+                        ) : activeTab === 'deployments' && isPublished && deploymentCount !== 0 ? (
+                            <ProjectDeploymentDialog
+                                onSuccess={(projectDeploymentId) => onTabChange('deployments', projectDeploymentId)}
+                                projectDeployment={{
+                                    environmentId: DEVELOPMENT_ENVIRONMENT,
+                                    name: project.name,
+                                    projectId: project.id,
+                                }}
+                                redirectOnSubmit={false}
+                                triggerNode={
+                                    <Button aria-label="Create Deployment" size="sm" variant="secondary">
+                                        <PlusIcon />
+                                        New Deployment
+                                    </Button>
+                                }
+                            />
                         ) : undefined
                     }
                     activeTab={activeTab ?? 'workflows'}
