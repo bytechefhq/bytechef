@@ -44,6 +44,10 @@ export interface ComponentDefinitionBasic {
      */
     componentCategories?: Array<ComponentCategory>;
     /**
+     * Whether every action of the component is deprecated, so it is no longer offered for new tasks.
+     */
+    deprecated?: boolean;
+    /**
      * The description.
      */
     description?: string;
@@ -96,6 +100,7 @@ export function ComponentDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimin
         'clusterElementsCount': json['clusterElementsCount'] == null ? undefined : json['clusterElementsCount'],
         'clusterRoot': json['clusterRoot'] == null ? undefined : json['clusterRoot'],
         'componentCategories': json['componentCategories'] == null ? undefined : ((json['componentCategories'] as Array<any>).map(ComponentCategoryFromJSON)),
+        'deprecated': json['deprecated'] == null ? undefined : json['deprecated'],
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'inputsCount': json['inputsCount'] == null ? undefined : json['inputsCount'],
@@ -121,6 +126,7 @@ export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionB
         'clusterElementsCount': value['clusterElementsCount'],
         'clusterRoot': value['clusterRoot'],
         'componentCategories': value['componentCategories'] == null ? undefined : ((value['componentCategories'] as Array<any>).map(ComponentCategoryToJSON)),
+        'deprecated': value['deprecated'],
         'description': value['description'],
         'icon': value['icon'],
         'inputsCount': value['inputsCount'],
