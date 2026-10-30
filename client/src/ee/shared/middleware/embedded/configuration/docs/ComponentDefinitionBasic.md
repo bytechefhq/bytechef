@@ -11,6 +11,7 @@ Name | Type
 `clusterElementsCount` | { [key: string]: number; }
 `clusterRoot` | boolean
 `componentCategories` | [Array&lt;ComponentCategory&gt;](ComponentCategory.md)
+`deprecated` | boolean
 `description` | string
 `icon` | string
 `inputsCount` | number
@@ -30,6 +31,7 @@ const example = {
   "clusterElementsCount": null,
   "clusterRoot": null,
   "componentCategories": null,
+  "deprecated": null,
   "description": null,
   "icon": null,
   "inputsCount": null,
