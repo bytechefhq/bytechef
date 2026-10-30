@@ -23,8 +23,10 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
@@ -47,6 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.cache.CacheManager;
@@ -57,6 +60,8 @@ import org.springframework.cache.CacheManager;
  * @author Ivica Cardic
  */
 class ProjectCodeWorkflowFacadeSourceTest {
+
+    private final ProjectOwnershipService projectOwnershipService = mock(ProjectOwnershipService.class);
 
     @Test
     void testGetCodeWorkflowSourceReturnsSourceForNonJavaLanguage() {
@@ -255,7 +260,11 @@ class ProjectCodeWorkflowFacadeSourceTest {
         Project project = new Project();
 
         project.setId(1L);
-        project.setName("__EMBEDDED_AUTOMATION__catalog-project");
+        project.setName("catalog-project");
+
+        when(projectOwnershipService.getOwnedProjectIds(List.of(1L),
+            Set.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT)))
+                .thenReturn(Set.of(1L));
 
         ProjectService projectService = mock(ProjectService.class);
 
@@ -393,7 +402,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
             + "perform: function() { return \"hello\"; }}]}]})";
     }
 
-    private static ProjectCodeWorkflowFacadeImpl newFacade(
+    private ProjectCodeWorkflowFacadeImpl newFacade(
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService,
@@ -409,7 +418,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
                 projectWorkflowService, workflowService, List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), projectOwnershipService);
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

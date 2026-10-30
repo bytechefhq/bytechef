@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
@@ -313,7 +312,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
         Project project = new Project();
 
         project.setId(projectId);
-        project.setName(SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + displayName);
+        project.setName(displayName);
         project.setProjectVersions(List.of(new ProjectVersion(draftVersion)));
 
         lenient().when(projectService.getProject(projectId))

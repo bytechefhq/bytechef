@@ -11,16 +11,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +41,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
@@ -88,8 +89,8 @@ import com.bytechef.workflow.definition.WorkflowDefinition;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -98,11 +99,11 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -131,7 +132,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectionLifecycleFacade.class, ConnectionService.class, EnvironmentService.class, Evaluator.class,
     JobFacade.class, JobService.class, PreBuiltTemplateService.class, PrincipalJobFacade.class,
     PrincipalJobService.class, ProjectCodeWorkflowService.class, ProjectDeploymentService.class,
-    ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowService.class,
+    ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectOwnershipService.class, ProjectService.class,
+    ProjectWorkflowService.class,
     SharedTemplateFileStorage.class, SharedTemplateService.class, TagService.class, TriggerDefinitionService.class,
     TriggerExecutionService.class, TriggerLifecycleFacade.class, WorkflowCacheManager.class, WorkflowFacade.class,
     WorkflowNodeTestOutputService.class, WorkflowService.class, WorkflowTestConfigurationService.class,
@@ -159,9 +161,6 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Autowired
     private CodeWorkflowContainerService codeWorkflowContainerService;
-
-    @Autowired
-    private CodeWorkflowContainerFacade codeWorkflowContainerFacade;
 
     @Autowired
     private PermissionService permissionService;
@@ -262,15 +261,15 @@ class ProjectCodeWorkflowFacadeIntTest {
         ProjectHandler projectHandler = mock(ProjectHandler.class);
 
         when(projectHandler.getDefinition()).thenReturn(projectDefinition);
-        when(codeWorkflowContainerFacade.create(any(), any(), any(), any(), any(), any()))
-            .thenReturn(mock(CodeWorkflowContainer.class));
+        when(codeWorkflowContainerFacade.create(any(), any(), any(), any(), any(), any(), any()))
+            .thenAnswer(invocation -> reconcile(invocation.getArgument(2), invocation.getArgument(6)));
 
         try (MockedStatic<ProjectHandlerLoader> projectHandlerLoader = mockStatic(ProjectHandlerLoader.class)) {
             projectHandlerLoader
                 .when(() -> ProjectHandlerLoader.loadProjectHandler(any(), any(), any(), any()))
                 .thenReturn(projectHandler);
 
-            projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA);
+            projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVASCRIPT);
         }
     }
 
@@ -423,7 +422,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
         Project project = publishedProject(1);
 
-        when(projectService.fetchProject(PROJECT_NAME)).thenReturn(Optional.of(project));
+        when(projectService.fetchProject(PROJECT_NAME, WORKSPACE_ID)).thenReturn(Optional.of(project));
         when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         UUID keptWorkflowUuid = UUID.randomUUID();
@@ -613,7 +612,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
         project.publish(null);
 
-        when(projectService.fetchProject(PROJECT_NAME)).thenReturn(Optional.of(project));
+        when(projectService.fetchProject(PROJECT_NAME, WORKSPACE_ID)).thenReturn(Optional.of(project));
         when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(projectService.getProject(PROJECT_ID)).thenAnswer(invocation -> publishedProject(2));
 
