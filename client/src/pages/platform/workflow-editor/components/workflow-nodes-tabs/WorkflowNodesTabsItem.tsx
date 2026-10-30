@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import {
     ClusterElementDefinitionBasic,
     ComponentDefinitionBasic,
@@ -146,7 +147,13 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
             </span>
 
             <div className="flex flex-col">
-                <p className="text-sm font-medium">{node?.title}</p>
+                <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">{node?.title}</p>
+
+                    {'deprecated' in node && node.deprecated && (
+                        <Badge label="Deprecated" styleType="warning-outline" weight="semibold" />
+                    )}
+                </div>
 
                 <p className="line-clamp-2 text-left text-xs text-muted-foreground">{node?.description}</p>
             </div>

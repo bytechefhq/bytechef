@@ -56,4 +56,19 @@ describe('WorkflowNodesTabsItem', () => {
         expect(setData).toHaveBeenCalledWith(getClusterElementTypeDragDataType('MODEL'), 'openAi');
         expect(setData).not.toHaveBeenCalledWith(getClusterElementTypeDragDataType('TOOLS'), expect.anything());
     });
+
+    it('labels a deprecated component', () => {
+        render(
+            <WorkflowNodesTabsItem node={{deprecated: true, name: 'bash', title: 'Bash'} as unknown as NodePropType} />
+        );
+
+        expect(screen.getByText('Bash')).toBeInTheDocument();
+        expect(screen.getByText('Deprecated')).toBeInTheDocument();
+    });
+
+    it('does not label a current component', () => {
+        render(<WorkflowNodesTabsItem node={{name: 'script', title: 'Script'} as NodePropType} />);
+
+        expect(screen.queryByText('Deprecated')).not.toBeInTheDocument();
+    });
 });

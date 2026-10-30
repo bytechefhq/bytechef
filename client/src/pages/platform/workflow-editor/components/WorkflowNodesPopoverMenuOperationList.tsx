@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ActionDefinition,
@@ -515,7 +516,13 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         >
                             <div className="flex items-center gap-2">
                                 <div className="min-w-0 flex-1 space-y-1">
-                                    <h3 className="text-sm">{operation.title}</h3>
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-sm">{operation.title}</h3>
+
+                                        {'deprecated' in operation && operation.deprecated && (
+                                            <Badge label="Deprecated" styleType="warning-outline" weight="semibold" />
+                                        )}
+                                    </div>
 
                                     <p className="text-xs wrap-break-word text-muted-foreground">
                                         {operation.description}
