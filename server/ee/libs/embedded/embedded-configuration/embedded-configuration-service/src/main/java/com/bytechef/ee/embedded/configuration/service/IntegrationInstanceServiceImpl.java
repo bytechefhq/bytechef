@@ -71,6 +71,14 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public Optional<IntegrationInstance> fetchIntegrationInstance(
+        long connectedUserId, long integrationInstanceConfigurationId) {
+
+        return integrationInstanceRepository.findFirstByConnectedUserIdAndIntegrationInstanceConfigurationId(
+            connectedUserId, integrationInstanceConfigurationId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public boolean existsByConnectionId(long connectionId) {
         return integrationInstanceRepository.existsByConnectionId(connectionId);

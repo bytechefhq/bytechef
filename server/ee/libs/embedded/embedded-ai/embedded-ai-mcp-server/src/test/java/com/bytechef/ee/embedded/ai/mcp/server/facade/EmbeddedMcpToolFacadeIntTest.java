@@ -302,7 +302,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @Test
     void testAnonymousWorkflowToolCallFailsWithClearErrorInsteadOfIssuingConnectLink() {
-        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(Map.of(), List.of(), null, false);
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(Map.of(), List.of(), null, false, false);
 
         assertThat(toolCallbacks).hasSize(1);
 
@@ -475,6 +475,32 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Test
+    void testWorkflowToolIsListedWhenTheUserHasANewerInstanceOfAnotherIntegrationOnTheSameComponent() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
+            Map.of(), List.of(), CONNECTED_EXTERNAL_USER_ID, true, true);
+
+        assertThat(toolCallbacks).hasSize(1);
+    }
+
+    @Test
+    void testWorkflowToolRunsOnTheInstanceOfItsOwnConfigurationWhenTheUserHasASiblingInstance() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
+            Map.of(), List.of(), CONNECTED_EXTERNAL_USER_ID, true, true);
+
+        assertThat(toolCallbacks).hasSize(1);
+
+        ToolCallback toolCallback = toolCallbacks.getFirst();
+
+        when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
+        when(jobCompletionAwaiter.await(eq(5L), any()))
+            .thenReturn(CompletableFuture.completedFuture(job(Job.Status.COMPLETED)));
+
+        toolCallback.call("{}");
+
+        verify(principalJobFacade).createJob(any(), eq(integrationInstanceId), eq(PlatformType.EMBEDDED));
+    }
+
+    @Test
     void testTimedOutJobReturnsAnErrorThatNamesTheJob() {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(
             List.of(Map.of("name", "requestApproval_1", "type", "approval/v1/requestApproval")));
@@ -519,7 +545,7 @@ class EmbeddedMcpToolFacadeIntTest {
     private ToolCallback getConnectedWorkflowToolCallback(List<Map<String, String>> tasks) {
         List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
             Map.of("toolName", "mappedTool", "toolDescription", "A mapped tool"), tasks, CONNECTED_EXTERNAL_USER_ID,
-            true);
+            true, false);
 
         assertThat(toolCallbacks).hasSize(1);
 
@@ -528,7 +554,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     private ToolDefinition getUnconnectedWorkflowToolDefinition(Map<String, Object> toolParameters) {
         List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
-            toolParameters, List.of(), UNCONNECTED_EXTERNAL_USER_ID, false);
+            toolParameters, List.of(), UNCONNECTED_EXTERNAL_USER_ID, false, false);
 
         assertThat(toolCallbacks).hasSize(1);
 
@@ -539,7 +565,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     private List<ToolCallback> getWorkflowToolCallbacks(
         Map<String, Object> toolParameters, List<Map<String, String>> tasks, @Nullable String externalUserId,
-        boolean connected) {
+        boolean connected, boolean newerSiblingIntegrationInstance) {
 
         McpServer mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
@@ -650,6 +676,10 @@ class EmbeddedMcpToolFacadeIntTest {
                     VALUES (?, ?, '{}', true, now(), 'system', now(), 'system', 0)
                     """,
                 integrationInstanceId, integrationInstanceConfigurationWorkflowId);
+
+            if (newerSiblingIntegrationInstance) {
+                insertNewerSiblingIntegrationInstance(connectedUserId, connectionId, environment);
+            }
         }
 
         List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations =
@@ -660,6 +690,36 @@ class EmbeddedMcpToolFacadeIntTest {
 
         return embeddedMcpToolFacade.getFunctionToolCallbacks(
             mcpIntegrationInstanceConfigurations.getFirst(), externalUserId, Environment.PRODUCTION, "tenant-1");
+    }
+
+    private void insertNewerSiblingIntegrationInstance(long connectedUserId, long connectionId, long environment) {
+        long siblingIntegrationId = insert(
+            """
+                INSERT INTO integration (name, component_name, allow_multiple_instances, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES ('myComponent Code', 'myComponent', false, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """);
+
+        long siblingIntegrationInstanceConfigurationId = insert(
+            """
+                INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
+                    environment, connection_parameters, authorization_type, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, 1, 'myComponent Code', true, ?, ?, 0, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            siblingIntegrationId, environment, encryption.encrypt("{}"));
+
+        insert(
+            """
+                INSERT INTO integration_instance (integration_instance_configuration_id, connected_user_id,
+                    connection_id, enabled, created_date, created_by, last_modified_date, last_modified_by,
+                    version)
+                VALUES (?, ?, ?, true, now() + interval '1 minute', 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            siblingIntegrationInstanceConfigurationId, connectedUserId, connectionId);
     }
 
     private long insert(String sql, Object... arguments) {
