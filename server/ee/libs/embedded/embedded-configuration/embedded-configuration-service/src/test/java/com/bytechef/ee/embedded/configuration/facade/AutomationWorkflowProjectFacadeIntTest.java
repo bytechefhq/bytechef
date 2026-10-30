@@ -100,6 +100,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -109,7 +111,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+    classes = {
+        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationWorkflowProjectFacadeIntTest.ConnectedUserServiceConfiguration.class
+    },
     properties = {
         "bytechef.edition=EE",
         "bytechef.workflow.repository.jdbc.enabled=true",
@@ -122,7 +127,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
     ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
     ComponentConnectionFacade.class,
-    ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
+    ComponentDefinitionService.class, ConnectionDefinitionService.class,
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -193,13 +198,15 @@ class AutomationWorkflowProjectFacadeIntTest {
     @Autowired
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
+    private long connectedUserId;
+
     @BeforeEach
     void setUp() {
-        ConnectedUser connectedUser = new ConnectedUser(
-            Map.of(), null, true, TEST_EXTERNAL_USER_ID, 1L, null, 0);
+        ConnectedUser connectedUser = connectedUserService
+            .fetchConnectedUser(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
+            .orElseGet(() -> connectedUserService.createConnectedUser(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION));
 
-        when(connectedUserService.getConnectedUser(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION))
-            .thenReturn(connectedUser);
+        connectedUserId = connectedUser.getId();
 
         when(embeddedPermissionEvaluator.evaluate(any(), any()))
             .thenReturn(true);
@@ -258,18 +265,19 @@ class AutomationWorkflowProjectFacadeIntTest {
         String newWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
             TEST_EXTERNAL_USER_ID, publishedWorkflowUuid, Environment.PRODUCTION);
 
-        ConnectedUserProjectWorkflow copy = connectedUserProjectWorkflowRepository.findAllByConnectedUserId(1L)
-            .stream()
-            .filter(row -> row.getAutomationWorkflowUuid() == null)
-            .filter(row -> {
-                ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
-                    row.getProjectWorkflowId());
+        ConnectedUserProjectWorkflow copy =
+            connectedUserProjectWorkflowRepository.findAllByConnectedUserId(connectedUserId)
+                .stream()
+                .filter(row -> row.getAutomationWorkflowUuid() == null)
+                .filter(row -> {
+                    ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
+                        row.getProjectWorkflowId());
 
-                return projectWorkflow.getUuidAsString()
-                    .equals(newWorkflowUuid);
-            })
-            .findFirst()
-            .orElseThrow();
+                    return projectWorkflow.getUuidAsString()
+                        .equals(newWorkflowUuid);
+                })
+                .findFirst()
+                .orElseThrow();
 
         assertThat(copy.getCopiedFromWorkflowUuid()).isEqualTo(publishedWorkflowUuid);
     }
@@ -1166,5 +1174,10 @@ class AutomationWorkflowProjectFacadeIntTest {
             .filter(component -> "slack".equals(component.name()))
             .findFirst()
             .orElseThrow();
+    }
+
+    @Configuration
+    @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
+    static class ConnectedUserServiceConfiguration {
     }
 }
