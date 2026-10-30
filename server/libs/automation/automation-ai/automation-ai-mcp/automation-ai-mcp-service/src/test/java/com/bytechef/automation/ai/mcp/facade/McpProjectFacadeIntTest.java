@@ -29,8 +29,6 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvent;
-import com.bytechef.automation.ai.mcp.audit.McpProjectAuditPublisher;
 import com.bytechef.automation.ai.mcp.config.McpIntTestWorkflows;
 import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
@@ -120,9 +118,6 @@ class McpProjectFacadeIntTest {
 
     @Autowired
     private JobFacade jobFacade;
-
-    @MockitoSpyBean
-    private McpProjectAuditPublisher mcpProjectAuditPublisher;
 
     @Autowired
     private McpProjectFacade mcpProjectFacade;
@@ -1158,7 +1153,6 @@ class McpProjectFacadeIntTest {
             mcpProjectFacade.deleteMcpProject(mcpProject.getId());
 
             verify(projectDeploymentFacade).deleteProjectDeployment(projectDeploymentId);
-            verify(mcpProjectAuditPublisher).publish(McpProjectAuditEvent.MCP_PROJECT_DELETED, mcpProject.getId());
 
             assertThat(projectDeploymentRepository.findById(projectDeploymentId)).isEmpty();
             assertThat(mcpProjectRepository.findById(mcpProject.getId())).isEmpty();

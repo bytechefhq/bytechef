@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.mcp.audit;
+package com.bytechef.platform.security.audit;
 
 /**
  * @author Ivica Cardic
  */
-public enum McpProjectAuditEvent {
+public final class ApiKeyAuditEvents {
 
-    MCP_PROJECT_CREATED,
+    public static final String API_KEY_CREATED = "API_KEY_CREATED";
+    public static final String API_KEY_DELETED = "API_KEY_DELETED";
 
-    MCP_PROJECT_DELETED
+    private ApiKeyAuditEvents() {
+    }
 }
