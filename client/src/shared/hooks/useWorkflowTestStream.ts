@@ -1,6 +1,8 @@
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import buildNodeStatesFromTaskExecutions from '@/pages/platform/workflow-editor/utils/buildNodeStatesFromTaskExecutions';
+import getTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getTestRunTriggerName';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {JobStatusEnum, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
@@ -261,6 +263,9 @@ export function useWorkflowTestStream({
                     const jobId = String(startData.jobId);
 
                     resetWorkflowTestNodeStates(workflowId);
+                    setWorkflowTestNodeState(getTestRunTriggerName(useWorkflowDataStore.getState().workflow), {
+                        status: 'COMPLETED',
+                    });
 
                     questionShownRef.current = false;
 

@@ -1,3 +1,4 @@
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useSSE} from '@/shared/hooks/useSSE';
 import {act, renderHook} from '@testing-library/react';
@@ -407,6 +408,32 @@ describe('useWorkflowTestStream', () => {
         });
 
         expect(mockResetWorkflowTestNodeStates).toHaveBeenCalled();
+    });
+
+    it('should mark the trigger a test run starts from as completed on start event', () => {
+        useWorkflowDataStore.setState({
+            workflow: {
+                ...useWorkflowDataStore.getState().workflow,
+                triggers: [
+                    {name: 'trigger_2', type: 'webhook/v1/autoRespondWithHTTP200'},
+                    {name: 'trigger_3', type: 'schedule/v1/interval'},
+                ],
+            },
+        });
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.start({jobId: 'job-123'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('trigger_2', {status: 'COMPLETED'});
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith('trigger_3', expect.anything());
+
+        useWorkflowDataStore.getState().reset();
     });
 
     it('should handle task_started event', () => {
