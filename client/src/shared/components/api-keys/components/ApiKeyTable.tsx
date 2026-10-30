@@ -122,22 +122,6 @@ const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
                                         cell.id.endsWith('name') && 'truncate xl:min-w-80'
                                     )}
                                     key={cell.id}
-                                    onClick={(event) => {
-                                        if (cell.id.endsWith('actions')) {
-                                            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                                            const target = event.target as any;
-
-                                            if (target.getAttribute('data-action') === 'delete') {
-                                                setCurrentApiKey(apiKeys[target.getAttribute('data-index')]);
-
-                                                setShowDeleteDialog(true);
-                                            } else if (target.getAttribute('data-action') === 'edit') {
-                                                setCurrentApiKey(apiKeys[target.getAttribute('data-index')]);
-
-                                                setShowEditDialog(true);
-                                            }
-                                        }
-                                    }}
                                 >
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
