@@ -7,7 +7,7 @@ services:
       - storage_db:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: bytechef
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_USER: postgres
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
@@ -50,7 +50,7 @@ services:
       BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL: ${OLLAMA_CHAT_MODEL:-qwen3:8b}
       BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
       BYTECHEF_AI_PROVIDER_OLLAMA_URL: http://ollama:11434
-      BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      BYTECHEF_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       BYTECHEF_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bytechef
       BYTECHEF_DATASOURCE_USERNAME: postgres
       BYTECHEF_FEATURE_FLAGS: ${BYTECHEF_FEATURE_FLAGS:-}
