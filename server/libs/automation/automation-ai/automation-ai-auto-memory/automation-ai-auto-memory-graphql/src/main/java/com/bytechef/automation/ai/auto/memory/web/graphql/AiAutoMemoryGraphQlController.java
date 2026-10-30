@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.ai.auto.memory.web.graphql;
+package com.bytechef.automation.ai.auto.memory.web.graphql;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.Workspace;
