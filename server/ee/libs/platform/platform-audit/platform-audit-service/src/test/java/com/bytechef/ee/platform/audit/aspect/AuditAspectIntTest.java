@@ -257,7 +257,7 @@ class AuditAspectIntTest {
             assertThat(auditedCaller.callAuditedInner()).isEqualTo("inner");
 
             Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-                .findAllFiltered(new AuditEventFilter(null, "CAPTURE_TEST", null, null, null), PageRequest.of(0, 25));
+                .findAllFiltered(new AuditEventFilter("CAPTURE_TEST", null, null, null, true), PageRequest.of(0, 25));
 
             assertThat(page.getContent())
                 .hasSize(2)
@@ -310,7 +310,7 @@ class AuditAspectIntTest {
                 .hasMessage("caller failed");
 
             Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
-                new AuditEventFilter(null, "CAPTURE_TEST", null, null, null), PageRequest.of(0, 25));
+                new AuditEventFilter("CAPTURE_TEST", null, null, null, true), PageRequest.of(0, 25));
 
             assertThat(page.getContent())
                 .extracting(persistentAuditEvent -> persistentAuditEvent.getData()
@@ -346,7 +346,7 @@ class AuditAspectIntTest {
             assertThat(auditedBusinessService.write()).isEqualTo("written");
 
             Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
-                new AuditEventFilter(null, "BUSINESS_TEST", null, null, null), PageRequest.of(0, 25));
+                new AuditEventFilter("BUSINESS_TEST", null, null, null, true), PageRequest.of(0, 25));
 
             assertThat(page.getContent())
                 .singleElement()
@@ -368,7 +368,7 @@ class AuditAspectIntTest {
 
         private Map<String, String> findRecordedMethodResults() {
             Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-                .findAllFiltered(new AuditEventFilter(null, "PERMISSION_CHECK", null, null, null),
+                .findAllFiltered(new AuditEventFilter("PERMISSION_CHECK", null, null, null, true),
                     PageRequest.of(0, 25));
 
             return page.getContent()

@@ -1,10 +1,9 @@
 extend type Query {
     auditEvents(
-        principal: String
         eventType: String
         fromDate: Long
         toDate: Long
-        dataSearch: String
+        search: String
         page: Int = 0
         size: Int = 25
     ): AuditEventPageType!

@@ -148,9 +148,7 @@ public class AuditEventGraphQlControllerIntTest {
         graphQlTester
             .document("""
                 query {
-                    auditEvents(
-                        principal: "alice", eventType: "WORKSPACE_USER_ADDED", fromDate: 1000, toDate: 2000,
-                        dataSearch: "needle") {
+                    auditEvents(eventType: "WORKSPACE_USER_ADDED", fromDate: 1000, toDate: 2000, search: "needle") {
                         totalElements
                     }
                 }
@@ -166,8 +164,7 @@ public class AuditEventGraphQlControllerIntTest {
         verify(auditEventFacade, atLeastOnce()).fetchAuditEvents(auditEventFilterArgumentCaptor.capture(), any());
 
         assertThat(auditEventFilterArgumentCaptor.getValue()).isEqualTo(
-            new AuditEventFilter(
-                "alice", "WORKSPACE_USER_ADDED", toLocalDateTime(1000), toLocalDateTime(2000), "needle"));
+            new AuditEventFilter("WORKSPACE_USER_ADDED", toLocalDateTime(1000), toLocalDateTime(2000), "needle", true));
     }
 
     @Test
@@ -343,6 +340,33 @@ public class AuditEventGraphQlControllerIntTest {
                 .path("auditEvents.content[*].principal")
                 .entityList(String.class)
                 .containsExactly("a***@example.com", "a***", " ");
+        }
+
+        @Test
+        @WithMockUser(authorities = "ROLE_ADMIN")
+        public void testAuditEventsSearchExcludesPrincipalsWhenMasked() {
+            when(auditEventFacade.fetchAuditEvents(any(), any())).thenReturn(Page.empty());
+
+            graphQlTester
+                .document("""
+                    query {
+                        auditEvents(search: "alice") {
+                            totalElements
+                        }
+                    }
+                    """)
+                .execute()
+                .path("auditEvents.totalElements")
+                .entity(Long.class)
+                .isEqualTo(0L);
+
+            ArgumentCaptor<AuditEventFilter> auditEventFilterArgumentCaptor = ArgumentCaptor.forClass(
+                AuditEventFilter.class);
+
+            verify(auditEventFacade, atLeastOnce()).fetchAuditEvents(auditEventFilterArgumentCaptor.capture(), any());
+
+            assertThat(auditEventFilterArgumentCaptor.getValue())
+                .isEqualTo(new AuditEventFilter(null, null, null, "alice", false));
         }
 
         @TestConfiguration

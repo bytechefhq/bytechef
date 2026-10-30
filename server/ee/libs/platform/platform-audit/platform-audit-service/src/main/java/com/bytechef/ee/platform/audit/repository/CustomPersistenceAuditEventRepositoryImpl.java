@@ -113,54 +113,57 @@ public class CustomPersistenceAuditEventRepositoryImpl implements CustomPersiste
     }
 
     private String buildWhereClause(AuditEventFilter auditEventFilter, List<Object> arguments) {
-        String principal = auditEventFilter.principal();
         String eventType = auditEventFilter.eventType();
         LocalDateTime fromDate = auditEventFilter.fromDate();
         LocalDateTime toDate = auditEventFilter.toDate();
-        String dataSearch = auditEventFilter.dataSearch();
+        String search = auditEventFilter.search();
 
-        StringBuilder whereClause = new StringBuilder();
-
-        if (principal != null) {
-            whereClause.append(" WHERE e.principal = ?");
-
-            arguments.add(principal);
-        }
+        List<String> predicates = new ArrayList<>();
 
         if (eventType != null) {
-            whereClause.append(whereClause.isEmpty() ? " WHERE" : " AND");
-            whereClause.append(" e.event_type = ?");
+            predicates.add("e.event_type = ?");
 
             arguments.add(eventType);
         }
 
         if (fromDate != null) {
-            whereClause.append(whereClause.isEmpty() ? " WHERE" : " AND");
-            whereClause.append(" e.event_date >= ?");
+            predicates.add("e.event_date >= ?");
 
             arguments.add(Timestamp.valueOf(fromDate));
         }
 
         if (toDate != null) {
-            whereClause.append(whereClause.isEmpty() ? " WHERE" : " AND");
-            whereClause.append(" e.event_date <= ?");
+            predicates.add("e.event_date <= ?");
 
             arguments.add(Timestamp.valueOf(toDate));
         }
 
-        if (dataSearch != null) {
-            whereClause.append(whereClause.isEmpty() ? " WHERE" : " AND");
-            whereClause.append(
-                " EXISTS ("
-                    + "SELECT 1 FROM persistent_audit_event_data ped"
-                    + " WHERE ped.persistent_audit_event_id = e.id"
-                    + " AND LOWER(ped.value) LIKE LOWER(CONCAT('%', ?, '%')) ESCAPE '\\'"
-                    + ")");
+        if (search != null) {
+            String dataPredicate = "EXISTS ("
+                + "SELECT 1 FROM persistent_audit_event_data ped"
+                + " WHERE ped.persistent_audit_event_id = e.id"
+                + " AND LOWER(ped.value) LIKE LOWER(CONCAT('%', ?, '%')) ESCAPE '\\'"
+                + ")";
 
-            arguments.add(escapeLikePattern(dataSearch));
+            String escapedSearch = escapeLikePattern(search);
+
+            if (auditEventFilter.searchPrincipal()) {
+                predicates.add(
+                    "(LOWER(e.principal) LIKE LOWER(CONCAT('%', ?, '%')) ESCAPE '\\' OR " + dataPredicate + ")");
+
+                arguments.add(escapedSearch);
+            } else {
+                predicates.add(dataPredicate);
+            }
+
+            arguments.add(escapedSearch);
         }
 
-        return whereClause.toString();
+        if (predicates.isEmpty()) {
+            return "";
+        }
+
+        return " WHERE " + String.join(" AND ", predicates);
     }
 
     private static String escapeLikePattern(String value) {

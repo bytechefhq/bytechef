@@ -54,15 +54,15 @@ public class AuditEventGraphQlController {
 
     @QueryMapping(name = "auditEvents")
     public AuditEventPage auditEvents(
-        @Argument String principal, @Argument String eventType, @Argument Long fromDate, @Argument Long toDate,
-        @Argument String dataSearch, @Argument Integer page, @Argument Integer size) {
+        @Argument String eventType, @Argument Long fromDate, @Argument Long toDate, @Argument String search,
+        @Argument Integer page, @Argument Integer size) {
 
         PageRequest pageRequest = PageRequest.of(
             page == null ? 0 : Math.max(0, page),
             size == null ? DEFAULT_PAGE_SIZE : Math.clamp(size, 1, MAX_PAGE_SIZE));
 
         AuditEventFilter auditEventFilter = new AuditEventFilter(
-            principal, eventType, toLocalDateTime(fromDate), toLocalDateTime(toDate), dataSearch);
+            eventType, toLocalDateTime(fromDate), toLocalDateTime(toDate), search, !maskPrincipals);
 
         Page<PersistentAuditEvent> persistentPage = auditEventFacade.fetchAuditEvents(auditEventFilter, pageRequest);
 
