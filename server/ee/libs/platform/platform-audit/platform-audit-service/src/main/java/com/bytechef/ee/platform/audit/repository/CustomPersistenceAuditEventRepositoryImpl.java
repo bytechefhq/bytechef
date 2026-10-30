@@ -25,8 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Custom repository implementation for paged, filtered audit event reads, distinct event types and the retention purge.
- *
  * @version ee
  *
  * @author Ivica Cardic

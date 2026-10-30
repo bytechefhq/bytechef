@@ -20,10 +20,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Reads and persists audit events. Writes never borrow a second pooled connection: with no transaction on the thread
- * they open their own, and inside an existing transaction they run on the caller's connection behind a savepoint, so a
- * failed audit insert rolls back to that savepoint and leaves the caller's transaction usable.
- *
  * @version ee
  *
  * @author Ivica Cardic

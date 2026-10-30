@@ -20,9 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation of {@link AuditEventFacade}. Delegates to the shared {@code AuditEventService} and carries the
- * {@code ADMIN} authorization guard so it is enforced for every caller of the facade.
- *
  * @version ee
  *
  * @author Ivica Cardic

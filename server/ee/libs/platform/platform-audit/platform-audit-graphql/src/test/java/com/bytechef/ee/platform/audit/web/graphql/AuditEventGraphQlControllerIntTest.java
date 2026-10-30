@@ -40,9 +40,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
- * Verifies the controller wires through to {@link AuditEventFacade} and maps results. Authorization is enforced on the
- * facade (see {@code AuditEventFacadeTest} and {@code AuditEventFacadeIntTest}), not on this controller.
- *
  * @version ee
  *
  * @author Ivica Cardic

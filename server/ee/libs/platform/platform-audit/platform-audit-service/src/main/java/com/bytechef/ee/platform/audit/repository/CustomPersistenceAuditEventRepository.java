@@ -16,20 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Custom repository fragment for the audit event queries Spring Data cannot derive: filtered paging, the retention
- * purge and the distinct event types.
- *
  * @version ee
  *
  * @author Ivica Cardic
  */
 interface CustomPersistenceAuditEventRepository {
 
-    /**
-     * Deletes the events older than the cutoff together with their data rows. The data rows have no foreign key to
-     * cascade from, so both deletes share one transaction: a failure between them must not leave events stripped of
-     * their data.
-     */
     @Transactional
     int deleteByEventDateBefore(LocalDateTime cutoff);
 
