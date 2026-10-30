@@ -17,7 +17,7 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
@@ -32,13 +32,11 @@ import org.springframework.security.core.Authentication;
  * <li>{@code isCurrentUser(#id)} — grants when the supplied id is the current authenticated user's id.</li>
  * <li>{@code isTenantAdmin()} — grants when the current user is a global tenant administrator.</li>
  * <li>{@code isResourceOwner(#id, 'Type')} — grants when the current user owns the identified resource.</li>
- * <li>{@code isConnectedUser()} — grants when the current principal is an embedded connected user.</li>
- * <li>{@code isCurrentConnectedUser(#id)} — grants when the current principal is the embedded connected user with the
- * supplied id.</li>
  * </ul>
  *
  * <p>
- * The first three always deny an embedded connected user, including under embedded skip-checks mode.
+ * All three always deny a principal that is not a platform user (a {@link NonPlatformUserAuthentication}), including
+ * under embedded skip-checks mode.
  *
  * @author Ivica Cardic
  */
@@ -61,22 +59,12 @@ public final class AutomationMethodSecurityExpressionRoot
         this.target = methodInvocation.getThis();
     }
 
-    public boolean isConnectedUser() {
-        return ConnectedUserAuthentications.isConnectedUser();
-    }
-
-    public boolean isCurrentConnectedUser(long connectedUserId) {
-        return ConnectedUserAuthentications.fetchCurrent()
-            .map(connectedUserAuthentication -> connectedUserAuthentication.connectedUserId() == connectedUserId)
-            .orElse(false);
-    }
-
     /**
      * Returns {@code true} if {@code userId} matches the current authenticated user. Bypassed (returns {@code true})
-     * under embedded skip-checks mode, except for a connected user.
+     * under embedded skip-checks mode, except for a non-platform user.
      */
     public boolean isCurrentUser(long userId) {
-        if (isConnectedUser()) {
+        if (NonPlatformUserAuthentication.isCurrent()) {
             return false;
         }
 
@@ -89,10 +77,10 @@ public final class AutomationMethodSecurityExpressionRoot
 
     /**
      * Returns {@code true} if the current user is a global tenant administrator. Bypassed (returns {@code true}) under
-     * embedded skip-checks mode, except for a connected user.
+     * embedded skip-checks mode, except for a non-platform user.
      */
     public boolean isTenantAdmin() {
-        if (isConnectedUser()) {
+        if (NonPlatformUserAuthentication.isCurrent()) {
             return false;
         }
 
@@ -106,10 +94,10 @@ public final class AutomationMethodSecurityExpressionRoot
     /**
      * Returns {@code true} if the current user owns the resource of {@code resourceType} identified by {@code id},
      * resolved via the registered {@code ResourceOwnershipResolver}. Bypassed (returns {@code true}) under embedded
-     * skip-checks mode, except for a connected user.
+     * skip-checks mode, except for a non-platform user.
      */
     public boolean isResourceOwner(long id, String resourceType) {
-        if (isConnectedUser()) {
+        if (NonPlatformUserAuthentication.isCurrent()) {
             return false;
         }
 

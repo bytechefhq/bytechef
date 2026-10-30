@@ -24,7 +24,7 @@ import com.bytechef.platform.security.config.PlatformSecurityIntTestConfiguratio
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.repository.UserRepository;
 import java.util.List;
@@ -260,12 +260,12 @@ class ApiKeyFacadeIntTest {
     }
 
     @Test
-    void testAConnectedUserWhoseExternalIdIsAPlatformLoginIsRefusedEveryApiKeyOperation() {
+    void testANonPlatformUserWhoseNameIsAPlatformLoginIsRefusedEveryApiKeyOperation() {
         ApiKey ownerApiKey = saveApiKey("owner key", ownerUser, PlatformType.AUTOMATION);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        securityContext.setAuthentication(new TestConnectedUserAuthentication(OWNER_LOGIN));
+        securityContext.setAuthentication(new TestNonPlatformUserAuthentication(OWNER_LOGIN));
 
         assertThatThrownBy(() -> apiKeyFacade.getApiKeys(ENVIRONMENT_ID, PlatformType.AUTOMATION))
             .isInstanceOf(AccessDeniedException.class);
@@ -275,7 +275,7 @@ class ApiKeyFacadeIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> apiKeyFacade.delete(ownerApiKey.getId()))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> apiKeyFacade.createOwnedApiKey(newApiKey("connected key"), PlatformType.AUTOMATION))
+        assertThatThrownBy(() -> apiKeyFacade.createOwnedApiKey(newApiKey("non-platform key"), PlatformType.AUTOMATION))
             .isInstanceOf(AccessDeniedException.class);
 
         List<ApiKey> apiKeys = apiKeyRepository.findAll();
@@ -340,32 +340,17 @@ class ApiKeyFacadeIntTest {
         return apiKeyRepository.save(apiKey);
     }
 
-    private static final class TestConnectedUserAuthentication extends AbstractAuthenticationToken
-        implements ConnectedUserAuthentication {
+    private static final class TestNonPlatformUserAuthentication extends AbstractAuthenticationToken
+        implements NonPlatformUserAuthentication {
 
-        private final String externalUserId;
+        private final String name;
 
-        private TestConnectedUserAuthentication(String externalUserId) {
+        private TestNonPlatformUserAuthentication(String name) {
             super(AuthorityUtils.NO_AUTHORITIES);
 
-            this.externalUserId = externalUserId;
+            this.name = name;
 
             setAuthenticated(true);
-        }
-
-        @Override
-        public long connectedUserId() {
-            return 1L;
-        }
-
-        @Override
-        public long environmentId() {
-            return ENVIRONMENT_ID;
-        }
-
-        @Override
-        public String externalUserId() {
-            return externalUserId;
         }
 
         @Override
@@ -375,7 +360,7 @@ class ApiKeyFacadeIntTest {
 
         @Override
         public Object getPrincipal() {
-            return externalUserId;
+            return name;
         }
     }
 }
