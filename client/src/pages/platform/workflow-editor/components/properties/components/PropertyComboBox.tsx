@@ -576,7 +576,7 @@ const PropertyComboBox = ({
                         <Button
                             aria-expanded={open}
                             className={twMerge(
-                                'relative h-auto min-h-9 w-full justify-between font-normal whitespace-normal',
+                                'relative h-auto min-h-9 w-full justify-between py-1.5 font-normal whitespace-normal',
                                 showInputTypeSwitchButton && 'mt-0',
                                 error &&
                                     'border-stroke-destructive-secondary ring-[3px] ring-stroke-destructive-secondary focus-visible:border-stroke-destructive-secondary focus-visible:ring-stroke-destructive-secondary'
