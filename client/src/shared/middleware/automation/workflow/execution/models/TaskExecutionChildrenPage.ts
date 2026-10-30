@@ -32,6 +32,10 @@ export interface TaskExecutionChildrenPage {
      */
     children: Array<TaskExecution>;
     /**
+     * The icons of the task executions on this page, keyed by task type. The task executions on a page carry no icon of their own.
+     */
+    icons: { [key: string]: string; };
+    /**
      * The loop iterations or on-error branches on this page, each a list of task executions.
      */
     iterations: Array<Array<TaskExecution>>;
@@ -62,6 +66,7 @@ export interface TaskExecutionChildrenPage {
  */
 export function instanceOfTaskExecutionChildrenPage(value: object): value is TaskExecutionChildrenPage {
     if (!('children' in value) || value['children'] === undefined) return false;
+    if (!('icons' in value) || value['icons'] === undefined) return false;
     if (!('iterations' in value) || value['iterations'] === undefined) return false;
     if (!('number' in value) || value['number'] === undefined) return false;
     if (!('numberOfElements' in value) || value['numberOfElements'] === undefined) return false;
@@ -82,6 +87,7 @@ export function TaskExecutionChildrenPageFromJSONTyped(json: any, ignoreDiscrimi
     return {
         
         'children': ((json['children'] as Array<any>).map(TaskExecutionFromJSON)),
+        'icons': json['icons'],
         'iterations': json['iterations'],
         'number': json['number'],
         'numberOfElements': json['numberOfElements'],
@@ -103,6 +109,7 @@ export function TaskExecutionChildrenPageToJSONTyped(value?: TaskExecutionChildr
     return {
         
         'children': ((value['children'] as Array<any>).map(TaskExecutionToJSON)),
+        'icons': value['icons'],
         'iterations': value['iterations'],
         'number': value['number'],
         'numberOfElements': value['numberOfElements'],
