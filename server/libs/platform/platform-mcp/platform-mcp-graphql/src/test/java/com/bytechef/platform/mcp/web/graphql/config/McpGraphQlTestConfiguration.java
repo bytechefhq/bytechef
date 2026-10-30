@@ -25,7 +25,7 @@ import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.mcp.web.McpServerPathResolver;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.graphql.GraphQLScalarTypes;
 import org.mockito.Mockito;
@@ -88,12 +88,17 @@ public class McpGraphQlTestConfiguration {
     }
 
     @Bean
-    public McpServerPathResolver mcpServerPathResolver() {
-        return new McpServerPathResolver() {
+    public McpServerTypeDefinition mcpServerTypeDefinition() {
+        return new McpServerTypeDefinition() {
 
             @Override
             public PlatformType getType() {
                 return PlatformType.AUTOMATION;
+            }
+
+            @Override
+            public boolean isSharedAdministration() {
+                return true;
             }
 
             @Override

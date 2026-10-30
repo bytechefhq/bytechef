@@ -17,18 +17,23 @@
 package com.bytechef.automation.ai.mcp.web.graphql;
 
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.mcp.web.McpServerPathResolver;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-class AutomationMcpServerPathResolver implements McpServerPathResolver {
+class AutomationMcpServerTypeDefinition implements McpServerTypeDefinition {
 
     @Override
     public PlatformType getType() {
         return PlatformType.AUTOMATION;
+    }
+
+    @Override
+    public boolean isSharedAdministration() {
+        return true;
     }
 
     @Override
