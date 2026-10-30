@@ -37,6 +37,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -90,6 +91,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public Map<String, Object> getClusterElementScriptInput(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -142,6 +144,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         }
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> getWorkflowNodeScriptInput(
@@ -193,6 +196,20 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     }
 
     @Override
+    public boolean stopScriptTest(String executionId) {
+        RunningScriptTest runningScriptTest = runningScriptTests.get(executionId);
+        Optional<String> currentUserLoginOptional = SecurityUtils.fetchCurrentUserLogin();
+
+        if (runningScriptTest == null ||
+            !Objects.equals(runningScriptTest.userLogin(), currentUserLoginOptional.orElse(null))) {
+
+            return false;
+        }
+
+        return runningScriptTest.stop();
+    }
+
+    @Override
     @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public ScriptTestExecutionDTO testClusterElementScript(
         String workflowId, String workflowNodeName, String clusterElementType,
@@ -201,7 +218,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
         long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
 
-        return executeTestAndBuildResult(() -> {
+        return executeTestAndBuildResult(executionId, () -> {
             if (inputParameters == null) {
                 return workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                     workflowId, workflowNodeName, clusterElementType.toUpperCase(Locale.ROOT),
@@ -222,7 +239,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
         long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
 
-        return executeTestAndBuildResult(() -> {
+        return executeTestAndBuildResult(executionId, () -> {
             if (inputParameters == null) {
                 return workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
                     workflowId, workflowNodeName, effectiveEnvironmentId);
