@@ -108,4 +108,10 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
     public List<ConnectedUserProject> getConnectedUserProjects(List<Long> ids) {
         return connectUserProjectRepository.findAllById(ids);
     }
+
+    @Override
+    public long lockConnectedUser(String externalUserId, Environment environment) {
+        return OptionalUtils.get(
+            connectUserProjectRepository.findConnectedUserIdForUpdate(externalUserId, environment.ordinal()));
+    }
 }

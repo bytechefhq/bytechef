@@ -44,4 +44,12 @@ public interface ConnectedUserProjectService {
     List<ConnectedUserProject> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
     List<ConnectedUserProject> getConnectedUserProjects(List<Long> ids);
+
+    /**
+     * Locks the connected user's row until the current transaction ends, so concurrent callers that create the user's
+     * own project run one after another.
+     *
+     * @return the connected user's id
+     */
+    long lockConnectedUser(String externalUserId, Environment environment);
 }

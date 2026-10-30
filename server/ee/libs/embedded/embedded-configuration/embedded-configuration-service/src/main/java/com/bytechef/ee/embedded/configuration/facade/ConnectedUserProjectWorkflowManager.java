@@ -22,8 +22,6 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
-import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
-import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
@@ -36,6 +34,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +67,6 @@ class ConnectedUserProjectWorkflowManager {
 
     private final ConnectedUserProjectService connectUserProjectService;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
-    private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
@@ -80,12 +78,11 @@ class ConnectedUserProjectWorkflowManager {
     public ConnectedUserProjectWorkflowManager(
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
-        ConnectedUserService connectedUserService, ConnectionService connectionService, ProjectService projectService,
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
-        WorkflowService workflowService, WorkflowTestConfigurationFacade workflowTestConfigurationFacade) {
+        ConnectionService connectionService, ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
+        WorkflowTestConfigurationFacade workflowTestConfigurationFacade) {
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
-        this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
@@ -136,6 +133,15 @@ class ConnectedUserProjectWorkflowManager {
     }
 
     public ConnectedUserProject getOrCreateConnectedUserProject(String externalUserId, Environment environment) {
+        Optional<ConnectedUserProject> connectedUserProjectOptional = connectUserProjectService
+            .fetchConnectUserProject(externalUserId, environment);
+
+        if (connectedUserProjectOptional.isPresent()) {
+            return connectedUserProjectOptional.get();
+        }
+
+        long connectedUserId = connectUserProjectService.lockConnectedUser(externalUserId, environment);
+
         return connectUserProjectService
             .fetchConnectUserProject(externalUserId, environment)
             .orElseGet(() -> {
@@ -146,9 +152,7 @@ class ConnectedUserProjectWorkflowManager {
 
                 project = projectService.create(project);
 
-                ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
-
-                return connectUserProjectService.create(connectedUser.getId(), project.getId());
+                return connectUserProjectService.create(connectedUserId, project.getId());
             });
     }
 
