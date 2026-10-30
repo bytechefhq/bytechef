@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
-import com.bytechef.ee.platform.audit.metric.AuditFailureCounters;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditInvocation;
@@ -17,7 +16,6 @@ import com.bytechef.platform.audit.AuditOutcome;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.micrometer.core.instrument.MeterRegistry;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,7 +31,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
@@ -81,19 +78,13 @@ public class AuditAspect {
 
     private final AuditEventService auditEventService;
     private final AuditMapperResolver auditMapperResolver;
-    private final AuditFailureCounters auditFailureCounters;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
     })
-    public AuditAspect(
-        AuditEventService auditEventService, AuditMapperResolver auditMapperResolver,
-        ObjectProvider<MeterRegistry> meterRegistryProvider) {
-
+    public AuditAspect(AuditEventService auditEventService, AuditMapperResolver auditMapperResolver) {
         this.auditEventService = auditEventService;
         this.auditMapperResolver = auditMapperResolver;
-
-        this.auditFailureCounters = AuditFailureCounters.register(meterRegistryProvider);
     }
 
     @Around("com.bytechef.ee.platform.audit.aspect.AuditPointcuts.preAuthorizedMethod()"
@@ -144,13 +135,13 @@ public class AuditAspect {
                         }
                     }
                 } catch (RuntimeException | LinkageError | StackOverflowError throwable) {
-                    reportAuditEventFailure(proceedingJoinPoint, AuditFailureCounters.Reason.BUILD, throwable);
+                    reportAuditEventFailure(proceedingJoinPoint, "build", throwable);
                 }
 
                 try {
                     writePendingAuditEvents(pendingAuditEvents, outermost);
                 } catch (RuntimeException | LinkageError | StackOverflowError throwable) {
-                    reportAuditEventFailure(proceedingJoinPoint, AuditFailureCounters.Reason.WRITE, throwable);
+                    reportAuditEventFailure(proceedingJoinPoint, "write", throwable);
                 }
             } finally {
                 AuditFrame.pop();
@@ -163,13 +154,11 @@ public class AuditAspect {
     }
 
     private void reportAuditEventFailure(
-        ProceedingJoinPoint proceedingJoinPoint, AuditFailureCounters.Reason reason, Throwable throwable) {
-
-        auditFailureCounters.increment(reason);
+        ProceedingJoinPoint proceedingJoinPoint, String stage, Throwable throwable) {
 
         log.error(
             "AUDIT EVENT FAILURE ({}): the audit event for {} failed; the business result is unaffected",
-            reason.getTagValue(),
+            stage,
             proceedingJoinPoint.getSignature()
                 .toShortString(),
             throwable);
@@ -203,8 +192,7 @@ public class AuditAspect {
         }
 
         if (TransactionSynchronizationManager.isCurrentTransactionReadOnly()) {
-            reportLostAuditEvents(
-                auditEvents, AuditFailureCounters.Reason.READ_ONLY, "the caller's transaction is read-only", null);
+            reportLostAuditEvents(auditEvents, "the caller's transaction is read-only", null);
 
             return;
         }
@@ -215,10 +203,7 @@ public class AuditAspect {
                 @Override
                 public void afterCompletion(int status) {
                     if (status != STATUS_COMMITTED) {
-                        reportLostAuditEvents(
-                            auditEvents, AuditFailureCounters.Reason.ROLLBACK,
-                            "the caller's transaction did not commit",
-                            null);
+                        reportLostAuditEvents(auditEvents, "the caller's transaction did not commit", null);
                     }
                 }
             });
@@ -255,18 +240,14 @@ public class AuditAspect {
 
             return true;
         } catch (Exception exception) {
-            reportLostAuditEvents(auditEvents, AuditFailureCounters.Reason.PERSIST, "persisting them failed",
-                exception);
+            reportLostAuditEvents(auditEvents, "persisting them failed", exception);
 
             return false;
         }
     }
 
     private void reportLostAuditEvents(
-        List<PersistentAuditEvent> auditEvents, AuditFailureCounters.Reason reason, String cause,
-        @Nullable Exception exception) {
-
-        auditFailureCounters.increment(reason, auditEvents.size());
+        List<PersistentAuditEvent> auditEvents, String cause, @Nullable Exception exception) {
 
         log.error(
             "AUDIT PERSISTENCE FAILURE: {} audit event(s) were not recorded because {} \u2014 audit trail is "
@@ -350,8 +331,6 @@ public class AuditAspect {
     }
 
     private void reportMapperFailure(Audited audited, @Nullable Throwable throwable) {
-        auditFailureCounters.increment(AuditFailureCounters.Reason.MAPPER);
-
         log.error(
             "AUDIT MAPPING FAILURE: {} could not map event {}; the row is written without its data",
             audited.mapper()

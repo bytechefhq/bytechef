@@ -21,9 +21,6 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,21 +50,13 @@ class AuditAspectTest {
     private AuditAspect aspect;
     private AuditMapperResolver auditMapperResolver;
     private ProceedingJoinPoint joinPoint;
-    private SimpleMeterRegistry meterRegistry;
 
     @BeforeEach
     void setUp() throws Throwable {
         auditEventService = mock(AuditEventService.class);
-        meterRegistry = new SimpleMeterRegistry();
-
-        @SuppressWarnings("unchecked")
-        ObjectProvider<MeterRegistry> provider = mock(ObjectProvider.class);
-
-        when(provider.getIfAvailable()).thenReturn(meterRegistry);
-
         auditMapperResolver = mock(AuditMapperResolver.class);
 
-        aspect = new AuditAspect(auditEventService, auditMapperResolver, provider);
+        aspect = new AuditAspect(auditEventService, auditMapperResolver);
         joinPoint = mock(ProceedingJoinPoint.class);
 
         MethodSignature signature = mock(MethodSignature.class);
@@ -133,28 +121,6 @@ class AuditAspectTest {
 
         assertThat(result).isEqualTo("ok");
         verify(auditEventService, times(1)).saveAll(any());
-    }
-
-    @Test
-    void testAuditPersistenceFailureIncrementsCounter() throws Throwable {
-        when(joinPoint.proceed()).thenReturn("ok");
-        org.mockito.Mockito.doThrow(new IllegalStateException("audit backend down"))
-            .when(auditEventService)
-            .saveAll(any());
-
-        aspect.audit(joinPoint);
-
-        assertThat(failureCount("persist")).isEqualTo(1.0);
-        assertThat(failureCount()).isEqualTo(1.0);
-    }
-
-    @Test
-    void testAuditSucceedsDoesNotIncrementFailureCounter() throws Throwable {
-        when(joinPoint.proceed()).thenReturn("ok");
-
-        aspect.audit(joinPoint);
-
-        assertThat(failureCount()).isEqualTo(0.0);
     }
 
     @Test
@@ -234,7 +200,7 @@ class AuditAspectTest {
     }
 
     @Test
-    void testReadOnlyCallerTransactionIsNotWrittenAndCountsAsLost() throws Throwable {
+    void testReadOnlyCallerTransactionIsNotWritten() throws Throwable {
         when(joinPoint.proceed()).thenReturn("ok");
 
         TransactionSynchronizationManager.setActualTransactionActive(true);
@@ -243,12 +209,10 @@ class AuditAspectTest {
         assertThat(aspect.audit(joinPoint)).isEqualTo("ok");
 
         verify(auditEventService, never()).saveAll(any());
-
-        assertThat(failureCount("read_only")).isEqualTo(1.0);
     }
 
     @Test
-    void testWritableCallerTransactionJoinsItAndCountsRollbackAsLost() throws Throwable {
+    void testWritableCallerTransactionJoinsIt() throws Throwable {
         when(joinPoint.proceed()).thenReturn("ok");
 
         TransactionSynchronizationManager.initSynchronization();
@@ -257,16 +221,6 @@ class AuditAspectTest {
         aspect.audit(joinPoint);
 
         verify(auditEventService, times(1)).saveAll(any());
-
-        assertThat(failureCount()).isEqualTo(0.0);
-
-        for (TransactionSynchronization transactionSynchronization : TransactionSynchronizationManager
-            .getSynchronizations()) {
-
-            transactionSynchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK);
-        }
-
-        assertThat(failureCount("rollback")).isEqualTo(1.0);
     }
 
     @Test
@@ -279,7 +233,6 @@ class AuditAspectTest {
         Object result = aspect.audit(joinPoint);
 
         assertThat(result).isEqualTo("ok");
-        assertThat(failureCount()).isEqualTo(1.0);
         assertThat(AuditFrame.current()).isNull();
     }
 
@@ -309,7 +262,6 @@ class AuditAspectTest {
         assertThat(aspect.audit(joinPoint)).isEqualTo("inner");
 
         assertThat(captureSavedEvent().getData()).containsEntry("method", "InnerService.createSomething");
-        assertThat(failureCount("build")).isEqualTo(1.0);
     }
 
     @AfterEach
@@ -320,24 +272,6 @@ class AuditAspectTest {
 
         TransactionSynchronizationManager.setActualTransactionActive(false);
         TransactionSynchronizationManager.setCurrentTransactionReadOnly(false);
-    }
-
-    private double failureCount() {
-        return meterRegistry.find("bytechef_audit_failure")
-            .counters()
-            .stream()
-            .mapToDouble(Counter::count)
-            .sum();
-    }
-
-    private double failureCount(String reason) {
-        Counter counter = meterRegistry.find("bytechef_audit_failure")
-            .tag("reason", reason)
-            .counter();
-
-        assertThat(counter).isNotNull();
-
-        return counter.count();
     }
 
     private PersistentAuditEvent captureSavedEvent() {
@@ -514,7 +448,7 @@ class AuditAspectTest {
     }
 
     @Test
-    void testThrowingMapperStillWritesTheRowAndCountsTheFailure() throws Throwable {
+    void testThrowingMapperStillWritesTheRow() throws Throwable {
         useAuditedTargetMethod(42L);
 
         when(auditMapperResolver.resolve(TestAuditMapper.class)).thenReturn(auditInvocation -> {
@@ -527,7 +461,6 @@ class AuditAspectTest {
         assertThat(captureSavedEvent().getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mapperError", IllegalArgumentException.class.getName());
-        assertThat(failureCount()).isEqualTo(1.0);
     }
 
     @Test
@@ -544,7 +477,6 @@ class AuditAspectTest {
         assertThat(captureSavedEvent().getData())
             .containsEntry("mapperError", NoClassDefFoundError.class.getName())
             .containsEntry("result", "SUCCESS");
-        assertThat(failureCount("mapper")).isEqualTo(1.0);
     }
 
     @Test
@@ -569,7 +501,6 @@ class AuditAspectTest {
         aspect.audit(joinPoint);
 
         assertThat(captureSavedEvent().getData()).containsEntry("mapperError", "NULL_DATA");
-        assertThat(failureCount()).isEqualTo(1.0);
     }
 
     @Test
@@ -677,7 +608,6 @@ class AuditAspectTest {
         assertThat(captureSavedEvent().getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("mapperError", IllegalStateException.class.getName());
-        assertThat(failureCount()).isEqualTo(1.0);
     }
 
     @Test
