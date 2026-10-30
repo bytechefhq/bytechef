@@ -104,8 +104,17 @@ describe('non-string expression mode', () => {
             expect(result.current.isFormulaMode).toBe(true);
         });
 
-        it('should NOT switch for non-numerical inputs', () => {
+        it('should switch to formula mode on `=` in an empty date field', () => {
             const {result} = renderField({controlType: 'DATE', expressionEnabled: true, type: 'DATE'});
+
+            const preventDefault = pressKey(result, '=');
+
+            expect(preventDefault).toHaveBeenCalled();
+            expect(result.current.isFormulaMode).toBe(true);
+        });
+
+        it('should NOT switch for inputs that are neither numerical nor temporal', () => {
+            const {result} = renderField({controlType: 'SELECT', expressionEnabled: true, type: 'STRING'});
 
             const preventDefault = pressKey(result, '=');
 
