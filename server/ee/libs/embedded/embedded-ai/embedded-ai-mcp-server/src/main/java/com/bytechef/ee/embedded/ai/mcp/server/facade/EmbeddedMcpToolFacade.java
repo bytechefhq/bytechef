@@ -233,8 +233,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             Integration integration = integrationService.getIntegration(
                 integrationInstanceConfiguration.getIntegrationId());
 
-            Long integrationInstanceId = fetchIntegrationInstanceId(
-                externalUserId, integration.getComponentName(), environment);
+            Long integrationInstanceId = fetchIntegrationInstanceIdByConfiguration(
+                externalUserId, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+                environment);
 
             if (integrationInstanceId != null &&
                 !isWorkflowEnabled(integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflow.getId())) {
@@ -323,6 +324,21 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             .orElse(null);
     }
 
+    private @Nullable Long fetchIntegrationInstanceIdByConfiguration(
+        @Nullable String externalUserId, long integrationInstanceConfigurationId, Environment environment) {
+
+        if (externalUserId == null) {
+            return null;
+        }
+
+        return connectedUserService.fetchConnectedUser(externalUserId, environment)
+            .map(ConnectedUser::getId)
+            .flatMap(connectedUserId -> integrationInstanceService.fetchIntegrationInstance(
+                connectedUserId, integrationInstanceConfigurationId))
+            .map(IntegrationInstance::getId)
+            .orElse(null);
+    }
+
     private Function<Map<String, Object>, Object> getClusterElementToolCallbackFunction(
         @Nullable String externalUserId, String componentName, int componentVersion, String clusterElementName,
         Map<String, ?> parameters, long mcpServerId, Environment environment, String tenantId) {
@@ -383,7 +399,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 throw new IllegalStateException("MCP server is disabled");
             }
 
-            Long integrationInstanceId = fetchIntegrationInstanceId(externalUserId, componentName, environment);
+            Long integrationInstanceId = fetchIntegrationInstanceIdByConfiguration(
+                externalUserId, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+                environment);
 
             if (integrationInstanceId == null) {
                 if (externalUserId == null) {
