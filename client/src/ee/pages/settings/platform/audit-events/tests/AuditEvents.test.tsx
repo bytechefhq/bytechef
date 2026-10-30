@@ -212,6 +212,28 @@ describe('AuditEvents', () => {
         expect(within(menu).getByRole('menuitem', {name: 'Clear all filters'})).toHaveAttribute('data-disabled');
     });
 
+    it('scrolls the event type list on its own and shows each full name as a title', async () => {
+        hoisted.auditEventTypesQueryResult = {
+            data: {auditEventTypes: ['JOB_COMPLETED', 'WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED']},
+            isError: false,
+        };
+
+        render(<AuditEvents />);
+
+        const menu = await openFilterMenu();
+
+        const eventTypeGroup = within(menu).getByRole('group', {name: 'Event types'});
+
+        expect(eventTypeGroup).toHaveClass('max-h-64', 'overflow-y-auto');
+        expect(within(eventTypeGroup).getByRole('menuitem', {name: /^All$/})).toBeInTheDocument();
+        expect(within(eventTypeGroup).getByText('WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED')).toHaveAttribute(
+            'title',
+            'WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED'
+        );
+        expect(within(eventTypeGroup).queryByRole('menuitem', {name: /^Last 7 days/})).not.toBeInTheDocument();
+        expect(within(menu).getByRole('menuitem', {name: 'Clear all filters'})).toBeInTheDocument();
+    });
+
     it('filters by the selected event type, returns to the first page and shows a chip', async () => {
         render(<AuditEvents />);
 
