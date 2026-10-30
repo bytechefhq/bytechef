@@ -9,11 +9,13 @@ query ComponentDefinitionSearch($platformType: PlatformType!, $query: String!) {
         triggersCount
         clusterElementsCount
         clusterRoot
+        deprecated
         componentCategories {
             name
             label
         }
         actions {
+            deprecated
             name
             title
             description
