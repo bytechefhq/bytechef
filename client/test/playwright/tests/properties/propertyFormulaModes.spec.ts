@@ -535,6 +535,44 @@ test.describe('Property formula modes', () => {
     });
 
     test.describe('Date and time fields', () => {
+        test('should take a data pill in a date time field once Text is turned on', async ({
+            authenticatedPage: page,
+            workflow,
+        }) => {
+            const dateTimeProperty = getProperty(configurationPanel, 'dateTime');
+
+            const dataPillPanel = await openVarDataPills(page, configurationPanel);
+
+            await getDynamicSwitch(dateTimeProperty).click();
+
+            await expect(getPropertyEditor(dateTimeProperty)).toBeFocused();
+            await expect(dateTimeProperty.locator('input[type="datetime-local"]')).toHaveCount(0);
+
+            const saveResponsePromise = propertyTestingParametersSavePromise(page, STRING_PILL_REFERENCE);
+
+            await getVarDataPill(dataPillPanel, 'String').click();
+
+            await saveResponsePromise;
+
+            await expectStoredParameter({
+                expected: STRING_PILL_REFERENCE,
+                page,
+                propertyName: 'dateTime',
+                workflowId: workflow.workflowId,
+            });
+
+            await getDynamicSwitch(dateTimeProperty).click();
+
+            await expect(dateTimeProperty.locator('input[type="datetime-local"]')).toBeVisible();
+
+            await expectStoredParameter({
+                expected: null,
+                page,
+                propertyName: 'dateTime',
+                workflowId: workflow.workflowId,
+            });
+        });
+
         test('should open the data pill editor on $ in an empty date time field and take a data pill', async ({
             authenticatedPage: page,
             workflow,
@@ -929,17 +967,19 @@ test.describe('Property formula modes', () => {
     });
 
     test.describe('Dynamic switch', () => {
-        test('should show the Dynamic switch on select, array and object properties only', async () => {
+        test('should show the Dynamic switch on select, date, array and object properties only', async () => {
             for (const propertyName of [
                 'bool',
                 'optionsNoMultiselect',
+                'date',
+                'dateTime',
                 'arrayNoDefaultValues',
                 'objectNoDefaultValues',
             ]) {
                 await expect(getDynamicSwitch(getProperty(configurationPanel, propertyName))).toBeVisible();
             }
 
-            for (const propertyName of ['stringMinLength', 'numberPrecision', 'integerMaxValue', 'date']) {
+            for (const propertyName of ['stringMinLength', 'numberPrecision', 'integerMaxValue']) {
                 await expect(getDynamicSwitch(getProperty(configurationPanel, propertyName))).toHaveCount(0);
             }
         });

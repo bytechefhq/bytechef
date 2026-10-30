@@ -506,12 +506,16 @@ export const useProperty = ({
 
     const stringSelect = isStringSelect(controlType, type);
 
-    // A select or a builder has nothing on screen to type `$` into, so it carries a Dynamic switch, and its pill
-    // editor stays up until that switch is turned off. An array item's object has no label row to hold the switch.
+    // A select, a date or time picker, or a builder has no text entry that shows a pill, so it carries a Dynamic
+    // switch, and its pill editor stays up until that switch is turned off. An array item's object has no label row
+    // to hold the switch.
     const hasDynamicSwitch =
         !control &&
         expressionEnabled !== false &&
         (controlType === 'SELECT' ||
+            controlType === 'DATE' ||
+            controlType === 'DATE_TIME' ||
+            controlType === 'TIME' ||
             controlType === 'ARRAY_BUILDER' ||
             controlType === 'JSON_SCHEMA_BUILDER' ||
             (controlType === 'OBJECT_BUILDER' && name !== '__item'));
