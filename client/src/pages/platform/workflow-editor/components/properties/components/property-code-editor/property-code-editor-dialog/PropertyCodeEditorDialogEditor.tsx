@@ -38,9 +38,10 @@ const PropertyCodeEditorDialogEditor = ({
             }))
         );
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {clusterElementType, currentNodeName} = useWorkflowNodeDetailsPanelStore(
+    const {clusterElementType, currentNodeEnv, currentNodeName} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             clusterElementType: state.currentNode?.clusterElementType,
+            currentNodeEnv: state.currentNode?.parameters?.env,
             currentNodeName: state.currentNode?.name,
         }))
     );
@@ -62,6 +63,14 @@ const PropertyCodeEditorDialogEditor = ({
     const completionContext = useMemo<CompletionContextType | undefined>(() => {
         const scriptLanguage = language.toLowerCase();
 
+        if (scriptLanguage === 'shell') {
+            return {
+                env: currentNodeEnv && typeof currentNodeEnv === 'object' ? Object.keys(currentNodeEnv) : [],
+                input: inputParameters ?? scriptInput,
+                kind: 'shell',
+            };
+        }
+
         if (scriptLanguage !== 'javascript' && scriptLanguage !== 'python') {
             return undefined;
         }
@@ -80,6 +89,7 @@ const PropertyCodeEditorDialogEditor = ({
         clusterElementNode,
         componentConnections,
         components,
+        currentNodeEnv,
         inputParameters,
         language,
         operationPropertyLoaders,
