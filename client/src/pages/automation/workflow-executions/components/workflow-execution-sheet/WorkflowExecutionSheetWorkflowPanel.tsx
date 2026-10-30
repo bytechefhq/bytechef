@@ -31,12 +31,16 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
 
     const {useGetWorkflowQuery} = useWorkflowExecutionDetailQueries();
 
-    const workflowExecutionOverlay = useJobExecutionOverlay(job);
-
     const {data: workflowDetails, isLoading: isWorkflowDetailsLoading} = useGetWorkflowQuery(
         workflow!.id as string,
         !!workflow?.id
     );
+
+    const triggerName =
+        workflowExecution.triggerExecution?.workflowTrigger?.name ??
+        (workflowDetails && !workflowDetails.triggers?.length ? 'trigger_1' : undefined);
+
+    const workflowExecutionOverlay = useJobExecutionOverlay(job, triggerName);
 
     useEffect(() => {
         setReady(false);

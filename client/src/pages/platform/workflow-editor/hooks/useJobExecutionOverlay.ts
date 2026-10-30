@@ -13,16 +13,22 @@ interface OverlaidJobI {
  * The overlay a read-only canvas draws for one job. Recomputed only when the job's task executions change,
  * which a polled, still-running job does on every refresh — so its nodes turn green as they finish.
  */
-export default function useJobExecutionOverlay(job: OverlaidJobI | undefined): WorkflowExecutionOverlayI {
+export default function useJobExecutionOverlay(
+    job: OverlaidJobI | undefined,
+    triggerName?: string
+): WorkflowExecutionOverlayI {
     const isRunning = job?.status === 'CREATED' || job?.status === 'STARTED';
     const taskExecutions = job?.taskExecutions;
 
     return useMemo(
         () => ({
             isRunning,
-            nodeStates: buildNodeStatesFromTaskExecutions(taskExecutions, isRunning),
+            nodeStates: {
+                ...(triggerName && {[triggerName]: {status: 'COMPLETED' as const}}),
+                ...buildNodeStatesFromTaskExecutions(taskExecutions, isRunning),
+            },
             taskExecutions: taskExecutions ?? [],
         }),
-        [isRunning, taskExecutions]
+        [isRunning, taskExecutions, triggerName]
     );
 }

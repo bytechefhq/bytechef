@@ -34,6 +34,12 @@ const disabledTaskNode = (workflowNodeName: string): Node => ({
     position: {x: 0, y: 0},
 });
 
+const triggerNode = (workflowNodeName: string): Node => ({
+    data: {trigger: true, workflowNodeName},
+    id: workflowNodeName,
+    position: {x: 0, y: 0},
+});
+
 const chainEdge = (source: string, target: string): Edge => ({id: `${source}=>${target}`, source, target});
 
 describe('resolveTestStateNodeName', () => {
@@ -217,6 +223,13 @@ describe('getExecutedEdgeStatus', () => {
                 states
             )
         ).toBeUndefined();
+    });
+
+    it('colors only the edge out of the trigger that started the run', () => {
+        const states = {trigger_2: {status: 'COMPLETED' as const}, var_1: {status: 'COMPLETED' as const}};
+
+        expect(getExecutedEdgeStatus(triggerNode('trigger_2'), taskNode('var_1'), states)).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus(triggerNode('trigger_1'), taskNode('var_1'), states)).toBeUndefined();
     });
 
     it('is neutral while the target is still running or has no state', () => {

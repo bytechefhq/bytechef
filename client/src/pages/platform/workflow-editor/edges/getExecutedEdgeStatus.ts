@@ -116,19 +116,7 @@ function resolveNodeStatus(
         return undefined;
     }
 
-    const nodeState = workflowTestNodeStates[name];
-
-    if (nodeState) {
-        return nodeState.status;
-    }
-
-    // Triggers never produce a task execution of their own, but if anything ran at all the trigger
-    // necessarily fired — treat it as completed so the trigger's outgoing edge joins the executed path.
-    if ((node?.data as {trigger?: boolean} | undefined)?.trigger && Object.keys(workflowTestNodeStates).length > 0) {
-        return 'COMPLETED';
-    }
-
-    return undefined;
+    return workflowTestNodeStates[name]?.status;
 }
 
 const isPlaceholderNode = (node: Node | undefined): boolean =>
