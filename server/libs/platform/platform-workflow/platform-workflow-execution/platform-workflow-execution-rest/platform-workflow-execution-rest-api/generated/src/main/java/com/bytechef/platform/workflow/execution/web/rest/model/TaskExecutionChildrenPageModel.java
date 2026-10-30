@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -26,10 +28,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecutionChildrenPage", description = "A page of the children of a task execution. At most one of children and iterations is non-empty; both are empty on an empty page.")
 @JsonTypeName("TaskExecutionChildrenPage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-22T23:22:06.180830+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-30T23:21:21.375131+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskExecutionChildrenPageModel {
 
   private List<@Valid TaskExecutionModel> children = new ArrayList<>();
+
+  private Map<String, String> icons = new HashMap<>();
 
   private List<List<@Valid TaskExecutionModel>> iterations = new ArrayList<>();
 
@@ -50,8 +54,9 @@ public class TaskExecutionChildrenPageModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskExecutionChildrenPageModel(List<@Valid TaskExecutionModel> children, List<List<@Valid TaskExecutionModel>> iterations, Integer number, Integer numberOfElements, Integer size, Long totalElements, Integer totalPages) {
+  public TaskExecutionChildrenPageModel(List<@Valid TaskExecutionModel> children, Map<String, String> icons, List<List<@Valid TaskExecutionModel>> iterations, Integer number, Integer numberOfElements, Integer size, Long totalElements, Integer totalPages) {
     this.children = children;
+    this.icons = icons;
     this.iterations = iterations;
     this.number = number;
     this.numberOfElements = numberOfElements;
@@ -87,6 +92,35 @@ public class TaskExecutionChildrenPageModel {
   @JsonProperty("children")
   public void setChildren(List<@Valid TaskExecutionModel> children) {
     this.children = children;
+  }
+
+  public TaskExecutionChildrenPageModel icons(Map<String, String> icons) {
+    this.icons = icons;
+    return this;
+  }
+
+  public TaskExecutionChildrenPageModel putIconsItem(String key, String iconsItem) {
+    if (this.icons == null) {
+      this.icons = new HashMap<>();
+    }
+    this.icons.put(key, iconsItem);
+    return this;
+  }
+
+  /**
+   * The icons of the task executions on this page, keyed by task type. The task executions on a page carry no icon of their own.
+   * @return icons
+   */
+  @NotNull 
+  @Schema(name = "icons", description = "The icons of the task executions on this page, keyed by task type. The task executions on a page carry no icon of their own.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("icons")
+  public Map<String, String> getIcons() {
+    return icons;
+  }
+
+  @JsonProperty("icons")
+  public void setIcons(Map<String, String> icons) {
+    this.icons = icons;
   }
 
   public TaskExecutionChildrenPageModel iterations(List<List<@Valid TaskExecutionModel>> iterations) {
@@ -233,6 +267,7 @@ public class TaskExecutionChildrenPageModel {
     }
     TaskExecutionChildrenPageModel taskExecutionChildrenPage = (TaskExecutionChildrenPageModel) o;
     return Objects.equals(this.children, taskExecutionChildrenPage.children) &&
+        Objects.equals(this.icons, taskExecutionChildrenPage.icons) &&
         Objects.equals(this.iterations, taskExecutionChildrenPage.iterations) &&
         Objects.equals(this.number, taskExecutionChildrenPage.number) &&
         Objects.equals(this.numberOfElements, taskExecutionChildrenPage.numberOfElements) &&
@@ -243,7 +278,7 @@ public class TaskExecutionChildrenPageModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(children, iterations, number, numberOfElements, size, totalElements, totalPages);
+    return Objects.hash(children, icons, iterations, number, numberOfElements, size, totalElements, totalPages);
   }
 
   @Override
@@ -251,6 +286,7 @@ public class TaskExecutionChildrenPageModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class TaskExecutionChildrenPageModel {\n");
     sb.append("    children: ").append(toIndentedString(children)).append("\n");
+    sb.append("    icons: ").append(toIndentedString(icons)).append("\n");
     sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
     sb.append("    number: ").append(toIndentedString(number)).append("\n");
     sb.append("    numberOfElements: ").append(toIndentedString(numberOfElements)).append("\n");
