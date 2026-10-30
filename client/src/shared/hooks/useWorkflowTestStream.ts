@@ -136,11 +136,6 @@ function handleClusterElementCall(data: unknown): string | undefined {
     return payload.name;
 }
 
-/**
- * Colors nodes from a `progress` snapshot. A task dispatcher that runs inside the coordinator emits no task lifecycle
- * event, so a snapshot is the only live source for it. A node its own task events track is left to them: the snapshot
- * only fills in a node that has no state yet or whose state an earlier snapshot set.
- */
 function applyProgressNodeStates(workflowTestExecution: WorkflowTestExecution, progressOwnedNodeNames: Set<string>) {
     const {setWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
 
