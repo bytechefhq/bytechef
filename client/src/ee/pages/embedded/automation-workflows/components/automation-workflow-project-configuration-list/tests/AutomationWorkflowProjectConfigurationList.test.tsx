@@ -68,10 +68,14 @@ const configuration = {
     workflows: [],
 };
 
-const renderList = (onEdit = vi.fn()) =>
+const renderList = (onEdit = vi.fn(), projectOverrides: Partial<typeof project> = {}, onCreate = vi.fn()) =>
     render(
         <TooltipProvider>
-            <AutomationWorkflowProjectConfigurationList onEdit={onEdit} project={project} />
+            <AutomationWorkflowProjectConfigurationList
+                onCreate={onCreate}
+                onEdit={onEdit}
+                project={{...project, ...projectOverrides}}
+            />
         </TooltipProvider>
     );
 
@@ -94,6 +98,23 @@ describe('AutomationWorkflowProjectConfigurationList', () => {
         expect(
             screen.getByText('Create a configuration to run a published version of this project in an environment.')
         ).toBeInTheDocument();
+    });
+
+    it('creates a configuration from the empty state', async () => {
+        const onCreate = vi.fn();
+
+        renderList(vi.fn(), {}, onCreate);
+
+        await userEvent.setup().click(screen.getByRole('button', {name: 'Create Configuration'}));
+
+        expect(onCreate).toHaveBeenCalledOnce();
+    });
+
+    it('asks to publish the project instead of offering creation while it is unpublished', () => {
+        renderList(vi.fn(), {published: false});
+
+        expect(screen.getByText('Publish the project to configure it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });
 
     it('lists the configurations by environment name instead of the empty state', () => {

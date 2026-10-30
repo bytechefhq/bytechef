@@ -40,7 +40,7 @@ const project: AutomationWorkflowProjectType = {
     workflowTemplates: [],
 };
 
-const renderList = () =>
+const renderList = (projectOverrides: Partial<AutomationWorkflowProjectType> = {}) =>
     render(
         <TooltipProvider>
             <AutomationWorkflowProjectList
@@ -54,7 +54,7 @@ const renderList = () =>
                 onPublishProject={vi.fn()}
                 onSelectWorkflow={vi.fn()}
                 onUpdateTags={vi.fn()}
-                projects={[project]}
+                projects={[{...project, ...projectOverrides}]}
                 tags={[]}
             />
         </TooltipProvider>
@@ -74,33 +74,72 @@ describe('AutomationWorkflowProjectList', () => {
         vi.clearAllMocks();
     });
 
-    it('shows the workflow actions on the Workflows tab and the configuration list on the Configurations tab', async () => {
+    it('offers creation only from the empty states while the project has no workflows or configurations', async () => {
         const user = userEvent.setup();
 
         renderList();
 
-        expect(await screen.findByRole('button', {name: 'Create Workflow'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
+        expect(await screen.findByText('No Workflows')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create Workflow'})).toHaveTextContent('Create Workflow');
+        expect(screen.queryByRole('button', {name: 'More Workflow Creation Actions'})).not.toBeInTheDocument();
 
         await user.click(screen.getByRole('tab', {name: 'Configurations'}));
 
         expect(await screen.findByText('No Configurations')).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'New Configuration'})).toBeEnabled();
-        expect(screen.queryByRole('button', {name: 'Create Workflow'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create Configuration'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
     });
 
-    it('opens the configuration dialog from the New Configuration button and closes it on cancel', async () => {
+    it('shows the tab actions once the project has workflows and configurations', async () => {
+        const user = userEvent.setup();
+
+        renderList({
+            configurationCount: 1,
+            workflowTemplates: [
+                {
+                    components: [],
+                    description: null,
+                    label: 'Greeting',
+                    lastModifiedDate: null,
+                    permissionExpression: null,
+                    triggers: [],
+                    workflowId: 'workflow-1',
+                    workflowUuid: 'workflow-uuid-1',
+                },
+            ],
+        });
+
+        expect(await screen.findByRole('button', {name: 'Create Workflow'})).toHaveTextContent('New Workflow');
+
+        await user.click(screen.getByRole('tab', {name: 'Configurations'}));
+
+        expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
+    });
+
+    it('hides configuration creation until the project is published', async () => {
+        const user = userEvent.setup();
+
+        renderList({configurationCount: 0, published: false});
+
+        await user.click(await screen.findByRole('tab', {name: 'Configurations'}));
+
+        expect(await screen.findByText('Publish the project to configure it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
+    });
+
+    it('opens the configuration dialog from the empty state and closes it on cancel', async () => {
         const user = userEvent.setup();
 
         renderList();
 
         await user.click(await screen.findByRole('tab', {name: 'Configurations'}));
-        await user.click(await screen.findByRole('button', {name: 'New Configuration'}));
+        await user.click(await screen.findByRole('button', {name: 'Create Configuration'}));
 
-        expect(await screen.findByText('Create Configuration')).toBeInTheDocument();
+        expect(await screen.findByRole('dialog')).toBeInTheDocument();
 
         await user.click(screen.getByRole('button', {name: 'Cancel'}));
 
-        await waitFor(() => expect(screen.queryByText('Create Configuration')).not.toBeInTheDocument());
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 });

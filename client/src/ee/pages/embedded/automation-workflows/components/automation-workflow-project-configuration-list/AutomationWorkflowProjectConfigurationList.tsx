@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
@@ -16,11 +17,13 @@ type AutomationWorkflowProjectConfigurationType =
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 
 interface AutomationWorkflowProjectConfigurationListProps {
+    onCreate: () => void;
     onEdit: (configuration: AutomationWorkflowProjectConfigurationType) => void;
     project: AutomationWorkflowProjectType;
 }
 
 const AutomationWorkflowProjectConfigurationList = ({
+    onCreate,
     onEdit,
     project,
 }: AutomationWorkflowProjectConfigurationListProps) => {
@@ -42,9 +45,14 @@ const AutomationWorkflowProjectConfigurationList = ({
         return (
             <div className="flex justify-center py-8">
                 <EmptyList
+                    button={project.published && <Button label="Create Configuration" onClick={onCreate} />}
                     icon={<SlidersHorizontalIcon className="size-24 text-stroke-neutral-tertiary" />}
-                    message="Create a configuration to run a published version of this project in an environment."
-                    title="No Configurations"
+                    message={
+                        project.published
+                            ? 'Create a configuration to run a published version of this project in an environment.'
+                            : 'Configurations run a published version of a project. Publish this project to configure it.'
+                    }
+                    title={project.published ? 'No Configurations' : 'Publish the project to configure it'}
                 />
             </div>
         );
