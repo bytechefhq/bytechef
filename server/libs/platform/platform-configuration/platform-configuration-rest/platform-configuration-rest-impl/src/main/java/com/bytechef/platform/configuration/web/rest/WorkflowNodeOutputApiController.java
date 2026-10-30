@@ -27,6 +27,7 @@ import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,6 +78,7 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     public ResponseEntity<WorkflowNodeOutputModel> getWorkflowNodeOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
