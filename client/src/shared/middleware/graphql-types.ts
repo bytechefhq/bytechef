@@ -55,6 +55,7 @@ export type ActionDefinition = {
   __typename?: 'ActionDefinition';
   componentName: Scalars['String']['output'];
   componentVersion: Scalars['Int']['output'];
+  deprecated?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   help?: Maybe<Help>;
   name: Scalars['String']['output'];
@@ -718,6 +719,7 @@ export type ComponentDefinition = {
   componentCategories?: Maybe<Array<ComponentCategory>>;
   connection?: Maybe<ConnectionDefinition>;
   connectionRequired?: Maybe<Scalars['Boolean']['output']>;
+  deprecated?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   icon?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];

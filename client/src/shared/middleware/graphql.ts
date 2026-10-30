@@ -1883,7 +1883,7 @@ export type ComponentDefinitionSearchQueryVariables = Exact<{
 }>;
 
 
-export type ComponentDefinitionSearchQuery = { componentDefinitionSearch: Array<{ name: string, title: string | null, icon: string | null, description: string | null, version: number | null, actionsCount: number | null, triggersCount: number | null, clusterElementsCount: any, clusterRoot: boolean | null, componentCategories: Array<{ name: string, label: string | null }> | null, actions: Array<{ name: string, title: string | null, description: string | null }> | null, triggers: Array<{ name: string, title: string | null, description: string | null }> | null, clusterElements: Array<{ type: { name: string | null, label: string | null } | null }> | null }> };
+export type ComponentDefinitionSearchQuery = { componentDefinitionSearch: Array<{ name: string, title: string | null, icon: string | null, description: string | null, version: number | null, actionsCount: number | null, triggersCount: number | null, clusterElementsCount: any, clusterRoot: boolean | null, deprecated: boolean | null, componentCategories: Array<{ name: string, label: string | null }> | null, actions: Array<{ deprecated: boolean | null, name: string, title: string | null, description: string | null }> | null, triggers: Array<{ name: string, title: string | null, description: string | null }> | null, clusterElements: Array<{ type: { name: string | null, label: string | null } | null }> | null }> };
 
 export type ComponentPropertyDisplayConditionsQueryVariables = Exact<{
   componentName: string;
@@ -9308,11 +9308,13 @@ export const ComponentDefinitionSearchDocument = new TypedDocumentString(`
     triggersCount
     clusterElementsCount
     clusterRoot
+    deprecated
     componentCategories {
       name
       label
     }
     actions {
+      deprecated
       name
       title
       description
