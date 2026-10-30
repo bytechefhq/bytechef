@@ -183,6 +183,7 @@ const ProjectWorkflowList = ({
                                         <DropdownMenu onOpenChange={handleOpenChange}>
                                             <DropdownMenuTrigger asChild>
                                                 <Button
+                                                    aria-label="More Workflow Creation Actions"
                                                     icon={
                                                         isImportingN8nWorkflow ? (
                                                             <LoaderCircleIcon className="animate-spin" />
