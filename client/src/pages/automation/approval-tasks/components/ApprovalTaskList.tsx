@@ -27,7 +27,6 @@ export default function ApprovalTaskList() {
         handleSelectApprovalTask,
         handleSortChange,
         handleStatusToggle,
-        headerText,
         sortBy,
         sortDirection,
         totalApprovalTaskCount,
@@ -48,7 +47,7 @@ export default function ApprovalTaskList() {
                             variant="ghost"
                         />
 
-                        <h2 className="text-lg font-semibold text-foreground">{headerText}</h2>
+                        <h2 className="text-lg font-semibold text-foreground">Approval Tasks</h2>
                     </div>
 
                     <div className="flex items-center gap-1">
