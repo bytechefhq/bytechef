@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.repository;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -54,6 +55,17 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
     Optional<Long> findConnectedUserIdByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
     List<ConnectedUserProject> findAllByConnectedUserId(long connectedUserId);
+
+    @Query("""
+        SELECT cup.*
+        FROM connected_user_project cup
+        JOIN connected_user cu ON cup.connected_user_id = cu.id
+        WHERE (CAST(:connectedUserId AS BIGINT) IS NULL OR cup.connected_user_id = :connectedUserId)
+        AND (CAST(:environment AS INTEGER) IS NULL OR cu.environment = :environment)
+        ORDER BY cup.id
+        """)
+    List<ConnectedUserProject> findAllByConnectedUserIdAndEnvironment(
+        @Nullable @Param("connectedUserId") Long connectedUserId, @Nullable @Param("environment") Integer environment);
 
     Optional<ConnectedUserProject> findByConnectedUserId(Long connectedUserid);
 
