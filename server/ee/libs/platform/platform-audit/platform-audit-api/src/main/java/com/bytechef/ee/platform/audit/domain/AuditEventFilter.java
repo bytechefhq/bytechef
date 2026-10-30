@@ -16,10 +16,10 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public record AuditEventFilter(
-    @Nullable String principal, @Nullable String eventType, @Nullable LocalDateTime fromDate,
-    @Nullable LocalDateTime toDate, @Nullable String dataSearch) {
+    @Nullable String eventType, @Nullable LocalDateTime fromDate, @Nullable LocalDateTime toDate,
+    @Nullable String search, boolean searchPrincipal) {
 
     public static AuditEventFilter empty() {
-        return new AuditEventFilter(null, null, null, null, null);
+        return new AuditEventFilter(null, null, null, null, true);
     }
 }

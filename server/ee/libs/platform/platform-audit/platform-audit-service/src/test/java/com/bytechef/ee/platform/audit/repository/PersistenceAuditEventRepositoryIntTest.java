@@ -72,16 +72,50 @@ public class PersistenceAuditEventRepositoryIntTest {
     }
 
     @Test
-    public void testFindAllFilteredByPrincipal() {
-        save("alice", "PERMISSION_CHECK", LocalDateTime.now());
+    public void testFindAllFilteredBySearchMatchesPrincipalCaseInsensitively() {
+        save("alice@example.com", "PERMISSION_CHECK", LocalDateTime.now());
         save("bob", "PERMISSION_CHECK", LocalDateTime.now());
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter("alice", null, null, null, null), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "ALICE@", true), PageRequest.of(0, 25));
 
         assertThat(page.getContent())
-            .hasSize(1)
-            .allSatisfy(event -> assertThat(event.getPrincipal()).isEqualTo("alice"));
+            .singleElement()
+            .satisfies(event -> assertThat(event.getPrincipal()).isEqualTo("alice@example.com"));
+
+        Page<PersistentAuditEvent> wildcardPage = persistenceAuditEventRepository
+            .findAllFiltered(new AuditEventFilter(null, null, null, "a_ice", true), PageRequest.of(0, 25));
+
+        assertThat(wildcardPage.getContent()).isEmpty();
+    }
+
+    @Test
+    public void testFindAllFilteredBySearchMatchesPrincipalOrDataValue() {
+        save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("method", "com.bytechef.ProjectFacade.delete"));
+        save("bob", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("userLogin", "alice"));
+        save("carol", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("userLogin", "dave"));
+
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository
+            .findAllFiltered(new AuditEventFilter(null, null, null, "alice", true), PageRequest.of(0, 25));
+
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(page.getContent())
+            .extracting(PersistentAuditEvent::getPrincipal)
+            .containsExactlyInAnyOrder("alice", "bob");
+    }
+
+    @Test
+    public void testFindAllFilteredBySearchSkipsPrincipalWhenPrincipalSearchIsOff() {
+        save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("method", "com.bytechef.ProjectFacade.delete"));
+        save("bob", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("userLogin", "alice"));
+
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository
+            .findAllFiltered(new AuditEventFilter(null, null, null, "alice", false), PageRequest.of(0, 25));
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent())
+            .singleElement()
+            .satisfies(event -> assertThat(event.getPrincipal()).isEqualTo("bob"));
     }
 
     @Test
@@ -90,7 +124,7 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("alice", "CONNECTION_CREATED", LocalDateTime.now());
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, "CONNECTION_CREATED", null, null, null), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter("CONNECTION_CREATED", null, null, null, true), PageRequest.of(0, 25));
 
         assertThat(page.getContent())
             .hasSize(1)
@@ -105,7 +139,7 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("alice", "PERMISSION_CHECK", now.minusDays(1));
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, now.minusDays(5), now, null), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, now.minusDays(5), now, null, true), PageRequest.of(0, 25));
 
         assertThat(page.getContent()).hasSize(1);
     }
@@ -184,12 +218,12 @@ public class PersistenceAuditEventRepositoryIntTest {
     }
 
     @Test
-    public void testFindAllFilteredByDataSearchIsCaseInsensitive() {
+    public void testFindAllFilteredBySearchIsCaseInsensitive() {
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("method", "com.bytechef.ProjectFacade.delete"));
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("method", "com.bytechef.UserFacade.create"));
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, null, "projectfacade"), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "projectfacade", true), PageRequest.of(0, 25));
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent())
@@ -199,24 +233,24 @@ public class PersistenceAuditEventRepositoryIntTest {
     }
 
     @Test
-    public void testFindAllFilteredByDataSearchTreatsWildcardsLiterally() {
+    public void testFindAllFilteredBySearchTreatsWildcardsLiterally() {
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("method", "com.bytechef.ProjectFacade.delete"));
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("note", "100% done_now"));
 
         Page<PersistentAuditEvent> percentPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, null, "%"), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "%", true), PageRequest.of(0, 25));
 
         assertThat(percentPage.getContent())
             .hasSize(1)
             .allSatisfy(event -> assertThat(event.getData()).containsKey("note"));
 
         Page<PersistentAuditEvent> underscorePage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, null, "done_now"), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "done_now", true), PageRequest.of(0, 25));
 
         assertThat(underscorePage.getContent()).hasSize(1);
 
         Page<PersistentAuditEvent> noMatchPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, null, "d_ne"), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "d_ne", true), PageRequest.of(0, 25));
 
         assertThat(noMatchPage.getContent()).isEmpty();
     }
@@ -231,7 +265,7 @@ public class PersistenceAuditEventRepositoryIntTest {
         persistenceAuditEventRepository.deleteByEventDateBefore(now.minusDays(365));
 
         Page<PersistentAuditEvent> expiredPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, null, "expired"), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "expired", true), PageRequest.of(0, 25));
 
         assertThat(expiredPage.getContent()).isEmpty();
 
@@ -249,25 +283,22 @@ public class PersistenceAuditEventRepositoryIntTest {
 
         for (int index = 0; index < 40; index++) {
             save(
-                index % 2 == 0 ? "alice" : "bob", index % 3 == 0 ? "OTHER_EVENT" : "TARGET_EVENT",
+                index % 5 == 0 ? "needle-owner" : "alice", index % 3 == 0 ? "OTHER_EVENT" : "TARGET_EVENT",
                 base.minusMinutes(index),
-                Map.of(
-                    "method", "method" + index,
-                    "target", index % 6 == 2 ? "hay" : "needle-target",
-                    "note", index % 4 == 0 ? "needle-note" : "plain"));
+                Map.of("method", "method" + index, "note", index % 4 == 0 ? "needle-note" : "plain"));
         }
 
         List<String> methods = new ArrayList<>();
 
         for (int pageNumber = 0; pageNumber < 3; pageNumber++) {
             Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
-                new AuditEventFilter("alice", "TARGET_EVENT", base.minusMinutes(35), base, "needle"),
+                new AuditEventFilter("TARGET_EVENT", base.minusMinutes(35), base, "needle", true),
                 PageRequest.of(pageNumber, 4));
 
-            assertThat(page.getTotalElements()).isEqualTo(9);
-            assertThat(page.getContent()).hasSize(pageNumber < 2 ? 4 : 1);
+            assertThat(page.getTotalElements()).isEqualTo(10);
+            assertThat(page.getContent()).hasSize(pageNumber < 2 ? 4 : 2);
             assertThat(page.getContent())
-                .allSatisfy(event -> assertThat(event.getData()).hasSize(3));
+                .allSatisfy(event -> assertThat(event.getData()).hasSize(2));
 
             page.getContent()
                 .forEach(event -> methods.add(event.getData()
@@ -275,7 +306,8 @@ public class PersistenceAuditEventRepositoryIntTest {
         }
 
         assertThat(methods).containsExactly(
-            "method4", "method8", "method10", "method16", "method20", "method22", "method28", "method32", "method34");
+            "method4", "method5", "method8", "method10", "method16", "method20", "method25", "method28", "method32",
+            "method35");
     }
 
     @Test
@@ -303,19 +335,19 @@ public class PersistenceAuditEventRepositoryIntTest {
     }
 
     @Test
-    public void testFindAllFilteredByDataSearchTreatsBackslashLiterally() {
+    public void testFindAllFilteredBySearchTreatsBackslashLiterally() {
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("path", "C:\\temp\\file"));
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("path", "C:/temp/file"));
 
         Page<PersistentAuditEvent> backslashPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, null, "C:\\te"), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "C:\\te", true), PageRequest.of(0, 25));
 
         assertThat(backslashPage.getContent())
             .singleElement()
             .satisfies(event -> assertThat(event.getData()).containsEntry("path", "C:\\temp\\file"));
 
         Page<PersistentAuditEvent> trailingBackslashPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, null, "temp\\"), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "temp\\", true), PageRequest.of(0, 25));
 
         assertThat(trailingBackslashPage.getContent()).hasSize(1);
     }
