@@ -23,34 +23,23 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 class McpAnonymousAuthenticationTokenTest {
 
-    private static final String SECRET_KEY = "server-secret";
+    private static final String PRINCIPAL = "mcp-anonymous:test:42";
 
     @Test
-    void testAutomationTokenIsAuthenticatedWithoutAuthorities() {
-        McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.ofAutomationMcpServer(42);
+    void testTokenIsAuthenticatedWithoutAuthorities() {
+        McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.of(PRINCIPAL);
 
         assertThat(token.isAuthenticated()).isTrue();
         assertThat(token.getAuthorities()).isEmpty();
-        assertThat(token.getName()).isEqualTo("mcp-anonymous:automation:42");
+        assertThat(token.getCredentials()).isEqualTo("");
         assertThat(token).isNotInstanceOf(AnonymousAuthenticationToken.class);
     }
 
     @Test
-    void testPrincipalDoesNotDiscloseTheSecretKey() {
-        McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.ofAutomationMcpServer(42);
+    void testTokenExposesThePrincipalAsItsName() {
+        McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.of(PRINCIPAL);
 
-        assertThat(token.getPrincipal()).asString()
-            .doesNotContain(SECRET_KEY);
-        assertThat(token.getName()).doesNotContain(SECRET_KEY);
-        assertThat(token.toString()).doesNotContain(SECRET_KEY);
-    }
-
-    @Test
-    void testA2aTokenIdentifiesTheServerWithoutAuthorities() {
-        McpAnonymousAuthenticationToken token = McpAnonymousAuthenticationToken.ofAutomationA2aServer(42);
-
-        assertThat(token.isAuthenticated()).isTrue();
-        assertThat(token.getAuthorities()).isEmpty();
-        assertThat(token.getPrincipal()).isEqualTo("a2a-anonymous:automation:42");
+        assertThat(token.getPrincipal()).isEqualTo(PRINCIPAL);
+        assertThat(token.getName()).isEqualTo(PRINCIPAL);
     }
 }

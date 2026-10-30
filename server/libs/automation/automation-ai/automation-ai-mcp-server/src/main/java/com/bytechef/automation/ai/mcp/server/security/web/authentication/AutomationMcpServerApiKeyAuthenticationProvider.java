@@ -47,6 +47,8 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class AutomationMcpServerApiKeyAuthenticationProvider implements AuthenticationProvider {
 
+    private static final String ANONYMOUS_PRINCIPAL_PREFIX = "mcp-anonymous:automation:";
+
     private final ApiKeyService apiKeyService;
     private final McpApiKeyEntityRepository mcpApiKeyEntityRepository;
     private final McpServerService mcpServerService;
@@ -87,7 +89,7 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
         if (!mcpServer.isAuthenticationRequired()) {
             checkEnabled(mcpServer);
 
-            return McpAnonymousAuthenticationToken.ofAutomationMcpServer(mcpServer.getId());
+            return McpAnonymousAuthenticationToken.of(ANONYMOUS_PRINCIPAL_PREFIX + mcpServer.getId());
         }
 
         String secretKey = mcpApiKeyCredentials.getSecret();

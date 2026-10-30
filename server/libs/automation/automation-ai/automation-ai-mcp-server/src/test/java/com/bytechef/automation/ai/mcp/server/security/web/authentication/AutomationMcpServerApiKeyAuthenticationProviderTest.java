@@ -185,6 +185,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
     void testAuthenticateWithoutAuthenticationRequiredReturnsAnonymous() {
         McpServer mcpServer = mock(McpServer.class);
 
+        when(mcpServer.getId()).thenReturn(42L);
         when(mcpServer.getType()).thenReturn(PlatformType.AUTOMATION);
         when(mcpServer.isAuthenticationRequired()).thenReturn(false);
         when(mcpServer.isEnabled()).thenReturn(true);
@@ -196,6 +197,7 @@ class AutomationMcpServerApiKeyAuthenticationProviderTest {
         assertThat(authentication).isInstanceOf(McpAnonymousAuthenticationToken.class);
         assertThat(authentication.isAuthenticated()).isTrue();
         assertThat(authentication.getAuthorities()).isEmpty();
+        assertThat(authentication.getName()).isEqualTo("mcp-anonymous:automation:42");
         verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
