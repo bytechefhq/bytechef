@@ -244,6 +244,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             "", structureOperationType, parameters, Map.of(), Map.of(), properties, false, Map.of());
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -274,6 +275,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             displayConditionMap, new ArrayList<>(workflowNodeStructure.missingRequiredProperties));
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public Set<String> getClusterElementMissingRequiredProperties(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -289,6 +292,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return Set.copyOf(workflowNodeStructure.missingRequiredProperties);
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public DisplayConditionResultDTO getWorkflowNodeDisplayConditions(
         String workflowId, String workflowNodeName, long environmentId) {
@@ -319,6 +323,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             displayConditionMap, new ArrayList<>(workflowNodeStructure.missingRequiredProperties));
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public Set<String> getWorkflowNodeMissingRequiredProperties(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);

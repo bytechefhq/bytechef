@@ -84,6 +84,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public Map<String, Object> getClusterElementScriptInput(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -137,6 +138,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         }
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> getWorkflowNodeScriptInput(

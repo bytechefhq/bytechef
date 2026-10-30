@@ -32,6 +32,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -67,6 +68,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public String getClusterElementWorkflowNodeDescription(
         String workflowId, String workflowNodeName, String clusterElementName, Long environmentId) {
@@ -96,6 +98,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
             inputParameters);
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public String getWorkflowNodeDescription(String workflowId, String workflowNodeName, long environmentId) {
         // See PrincipalEnvironment.
