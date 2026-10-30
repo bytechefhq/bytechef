@@ -13,10 +13,8 @@ export interface AuditEventDateRangePresetI {
 }
 
 export interface AuditEventFiltersI {
-    dataSearch?: string;
     dateRange: AuditEventDateRangeType;
     eventType?: string;
     fromDate?: number;
-    principal?: string;
     toDate?: number;
 }

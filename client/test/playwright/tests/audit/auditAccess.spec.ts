@@ -5,8 +5,8 @@ import {
     AUDIT_EVENTS_ROUTE,
     NON_ADMIN_USER,
     auditEventData,
-    auditEventsDataSearchInput,
     auditEventsFilterButton,
+    auditEventsSearchInput,
     openAuditEventsPage,
     postGraphQl,
     queryAuditEvents,
@@ -24,7 +24,7 @@ test.describe('Audit Events access', () => {
         await authenticatedPage.getByRole('link', {exact: true, name: 'Audit Events'}).click();
 
         await expect(authenticatedPage).toHaveURL(new RegExp(`${AUDIT_EVENTS_ROUTE}$`));
-        await expect(auditEventsDataSearchInput(authenticatedPage)).toBeVisible();
+        await expect(auditEventsSearchInput(authenticatedPage)).toBeVisible();
         await expect(auditEventsFilterButton(authenticatedPage)).toBeVisible();
 
         for (const columnName of ['Date', 'Principal', 'Event Type', 'Result']) {
@@ -45,7 +45,7 @@ test.describe('Audit Events access', () => {
         await nonAdminPage.goto(AUDIT_EVENTS_ROUTE);
 
         await expect(nonAdminPage.getByText('You are not authorized to access this page.')).toBeVisible();
-        await expect(auditEventsDataSearchInput(nonAdminPage)).toHaveCount(0);
+        await expect(auditEventsSearchInput(nonAdminPage)).toHaveCount(0);
         await expect(auditEventsFilterButton(nonAdminPage)).toHaveCount(0);
         await expect(nonAdminPage.getByRole('table')).toHaveCount(0);
 
@@ -74,12 +74,12 @@ test.describe('Audit Events access', () => {
 
         const deniedEvents = await queryAuditEvents(authenticatedPage, {
             eventType: 'PERMISSION_CHECK',
-            principal: 'user',
+            search: 'AuditEventFacadeImpl',
             size: 200,
         });
 
         const deniedMethods = deniedEvents.content
-            .filter((auditEvent) => auditEvent.outcome === 'DENIED')
+            .filter((auditEvent) => auditEvent.principal === 'user' && auditEvent.outcome === 'DENIED')
             .map((auditEvent) => auditEventData(auditEvent).method);
 
         expect(deniedMethods).toContain('com.bytechef.ee.platform.audit.facade.AuditEventFacadeImpl.fetchEventTypes');
@@ -91,11 +91,8 @@ test.describe('Audit Events access', () => {
 
         await queryAuditEvents(authenticatedPage);
 
-        const readEvents = await queryAuditEvents(authenticatedPage, {
-            dataSearch: 'AuditEventFacadeImpl',
-            principal: 'admin',
-        });
+        const readEvents = await queryAuditEvents(authenticatedPage, {search: 'AuditEventFacadeImpl', size: 200});
 
-        expect(readEvents.totalElements).toBe(0);
+        expect(readEvents.content.filter((auditEvent) => auditEvent.principal === 'admin')).toHaveLength(0);
     });
 });

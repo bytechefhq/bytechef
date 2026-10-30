@@ -54,8 +54,8 @@ export async function getApi(page: Page, path: string): Promise<APIResponse> {
     return response;
 }
 
-export function auditEventsDataSearchInput(page: Page) {
-    return page.getByRole('textbox', {exact: true, name: 'Search data'});
+export function auditEventsSearchInput(page: Page) {
+    return page.getByRole('textbox', {exact: true, name: 'Search'});
 }
 
 export function auditEventsFilterButton(page: Page) {
@@ -67,34 +67,35 @@ export async function openAuditEventsPage(page: Page): Promise<void> {
 
     await page.addStyleTag({content: '.tsqd-parent-container { display: none !important; }'});
 
-    await expect(auditEventsDataSearchInput(page)).toBeVisible();
+    await expect(auditEventsSearchInput(page)).toBeVisible();
 }
 
 async function expectFilterApplied(page: Page, label: string, value: string): Promise<void> {
-    if (value) {
-        await expect(page.getByText(`${label} ${value}`, {exact: true})).toBeVisible();
-    } else {
-        await expect(page.getByText(new RegExp(`^${label} `))).toHaveCount(0);
-    }
+    await expect(page.getByText(`${label} ${value}`, {exact: true})).toBeVisible();
 
     await expect(page.getByText('Loading…')).toHaveCount(0);
 }
 
-export async function filterAuditEvents(
-    page: Page,
-    {dataSearch, principal}: {dataSearch?: string; principal?: string}
-): Promise<void> {
-    if (principal !== undefined) {
-        await page.getByRole('textbox', {exact: true, name: 'Principal'}).fill(principal);
+export async function searchAuditEvents(page: Page, search: string): Promise<void> {
+    const trimmedSearch = search.trim();
 
-        await expectFilterApplied(page, 'Principal:', principal);
-    }
+    const searchResponse = page.waitForResponse((response) => {
+        const postData = response.request().postData() || '';
 
-    if (dataSearch !== undefined) {
-        await auditEventsDataSearchInput(page).fill(dataSearch);
+        if (!response.url().endsWith('/graphql') || !postData.includes('auditEvents(')) {
+            return false;
+        }
 
-        await expectFilterApplied(page, 'Data:', dataSearch);
-    }
+        const searchVariable = JSON.parse(postData).variables?.search;
+
+        return searchVariable === (trimmedSearch || undefined);
+    });
+
+    await auditEventsSearchInput(page).fill(search);
+
+    await searchResponse;
+
+    await expect(page.getByText('Loading…')).toHaveCount(0);
 }
 
 export async function openAuditEventsFilterMenu(page: Page) {
@@ -120,7 +121,7 @@ export function auditEventRows(page: Page) {
 }
 
 export async function openAuditEventRowWithDataEntry(page: Page, key: string, value: string): Promise<void> {
-    await filterAuditEvents(page, {dataSearch: value});
+    await searchAuditEvents(page, value);
 
     const rows = auditEventRows(page);
 
@@ -170,8 +171,8 @@ export async function queryAuditEvents(
 ): Promise<{content: AuditEventI[]; totalElements: number}> {
     const response = await postGraphQl(
         page,
-        `query AuditEvents($principal: String, $eventType: String, $fromDate: Long, $toDate: Long, $dataSearch: String, $size: Int) {
-            auditEvents(principal: $principal, eventType: $eventType, fromDate: $fromDate, toDate: $toDate, dataSearch: $dataSearch, size: $size) {
+        `query AuditEvents($eventType: String, $fromDate: Long, $toDate: Long, $search: String, $size: Int) {
+            auditEvents(eventType: $eventType, fromDate: $fromDate, toDate: $toDate, search: $search, size: $size) {
                 content {
                     data {
                         key
@@ -288,7 +289,7 @@ export async function runDeployedWorkflow(
 
 export async function expectJobAuditEvent(page: Page, jobId: number, eventType: string): Promise<void> {
     await expect(async () => {
-        const auditEvents = await queryAuditEvents(page, {eventType, principal: 'SYSTEM', size: 200});
+        const auditEvents = await queryAuditEvents(page, {eventType, search: String(jobId), size: 200});
 
         expect(auditEvents.content.map((auditEvent) => auditEventData(auditEvent).jobId)).toContain(String(jobId));
     }).toPass({timeout: 30000});

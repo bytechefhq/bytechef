@@ -315,34 +315,44 @@ describe('AuditEvents', () => {
         expect(screen.queryByRole('button', {name: 'Clear all'})).not.toBeInTheDocument();
     });
 
-    it('trims typed filters and drops blank ones after the debounce', async () => {
+    it('places the search box in the header before the filter button', () => {
         render(<AuditEvents />);
 
-        await userEvent.type(screen.getByPlaceholderText('Principal (exact login)'), '  alice  ');
-        await userEvent.type(screen.getByPlaceholderText('Search data'), '   ');
+        const header = screen.getByRole('banner');
+        const searchInput = within(header).getByRole('textbox', {name: 'Search'});
+        const filterButton = within(header).getByRole('button', {name: 'Filter options'});
 
-        expect(lastQueryVariables()).toMatchObject({principal: undefined});
-
-        await waitFor(() => expect(lastQueryVariables()).toMatchObject({dataSearch: undefined, principal: 'alice'}));
-        expect(screen.getByText('Principal: alice')).toBeInTheDocument();
-        expect(screen.queryByText(/^Data: /)).not.toBeInTheDocument();
+        expect(searchInput).toHaveAttribute('placeholder', 'Search');
+        expect(searchInput.compareDocumentPosition(filterButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
-    it('empties the principal input when its chip is cleared', async () => {
+    it('searches with the trimmed text after the debounce and returns to the first page', async () => {
         render(<AuditEvents />);
 
-        await userEvent.type(screen.getByPlaceholderText('Principal (exact login)'), 'alice');
-        await userEvent.type(screen.getByPlaceholderText('Search data'), 'createProject');
+        await userEvent.click(screen.getByRole('button', {name: 'Next'}));
 
-        await waitFor(() =>
-            expect(lastQueryVariables()).toMatchObject({dataSearch: 'createProject', principal: 'alice'})
-        );
+        await userEvent.type(screen.getByRole('textbox', {name: 'Search'}), '  alice  ');
 
-        await userEvent.click(screen.getByRole('button', {name: 'Clear principal filter'}));
+        expect(lastQueryVariables()).toMatchObject({page: 1, search: undefined});
 
-        expect(lastQueryVariables()).toMatchObject({dataSearch: 'createProject', principal: undefined});
-        expect(screen.getByPlaceholderText('Principal (exact login)')).toHaveValue('');
-        expect(screen.getByPlaceholderText('Search data')).toHaveValue('createProject');
+        await waitFor(() => expect(lastQueryVariables()).toMatchObject({page: 0, search: 'alice'}));
+        expect(screen.queryByText(/^Search: /)).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-transparent');
+    });
+
+    it('drops a blank search after the debounce', async () => {
+        render(<AuditEvents />);
+
+        const searchInput = screen.getByRole('textbox', {name: 'Search'});
+
+        await userEvent.type(searchInput, 'alice');
+
+        await waitFor(() => expect(lastQueryVariables()).toMatchObject({search: 'alice'}));
+
+        await userEvent.clear(searchInput);
+        await userEvent.type(searchInput, '   ');
+
+        await waitFor(() => expect(lastQueryVariables()).toMatchObject({search: undefined}));
     });
 
     it('tells the viewer in the filter menu when the event types could not be loaded', async () => {
@@ -369,12 +379,12 @@ describe('AuditEvents', () => {
         expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-transparent');
     });
 
-    it('clears every filter with Clear all and requests the unfiltered first page', async () => {
+    it('clears the menu filters with Clear all and keeps the search', async () => {
         render(<AuditEvents />);
 
-        await userEvent.type(screen.getByPlaceholderText('Principal (exact login)'), 'alice');
+        await userEvent.type(screen.getByRole('textbox', {name: 'Search'}), 'alice');
 
-        await waitFor(() => expect(lastQueryVariables()).toMatchObject({principal: 'alice'}));
+        await waitFor(() => expect(lastQueryVariables()).toMatchObject({search: 'alice'}));
 
         await selectMenuItem(/^PERMISSION_CHECK/);
         await selectMenuItem(/^Last 24 hours/);
@@ -384,29 +394,27 @@ describe('AuditEvents', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Clear all'}));
 
         expect(lastQueryVariables()).toMatchObject({
-            dataSearch: undefined,
             eventType: undefined,
             fromDate: undefined,
             page: 0,
-            principal: undefined,
+            search: 'alice',
             toDate: undefined,
         });
-        expect(screen.getByPlaceholderText('Principal (exact login)')).toHaveValue('');
-        expect(screen.queryByText('Principal: alice')).not.toBeInTheDocument();
+        expect(screen.getByRole('textbox', {name: 'Search'})).toHaveValue('alice');
     });
 
-    it('clears every filter from the Clear all filters menu item', async () => {
+    it('clears the menu filters from the Clear all filters menu item', async () => {
         render(<AuditEvents />);
 
-        await userEvent.type(screen.getByPlaceholderText('Search data'), 'createProject');
+        await userEvent.type(screen.getByRole('textbox', {name: 'Search'}), 'createProject');
 
-        await waitFor(() => expect(lastQueryVariables()).toMatchObject({dataSearch: 'createProject'}));
+        await waitFor(() => expect(lastQueryVariables()).toMatchObject({search: 'createProject'}));
 
         await selectMenuItem(/^JOB_COMPLETED/);
         await selectMenuItem('Clear all filters');
 
-        expect(lastQueryVariables()).toMatchObject({dataSearch: undefined, eventType: undefined, page: 0});
-        expect(screen.getByPlaceholderText('Search data')).toHaveValue('');
+        expect(lastQueryVariables()).toMatchObject({eventType: undefined, page: 0, search: 'createProject'});
+        expect(screen.getByRole('textbox', {name: 'Search'})).toHaveValue('createProject');
         expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-transparent');
     });
 });

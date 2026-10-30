@@ -1,7 +1,7 @@
 import {expect} from '@playwright/test';
 
 import {loginTest, mergeTests} from '../../fixtures';
-import {auditEventRows, filterAuditEvents, openAuditEventsPage, selectAuditEventType} from '../../utils/auditUtils';
+import {auditEventRows, openAuditEventsPage, searchAuditEvents, selectAuditEventType} from '../../utils/auditUtils';
 import {createProject} from '../../utils/projectUtils';
 
 const test = mergeTests(loginTest());
@@ -15,7 +15,7 @@ test.describe('Audit Events permission checks', () => {
         await openAuditEventsPage(authenticatedPage);
 
         await selectAuditEventType(authenticatedPage, 'PERMISSION_CHECK');
-        await filterAuditEvents(authenticatedPage, {dataSearch: 'ProjectFacadeImpl.createProject', principal: 'admin'});
+        await searchAuditEvents(authenticatedPage, 'ProjectFacadeImpl.createProject');
 
         const firstRow = auditEventRows(authenticatedPage).first();
 

@@ -4,11 +4,12 @@ import {loginTest, mergeTests} from '../../fixtures';
 import {
     NON_ADMIN_USER,
     auditEventRows,
-    filterAuditEvents,
+    auditEventsSearchInput,
     openAuditEventsFilterMenu,
     openAuditEventsPage,
     postGraphQl,
     queryAuditEvents,
+    searchAuditEvents,
     selectAuditEventType,
 } from '../../utils/auditUtils';
 import {login} from '../../utils/login';
@@ -53,21 +54,18 @@ test.describe('Audit Events filters and paging', () => {
         }
     });
 
-    test('the principal and data filters narrow the table, and an unmatched filter shows the empty state', async ({
-        authenticatedPage,
-    }) => {
+    test('the search narrows the table, and an unmatched search shows the empty state', async ({authenticatedPage}) => {
         await openAuditEventsPage(authenticatedPage);
 
-        await filterAuditEvents(authenticatedPage, {dataSearch: 'fetchEventTypes', principal: 'user'});
+        await searchAuditEvents(authenticatedPage, 'fetchEventTypes');
 
-        await expect(auditEventRows(authenticatedPage).first()).toContainText('DENIED');
+        await expect(auditEventRows(authenticatedPage).first()).toContainText('PERMISSION_CHECK');
 
         for (const rowText of await auditEventRows(authenticatedPage).allInnerTexts()) {
-            expect(rowText).toContain('user');
             expect(rowText).toContain('PERMISSION_CHECK');
         }
 
-        await filterAuditEvents(authenticatedPage, {principal: 'nobody-with-this-login'});
+        await searchAuditEvents(authenticatedPage, 'nobody-with-this-login');
 
         await expect(authenticatedPage.getByText('No audit events match the current filters.')).toBeVisible();
     });
@@ -76,7 +74,7 @@ test.describe('Audit Events filters and paging', () => {
         await openAuditEventsPage(authenticatedPage);
 
         await selectAuditEventType(authenticatedPage, 'PERMISSION_CHECK');
-        await filterAuditEvents(authenticatedPage, {dataSearch: 'fetchEventTypes', principal: 'user'});
+        await searchAuditEvents(authenticatedPage, 'fetchEventTypes');
 
         await expect(authenticatedPage.getByText(/^Page 1 of \d+$/)).toBeVisible();
         await expect(auditEventRows(authenticatedPage)).toHaveCount(25);
@@ -132,25 +130,30 @@ test.describe('Audit Events filters and paging', () => {
         expect(pastEvents.totalElements).toBe(0);
     });
 
-    test('Clear all resets every filter and shows all events again', async ({authenticatedPage}) => {
+    test('Clear all resets the menu filters and keeps the search', async ({authenticatedPage}) => {
         await openAuditEventsPage(authenticatedPage);
 
-        await filterAuditEvents(authenticatedPage, {principal: 'nobody-with-this-login'});
+        await selectAuditEventType(authenticatedPage, 'AUTHENTICATION_SUCCESS');
+        await searchAuditEvents(authenticatedPage, 'nobody-with-this-login');
 
         await expect(authenticatedPage.getByText('No audit events match the current filters.')).toBeVisible();
 
         await authenticatedPage.getByRole('button', {exact: true, name: 'Clear all'}).click();
 
-        await expect(authenticatedPage.getByRole('textbox', {exact: true, name: 'Principal'})).toHaveValue('');
-        await expect(authenticatedPage.getByText(/^Principal: /)).toHaveCount(0);
+        await expect(authenticatedPage.getByText(/^Event type: /)).toHaveCount(0);
+        await expect(auditEventsSearchInput(authenticatedPage)).toHaveValue('nobody-with-this-login');
+        await expect(authenticatedPage.getByText('No audit events match the current filters.')).toBeVisible();
+
+        await auditEventsSearchInput(authenticatedPage).fill('');
+
         await expect(auditEventRows(authenticatedPage).first()).toBeVisible();
     });
 
-    test("filtering by an exact login finds that user's events", async ({authenticatedPage}) => {
+    test("searching a login finds that user's events", async ({authenticatedPage}) => {
         await openAuditEventsPage(authenticatedPage);
 
         await selectAuditEventType(authenticatedPage, 'AUTHENTICATION_SUCCESS');
-        await filterAuditEvents(authenticatedPage, {principal: 'admin'});
+        await searchAuditEvents(authenticatedPage, 'admin');
 
         await expect(authenticatedPage.getByText('No audit events match the current filters.')).toHaveCount(0);
         await expect(auditEventRows(authenticatedPage).first()).toContainText('AUTHENTICATION_SUCCESS');

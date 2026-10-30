@@ -8,11 +8,11 @@ import {
     auditEventRows,
     deployWorkflows,
     expectJobAuditEvent,
-    filterAuditEvents,
     openAuditEventRowWithDataEntry,
     openAuditEventsPage,
     putApi,
     runDeployedWorkflow,
+    searchAuditEvents,
     selectAuditEventType,
 } from '../../utils/auditUtils';
 import getRandomString from '../../utils/getRandomString';
@@ -38,7 +38,7 @@ test.describe('Audit Events job lifecycle', () => {
         await openAuditEventsPage(authenticatedPage);
 
         await selectAuditEventType(authenticatedPage, 'JOB_COMPLETED');
-        await filterAuditEvents(authenticatedPage, {principal: 'SYSTEM'});
+        await searchAuditEvents(authenticatedPage, 'SYSTEM');
 
         const firstRow = auditEventRows(authenticatedPage).first();
 

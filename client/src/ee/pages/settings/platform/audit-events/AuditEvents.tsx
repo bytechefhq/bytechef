@@ -19,13 +19,10 @@ const AuditEvents = () => {
     const [sheetOpen, setSheetOpen] = useState(false);
 
     const {
-        dataSearchInput,
         filters,
-        handleClearDataSearch,
         handleClearDateRange,
         handleClearEventType,
         handleClearFromDate,
-        handleClearPrincipal,
         handleClearToDate,
         handleCustomFromDateChange,
         handleCustomToDateChange,
@@ -34,18 +31,17 @@ const AuditEvents = () => {
         handleResetFilters,
         hasActiveFilters,
         page,
-        principalInput,
-        setDataSearchInput,
+        search,
+        searchInput,
         setPage,
-        setPrincipalInput,
+        setSearchInput,
     } = useAuditEventFilters();
 
     const {data, isError, isLoading, refetch} = useAuditEventsQuery({
-        dataSearch: filters.dataSearch,
         eventType: filters.eventType,
         fromDate: filters.fromDate,
         page,
-        principal: filters.principal,
+        search,
         size: PAGE_SIZE,
         toDate: filters.toDate,
     });
@@ -60,16 +56,20 @@ const AuditEvents = () => {
                     centerTitle
                     position="main"
                     right={
-                        <AuditEventsFilters
-                            filters={filters}
-                            hasActiveFilters={hasActiveFilters}
-                            onClearDateRange={handleClearDateRange}
-                            onCustomFromDateChange={handleCustomFromDateChange}
-                            onCustomToDateChange={handleCustomToDateChange}
-                            onDateRangePresetChange={handleDateRangePresetChange}
-                            onEventTypeChange={handleEventTypeChange}
-                            onResetFilters={handleResetFilters}
-                        />
+                        <div className="flex items-center gap-2">
+                            <AuditEventsSearch onSearchChange={setSearchInput} search={searchInput} />
+
+                            <AuditEventsFilters
+                                filters={filters}
+                                hasActiveFilters={hasActiveFilters}
+                                onClearDateRange={handleClearDateRange}
+                                onCustomFromDateChange={handleCustomFromDateChange}
+                                onCustomToDateChange={handleCustomToDateChange}
+                                onDateRangePresetChange={handleDateRangePresetChange}
+                                onEventTypeChange={handleEventTypeChange}
+                                onResetFilters={handleResetFilters}
+                            />
+                        </div>
                     }
                     title="Audit Events"
                 />
@@ -80,20 +80,11 @@ const AuditEvents = () => {
                 <AuditEventsActiveFilterBadges
                     filters={filters}
                     hasActiveFilters={hasActiveFilters}
-                    onClearDataSearch={handleClearDataSearch}
                     onClearDateRange={handleClearDateRange}
                     onClearEventType={handleClearEventType}
                     onClearFromDate={handleClearFromDate}
-                    onClearPrincipal={handleClearPrincipal}
                     onClearToDate={handleClearToDate}
                     onResetFilters={handleResetFilters}
-                />
-
-                <AuditEventsSearch
-                    dataSearch={dataSearchInput}
-                    onDataSearchChange={setDataSearchInput}
-                    onPrincipalChange={setPrincipalInput}
-                    principal={principalInput}
                 />
 
                 {isLoading && <p className="p-8 text-center text-sm text-muted-foreground">Loading…</p>}
