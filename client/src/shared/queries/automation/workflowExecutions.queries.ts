@@ -10,7 +10,7 @@ import {
 } from '@/shared/middleware/automation/workflow/execution';
 
 /* eslint-disable sort-keys */
-import {useInfiniteQuery, useQuery} from '@tanstack/react-query';
+import {Query, QueryKey, useInfiniteQuery, useQuery} from '@tanstack/react-query';
 
 /**
  * A row of the executions list is a job, or a trigger execution that failed before any job existed; the detail is
@@ -21,6 +21,16 @@ export type WorkflowExecutionKindType = 'JOB' | 'TRIGGER_EXECUTION';
 export const TASK_EXECUTION_CHILDREN_MAX_PAGES = 10;
 
 export const TASK_EXECUTION_CHILDREN_PAGE_SIZE = 50;
+
+const TERMINATED_TASK_EXECUTION_STATUSES = ['CANCELLED', 'COMPLETED', 'FAILED'];
+
+export const getTaskExecutionStaleTime = <TaskExecutionType extends {status?: string}>(
+    query: Query<TaskExecutionType, Error, TaskExecutionType, QueryKey>
+) => {
+    const status = query.state.data?.status;
+
+    return status && TERMINATED_TASK_EXECUTION_STATUSES.includes(status) ? Infinity : 0;
+};
 
 export const WorkflowExecutionKeys = {
     filteredWorkflowExecutions: (request: GetWorkflowExecutionsPageRequest) => [
@@ -121,6 +131,7 @@ export const useGetWorkflowExecutionTaskExecutionQuery = (
         enabled,
         refetchInterval,
         retry,
+        staleTime: getTaskExecutionStaleTime,
     });
 
 export const useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery = (
