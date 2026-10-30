@@ -6,6 +6,7 @@ import {
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -67,7 +68,14 @@ export default function handleTaskDispatcherSubtaskOperationClick({
     const baseNodeData: NodeDataType = {
         ...(clusterRoot ? {clusterElements: {}} : {}),
         componentName: operation.componentName,
-        icon: icon && <InlineSVG className="size-9" loader={<ComponentIcon className="size-9" />} src={icon} />,
+        icon: icon && (
+            <InlineSVG
+                className="size-9 text-content-neutral-primary"
+                loader={<ComponentIcon className="size-9" />}
+                preProcessor={paintMonochromeSvgWithCurrentColor}
+                src={icon}
+            />
+        ),
         label: componentLabel,
         name: workflowNodeName,
         type,

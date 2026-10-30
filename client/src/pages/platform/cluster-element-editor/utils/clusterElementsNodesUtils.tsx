@@ -1,5 +1,6 @@
 import {CLUSTER_ELEMENT_PLACEHOLDER_WIDTH, DEFAULT_NODE_POSITION} from '@/shared/constants';
 import {ClusterElementItemType} from '@/shared/types';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -98,6 +99,7 @@ export function createSingleElementsNode({
                 <InlineSVG
                     className="size-9 flex-none text-content-neutral-primary"
                     loader={<ComponentIcon className="size-9 flex-none text-content-neutral-primary" />}
+                    preProcessor={paintMonochromeSvgWithCurrentColor}
                     src={iconUrl as string}
                 />
             ),
@@ -163,6 +165,7 @@ export function createMultipleElementsNode({
                 <InlineSVG
                     className="size-9 flex-none text-content-neutral-primary"
                     loader={<ComponentIcon className="size-9 flex-none text-content-neutral-primary" />}
+                    preProcessor={paintMonochromeSvgWithCurrentColor}
                     src={iconUrl as string}
                 />
             ),

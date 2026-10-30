@@ -9,6 +9,7 @@ import {CLUSTER_ROOT_NODE_LABEL_WIDTH} from '@/shared/constants';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {CheckIcon, ChevronsUpDownIcon, ComponentIcon, EllipsisVerticalIcon, XIcon} from 'lucide-react';
@@ -450,6 +451,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                                             {iconUrlObject ? (
                                                                 <InlineSVG
                                                                     className="size-9 flex-none text-content-neutral-primary"
+                                                                    preProcessor={paintMonochromeSvgWithCurrentColor}
                                                                     src={iconUrlObject.icon}
                                                                 />
                                                             ) : (
