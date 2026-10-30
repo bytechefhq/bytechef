@@ -60,12 +60,11 @@ public class ClusterElementCallObservingSubagentExecutor implements SubagentExec
         try {
             result = delegate.execute(taskCall, subagentDefinition);
         } catch (RuntimeException exception) {
+            Class<?> exceptionClass = exception.getClass();
             String message = exception.getMessage();
 
             recorder.callFailed(
-                jobId, taskExecutionId, workflowNodeName,
-                message == null ? exception.getClass()
-                    .getSimpleName() : message);
+                jobId, taskExecutionId, workflowNodeName, message == null ? exceptionClass.getSimpleName() : message);
 
             throw exception;
         }

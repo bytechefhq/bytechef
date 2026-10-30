@@ -83,8 +83,10 @@ public final class ClusterElementCallRecorder {
     public AutoCloseable addListener(long jobId, Consumer<ClusterElementCallEvent> listener) {
         String key = TenantCacheKeyUtils.getKey(jobId);
 
-        listenersByJob.computeIfAbsent(key, curKey -> new CopyOnWriteArrayList<>())
-            .add(listener);
+        List<Consumer<ClusterElementCallEvent>> jobListeners = listenersByJob.computeIfAbsent(
+            key, curKey -> new CopyOnWriteArrayList<>());
+
+        jobListeners.add(listener);
 
         return () -> listenersByJob.computeIfPresent(key, (curKey, listeners) -> {
             listeners.remove(listener);
@@ -106,8 +108,10 @@ public final class ClusterElementCallRecorder {
     }
 
     public Map<String, ClusterElementCall> drain(long taskExecutionId) {
-        TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.asMap()
-            .remove(TenantCacheKeyUtils.getKey(taskExecutionId));
+        Map<String, TaskExecutionCalls> taskExecutionCallsMap = callsByTaskExecution.asMap();
+
+        TaskExecutionCalls taskExecutionCalls =
+            taskExecutionCallsMap.remove(TenantCacheKeyUtils.getKey(taskExecutionId));
 
         if (taskExecutionCalls == null) {
             return Map.of();
@@ -137,10 +141,9 @@ public final class ClusterElementCallRecorder {
         synchronized (taskExecutionCalls) {
             ClusterElementCall merged = taskExecutionCalls.record(type, workflowNodeName, error);
 
-            notifyListeners(new ClusterElementCallEvent(
-                jobId, taskExecutionId, Type.valueOf(merged.status()
-                    .name()),
-                merged));
+            Status status = merged.status();
+
+            notifyListeners(new ClusterElementCallEvent(jobId, taskExecutionId, Type.valueOf(status.name()), merged));
         }
     }
 

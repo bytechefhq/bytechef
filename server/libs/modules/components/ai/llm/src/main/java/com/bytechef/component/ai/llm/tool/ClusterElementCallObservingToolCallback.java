@@ -104,12 +104,12 @@ public class ClusterElementCallObservingToolCallback implements ToolCallback {
             result = call.get();
         } catch (RuntimeException exception) {
             if (!ToolSuspension.isToolSuspensionFailure(exception)) {
+                Class<?> exceptionClass = exception.getClass();
                 String message = exception.getMessage();
 
                 recorder.callFailed(
                     jobId, taskExecutionId, workflowNodeName,
-                    message == null ? exception.getClass()
-                        .getSimpleName() : message);
+                    message == null ? exceptionClass.getSimpleName() : message);
             }
 
             throw exception;
