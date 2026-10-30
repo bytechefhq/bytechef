@@ -36,9 +36,6 @@ const Header = ({
                     className
                 )}
             >
-                {/* The toggle sits beside the title-and-description block, top-aligned so it stays level with
-                    the title however tall the right slot is. Sidebar headers never carry it. */}
-
                 <div className="flex items-start gap-2 self-start">
                     {showLeftSidebarToggle && (
                         <div
@@ -55,7 +52,6 @@ const Header = ({
                         <div
                             className={twMerge(
                                 'flex h-header-height flex-col justify-center text-lg tracking-tight text-foreground',
-                                // A main header standing in for a hidden sidebar shows the page title as that would.
                                 position === 'sidebar' || leftSidebarHidden ? 'font-semibold' : '',
                                 titleClassName
                             )}
