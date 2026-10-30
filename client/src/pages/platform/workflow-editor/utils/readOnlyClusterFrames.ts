@@ -19,10 +19,6 @@ function toNonInteractiveNode(node: Node): Node {
     };
 }
 
-/**
- * The cluster roots a read-only canvas draws as frames: every root when the canvas shows a stored execution, so its
- * called elements can be coloured, and none on any other read-only canvas, which keeps the compact icon row.
- */
 export function getReadOnlyFramedClusterRootIds(
     tasks: ClusterRootTaskI[] | undefined,
     hasExecutionOverlay: boolean

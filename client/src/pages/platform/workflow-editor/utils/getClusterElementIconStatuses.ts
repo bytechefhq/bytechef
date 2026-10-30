@@ -15,10 +15,6 @@ const STATUS_PRIORITY: Record<NodeStatusType, number> = {
     RUNNING: 1,
 };
 
-/**
- * The status each cluster element icon of a compact cluster root card shows, keyed by icon URL. The card draws one icon
- * per component, so an icon takes the worst status of the elements behind it: failed, then running, then completed.
- */
 export default function getClusterElementIconStatuses(
     clusterElements: ClusterElementsType | undefined,
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>
