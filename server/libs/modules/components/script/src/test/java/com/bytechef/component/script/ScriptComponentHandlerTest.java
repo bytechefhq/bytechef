@@ -84,6 +84,8 @@ import org.junit.jupiter.api.Test;
  */
 public class ScriptComponentHandlerTest {
 
+    private static final String BASH = "bash";
+
     private static final List<String> ALWAYS_VISIBLE_PROPERTY_NAMES = List.of("input", "script", TASK_RUNNER);
 
     private final ComponentDefinition componentDefinition = new ScriptComponentHandler(
@@ -95,24 +97,37 @@ public class ScriptComponentHandlerTest {
     }
 
     @Test
-    public void testEveryActionOffersEveryEnabledTaskRunner() {
+    public void testEveryInlineScriptActionOffersEveryEnabledTaskRunner() {
         List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
             .orElseThrow();
 
         assertThat(actionDefinitions).isNotEmpty();
 
         for (ActionDefinition actionDefinition : actionDefinitions) {
+            if (BASH.equals(actionDefinition.getName())) {
+                continue;
+            }
+
             StringProperty typeProperty = findTaskRunnerTypeProperty(actionDefinition);
 
-            List<String> optionValues = typeProperty.getOptions()
-                .orElseThrow()
-                .stream()
-                .map(Option::getValue)
-                .toList();
-
-            assertThat(optionValues).containsExactly(DOCKER, GRAALVM, PROCESS);
+            assertThat(optionValues(typeProperty)).containsExactly(DOCKER, GRAALVM, PROCESS);
             assertThat(typeProperty.getDefaultValue()).contains(GRAALVM);
         }
+    }
+
+    @Test
+    public void testTheBashActionOffersOnlyTheExternalTaskRunners() {
+        ActionDefinition actionDefinition = componentDefinition.getActions()
+            .orElseThrow()
+            .stream()
+            .filter(candidate -> BASH.equals(candidate.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        StringProperty typeProperty = findTaskRunnerTypeProperty(actionDefinition);
+
+        assertThat(optionValues(typeProperty)).containsExactly(DOCKER, PROCESS);
+        assertThat(typeProperty.getDefaultValue()).contains(PROCESS);
     }
 
     @Test
@@ -180,6 +195,14 @@ public class ScriptComponentHandlerTest {
         }
 
         return displayConditions;
+    }
+
+    private static List<String> optionValues(StringProperty typeProperty) {
+        return typeProperty.getOptions()
+            .orElseThrow()
+            .stream()
+            .map(Option::getValue)
+            .toList();
     }
 
     private static StringProperty findTaskRunnerTypeProperty(ActionDefinition actionDefinition) {

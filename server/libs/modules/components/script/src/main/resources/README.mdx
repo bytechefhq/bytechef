@@ -126,6 +126,12 @@ That check is deliberately not enforced earlier, in the editor: the **Task Runne
 
 In the current build this only matters for JavaScript and Python, the two languages this component ships — both resolve externally. The Ruby, Java and R actions exist in the codebase but are not registered on this component for reasons unrelated to task runners; the mismatch above becomes reachable once they are.
 
+### The Bash Action
+
+The **Bash** action runs its script with `bash`, so it needs the Process, Docker, Kubernetes or AWS Batch runner; GraalVM cannot run it. Each **Input** value is exported as `INPUT_<name>`, a string as it is and any other value as JSON. A name that is not a valid shell variable name is not exported, but every value is also in the JSON file named by `BYTECHEF_INPUT_FILE`. Writing a JSON object to `$BYTECHEF_OUTPUT_DIR/output.json` returns it in `vars`.
+
+Under Docker, Kubernetes and AWS Batch the default image is `ubuntu:24.04`. It has `bash` but not `jq`, `python3` or `curl`, so a script that needs them, including one that reads `BYTECHEF_INPUT_FILE` or `BYTECHEF_CONNECTIONS_FILE` with `jq`, must set the runner's **Image** to one that ships them. The Process runner uses whatever the host has on its `PATH`.
+
 ### Inheriting The Host Environment
 
 The Process runner clears the environment before the script starts and re-seeds only `PATH`, `HOME` and its own `BYTECHEF_*` names — the server process holds datasource passwords and cloud credentials, and a script must not be able to read them by name.

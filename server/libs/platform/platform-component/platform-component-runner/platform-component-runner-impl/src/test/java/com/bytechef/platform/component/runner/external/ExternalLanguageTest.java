@@ -36,6 +36,7 @@ class ExternalLanguageTest {
     void testPythonAndShellResolve() {
         assertThat(ExternalLanguage.of("python")).isEqualTo(ExternalLanguage.PYTHON);
         assertThat(ExternalLanguage.of("shell")).isEqualTo(ExternalLanguage.SHELL);
+        assertThat(ExternalLanguage.of("bash")).isEqualTo(ExternalLanguage.BASH);
     }
 
     @Test

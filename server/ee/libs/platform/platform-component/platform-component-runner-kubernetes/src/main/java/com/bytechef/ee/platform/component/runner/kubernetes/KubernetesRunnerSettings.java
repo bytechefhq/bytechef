@@ -60,8 +60,8 @@ record KubernetesRunnerSettings(
 
     private static final String DEFAULT_FILE_SIDECAR_IMAGE = "busybox:1.36";
     private static final Map<String, String> DEFAULT_IMAGES = Map.of(
-        "javascript", "node:22-alpine", "js", "node:22-alpine", "python", "python:3.12-slim", "shell",
-        "ubuntu:24.04");
+        "bash", "ubuntu:24.04", "javascript", "node:22-alpine", "js", "node:22-alpine", "python", "python:3.12-slim",
+        "shell", "ubuntu:24.04");
     private static final int MAX_QUANTITY_LENGTH = 64;
     private static final Set<String> TOLERATION_EFFECTS = Set.of("NoSchedule", "PreferNoSchedule", "NoExecute");
     private static final Set<String> TOLERATION_OPERATORS = Set.of("Equal", "Exists");

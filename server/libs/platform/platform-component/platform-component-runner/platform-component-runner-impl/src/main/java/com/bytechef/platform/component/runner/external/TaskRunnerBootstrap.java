@@ -33,7 +33,7 @@ public final class TaskRunnerBootstrap {
         return switch (ExternalLanguage.of(languageId)) {
             case JAVASCRIPT -> separated + javaScriptBootstrap(runnerType);
             case PYTHON -> separated + pythonBootstrap(runnerType);
-            case SHELL -> separated;
+            case BASH, SHELL -> separated;
         };
     }
 
@@ -47,6 +47,7 @@ public final class TaskRunnerBootstrap {
         return switch (ExternalLanguage.of(languageId)) {
             case JAVASCRIPT -> "script.js";
             case PYTHON -> "script.py";
+            case BASH -> "script.sh";
             case SHELL -> "commands.sh";
         };
     }
