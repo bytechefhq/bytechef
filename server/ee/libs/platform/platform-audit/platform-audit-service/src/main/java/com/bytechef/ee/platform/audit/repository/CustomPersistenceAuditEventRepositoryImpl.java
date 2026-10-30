@@ -56,10 +56,6 @@ public class CustomPersistenceAuditEventRepositoryImpl implements CustomPersiste
             return Page.empty(pageable);
         }
 
-        // LIMIT/OFFSET are applied to the events alone, inside the derived table, and the data rows are joined
-        // afterwards. Paging the joined rows instead would count every data entry as a row, returning short pages and
-        // truncating the data of the event that straddles the page boundary. The id tiebreaker keeps the order total
-        // so events sharing an event_date cannot repeat or go missing between pages.
         String dataQuery = "SELECT e.id, e.principal, e.event_date, e.event_type, d.key, d.value"
             + " FROM (SELECT e.id, e.principal, e.event_date, e.event_type FROM persistent_audit_event e"
             + whereClause

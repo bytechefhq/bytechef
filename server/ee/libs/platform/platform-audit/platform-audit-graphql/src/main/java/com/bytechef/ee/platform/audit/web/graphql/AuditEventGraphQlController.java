@@ -91,10 +91,6 @@ public class AuditEventGraphQlController {
             return null;
         }
 
-        // Event dates are written as zone-less timestamps in the JVM default zone (LocalDateTime.now() in the aspect
-        // and
-        // the job status listener, LocalDateTimeUtils in the actuator repository), so epoch millis are converted with
-        // that same zone.
         return LocalDateTimeUtils.toLocalDateTime(Instant.ofEpochMilli(epochMillis));
     }
 
