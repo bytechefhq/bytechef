@@ -1,6 +1,7 @@
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {permissionStore} from '@/shared/stores/usePermissionStore';
 import {renderHook} from '@testing-library/react';
+import {toast} from 'sonner';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -47,6 +48,32 @@ describe('useLoadWorkspaceScopes', () => {
             scopes: ['API_KEY_VIEW'],
             status: 'loaded',
         });
+    });
+
+    it('marks the scopes as loading while the query is in flight', () => {
+        hoisted.myWorkspaceScopesQuery.mockReturnValue({data: undefined, isError: false, isLoading: true});
+
+        const {result} = renderHook(() => useLoadWorkspaceScopes(7));
+
+        expect(result.current).toEqual({error: false, loading: true});
+        expect(permissionStore.getState().workspaceScopeStates[7][2]).toEqual({status: 'loading'});
+    });
+
+    it('marks the scopes as failed and tells the user when the query fails', () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        hoisted.myWorkspaceScopesQuery.mockReturnValue({data: undefined, isError: true, isLoading: false});
+
+        const {result} = renderHook(() => useLoadWorkspaceScopes(7));
+
+        expect(result.current).toEqual({error: true, loading: false});
+        expect(permissionStore.getState().workspaceScopeStates[7][2]).toEqual({status: 'error'});
+        expect(toast.error).toHaveBeenCalledWith(
+            'Could not load workspace permissions. Some actions may appear restricted until you refresh.',
+            {id: 'workspace-permissions-error'}
+        );
+
+        consoleErrorSpy.mockRestore();
     });
 
     it('never sends the query on Community', () => {
