@@ -39,6 +39,8 @@ public class ComponentDefinitionBasicModel {
 
   private List<@Valid ComponentCategoryModel> componentCategories = new ArrayList<>();
 
+  private @Nullable Boolean deprecated;
+
   private @Nullable String description;
 
   private @Nullable String icon;
@@ -163,6 +165,27 @@ public class ComponentDefinitionBasicModel {
   @JsonProperty("componentCategories")
   public void setComponentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
     this.componentCategories = componentCategories;
+  }
+
+  public ComponentDefinitionBasicModel deprecated(@Nullable Boolean deprecated) {
+    this.deprecated = deprecated;
+    return this;
+  }
+
+  /**
+   * Whether every action of the component is deprecated, so it is no longer offered for new tasks.
+   * @return deprecated
+   */
+  
+  @Schema(name = "deprecated", description = "Whether every action of the component is deprecated, so it is no longer offered for new tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("deprecated")
+  public @Nullable Boolean getDeprecated() {
+    return deprecated;
+  }
+
+  @JsonProperty("deprecated")
+  public void setDeprecated(@Nullable Boolean deprecated) {
+    this.deprecated = deprecated;
   }
 
   public ComponentDefinitionBasicModel description(@Nullable String description) {
@@ -325,6 +348,7 @@ public class ComponentDefinitionBasicModel {
         Objects.equals(this.clusterElementsCount, componentDefinitionBasic.clusterElementsCount) &&
         Objects.equals(this.clusterRoot, componentDefinitionBasic.clusterRoot) &&
         Objects.equals(this.componentCategories, componentDefinitionBasic.componentCategories) &&
+        Objects.equals(this.deprecated, componentDefinitionBasic.deprecated) &&
         Objects.equals(this.description, componentDefinitionBasic.description) &&
         Objects.equals(this.icon, componentDefinitionBasic.icon) &&
         Objects.equals(this.inputsCount, componentDefinitionBasic.inputsCount) &&
@@ -336,7 +360,7 @@ public class ComponentDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionsCount, clusterElementsCount, clusterRoot, componentCategories, description, icon, inputsCount, name, title, triggersCount, version);
+    return Objects.hash(actionsCount, clusterElementsCount, clusterRoot, componentCategories, deprecated, description, icon, inputsCount, name, title, triggersCount, version);
   }
 
   @Override
@@ -347,6 +371,7 @@ public class ComponentDefinitionBasicModel {
     sb.append("    clusterElementsCount: ").append(toIndentedString(clusterElementsCount)).append("\n");
     sb.append("    clusterRoot: ").append(toIndentedString(clusterRoot)).append("\n");
     sb.append("    componentCategories: ").append(toIndentedString(componentCategories)).append("\n");
+    sb.append("    deprecated: ").append(toIndentedString(deprecated)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    inputsCount: ").append(toIndentedString(inputsCount)).append("\n");
