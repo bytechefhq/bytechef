@@ -232,8 +232,8 @@ class ApiKeyFacadeIntTest {
     }
 
     @Test
-    void testAMemberMayCreateAWorkspaceAutomationKey() {
-        ApiKey createdApiKey = apiKeyFacade.createAutomationApiKey(newApiKey("workspace key"));
+    void testAMemberMayCreateAnOwnedKey() {
+        ApiKey createdApiKey = apiKeyFacade.createOwnedApiKey(newApiKey("owned key"), PlatformType.AUTOMATION);
 
         assertThat(apiKeyRepository.findById(createdApiKey.getId()))
             .hasValueSatisfying(apiKey -> {
@@ -275,7 +275,7 @@ class ApiKeyFacadeIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> apiKeyFacade.delete(ownerApiKey.getId()))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> apiKeyFacade.createAutomationApiKey(newApiKey("connected key")))
+        assertThatThrownBy(() -> apiKeyFacade.createOwnedApiKey(newApiKey("connected key"), PlatformType.AUTOMATION))
             .isInstanceOf(AccessDeniedException.class);
 
         List<ApiKey> apiKeys = apiKeyRepository.findAll();
