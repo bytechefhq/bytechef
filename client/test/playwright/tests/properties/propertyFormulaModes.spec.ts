@@ -504,6 +504,36 @@ test.describe('Property formula modes', () => {
         }
     });
 
+    test.describe('Field height', () => {
+        for (const propertyName of ['optionsNoMultiselect', 'optionsLookupDependsOn']) {
+            test(`should keep ${propertyName} at the same height when Text is turned on`, async () => {
+                const property = getProperty(configurationPanel, propertyName);
+                const trigger = property.getByRole('combobox').first();
+
+                await trigger.scrollIntoViewIfNeeded();
+
+                const nativeHeight = (await trigger.boundingBox())?.height;
+
+                await getDynamicSwitch(property).click();
+
+                const editorFrame = getPropertyEditor(property).locator('xpath=../../..');
+
+                await expect(editorFrame).toBeVisible();
+
+                expect((await editorFrame.boundingBox())?.height).toBe(nativeHeight);
+            });
+        }
+
+        test('should keep a select at the height of a number input', async () => {
+            const trigger = getProperty(configurationPanel, 'optionsNoMultiselect').getByRole('combobox').first();
+            const numberInput = getNativeInput(getProperty(configurationPanel, 'numberPrecision'));
+
+            await trigger.scrollIntoViewIfNeeded();
+
+            expect((await trigger.boundingBox())?.height).toBe((await numberInput.boundingBox())?.height);
+        });
+    });
+
     test.describe('Pill target', () => {
         test('should put a clicked data pill into the focused select instead of the editor focused before', async ({
             authenticatedPage: page,
