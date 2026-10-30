@@ -367,11 +367,10 @@ export type UpdateAiSkillTagsMutationVariables = Exact<{
 export type UpdateAiSkillTagsMutation = { updateAiSkillTags: { id: string } };
 
 export type AuditEventsQueryVariables = Exact<{
-  principal?: string | null | undefined;
   eventType?: string | null | undefined;
   fromDate?: any;
   toDate?: any;
-  dataSearch?: string | null | undefined;
+  search?: string | null | undefined;
   page?: number | null | undefined;
   size?: number | null | undefined;
 }>;
@@ -3608,13 +3607,12 @@ export const useUpdateAiSkillTagsMutation = <
     )};
 
 export const AuditEventsDocument = new TypedDocumentString(`
-    query AuditEvents($principal: String, $eventType: String, $fromDate: Long, $toDate: Long, $dataSearch: String, $page: Int, $size: Int) {
+    query AuditEvents($eventType: String, $fromDate: Long, $toDate: Long, $search: String, $page: Int, $size: Int) {
   auditEvents(
-    principal: $principal
     eventType: $eventType
     fromDate: $fromDate
     toDate: $toDate
-    dataSearch: $dataSearch
+    search: $search
     page: $page
     size: $size
   ) {
