@@ -54,6 +54,11 @@ const getFocusedChildIndex = (focusPath: FocusPathElement[] | undefined, parentT
     return focusedElement?.iterationIndex ?? focusedElement?.childIndex;
 };
 
+const withPageIcon = (taskExecution: TaskExecution, icons: TaskExecutionChildrenPage['icons'] | undefined) =>
+    taskExecution.icon || !taskExecution.type || !icons?.[taskExecution.type]
+        ? taskExecution
+        : {...taskExecution, icon: icons[taskExecution.type]};
+
 const getPageRowCount = (page: TaskExecutionChildrenPage) =>
     (page.iterations?.length || 0) > 0 ? page.iterations!.length : page.children?.length || 0;
 
@@ -133,13 +138,22 @@ const LazyTaskExecutionChildren = ({
     const iterations = useMemo(
         () =>
             pages.some((page) => (page.iterations?.length || 0) > 0)
-                ? pages.flatMap((page) => page.iterations || [])
+                ? pages.flatMap((page) =>
+                      (page.iterations || []).map((iteration) =>
+                          iteration.map((taskExecution) => withPageIcon(taskExecution, page.icons))
+                      )
+                  )
                 : undefined,
         [pages]
     );
 
     const children = useMemo(
-        () => (iterations === undefined ? pages.flatMap((page) => page.children || []) : undefined),
+        () =>
+            iterations === undefined
+                ? pages.flatMap((page) =>
+                      (page.children || []).map((taskExecution) => withPageIcon(taskExecution, page.icons))
+                  )
+                : undefined,
         [iterations, pages]
     );
 
