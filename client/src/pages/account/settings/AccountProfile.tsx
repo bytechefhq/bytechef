@@ -14,7 +14,14 @@ const AccountProfile = () => {
 
     return (
         <LayoutContainer
-            header={<Header centerTitle={true} position="main" title="Your profile" />}
+            header={
+                <Header
+                    centerTitle={true}
+                    description="Manage your name, email address, and password, and the security options that protect your account."
+                    position="main"
+                    title="Your profile"
+                />
+            }
             leftSidebarOpen={false}
         >
             <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
