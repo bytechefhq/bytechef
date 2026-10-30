@@ -22,8 +22,6 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The outcome of the calls a cluster root made to one of its cluster elements during a task execution.
- *
  * @author Ivica Cardic
  */
 public record ClusterElementCall(

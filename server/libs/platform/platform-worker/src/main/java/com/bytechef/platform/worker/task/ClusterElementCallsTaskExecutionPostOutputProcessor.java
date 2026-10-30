@@ -29,10 +29,6 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 
 /**
- * Stores the cluster element calls recorded during a task execution in its metadata, merged with any calls an earlier
- * run of the same task execution stored before it was suspended. Runs after the streaming processors, which return only
- * once a streamed response has finished.
- *
  * @author Ivica Cardic
  */
 public class ClusterElementCallsTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
