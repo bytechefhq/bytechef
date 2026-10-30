@@ -39,6 +39,7 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
         FROM connected_user_project cup
         JOIN connected_user cu ON cup.connected_user_id = cu.id
         WHERE cu.environment = :environment AND cu.external_id = :externalUserId
+        ORDER BY cup.id
         LIMIT 1
         """)
     Optional<ConnectedUserProject> findFirstByEnvironmentAndExternalUserId(
@@ -68,6 +69,15 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
         @Nullable @Param("connectedUserId") Long connectedUserId, @Nullable @Param("environment") Integer environment);
 
     Optional<ConnectedUserProject> findByConnectedUserId(Long connectedUserid);
+
+    @Query("""
+        SELECT id
+        FROM connected_user
+        WHERE environment = :environment AND external_id = :externalUserId
+        FOR UPDATE
+        """)
+    Optional<Long> findConnectedUserIdForUpdate(
+        @Param("externalUserId") String externalUserId, @Param("environment") int environment);
 
     @Query("SELECT * FROM connected_user_project WHERE id = :id FOR UPDATE")
     Optional<ConnectedUserProject> findByIdForUpdate(@Param("id") long id);
