@@ -8,6 +8,7 @@ A page of the children of a task execution. At most one of children and iteratio
 Name | Type
 ------------ | -------------
 `children` | [Array&lt;TaskExecution&gt;](TaskExecution.md)
+`icons` | { [key: string]: string; }
 `iterations` | Array&lt;Array&lt;TaskExecution&gt;&gt;
 `number` | number
 `numberOfElements` | number
@@ -23,6 +24,7 @@ import type { TaskExecutionChildrenPage } from ''
 // TODO: Update the object below with actual values
 const example = {
   "children": null,
+  "icons": null,
   "iterations": null,
   "number": null,
   "numberOfElements": null,
