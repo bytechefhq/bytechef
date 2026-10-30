@@ -163,8 +163,6 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
         future.whenComplete((result, throwable) -> {
             try {
-                // Closed before the terminal event goes out, so a snapshot still in flight can never land after it
-                // and repaint a finished run as running.
                 jobProgressPublisher.close();
 
                 if (throwable != null) {
@@ -229,11 +227,6 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         return getJobTaskExecutions(jobId, false);
     }
 
-    /**
-     * @param inProgress whether the job is still running. A task that has only just been created may not have pushed
-     *                   its context yet, and its parameters may reference outputs that do not exist yet, so a snapshot
-     *                   of a running job shows such a task without parameters instead of failing the whole snapshot.
-     */
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId, boolean inProgress) {
         List<Long> childJobIds = jobService.getChildJobIds(jobId);
         Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
@@ -586,14 +579,6 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     private record DefinitionResult(String title, String icon) {
     }
 
-    /**
-     * Streams {@code progress} snapshots of a running test job -- the same shape as the final {@code result} -- so the
-     * editor's test output panel can show task executions as they happen instead of a spinner. Task lifecycle events
-     * only request a snapshot; requests arriving within {@link #SNAPSHOT_INTERVAL_MILLIS} coalesce into one, and a
-     * request made while a snapshot is being built schedules a trailing one, so the last state before the result is
-     * never dropped. Building a snapshot reads every task execution's context and output, which is why it is never done
-     * per event nor on the listener thread that delivered the event.
-     */
     private final class JobProgressPublisher implements AutoCloseable {
 
         private static final long SNAPSHOT_INTERVAL_MILLIS = 500;
