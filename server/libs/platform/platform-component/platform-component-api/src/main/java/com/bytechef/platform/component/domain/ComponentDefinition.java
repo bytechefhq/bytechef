@@ -218,6 +218,17 @@ public final class ComponentDefinition {
         return triggers.size();
     }
 
+    public boolean isDeprecated() {
+        if (actions == null || actions.isEmpty() || (triggers != null && !triggers.isEmpty()) ||
+            (clusterElements != null && !clusterElements.isEmpty())) {
+
+            return false;
+        }
+
+        return actions.stream()
+            .allMatch(ActionDefinition::isDeprecated);
+    }
+
     @Nullable
     public UnifiedApiCategory getUnifiedApiCategory() {
         return unifiedApiCategory;
