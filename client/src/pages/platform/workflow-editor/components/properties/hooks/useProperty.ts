@@ -536,6 +536,9 @@ export const useProperty = ({
         [mentionInput, controlType]
     );
 
+    const isTemporalInput =
+        !mentionInput && (controlType === 'DATE' || controlType === 'DATE_TIME' || controlType === 'TIME');
+
     const parameterValueContext = useMemo<ParameterValueContextI>(
         () => ({controlType, formulaMode: formulaModeState, isNumericalInput, mentionInput, type}),
         [controlType, formulaModeState, isNumericalInput, mentionInput, type]
@@ -1200,7 +1203,7 @@ export const useProperty = ({
             const isEmpty = (event.currentTarget as HTMLInputElement).value === '';
 
             if (
-                !isNumericalInput ||
+                !(isNumericalInput || isTemporalInput) ||
                 !isEmpty ||
                 expressionEnabled === false ||
                 (event.key !== '$' && event.key !== '=') ||
@@ -1219,7 +1222,7 @@ export const useProperty = ({
 
             startPillEntry('$');
         },
-        [expressionEnabled, handleFormulaSwitch, isNumericalInput, showFormulaSwitch, startPillEntry]
+        [expressionEnabled, handleFormulaSwitch, isNumericalInput, isTemporalInput, showFormulaSwitch, startPillEntry]
     );
 
     const handleSelectKeyDown = useCallback(

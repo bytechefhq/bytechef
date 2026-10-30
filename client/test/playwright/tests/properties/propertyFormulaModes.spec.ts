@@ -534,6 +534,64 @@ test.describe('Property formula modes', () => {
         });
     });
 
+    test.describe('Date and time fields', () => {
+        test('should open the data pill editor on $ in an empty date time field and take a data pill', async ({
+            authenticatedPage: page,
+            workflow,
+        }) => {
+            const dateTimeProperty = getProperty(configurationPanel, 'dateTime');
+            const dateTimeInput = dateTimeProperty.locator('input[type="datetime-local"]');
+
+            await dateTimeInput.scrollIntoViewIfNeeded();
+            await dateTimeInput.focus();
+            await page.keyboard.type('$');
+
+            await expect(getSuggestionMenu(page)).toBeVisible();
+
+            const saveResponsePromise = propertyTestingParametersSavePromise(page, STRING_PILL_REFERENCE);
+
+            await page.keyboard.type('var_1.String');
+            await page.keyboard.press('Enter');
+
+            await saveResponsePromise;
+
+            await expect(getPropertyMentions(dateTimeProperty)).toHaveAttribute('data-id', 'var_1.String');
+
+            await expectStoredParameter({
+                expected: STRING_PILL_REFERENCE,
+                page,
+                propertyName: 'dateTime',
+                workflowId: workflow.workflowId,
+            });
+        });
+
+        test('should replace an empty date time field with a clicked data pill', async ({
+            authenticatedPage: page,
+            workflow,
+        }) => {
+            const dateTimeProperty = getProperty(configurationPanel, 'dateTime');
+            const dateTimeInput = dateTimeProperty.locator('input[type="datetime-local"]');
+
+            const dataPillPanel = await openVarDataPills(page, configurationPanel);
+
+            await dateTimeInput.scrollIntoViewIfNeeded();
+            await dateTimeInput.focus();
+
+            const saveResponsePromise = propertyTestingParametersSavePromise(page, STRING_PILL_REFERENCE);
+
+            await getVarDataPill(dataPillPanel, 'String').click();
+
+            await saveResponsePromise;
+
+            await expectStoredParameter({
+                expected: STRING_PILL_REFERENCE,
+                page,
+                propertyName: 'dateTime',
+                workflowId: workflow.workflowId,
+            });
+        });
+    });
+
     test.describe('Pill target', () => {
         test('should put a clicked data pill into the focused select instead of the editor focused before', async ({
             authenticatedPage: page,

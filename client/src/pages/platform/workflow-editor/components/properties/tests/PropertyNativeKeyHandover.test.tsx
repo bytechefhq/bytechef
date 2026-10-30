@@ -134,6 +134,113 @@ describe('keyboard handover from an empty number field', () => {
     });
 });
 
+const temporalProperties: Array<[string, string, string]> = [
+    ['DATE', 'date', '2026-10-30'],
+    ['DATE_TIME', 'datetime-local', '2026-10-30T09:30'],
+    ['TIME', 'time', '09:30'],
+];
+
+const renderEmptyTemporal = (controlType: string) =>
+    render(
+        <StrictMode>
+            <TooltipProvider>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>
+                    <Property
+                        parameterValue=""
+                        path="parameters.postAt"
+                        property={
+                            {
+                                controlType,
+                                expressionEnabled: true,
+                                label: 'Post at',
+                                name: 'postAt',
+                                type: controlType,
+                            } as PropertyAllType
+                        }
+                    />
+                </WorkflowEditorProvider>
+            </TooltipProvider>
+        </StrictMode>
+    );
+
+describe('keyboard handover from an empty date or time field', () => {
+    beforeEach(() => {
+        Element.prototype.append = blurFocusedElementWhenMoved;
+
+        (saveProperty as unknown as Mock).mockReset();
+
+        useWorkflowDataStore.setState({
+            workflow: {id: 'wf-temporal-key-handover', nodeNames: []},
+        } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+
+        useWorkflowNodeDetailsPanelStore.setState({
+            currentNode: {name: 'node_1', parameters: {}, workflowNodeName: 'node_1'},
+            pillTarget: null,
+            workflowNodeDetailsPanelOpen: true,
+        } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
+    });
+
+    afterEach(() => {
+        Element.prototype.append = originalAppend;
+    });
+
+    it.each(temporalProperties)(
+        '$ on an empty %s field swaps to the one-pill editor',
+        async (controlType, inputType) => {
+            const {container} = renderEmptyTemporal(controlType);
+
+            const input = container.querySelector(`input[type=${inputType}]`) as HTMLInputElement;
+
+            fireEvent.focus(input);
+            fireEvent.keyDown(input, {key: '$'});
+
+            await settle();
+
+            const editorElement = container.querySelector('.ProseMirror');
+
+            expect(editorElement).not.toBeNull();
+            expect(container.querySelector(`input[type=${inputType}]`)).toBeNull();
+            expect(editorElement!.textContent).toBe('$');
+            expect(document.activeElement).toBe(editorElement);
+        }
+    );
+
+    it.each(temporalProperties)(
+        '= on an empty %s field swaps to the formula editor',
+        async (controlType, inputType) => {
+            const {container} = renderEmptyTemporal(controlType);
+
+            const input = container.querySelector(`input[type=${inputType}]`) as HTMLInputElement;
+
+            fireEvent.focus(input);
+            fireEvent.keyDown(input, {key: '='});
+
+            await settle();
+
+            expect(container.querySelector('.ProseMirror')).not.toBeNull();
+            expect(screen.getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'true');
+        }
+    );
+
+    it.each(temporalProperties)(
+        '$ on a %s field holding a value keeps the native input',
+        async (controlType, inputType, inputValue) => {
+            const {container} = renderEmptyTemporal(controlType);
+
+            const input = container.querySelector(`input[type=${inputType}]`) as HTMLInputElement;
+
+            fireEvent.focus(input);
+            fireEvent.change(input, {target: {value: inputValue}});
+            fireEvent.keyDown(input, {key: '$'});
+
+            await settle();
+
+            expect(container.querySelector('.ProseMirror')).toBeNull();
+            expect(container.querySelector(`input[type=${inputType}]`)).not.toBeNull();
+        }
+    );
+});
+
 const methodProperty = {
     controlType: 'SELECT',
     expressionEnabled: true,
