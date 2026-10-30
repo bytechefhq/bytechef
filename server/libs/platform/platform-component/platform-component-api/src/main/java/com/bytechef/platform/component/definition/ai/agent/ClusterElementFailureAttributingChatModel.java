@@ -24,8 +24,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import reactor.core.publisher.Flux;
 
 /**
- * Records a failure raised by the wrapped model on the model's cluster element, then rethrows it unchanged.
- *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI_EXPOSE_REP2")
