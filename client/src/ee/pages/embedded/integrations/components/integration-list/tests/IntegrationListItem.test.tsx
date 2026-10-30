@@ -304,15 +304,23 @@ describe('IntegrationListItem', () => {
             expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
         });
 
-        it('disables New Configuration until the integration is published', async () => {
+        it('hides New Workflow while the integration has no workflows', () => {
+            renderItem({integrationWorkflowIds: []}, 'workflows');
+
+            expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
+        });
+
+        it('hides New Configuration while the integration has no configurations', () => {
+            renderItem({developmentConfigurationCount: 0}, 'configurations');
+
+            expect(screen.queryByLabelText('Create Configuration')).not.toBeInTheDocument();
+        });
+
+        it('hides New Configuration until the integration is published', () => {
             renderItem({lastPublishedDate: undefined}, 'configurations');
 
-            expect(screen.getByLabelText('Create Configuration')).toBeDisabled();
+            expect(screen.queryByLabelText('Create Configuration')).not.toBeInTheDocument();
             expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
-
-            await userEvent.hover(screen.getByLabelText('Create Configuration').parentElement!);
-
-            expect((await screen.findAllByText('Publish the integration first'))[0]).toBeInTheDocument();
         });
     });
 });

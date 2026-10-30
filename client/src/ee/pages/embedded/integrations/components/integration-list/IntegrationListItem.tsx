@@ -353,7 +353,7 @@ const IntegrationListItem = ({
             <CollapsibleContent className="mx-3 mt-1 mb-3">
                 <IntegrationListItemTabs
                     actions={
-                        activeTab === 'workflows' ? (
+                        activeTab === 'workflows' && workflowCount > 0 ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
                                 <Button
                                     aria-label="Create Workflow"
@@ -397,41 +397,21 @@ const IntegrationListItem = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
-                        ) : activeTab === 'configurations' ? (
-                            isPublished ? (
-                                <IntegrationInstanceConfigurationDialog
-                                    integrationInstanceConfiguration={
-                                        {
-                                            environmentId: DEVELOPMENT_ENVIRONMENT,
-                                            integrationId: integration.id,
-                                        } as IntegrationInstanceConfiguration
-                                    }
-                                    triggerNode={
-                                        <Button aria-label="Create Configuration" size="sm" variant="secondary">
-                                            <PlusIcon />
-                                            New Configuration
-                                        </Button>
-                                    }
-                                />
-                            ) : (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span className="inline-block">
-                                            <Button
-                                                aria-label="Create Configuration"
-                                                disabled
-                                                size="sm"
-                                                variant="secondary"
-                                            >
-                                                <PlusIcon />
-                                                New Configuration
-                                            </Button>
-                                        </span>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Publish the integration first</TooltipContent>
-                                </Tooltip>
-                            )
+                        ) : activeTab === 'configurations' && isPublished && configurationCount !== 0 ? (
+                            <IntegrationInstanceConfigurationDialog
+                                integrationInstanceConfiguration={
+                                    {
+                                        environmentId: DEVELOPMENT_ENVIRONMENT,
+                                        integrationId: integration.id,
+                                    } as IntegrationInstanceConfiguration
+                                }
+                                triggerNode={
+                                    <Button aria-label="Create Configuration" size="sm" variant="secondary">
+                                        <PlusIcon />
+                                        New Configuration
+                                    </Button>
+                                }
+                            />
                         ) : undefined
                     }
                     activeTab={activeTab ?? 'workflows'}
