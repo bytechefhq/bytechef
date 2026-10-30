@@ -203,7 +203,7 @@ class AiAgentChatActionIntTest {
             new ModelConnectionTaskDispatcherPreSendProcessor());
 
         jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, asyncMessageBroker, List.of(),
+            contextService, evaluator, event -> {}, jobService, -1, asyncMessageBroker, List.of(),
             List.of(
                 (taskCompletionHandler, taskDispatcher) -> new SuspendTaskCompletionHandler(
                     contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage,

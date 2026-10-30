@@ -38,6 +38,7 @@ import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.event.JobDeletedEvent;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -87,6 +88,7 @@ class JobSyncExecutorTest {
     private MemoryMessageBroker memoryMessageBroker;
     private JobSyncExecutor jobSyncExecutor;
     private final JobService jobService = mock(JobService.class);
+    private final List<Object> publishedApplicationEvents = new CopyOnWriteArrayList<>();
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
 
     @BeforeEach
@@ -109,9 +111,24 @@ class JobSyncExecutorTest {
         WorkflowService workflowService = mock(WorkflowService.class);
 
         jobSyncExecutor = new JobSyncExecutor(
-            contextService, evaluator, jobService, -1, memoryMessageBroker, List.of(), List.of(), List.of(),
+            contextService, evaluator, publishedApplicationEvents::add, jobService, -1, memoryMessageBroker, List.of(),
+            List.of(), List.of(),
             List.of(), List.of(), taskExecutionService, new SyncTaskExecutor(), taskHandlerRegistry, taskFileStorage,
             2L, workflowService);
+    }
+
+    @Test
+    void testDeleteJobPublishesJobDeletedEventToApplicationEventPublisher() {
+        long jobId = 100L;
+
+        when(jobService.getChildJobIds(jobId)).thenReturn(List.of());
+
+        assertThatNoException().isThrownBy(() -> jobSyncExecutor.deleteJob(jobId));
+
+        verify(taskExecutionService).deleteJobTaskExecutions(jobId);
+        verify(jobService).deleteJob(jobId);
+
+        assertThat(publishedApplicationEvents).containsExactly(new JobDeletedEvent(jobId));
     }
 
     @Test
