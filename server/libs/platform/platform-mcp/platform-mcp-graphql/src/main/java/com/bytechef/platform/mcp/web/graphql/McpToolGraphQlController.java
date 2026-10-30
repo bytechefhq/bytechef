@@ -23,6 +23,7 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -43,14 +44,17 @@ public class McpToolGraphQlController {
 
     private final McpComponentService mcpComponentService;
     private final McpServerService mcpServerService;
+    private final McpServerTypeDefinitions mcpServerTypeDefinitions;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
     public McpToolGraphQlController(
-        McpComponentService mcpComponentService, McpServerService mcpServerService, McpToolService mcpToolService) {
+        McpComponentService mcpComponentService, McpServerService mcpServerService,
+        List<McpServerTypeDefinition> mcpServerTypeDefinitions, McpToolService mcpToolService) {
 
         this.mcpComponentService = mcpComponentService;
         this.mcpServerService = mcpServerService;
+        this.mcpServerTypeDefinitions = new McpServerTypeDefinitions(mcpServerTypeDefinitions);
         this.mcpToolService = mcpToolService;
     }
 
@@ -60,7 +64,7 @@ public class McpToolGraphQlController {
             .orElse(null);
 
         if (mcpTool != null) {
-            checkMcpComponentNotEmbedded(mcpTool.getMcpComponentId());
+            checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
         }
 
         return mcpTool;
@@ -68,31 +72,32 @@ public class McpToolGraphQlController {
 
     @QueryMapping
     public List<McpTool> mcpTools() {
-        Set<Long> embeddedMcpServerIds = McpServerTypeUtils.getEmbeddedMcpServerIds(mcpServerService);
+        Set<Long> sharedAdministrationMcpServerIds =
+            mcpServerTypeDefinitions.getSharedAdministrationMcpServerIds(mcpServerService);
 
-        Set<Long> nonEmbeddedMcpComponentIds = mcpComponentService.getMcpComponents()
+        Set<Long> sharedAdministrationMcpComponentIds = mcpComponentService.getMcpComponents()
             .stream()
-            .filter(mcpComponent -> !embeddedMcpServerIds.contains(mcpComponent.getMcpServerId()))
+            .filter(mcpComponent -> sharedAdministrationMcpServerIds.contains(mcpComponent.getMcpServerId()))
             .map(McpComponent::getId)
             .collect(Collectors.toSet());
 
         return mcpToolService.getMcpTools()
             .stream()
-            .filter(mcpTool -> nonEmbeddedMcpComponentIds.contains(mcpTool.getMcpComponentId()))
+            .filter(mcpTool -> sharedAdministrationMcpComponentIds.contains(mcpTool.getMcpComponentId()))
             .toList();
     }
 
     @QueryMapping
     @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_VIEW')")
     public List<McpTool> mcpToolsByComponentId(@Argument long mcpComponentId) {
-        checkMcpComponentNotEmbedded(mcpComponentId);
+        checkMcpComponentSharedAdministration(mcpComponentId);
 
         return mcpToolService.getMcpComponentMcpTools(mcpComponentId);
     }
 
     @MutationMapping
     public McpTool createMcpTool(@Argument McpToolInput input) {
-        checkMcpComponentNotEmbedded(input.mcpComponentId());
+        checkMcpComponentSharedAdministration(input.mcpComponentId());
 
         Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
@@ -104,7 +109,7 @@ public class McpToolGraphQlController {
         McpTool mcpTool = mcpToolService.fetchMcpTool(id)
             .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
 
-        checkMcpComponentNotEmbedded(mcpTool.getMcpComponentId());
+        checkMcpComponentSharedAdministration(mcpTool.getMcpComponentId());
 
         mcpToolService.delete(mcpTool);
 
@@ -116,8 +121,8 @@ public class McpToolGraphQlController {
         McpTool currentMcpTool = mcpToolService.fetchMcpTool(id)
             .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
 
-        checkMcpComponentNotEmbedded(currentMcpTool.getMcpComponentId());
-        checkMcpComponentNotEmbedded(input.mcpComponentId());
+        checkMcpComponentSharedAdministration(currentMcpTool.getMcpComponentId());
+        checkMcpComponentSharedAdministration(input.mcpComponentId());
 
         Map<String, Object> parameters = input.parameters() != null ? input.parameters() : Map.of();
 
@@ -132,12 +137,12 @@ public class McpToolGraphQlController {
         return mcpToolService.update(mcpTool);
     }
 
-    private void checkMcpComponentNotEmbedded(long mcpComponentId) {
+    private void checkMcpComponentSharedAdministration(long mcpComponentId) {
         McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
 
         McpServer mcpServer = mcpServerService.getMcpServer(mcpComponent.getMcpServerId());
 
-        McpServerTypeUtils.checkNotEmbedded(mcpServer.getType());
+        mcpServerTypeDefinitions.checkSharedAdministration(mcpServer.getType());
     }
 
     @SuppressFBWarnings("EI")

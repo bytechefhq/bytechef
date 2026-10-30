@@ -19,14 +19,20 @@ package com.bytechef.platform.mcp.web;
 import com.bytechef.platform.constant.PlatformType;
 
 /**
- * Resolves the request path under which an MCP server of one {@link PlatformType} is served. The module that serves MCP
- * servers of that type contributes the bean, so the platform never hardcodes their paths.
+ * Describes the MCP servers of one {@link PlatformType}. The module that serves MCP servers of that type contributes
+ * the bean, so the platform never hardcodes their paths or administration rules.
  *
  * @author Ivica Cardic
  */
-public interface McpServerPathResolver {
+public interface McpServerTypeDefinition {
 
     PlatformType getType();
+
+    /**
+     * @return whether the shared MCP server, component and tool operations may administer servers of this type; a type
+     *         that is administered only through its own operations returns {@code false}
+     */
+    boolean isSharedAdministration();
 
     /**
      * @param secretKey the MCP server secret key, possibly masked
