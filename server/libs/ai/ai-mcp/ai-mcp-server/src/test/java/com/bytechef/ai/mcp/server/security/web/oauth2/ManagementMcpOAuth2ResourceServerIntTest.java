@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.mcp.oauth2;
+package com.bytechef.ai.mcp.server.security.web.oauth2;
 
-import static com.bytechef.platform.security.web.mcp.config.McpOAuth2ResourceServerCeOnlyIntTestConfiguration.ISSUER_URI;
-import static com.bytechef.platform.security.web.mcp.config.McpOAuth2ResourceServerCeOnlyIntTestConfiguration.TENANT_CLAIM;
+import static com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration.ISSUER_URI;
+import static com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration.TENANT_CLAIM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
-import com.bytechef.platform.security.web.mcp.config.McpOAuth2ResourceServerCeOnlyIntTestConfiguration;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.domain.TenantKey;
@@ -62,10 +62,10 @@ import org.springframework.context.annotation.Import;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = McpOAuth2ResourceServerCeOnlyIntTestConfiguration.class,
+    classes = ManagementMcpOAuth2ResourceServerIntTestConfiguration.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(PostgreSQLContainerConfiguration.class)
-class McpOAuth2ResourceServerCeOnlyIntTest {
+class ManagementMcpOAuth2ResourceServerIntTest {
 
     private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of("public"));
 
