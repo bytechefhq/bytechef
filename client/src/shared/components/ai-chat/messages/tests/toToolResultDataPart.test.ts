@@ -94,6 +94,41 @@ describe('toToolResultDataPart', () => {
         }
     });
 
+    it('maps knowledge-base-citations', () => {
+        const hits = [
+            {
+                docId: '7',
+                docTitle: 'Onboarding Guide',
+                excerpt: 'Spring AI supports vector stores.',
+                knowledgeBaseId: '42',
+                knowledgeBaseName: 'Company Docs',
+                score: 0.92,
+            },
+        ];
+
+        const result = toToolResultDataPart(
+            'queryKnowledgeBase',
+            JSON.stringify({hits, kind: 'knowledge-base-citations'})
+        );
+
+        expect(result?.ok).toBe(true);
+
+        if (result?.ok) {
+            expect(result.type).toBe('data-knowledge-base-citations');
+            expect(result.data).toEqual({hits, kind: 'knowledge-base-citations'});
+        }
+    });
+
+    it('returns undefined for queryKnowledgeBase results without renderable hits', () => {
+        expect(
+            toToolResultDataPart('queryKnowledgeBase', JSON.stringify({hits: [], kind: 'knowledge-base-citations'}))
+        ).toBeUndefined();
+        expect(
+            toToolResultDataPart('queryKnowledgeBase', JSON.stringify({error: 'question is required'}))
+        ).toBeUndefined();
+        expect(toToolResultDataPart('queryKnowledgeBase', 'not json{')).toBeUndefined();
+    });
+
     it('returns an error result for a malformed payload (unparseable JSON)', () => {
         const r = toToolResultDataPart('selectPropertyOption', 'not json{');
 

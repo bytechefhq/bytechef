@@ -1,11 +1,3 @@
-/**
- * Surface-agnostic mapper for interactive tool-result payloads, reusable across any chat surface (AI Hub,
- * Copilot, etc.). Returns:
- *   - `{ok: true, data, type}` — payload parsed and validated successfully.
- *   - `{ok: false, errorMessage, toolName}` — payload unparseable or failed kind/shape validation.
- *   - `undefined` — `toolCallName` is not one of the interactive tool names handled here.
- */
-
 export type ToolResultDataPartType =
     {data: Record<string, unknown>; ok: true; type: string} | {errorMessage: string; ok: false; toolName: string};
 
@@ -54,6 +46,18 @@ interface AskUserQuestionResultI {
         options: Array<{description?: string; label: string}>;
         question: string;
     }>;
+}
+
+interface KnowledgeBaseCitationsResultI {
+    hits: Array<{
+        docId?: string;
+        docTitle?: string;
+        excerpt?: string;
+        knowledgeBaseId?: string;
+        knowledgeBaseName?: string;
+        score?: number;
+    }>;
+    kind: 'knowledge-base-citations';
 }
 
 export function toToolResultDataPart(toolCallName: string, eventContent: string): ToolResultDataPartType | undefined {
@@ -123,6 +127,28 @@ export function toToolResultDataPart(toolCallName: string, eventContent: string)
             },
             ok: true,
             type: 'data-select-property-option',
+        };
+    }
+
+    if (toolCallName === 'queryKnowledgeBase') {
+        const parsed = parseJson<KnowledgeBaseCitationsResultI>(eventContent, 'queryKnowledgeBase result');
+
+        if (
+            !parsed ||
+            parsed.kind !== 'knowledge-base-citations' ||
+            !Array.isArray(parsed.hits) ||
+            parsed.hits.length === 0
+        ) {
+            return undefined;
+        }
+
+        return {
+            data: {
+                hits: parsed.hits,
+                kind: parsed.kind,
+            },
+            ok: true,
+            type: 'data-knowledge-base-citations',
         };
     }
 
