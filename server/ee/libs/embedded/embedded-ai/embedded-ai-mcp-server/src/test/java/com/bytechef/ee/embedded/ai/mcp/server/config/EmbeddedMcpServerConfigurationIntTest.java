@@ -11,12 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -41,16 +37,12 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import io.modelcontextprotocol.common.McpTransportContext;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -65,17 +57,14 @@ import org.springframework.security.core.userdetails.User;
 class EmbeddedMcpServerConfigurationIntTest {
 
     private static final List<Class<?>> MOCKED_DEPENDENCY_TYPES = List.of(
-        ApplicationProperties.class, ChildJobPrincipalFactory.class, ClusterElementDefinitionFacade.class,
-        ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectedUserService.class,
-        ContextService.class, CounterService.class, EnvironmentService.class, Evaluator.class,
-        IntegrationInstanceConfigurationService.class,
-        IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceService.class,
-        IntegrationInstanceWorkflowService.class, IntegrationService.class, JobCompletionAwaiter.class,
-        JobService.class, JwtTokenService.class, McpComponentService.class,
+        ApplicationProperties.class, ClusterElementDefinitionFacade.class, ClusterElementDefinitionService.class,
+        ComponentDefinitionService.class, ConnectedUserService.class, EnvironmentService.class, Evaluator.class,
+        IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
+        IntegrationInstanceService.class, IntegrationInstanceWorkflowService.class, IntegrationService.class,
+        JobCompletionAwaiter.class, JwtTokenService.class, McpComponentService.class,
         McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
         McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class,
-        PrincipalJobFacade.class, SigningKeyService.class, SubflowResolver.class, TaskExecutionService.class,
-        TaskFileStorage.class, TaskHandlerRegistry.class, WorkflowService.class);
+        PrincipalJobFacade.class, SigningKeyService.class, TaskExecutionService.class, WorkflowService.class);
 
     @AfterEach
     void afterEach() {
@@ -83,13 +72,10 @@ class EmbeddedMcpServerConfigurationIntTest {
     }
 
     @Test
-    void testEmbeddedMcpToolFacadeRunsWorkflowToolsOnTheSynchronousWorkerExecutor() {
+    void testEmbeddedMcpToolFacadeUsesTheDurableTaskFileStorageWithoutAPrivateCoordinator() {
         ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
             .withPropertyValues("bytechef.edition=ee")
-            .withBean("syncWorkerExecutor", TaskExecutor.class, SyncTaskExecutor::new)
-            .withBean(
-                "workerExecutor", TaskExecutor.class, SyncTaskExecutor::new,
-                beanDefinition -> beanDefinition.setPrimary(true))
+            .withBean("durableTaskFileStorage", TaskFileStorage.class, () -> mock(TaskFileStorage.class))
             .withUserConfiguration(EmbeddedMcpServerConfiguration.class);
 
         for (Class<?> mockedDependencyType : MOCKED_DEPENDENCY_TYPES) {
@@ -103,8 +89,8 @@ class EmbeddedMcpServerConfigurationIntTest {
             ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 
             assertThat(beanFactory.getDependenciesForBean("embeddedMcpToolFacade"))
-                .contains("syncWorkerExecutor")
-                .doesNotContain("workerExecutor");
+                .contains("durableTaskFileStorage")
+                .doesNotContain("syncWorkerExecutor");
         });
     }
 
