@@ -48,7 +48,10 @@ public class BashExecuteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("execute")
         .title("Execute")
-        .description("Creates a temporary script that executes bash commands. The script is afterwards deleted.")
+        .description(
+            "Creates a temporary script that executes bash commands. The script is afterwards deleted. Deprecated: " +
+                "use the Bash action of the Script component instead.")
+        .deprecated(true)
         .properties(
             string(SCRIPT)
                 .label("Script")

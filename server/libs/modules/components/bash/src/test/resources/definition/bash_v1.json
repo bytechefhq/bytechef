@@ -4,8 +4,8 @@
     "beforeResume": null,
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
-    "deprecated": null,
-    "description": "Creates a temporary script that executes bash commands. The script is afterwards deleted.",
+    "deprecated": true,
+    "description": "Creates a temporary script that executes bash commands. The script is afterwards deleted. Deprecated: use the Bash action of the Script component instead.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/bash_v1#execute"
@@ -100,7 +100,7 @@
   "connection": null,
   "customAction": null,
   "customActionHelp": null,
-  "description": "Allows you to run arbitrary Bash scripts.",
+  "description": "Runs arbitrary Bash scripts on the server. Deprecated: use the Script component's Bash action.",
   "icon": "path:assets/bash.svg",
   "inputs": null,
   "metadata": null,

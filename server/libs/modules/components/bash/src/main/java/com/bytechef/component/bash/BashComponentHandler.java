@@ -33,7 +33,7 @@ public class BashComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("bash")
         .title("Bash")
-        .description("Allows you to run arbitrary Bash scripts.")
+        .description("Runs arbitrary Bash scripts on the server. Deprecated: use the Script component's Bash action.")
         .icon("path:assets/bash.svg")
         .actions(BashExecuteAction.ACTION_DEFINITION);
 
