@@ -33,7 +33,6 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql")
-    testImplementation(project(":server:libs:ai:ai-mcp:ai-mcp-server"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:test:test-int-support"))

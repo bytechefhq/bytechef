@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.security.web.mcp.config;
+package com.bytechef.ai.mcp.server.security.web.oauth2.config;
 
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -70,7 +70,7 @@ import org.springframework.web.servlet.function.ServerResponse;
 @EnableWebSecurity
 @Import(LiquibaseConfiguration.class)
 @Configuration
-public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
+public class ManagementMcpOAuth2ResourceServerIntTestConfiguration {
 
     public static final String ISSUER_URI = "https://as.bytechef.test";
     public static final String TENANT_CLAIM = "tenant_id";
@@ -256,6 +256,7 @@ public class McpOAuth2ResourceServerCeOnlyIntTestConfiguration {
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
-    public static class McpOAuth2ResourceServerCeOnlyIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+    public static class ManagementMcpOAuth2ResourceServerIntTestJdbcConfiguration
+        extends AbstractIntTestJdbcConfiguration {
     }
 }
