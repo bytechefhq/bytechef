@@ -37,6 +37,7 @@ import {
     OnErrorChildTasksType,
     ParallelChildTasksType,
 } from '@/shared/types';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon, PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -248,8 +249,9 @@ export const convertTaskToNode = (
             componentName,
             icon: (
                 <InlineSVG
-                    className="size-9"
+                    className="size-9 text-content-neutral-primary"
                     loader={<ComponentIcon className="size-9 flex-none text-content-neutral-primary" />}
+                    preProcessor={paintMonochromeSvgWithCurrentColor}
                     src={taskDefinition.icon!}
                 />
             ),

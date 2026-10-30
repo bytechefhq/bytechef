@@ -7,6 +7,7 @@ import {
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {QueryClient} from '@tanstack/react-query';
 import {Edge} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
@@ -61,7 +62,15 @@ export default async function handleTaskDispatcherClick({
         ...taskDispatcherDefinition,
         componentName: name,
         description: undefined,
-        icon: icon ? <InlineSVG className="size-9 text-content-neutral-primary" src={icon} /> : fallbackIcon,
+        icon: icon ? (
+            <InlineSVG
+                className="size-9 text-content-neutral-primary"
+                preProcessor={paintMonochromeSvgWithCurrentColor}
+                src={icon}
+            />
+        ) : (
+            fallbackIcon
+        ),
         label: title,
         name: workflowNodeName,
         taskDispatcher: true,

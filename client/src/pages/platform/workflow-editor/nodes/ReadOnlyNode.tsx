@@ -1,4 +1,5 @@
 import {NodeDataType} from '@/shared/types';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {Handle, Position} from '@xyflow/react';
 import {memo, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -79,6 +80,7 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
                             >
                                 <InlineSVG
                                     className="size-9 flex-none text-content-neutral-primary"
+                                    preProcessor={paintMonochromeSvgWithCurrentColor}
                                     src={clusterElementIcon.icon}
                                 />
                             </li>
