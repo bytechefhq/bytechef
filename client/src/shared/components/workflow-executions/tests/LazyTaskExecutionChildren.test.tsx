@@ -20,6 +20,10 @@ vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importO
         hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery,
 }));
 
+vi.mock('@/components/LazyLoadSVG/LazyLoadSVG', () => ({
+    default: ({src}: {src: string}) => <img alt={src} src={src} />,
+}));
+
 const loopTaskExecution = {
     id: '4',
     jobId: '7',
@@ -414,6 +418,121 @@ describe('LazyTaskExecutionChildren', () => {
         expect(screen.getByText('Child task 1')).toBeInTheDocument();
         expect(screen.getByText('Child task 2')).toBeInTheDocument();
         expect(screen.queryByText(/Loop iteration/)).not.toBeInTheDocument();
+    });
+
+    it('showsThePageIconOfEachTypeOnChildRowsWithoutAnIcon', () => {
+        hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery.mockReturnValue({
+            data: {
+                pages: [
+                    TaskExecutionChildrenPageFromJSON({
+                        children: [
+                            {
+                                id: '201',
+                                jobId: '7',
+                                priority: 0,
+                                status: 'COMPLETED',
+                                title: 'First condition',
+                                type: 'condition/v1',
+                            },
+                            {
+                                id: '202',
+                                jobId: '7',
+                                priority: 0,
+                                status: 'COMPLETED',
+                                title: 'Second condition',
+                                type: 'condition/v1',
+                            },
+                            {
+                                icon: '<svg>own</svg>',
+                                id: '203',
+                                jobId: '7',
+                                priority: 0,
+                                status: 'COMPLETED',
+                                title: 'Own icon',
+                                type: 'condition/v1',
+                            },
+                            {
+                                id: '204',
+                                jobId: '7',
+                                priority: 0,
+                                status: 'COMPLETED',
+                                title: 'No icon',
+                                type: 'var/v1/set',
+                            },
+                        ],
+                        icons: {'condition/v1': '<svg>condition</svg>'},
+                        iterations: [],
+                        number: 0,
+                        numberOfElements: 4,
+                        size: 50,
+                        totalElements: 4,
+                        totalPages: 1,
+                    }),
+                ],
+            },
+            fetchNextPage: vi.fn(),
+            hasNextPage: false,
+            isLoading: false,
+        });
+
+        render(
+            <LazyTaskExecutionChildren
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={plainTaskExecution}
+                selectedExecutionId=""
+            />
+        );
+
+        expect(screen.getAllByAltText('<svg>condition</svg>')).toHaveLength(2);
+        expect(screen.getByAltText('<svg>own</svg>')).toBeInTheDocument();
+        expect(screen.getAllByRole('img')).toHaveLength(3);
+    });
+
+    it('showsThePageIconOnTheRowsOfAnIteration', () => {
+        hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery.mockReturnValue({
+            data: {
+                pages: [
+                    TaskExecutionChildrenPageFromJSON({
+                        children: [],
+                        icons: {'condition/v1': '<svg>condition</svg>'},
+                        iterations: [
+                            [
+                                {
+                                    id: '101',
+                                    jobId: '7',
+                                    priority: 0,
+                                    status: 'COMPLETED',
+                                    title: 'Row task',
+                                    type: 'condition/v1',
+                                },
+                            ],
+                        ],
+                        number: 0,
+                        numberOfElements: 1,
+                        size: 50,
+                        totalElements: 1,
+                        totalPages: 1,
+                    }),
+                ],
+            },
+            fetchNextPage: vi.fn(),
+            hasNextPage: false,
+            isLoading: false,
+        });
+
+        render(
+            <LazyTaskExecutionChildren
+                defaultValue={['4-iteration-0']}
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={loopTaskExecution}
+                selectedExecutionId=""
+            />
+        );
+
+        expect(screen.getByText('Row task')).toBeInTheDocument();
+        expect(screen.getByAltText('<svg>condition</svg>')).toBeInTheDocument();
     });
 
     it('loadsPagesUntilFocusedPlainChildIsLoaded', () => {
