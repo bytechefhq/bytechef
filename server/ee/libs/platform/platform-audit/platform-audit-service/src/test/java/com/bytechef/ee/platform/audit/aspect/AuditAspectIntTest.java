@@ -15,10 +15,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
+import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.platform.audit.AuditInvocation;
+import com.bytechef.platform.audit.AuditMapper;
+import com.bytechef.platform.audit.Audited;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,16 +38,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @version ee
@@ -115,6 +133,186 @@ class AuditAspectIntTest {
         }
     }
 
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @SpringBootTest(
+        classes = AuditIntTestConfiguration.class,
+        properties = {
+            "spring.datasource.hikari.maximum-pool-size=1", "spring.datasource.hikari.connection-timeout=1000"
+        })
+    @ActiveProfiles("testint")
+    @Import({
+        PostgreSQLContainerConfiguration.class, AuditAspectIntTest.GuardedServiceConfiguration.class
+    })
+    class SingleConnectionPool {
+
+        @Autowired
+        private AuditedCaller auditedCaller;
+
+        @Autowired
+        private OuterGuardedService outerGuardedService;
+
+        @Autowired
+        private UnauditedCaller unauditedCaller;
+
+        @Autowired
+        private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+        @BeforeEach
+        void beforeEach() {
+            persistenceAuditEventRepository.deleteAll();
+
+            SecurityContextHolder.clearContext();
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testNestedAuditedCallInsideTransactionRecordsBothEventsWithOneConnection() {
+            authenticate("ROLE_ADMIN");
+
+            assertThat(outerGuardedService.callInner()).isEqualTo("inner");
+
+            assertThat(findRecordedMethodResults()).containsExactlyInAnyOrderEntriesOf(
+                Map.of(
+                    OuterGuardedService.class.getName() + ".callInner", "ALLOWED",
+                    InnerGuardedService.class.getName() + ".adminOnly", "ALLOWED"));
+        }
+
+        @Test
+        void testNestedDeniedCallInsideTransactionIsRecorded() {
+            authenticate("ROLE_USER");
+
+            assertThatThrownBy(() -> outerGuardedService.callInnerAsAnyone())
+                .isInstanceOf(AccessDeniedException.class);
+
+            assertThat(findRecordedMethodResults()).containsExactlyInAnyOrderEntriesOf(
+                Map.of(
+                    OuterGuardedService.class.getName() + ".callInnerAsAnyone", "DENIED",
+                    InnerGuardedService.class.getName() + ".adminOnly", "DENIED"));
+        }
+
+        @Test
+        void testAuditedCallInsideUnauditedTransactionIsWrittenOnTheCallersConnection() {
+            authenticate("ROLE_ADMIN");
+
+            assertThat(unauditedCaller.callInner()).isEqualTo("inner");
+
+            assertThat(findRecordedMethodResults()).containsExactlyInAnyOrderEntriesOf(
+                Map.of(InnerGuardedService.class.getName() + ".adminOnly", "ALLOWED"));
+        }
+
+        @Test
+        void testAuditedCallInsideUnauditedTransactionThatRollsBackLeavesTheCallerUsable() {
+            authenticate("ROLE_ADMIN");
+
+            assertThatThrownBy(() -> unauditedCaller.callInnerThenFail())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("caller failed");
+
+            assertThat(findRecordedMethodResults()).isEmpty();
+        }
+
+        @Test
+        void testAuditedCallInsideUnauditedReadOnlyTransactionDoesNotBreakTheCaller() {
+            authenticate("ROLE_ADMIN");
+
+            assertThat(unauditedCaller.callInnerReadOnly()).isEqualTo("inner");
+
+            assertThat(findRecordedMethodResults()).isEmpty();
+        }
+
+        @Test
+        void testCaptureReadsInsideNestedAuditedTransactionsUseTheHeldConnection() {
+            authenticate("ROLE_ADMIN");
+
+            assertThat(auditedCaller.callAuditedInner()).isEqualTo("inner");
+
+            Page<PersistentAuditEvent> page = persistenceAuditEventRepository
+                .findAllFiltered(new AuditEventFilter(null, "CAPTURE_TEST", null, null, null), PageRequest.of(0, 25));
+
+            assertThat(page.getContent())
+                .hasSize(2)
+                .allSatisfy(persistentAuditEvent -> assertThat(persistentAuditEvent.getData())
+                    .containsEntry("result", "SUCCESS")
+                    .containsKey("captured")
+                    .doesNotContainKey("mapperError"));
+        }
+
+        @Test
+        void testFailedCaptureReadInsideUnauditedTransactionLeavesTheCallerUsable() {
+            authenticate("ROLE_ADMIN");
+
+            assertThat(unauditedCaller.callFailingCaptureThenWrite()).isEqualTo("inner");
+
+            Page<PersistentAuditEvent> page =
+                persistenceAuditEventRepository.findAllFiltered(AuditEventFilter.empty(), PageRequest.of(0, 25));
+
+            assertThat(page.getContent())
+                .extracting(PersistentAuditEvent::getEventType)
+                .containsExactlyInAnyOrder("FAILING_CAPTURE_TEST", "CALLER_WRITE");
+            assertThat(page.getContent())
+                .filteredOn(persistentAuditEvent -> "FAILING_CAPTURE_TEST".equals(persistentAuditEvent.getEventType()))
+                .singleElement()
+                .satisfies(persistentAuditEvent -> assertThat(persistentAuditEvent.getData())
+                    .containsEntry("result", "SUCCESS")
+                    .doesNotContainKey("captured"));
+        }
+
+        @Test
+        void testFailedAuditInsertInsideUnauditedTransactionLeavesTheCallerUsable() {
+            authenticate("ROLE_ADMIN");
+
+            assertThat(unauditedCaller.callWhileAuditInsertFailsThenWrite()).isEqualTo("inner");
+
+            Page<PersistentAuditEvent> page =
+                persistenceAuditEventRepository.findAllFiltered(AuditEventFilter.empty(), PageRequest.of(0, 25));
+
+            assertThat(page.getContent())
+                .extracting(PersistentAuditEvent::getEventType)
+                .containsExactly("CALLER_WRITE");
+        }
+
+        @Test
+        void testNestedAuditedCallIsRecordedAsRolledBackWhenTheEnclosingTransactionRollsBack() {
+            authenticate("ROLE_ADMIN");
+
+            assertThatThrownBy(() -> auditedCaller.callAuditedInnerThenFail())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("caller failed");
+
+            Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+                new AuditEventFilter(null, "CAPTURE_TEST", null, null, null), PageRequest.of(0, 25));
+
+            assertThat(page.getContent())
+                .extracting(persistentAuditEvent -> persistentAuditEvent.getData()
+                    .get("result"))
+                .containsExactlyInAnyOrder("ERROR", "ROLLED_BACK");
+        }
+
+        private void authenticate(String authority) {
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken("alice", "n/a",
+                    List.of(new SimpleGrantedAuthority(authority))));
+        }
+
+        private Map<String, String> findRecordedMethodResults() {
+            Page<PersistentAuditEvent> page = persistenceAuditEventRepository
+                .findAllFiltered(new AuditEventFilter(null, "PERMISSION_CHECK", null, null, null),
+                    PageRequest.of(0, 25));
+
+            return page.getContent()
+                .stream()
+                .map(PersistentAuditEvent::getData)
+                .collect(Collectors.toMap(data -> data.get("method"), data -> data.get("result")));
+        }
+    }
+
     @SpringBootConfiguration
     @EnableAspectJAutoProxy
     @EnableMethodSecurity
@@ -137,6 +335,227 @@ class AuditAspectIntTest {
         @PreAuthorize("hasRole('ADMIN')")
         public String adminOnlyMethod() {
             return "ok";
+        }
+    }
+
+    @Configuration
+    @EnableMethodSecurity
+    static class GuardedServiceConfiguration {
+
+        @Bean
+        InnerGuardedService innerGuardedService() {
+            return new InnerGuardedService();
+        }
+
+        @Bean
+        OuterGuardedService outerGuardedService(InnerGuardedService innerGuardedService) {
+            return new OuterGuardedService(innerGuardedService);
+        }
+
+        @Bean
+        UnauditedCaller unauditedCaller(
+            InnerGuardedService innerGuardedService, JdbcTemplate jdbcTemplate,
+            PersistenceAuditEventRepository persistenceAuditEventRepository) {
+
+            return new UnauditedCaller(innerGuardedService, jdbcTemplate, persistenceAuditEventRepository);
+        }
+
+        @Bean
+        FailingCaptureAuditMapper failingCaptureAuditMapper(JdbcTemplate jdbcTemplate) {
+            return new FailingCaptureAuditMapper(jdbcTemplate);
+        }
+
+        @Bean
+        CountingAuditMapper countingAuditMapper(PersistenceAuditEventRepository persistenceAuditEventRepository) {
+            return new CountingAuditMapper(persistenceAuditEventRepository);
+        }
+
+        @Bean
+        AuditedCaller auditedCaller(InnerGuardedService innerGuardedService) {
+            return new AuditedCaller(innerGuardedService);
+        }
+    }
+
+    static class InnerGuardedService {
+
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String adminOnly() {
+            return "inner";
+        }
+
+        @Audited(event = "CAPTURE_TEST", mapper = CountingAuditMapper.class)
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String auditedAdminOnly() {
+            return "inner";
+        }
+
+        @Audited(event = "FAILING_CAPTURE_TEST", mapper = FailingCaptureAuditMapper.class)
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String failingCaptureAdminOnly() {
+            return "inner";
+        }
+
+        @Audited(event = "REJECTED_BY_THE_DATABASE", mapper = CountingAuditMapper.class)
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String rejectedAuditAdminOnly() {
+            return "inner";
+        }
+    }
+
+    static class OuterGuardedService {
+
+        private final InnerGuardedService innerGuardedService;
+
+        OuterGuardedService(InnerGuardedService innerGuardedService) {
+            this.innerGuardedService = innerGuardedService;
+        }
+
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String callInner() {
+            return innerGuardedService.adminOnly();
+        }
+
+        @PreAuthorize("isAuthenticated()")
+        @Transactional
+        public String callInnerAsAnyone() {
+            return innerGuardedService.adminOnly();
+        }
+    }
+
+    static class UnauditedCaller {
+
+        private final InnerGuardedService innerGuardedService;
+        private final JdbcTemplate jdbcTemplate;
+        private final PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+        UnauditedCaller(
+            InnerGuardedService innerGuardedService, JdbcTemplate jdbcTemplate,
+            PersistenceAuditEventRepository persistenceAuditEventRepository) {
+
+            this.innerGuardedService = innerGuardedService;
+            this.jdbcTemplate = jdbcTemplate;
+            this.persistenceAuditEventRepository = persistenceAuditEventRepository;
+        }
+
+        @Transactional
+        public String callFailingCaptureThenWrite() {
+            String result = innerGuardedService.failingCaptureAdminOnly();
+
+            writeCallerEvent();
+
+            return result;
+        }
+
+        @Transactional
+        public String callWhileAuditInsertFailsThenWrite() {
+            jdbcTemplate.execute(
+                "ALTER TABLE persistent_audit_event ADD CONSTRAINT reject_audit_event "
+                    + "CHECK (event_type <> 'REJECTED_BY_THE_DATABASE')");
+
+            String result = innerGuardedService.rejectedAuditAdminOnly();
+
+            jdbcTemplate.execute("ALTER TABLE persistent_audit_event DROP CONSTRAINT reject_audit_event");
+
+            writeCallerEvent();
+
+            return result;
+        }
+
+        private void writeCallerEvent() {
+            PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
+
+            persistentAuditEvent.setEventDate(LocalDateTime.now());
+            persistentAuditEvent.setEventType("CALLER_WRITE");
+            persistentAuditEvent.setPrincipal("alice");
+
+            persistenceAuditEventRepository.save(persistentAuditEvent);
+        }
+
+        @Transactional
+        public String callInner() {
+            return innerGuardedService.adminOnly();
+        }
+
+        @Transactional
+        public String callInnerThenFail() {
+            innerGuardedService.adminOnly();
+
+            throw new IllegalStateException("caller failed");
+        }
+
+        @Transactional(readOnly = true)
+        public String callInnerReadOnly() {
+            return innerGuardedService.adminOnly();
+        }
+    }
+
+    static class AuditedCaller {
+
+        private final InnerGuardedService innerGuardedService;
+
+        AuditedCaller(InnerGuardedService innerGuardedService) {
+            this.innerGuardedService = innerGuardedService;
+        }
+
+        @Audited(event = "CAPTURE_TEST", mapper = CountingAuditMapper.class)
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String callAuditedInner() {
+            return innerGuardedService.auditedAdminOnly();
+        }
+
+        @Audited(event = "CAPTURE_TEST", mapper = CountingAuditMapper.class)
+        @PreAuthorize("hasRole('ADMIN')")
+        @Transactional
+        public String callAuditedInnerThenFail() {
+            innerGuardedService.auditedAdminOnly();
+
+            throw new IllegalStateException("caller failed");
+        }
+    }
+
+    static class CountingAuditMapper implements AuditMapper {
+
+        private final PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+        CountingAuditMapper(PersistenceAuditEventRepository persistenceAuditEventRepository) {
+            this.persistenceAuditEventRepository = persistenceAuditEventRepository;
+        }
+
+        @Override
+        public Object capture(AuditInvocation auditInvocation) {
+            return persistenceAuditEventRepository.count();
+        }
+
+        @Override
+        public Map<String, String> map(AuditInvocation auditInvocation) {
+            return auditInvocation.captured() == null
+                ? Map.of() : Map.of("captured", String.valueOf(auditInvocation.captured()));
+        }
+    }
+
+    static class FailingCaptureAuditMapper implements AuditMapper {
+
+        private final JdbcTemplate jdbcTemplate;
+
+        FailingCaptureAuditMapper(JdbcTemplate jdbcTemplate) {
+            this.jdbcTemplate = jdbcTemplate;
+        }
+
+        @Override
+        public Object capture(AuditInvocation auditInvocation) {
+            return jdbcTemplate.queryForObject("SELECT 1 / 0", Integer.class);
+        }
+
+        @Override
+        public Map<String, String> map(AuditInvocation auditInvocation) {
+            return auditInvocation.captured() == null
+                ? Map.of() : Map.of("captured", String.valueOf(auditInvocation.captured()));
         }
     }
 }
