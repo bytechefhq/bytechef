@@ -1,4 +1,4 @@
-import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
+import {Notification, NotificationEventTypeEnum, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {
     useCreateNotificationMutation,
     useDeleteNotificationMutation,
@@ -11,7 +11,7 @@ import {coreTableFeatures} from '@/shared/util/table-features';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper} from '@tanstack/react-table';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import z from 'zod';
 
@@ -52,7 +52,7 @@ export default function useNotifications() {
         isLoading: isNotificationsLoading,
     } = useGetNotificationsQuery();
 
-    const {data: notificationEvents, isLoading: isNotificationEventsLoading} = useGetNotificationEventsQuery();
+    const {data: allNotificationEvents, isLoading: isNotificationEventsLoading} = useGetNotificationEventsQuery();
 
     const queryClient = useQueryClient();
     const ff_1132 = useFeatureFlagsStore()('ff-1132');
@@ -125,6 +125,14 @@ export default function useNotifications() {
 
         closeEditDialog();
     }
+
+    const notificationEvents = useMemo(
+        () =>
+            allNotificationEvents?.filter(
+                (notificationEvent) => notificationEvent.type !== NotificationEventTypeEnum.JobCancelled
+            ),
+        [allNotificationEvents]
+    );
 
     const columnHelper = createColumnHelper<typeof coreTableFeatures, Notification>();
 
