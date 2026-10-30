@@ -26,10 +26,6 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public final class McpAnonymousAuthenticationToken extends AbstractAuthenticationToken {
 
-    private static final String AUTOMATION_A2A_PRINCIPAL_PREFIX = "a2a-anonymous:automation:";
-    private static final String AUTOMATION_PRINCIPAL_PREFIX = "mcp-anonymous:automation:";
-    private static final String EMBEDDED_PRINCIPAL_PREFIX = "mcp-anonymous:embedded:";
-
     private final String principal;
 
     private McpAnonymousAuthenticationToken(String principal) {
@@ -40,16 +36,11 @@ public final class McpAnonymousAuthenticationToken extends AbstractAuthenticatio
         setAuthenticated(true);
     }
 
-    public static McpAnonymousAuthenticationToken ofAutomationA2aServer(long a2aServerId) {
-        return new McpAnonymousAuthenticationToken(AUTOMATION_A2A_PRINCIPAL_PREFIX + a2aServerId);
-    }
-
-    public static McpAnonymousAuthenticationToken ofAutomationMcpServer(long mcpServerId) {
-        return new McpAnonymousAuthenticationToken(AUTOMATION_PRINCIPAL_PREFIX + mcpServerId);
-    }
-
-    public static McpAnonymousAuthenticationToken ofEmbeddedMcpServer(long mcpServerId) {
-        return new McpAnonymousAuthenticationToken(EMBEDDED_PRINCIPAL_PREFIX + mcpServerId);
+    /**
+     * @param principal identifies the anonymous caller, e.g. the server it reached; it must not carry a secret key
+     */
+    public static McpAnonymousAuthenticationToken of(String principal) {
+        return new McpAnonymousAuthenticationToken(principal);
     }
 
     @Override

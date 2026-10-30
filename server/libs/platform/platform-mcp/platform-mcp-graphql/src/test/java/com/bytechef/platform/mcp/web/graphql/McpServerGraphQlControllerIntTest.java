@@ -366,7 +366,8 @@ public class McpServerGraphQlControllerIntTest {
             .execute()
             .path("updateMcpServerUrl")
             .entity(String.class)
-            .satisfies(url -> assertThat(url).endsWith("/api/automation/" + mcpServer.getSecretKey() + "/mcp"));
+            .satisfies(
+                url -> assertThat(url).endsWith("/test/" + mcpServer.getSecretKey() + "/mcp"));
 
         verify(mcpServerService).rotateSecretKey(1L);
     }
