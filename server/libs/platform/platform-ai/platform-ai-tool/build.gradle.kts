@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service"))
-    implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
 
     testImplementation(project(":server:libs:test:test-support"))
 }

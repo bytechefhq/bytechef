@@ -29,9 +29,6 @@ import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
@@ -42,6 +39,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -88,7 +86,7 @@ public class ComponentTools {
     private final ComponentDefinitionService componentDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
-    private final ConnectionService connectionService;
+    private final @Nullable ComponentToolsConnectionResolver componentToolsConnectionResolver;
     private final VectorStore vectorStore;
 
     private static final String DEFAULT_TRIGGER_DEFINITION = """
@@ -112,12 +110,12 @@ public class ComponentTools {
     @SuppressFBWarnings("EI")
     public ComponentTools(ComponentDefinitionService componentDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        ConnectionService connectionService,
+        @Autowired(required = false) @Nullable ComponentToolsConnectionResolver componentToolsConnectionResolver,
         @Autowired(required = false) @Qualifier("copilotPgVectorStore") VectorStore vectorStore) {
         this.componentDefinitionService = componentDefinitionService;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
-        this.connectionService = connectionService;
+        this.componentToolsConnectionResolver = componentToolsConnectionResolver;
         this.vectorStore = vectorStore;
     }
 
@@ -769,13 +767,13 @@ public class ComponentTools {
                                 }
 
                                 try {
-                                    List<Connection> connections =
-                                        connectionService.getConnections(componentName, version,
-                                            PlatformType.AUTOMATION);
+                                    Optional<Long> connectionId = componentToolsConnectionResolver == null
+                                        ? Optional.empty()
+                                        : componentToolsConnectionResolver.resolveConnectionId(
+                                            componentDefinition.getName(), componentDefinition.getVersion(),
+                                            toolContext);
 
-                                    Connection connection = connections.getFirst();
-
-                                    Map<String, Long> connectionIds = Map.of(operationName, connection.getId());
+                                    Map<String, Long> connectionIds = Map.of(operationName, connectionId.orElseThrow());
 
                                     var output = actionDefinitionFacade.executePerform(componentDefinition.getName(),
                                         componentDefinition.getVersion(), actionDefinition.getName(), null, null, null,
