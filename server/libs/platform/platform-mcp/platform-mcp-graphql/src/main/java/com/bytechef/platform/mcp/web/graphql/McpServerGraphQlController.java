@@ -18,17 +18,15 @@ package com.bytechef.platform.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.mcp.web.McpServerPathResolver;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
@@ -50,19 +48,18 @@ public class McpServerGraphQlController {
     private static final String MASKED_SECRET_KEY = "********";
 
     private final McpServerFacade mcpServerFacade;
-    private final Map<PlatformType, McpServerPathResolver> mcpServerPathResolvers;
     private final McpServerService mcpServerService;
+    private final McpServerTypeDefinitions mcpServerTypeDefinitions;
     private final String publicUrl;
 
     @SuppressFBWarnings("EI")
     public McpServerGraphQlController(
         ApplicationProperties applicationProperties, McpServerFacade mcpServerFacade,
-        List<McpServerPathResolver> mcpServerPathResolvers, McpServerService mcpServerService) {
+        McpServerService mcpServerService, List<McpServerTypeDefinition> mcpServerTypeDefinitions) {
 
         this.mcpServerFacade = mcpServerFacade;
-        this.mcpServerPathResolvers = mcpServerPathResolvers.stream()
-            .collect(Collectors.toMap(McpServerPathResolver::getType, Function.identity()));
         this.mcpServerService = mcpServerService;
+        this.mcpServerTypeDefinitions = new McpServerTypeDefinitions(mcpServerTypeDefinitions);
         this.publicUrl = applicationProperties.getPublicUrl();
     }
 
@@ -73,12 +70,12 @@ public class McpServerGraphQlController {
 
     @QueryMapping
     public McpServer mcpServer(@Argument long id) {
-        return getNonEmbeddedMcpServer(id);
+        return getSharedAdministrationMcpServer(id);
     }
 
     @MutationMapping
     public McpServer updateMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
-        getNonEmbeddedMcpServer(id);
+        getSharedAdministrationMcpServer(id);
 
         return mcpServerService.update(
             id, input.name(), input.enabled(), input.enforceToolAuthorization(), input.authenticationRequired());
@@ -86,7 +83,7 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public List<Tag> updateMcpServerTags(@Argument long id, @Argument List<TagInput> tags) {
-        getNonEmbeddedMcpServer(id);
+        getSharedAdministrationMcpServer(id);
 
         List<Tag> tagList = tags.stream()
             .map(tagInput -> {
@@ -104,7 +101,7 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public boolean deleteMcpServer(@Argument long id) {
-        getNonEmbeddedMcpServer(id);
+        getSharedAdministrationMcpServer(id);
 
         mcpServerFacade.deleteMcpServer(id);
 
@@ -129,17 +126,17 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public String updateMcpServerUrl(@Argument long id) {
-        getNonEmbeddedMcpServer(id);
+        getSharedAdministrationMcpServer(id);
 
         McpServer mcpServer = mcpServerService.rotateSecretKey(id);
 
         return buildMcpServerUrl(mcpServer, mcpServer.getSecretKey());
     }
 
-    private McpServer getNonEmbeddedMcpServer(long id) {
+    private McpServer getSharedAdministrationMcpServer(long id) {
         McpServer mcpServer = mcpServerService.getMcpServer(id);
 
-        McpServerTypeUtils.checkNotEmbedded(mcpServer.getType());
+        mcpServerTypeDefinitions.checkSharedAdministration(mcpServer.getType());
 
         return mcpServer;
     }
@@ -157,13 +154,7 @@ public class McpServerGraphQlController {
     }
 
     private String buildMcpServerUrl(McpServer mcpServer, String secretKey) {
-        McpServerPathResolver mcpServerPathResolver = mcpServerPathResolvers.get(mcpServer.getType());
-
-        if (mcpServerPathResolver == null) {
-            throw new IllegalStateException("No MCP server path resolver for type " + mcpServer.getType());
-        }
-
-        return publicUrl + mcpServerPathResolver.resolvePath(secretKey);
+        return publicUrl + mcpServerTypeDefinitions.resolvePath(mcpServer.getType(), secretKey);
     }
 
     public record TagInput(Long id, String name) {
