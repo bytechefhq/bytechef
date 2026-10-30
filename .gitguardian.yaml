@@ -6,3 +6,12 @@ secret:
     # created and destroyed within the test run — nothing to rotate or revoke.
     - name: FTP Testcontainers fixture password (false positive)
       match: byteChefFtpPass123
+    # Fixed defaults of the evaluation Compose files (docker-compose*.yml). PostgreSQL and
+    # RabbitMQ there are reachable only inside the Compose network or from the host; the
+    # docs mark these files as evaluation-only and not for an internet-reachable instance.
+    - name: Default PostgreSQL password in the Compose files (false positive)
+      match: postgres
+    - name: Default RabbitMQ password in the cluster Compose file (false positive)
+      match: bytechef
+    - name: Default remember-me key in the Compose files (false positive)
+      match: e48keep1this1safe3ffb2
