@@ -129,8 +129,8 @@ class AutomationProjectApiControllerIntTest {
             null);
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(
-            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, true, 0,
-            null);
+            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, false, true,
+            0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(projectDTO));
@@ -426,7 +426,7 @@ class AutomationProjectApiControllerIntTest {
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(
             PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null,
-            automationHubVisible, 0, null);
+            false, automationHubVisible, 0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(projectDTO));

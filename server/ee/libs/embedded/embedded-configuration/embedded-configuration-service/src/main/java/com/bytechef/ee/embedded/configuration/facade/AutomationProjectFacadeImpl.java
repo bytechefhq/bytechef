@@ -21,6 +21,8 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
+import com.bytechef.ee.embedded.configuration.audit.AutomationProjectAuditEvents;
+import com.bytechef.ee.embedded.configuration.audit.WorkflowAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProject;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -48,6 +50,8 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
@@ -126,7 +130,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, ProjectCodeWorkflowService projectCodeWorkflowService,
-        ProjectService projectService,
+        ProjectService projectService, ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
@@ -347,14 +351,26 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public Optional<Long> fetchProjectIdByName(String name) {
-        return projectService.fetchProject(name, Workspace.DEFAULT_WORKSPACE_ID)
+        List<Long> projectIds = automationProjectService.getAutomationProjects()
+            .stream()
+            .map(AutomationProject::getProjectId)
+            .toList();
+
+        if (projectIds.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return projectService.getProjects(projectIds)
+            .stream()
+            .filter(project -> Objects.equals(project.getName(), name))
             .map(Project::getId)
-            .filter(projectId -> automationProjectService.fetchAutomationProject(projectId)
-                .isPresent());
+            .findFirst();
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public List<AutomationProjectVersionDTO> getProjectVersions(long projectId) {
         Project project = getProjectOfAutomationProject(projectId);
 
@@ -415,7 +431,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
     private List<AutomationProjectDTO> getProjectsWithConfigurationCounts(@Nullable Long environmentId) {
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
-        Map<Long, Long> configurationCounts = getConfigurationCounts(automationProjects.keySet());
+        Map<Long, Long> configurationCounts =
+            getConfigurationCounts(automationProjects.keySet(), environmentId);
         Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         return getAutomationProjectProjects(automationProjects.keySet())
@@ -490,6 +507,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
 
         Map<Long, AutomationProject> automationProjects = getAutomationProjects();
+        Set<Long> codeWorkflowProjectIds = Set.copyOf(projectCodeWorkflowService.getCodeWorkflowProjectIds());
 
         List<AutomationProjectConfigurationReleaseDTO> releases = new ArrayList<>();
 
@@ -515,7 +533,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
                     project, automationProject, configuration.getProjectVersion(),
                     configuration.isAutomationHubVisible(),
                     projectWorkflow -> automationProjectConfigurationService.isWorkflowEnabled(
-                        configuration, projectWorkflow.getUuid()));
+                        configuration, projectWorkflow.getUuid()),
+                    codeWorkflowProjectIds);
 
                 releases.add(
                     new AutomationProjectConfigurationReleaseDTO(

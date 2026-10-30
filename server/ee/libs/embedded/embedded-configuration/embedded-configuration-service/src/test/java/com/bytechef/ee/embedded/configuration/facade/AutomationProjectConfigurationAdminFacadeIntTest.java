@@ -1440,7 +1440,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
                 reference.connectedUserId(), configuration.getProjectId(), configurationId);
         }
 
-        when(connectedUserWorkflowReferenceAdminFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceAdminFacade.getReferences(anySet(), any()))
             .thenReturn(List.of(references));
     }
 

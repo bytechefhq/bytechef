@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -24,6 +25,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
@@ -101,7 +103,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         createdProject.setId(1L);
         createdProject.setName("my-code-project");
 
-        when(projectService.fetchProject("my-code-project")).thenReturn(Optional.empty());
+        when(projectService.fetchProject(eq("my-code-project"), anyLong())).thenReturn(Optional.empty());
         when(projectService.create(any()))
             .thenReturn(createdProject);
 
@@ -124,7 +126,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         Project project = projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", Language.JAVASCRIPT);
 
@@ -161,7 +163,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", language))
             .isInstanceOf(ConfigurationException.class)
@@ -183,7 +185,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         existingProject.setId(2L);
         existingProject.setName("my-code-project");
 
-        when(projectService.fetchProject("my-code-project"))
+        when(projectService.fetchProject(eq("my-code-project"), anyLong()))
             .thenReturn(Optional.of(existingProject));
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
@@ -195,7 +197,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(
             1L, "my-code-project", Language.JAVASCRIPT))
@@ -252,7 +254,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, name, Language.JAVASCRIPT))
             .isInstanceOf(ConfigurationException.class)
@@ -260,7 +262,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
             .isEqualTo(CodeWorkflowErrorType.INVALID_CODE_WORKFLOW_NAME.getErrorKey());
 
         verify(projectService, never()).create(any());
-        verify(projectService, never()).fetchProject(any());
+        verify(projectService, never()).fetchProject(anyString(), anyLong());
     }
 
     private static void assertStarterLoads(Language language) throws IOException {
