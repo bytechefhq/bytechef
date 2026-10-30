@@ -48,6 +48,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -89,6 +90,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     @SuppressWarnings("unchecked")
     public List<Property> getClusterElementDynamicProperties(
@@ -176,6 +178,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         return result;
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public List<Property> getWorkflowNodeComponentOperationDynamicProperties(
         String workflowId, String workflowNodeName, @Nullable ClusterElementNode clusterElementNode,
