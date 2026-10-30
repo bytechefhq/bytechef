@@ -9,20 +9,29 @@ comingSoon: true
 
 ---
 
-{/* TODO screenshot: Settings → Audit Events page - the results table with columns Date, Principal, Event Type and a per-row chevron; the left filter sidebar showing Principal, Search data, Event type, From date, and To date; the header showing the active "Filter by" summary */}
+{/* TODO screenshot: Settings → Audit Events page - the header with the filter button on the right, a row of active filter chips, the Principal and Search data inputs, and the results table with columns Date, Principal, Event Type, Result and a per-row chevron */}
 
 ## Finding an event
 
-The screen has a filter sidebar on the left and a results table on the right.
+The filter button on the right of the page header opens the **Filter Audit Events** menu. The button is highlighted while any filter is active.
 
-| Filter | What it does |
+| Menu group | What it does |
 |---|---|
-| **Principal** | Match a single actor by login, e.g. `admin`. A failed sign-in is recorded under the name that was typed. |
-| **Search data** | Free-text match against any recorded event data value. |
-| **Event type** | Restrict to one event type from the dropdown; **All** clears it. |
-| **From date** / **To date** | Bound the time window. |
+| **Event type** | Restrict to one event type; **All** clears it. A check mark shows the active choice. |
+| **Date** | **All time**, **Last 24 hours**, **Last 7 days**, **Last 30 days**, or **Custom range**. The presets count back from the moment you pick them. **Custom range** opens a small panel with **From** and **To** date pickers; a range starts at the beginning of the **From** day and ends at the end of the **To** day, in your local time. |
 
-A **Clear filters** link resets everything, and the page header shows a live **Filter by** summary of what is active. With no matches the table reads "No audit events match the current filters."
+**Clear all filters** at the bottom of the menu resets everything. It is disabled when no filter is active.
+
+Two inputs sit below the header:
+
+| Input | What it does |
+|---|---|
+| **Principal** | Match a single actor by exact login, e.g. `admin`. A failed sign-in is recorded under the name that was typed. |
+| **Search data** | Free-text match against any recorded event data value. |
+
+Both apply shortly after you stop typing, and surrounding spaces are ignored.
+
+Each active filter appears as a chip above the inputs, e.g. **Event type: JOB_FAILED**, **Last 7 days**, **From:** / **To:** for a custom range, **Principal: admin**, or **Data: createProject**. Click the **×** on a chip to remove that filter, or **Clear all** to remove every filter. Changing a filter always returns to the first page of results. With no matches the table reads "No audit events match the current filters."
 
 The results table lists **Date**, **Principal**, and **Event Type**. Clicking a row opens the **Audit Event Details** panel, showing the event type with its timestamp, the **Principal**, the **Event ID**, and the event's recorded **Data** as key/value pairs. When results span multiple pages, **Previous** / **Next** page through them.
 
@@ -52,7 +61,7 @@ Some events are marked *strict*: if the audit entry cannot be written, the opera
 
 ## Event types
 
-The dropdown on the page is populated from the events your instance has actually recorded. The full set the platform can emit:
+The **Event type** group of the filter menu is populated from the events your instance has actually recorded. The full set the platform can emit:
 
 | Area | Event types |
 |---|---|
