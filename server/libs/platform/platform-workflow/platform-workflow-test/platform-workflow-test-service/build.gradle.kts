@@ -34,5 +34,20 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
     implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
+    testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))
+    testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
+
+    testRuntimeOnly(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testRuntimeOnly(project(":server:libs:platform:platform-tag:platform-tag-service"))
 }
