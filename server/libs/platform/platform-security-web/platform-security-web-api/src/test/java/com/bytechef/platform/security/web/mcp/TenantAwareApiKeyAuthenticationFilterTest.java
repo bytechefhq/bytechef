@@ -162,7 +162,7 @@ class TenantAwareApiKeyAuthenticationFilterTest {
                 throw new BadCredentialsException("Authorization token does not exist");
             }
 
-            return McpAnonymousAuthenticationToken.ofAutomationMcpServer(1L);
+            return McpAnonymousAuthenticationToken.of("mcp-anonymous:test:1");
         });
 
         MockHttpServletRequest mockHttpServletRequest = getMcpRequest();
@@ -262,7 +262,7 @@ class TenantAwareApiKeyAuthenticationFilterTest {
             mcpServerSecretKeys.add(mcpApiKeyCredentials.getMcpServerSecretKey());
             presentedApiKeys.add(mcpApiKeyCredentials.getSecret());
 
-            return McpAnonymousAuthenticationToken.ofAutomationMcpServer(1L);
+            return McpAnonymousAuthenticationToken.of("mcp-anonymous:test:1");
         });
 
         managementTenantAwareApiKeyAuthenticationFilter.doFilter(
@@ -379,7 +379,7 @@ class TenantAwareApiKeyAuthenticationFilterTest {
             authenticationTenantIds.add(TenantContext.getCurrentTenantId());
             presentedApiKeys.add(mcpApiKeyCredentials.getSecret());
 
-            return McpAnonymousAuthenticationToken.ofAutomationMcpServer(1L);
+            return McpAnonymousAuthenticationToken.of("mcp-anonymous:test:1");
         });
     }
 }
