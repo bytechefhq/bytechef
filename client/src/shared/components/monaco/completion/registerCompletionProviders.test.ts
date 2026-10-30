@@ -26,11 +26,12 @@ describe('registerCompletionProviders', () => {
         registerCompletionProviders(fakeMonaco);
         registerCompletionProviders(fakeMonaco);
 
-        expect(registerCompletionItemProvider).toHaveBeenCalledTimes(5);
+        expect(registerCompletionItemProvider).toHaveBeenCalledTimes(6);
         expect(registerCompletionItemProvider.mock.calls.map((call) => (call as unknown[])[0])).toEqual([
             'javascript',
             'python',
             'ruby',
+            'shell',
             'json',
             'yaml',
         ]);
@@ -75,6 +76,24 @@ describe('buildCompletionProvider', () => {
         );
 
         expect(result?.suggestions.map((suggestion) => suggestion.label)).toEqual(['http', 'log']);
+    });
+
+    it('returns shell suggestions for a model registered as a shell script', async () => {
+        registerCompletionContext('inmemory://shell', {env: ['API_TOKEN'], input: {}, kind: 'shell'});
+
+        const provider = buildCompletionProvider(fakeMonaco);
+
+        const result = await provider.provideCompletionItems(
+            model('echo $API', 'inmemory://shell') as never,
+            {column: 10, lineNumber: 1} as never,
+            {} as never,
+            {} as never
+        );
+
+        const suggestion = result?.suggestions.find((candidate) => candidate.label === 'API_TOKEN');
+
+        expect(suggestion?.insertText).toBe('API_TOKEN');
+        expect(suggestion?.range).toMatchObject({endColumn: 10, startColumn: 7});
     });
 
     it('gives every suggestion a sort text below the TypeScript service range', async () => {
