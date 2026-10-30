@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.security.config;
+package com.bytechef.automation.workflow.execution.web.security.config;
 
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
+ * Permits anonymous access to the public trigger form served by
+ * {@link com.bytechef.automation.workflow.execution.web.rest.TriggerFormApiController}. The unguessable random-v4
+ * workflow uuid in the WorkflowExecutionId is the capability, like a webhook URL.
+ *
  * @author Ivica Cardic
  */
 @Component
-public class PlatformConfigurationAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
+public class TriggerFormAuthorizeHttpRequestContributor implements AuthorizeHttpRequestContributor {
 
     @Override
     public List<String> getApiPermitAllRequestMatcherPaths() {
-        // The trigger-form endpoint is served by the automation TriggerFormApiController at
-        // /api/automation/internal/trigger-form/{id}; it is a public form (the unguessable random-v4 workflow uuid in
-        // the WorkflowExecutionId is the capability, like a webhook URL). The previous /api/platform/... path matched
-        // no
-        // controller, so anonymous form loads failed.
         return List.of("/api/automation/internal/trigger-form/**");
     }
 }

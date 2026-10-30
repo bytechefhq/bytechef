@@ -30,6 +30,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.security:spring-security-oauth2-jose")
+    testImplementation("org.springframework.security:spring-security-oauth2-resource-server")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-a2a:automation-ai-a2a-api")) {
@@ -53,6 +55,7 @@ dependencies {
         isTransitive = false
     }
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 
