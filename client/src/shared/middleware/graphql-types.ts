@@ -3549,11 +3549,10 @@ export type QueryApprovalTasksByIdsArgs = {
 
 
 export type QueryAuditEventsArgs = {
-  dataSearch?: InputMaybe<Scalars['String']['input']>;
   eventType?: InputMaybe<Scalars['String']['input']>;
   fromDate?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
-  principal?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
 };
