@@ -600,6 +600,8 @@ public class JobSyncExecutor {
 
             Job.Status status = jobStatusEvent.getStatus();
 
+            notifyJobStatusListeners(jobId, jobStatusEvent);
+
             if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
                 CountDownLatch latch = jobCompletionLatches.get(getKey(jobId));
 
@@ -608,11 +610,7 @@ public class JobSyncExecutor {
                 }
 
                 jobSyncAsyncTaskExecutor.clearCounter(jobId);
-            }
 
-            notifyJobStatusListeners(jobId, jobStatusEvent);
-
-            if (status == Job.Status.COMPLETED || status == Job.Status.FAILED || status == Job.Status.STOPPED) {
                 invalidateListeners(jobId);
             }
         } else if (event instanceof TaskStartedApplicationEvent taskStartedEvent && taskStartedJob != null) {

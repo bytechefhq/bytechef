@@ -254,6 +254,73 @@ class JobSyncExecutorTest {
 
     @Test
     @SuppressWarnings("PMD.UnusedLocalVariable")
+    void testAwaitJobReturnsOnlyAfterJobStatusListenersHandledTheTerminalStatus() throws Exception {
+        long jobId = 304L;
+
+        Job startedJob = new Job();
+
+        startedJob.setId(jobId);
+        startedJob.setStatus(Job.Status.STARTED);
+
+        AtomicReference<Job> currentJob = new AtomicReference<>(startedJob);
+
+        when(jobService.getJob(jobId)).thenAnswer(invocation -> currentJob.get());
+
+        CountDownLatch listenerEnteredLatch = new CountDownLatch(1);
+        CountDownLatch listenerReleaseLatch = new CountDownLatch(1);
+
+        try (AutoCloseable handle = jobSyncExecutor.addJobStatusListener(jobId, event -> {
+            if (event.getStatus() == Job.Status.FAILED) {
+                listenerEnteredLatch.countDown();
+
+                awaitLatch(listenerReleaseLatch);
+            }
+        })) {
+            CountDownLatch awaitReturnedLatch = new CountDownLatch(1);
+
+            Thread awaitThread = new Thread(() -> {
+                try {
+                    TenantContext.runWithTenantId(TENANT, () -> jobSyncExecutor.awaitJob(jobId, false));
+                } finally {
+                    awaitReturnedLatch.countDown();
+                }
+            });
+
+            awaitThread.start();
+
+            waitForLatchRegistration(jobSyncExecutor, TENANT + "_" + jobId, Duration.ofMillis(250));
+
+            Job failedJob = new Job();
+
+            failedJob.setId(jobId);
+            failedJob.setStatus(Job.Status.FAILED);
+
+            currentJob.set(failedJob);
+
+            JobStatusApplicationEvent jobStatusApplicationEvent = new JobStatusApplicationEvent(
+                jobId, Job.Status.FAILED);
+
+            jobStatusApplicationEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+            Thread coordinatorThread = new Thread(
+                () -> memoryMessageBroker.send(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
+                    jobStatusApplicationEvent));
+
+            coordinatorThread.start();
+
+            assertThat(listenerEnteredLatch.await(1, TimeUnit.SECONDS)).isTrue();
+            assertThat(awaitReturnedLatch.await(300, TimeUnit.MILLISECONDS)).isFalse();
+
+            listenerReleaseLatch.countDown();
+
+            assertThat(awaitReturnedLatch.await(1, TimeUnit.SECONDS)).isTrue();
+
+            coordinatorThread.join(TimeUnit.SECONDS.toMillis(1));
+        }
+    }
+
+    @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testTaskStartedListenerInvokedAndJobIdDerivedFromTaskExecutionId() throws Exception {
         long jobId = 404L;
         long taskExecutionId = 9001L;
@@ -738,6 +805,17 @@ class JobSyncExecutorTest {
 
         when(jobService.getJob(jobId)).thenReturn(startedJob);
         when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
+    }
+
+    private static void awaitLatch(CountDownLatch countDownLatch) {
+        try {
+            if (!countDownLatch.await(5, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("The latch was not released in time");
+            }
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+        }
     }
 
     private static void waitForLatchRegistration(JobSyncExecutor jobSyncExecutor, String key, Duration timeout)
