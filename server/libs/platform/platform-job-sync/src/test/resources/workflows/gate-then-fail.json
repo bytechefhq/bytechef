@@ -1,0 +1,13 @@
+{
+  "label": "Gate Then Fail",
+  "tasks": [ {
+    "name": "gate",
+    "type": "test/v1/gate"
+  }, {
+    "name": "failure",
+    "type": "test/v1/fail",
+    "parameters": {
+      "message": "Task failed on purpose"
+    }
+  } ]
+}

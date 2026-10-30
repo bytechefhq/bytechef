@@ -1,0 +1,7 @@
+{
+  "label": "Gate",
+  "tasks": [ {
+    "name": "gate",
+    "type": "test/v1/gate"
+  } ]
+}
