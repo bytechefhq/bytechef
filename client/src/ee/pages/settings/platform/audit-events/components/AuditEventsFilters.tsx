@@ -81,32 +81,36 @@ const AuditEventsFilters = ({
                             <DropdownMenuGroup>
                                 <DropdownMenuLabel>Event type</DropdownMenuLabel>
 
-                                <DropdownMenuItem
-                                    className="flex items-center justify-between"
-                                    onClick={() => onEventTypeChange(undefined)}
-                                >
-                                    <span>All</span>
-
-                                    {!filters.eventType && <CheckIcon className="size-4" />}
-                                </DropdownMenuItem>
-
-                                {eventTypes.map((eventType) => (
+                                <DropdownMenuGroup aria-label="Event types" className="max-h-64 overflow-y-auto">
                                     <DropdownMenuItem
                                         className="flex items-center justify-between"
-                                        key={eventType}
-                                        onClick={() => onEventTypeChange(eventType)}
+                                        onClick={() => onEventTypeChange(undefined)}
                                     >
-                                        <span className="truncate">{eventType}</span>
+                                        <span>All</span>
 
-                                        {filters.eventType === eventType && <CheckIcon className="size-4" />}
+                                        {!filters.eventType && <CheckIcon className="size-4" />}
                                     </DropdownMenuItem>
-                                ))}
 
-                                {isEventTypesError && (
-                                    <p className="px-2 py-1.5 text-xs text-destructive">
-                                        Event types could not be loaded.
-                                    </p>
-                                )}
+                                    {eventTypes.map((eventType) => (
+                                        <DropdownMenuItem
+                                            className="flex items-center justify-between"
+                                            key={eventType}
+                                            onClick={() => onEventTypeChange(eventType)}
+                                        >
+                                            <span className="truncate" title={eventType}>
+                                                {eventType}
+                                            </span>
+
+                                            {filters.eventType === eventType && <CheckIcon className="size-4" />}
+                                        </DropdownMenuItem>
+                                    ))}
+
+                                    {isEventTypesError && (
+                                        <p className="px-2 py-1.5 text-xs text-destructive">
+                                            Event types could not be loaded.
+                                        </p>
+                                    )}
+                                </DropdownMenuGroup>
                             </DropdownMenuGroup>
 
                             <DropdownMenuSeparator />
