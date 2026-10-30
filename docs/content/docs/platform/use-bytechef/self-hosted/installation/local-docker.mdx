@@ -186,13 +186,13 @@ ByteChef pair, so AI steps can run on a model that never leaves your machine.
 
 ```bash
 curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/docker-compose.ollama.yml
-echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)" > .env
 docker compose -f docker-compose.ollama.yml up
 ```
 
-`POSTGRES_PASSWORD` has no default. Docker Compose reads it from the `.env` file next to the Compose
-file, so it stays the same on every start. Keep that file: PostgreSQL sets the password only when it
-first creates the `storage_db` volume.
+PostgreSQL's port is not published, so only the containers in the stack can reach the database. Its
+password defaults to `postgres`; to use your own, put `POSTGRES_PASSWORD=...` in a `.env` file next
+to the Compose file before the first start. PostgreSQL sets the password only when it first creates
+the `storage_db` volume.
 
 On first start the one-off `ollama-pull` service downloads a chat model (`qwen3:8b`, about 5 GB)
 and an embedding model (`nomic-embed-text`). ByteChef starts without waiting for it, and the models
