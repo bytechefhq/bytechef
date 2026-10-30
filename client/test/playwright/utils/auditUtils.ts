@@ -54,8 +54,12 @@ export async function getApi(page: Page, path: string): Promise<APIResponse> {
     return response;
 }
 
-export function auditEventsFilterBar(page: Page) {
-    return page.getByPlaceholder('match any data value');
+export function auditEventsDataSearchInput(page: Page) {
+    return page.getByRole('textbox', {exact: true, name: 'Search data'});
+}
+
+export function auditEventsFilterButton(page: Page) {
+    return page.getByRole('button', {exact: true, name: 'Filter options'});
 }
 
 export async function openAuditEventsPage(page: Page): Promise<void> {
@@ -63,17 +67,14 @@ export async function openAuditEventsPage(page: Page): Promise<void> {
 
     await page.addStyleTag({content: '.tsqd-parent-container { display: none !important; }'});
 
-    await expect(auditEventsFilterBar(page)).toBeVisible();
+    await expect(auditEventsDataSearchInput(page)).toBeVisible();
 }
 
 async function expectFilterApplied(page: Page, label: string, value: string): Promise<void> {
-    const filterTitle = page.getByText('Filter by', {exact: true}).locator('..');
-
     if (value) {
-        await expect(filterTitle.getByText(label, {exact: true})).toBeVisible();
-        await expect(filterTitle.getByText(value, {exact: true})).toBeVisible();
+        await expect(page.getByText(`${label} ${value}`, {exact: true})).toBeVisible();
     } else {
-        await expect(filterTitle.getByText(label, {exact: true})).toHaveCount(0);
+        await expect(page.getByText(new RegExp(`^${label} `))).toHaveCount(0);
     }
 
     await expect(page.getByText('Loading…')).toHaveCount(0);
@@ -84,24 +85,34 @@ export async function filterAuditEvents(
     {dataSearch, principal}: {dataSearch?: string; principal?: string}
 ): Promise<void> {
     if (principal !== undefined) {
-        await page.getByPlaceholder('e.g. admin').fill(principal);
+        await page.getByRole('textbox', {exact: true, name: 'Principal'}).fill(principal);
 
-        await expectFilterApplied(page, 'principal:', principal);
+        await expectFilterApplied(page, 'Principal:', principal);
     }
 
     if (dataSearch !== undefined) {
-        await page.getByPlaceholder('match any data value').fill(dataSearch);
+        await auditEventsDataSearchInput(page).fill(dataSearch);
 
-        await expectFilterApplied(page, 'data:', dataSearch);
+        await expectFilterApplied(page, 'Data:', dataSearch);
     }
 }
 
+export async function openAuditEventsFilterMenu(page: Page) {
+    await auditEventsFilterButton(page).click();
+
+    const filterMenu = page.getByRole('menu');
+
+    await expect(filterMenu.getByText('Filter Audit Events', {exact: true})).toBeVisible();
+
+    return filterMenu;
+}
+
 export async function selectAuditEventType(page: Page, eventType: string): Promise<void> {
-    await page.getByRole('combobox').click();
+    const filterMenu = await openAuditEventsFilterMenu(page);
 
-    await page.getByRole('option', {exact: true, name: eventType}).click();
+    await filterMenu.getByRole('menuitem', {exact: true, name: eventType}).click();
 
-    await expectFilterApplied(page, 'type:', eventType);
+    await expectFilterApplied(page, 'Event type:', eventType);
 }
 
 export function auditEventRows(page: Page) {

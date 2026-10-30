@@ -5,6 +5,7 @@ import {
     NON_ADMIN_USER,
     auditEventRows,
     filterAuditEvents,
+    openAuditEventsFilterMenu,
     openAuditEventsPage,
     postGraphQl,
     queryAuditEvents,
@@ -35,10 +36,10 @@ test.describe('Audit Events filters and paging', () => {
     }) => {
         await openAuditEventsPage(authenticatedPage);
 
-        await authenticatedPage.getByRole('combobox').click();
+        const filterMenu = await openAuditEventsFilterMenu(authenticatedPage);
 
         for (const eventType of ['AUTHENTICATION_SUCCESS', 'PERMISSION_CHECK']) {
-            await expect(authenticatedPage.getByRole('option', {exact: true, name: eventType})).toBeVisible();
+            await expect(filterMenu.getByRole('menuitem', {exact: true, name: eventType})).toBeVisible();
         }
 
         await authenticatedPage.keyboard.press('Escape');
@@ -97,13 +98,17 @@ test.describe('Audit Events filters and paging', () => {
     }) => {
         await openAuditEventsPage(authenticatedPage);
 
-        const datePickerButtons = authenticatedPage.getByRole('button', {name: 'Pick a date'});
+        const filterMenu = await openAuditEventsFilterMenu(authenticatedPage);
 
-        await datePickerButtons.first().click();
+        await filterMenu.getByRole('menuitem', {name: 'Custom range'}).click();
+
+        const customRange = authenticatedPage.getByRole('group', {name: 'Custom range'});
+
+        await customRange.getByRole('button', {name: 'Pick a date'}).first().click();
         await authenticatedPage.getByRole('button', {name: /^Today/}).click();
         await authenticatedPage.keyboard.press('Escape');
 
-        await authenticatedPage.getByRole('button', {name: 'Pick a date'}).click();
+        await customRange.getByRole('button', {name: 'Pick a date'}).click();
         await authenticatedPage
             .getByRole('button', {name: /^Today/})
             .last()
@@ -112,7 +117,8 @@ test.describe('Audit Events filters and paging', () => {
 
         const today = await authenticatedPage.evaluate(() => new Date().toLocaleDateString());
 
-        await expect(authenticatedPage.getByText(`${today} → ${today}`)).toBeVisible();
+        await expect(authenticatedPage.getByText(`From: ${today}`, {exact: true})).toBeVisible();
+        await expect(authenticatedPage.getByText(`To: ${today}`, {exact: true})).toBeVisible();
 
         await expect(auditEventRows(authenticatedPage).first()).toBeVisible();
 
@@ -126,22 +132,21 @@ test.describe('Audit Events filters and paging', () => {
         expect(pastEvents.totalElements).toBe(0);
     });
 
-    test('Clear filters resets every filter and shows all events again', async ({authenticatedPage}) => {
+    test('Clear all resets every filter and shows all events again', async ({authenticatedPage}) => {
         await openAuditEventsPage(authenticatedPage);
 
         await filterAuditEvents(authenticatedPage, {principal: 'nobody-with-this-login'});
 
         await expect(authenticatedPage.getByText('No audit events match the current filters.')).toBeVisible();
 
-        await authenticatedPage.getByRole('button', {name: 'Clear filters'}).click();
+        await authenticatedPage.getByRole('button', {exact: true, name: 'Clear all'}).click();
 
-        await expect(authenticatedPage.getByPlaceholder('e.g. admin')).toHaveValue('');
+        await expect(authenticatedPage.getByRole('textbox', {exact: true, name: 'Principal'})).toHaveValue('');
+        await expect(authenticatedPage.getByText(/^Principal: /)).toHaveCount(0);
         await expect(auditEventRows(authenticatedPage).first()).toBeVisible();
     });
 
-    test("filtering by the login the principal placeholder suggests finds that user's events", async ({
-        authenticatedPage,
-    }) => {
+    test("filtering by an exact login finds that user's events", async ({authenticatedPage}) => {
         await openAuditEventsPage(authenticatedPage);
 
         await selectAuditEventType(authenticatedPage, 'AUTHENTICATION_SUCCESS');
