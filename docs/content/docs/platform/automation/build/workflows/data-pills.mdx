@@ -1,12 +1,12 @@
 ---
 title: "Data Pills & Input Modes"
-description: "Reference outputs from earlier steps with data pills, and switch fields between static, dynamic, and formula input modes."
+description: "Reference outputs from earlier steps with data pills, and switch fields between Text and Formula input modes."
 ---
 
 When you configure a component, every property field can hold more than a typed-in constant. It can
 pull in the output of the trigger or an earlier component (a **data pill**), or compute a value with
-an **expression**. This page explains data pills and the three ways a field can accept input:
-**static**, **dynamic**, and **formula** mode.
+a **formula**. This page explains data pills and the two input modes every field has: **Text** and
+**Formula**.
 
 ## Data Pills
 
@@ -31,12 +31,14 @@ colored pill - but it is what gets saved in the workflow's JSON.
 
 {/* TODO screenshot: workflow editor with the Data Pill Panel open on the left - trigger and upstream components expanded into their output field pills, next to a property field mid-insertion */}
 
-1. Click into a property field that supports dynamic input. The **Data Pill Panel** opens on the
-   left, listing the trigger and every component that runs before the current one.
+1. Click into a property field. The **Data Pill Panel** opens on the left, listing the trigger and
+   every component that runs before the current one. This works for every kind of field: text,
+   numbers, true/false, dates and dropdowns.
 2. Expand a component to see the fields available in its output.
-3. Click a field to insert it as a pill at the cursor position.
+3. Click a field to insert it as a pill. In a text field the pill goes in at the cursor; in any other
+   field it replaces the value. You can also drag a pill from the panel onto a field.
 
-You can also type `$` directly in the field to open an inline data-pill picker without using the panel.
+You can also type `$` in the field to open an inline data-pill picker without using the panel.
 
 <Callout type="info">
 Only steps that run **before** the current component appear in the Data Pill Panel. A component can
@@ -57,36 +59,39 @@ See the [Output section](./workflows#output) on the Workflows page for the full 
 
 ## Input Modes
 
-Most property fields can be filled in one of three modes. The mode determines whether the value is a
-fixed constant, a value assembled from data pills, or a computed expression.
+Every property field has two modes, shown as switches next to its label. **Text** is the default and
+covers constants and data pills; **Formula** computes the value with an expression.
 
-{/* TODO screenshot: a property field showing the Dynamic switch toggled on and the leading f(x) marker that indicates formula mode */}
+{/* TODO screenshot: a property field with the Formula switch on, showing the violet formula frame, next to a number field holding a single data pill */}
 
-### Static (constant) value
+### Text mode
 
-This is the default. You type a literal value - a number, a piece of text, a selection from a
-dropdown - and that exact value is used every time the workflow runs.
+In Text mode you type a constant, insert data pills, or both. What a field accepts depends on its
+type:
 
-Use static input when the value never changes, for example a fixed subject line or a constant limit.
+- **Text fields** mix typed text and any number of data pills, e.g.
+  `Hello ${trigger_1.body.firstName}, your order shipped.`
+- **Numbers, true/false and dates** hold either a constant in the regular input or exactly **one**
+  data pill. Click a pill in the panel (or type `$` in an empty field) to replace the constant
+  with a pill; delete the pill to get the regular input back.
+- **Dropdowns, arrays and objects** have an extra **Text** switch. Turn it on to replace the
+  selected option or the items with a data pill, for example a list produced by an earlier step.
+  A dropdown of text values also accepts typed text around its pills.
 
-### Dynamic value
+<Callout type="warn">
+Turning the **Text** switch on for an array or object that already has items asks before it
+replaces them, because the data pill becomes the whole value and the items are removed.
+</Callout>
 
-Toggle the **Dynamic** switch on a field to turn it into a dynamic input. The field becomes a rich
-editor where you can mix typed text with data pills, so the value is assembled from earlier steps at
-run time.
+### Formula mode
 
-1. Turn on the **Dynamic** switch (or simply start typing `$` in a supported field).
-2. Insert one or more data pills from the panel or the inline `$` picker.
-3. Combine pills with literal text as needed, e.g. `Hello ${trigger_1.body.firstName}, your order shipped.`
+When a field needs a computed value, such as joining strings, formatting a date or doing
+arithmetic, turn on its **Formula** switch, or type `=` in an empty field. The field gets a violet
+frame to show it holds a formula.
 
-The placeholder text in these fields reminds you of the shortcuts: use `$` for data pills and `=` for
-an expression.
-
-### Formula (expression) mode
-
-When a field needs a computed value - concatenating strings, formatting a date, doing arithmetic -
-start the field with an equals sign (`=`) to enter **formula mode**. The leading icon changes to an
-`f(x)` marker to show the field is now an expression.
+You type the expression without the leading `=`; ByteChef stores it with one, which is the form
+the examples on this page use. Typing `1 + ` and then clicking the `Number` pill of `var_1` saves
+`=1 + ${var_1.Number}`.
 
 In formula mode you can:
 
@@ -202,13 +207,23 @@ gives `null` in the result. In ByteChef 0.34.0 and earlier, write `#this['email'
 form can leave the whole formula unevaluated when the first item in the list has no such key.
 </Callout>
 
-<Callout type="info">
-To leave formula mode, clear the field and remove the leading `=`. To go back to a plain constant,
-turn the **Dynamic** switch off.
-</Callout>
+### Switching between modes
+
+Turning **Formula** on or off keeps the value whenever it can be carried over:
+
+| Before | After switching | Result |
+| --- | --- | --- |
+| Constant `42` in a number field | Formula on | `42` (saved as `=42`) |
+| Text `hello` | Formula on | `'hello'` |
+| A single data pill | Formula on, or off again | The same pill |
+| Formula `42`, `true` or `'hello'` | Formula off | The constant `42`, `true` or `hello` |
+| Text mixed with data pills, or a formula like `concat(a, b)` | Either way | The field is cleared |
+
+Pressing Backspace in an empty formula also turns Formula off.
 
 ## Which mode should I use?
 
-- **Static** - the value is the same on every run.
-- **Dynamic** - the value comes from the trigger or an earlier step, optionally mixed with fixed text.
+- **Text with a constant** - the value is the same on every run.
+- **Text with data pills** - the value comes from the trigger or an earlier step, optionally mixed
+  with fixed text.
 - **Formula** - the value must be computed or transformed before it is used.
