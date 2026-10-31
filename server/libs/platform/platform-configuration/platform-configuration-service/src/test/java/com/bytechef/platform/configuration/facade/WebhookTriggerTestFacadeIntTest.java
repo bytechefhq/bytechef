@@ -17,7 +17,6 @@
 package com.bytechef.platform.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,31 +28,29 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.repository.jdbc.JdbcWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfiguration;
+import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfigurationSharedMocks;
+import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
-import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Pins that the webhook test URL is minted for the trigger the editor asked for, not for the workflow's first trigger —
@@ -61,17 +58,16 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
  *
  * @author Ivica Cardic
  */
-@ExtendWith({
-    MockitoExtension.class, ObjectMapperSetupExtension.class
-})
-@MockitoSettings(strictness = Strictness.LENIENT)
-class WebhookTriggerTestFacadeTest {
+@ActiveProfiles("testint")
+@PlatformConfigurationIntTestConfigurationSharedMocks
+@SpringBootTest(classes = PlatformConfigurationIntTestConfiguration.class)
+class WebhookTriggerTestFacadeIntTest {
 
+    private static final long CONNECTION_ID = 42L;
     private static final long ENVIRONMENT_ID = 0L;
     private static final String MANUAL_TRIGGER_NAME = "trigger_1";
     private static final String WEBHOOK_TRIGGER_NAME = "trigger_2";
-    private static final String WORKFLOW_ID = "workflow1";
-    private static final String WORKFLOW_UUID = "workflow-uuid-1";
+    private static final String WEBHOOK_URL_PREFIX = "http://localhost:9555/webhooks/";
 
     private static final String DEFINITION = """
         {
@@ -91,44 +87,46 @@ class WebhookTriggerTestFacadeTest {
         }
         """;
 
-    @Mock
-    private ApplicationProperties applicationProperties;
+    @Autowired
+    private JdbcWorkflowRepository jdbcWorkflowRepository;
 
-    @Mock
-    private Evaluator evaluator;
-
-    @Mock
-    private JobPrincipalAccessor jobPrincipalAccessor;
-
-    @Mock
+    @Autowired
     private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
 
-    @Mock
+    @Autowired
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
-    @Mock
+    @Autowired
     private TriggerDefinitionService triggerDefinitionService;
 
-    @Mock
+    @Autowired
+    private WebhookTriggerTestFacade webhookTriggerTestFacade;
+
+    @Autowired
     private WorkflowService workflowService;
 
-    @Mock
+    @Autowired
+    private WorkflowTestConfigurationRepository workflowTestConfigurationRepository;
+
+    @Autowired
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
-    private WebhookTriggerTestFacadeImpl webhookTriggerTestFacade;
+    private String workflowId;
+    private String workflowUuid;
 
     @BeforeEach
-    void setUp() {
-        when(applicationProperties.getWebhookUrl()).thenReturn("http://localhost/webhooks/{id}");
-        when(evaluator.evaluate(anyMap(), anyMap(), anyBoolean()))
-            .thenAnswer(invocation -> invocation.getArgument(0));
+    void beforeEach() {
+        Workflow workflow = workflowService.create(DEFINITION, Format.JSON, Workflow.SourceType.JDBC);
+
+        workflowId = workflow.getId();
+        workflowUuid = "workflow-uuid-" + workflowId;
+
+        JobPrincipalAccessor jobPrincipalAccessor = mock(JobPrincipalAccessor.class);
+
         when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.AUTOMATION))
             .thenReturn(jobPrincipalAccessor);
-        when(jobPrincipalAccessor.getWorkflowUuid(WORKFLOW_ID)).thenReturn(WORKFLOW_UUID);
-        when(jobPrincipalAccessor.getLastWorkflowId(WORKFLOW_UUID)).thenReturn(WORKFLOW_ID);
-        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(new Workflow(WORKFLOW_ID, DEFINITION, Format.JSON));
-        when(workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
-            anyString(), anyString(), eq(ENVIRONMENT_ID))).thenReturn(Optional.empty());
+        when(jobPrincipalAccessor.getWorkflowUuid(workflowId)).thenReturn(workflowUuid);
+        when(jobPrincipalAccessor.getLastWorkflowId(workflowUuid)).thenReturn(workflowId);
 
         TriggerDefinition manualTriggerDefinition = mock(TriggerDefinition.class);
 
@@ -143,21 +141,24 @@ class WebhookTriggerTestFacadeTest {
             .thenReturn(webhookTriggerDefinition);
         when(triggerDefinitionService.getWebhookTriggerFlags(anyString(), eq(1), anyString()))
             .thenReturn(new WebhookTriggerFlags(false, false, false, false));
+    }
 
-        webhookTriggerTestFacade = new WebhookTriggerTestFacadeImpl(
-            new ConcurrentMapCacheManager(), evaluator, applicationProperties, jobPrincipalAccessorRegistry,
-            triggerDefinitionFacade, triggerDefinitionService, workflowService, workflowTestConfigurationService);
+    @AfterEach
+    void afterEach() {
+        workflowTestConfigurationRepository.deleteAll();
+        jdbcWorkflowRepository.deleteAll();
     }
 
     @Test
     void testEnableTriggerMintsUrlForRequestedTrigger() {
         String webhookUrl = webhookTriggerTestFacade.enableTrigger(
-            WORKFLOW_ID, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.AUTOMATION);
+            workflowId, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.AUTOMATION);
 
         WorkflowExecutionId workflowExecutionId = parseWorkflowExecutionId(webhookUrl);
 
         assertThat(workflowExecutionId.getTriggerName()).isEqualTo(WEBHOOK_TRIGGER_NAME);
-        assertThat(workflowExecutionId.getWorkflowUuid()).isEqualTo(WORKFLOW_UUID);
+        assertThat(workflowExecutionId.getWorkflowUuid()).isEqualTo(workflowUuid);
+        assertThat(webhookTriggerTestFacade.isWorkflowEnabled(workflowExecutionId)).isTrue();
 
         verify(triggerDefinitionFacade).executeWebhookEnable(
             eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), anyMap(), eq(workflowExecutionId.toString()),
@@ -169,7 +170,7 @@ class WebhookTriggerTestFacadeTest {
     @Test
     void testEnableTriggerWithoutTriggerNameFallsBackToFirstTrigger() {
         String webhookUrl = webhookTriggerTestFacade.enableTrigger(
-            WORKFLOW_ID, null, ENVIRONMENT_ID, PlatformType.AUTOMATION);
+            workflowId, null, ENVIRONMENT_ID, PlatformType.AUTOMATION);
 
         assertThat(parseWorkflowExecutionId(webhookUrl).getTriggerName()).isEqualTo(MANUAL_TRIGGER_NAME);
     }
@@ -177,7 +178,7 @@ class WebhookTriggerTestFacadeTest {
     @Test
     void testDisableTriggerTearsDownRequestedTrigger() {
         webhookTriggerTestFacade.disableTrigger(
-            WORKFLOW_ID, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.AUTOMATION);
+            workflowId, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.AUTOMATION);
 
         verify(triggerDefinitionService).getTriggerDefinition("webhook", 1, "autoRespondWithHTTP200");
         verify(triggerDefinitionService, never()).getTriggerDefinition("manual", 1, "manual");
@@ -185,44 +186,47 @@ class WebhookTriggerTestFacadeTest {
 
     @Test
     void testValidateOnEnableUsesTriggerNamedInWorkflowExecutionId() {
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflowId, WEBHOOK_TRIGGER_NAME, "connection", CONNECTION_ID, true, ENVIRONMENT_ID);
+
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, -1, WORKFLOW_UUID, WEBHOOK_TRIGGER_NAME);
+            PlatformType.AUTOMATION, -1, workflowUuid, WEBHOOK_TRIGGER_NAME);
         WebhookRequest webhookRequest = mock(WebhookRequest.class);
 
         webhookTriggerTestFacade.validateOnEnable(workflowExecutionId, webhookRequest, ENVIRONMENT_ID);
 
-        verify(workflowTestConfigurationService).fetchWorkflowTestConfigurationConnectionId(
-            WORKFLOW_ID, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID);
         verify(triggerDefinitionFacade).executeWebhookValidateOnEnable(
-            eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), anyMap(), eq(webhookRequest), isNull());
+            eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), anyMap(), eq(webhookRequest), eq(CONNECTION_ID));
+
+        assertThat(webhookTriggerTestFacade.isWorkflowEnabled(workflowExecutionId)).isTrue();
     }
 
     @Test
     void testValidateUsesTriggerNamedInWorkflowExecutionIdWithoutEnablingWorkflow() {
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflowId, WEBHOOK_TRIGGER_NAME, "connection", CONNECTION_ID, true, ENVIRONMENT_ID);
+
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, -1, WORKFLOW_UUID, WEBHOOK_TRIGGER_NAME);
+            PlatformType.AUTOMATION, -1, workflowUuid, WEBHOOK_TRIGGER_NAME);
         WebhookRequest webhookRequest = mock(WebhookRequest.class);
         WebhookValidateResponse badRequestResponse = WebhookValidateResponse.badRequest();
 
         when(triggerDefinitionFacade.executeWebhookValidate(
-            eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), anyMap(), eq(webhookRequest), isNull()))
+            eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), anyMap(), eq(webhookRequest), eq(CONNECTION_ID)))
                 .thenReturn(badRequestResponse);
 
         assertThat(webhookTriggerTestFacade.validate(workflowExecutionId, webhookRequest, ENVIRONMENT_ID))
             .isSameAs(badRequestResponse);
         assertThat(webhookTriggerTestFacade.isWorkflowEnabled(workflowExecutionId)).isFalse();
-
-        verify(workflowTestConfigurationService).fetchWorkflowTestConfigurationConnectionId(
-            WORKFLOW_ID, WEBHOOK_TRIGGER_NAME, ENVIRONMENT_ID);
     }
 
     private static WorkflowExecutionId parseWorkflowExecutionId(String webhookUrl) {
-        String prefix = "http://localhost/webhooks/";
         String suffix = "/test/environments/" + ENVIRONMENT_ID;
 
-        assertThat(webhookUrl).startsWith(prefix)
+        assertThat(webhookUrl).startsWith(WEBHOOK_URL_PREFIX)
             .endsWith(suffix);
 
-        return WorkflowExecutionId.parse(webhookUrl.substring(prefix.length(), webhookUrl.length() - suffix.length()));
+        return WorkflowExecutionId.parse(
+            webhookUrl.substring(WEBHOOK_URL_PREFIX.length(), webhookUrl.length() - suffix.length()));
     }
 }
