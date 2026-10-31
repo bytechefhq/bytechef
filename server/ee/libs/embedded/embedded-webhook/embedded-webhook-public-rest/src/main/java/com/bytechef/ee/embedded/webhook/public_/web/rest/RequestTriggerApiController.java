@@ -332,7 +332,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
     private ResponseEntity<Object> dispatch(WorkflowExecutionId workflowExecutionId) {
         if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
-            return ResponseEntity.ok()
+            return ResponseEntity.notFound()
                 .build();
         }
 
