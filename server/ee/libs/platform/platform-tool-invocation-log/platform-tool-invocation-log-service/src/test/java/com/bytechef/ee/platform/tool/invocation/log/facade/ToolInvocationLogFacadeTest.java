@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import java.lang.reflect.Method;
@@ -41,12 +42,14 @@ class ToolInvocationLogFacadeTest {
     void testPreAuthorizeExpressionsArePinned() throws NoSuchMethodException {
         assertThat(
             preAuthorize(
-                "getToolInvocationLogs", ToolExecutionSurface.class, ToolExecutionOutcome.class, Long.class, Long.class,
-                Long.class, Instant.class, Instant.class, int.class))
+                "getToolInvocationLogs", PlatformType.class, Long.class, ToolExecutionSurface.class,
+                ToolExecutionOutcome.class, Long.class,
+                Long.class, Long.class, Instant.class, Instant.class, int.class))
                     .isEqualTo("isTenantAdmin()");
         assertThat(
             preAuthorize(
-                "getWorkspaceToolInvocationLogs", long.class, long.class, ToolExecutionSurface.class,
+                "getWorkspaceToolInvocationLogs", PlatformType.class, long.class, long.class,
+                ToolExecutionSurface.class,
                 ToolExecutionOutcome.class, Long.class, Long.class, Long.class, Instant.class, Instant.class,
                 int.class))
                     .isEqualTo("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
@@ -58,14 +61,16 @@ class ToolInvocationLogFacadeTest {
 
         when(
             toolInvocationLogService.getWorkspaceToolInvocationLogs(
-                7L, 2, ToolExecutionSurface.MCP_AUTOMATION, null, 5L, null, null, null, null, 1))
+                PlatformType.AUTOMATION, 7L, 2, ToolExecutionSurface.MCP_AUTOMATION, null, 5L, null, null, null, null,
+                1))
                     .thenReturn(page);
 
         ToolInvocationLogFacadeImpl toolInvocationLogFacade = new ToolInvocationLogFacadeImpl(toolInvocationLogService);
 
         assertThat(
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
-                7L, 2L, ToolExecutionSurface.MCP_AUTOMATION, null, 5L, null, null, null, null, 1))
+                PlatformType.AUTOMATION, 7L, 2L, ToolExecutionSurface.MCP_AUTOMATION, null, 5L, null, null, null, null,
+                1))
                     .isSameAs(page);
 
         verifyNoMoreInteractions(toolInvocationLogService);
@@ -75,13 +80,34 @@ class ToolInvocationLogFacadeTest {
     void testTenantQueryDelegatesToTheTenantWideServiceQuery() {
         Page<ToolInvocationLog> page = new PageImpl<>(List.of());
 
-        when(toolInvocationLogService.getToolInvocationLogs(null, null, null, 3L, null, null, null, 0))
-            .thenReturn(page);
+        when(toolInvocationLogService.getToolInvocationLogs(PlatformType.AUTOMATION, null, null, null, null, 3L, null,
+            null, null, 0))
+                .thenReturn(page);
 
         ToolInvocationLogFacadeImpl toolInvocationLogFacade = new ToolInvocationLogFacadeImpl(toolInvocationLogService);
 
-        assertThat(toolInvocationLogFacade.getToolInvocationLogs(null, null, null, 3L, null, null, null, 0))
-            .isSameAs(page);
+        assertThat(toolInvocationLogFacade.getToolInvocationLogs(PlatformType.AUTOMATION, null, null, null, null, 3L,
+            null, null, null, 0))
+                .isSameAs(page);
+    }
+
+    @Test
+    void testTenantQueryPassesTheEnvironmentToTheService() {
+        Page<ToolInvocationLog> page = new PageImpl<>(List.of());
+
+        when(
+            toolInvocationLogService.getToolInvocationLogs(
+                PlatformType.EMBEDDED, 2, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, 0))
+                    .thenReturn(page);
+
+        ToolInvocationLogFacadeImpl toolInvocationLogFacade = new ToolInvocationLogFacadeImpl(toolInvocationLogService);
+
+        assertThat(
+            toolInvocationLogFacade.getToolInvocationLogs(
+                PlatformType.EMBEDDED, 2L, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, 0))
+                    .isSameAs(page);
+
+        verifyNoMoreInteractions(toolInvocationLogService);
     }
 
     private static String preAuthorize(String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {

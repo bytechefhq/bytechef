@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.tool.invocation.log.facade;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,24 +42,26 @@ public class ToolInvocationLogFacadeImpl implements ToolInvocationLogFacade {
     @Override
     @PreAuthorize("isTenantAdmin()")
     public Page<ToolInvocationLog> getToolInvocationLogs(
-        @Nullable ToolExecutionSurface surface, @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId,
-        @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
-        @Nullable Instant endDate, int pageNumber) {
+        PlatformType type, @Nullable Long environmentId, @Nullable ToolExecutionSurface surface,
+        @Nullable ToolExecutionOutcome outcome,
+        @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
+        @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return toolInvocationLogService.getToolInvocationLogs(
-            surface, outcome, mcpServerId, connectedUserId, integrationInstanceId, startDate, endDate, pageNumber);
+            type, environmentId == null ? null : Math.toIntExact(environmentId), surface, outcome, mcpServerId,
+            connectedUserId, integrationInstanceId, startDate, endDate, pageNumber);
     }
 
     @Override
     @PreAuthorize(IS_PLATFORM_USER + " and hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public Page<ToolInvocationLog> getWorkspaceToolInvocationLogs(
-        long workspaceId, long environmentId, @Nullable ToolExecutionSurface surface,
+        PlatformType type, long workspaceId, long environmentId, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         return toolInvocationLogService.getWorkspaceToolInvocationLogs(
-            workspaceId, Math.toIntExact(environmentId), surface, outcome, mcpServerId, connectedUserId,
+            type, workspaceId, Math.toIntExact(environmentId), surface, outcome, mcpServerId, connectedUserId,
             integrationInstanceId, startDate, endDate, pageNumber);
     }
 }

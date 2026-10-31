@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.facade.ToolInvocationLogFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,26 +42,29 @@ public class ToolInvocationLogGraphQlController {
 
     @QueryMapping(name = "toolInvocationLogs")
     public ToolInvocationLogPage toolInvocationLogs(
-        @Argument @Nullable String surface, @Argument @Nullable String outcome, @Argument @Nullable Long mcpServerId,
-        @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
-        @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
+        @Argument PlatformType type, @Argument @Nullable Long environmentId, @Argument @Nullable String surface,
+        @Argument @Nullable String outcome,
+        @Argument @Nullable Long mcpServerId, @Argument @Nullable Long connectedUserId,
+        @Argument @Nullable Long integrationInstanceId, @Argument @Nullable Long fromDate,
+        @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
         return toPage(
             toolInvocationLogFacade.getToolInvocationLogs(
-                toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId, integrationInstanceId,
-                toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+                type, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId,
+                integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 
     @QueryMapping(name = "workspaceToolInvocationLogs")
     public ToolInvocationLogPage workspaceToolInvocationLogs(
-        @Argument long workspaceId, @Argument long environmentId, @Argument @Nullable String surface,
+        @Argument PlatformType type, @Argument long workspaceId, @Argument long environmentId,
+        @Argument @Nullable String surface,
         @Argument @Nullable String outcome, @Argument @Nullable Long mcpServerId,
         @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
         @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
         return toPage(
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
-                workspaceId, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId,
+                type, workspaceId, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId,
                 integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.tool.invocation.log;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import java.time.Instant;
@@ -25,12 +26,13 @@ public interface ToolInvocationLogService {
     int deleteToolInvocationLogsCreatedBefore(Instant instant);
 
     Page<ToolInvocationLog> getToolInvocationLogs(
-        @Nullable ToolExecutionSurface surface, @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId,
-        @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
-        @Nullable Instant endDate, int pageNumber);
+        PlatformType type, @Nullable Integer environment, @Nullable ToolExecutionSurface surface,
+        @Nullable ToolExecutionOutcome outcome,
+        @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
+        @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
 
     Page<ToolInvocationLog> getWorkspaceToolInvocationLogs(
-        long workspaceId, int environment, @Nullable ToolExecutionSurface surface,
+        PlatformType type, long workspaceId, int environment, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber);
