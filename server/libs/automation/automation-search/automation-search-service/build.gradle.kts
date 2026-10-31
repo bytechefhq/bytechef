@@ -12,6 +12,10 @@ dependencies {
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:cache-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
+    testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
+    testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
