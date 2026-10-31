@@ -40,6 +40,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.category.domain.Category;
@@ -72,6 +73,9 @@ class ProjectToolsTest {
 
     @Mock
     private ProjectFacade projectFacade;
+
+    @Mock
+    private ProjectOwnershipService projectOwnershipService;
 
     @Mock
     private ProjectTagFacade projectTagFacade;
@@ -491,7 +495,8 @@ class ProjectToolsTest {
     private ProjectTools newTools() {
         return new ProjectTools(
             projectCategoryFacade, projectDeploymentFacade, projectFacade, projectTagFacade,
-            new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard),
+            new ScopedProjectGuard(new GrantingPermissionService(), projectOwnershipService, projectWorkflowService,
+                scopedConnectionGuard),
             workspaceFacade);
     }
 
