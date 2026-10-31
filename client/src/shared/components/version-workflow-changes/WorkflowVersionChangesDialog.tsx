@@ -3,43 +3,69 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {VersionWorkflowChange} from '@/shared/middleware/graphql';
-import {Suspense, lazy} from 'react';
+import {Suspense, lazy, useState} from 'react';
 
+import WorkflowChangeCanvasTab, {SideType, WorkflowChangeCanvasToolbar} from './WorkflowChangeCanvasTab';
 import WorkflowDefinitionChangesList from './WorkflowDefinitionChangesList';
 
 const MonacoDiffEditorWrapper = lazy(() => import('@/shared/components/MonacoDiffEditorWrapper'));
 
 interface WorkflowVersionChangesTabsProps {
+    baseVersionLabel?: string;
     change: VersionWorkflowChange;
+    versionLabel: string;
 }
 
-const WorkflowVersionChangesTabs = ({change}: WorkflowVersionChangesTabsProps) => (
-    <Tabs className="gap-4" defaultValue="changes">
-        <TabsList>
-            <TabsTrigger value="changes">Changes</TabsTrigger>
+const WorkflowVersionChangesTabs = ({baseVersionLabel, change, versionLabel}: WorkflowVersionChangesTabsProps) => {
+    const [activeTab, setActiveTab] = useState('changes');
+    const [selectedSide, setSelectedSide] = useState<SideType>('new');
 
-            <TabsTrigger value="definition">Definition</TabsTrigger>
-        </TabsList>
+    return (
+        <Tabs className="gap-4" onValueChange={setActiveTab} value={activeTab}>
+            <div className="flex items-center justify-between gap-4">
+                <TabsList>
+                    <TabsTrigger value="changes">Changes</TabsTrigger>
 
-        <TabsContent value="changes">
-            <div className="h-[70vh] overflow-y-auto">
-                <WorkflowDefinitionChangesList changeType={change.changeType} changes={change.changes} />
-            </div>
-        </TabsContent>
+                    <TabsTrigger value="canvas">Canvas</TabsTrigger>
 
-        <TabsContent value="definition">
-            <div className="h-[70vh]">
-                <Suspense fallback={<MonacoEditorLoader />}>
-                    <MonacoDiffEditorWrapper
-                        language="json"
-                        modified={change.newDefinition ?? ''}
-                        original={change.oldDefinition ?? ''}
+                    <TabsTrigger value="definition">Definition</TabsTrigger>
+                </TabsList>
+
+                {activeTab === 'canvas' && (
+                    <WorkflowChangeCanvasToolbar
+                        baseVersionLabel={baseVersionLabel}
+                        change={change}
+                        onSelectedSideChange={setSelectedSide}
+                        selectedSide={selectedSide}
+                        versionLabel={versionLabel}
                     />
-                </Suspense>
+                )}
             </div>
-        </TabsContent>
-    </Tabs>
-);
+
+            <TabsContent value="changes">
+                <div className="h-[70vh] overflow-y-auto">
+                    <WorkflowDefinitionChangesList changeType={change.changeType} changes={change.changes} />
+                </div>
+            </TabsContent>
+
+            <TabsContent value="canvas">
+                <WorkflowChangeCanvasTab change={change} selectedSide={selectedSide} />
+            </TabsContent>
+
+            <TabsContent value="definition">
+                <div className="h-[70vh]">
+                    <Suspense fallback={<MonacoEditorLoader />}>
+                        <MonacoDiffEditorWrapper
+                            language="json"
+                            modified={change.newDefinition ?? ''}
+                            original={change.oldDefinition ?? ''}
+                        />
+                    </Suspense>
+                </div>
+            </TabsContent>
+        </Tabs>
+    );
+};
 
 interface WorkflowVersionChangesDialogProps {
     baseVersionLabel?: string;
@@ -81,7 +107,11 @@ const WorkflowVersionChangesDialog = ({
                                 <LoadingIcon />
                             </div>
                         ) : (
-                            <WorkflowVersionChangesTabs change={change} />
+                            <WorkflowVersionChangesTabs
+                                baseVersionLabel={baseVersionLabel}
+                                change={change}
+                                versionLabel={versionLabel}
+                            />
                         )}
                     </DialogBody>
                 </DialogMain>
