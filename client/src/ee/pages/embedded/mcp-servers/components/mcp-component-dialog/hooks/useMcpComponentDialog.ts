@@ -18,11 +18,17 @@ export interface McpIntegrationComponentOptionI extends ComponentDefinition {
     version: number | null;
 }
 
-const getInitialStep = (mcpComponent?: McpComponent): StepType =>
-    mcpComponent?.integrationId ? 'tools' : 'components';
+const isIntegrationLocked = (mcpComponent?: McpComponent, integrationUnavailable?: boolean) =>
+    !!mcpComponent?.integrationId && !integrationUnavailable;
 
-const getInitialSelectedComponent = (mcpComponent?: McpComponent): McpIntegrationComponentOptionI | null =>
-    mcpComponent?.integrationId
+const getInitialStep = (mcpComponent?: McpComponent, integrationUnavailable?: boolean): StepType =>
+    isIntegrationLocked(mcpComponent, integrationUnavailable) ? 'tools' : 'components';
+
+const getInitialSelectedComponent = (
+    mcpComponent?: McpComponent,
+    integrationUnavailable?: boolean
+): McpIntegrationComponentOptionI | null =>
+    mcpComponent?.integrationId && isIntegrationLocked(mcpComponent, integrationUnavailable)
         ? {
               integrationId: mcpComponent.integrationId,
               name: mcpComponent.componentName,
@@ -32,19 +38,21 @@ const getInitialSelectedComponent = (mcpComponent?: McpComponent): McpIntegratio
         : null;
 
 const useMcpComponentDialog = ({
+    integrationUnavailable,
     mcpComponent,
     mcpServerId,
     onOpenChange,
     open,
 }: {
+    integrationUnavailable?: boolean;
     mcpComponent?: McpComponent;
     mcpServerId: string;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
 }) => {
-    const [currentStep, setCurrentStep] = useState<StepType>(getInitialStep(mcpComponent));
+    const [currentStep, setCurrentStep] = useState<StepType>(getInitialStep(mcpComponent, integrationUnavailable));
     const [selectedComponent, setSelectedComponent] = useState<McpIntegrationComponentOptionI | null>(
-        getInitialSelectedComponent(mcpComponent)
+        getInitialSelectedComponent(mcpComponent, integrationUnavailable)
     );
     const [selectedTools, setSelectedTools] = useState<SelectedToolI[]>([]);
 
@@ -83,8 +91,8 @@ const useMcpComponentDialog = ({
             onOpenChange(false);
         }
 
-        setCurrentStep(getInitialStep(mcpComponent));
-        setSelectedComponent(getInitialSelectedComponent(mcpComponent));
+        setCurrentStep(getInitialStep(mcpComponent, integrationUnavailable));
+        setSelectedComponent(getInitialSelectedComponent(mcpComponent, integrationUnavailable));
 
         if (!mcpComponent) {
             setSelectedTools([]);
@@ -96,7 +104,7 @@ const useMcpComponentDialog = ({
             onOpenChange(false);
         }
 
-        setCurrentStep(getInitialStep(mcpComponent));
+        setCurrentStep(getInitialStep(mcpComponent, integrationUnavailable));
 
         if (!mcpComponent) {
             setSelectedComponent(null);
@@ -124,7 +132,9 @@ const useMcpComponentDialog = ({
                         })),
                         version: mcpComponent.version,
                     },
-                    integrationId: mcpComponent.integrationId ? undefined : selectedComponent.integrationId,
+                    integrationId: isIntegrationLocked(mcpComponent, integrationUnavailable)
+                        ? undefined
+                        : selectedComponent.integrationId,
                 },
                 {onSuccess: handleSaveSuccess}
             );
@@ -148,7 +158,7 @@ const useMcpComponentDialog = ({
     };
 
     const handleBack = () => {
-        if (mcpComponent?.integrationId) {
+        if (isIntegrationLocked(mcpComponent, integrationUnavailable)) {
             handleClose();
         } else {
             setCurrentStep('components');
@@ -163,8 +173,8 @@ const useMcpComponentDialog = ({
         }
 
         if (!newOpen) {
-            setCurrentStep(getInitialStep(mcpComponent));
-            setSelectedComponent(getInitialSelectedComponent(mcpComponent));
+            setCurrentStep(getInitialStep(mcpComponent, integrationUnavailable));
+            setSelectedComponent(getInitialSelectedComponent(mcpComponent, integrationUnavailable));
 
             if (!mcpComponent) {
                 setSelectedTools([]);
