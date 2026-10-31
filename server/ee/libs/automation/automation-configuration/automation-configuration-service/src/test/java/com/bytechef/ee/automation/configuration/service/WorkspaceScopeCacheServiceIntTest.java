@@ -248,7 +248,7 @@ class WorkspaceScopeCacheServiceIntTest {
             .doesNotThrowAnyException();
         assertThatCode(() -> failingCacheService.evictWorkspaceScopeCaches(
             Set.of(new UserWorkspacePair(USER_ID, workspaceId))))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
