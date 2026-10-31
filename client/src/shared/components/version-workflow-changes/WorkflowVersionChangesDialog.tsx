@@ -21,7 +21,7 @@ const WorkflowVersionChangesTabs = ({baseVersionLabel, change, versionLabel}: Wo
     const [selectedSide, setSelectedSide] = useState<SideType>('new');
 
     return (
-        <Tabs onValueChange={setActiveTab} value={activeTab}>
+        <Tabs className="gap-4" onValueChange={setActiveTab} value={activeTab}>
             <div className="flex items-center justify-between gap-4">
                 <TabsList>
                     <TabsTrigger value="changes">Changes</TabsTrigger>
