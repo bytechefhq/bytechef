@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +43,9 @@ class WorkflowReadFacadeAuthorizationTest {
             + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)";
     private static final String IN_REQUESTED_ENVIRONMENT =
         "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)";
+    private static final Map<Class<?>, Set<String>> GUARDED_BY_CALLERS = Map.of(
+        WorkflowFacadeImpl.class, Set.of("fetchWorkflow", "getWorkflow", "update"),
+        WorkflowNodeOutputFacadeImpl.class, Set.of("getPreviousWorkflowNodeOutputs", "getWorkflowNodeOutput"));
 
     @ParameterizedTest
     @MethodSource("guardedFacades")
@@ -63,14 +67,15 @@ class WorkflowReadFacadeAuthorizationTest {
 
     @ParameterizedTest
     @MethodSource("guardedFacades")
-    void testEveryWorkflowIdOverloadOfAGuardedMethodIsGuarded(
-        Class<?> facadeClass, Map<String, String> expectedGates) {
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    void testEveryWorkflowIdMethodIsGuarded(Class<?> facadeClass, Map<String, String> expectedGates) {
+        Set<String> guardedByCallers = GUARDED_BY_CALLERS.getOrDefault(facadeClass, Set.of());
 
         assertThat(Arrays.stream(facadeClass.getDeclaredMethods())
             .filter(method -> Modifier.isPublic(method.getModifiers()) && !method.isSynthetic())
-            .filter(method -> expectedGates.containsKey(method.getName()))
             .filter(method -> method.getParameterCount() > 0 && method.getParameterTypes()[0] == String.class)
             .filter(method -> !method.isAnnotationPresent(PreAuthorize.class))
+            .filter(method -> !guardedByCallers.contains(method.getName()))
             .map(Method::toGenericString))
                 .isEmpty();
     }
