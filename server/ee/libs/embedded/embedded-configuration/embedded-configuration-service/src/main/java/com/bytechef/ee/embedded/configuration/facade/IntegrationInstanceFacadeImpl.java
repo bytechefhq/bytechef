@@ -143,7 +143,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isConnectedUser()")
+    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
     public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
         validateCurrentPrincipalIntegrationInstanceOwnership(integrationInstanceId);
 
@@ -274,7 +274,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isConnectedUser()")
+    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
     public void updateIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId, Map<String, Object> inputs) {
 
