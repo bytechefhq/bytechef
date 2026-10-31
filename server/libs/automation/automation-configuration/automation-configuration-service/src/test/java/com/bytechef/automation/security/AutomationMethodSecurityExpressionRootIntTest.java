@@ -28,7 +28,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -131,10 +132,8 @@ class AutomationMethodSecurityExpressionRootIntTest {
     }
 
     @Test
-    void testConnectedUserIsDeniedUnderSkipChecks() throws Throwable {
-        authenticate(TestConnectedUserAuthentication.of("external-user"));
-
-        assertThat(callSkippingChecks(guardedOperations::connectedUserOperation)).isEqualTo(GRANTED);
+    void testNonPlatformUserIsDeniedUnderSkipChecks() throws Throwable {
+        authenticate(TestNonPlatformUserAuthentication.of("external-user"));
 
         assertThatThrownBy(() -> callSkippingChecks(() -> guardedOperations.currentUserOperation(7L)))
             .isInstanceOf(AccessDeniedException.class);
@@ -147,12 +146,12 @@ class AutomationMethodSecurityExpressionRootIntTest {
     }
 
     @Test
-    void testConnectedUserIsDeniedWithoutConsultingPermissionService() {
+    void testNonPlatformUserIsDeniedWithoutConsultingPermissionService() {
         when(permissionService.isCurrentUser(anyLong())).thenReturn(true);
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(permissionService.isResourceOwner(anyString(), anyLong())).thenReturn(true);
 
-        authenticate(TestConnectedUserAuthentication.of("external-user"));
+        authenticate(TestNonPlatformUserAuthentication.of("external-user"));
 
         assertThatThrownBy(() -> guardedOperations.currentUserOperation(7L))
             .isInstanceOf(AccessDeniedException.class);
@@ -165,43 +164,24 @@ class AutomationMethodSecurityExpressionRootIntTest {
     }
 
     @Test
-    void testIsCurrentConnectedUserMatchesOnlyTheTokensConnectedUserId() {
-        authenticate(new TestConnectedUserAuthentication("external-user", 5L, 2L, true));
+    void testContributedExpressionResolvesByBareName() {
+        assertThat(guardedOperations.contributedOperation(7L)).isEqualTo(GRANTED);
 
-        assertThat(guardedOperations.currentConnectedUserOperation(5L)).isEqualTo(GRANTED);
-
-        assertThatThrownBy(() -> guardedOperations.currentConnectedUserOperation(6L))
-            .isInstanceOf(AccessDeniedException.class);
-
-        verifyNoInteractions(permissionService);
-    }
-
-    @Test
-    void testIsCurrentConnectedUserIsNotBypassedUnderSkipChecks() {
-        authenticate(new TestConnectedUserAuthentication("external-user", 5L, 2L, true));
-
-        assertThatThrownBy(() -> callSkippingChecks(() -> guardedOperations.currentConnectedUserOperation(6L)))
+        assertThatThrownBy(() -> guardedOperations.contributedOperation(8L))
             .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
-    void testIsCurrentConnectedUserIsFalseForAnUnauthenticatedConnectedUserOrOtherPrincipals() {
-        authenticate(new TestConnectedUserAuthentication("external-user", 5L, 2L, false));
+    void testContributedExpressionCombinesWithBuiltIn() {
+        when(permissionService.isTenantAdmin()).thenReturn(true);
 
-        assertThatThrownBy(() -> guardedOperations.currentConnectedUserOperation(5L))
-            .isInstanceOf(AccessDeniedException.class);
+        assertThat(guardedOperations.tenantAdminOrContributedOperation(8L)).isEqualTo(GRANTED);
 
-        authenticate(
-            new UsernamePasswordAuthenticationToken(
-                "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        when(permissionService.isTenantAdmin()).thenReturn(false);
 
-        assertThatThrownBy(() -> guardedOperations.currentConnectedUserOperation(5L))
-            .isInstanceOf(AccessDeniedException.class);
-    }
+        assertThat(guardedOperations.tenantAdminOrContributedOperation(7L)).isEqualTo(GRANTED);
 
-    @Test
-    void testIsConnectedUserIsFalseForOtherPrincipals() {
-        assertThatThrownBy(() -> guardedOperations.connectedUserOperation())
+        assertThatThrownBy(() -> guardedOperations.tenantAdminOrContributedOperation(8L))
             .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -223,6 +203,18 @@ class AutomationMethodSecurityExpressionRootIntTest {
         @Bean("permissionService")
         PermissionService permissionService() {
             return mock(PermissionService.class);
+        }
+
+        @Bean
+        TestMethodSecurityExpressionContributor testMethodSecurityExpressionContributor() {
+            return new TestMethodSecurityExpressionContributor();
+        }
+    }
+
+    static class TestMethodSecurityExpressionContributor implements MethodSecurityExpressionContributor {
+
+        public boolean isContributedId(long id) {
+            return id == 7L;
         }
     }
 
@@ -247,14 +239,15 @@ class AutomationMethodSecurityExpressionRootIntTest {
             return grant();
         }
 
-        @PreAuthorize("isConnectedUser()")
-        public String connectedUserOperation() {
+        @PreAuthorize("isContributedId(#id)")
+        @SuppressWarnings("PMD.UnusedFormalParameter")
+        public String contributedOperation(long id) {
             return grant();
         }
 
-        @PreAuthorize("isCurrentConnectedUser(#connectedUserId)")
+        @PreAuthorize("isTenantAdmin() or isContributedId(#id)")
         @SuppressWarnings("PMD.UnusedFormalParameter")
-        public String currentConnectedUserOperation(long connectedUserId) {
+        public String tenantAdminOrContributedOperation(long id) {
             return grant();
         }
 

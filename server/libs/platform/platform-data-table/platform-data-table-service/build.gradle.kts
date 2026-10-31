@@ -20,7 +20,6 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))

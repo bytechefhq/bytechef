@@ -92,6 +92,12 @@ public class McpComponentGraphQlControllerIntTest {
     void beforeEach() {
         when(mcpComponentService.getMcpComponent(anyLong())).thenReturn(createMockMcpComponent(1L, "component", 1));
         when(mcpServerService.getMcpServer(anyLong())).thenReturn(createMcpServer(PlatformType.AUTOMATION));
+
+        McpServer automationMcpServer = createMcpServer(PlatformType.AUTOMATION);
+
+        automationMcpServer.setId(1L);
+
+        when(mcpServerService.getMcpServers(PlatformType.AUTOMATION)).thenReturn(List.of(automationMcpServer));
     }
 
     @Test
@@ -343,15 +349,10 @@ public class McpComponentGraphQlControllerIntTest {
 
         @Test
         void testMcpComponentsOmitsEmbeddedMcpComponentsAndTheirTools() {
-            McpServer embeddedMcpServer = createMcpServer(PlatformType.EMBEDDED);
-
-            embeddedMcpServer.setId(EMBEDDED_MCP_SERVER_ID);
-
             McpComponent embeddedMcpComponent = new McpComponent("component", 1, EMBEDDED_MCP_SERVER_ID, null);
 
             embeddedMcpComponent.setId(2L);
 
-            when(mcpServerService.getMcpServers(PlatformType.EMBEDDED)).thenReturn(List.of(embeddedMcpServer));
             when(mcpComponentService.getMcpComponents()).thenReturn(
                 List.of(createMockMcpComponent(1L, "automation-component", 1), embeddedMcpComponent));
 

@@ -20,10 +20,12 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.graphql.GraphQLScalarTypes;
 import org.mockito.Mockito;
@@ -83,6 +85,27 @@ public class McpGraphQlTestConfiguration {
     @Primary
     public McpComponentService mcpComponentService() {
         return Mockito.mock(McpComponentService.class);
+    }
+
+    @Bean
+    public McpServerTypeDefinition mcpServerTypeDefinition() {
+        return new McpServerTypeDefinition() {
+
+            @Override
+            public PlatformType getType() {
+                return PlatformType.AUTOMATION;
+            }
+
+            @Override
+            public boolean isSharedAdministration() {
+                return true;
+            }
+
+            @Override
+            public String resolvePath(String secretKey) {
+                return "/test/" + secretKey + "/mcp";
+            }
+        };
     }
 
     @Bean

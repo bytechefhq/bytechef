@@ -27,6 +27,7 @@ import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.mcp.web.McpServerTypeDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
 import java.util.List;
@@ -55,19 +56,22 @@ public class McpComponentGraphQlController {
     private final McpComponentService mcpComponentService;
     private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
+    private final McpServerTypeDefinitions mcpServerTypeDefinitions;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
     public McpComponentGraphQlController(
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, McpComponentService mcpComponentService,
-        McpServerFacade mcpServerFacade, McpServerService mcpServerService, McpToolService mcpToolService) {
+        McpServerFacade mcpServerFacade, McpServerService mcpServerService,
+        List<McpServerTypeDefinition> mcpServerTypeDefinitions, McpToolService mcpToolService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.mcpComponentService = mcpComponentService;
         this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
+        this.mcpServerTypeDefinitions = new McpServerTypeDefinitions(mcpServerTypeDefinitions);
         this.mcpToolService = mcpToolService;
     }
 
@@ -76,32 +80,33 @@ public class McpComponentGraphQlController {
     public McpComponent mcpComponent(@Argument long id) {
         McpComponent mcpComponent = mcpComponentService.getMcpComponent(id);
 
-        checkMcpServerNotEmbedded(mcpComponent.getMcpServerId());
+        checkMcpServerSharedAdministration(mcpComponent.getMcpServerId());
 
         return mcpComponent;
     }
 
     @QueryMapping
     public List<McpComponent> mcpComponents() {
-        Set<Long> embeddedMcpServerIds = McpServerTypeUtils.getEmbeddedMcpServerIds(mcpServerService);
+        Set<Long> sharedAdministrationMcpServerIds =
+            mcpServerTypeDefinitions.getSharedAdministrationMcpServerIds(mcpServerService);
 
         return mcpComponentService.getMcpComponents()
             .stream()
-            .filter(mcpComponent -> !embeddedMcpServerIds.contains(mcpComponent.getMcpServerId()))
+            .filter(mcpComponent -> sharedAdministrationMcpServerIds.contains(mcpComponent.getMcpServerId()))
             .toList();
     }
 
     @QueryMapping
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     public List<McpComponent> mcpComponentsByServerId(@Argument long mcpServerId) {
-        checkMcpServerNotEmbedded(mcpServerId);
+        checkMcpServerSharedAdministration(mcpServerId);
 
         return mcpComponentService.getMcpServerMcpComponents(mcpServerId);
     }
 
     @MutationMapping
     public McpComponent createMcpComponent(@Argument McpComponentInput input) {
-        checkMcpServerNotEmbedded(input.mcpServerId());
+        checkMcpServerSharedAdministration(input.mcpServerId());
 
         return mcpComponentService.create(
             new McpComponent(
@@ -110,7 +115,7 @@ public class McpComponentGraphQlController {
 
     @MutationMapping
     public McpComponent createMcpComponentWithTools(@Argument McpComponentWithToolsInput input) {
-        checkMcpServerNotEmbedded(input.mcpServerId());
+        checkMcpServerSharedAdministration(input.mcpServerId());
 
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId());
@@ -129,8 +134,8 @@ public class McpComponentGraphQlController {
 
     @MutationMapping
     public McpComponent updateMcpComponentWithTools(@Argument long id, @Argument McpComponentWithToolsInput input) {
-        checkMcpComponentNotEmbedded(id);
-        checkMcpServerNotEmbedded(input.mcpServerId());
+        checkMcpComponentSharedAdministration(id);
+        checkMcpServerSharedAdministration(input.mcpServerId());
 
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId(),
@@ -150,7 +155,7 @@ public class McpComponentGraphQlController {
 
     @MutationMapping
     public boolean deleteMcpComponent(@Argument long id) {
-        checkMcpComponentNotEmbedded(id);
+        checkMcpComponentSharedAdministration(id);
 
         mcpServerFacade.deleteMcpComponent(id);
 
@@ -188,16 +193,16 @@ public class McpComponentGraphQlController {
                 mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())));
     }
 
-    private void checkMcpComponentNotEmbedded(long mcpComponentId) {
+    private void checkMcpComponentSharedAdministration(long mcpComponentId) {
         McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
 
-        checkMcpServerNotEmbedded(mcpComponent.getMcpServerId());
+        checkMcpServerSharedAdministration(mcpComponent.getMcpServerId());
     }
 
-    private void checkMcpServerNotEmbedded(long mcpServerId) {
+    private void checkMcpServerSharedAdministration(long mcpServerId) {
         McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
-        McpServerTypeUtils.checkNotEmbedded(mcpServer.getType());
+        mcpServerTypeDefinitions.checkSharedAdministration(mcpServer.getType());
     }
 
     public record McpComponentInput(String componentName, int componentVersion, Long mcpServerId, Long connectionId) {

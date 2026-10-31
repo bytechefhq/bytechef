@@ -53,7 +53,7 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     @Override
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_CREATE')")
     public String create(long workspaceId, ApiKey apiKey) {
-        apiKey = apiKeyFacade.createAutomationApiKey(apiKey);
+        apiKey = apiKeyFacade.createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
 
         workspaceApiKeyService.create(apiKey.getId(), workspaceId);
 

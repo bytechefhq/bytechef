@@ -21,7 +21,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -50,25 +50,25 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
 
     @Override
     public ApiKey create(ApiKey apiKey, PlatformType type) {
-        checkNotConnectedUser();
+        checkPlatformUser();
 
         if (!isTenantAdmin()) {
             throw new AccessDeniedException("Only a tenant admin may create this API key");
         }
 
-        return createOwnedApiKey(apiKey, type);
+        return saveOwnedApiKey(apiKey, type);
     }
 
     @Override
-    public ApiKey createAutomationApiKey(ApiKey apiKey) {
-        checkNotConnectedUser();
+    public ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
+        checkPlatformUser();
 
-        return createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
+        return saveOwnedApiKey(apiKey, type);
     }
 
     @Override
     public void delete(long id) {
-        checkNotConnectedUser();
+        checkPlatformUser();
 
         getOwnedApiKey(id);
 
@@ -77,7 +77,7 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
 
     @Override
     public List<ApiKey> getAdminApiKeys(long environmentId) {
-        checkNotConnectedUser();
+        checkPlatformUser();
 
         if (!isTenantAdmin()) {
             throw new AccessDeniedException("Only a tenant admin may list platform API keys");
@@ -88,34 +88,34 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
 
     @Override
     public ApiKey getApiKey(long id) {
-        checkNotConnectedUser();
+        checkPlatformUser();
 
         return getOwnedApiKey(id);
     }
 
     @Override
     public List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
-        checkNotConnectedUser();
+        checkPlatformUser();
 
         return filterOwned(apiKeyService.getApiKeys(environmentId, type));
     }
 
     @Override
     public ApiKey update(ApiKey apiKey) {
-        checkNotConnectedUser();
+        checkPlatformUser();
 
         getOwnedApiKey(apiKey.getId());
 
         return apiKeyService.update(apiKey);
     }
 
-    private static void checkNotConnectedUser() {
-        if (ConnectedUserAuthentications.isConnectedUser()) {
-            throw new AccessDeniedException("A connected user has no platform API keys");
+    private static void checkPlatformUser() {
+        if (NonPlatformUserAuthentication.isCurrent()) {
+            throw new AccessDeniedException("Only a platform user has platform API keys");
         }
     }
 
-    private ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
+    private ApiKey saveOwnedApiKey(ApiKey apiKey, @Nullable PlatformType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);

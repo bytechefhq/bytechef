@@ -1,0 +1,562 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.ai.mcp.server.security.web.oauth2;
+
+import static com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration.ISSUER_URI;
+import static com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration.TENANT_CLAIM;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.ai.mcp.server.security.web.oauth2.config.ManagementMcpOAuth2ResourceServerIntTestConfiguration;
+import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.domain.TenantKey;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import io.modelcontextprotocol.client.McpClient;
+import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
+import io.modelcontextprotocol.spec.McpSchema;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+/**
+ * @author Ivica Cardic
+ */
+@SpringBootTest(
+    classes = {
+        ManagementMcpOAuth2ResourceServerIntTestConfiguration.class,
+        ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest.AuthenticationEventConfiguration.class
+    },
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(PostgreSQLContainerConfiguration.class)
+class ManagementMcpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
+
+    private static final String INITIALIZE_REQUEST = """
+        {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05",\
+        "capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}""";
+    private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of("public"));
+    private static final String CANONICAL_ENDPOINT_PATH = "/api/management/mcp";
+    private static final String MANAGEMENT_ENDPOINT_PATH = "/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp";
+
+    @Autowired
+    private AuthenticationEventRecorder authenticationEventRecorder;
+
+    @Autowired
+    private KeyPair mcpTestSigningKeyPair;
+
+    @Autowired
+    private PropertyService propertyService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @LocalServerPort
+    private int port;
+
+    @BeforeEach
+    void beforeEach() {
+        Mockito.reset(propertyService, userService);
+
+        authenticationEventRecorder.clear();
+
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn(MCP_SERVER_SECRET_KEY);
+        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.of(property));
+
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(true);
+        when(user.getLogin()).thenReturn("admin@localhost.com");
+        when(user.getAuthorityIds()).thenReturn(List.of());
+        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.of(user));
+    }
+
+    @Test
+    void testInitializeAndListToolsWithValidSelfIssuerJwt() {
+        String token = signManagementJwt(managementEndpointUrl());
+
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(token)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
+
+            assertThat(initializeResult).isNotNull();
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("mcp-server");
+            assertThat(mcpSyncClient.listTools()
+                .tools()).isEmpty();
+        }
+    }
+
+    @Test
+    void testAcceptedJwtPublishesOneSuccessInTheUrlTenantUnderTheByteChefLogin() throws Exception {
+        String tenantSecretKey = String.valueOf(TenantKey.of("000002"));
+
+        Property property = mock(Property.class);
+
+        when(property.get("secretKey")).thenReturn(tenantSecretKey);
+        when(propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null)).thenReturn(property);
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.of(property));
+
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim(TENANT_CLAIM, "000002")
+                .claim("scope", "mcp:management")
+                .audience(List.of("http://localhost:" + port + "/api/management/" + tenantSecretKey + "/mcp"))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(token, tenantSecretKey);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class))
+            .containsExactly("000002:admin@localhost.com");
+    }
+
+    @Test
+    void testForgedMcpServerSecretPublishesNoSuccess() throws Exception {
+        String forgedMcpServerSecretKey = String.valueOf(TenantKey.of("public"));
+        String forgedEndpointUrl = "http://localhost:" + port + "/api/management/" + forgedMcpServerSecretKey + "/mcp";
+
+        HttpResponse<String> httpResponse = postInitialize(
+            signManagementJwt(forgedEndpointUrl), forgedMcpServerSecretKey);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class)).isEmpty();
+    }
+
+    @Test
+    void testExpiredJwtStillPublishesTheFailure() throws Exception {
+        Instant now = Instant.now();
+
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim(TENANT_CLAIM, "public")
+                .claim("scope", "mcp:management")
+                .audience(List.of(managementEndpointUrl()))
+                .issueTime(Date.from(now.minus(20, ChronoUnit.MINUTES)))
+                .expirationTime(Date.from(now.minus(10, ChronoUnit.MINUTES)))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+        assertThat(authenticationEventRecorder.getEvents(AbstractAuthenticationFailureEvent.class)).hasSize(1);
+        assertThat(authenticationEventRecorder.getEvents(AuthenticationSuccessEvent.class)).isEmpty();
+    }
+
+    @Test
+    void testNonStaticIssuerJwtIsRejected() throws Exception {
+        String token = sign(
+            baseClaims("https://idp.customer.test")
+                .claim(TENANT_CLAIM, "public")
+                .claim("scope", "mcp:management")
+                .audience(List.of(managementEndpointUrl()))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void testWrongScopeIsRejectedWithInsufficientScopeChallenge() throws Exception {
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim(TENANT_CLAIM, "public")
+                .claim("scope", "mcp:automation")
+                .audience(List.of(managementEndpointUrl()))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(403);
+        assertThat(httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse("")).startsWith("Bearer error=\"insufficient_scope\"")
+                .contains("scope=\"mcp:management\"");
+    }
+
+    @Test
+    void testMismatchedAudienceIsRejected() throws Exception {
+        String token = signManagementJwt("http://localhost:" + port + "/api/management/other-secret/mcp");
+
+        HttpResponse<String> httpResponse = postInitialize(token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void testForgedMcpServerSecretIsRejected() throws Exception {
+        String forgedMcpServerSecretKey = String.valueOf(TenantKey.of("public"));
+        String forgedEndpointUrl = "http://localhost:" + port + "/api/management/" + forgedMcpServerSecretKey + "/mcp";
+
+        HttpResponse<String> httpResponse = postInitialize(
+            signManagementJwt(forgedEndpointUrl), forgedMcpServerSecretKey);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void testDeactivatedUserIsRejected() throws Exception {
+        when(userService.fetchUserByLogin("admin@localhost.com")).thenReturn(Optional.empty());
+
+        String token = signManagementJwt(managementEndpointUrl());
+
+        HttpResponse<String> httpResponse = postInitialize(token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void testUnauthenticatedRequestReturnsDiscoveryChallenge() throws Exception {
+        HttpResponse<String> httpResponse = postInitialize(null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+
+        String wwwAuthenticate = httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse("");
+
+        assertThat(wwwAuthenticate)
+            .contains("Bearer")
+            .contains("resource_metadata");
+    }
+
+    @Test
+    void testCanonicalEndpointUnauthenticatedRequestReturnsDiscoveryChallenge() throws Exception {
+        HttpResponse<String> httpResponse = postInitializeTo(CANONICAL_ENDPOINT_PATH, null);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+
+        String wwwAuthenticate = httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse("");
+
+        assertThat(wwwAuthenticate)
+            .contains("Bearer")
+            .contains("resource_metadata=\"http://localhost:" + port +
+                "/.well-known/oauth-protected-resource/api/management/mcp\"");
+    }
+
+    @Test
+    void testCanonicalEndpointInitializesWithSelfIssuerJwt() {
+        String token = signManagementJwt("http://localhost:" + port + CANONICAL_ENDPOINT_PATH);
+
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(CANONICAL_ENDPOINT_PATH, token)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
+
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("mcp-server");
+        }
+    }
+
+    @Test
+    void testCanonicalEndpointInitializesWithSelfIssuerJwtWhenTenantHasNoManagementServerProperty() {
+        when(propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null))
+            .thenReturn(Optional.empty());
+
+        String token = signManagementJwt("http://localhost:" + port + CANONICAL_ENDPOINT_PATH);
+
+        try (McpSyncClient mcpSyncClient = createMcpSyncClient(CANONICAL_ENDPOINT_PATH, token)) {
+            McpSchema.InitializeResult initializeResult = mcpSyncClient.initialize();
+
+            assertThat(initializeResult.serverInfo()
+                .name()).isEqualTo("mcp-server");
+        }
+    }
+
+    @Test
+    void testCanonicalEndpointRejectsJwtWithoutTenantClaim() throws Exception {
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim("scope", "mcp:management")
+                .audience(List.of("http://localhost:" + port + CANONICAL_ENDPOINT_PATH))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitializeTo(CANONICAL_ENDPOINT_PATH, token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void testProtectedResourceMetadataResolvesToConfiguredIssuer() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:" + port + "/.well-known/oauth-protected-resource/api"))
+            .GET()
+            .build();
+
+        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            assertThat(httpResponse.statusCode()).isEqualTo(200);
+            assertThat(httpResponse.body()).contains(ISSUER_URI);
+        }
+    }
+
+    @Test
+    void testUiSessionWithNonTenantBearerTokenReturnsDiscoveryChallenge() throws Exception {
+        String expectedWwwAuthenticate = postInitialize(null).headers()
+            .firstValue("WWW-Authenticate")
+            .orElseThrow();
+
+        MvcResult mvcResult = createMockMvc()
+            .perform(
+                MockMvcRequestBuilders.post(MANAGEMENT_ENDPOINT_PATH)
+                    .servletPath(MANAGEMENT_ENDPOINT_PATH)
+                    .session(createUiSession())
+                    .header("Authorization", "Bearer not-a-tenant-key"))
+            .andExpect(MockMvcResultMatchers.status()
+                .isUnauthorized())
+            .andReturn();
+
+        MockHttpServletResponse mockHttpServletResponse = mvcResult.getResponse();
+
+        assertThat(mockHttpServletResponse.getHeader("WWW-Authenticate"))
+            .isEqualTo(expectedWwwAuthenticate.replace("localhost:" + port, "localhost"));
+    }
+
+    @Test
+    void testUiSessionWithoutBearerTokenReturnsDiscoveryChallenge() throws Exception {
+        MvcResult mvcResult = createMockMvc()
+            .perform(
+                MockMvcRequestBuilders.post(MANAGEMENT_ENDPOINT_PATH)
+                    .servletPath(MANAGEMENT_ENDPOINT_PATH)
+                    .session(createUiSession()))
+            .andExpect(MockMvcResultMatchers.status()
+                .isUnauthorized())
+            .andReturn();
+
+        MockHttpServletResponse mockHttpServletResponse = mvcResult.getResponse();
+
+        assertThat(mockHttpServletResponse.getHeader("WWW-Authenticate"))
+            .contains("Bearer")
+            .contains("resource_metadata");
+    }
+
+    @Test
+    void testUiSessionWithValidSelfIssuerJwtIsAccepted() throws Exception {
+        String token = signManagementJwt("http://localhost" + MANAGEMENT_ENDPOINT_PATH);
+
+        createMockMvc()
+            .perform(
+                MockMvcRequestBuilders.post(MANAGEMENT_ENDPOINT_PATH)
+                    .servletPath(MANAGEMENT_ENDPOINT_PATH)
+                    .session(createUiSession())
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_EVENT_STREAM)
+                    .content(INITIALIZE_REQUEST))
+            .andExpect(MockMvcResultMatchers.status()
+                .isOk());
+    }
+
+    private MockMvc createMockMvc() {
+        return MockMvcBuilders.webAppContextSetup(webApplicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
+    }
+
+    private static MockHttpSession createUiSession() {
+        MockHttpSession mockHttpSession = new MockHttpSession();
+
+        mockHttpSession.setAttribute(
+            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+            new SecurityContextImpl(
+                UsernamePasswordAuthenticationToken.authenticated(
+                    "admin@localhost.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")))));
+
+        return mockHttpSession;
+    }
+
+    private String signManagementJwt(String audience) {
+        return sign(
+            baseClaims(ISSUER_URI)
+                .claim(TENANT_CLAIM, "public")
+                .claim("scope", "mcp:management")
+                .audience(List.of(audience))
+                .build());
+    }
+
+    private String managementEndpointUrl() {
+        return "http://localhost:" + port + "/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp";
+    }
+
+    private static JWTClaimsSet.Builder baseClaims(String issuer) {
+        return new JWTClaimsSet.Builder()
+            .issuer(issuer)
+            .subject("admin@localhost.com")
+            .issueTime(Date.from(Instant.now()))
+            .expirationTime(Date.from(Instant.now()
+                .plus(5, ChronoUnit.MINUTES)));
+    }
+
+    private String sign(JWTClaimsSet claimsSet) {
+        try {
+            SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claimsSet);
+
+            signedJWT.sign(new RSASSASigner((RSAPrivateKey) mcpTestSigningKeyPair.getPrivate()));
+
+            return signedJWT.serialize();
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    private McpSyncClient createMcpSyncClient(String bearerToken) {
+        return createMcpSyncClient("/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp", bearerToken);
+    }
+
+    private McpSyncClient createMcpSyncClient(String endpoint, String bearerToken) {
+        HttpClientStreamableHttpTransport transport =
+            HttpClientStreamableHttpTransport.builder("http://localhost:" + port)
+                .endpoint(endpoint)
+                .httpRequestCustomizer((httpRequestBuilder, method, uri, body, transportContext) -> {
+                    if (bearerToken != null) {
+                        httpRequestBuilder.header("Authorization", "Bearer " + bearerToken);
+                    }
+                })
+                .build();
+
+        return McpClient.sync(transport)
+            .requestTimeout(Duration.ofSeconds(30))
+            .build();
+    }
+
+    private HttpResponse<String> postInitialize(String bearerToken) throws Exception {
+        return postInitialize(bearerToken, MCP_SERVER_SECRET_KEY);
+    }
+
+    private HttpResponse<String> postInitialize(String bearerToken, String mcpServerSecretKey) throws Exception {
+        return postInitializeTo("/api/management/" + mcpServerSecretKey + "/mcp", bearerToken);
+    }
+
+    private HttpResponse<String> postInitializeTo(String endpoint, String bearerToken) throws Exception {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:" + port + endpoint))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json, text/event-stream")
+            .POST(HttpRequest.BodyPublishers.ofString(INITIALIZE_REQUEST));
+
+        if (bearerToken != null) {
+            requestBuilder.header("Authorization", "Bearer " + bearerToken);
+        }
+
+        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+            return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+        }
+    }
+
+    @TestConfiguration(proxyBeanMethods = false)
+    static class AuthenticationEventConfiguration {
+
+        @Bean
+        AuthenticationEventPublisher authenticationEventPublisher(
+            ApplicationEventPublisher applicationEventPublisher) {
+
+            return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+        }
+
+        @Bean
+        AuthenticationEventRecorder authenticationEventRecorder() {
+            return new AuthenticationEventRecorder();
+        }
+    }
+
+    static class AuthenticationEventRecorder implements ApplicationListener<AbstractAuthenticationEvent> {
+
+        private final List<RecordedAuthenticationEvent> recordedAuthenticationEvents = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void onApplicationEvent(AbstractAuthenticationEvent authenticationEvent) {
+            Authentication authentication = authenticationEvent.getAuthentication();
+
+            recordedAuthenticationEvents.add(
+                new RecordedAuthenticationEvent(
+                    authenticationEvent, TenantContext.getCurrentTenantId() + ":" + authentication.getName()));
+        }
+
+        void clear() {
+            recordedAuthenticationEvents.clear();
+        }
+
+        List<String> getEvents(Class<? extends AbstractAuthenticationEvent> eventType) {
+            return recordedAuthenticationEvents.stream()
+                .filter(recordedAuthenticationEvent -> eventType.isInstance(recordedAuthenticationEvent.event()))
+                .map(RecordedAuthenticationEvent::tenantPrincipal)
+                .toList();
+        }
+    }
+
+    private record RecordedAuthenticationEvent(AbstractAuthenticationEvent event, String tenantPrincipal) {
+    }
+}

@@ -45,13 +45,11 @@ import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,7 +71,7 @@ class ComponentToolsTest {
 
     private ComponentTools componentTools;
     @Mock
-    private ConnectionService connectionService;
+    private ComponentToolsConnectionResolver componentToolsConnectionResolver;
 
     @Mock
     private VectorStore vectorStore;
@@ -82,7 +80,8 @@ class ComponentToolsTest {
     void beforeEach() {
         MockitoAnnotations.openMocks(this);
         componentTools = new ComponentTools(
-            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade, connectionService,
+            componentDefinitionService, actionDefinitionFacade, triggerDefinitionFacade,
+            componentToolsConnectionResolver,
             vectorStore);
     }
 
@@ -253,10 +252,8 @@ class ComponentToolsTest {
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenThrow(new RuntimeException("Output function failed"));
 
-        Connection connection = mock(Connection.class);
-        when(connection.getId()).thenReturn(123L);
-        when(connectionService.getConnections(componentName, version, PlatformType.AUTOMATION))
-            .thenReturn(List.of(connection));
+        when(componentToolsConnectionResolver.resolveConnectionId(componentName, version, null))
+            .thenReturn(Optional.of(123L));
 
         Map<String, Object> performResult = Map.of("data", "test");
         when(
@@ -273,7 +270,7 @@ class ComponentToolsTest {
             anyMap());
         verify(actionDefinitionFacade).executePerform(
             eq(componentName), eq(version), eq(actionName), isNull(), isNull(), isNull(), isNull(), isNull(), anyMap(),
-            anyMap(), isNull(), isNull(), isNull(), eq(true), isNull(), isNull(), isNull());
+            eq(Map.of(actionName, 123L)), isNull(), isNull(), isNull(), eq(true), isNull(), isNull(), isNull());
     }
 
     @Test
@@ -300,8 +297,8 @@ class ComponentToolsTest {
             eq(componentName), eq(version), eq(actionName), anyMap(), anyMap()))
                 .thenThrow(new RuntimeException("Output function failed"));
 
-        when(connectionService.getConnections(componentName, version, PlatformType.AUTOMATION))
-            .thenThrow(new RuntimeException("Connection required"));
+        when(componentToolsConnectionResolver.resolveConnectionId(componentName, version, null))
+            .thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(RuntimeException.class,
             () -> componentTools.getOutputProperty(componentName, actionName, version, null));
@@ -345,7 +342,7 @@ class ComponentToolsTest {
                 " is only known after a test run",
             exception.getMessage());
 
-        verify(connectionService, never()).getConnections(anyString(), anyInt(), any());
+        verify(componentToolsConnectionResolver, never()).resolveConnectionId(anyString(), anyInt(), any());
         verify(actionDefinitionFacade, never()).executePerform(
             anyString(), anyInt(), anyString(), any(), any(), any(), any(), any(), anyMap(), anyMap(), any(), any(),
             any(), anyBoolean(), any(), any(), any());

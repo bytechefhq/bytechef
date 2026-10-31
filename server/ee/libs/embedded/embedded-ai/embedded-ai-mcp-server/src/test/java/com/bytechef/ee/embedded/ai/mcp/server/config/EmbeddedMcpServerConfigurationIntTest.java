@@ -112,7 +112,7 @@ class EmbeddedMcpServerConfigurationIntTest {
 
     @Test
     void testTransportContextOmitsExternalUserForAnonymousCaller() {
-        setAuthentication(McpAnonymousAuthenticationToken.ofEmbeddedMcpServer(1050L));
+        setAuthentication(McpAnonymousAuthenticationToken.of("mcp-anonymous:embedded:1050"));
 
         McpTransportContext mcpTransportContext = EmbeddedMcpServerConfiguration.createMcpTransportContext(
             "server-secret", null);
