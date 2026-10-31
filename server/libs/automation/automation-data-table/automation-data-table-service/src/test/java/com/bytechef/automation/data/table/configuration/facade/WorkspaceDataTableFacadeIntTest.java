@@ -45,6 +45,7 @@ class WorkspaceDataTableFacadeIntTest {
     private static final long DEV_ENVIRONMENT_ID = 0;
     private static final long STAGE_ENVIRONMENT_ID = 1;
     private static final long WORKSPACE_ID = 9001;
+    private static final long SECOND_WORKSPACE_ID = 9002;
     private static final List<ColumnSpec> COLUMN_SPECS = List.of(new ColumnSpec("title", ColumnType.STRING));
 
     @Autowired
@@ -63,19 +64,37 @@ class WorkspaceDataTableFacadeIntTest {
     void beforeEach() {
         dropTestTables();
 
-        jdbcTemplate.update(
-            "INSERT INTO workspace " +
-                "(id, name, created_date, created_by, last_modified_date, last_modified_by, version) " +
-                "VALUES (?, 'data-table-workspace', CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0)",
-            WORKSPACE_ID);
+        for (long workspaceId : List.of(WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
+            jdbcTemplate.update(
+                "INSERT INTO workspace " +
+                    "(id, name, created_date, created_by, last_modified_date, last_modified_by, version) " +
+                    "VALUES (?, ?, CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0)",
+                workspaceId, "data-table-workspace-" + workspaceId);
+        }
     }
 
     @AfterEach
     void afterEach() {
         dropTestTables();
 
-        jdbcTemplate.update("DELETE FROM workspace_data_table WHERE workspace_id = ?", WORKSPACE_ID);
-        jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", WORKSPACE_ID);
+        for (long workspaceId : List.of(WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
+            jdbcTemplate.update("DELETE FROM workspace_data_table WHERE workspace_id = ?", workspaceId);
+            jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", workspaceId);
+        }
+    }
+
+    @Test
+    void testCreateTableAssignsTableToWorkspace() {
+        workspaceDataTableFacade.createTable("events", "Events", COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        long dataTableId = dataTableService.getIdByBaseName("events");
+
+        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId))
+            .extracting(WorkspaceDataTable::getWorkspaceId)
+            .containsExactly(WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::baseName)
+            .containsExactly("events");
     }
 
     @Test
@@ -122,8 +141,74 @@ class WorkspaceDataTableFacadeIntTest {
             .containsExactlyInAnyOrder("original", "copy");
     }
 
+    @Test
+    void testDuplicateTableAssignsCopyToSourceWorkspace() {
+        workspaceDataTableFacade.createTable("events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        long eventsDataTableId = dataTableService.getIdByBaseName("events");
+
+        workspaceDataTableFacade.duplicateTable(eventsDataTableId, "events_copy", DEV_ENVIRONMENT_ID);
+
+        long eventsCopyDataTableId = dataTableService.getIdByBaseName("events_copy");
+
+        assertThat(eventsCopyDataTableId).isNotEqualTo(eventsDataTableId);
+        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(eventsCopyDataTableId))
+            .extracting(WorkspaceDataTable::getWorkspaceId)
+            .containsExactly(WORKSPACE_ID);
+    }
+
+    @Test
+    void testDuplicateTableAssignsCopyToEverySourceWorkspace() {
+        workspaceDataTableFacade.createTable("events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        long eventsDataTableId = dataTableService.getIdByBaseName("events");
+
+        workspaceDataTableService.assignDataTableToWorkspace(eventsDataTableId, SECOND_WORKSPACE_ID);
+
+        workspaceDataTableFacade.duplicateTable(eventsDataTableId, "events_copy", DEV_ENVIRONMENT_ID);
+
+        long eventsCopyDataTableId = dataTableService.getIdByBaseName("events_copy");
+
+        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(eventsCopyDataTableId))
+            .extracting(WorkspaceDataTable::getWorkspaceId)
+            .containsExactlyInAnyOrder(WORKSPACE_ID, SECOND_WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.listTables(SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::baseName)
+            .containsExactlyInAnyOrder("events", "events_copy");
+    }
+
+    @Test
+    void testDuplicateTableWithoutSourceWorkspaceAssignsNothing() {
+        dataTableService.createTable("events", null, COLUMN_SPECS, DEV_ENVIRONMENT_ID);
+
+        long eventsDataTableId = dataTableService.getIdByBaseName("events");
+
+        workspaceDataTableFacade.duplicateTable(eventsDataTableId, "events_copy", DEV_ENVIRONMENT_ID);
+
+        long eventsCopyDataTableId = dataTableService.getIdByBaseName("events_copy");
+
+        assertThat(dataTableService.listTables(DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::baseName)
+            .contains("events", "events_copy");
+        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(eventsCopyDataTableId)).isEmpty();
+    }
+
+    @Test
+    void testListTablesReturnsOnlyWorkspaceTables() {
+        workspaceDataTableFacade.createTable("events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        workspaceDataTableFacade.createTable(
+            "events_copy", null, COLUMN_SPECS, SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        assertThat(dataTableService.listTables(DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::baseName)
+            .contains("events", "events_copy");
+        assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::baseName)
+            .containsExactly("events");
+    }
+
     private void dropTestTables() {
-        for (String baseName : List.of("dropped", "original", "copy")) {
+        for (String baseName : List.of("dropped", "original", "copy", "events", "events_copy")) {
             dataTableService.dropTable(baseName, DEV_ENVIRONMENT_ID);
             dataTableService.dropTable(baseName, STAGE_ENVIRONMENT_ID);
         }
