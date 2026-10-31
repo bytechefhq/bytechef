@@ -306,6 +306,27 @@ class LogFileStorageImplIntTest {
     }
 
     @Test
+    void testReadLogEntriesOfAClusterElementCallKeepsOnlyThatCallsEntries() {
+        LogEntry fromCall = LogEntry.builder()
+            .timestamp(Instant.parse("2026-09-04T10:00:00Z"))
+            .level(LogEntry.Level.INFO)
+            .componentName("httpClient")
+            .taskExecutionId(10L)
+            .message("from call-1")
+            .clusterElementCallId("call-1")
+            .build();
+
+        storeFile(
+            JOB_DIR, "10.jsonl", jsonLine(fromCall) + jsonLine(logEntry(10L, "from the agent")));
+        storeFile(JOB_DIR, "11.jsonl", jsonLine(logEntry(11L, "other task")));
+
+        List<LogEntry> logEntries = logFileStorage.readLogEntries(JOB_ID, 10L, "call-1");
+
+        assertEquals(List.of("from call-1"), messagesOf(logEntries));
+        assertEquals(List.of(), fileStorageService.getListedDirectories());
+    }
+
+    @Test
     void testClusterElementCallFieldsSurviveWriteAndRead() {
         LogEntry stamped = LogEntry.builder()
             .timestamp(Instant.parse("2026-09-04T10:00:00Z"))

@@ -33,6 +33,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import javax.sql.DataSource;
 import liquibase.integration.spring.SpringLiquibase;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -155,6 +156,18 @@ class JdbcLogFileStorageIntTest {
         }
 
         @Test
+        void testReadsOnlyTheEntriesOfOneClusterElementCall() {
+            jobLogFileStorage.storeLogEntry(1L, 7L, createLogEntry(LogEntry.Level.INFO, "a", 7L, "call-1"));
+            jobLogFileStorage.storeLogEntry(1L, 7L, createLogEntry(LogEntry.Level.INFO, "b", 7L, "call-2"));
+            jobLogFileStorage.storeLogEntry(1L, 7L, createLogEntry(LogEntry.Level.INFO, "agent", 7L, null));
+            jobLogFileStorage.storeLogEntry(1L, 8L, createLogEntry(LogEntry.Level.INFO, "other task", 8L, "call-1"));
+
+            assertThat(jobLogFileStorage.readLogEntries(1L, 7L, "call-1"))
+                .extracting(LogEntry::message)
+                .containsExactly("a");
+        }
+
+        @Test
         void testReadsTheEntriesOfAJobAcrossTaskExecutions() {
             jobLogFileStorage.storeLogEntry(1L, 7L, createLogEntry(LogEntry.Level.INFO, "a", 7L));
             jobLogFileStorage.storeLogEntry(1L, 8L, createLogEntry(LogEntry.Level.INFO, "b", 8L));
@@ -251,6 +264,12 @@ class JdbcLogFileStorageIntTest {
     }
 
     private static LogEntry createLogEntry(LogEntry.Level level, String message, long taskExecutionId) {
+        return createLogEntry(level, message, taskExecutionId, null);
+    }
+
+    private static LogEntry createLogEntry(
+        LogEntry.Level level, String message, long taskExecutionId, @Nullable String clusterElementCallId) {
+
         return LogEntry.builder()
             .timestamp(truncatedNow())
             .level(level)
@@ -258,6 +277,7 @@ class JdbcLogFileStorageIntTest {
             .componentOperationName("info")
             .taskExecutionId(taskExecutionId)
             .message(message)
+            .clusterElementCallId(clusterElementCallId)
             .build();
     }
 

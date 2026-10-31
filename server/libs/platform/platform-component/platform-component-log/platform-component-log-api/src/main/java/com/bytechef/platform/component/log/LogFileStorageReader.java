@@ -36,6 +36,8 @@ public interface LogFileStorageReader {
      */
     List<LogEntry> readLogEntries(long jobId, long taskExecutionId);
 
+    List<LogEntry> readLogEntries(long jobId, long taskExecutionId, String clusterElementCallId);
+
     /**
      * Reads all log entries for an entire job (workflow execution).
      *

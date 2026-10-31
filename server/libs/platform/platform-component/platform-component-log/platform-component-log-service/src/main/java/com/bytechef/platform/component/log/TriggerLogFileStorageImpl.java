@@ -65,6 +65,11 @@ public class TriggerLogFileStorageImpl implements TriggerLogFileStorage {
     }
 
     @Override
+    public List<LogEntry> readLogEntries(long jobId, long taskExecutionId, String clusterElementCallId) {
+        return logFileStorage.readLogEntries(jobId, taskExecutionId, clusterElementCallId);
+    }
+
+    @Override
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         return logFileStorage.readLogEntriesByJobId(jobId);
     }
