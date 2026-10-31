@@ -3393,6 +3393,7 @@ export type Query = {
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
+  workspaceToolInvocationLogs: ToolInvocationLogPageType;
 };
 
 
@@ -4135,6 +4136,7 @@ export type QueryToolEligibleProjectVersionWorkflowsArgs = {
 
 export type QueryToolInvocationLogsArgs = {
   connectedUserId?: InputMaybe<Scalars['Long']['input']>;
+  environmentId?: InputMaybe<Scalars['ID']['input']>;
   fromDate?: InputMaybe<Scalars['Long']['input']>;
   integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
   mcpServerId?: InputMaybe<Scalars['Long']['input']>;
@@ -4142,6 +4144,7 @@ export type QueryToolInvocationLogsArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   surface?: InputMaybe<Scalars['String']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
+  type: PlatformType;
 };
 
 
@@ -4251,6 +4254,21 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
   environmentId: Scalars['ID']['input'];
   projectId?: InputMaybe<Scalars['ID']['input']>;
   tagId?: InputMaybe<Scalars['ID']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceToolInvocationLogsArgs = {
+  connectedUserId?: InputMaybe<Scalars['Long']['input']>;
+  environmentId: Scalars['ID']['input'];
+  fromDate?: InputMaybe<Scalars['Long']['input']>;
+  integrationInstanceId?: InputMaybe<Scalars['Long']['input']>;
+  mcpServerId?: InputMaybe<Scalars['Long']['input']>;
+  outcome?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  surface?: InputMaybe<Scalars['String']['input']>;
+  toDate?: InputMaybe<Scalars['Long']['input']>;
+  type: PlatformType;
   workspaceId: Scalars['ID']['input'];
 };
 
