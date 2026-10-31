@@ -4,6 +4,7 @@ import {ReactFlowProvider} from '@xyflow/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {calculateNodeWidth} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import ReadOnlyClusterElementNode from './ReadOnlyClusterElementNode';
 import ReadOnlyClusterRootNode from './ReadOnlyClusterRootNode';
@@ -83,6 +84,46 @@ describe('read-only cluster nodes', () => {
 
         expect(screen.getByText('httpClient_1')).toBeInTheDocument();
         expect(container.querySelector('.border-red-500')).not.toBeNull();
+    });
+
+    it('draws a nested cluster root as a card as wide as the layout reserves for it', () => {
+        useWorkflowEditorStore.setState({
+            nestedClusterRootsComponentDefinitions: {
+                guardrails: {
+                    clusterElementTypes: [
+                        {key: 'model', label: 'Model', multipleElements: false, name: 'MODEL', required: false},
+                        {
+                            key: 'sanitizers',
+                            label: 'Sanitizers',
+                            multipleElements: true,
+                            name: 'SANITIZERS',
+                            required: false,
+                        },
+                    ],
+                    name: 'guardrails',
+                },
+            },
+        } as unknown as Parameters<typeof useWorkflowEditorStore.setState>[0]);
+
+        const nestedRootData = {
+            clusterElementType: 'guardrails',
+            componentName: 'guardrails',
+            isNestedClusterRoot: true,
+            label: 'Sanitize Text',
+            name: 'sanitizeText_1',
+            operationName: 'sanitizeText',
+            workflowNodeName: 'sanitizeText_1',
+        } as unknown as NodeDataType;
+
+        const {container} = renderInFlow(<ReadOnlyClusterElementNode data={nestedRootData} />);
+
+        const nestedRootBox = container.querySelector<HTMLElement>('[data-nested-cluster-root]');
+
+        expect(nestedRootBox).not.toBeNull();
+        expect(nestedRootBox!.style.width).toBe(`${calculateNodeWidth(2)}px`);
+        expect(container.querySelector('.rounded-full')).toBeNull();
+        expect(container.querySelector('[data-handleid="model-handle"]')).not.toBeNull();
+        expect(container.querySelector('[data-handleid="sanitizers-handle"]')).not.toBeNull();
     });
 
     it('leaves an element that was not called plain', () => {
