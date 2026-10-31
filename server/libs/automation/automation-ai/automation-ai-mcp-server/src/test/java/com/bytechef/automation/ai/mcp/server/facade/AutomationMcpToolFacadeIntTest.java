@@ -68,6 +68,7 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.tool.execution.ToolExecutionEvent;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
@@ -617,8 +618,9 @@ class AutomationMcpToolFacadeIntTest {
             21L, Map.of("toolName", "mappedTool", "toolDescription", "A mapped tool"));
 
         stubCallableWorkflow(21L, "wf2");
-        givenEnabledMcpServer();
 
+        when(mcpServerServiceTarget.getMcpServer(30L)).thenReturn(
+            new McpServer("test-server", PlatformType.AUTOMATION, Environment.PRODUCTION, true));
         when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(10L))
             .thenReturn(List.of(mappedMcpProjectWorkflow));
         when(principalJobFacade.createJob(any(), anyLong(), any())).thenReturn(5L);
@@ -645,7 +647,30 @@ class AutomationMcpToolFacadeIntTest {
             assertThat(jobParametersDTO.getInputs())
                 .containsEntry(JobInputConstants.TRIGGER_NAME_INPUT, "newWorkflowCall_1")
                 .containsKey("newWorkflowCall_1");
+
+            ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+
+            assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.AUTOMATION);
+            assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
         }
+    }
+
+    @Test
+    void testCallRecordsTheWorkspaceAndEnvironmentOfTheMcpServer() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = givenListedTool(Optional.of(4L));
+
+        when(mcpServerServiceTarget.getMcpServer(30L)).thenReturn(
+            new McpServer("test-server", PlatformType.AUTOMATION, Environment.PRODUCTION, true));
+        when(mcpToolServiceTarget.fetchMcpTool(3L)).thenReturn(Optional.of(mcpTool(true)));
+        when(toolExecutionRecorder.record(any(), any(Supplier.class))).thenReturn(Map.of("ok", true));
+
+        functionToolCallback.call("{}");
+
+        ToolExecutionEvent toolExecutionEvent = captureRecordedToolExecutionEvent();
+
+        assertThat(toolExecutionEvent.type()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(toolExecutionEvent.workspaceId()).isEqualTo(4L);
+        assertThat(toolExecutionEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
     }
 
     @Test
@@ -779,7 +804,22 @@ class AutomationMcpToolFacadeIntTest {
         }
     }
 
+    private ToolExecutionEvent captureRecordedToolExecutionEvent() {
+        ArgumentCaptor<ToolExecutionEvent.Builder> builderArgumentCaptor =
+            ArgumentCaptor.forClass(ToolExecutionEvent.Builder.class);
+
+        verify(toolExecutionRecorder).record(builderArgumentCaptor.capture(), any(Supplier.class));
+
+        ToolExecutionEvent.Builder builder = builderArgumentCaptor.getValue();
+
+        return builder.build();
+    }
+
     private FunctionToolCallback<Map<String, Object>, Object> givenListedTool() {
+        return givenListedTool(Optional.empty());
+    }
+
+    private FunctionToolCallback<Map<String, Object>, Object> givenListedTool(Optional<Long> workspaceId) {
         McpComponent mcpComponent = mock(McpComponent.class);
 
         when(mcpComponent.getComponentName()).thenReturn("slack");
@@ -797,7 +837,7 @@ class AutomationMcpToolFacadeIntTest {
         when(mcpComponentService.getMcpComponent(2L)).thenReturn(mcpComponent);
         when(clusterElementDefinitionService.getClusterElementDefinition("slack", 1, "sendMessage"))
             .thenReturn(clusterElementDefinition);
-        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(30L)).thenReturn(Optional.empty());
+        when(workspaceMcpServerService.fetchMcpServerWorkspaceId(30L)).thenReturn(workspaceId);
 
         return facade.getFunctionToolCallback(mcpTool(true));
     }
