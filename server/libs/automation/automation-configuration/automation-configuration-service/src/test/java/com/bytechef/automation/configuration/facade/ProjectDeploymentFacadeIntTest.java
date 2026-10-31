@@ -67,6 +67,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -75,6 +76,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -383,10 +385,59 @@ public class ProjectDeploymentFacadeIntTest {
         // TODO
     }
 
-    @Disabled
     @Test
     public void testGetProjectDeploymentTags() {
-        // TODO
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
+            workspace.getId(), projectDeploymentFacadeHelper.createProject(workspace.getId()));
+        ProjectDeploymentDTO otherProjectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
+            workspace.getId(), projectDeploymentFacadeHelper.createProject(workspace.getId()));
+
+        projectDeploymentFacade.updateProjectDeploymentTags(
+            projectDeploymentDTO.id(), List.of(new Tag("deployment-tag-x"), new Tag("deployment-tag-y")));
+        projectDeploymentFacade.updateProjectDeploymentTags(
+            otherProjectDeploymentDTO.id(), List.of(new Tag("deployment-tag-z")));
+
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags();
+
+        assertThat(tags)
+            .extracting(Tag::getName)
+            .containsExactlyInAnyOrder("deployment-tag-x", "deployment-tag-y", "deployment-tag-z");
+    }
+
+    @Test
+    public void testCreateProjectDeploymentRejectsMissingBlankAndNullRequiredInputs() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectWorkflow publishedProjectWorkflow = publishProjectWithInputsWorkflow(
+            projectDTO, "{\"name\": \"name\", \"label\": \"Name\", \"type\": \"string\", \"required\": true}");
+
+        Map<String, Object> nullValueInputs = new HashMap<>();
+
+        nullValueInputs.put("name", null);
+
+        List<Map<String, Object>> invalidInputs = List.of(Map.of(), Map.of("name", "   "), nullValueInputs);
+
+        for (Map<String, Object> inputs : invalidInputs) {
+            assertThatThrownBy(
+                () -> createProjectDeploymentWithInputs(projectDTO, publishedProjectWorkflow, inputs))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Missing required param: name");
+        }
+
+        assertThat(projectDeploymentRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void testCreateProjectDeploymentIgnoresAbsentOptionalInputs() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectWorkflow publishedProjectWorkflow = publishProjectWithInputsWorkflow(
+            projectDTO, "{\"name\": \"destinationFolderName\", \"label\": \"Folder\", \"type\": \"string\"}");
+
+        long projectDeploymentId = createProjectDeploymentWithInputs(projectDTO, publishedProjectWorkflow, Map.of());
+
+        assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId))
+            .hasSize(1);
     }
 
     @Disabled
@@ -1003,6 +1054,35 @@ public class ProjectDeploymentFacadeIntTest {
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerDisable(any(), any(), any(), any(), any());
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerEnable(
             any(), any(), any(), any(), any(), any(), anyLong());
+    }
+
+    private long createProjectDeploymentWithInputs(
+        ProjectDTO projectDTO, ProjectWorkflow publishedProjectWorkflow, Map<String, ?> inputs) {
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            List.of(), null, null, inputs, true, null, null, null, null, null, null, null, 0,
+            publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name("Inputs Deployment")
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(1)
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        return projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO);
+    }
+
+    private ProjectWorkflow publishProjectWithInputsWorkflow(ProjectDTO projectDTO, String inputDefinition) {
+        projectDeploymentFacadeHelper.addTestWorkflow(
+            projectDTO,
+            "{\"label\": \"Inputs Workflow\", \"inputs\": [" + inputDefinition + "], \"tasks\": []}");
+
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
+
+        return projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectDTO.id(), 1)
+            .getFirst();
     }
 
     private long createCronInputProjectDeployment(String cronExpression) {
