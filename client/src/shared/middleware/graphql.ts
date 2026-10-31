@@ -2352,6 +2352,20 @@ export type UsersQueryVariables = Exact<{
 
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
 
+export type ToolInvocationLogsQueryVariables = Exact<{
+  surface?: string | null | undefined;
+  outcome?: string | null | undefined;
+  mcpServerId?: any;
+  connectedUserId?: any;
+  integrationInstanceId?: any;
+  fromDate?: any;
+  toDate?: any;
+  page?: number | null | undefined;
+}>;
+
+
+export type ToolInvocationLogsQuery = { toolInvocationLogs: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string, surface: string, kind: string, toolName: string | null, componentName: string | null, componentVersion: number | null, operationName: string | null, connectionId: any, environment: number | null, externalUserId: string | null, connectedUserId: any, integrationInstanceId: any, mcpServerId: any, jobId: any, outcome: string, errorType: string | null, errorMessage: string | null, durationMs: number, createdDate: any }> } };
+
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -11163,6 +11177,63 @@ export const useUsersQuery = <
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
     queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const ToolInvocationLogsDocument = new TypedDocumentString(`
+    query ToolInvocationLogs($surface: String, $outcome: String, $mcpServerId: Long, $connectedUserId: Long, $integrationInstanceId: Long, $fromDate: Long, $toDate: Long, $page: Int) {
+  toolInvocationLogs(
+    surface: $surface
+    outcome: $outcome
+    mcpServerId: $mcpServerId
+    connectedUserId: $connectedUserId
+    integrationInstanceId: $integrationInstanceId
+    fromDate: $fromDate
+    toDate: $toDate
+    page: $page
+  ) {
+    content {
+      id
+      surface
+      kind
+      toolName
+      componentName
+      componentVersion
+      operationName
+      connectionId
+      environment
+      externalUserId
+      connectedUserId
+      integrationInstanceId
+      mcpServerId
+      jobId
+      outcome
+      errorType
+      errorMessage
+      durationMs
+      createdDate
+    }
+    number
+    size
+    totalElements
+    totalPages
+  }
+}
+    `);
+
+export const useToolInvocationLogsQuery = <
+      TData = ToolInvocationLogsQuery,
+      TError = unknown
+    >(
+      variables?: ToolInvocationLogsQueryVariables,
+      options?: Omit<UseQueryOptions<ToolInvocationLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolInvocationLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolInvocationLogsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['ToolInvocationLogs'] : ['ToolInvocationLogs', variables],
+    queryFn: fetcher<ToolInvocationLogsQuery, ToolInvocationLogsQueryVariables>(ToolInvocationLogsDocument, variables),
     ...options
   }
     )};
