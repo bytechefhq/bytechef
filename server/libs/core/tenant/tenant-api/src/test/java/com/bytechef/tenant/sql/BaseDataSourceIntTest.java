@@ -111,7 +111,9 @@ class BaseDataSourceIntTest {
 
     private static String querySingleValue(Connection connection, String sql) throws SQLException {
         try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
-            assertThat(resultSet.next()).isTrue();
+            if (!resultSet.next()) {
+                throw new IllegalStateException("No row returned by " + sql);
+            }
 
             return resultSet.getString(1);
         }
