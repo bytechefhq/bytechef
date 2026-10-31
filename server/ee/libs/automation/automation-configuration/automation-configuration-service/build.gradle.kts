@@ -23,6 +23,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-crypto")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
+    testImplementation(project(":server:libs:config:cache-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
