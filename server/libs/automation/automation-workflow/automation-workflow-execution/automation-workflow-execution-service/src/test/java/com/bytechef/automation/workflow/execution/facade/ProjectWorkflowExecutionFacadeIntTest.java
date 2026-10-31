@@ -143,8 +143,8 @@ import tools.jackson.databind.ObjectMapper;
  * project deployment, project workflow and workflow services backed by Postgres. Only the component/task-dispatcher
  * registries, the trigger file storage, {@link ProjectFacade} and the embedded deployment owner contributor (normally
  * supplied by the embedded module) are test doubles. {@link JobService}, {@link TaskExecutionService} and
- * {@link ProjectDeploymentService} are spies over the real beans: they count calls for the cases that pin how often
- * the facade hits the database, and stub the "missing row" cases that foreign keys make impossible to arrange.
+ * {@link ProjectDeploymentService} are spies over the real beans: they count calls for the cases that pin how often the
+ * facade hits the database, and stub the "missing row" cases that foreign keys make impossible to arrange.
  *
  * @author Ivica Cardic
  */
@@ -854,7 +854,8 @@ class ProjectWorkflowExecutionFacadeIntTest {
     @Import({
         CacheConfiguration.class, ContextServiceImpl.class, EnvironmentServiceImpl.class, JacksonConfiguration.class,
         JobServiceImpl.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
-        PrincipalJobServiceImpl.class, ProjectCallback.class, ProjectDeploymentServiceImpl.class, ProjectServiceImpl.class,
+        PrincipalJobServiceImpl.class, ProjectCallback.class, ProjectDeploymentServiceImpl.class,
+        ProjectServiceImpl.class,
         ProjectWorkflowCallback.class,
         ProjectWorkflowExecutionFacadeImpl.class, ProjectWorkflowServiceImpl.class,
         TaskExecutionServiceImpl.class, TriggerExecutionServiceImpl.class, WorkflowExecutionRowRepositoryImpl.class,
@@ -906,7 +907,8 @@ class ProjectWorkflowExecutionFacadeIntTest {
                     new StringToTaskStateValueConverter(objectMapper),
                     new StringToTriggerStateValueConverter(objectMapper), new StringToWebhooksConverter(objectMapper),
                     new StringToWorkflowExecutionIdConverter(), new StringToWorkflowTaskConverter(objectMapper),
-                    new StringToWorkflowTriggerConverter(objectMapper), new TaskStateValueToStringConverter(objectMapper),
+                    new StringToWorkflowTriggerConverter(objectMapper),
+                    new TaskStateValueToStringConverter(objectMapper),
                     new TriggerStateValueToStringConverter(objectMapper), new WebhooksToStringConverter(objectMapper),
                     new WorkflowExecutionIdToStringConverter(), new WorkflowTaskToStringConverter(objectMapper),
                     new WorkflowTriggerToStringConverter(objectMapper));
