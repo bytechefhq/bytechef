@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -46,6 +47,7 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.configuration.tool.model.WorkflowInfo;
@@ -65,6 +67,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,6 +103,9 @@ class ProjectWorkflowToolsTest {
     private ProjectFacade projectFacade;
 
     @Mock
+    private ProjectOwnershipService projectOwnershipService;
+
+    @Mock
     private ProjectWorkflowFacade projectWorkflowFacade;
 
     @Mock
@@ -116,6 +122,12 @@ class ProjectWorkflowToolsTest {
 
     @Mock
     private WorkspaceFacade workspaceFacade;
+
+    @BeforeEach
+    void beforeEach() {
+        lenient().when(projectWorkflowService.getWorkflowProjectWorkflow(anyString()))
+            .thenAnswer(invocation -> buildProjectWorkflow(1L, 1L, invocation.getArgument(0)));
+    }
 
     @Nested
     class PersistedWorkflowCaptureTest {
@@ -519,7 +531,7 @@ class ProjectWorkflowToolsTest {
             newTools().updateWorkflow(VENDOR_WORKFLOW_ID, DEFINITION, 1, new ToolContext(Map.of()));
 
             verify(projectWorkflowFacade).updateWorkflow(VENDOR_WORKFLOW_ID, DEFINITION, 1);
-            verify(projectWorkflowService, never()).getWorkflowProjectWorkflow(any());
+            verify(projectOwnershipService).getOwnedProjectIds(any(), any());
         }
 
         private ToolContext scopedToolContext() {
@@ -988,7 +1000,8 @@ class ProjectWorkflowToolsTest {
     private ProjectWorkflowTools newToolsCheckedBy(PermissionService permissionService) {
         return new ProjectWorkflowTools(
             componentDefinitionFacade, projectFacade, projectWorkflowFacade,
-            new ScopedProjectGuard(permissionService, projectWorkflowService, scopedConnectionGuard),
+            new ScopedProjectGuard(permissionService, projectOwnershipService, projectWorkflowService,
+                scopedConnectionGuard),
             mock(ObjectProvider.class), workspaceConnectionFacade, workspaceFacade);
     }
 
@@ -1002,7 +1015,8 @@ class ProjectWorkflowToolsTest {
 
         return new ProjectWorkflowTools(
             componentDefinitionFacade, projectFacade, projectWorkflowFacade,
-            new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard),
+            new ScopedProjectGuard(new GrantingPermissionService(), projectOwnershipService, projectWorkflowService,
+                scopedConnectionGuard),
             workflowArtifactRecorderProvider,
             workspaceConnectionFacade, workspaceFacade);
     }
