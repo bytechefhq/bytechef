@@ -52,7 +52,8 @@ describe('WorkflowTaskExecutionItem', () => {
             const {container} = render(<WorkflowTaskExecutionItem jobEnded taskExecution={taskExecution} />);
 
             expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
-            expect(container.querySelector('.text-destructive')).toBeInTheDocument();
+            expect(container.querySelector('.lucide-ban')).toBeInTheDocument();
+            expect(container.querySelector('.text-destructive')).not.toBeInTheDocument();
         });
 
         it('should show a dash instead of a duration for an unfinished task of an ended job', () => {
