@@ -369,8 +369,8 @@ class SessionChatMemoryUtilsIntTest {
     }
 
     /**
-     * Roles are cluster-wide in PostgreSQL, so each test gets its own. SUPERUSER mirrors the H2 ADMIN user the
-     * original test created and lets the role create the session tables in the public schema.
+     * Roles are cluster-wide in PostgreSQL, so each test gets its own. SUPERUSER mirrors the H2 ADMIN user the original
+     * test created and lets the role create the session tables in the public schema.
      */
     private static String createLoginRole(String password) {
         String roleName = "memory_user_" + DATABASE_COUNTER.incrementAndGet();
