@@ -175,6 +175,8 @@ The MCP server exposes the following tools to connected AI assistants.
 
 Tools that list, search or create things inside a workspace take a `workspaceId`. The assistant finds it with `listWorkspaces`; a call that needs a workspace and names none returns an error pointing there. Tools that take a project or workflow id act on that object directly, and your permissions in its workspace decide whether the call is allowed.
 
+Projects that belong to [Embedded](/platform/embedded/get-started) are out of reach of these tools: the automation workflow catalog and the projects of your connected users are left out of listings and searches, and a call that names one of their projects or workflows fails as if it did not exist. Manage them from the Embedded pages instead.
+
 ### Workspaces
 
 | Tool | Description |
