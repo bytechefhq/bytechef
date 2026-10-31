@@ -528,6 +528,12 @@ System administrator is used for accessing protected data reachable through /act
 
 ## Workflow Configuration
 
+### AI Agent Sub-Workflows
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_WORKFLOW_EXECUTION_AGENT_MAX_SUBFLOW_DEPTH` | How deep sub-workflows may nest below a run whose AI agent calls a sub-workflow tool. Plain Subflow steps count toward the same depth. A call past the limit is not started; the agent gets an error back instead, so an agent that calls an agent that calls the first one again cannot loop forever. Must be at least `1` | `10` |
+
 ### Execution Recovery
 
 > **Coming soon.** The execution recovery, timeout, and retention monitors (the variables in this and the following two subsections) are on the upcoming release track and are not yet available in the latest released version of ByteChef.

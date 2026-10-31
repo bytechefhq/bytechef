@@ -54,6 +54,17 @@ A subflow runs as an **isolated child job** owned by the parent's Subflow step -
 - **No external trigger fires.** The New Workflow Call trigger is the *declared interface* (it defines the input schema), not an event source. Nothing polls, no webhook is hit - the parent invokes the child programmatically. So a callable workflow doesn't need - and shouldn't rely on - a webhook or schedule trigger to be reachable as a subflow.
 - **Inputs and outputs are the whole contract.** The caller provides data matching the New Workflow Call input schema; it reads back exactly the Response to Workflow Call output. Nothing else crosses the boundary.
 - **Suspend/resume works across the boundary.** A child job can pause (for an approval, a human-in-the-loop question, or an agent step) and resume without breaking the parent - the parent's Subflow step waits for the child to complete.
+- **Synchronous runs can't pause.** A run that has to answer its caller right away - a workflow whose webhook trigger returns a synchronous response, or a subflow called synchronously from such a workflow or from the editor - has no way to wait for a person. A webhook workflow that returns a synchronous response is rejected before it starts if it contains a step that pauses the run, such as an approval or wait step, and a step that still tries to pause a synchronous run fails it with an error that names the step. Use a trigger that responds asynchronously for workflows that need to pause.
+
+## When an AI agent calls a subflow
+
+When an [AI agent](/platform/automation/build/workflows/ai/universal-ai) calls a callable workflow through the **Call Workflow** tool, the agent doesn't hold a worker while the subflow runs:
+
+- **The agent pauses and the subflow runs as its own job.** It runs as the same user as the agent's run. When it finishes, the agent continues with the subflow's response as the tool result. If the subflow fails, the agent gets the failed step's error message instead, so it can react to it.
+- **The agent keeps waiting while the subflow pauses.** A subflow that stops for an approval or a wait step keeps the agent paused until the subflow resumes and finishes.
+- **One agent run can call several subflows,** one after another. Only one tool call that pauses the agent is allowed per turn; a second one in the same turn gets an error back.
+- **A synchronous run calls the subflow in place.** When the agent's own run can't pause (see above), the tool runs the subflow synchronously and waits for its response.
+- **Nesting is bounded.** An agent can call a subflow whose agent calls another subflow, and so on, up to 10 levels by default (`BYTECHEF_WORKFLOW_EXECUTION_AGENT_MAX_SUBFLOW_DEPTH`; Subflow steps count toward the same depth). A call past the limit is not started and the agent gets an error back, so agents that call each other in a cycle stop instead of looping forever.
 
 <Callout type="info">
 If you want the *same* workflow to also run on its own - say, on a schedule or from a webhook - give it that trigger separately. Being callable as a subflow is independent of, and doesn't conflict with, having a normal trigger for standalone runs.
