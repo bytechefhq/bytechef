@@ -31,6 +31,14 @@ const uriProperty = {
     type: 'STRING',
 } as PropertyAllType;
 
+const fileProperty = {
+    controlType: 'FILE_ENTRY',
+    expressionEnabled: true,
+    label: 'File',
+    name: 'file',
+    type: 'FILE_ENTRY',
+} as PropertyAllType;
+
 type EditorElementType = HTMLElement & {editor: Editor};
 
 const settle = async () => {
@@ -283,6 +291,23 @@ describe('uncontrolled Formula switch', () => {
         await settle();
 
         expect(screen.getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'false');
+    });
+
+    it('turns a file entry pill into a formula', async () => {
+        renderProperty(fileProperty, '${trigger_1.file}');
+
+        await settle();
+
+        const formulaSwitch = screen.getByRole('switch', {name: 'Formula'});
+
+        expect(formulaSwitch).toHaveAttribute('aria-checked', 'false');
+
+        fireEvent.click(formulaSwitch);
+
+        await settle();
+
+        expect(screen.getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'true');
+        expect(savedValues()).toContain('=${trigger_1.file}');
     });
 
     it('never shows Formula for a fromAi value', async () => {
