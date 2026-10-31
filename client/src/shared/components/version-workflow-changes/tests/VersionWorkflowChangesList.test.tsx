@@ -19,15 +19,14 @@ describe('VersionWorkflowChangesList', () => {
         render(<VersionWorkflowChangesList changes={changes} isLoading={false} onWorkflowClick={vi.fn()} />);
 
         expect(screen.getByText('3 workflows changed (1 added, 1 modified, 1 removed)')).toBeInTheDocument();
-        expect(screen.getAllByRole('button')).toHaveLength(3);
-        expect(screen.getByLabelText('Open changes of First')).toBeInTheDocument();
+        expect(screen.getByText('First')).toBeInTheDocument();
         expect(screen.getByLabelText('Open changes of uuid-2')).toBeInTheDocument();
         expect(screen.getByText('Added')).toBeInTheDocument();
         expect(screen.getByText('Modified')).toBeInTheDocument();
         expect(screen.getByText('Removed')).toBeInTheDocument();
         expect(screen.getByText('3 changes')).toBeInTheDocument();
-        expect(screen.getByLabelText('Open changes of First')).not.toHaveTextContent(/change/);
-        expect(screen.getByLabelText('Open changes of Gone')).not.toHaveTextContent(/change/);
+        expect(screen.getByText('First').parentElement).not.toHaveTextContent(/change/);
+        expect(screen.getByText('Gone').parentElement).not.toHaveTextContent(/change/);
         expect(screen.queryByText('0 changes')).not.toBeInTheDocument();
     });
 
@@ -62,9 +61,22 @@ describe('VersionWorkflowChangesList', () => {
 
         render(<VersionWorkflowChangesList changes={changes} isLoading={false} onWorkflowClick={onWorkflowClick} />);
 
-        await userEvent.click(screen.getByLabelText('Open changes of First'));
+        await userEvent.click(screen.getByLabelText('Open changes of uuid-2'));
 
-        expect(onWorkflowClick).toHaveBeenCalledWith('uuid-1');
+        expect(onWorkflowClick).toHaveBeenCalledWith('uuid-2');
+    });
+
+    it('opens only modified workflows, since added and removed ones have nothing to compare', async () => {
+        const onWorkflowClick = vi.fn();
+
+        render(<VersionWorkflowChangesList changes={changes} isLoading={false} onWorkflowClick={onWorkflowClick} />);
+
+        expect(screen.getAllByRole('button')).toHaveLength(1);
+
+        await userEvent.click(screen.getByText('First'));
+        await userEvent.click(screen.getByText('Gone'));
+
+        expect(onWorkflowClick).not.toHaveBeenCalled();
     });
 
     it('shows the loading icon while loading', () => {
