@@ -41,6 +41,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
@@ -151,7 +152,14 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
                 createdCount++;
             } catch (IllegalArgumentException illegalArgumentException) {
-                rejectedRows.add(new RejectedRow(parsedRow.rowNumber(), illegalArgumentException.getMessage()));
+                Optional<ConnectedUser> concurrentlyCreatedConnectedUser = connectedUserService.fetchConnectedUser(
+                    externalId, environment);
+
+                if (concurrentlyCreatedConnectedUser.isPresent()) {
+                    skippedExternalIds.add(externalId);
+                } else {
+                    rejectedRows.add(new RejectedRow(parsedRow.rowNumber(), illegalArgumentException.getMessage()));
+                }
             }
         }
 
