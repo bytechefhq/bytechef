@@ -22,6 +22,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-oauth2-jose")
     testImplementation("org.springframework.security:spring-security-oauth2-resource-server")
+    testImplementation(project(":server:ee:libs:platform:platform-user:platform-user-scim"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-service"))
@@ -36,6 +37,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
