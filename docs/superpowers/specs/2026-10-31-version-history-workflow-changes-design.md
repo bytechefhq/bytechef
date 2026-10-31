@@ -204,8 +204,12 @@ hook passed in by each panel so they don't know which owner they serve:
      component icon, name, kind badge, and old → new values for modified fields.
   2. **Definition**: Monaco `DiffEditor` (`@monaco-editor/react`, already a dependency), side-by-side, read-only,
      JSON language, theme follows light/dark.
-  3. **Canvas**: read-only `WorkflowEditor` (as used by `ReadOnlyWorkflowSheet` via `readOnlyWorkflow`) with
-     changed nodes highlighted: added = green, modified = amber, moved = blue, removed = red. A toggle switches
+  3. **Canvas**: a **standalone** read-only canvas (user decided, 2026-10-31): its own ReactFlow instance fed by the
+     pure graph-assembly and layout functions of the editor (`buildWorkflowGraph`, extracted from `useLayout`, and
+     `getLayoutElements`) and the existing read-only node components. It must not use `WorkflowEditor` or the
+     editor's global stores, because the read-only `WorkflowEditor` reads and writes `useWorkflowDataStore`, and the
+     version history sheets open while the editable editor is mounted. Changed nodes are highlighted: added = green,
+     modified = amber, moved = blue, removed = red. A toggle switches
      between the newer version (shows added/modified/moved) and the older version (shows removed/modified/moved),
      since removed nodes only exist on the old canvas (my call). The canvas is fed from the **masked definitions**
      returned by the API: the client builds the `readOnlyWorkflow` (`tasks`, `triggers`, `definition`) from the
