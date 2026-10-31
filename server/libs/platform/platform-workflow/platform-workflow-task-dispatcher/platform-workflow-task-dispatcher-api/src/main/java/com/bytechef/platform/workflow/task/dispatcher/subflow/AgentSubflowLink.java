@@ -22,8 +22,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
 /**
- * Links a sub-workflow job to the suspended agent job that launched it and waits on its result.
- *
  * @author Ivica Cardic
  */
 public record AgentSubflowLink(long agentJobId, String agentJobResumeId) {

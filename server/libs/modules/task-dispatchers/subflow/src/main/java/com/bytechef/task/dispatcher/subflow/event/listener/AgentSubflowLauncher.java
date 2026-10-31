@@ -47,10 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
- * Launches the sub-workflow an agent tool asked for when the agent job suspends, and claims the launch on the agent job
- * first so a redelivered suspend event cannot start it twice. Known limit: a crash between the claim and the launch
- * leaves the agent job stopped, because nothing re-launches a claimed request.
- *
  * @author Ivica Cardic
  */
 public class AgentSubflowLauncher implements ApplicationEventListener {

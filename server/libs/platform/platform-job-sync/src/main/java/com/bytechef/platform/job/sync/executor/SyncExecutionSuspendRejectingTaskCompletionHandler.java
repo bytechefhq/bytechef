@@ -32,9 +32,6 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
- * Fails a synchronously executed job when one of its steps tries to suspend it. It claims the same task executions as
- * the suspend completion handler, so it must be registered ahead of it.
- *
  * @author Ivica Cardic
  */
 public class SyncExecutionSuspendRejectingTaskCompletionHandler implements TaskCompletionHandler {
@@ -44,9 +41,6 @@ public class SyncExecutionSuspendRejectingTaskCompletionHandler implements TaskC
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
 
-    /**
-     * @param errorMessageFunction builds the failed step's error from the step's name and type
-     */
     @SuppressFBWarnings("EI")
     public SyncExecutionSuspendRejectingTaskCompletionHandler(
         ApplicationEventPublisher eventPublisher, JobService jobService, TaskExecutionService taskExecutionService,

@@ -22,8 +22,6 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The result of a sub-workflow run, handed back to the agent tool call that launched it.
- *
  * @author Ivica Cardic
  */
 sealed interface SubflowOutcome {
