@@ -459,10 +459,13 @@ describe('non-string expression mode', () => {
             expect(result.current.showFormulaSwitch).toBe(false);
         });
 
-        it('should NOT show for FILE_ENTRY, NULL or CODE_EDITOR controls', () => {
+        it('should show for FILE_ENTRY controls', () => {
             expect(
                 renderShowFormulaSwitch({controlType: 'FILE_ENTRY', expressionEnabled: true, type: 'FILE_ENTRY'})
-            ).toBe(false);
+            ).toBe(true);
+        });
+
+        it('should NOT show for NULL or CODE_EDITOR controls', () => {
             expect(renderShowFormulaSwitch({controlType: 'NULL', expressionEnabled: true, type: 'NULL'})).toBe(false);
             expect(renderShowFormulaSwitch({controlType: 'CODE_EDITOR', expressionEnabled: true, type: 'STRING'})).toBe(
                 false

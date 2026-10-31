@@ -532,7 +532,6 @@ export const useProperty = ({
         controlType !== 'FORMULA_MODE' &&
         controlType !== 'NULL' &&
         controlType !== 'CODE_EDITOR' &&
-        controlType !== 'FILE_ENTRY' &&
         type !== 'DYNAMIC_PROPERTIES';
 
     const isNumericalInput = useMemo(
