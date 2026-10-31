@@ -61,6 +61,7 @@ The **Event type** group of the filter menu is populated from the events your in
 | Area | Event types |
 |---|---|
 | **Users** | `USER_CREATED`, `USER_ACTIVATED`, `USER_PASSWORD_CHANGED`, `USER_DELETED` |
+| **SCIM provisioning** | `SCIM_USER_CREATED`, `SCIM_USER_UPDATED`, `SCIM_USER_PATCHED`, `SCIM_USER_DEACTIVATED`, `SCIM_USER_DELETED`, `SCIM_GROUP_CREATED`, `SCIM_GROUP_UPDATED`, `SCIM_GROUP_DELETED` - recorded under the `scim:<identity provider name> (<identity provider id>)` principal; a PUT or PATCH that deactivates an active user is recorded once, as `SCIM_USER_DEACTIVATED` |
 | **Workspace membership** | `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED` |
 | **Custom roles** | `CUSTOM_ROLE_CREATED`, `CUSTOM_ROLE_UPDATED`, `CUSTOM_ROLE_DELETED` |
 | **Projects** | `PROJECT_CREATED`, `PROJECT_UPDATED`, `PROJECT_DELETED` |
