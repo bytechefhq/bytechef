@@ -1,6 +1,7 @@
 dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("org.apache.commons:commons-lang3")
+    implementation(libs.commons.validator)
     implementation("org.aspectj:aspectjweaver")
     implementation("org.springframework.boot:spring-boot-actuator")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
