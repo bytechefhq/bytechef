@@ -139,6 +139,7 @@ public class FacadeTestComponentHandler implements ComponentHandler {
         return connectionParameters.getString(CHANNEL_ID, NO_CONNECTION);
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private List<com.bytechef.component.definition.Option<String>> getChannelOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, com.bytechef.component.definition.Context context) {
@@ -150,6 +151,7 @@ public class FacadeTestComponentHandler implements ComponentHandler {
         return List.of(option("Channel", getChannelId(connectionParameters)));
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private List<? extends ValueProperty<?>> getProbeProperties(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ClusterElementContext context) {
