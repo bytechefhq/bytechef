@@ -47,6 +47,9 @@ import org.springaicommunity.agent.common.task.subagent.TaskCall;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class ToolCallLoggingSubagentExecutorTest {
 
+    private static final TaskCall BACKGROUND_TASK_CALL = new TaskCall(
+        "Find it", "Find the thing", "Analyst", null, null, Boolean.TRUE);
+
     private static final TaskCall TASK_CALL = new TaskCall(
         "Find it", "Find the thing", "Analyst", null, null, Boolean.FALSE);
 
@@ -93,12 +96,25 @@ class ToolCallLoggingSubagentExecutorTest {
     }
 
     @Test
-    void testLogsThePromptAndResultInsideTheSubagentsCall() {
+    void testLogsNothingForAForegroundRunThatSucceeded() {
         ClusterElementSubagentDefinition subagentDefinition = ClusterElementSubagentDefinition.of(clusterElement());
 
         when(delegate.execute(TASK_CALL, subagentDefinition)).thenReturn("done");
 
         subagentExecutor.execute(TASK_CALL, subagentDefinition);
+
+        recorder.drain(10);
+
+        assertThat(loggedMessages).isEmpty();
+    }
+
+    @Test
+    void testLogsThePromptAndResultOfABackgroundRunInsideTheSubagentsCall() {
+        ClusterElementSubagentDefinition subagentDefinition = ClusterElementSubagentDefinition.of(clusterElement());
+
+        when(delegate.execute(BACKGROUND_TASK_CALL, subagentDefinition)).thenReturn("done");
+
+        subagentExecutor.execute(BACKGROUND_TASK_CALL, subagentDefinition);
 
         List<ClusterElementCallRecord> records = recorder.drain(10)
             .records();

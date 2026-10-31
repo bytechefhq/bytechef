@@ -52,7 +52,9 @@ public class ToolCallLoggingSubagentExecutor implements SubagentExecutor {
             throw exception;
         }
 
-        ToolCallLoggingToolCallback.logCall(context, subagentDefinition.getName(), inputs, result);
+        if (Boolean.TRUE.equals(taskCall.run_in_background())) {
+            ToolCallLoggingToolCallback.logCall(context, subagentDefinition.getName(), inputs, result);
+        }
 
         return result;
     }
