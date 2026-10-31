@@ -10,6 +10,21 @@ vi.mock('@/shared/components/MonacoDiffEditorWrapper', () => ({
     ),
 }));
 
+vi.mock('../WorkflowChangeCanvasTab', () => ({
+    WorkflowChangeCanvasToolbar: ({
+        onSelectedSideChange,
+        selectedSide,
+    }: {
+        onSelectedSideChange: (side: string) => void;
+        selectedSide: string;
+    }) => (
+        <button data-testid="mock-canvas-toolbar" onClick={() => onSelectedSideChange('old')}>
+            {selectedSide}
+        </button>
+    ),
+    default: ({selectedSide}: {selectedSide: string}) => <div data-testid="mock-canvas-tab">{selectedSide}</div>,
+}));
+
 const change = {
     baseVersion: 1,
     changeType: WorkflowChangeType.Modified,
@@ -108,7 +123,7 @@ describe('WorkflowVersionChangesDialog', () => {
         expect(document.querySelector('svg.animate-spin')).toBeInTheDocument();
     });
 
-    it('orders the tabs Changes, Definition', () => {
+    it('orders the tabs Changes, Canvas, Definition', () => {
         render(
             <WorkflowVersionChangesDialog
                 baseVersionLabel="V1"
@@ -120,7 +135,34 @@ describe('WorkflowVersionChangesDialog', () => {
             />
         );
 
-        expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Changes', 'Definition']);
+        expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Changes', 'Canvas', 'Definition']);
+    });
+
+    it('shows the canvas toolbar in the tab row only on the Canvas tab and passes the picked side to the canvas', async () => {
+        render(
+            <WorkflowVersionChangesDialog
+                baseVersionLabel="V1"
+                change={change}
+                isLoading={false}
+                onClose={vi.fn()}
+                open
+                versionLabel="V2"
+            />
+        );
+
+        expect(screen.queryByTestId('mock-canvas-toolbar')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Canvas'}));
+
+        expect(screen.getByTestId('mock-canvas-tab')).toHaveTextContent('new');
+
+        await userEvent.click(screen.getByTestId('mock-canvas-toolbar'));
+
+        expect(screen.getByTestId('mock-canvas-tab')).toHaveTextContent('old');
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Changes'}));
+
+        expect(screen.queryByTestId('mock-canvas-toolbar')).not.toBeInTheDocument();
     });
 
     it('shows an error instead of the spinner when loading failed', () => {
