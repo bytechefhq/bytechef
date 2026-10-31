@@ -70,7 +70,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
 
     const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
 
-    // Publishing creates the next draft version, so the last published version is the one before the draft.
     const lastPublishedProjectVersion = (project?.lastProjectVersion ?? 0) - 1;
 
     const {data: lastPublishedProjectWorkflows} = useGetProjectVersionWorkflowsQuery(
@@ -123,9 +122,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         },
     });
 
-    // Publishing duplicates every project workflow, so each draft workflow starts at version 1. Any workflow with a
-    // higher version has been edited since the last publish, and a workflow missing from either side has been added or
-    // deleted since then.
     const hasUnpublishedChanges = useMemo(() => {
         if (!project?.lastPublishedDate) {
             return true;
