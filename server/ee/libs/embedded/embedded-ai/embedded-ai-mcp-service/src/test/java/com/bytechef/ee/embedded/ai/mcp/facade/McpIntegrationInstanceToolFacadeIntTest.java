@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
@@ -111,6 +112,9 @@ class McpIntegrationInstanceToolFacadeIntTest {
     private McpComponentRepository mcpComponentRepository;
 
     @Autowired
+    private McpIntegrationComponentService mcpIntegrationComponentService;
+
+    @Autowired
     private McpIntegrationInstanceToolFacade mcpIntegrationInstanceToolFacade;
 
     @MockitoSpyBean
@@ -123,6 +127,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
     private McpToolRepository mcpToolRepository;
 
     private long foreignIntegrationInstanceId;
+    private long integrationId;
     private long integrationInstanceConfigurationWorkflowId;
     private long integrationInstanceId;
     private long mcpToolId;
@@ -152,7 +157,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         long foreignConnectedUserId = insertConnectedUser(FOREIGN_EXTERNAL_USER_ID);
 
-        long integrationId = insert(
+        integrationId = insert(
             """
                 INSERT INTO integration (name, component_name, allow_multiple_instances, created_date, created_by,
                     last_modified_date, last_modified_by, version)
@@ -305,6 +310,40 @@ class McpIntegrationInstanceToolFacadeIntTest {
 
         verify(mcpIntegrationInstanceToolService, never()).createMcpIntegrationInstanceTool(
             integrationInstanceId, foreignMcpToolId, true);
+
+        assertThat(countMcpIntegrationInstanceTools()).isZero();
+    }
+
+    @Test
+    void testEnableMcpIntegrationInstanceToolAcceptsToolBoundToTheInstancesIntegration() throws Throwable {
+        McpTool mcpTool = mcpToolRepository.findById(mcpToolId)
+            .orElseThrow();
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), integrationId);
+
+        enableMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, true);
+
+        assertThat(countMcpIntegrationInstanceTools()).isEqualTo(1);
+    }
+
+    @Test
+    void testEnableMcpIntegrationInstanceToolRejectsToolBoundToAnotherIntegrationOnTheSameComponent() {
+        McpTool mcpTool = mcpToolRepository.findById(mcpToolId)
+            .orElseThrow();
+
+        long siblingIntegrationId = insert(
+            """
+                INSERT INTO integration (name, component_name, allow_multiple_instances, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES ('gmail code', 'gmail', false, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """);
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), siblingIntegrationId);
+
+        assertThatThrownBy(() -> enableMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, true))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("does not belong to integration instance");
 
         assertThat(countMcpIntegrationInstanceTools()).isZero();
     }

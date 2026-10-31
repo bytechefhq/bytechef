@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -44,6 +46,7 @@ class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceTool
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final McpComponentService mcpComponentService;
+    private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpServerService mcpServerService;
     private final McpToolService mcpToolService;
@@ -53,14 +56,16 @@ class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceTool
         ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        McpComponentService mcpComponentService, McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
-        McpServerService mcpServerService, McpToolService mcpToolService) {
+        McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
+        McpToolService mcpToolService) {
 
         this.connectedUserIntegrationInstanceFacade = connectedUserIntegrationInstanceFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.mcpComponentService = mcpComponentService;
+        this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpServerService = mcpServerService;
         this.mcpToolService = mcpToolService;
@@ -112,6 +117,13 @@ class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceTool
         Integration integration = integrationService.getIntegration(
             integrationInstanceConfiguration.getIntegrationId());
 
-        return Objects.equals(mcpComponent.getComponentName(), integration.getComponentName());
+        if (!Objects.equals(mcpComponent.getComponentName(), integration.getComponentName())) {
+            return false;
+        }
+
+        return mcpIntegrationComponentService.fetchMcpIntegrationComponent(mcpComponent.getId())
+            .map(McpIntegrationComponent::getIntegrationId)
+            .map(boundIntegrationId -> Objects.equals(boundIntegrationId, integration.getId()))
+            .orElse(true);
     }
 }
