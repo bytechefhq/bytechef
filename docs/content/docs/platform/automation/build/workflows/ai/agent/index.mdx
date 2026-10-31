@@ -347,17 +347,20 @@ execution detail:
 - **One row per call**, in the order the calls happened. A tool called several times gets numbered
   rows, such as `fetch_ok` and `fetch_ok #2`.
 - **Selecting a row** shows that call's **Input**, **Output** or **Error**, and its **Logs** show only
-  the entries from that call. A tool backed by an external provider, such as an MCP Client tool, has no logs of its own, so its **Logs** tab is empty. The agent's own **Logs** tab is unchanged.
+  the entries from that call. On the execution detail, **Input** and **Output** are read from the call's
+  log entry. A tool backed by an external provider, such as an MCP Client tool, has no logs of its own,
+  so its **Logs** tab shows only that entry. The agent's own **Logs** tab is unchanged.
 - **Rows appear live.** During a test run a row shows up as soon as the call starts, and fills in when
   it returns.
 - **A Task Tool sub-agent nests three levels deep.** The agent's `Task` call is a row (its **Input** is
   the prompt, its **Output** the result), the sub-agent run is nested under it, and the tools the
   sub-agent called are nested under that run. A background run's result is collected by separate Task
   output calls, which are rows under the agent.
-- **Long values are cut off.** An input or output over 65,536 characters is truncated, and ends with a
-  marker giving the original length.
+- **Long values are cut off while a test runs.** A live row's input or output over 65,536 characters is
+  truncated, and ends with a marker giving the original length. The execution detail shows the full value
+  from the call's log entry.
 - **A call waiting on a human** reads "Waiting for a response", and completes with the answer when the
-  run resumes.
+  run resumes. Its **Input** and **Output** appear on the execution detail once it completes.
 - **A background sub-agent's call** that was still running when the agent finished reads "Still running
   when the agent finished".
 - **Only tools and Task Tool sub-agents get rows.** The model, memory, RAG and guardrail elements do
