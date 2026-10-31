@@ -37,8 +37,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Mocks the collaborators of the platform-configuration facades that live in other modules: component, trigger, cluster
- * element and task dispatcher definitions (and their execution), connections, OAuth2,
- * editor temp files and job principal accessors.
+ * element and task dispatcher definitions (and their execution), connections, OAuth2, editor temp files and job
+ * principal accessors.
  *
  * @author Ivica Cardic
  */
@@ -48,7 +48,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ActionDefinitionFacade.class, ActionDefinitionService.class, ClusterElementDefinitionFacade.class,
     ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
     ConnectionService.class, EditorTempFileStorage.class, JobPrincipalAccessorRegistry.class,
-    OAuth2Service.class, TaskDispatcherDefinitionService.class, TriggerDefinitionFacade.class, TriggerDefinitionService.class
+    OAuth2Service.class, TaskDispatcherDefinitionService.class, TriggerDefinitionFacade.class,
+    TriggerDefinitionService.class
 })
 public @interface PlatformConfigurationIntTestConfigurationSharedMocks {
 }
