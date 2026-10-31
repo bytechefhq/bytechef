@@ -7,4 +7,5 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation(project(":server:libs:test:test-int-support"))
 }
