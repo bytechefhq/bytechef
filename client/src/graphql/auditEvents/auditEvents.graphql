@@ -3,6 +3,7 @@ query AuditEvents(
     $fromDate: Long
     $toDate: Long
     $search: String
+    $platform: PlatformType
     $page: Int
     $size: Int
 ) {
@@ -11,6 +12,7 @@ query AuditEvents(
         fromDate: $fromDate
         toDate: $toDate
         search: $search
+        platform: $platform
         page: $page
         size: $size
     ) {
@@ -23,6 +25,7 @@ query AuditEvents(
             eventType
             id
             outcome
+            platform
             principal
         }
         number
