@@ -155,7 +155,6 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import com.bytechef.platform.mcp.service.McpToolServiceImpl;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.security.audit.ApiKeyAuditPublisher;
 import com.bytechef.platform.security.facade.ApiKeyFacadeImpl;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.service.ApiKeyServiceImpl;
@@ -1061,7 +1060,7 @@ class EmbeddedGatesIntTest {
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        ApiKeyAuditPublisher.class, ApiKeyEnvironmentResolver.class, ApiKeyFacadeImpl.class,
+        ApiKeyEnvironmentResolver.class, ApiKeyFacadeImpl.class,
         ApiKeyOwnershipResolver.class, ApiKeyPermissionScopeProvider.class, ApiKeyServiceImpl.class,
         ApiPlatformPermissionScopeProvider.class, AppEventPermissionScopeProvider.class,
         ConnectedUserPermissionScopeProvider.class, ConnectionPermissionScopeProvider.class,
