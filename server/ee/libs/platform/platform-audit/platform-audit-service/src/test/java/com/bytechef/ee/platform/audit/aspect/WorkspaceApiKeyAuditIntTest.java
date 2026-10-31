@@ -8,12 +8,6 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditEvents;
 import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditMapper;
@@ -21,38 +15,52 @@ import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import com.bytechef.automation.configuration.repository.WorkspaceApiKeyRepository;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyServiceImpl;
+import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkspaceApiKeyAuditIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(classes = AuditIntTestConfiguration.class)
+@ActiveProfiles("testint")
+@Import({
+    PostgreSQLContainerConfiguration.class, WorkspaceApiKeyAuditIntTest.WorkspaceApiKeyRepositoryConfiguration.class,
+    WorkspaceApiKeyAuditMapper.class, WorkspaceApiKeyServiceImpl.class
+})
 class WorkspaceApiKeyAuditIntTest {
 
-    private static final long API_KEY_ID = 3L;
-    private static final long WORKSPACE_API_KEY_ID = 5L;
-    private static final long WORKSPACE_ID = 1L;
+    private static final long UNKNOWN_WORKSPACE_API_KEY_ID = Long.MAX_VALUE;
 
     @Autowired
-    private AuditEventService auditEventService;
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @Autowired
     private WorkspaceApiKeyRepository workspaceApiKeyRepository;
@@ -60,128 +68,167 @@ class WorkspaceApiKeyAuditIntTest {
     @Autowired
     private WorkspaceApiKeyService workspaceApiKeyService;
 
+    private long apiKeyId;
+    private long userId;
+    private long workspaceId;
+
     @BeforeEach
     void beforeEach() {
-        reset(auditEventService, workspaceApiKeyRepository);
+        persistenceAuditEventRepository.deleteAll();
 
-        SecurityContextHolder.getContext()
-            .setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                    "alice", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        userId = insertUser();
+        apiKeyId = insertApiKey(userId);
+        workspaceId = insertWorkspace();
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken("alice", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+
+        jdbcTemplate.update("DELETE FROM workspace_api_key WHERE workspace_id = ?", workspaceId);
+        jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", workspaceId);
+        jdbcTemplate.update("DELETE FROM api_key WHERE user_id = ?", userId);
+        jdbcTemplate.update("DELETE FROM \"user\" WHERE id = ?", userId);
     }
 
     @Test
     void testCreateRecordsTheSavedBinding() {
-        WorkspaceApiKey workspaceApiKey = createWorkspaceApiKey();
+        WorkspaceApiKey workspaceApiKey = workspaceApiKeyService.create(apiKeyId, workspaceId);
 
-        when(workspaceApiKeyRepository.save(any(WorkspaceApiKey.class))).thenReturn(workspaceApiKey);
+        Long workspaceApiKeyId = workspaceApiKey.getId();
 
-        workspaceApiKeyService.create(API_KEY_ID, WORKSPACE_ID);
+        assertThat(workspaceApiKeyRepository.findById(Objects.requireNonNull(workspaceApiKeyId))).isPresent();
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType())
             .isEqualTo(WorkspaceApiKeyAuditEvents.WORKSPACE_API_KEY_CREATED);
         assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("workspaceApiKeyId", "5")
-            .containsEntry("apiKeyId", "3")
-            .containsEntry("workspaceId", "1");
+            .containsEntry("workspaceApiKeyId", String.valueOf(workspaceApiKeyId))
+            .containsEntry("apiKeyId", String.valueOf(apiKeyId))
+            .containsEntry("workspaceId", String.valueOf(workspaceId));
     }
 
     @Test
     void testDeleteRecordsTheBindingCapturedBeforeTheDelete() {
-        WorkspaceApiKey workspaceApiKey = createWorkspaceApiKey();
+        long workspaceApiKeyId = saveWorkspaceApiKey();
 
-        when(workspaceApiKeyRepository.findById(WORKSPACE_API_KEY_ID)).thenReturn(Optional.of(workspaceApiKey));
+        workspaceApiKeyService.delete(workspaceApiKeyId);
 
-        workspaceApiKeyService.delete(WORKSPACE_API_KEY_ID);
+        assertThat(workspaceApiKeyRepository.findById(workspaceApiKeyId)).isEmpty();
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType())
             .isEqualTo(WorkspaceApiKeyAuditEvents.WORKSPACE_API_KEY_DELETED);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("workspaceApiKeyId", "5")
-            .containsEntry("apiKeyId", "3")
-            .containsEntry("workspaceId", "1");
+            .containsEntry("workspaceApiKeyId", String.valueOf(workspaceApiKeyId))
+            .containsEntry("apiKeyId", String.valueOf(apiKeyId))
+            .containsEntry("workspaceId", String.valueOf(workspaceId));
     }
 
     @Test
     void testDeleteWorkspaceApiKeyRecordsTheBindingCapturedBeforeTheDelete() {
-        WorkspaceApiKey workspaceApiKey = createWorkspaceApiKey();
+        long workspaceApiKeyId = saveWorkspaceApiKey();
 
-        when(workspaceApiKeyRepository.findByApiKeyId(API_KEY_ID)).thenReturn(Optional.of(workspaceApiKey));
+        workspaceApiKeyService.deleteWorkspaceApiKey(apiKeyId);
 
-        workspaceApiKeyService.deleteWorkspaceApiKey(API_KEY_ID);
+        assertThat(workspaceApiKeyRepository.findById(workspaceApiKeyId)).isEmpty();
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType())
             .isEqualTo(WorkspaceApiKeyAuditEvents.WORKSPACE_API_KEY_DELETED);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("workspaceApiKeyId", "5")
-            .containsEntry("apiKeyId", "3");
+            .containsEntry("workspaceApiKeyId", String.valueOf(workspaceApiKeyId))
+            .containsEntry("apiKeyId", String.valueOf(apiKeyId));
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testDeleteOfMissingBindingRecordsNothing() {
-        when(workspaceApiKeyRepository.findById(WORKSPACE_API_KEY_ID)).thenReturn(Optional.empty());
+        long workspaceApiKeyId = saveWorkspaceApiKey();
 
-        workspaceApiKeyService.delete(WORKSPACE_API_KEY_ID);
+        workspaceApiKeyService.delete(UNKNOWN_WORKSPACE_API_KEY_ID);
 
-        verify(workspaceApiKeyRepository, never()).deleteById(WORKSPACE_API_KEY_ID);
-        verify(auditEventService, never()).saveAll(any(List.class));
+        assertThat(workspaceApiKeyRepository.findById(workspaceApiKeyId)).isPresent();
+        assertThat(findAllEvents()).isEmpty();
     }
 
-    private static WorkspaceApiKey createWorkspaceApiKey() {
-        WorkspaceApiKey workspaceApiKey = mock(WorkspaceApiKey.class);
+    private List<PersistentAuditEvent> findAllEvents() {
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 25));
 
-        when(workspaceApiKey.getApiKeyId()).thenReturn(API_KEY_ID);
-        when(workspaceApiKey.getId()).thenReturn(WORKSPACE_API_KEY_ID);
-        when(workspaceApiKey.getWorkspaceId()).thenReturn(WORKSPACE_ID);
-
-        return workspaceApiKey;
+        return page.getContent();
     }
 
-    @SuppressWarnings("unchecked")
-    private PersistentAuditEvent captureSavedEvent() {
-        ArgumentCaptor<List<PersistentAuditEvent>> argumentCaptor = ArgumentCaptor.forClass(List.class);
-
-        verify(auditEventService).saveAll(argumentCaptor.capture());
-
-        List<PersistentAuditEvent> persistentAuditEvents = argumentCaptor.getValue();
+    private PersistentAuditEvent findSingleEvent() {
+        List<PersistentAuditEvent> persistentAuditEvents = findAllEvents();
 
         assertThat(persistentAuditEvents).hasSize(1);
 
         return persistentAuditEvents.getFirst();
     }
 
-    @SpringBootConfiguration
-    @EnableAspectJAutoProxy
-    @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditMapperResolver.class, WorkspaceApiKeyAuditMapper.class,
-        WorkspaceApiKeyServiceImpl.class
-    })
-    static class Config {
+    private long insertApiKey(long apiKeyUserId) {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO api_key
+                        (name, secret_key, user_id, type, environment, created_by, created_date, last_modified_by,
+                         last_modified_date)
+                    VALUES ('workspace key', 'secret', ?, 0, 0, 'test', now(), 'test', now())
+                    RETURNING id
+                    """,
+                Long.class, apiKeyUserId),
+            "api key id");
+    }
 
-        @Bean
-        AuditEventService auditEventService() {
-            return mock(AuditEventService.class);
-        }
+    private long insertUser() {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO "user"
+                        (login, password_hash, email, activated, uuid, created_by, created_date, last_modified_by,
+                         last_modified_date)
+                    VALUES ('workspace-api-key-audit', 'n/a', 'workspace-api-key-audit@example.com', true,
+                        gen_random_uuid(), 'test', now(), 'test', now())
+                    RETURNING id
+                    """,
+                Long.class),
+            "user id");
+    }
 
-        @Bean
-        WorkspaceApiKeyRepository workspaceApiKeyRepository() {
-            return mock(WorkspaceApiKeyRepository.class);
-        }
+    private long insertWorkspace() {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO workspace (name, created_date, created_by, last_modified_date, last_modified_by, version)
+                    VALUES ('workspace api key audit', now(), 'test', now(), 'test', 1)
+                    RETURNING id
+                    """,
+                Long.class),
+            "workspace id");
+    }
+
+    private long saveWorkspaceApiKey() {
+        WorkspaceApiKey workspaceApiKey = workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
+
+        return Objects.requireNonNull(workspaceApiKey.getId());
+    }
+
+    @Configuration
+    @EnableJdbcRepositories(
+        basePackageClasses = WorkspaceApiKeyRepository.class,
+        includeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WorkspaceApiKeyRepository.class))
+    static class WorkspaceApiKeyRepositoryConfiguration {
     }
 }
