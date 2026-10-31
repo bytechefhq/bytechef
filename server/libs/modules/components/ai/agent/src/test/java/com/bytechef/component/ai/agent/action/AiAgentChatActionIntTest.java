@@ -562,6 +562,11 @@ class AiAgentChatActionIntTest {
         }
 
         @Override
+        public <T> Optional<T> fetchUnlockedValue(JobResumeId jobResumeId) {
+            return fetchValue(jobResumeId);
+        }
+
+        @Override
         public void save(JobResumeId jobResumeId, Object value) {
             values.put(jobResumeId.toString(), value);
         }
