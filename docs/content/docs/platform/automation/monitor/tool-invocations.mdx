@@ -1,0 +1,99 @@
+---
+title: "Tool Invocations"
+description: "A log of the tools AI clients called through your MCP servers - which tool ran, how it ended, and how long it took."
+---
+
+When an AI client calls a tool on one of your [MCP servers](/platform/automation/deploy/mcp-servers),
+ByteChef records the call. **Tool Invocations** lists those records, so you can see which tools are
+being used, which ones fail, and how long they take. Open it from **Tool Invocations** in the left
+sidebar, next to **Workflow Executions**.
+
+The page is available on Enterprise Edition only.
+
+<Callout type="info">
+    A record holds the identity and outcome of a call only: which tool ran, through which MCP server,
+    how it ended, and how long it took. The tool's input parameters and its output are never stored.
+</Callout>
+
+---
+
+## What is recorded
+
+A record is written for every tool call an AI client makes through an MCP server in the workspace:
+
+- **Component tools** - a component action exposed as a tool, such as Slack's **Send Message**.
+- **Workflow tools** - a project workflow exposed as a tool.
+
+The call is recorded whether it succeeds or fails. A call to a tool or a server that is turned off is
+rejected before it runs and is not recorded.
+
+The page lists automation calls only. Calls made through an embedded integration are recorded
+separately and never appear here.
+
+---
+
+## The invocations table
+
+Each call is one row, newest first:
+
+| Column | What it shows |
+|---|---|
+| **Tool** | The tool name the AI client called. |
+| **Surface** | Where the call came in. On this page it is always **Automation MCP**. |
+| **Component** | The component and the operation a component tool ran, such as `slack / sendMessage`. Workflow tools show a dash. |
+| **Outcome** | How the call ended, for example `SUCCESS`, `ERROR` or `TIMEOUT`. |
+| **Duration** | How long the call took, in milliseconds. |
+| **Date** | When the call was made. |
+
+The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
+calls.
+
+---
+
+## Filter invocations
+
+| Filter | Narrows the list to |
+|---|---|
+| **Surface** | Calls that came in through one surface. |
+| **Outcome** | Calls that ended one way: Success, Error, Connection required, Timeout, Approval required or Approval denied. |
+| **MCP Server** | Calls made through one MCP server. The filter appears when the workspace has at least one MCP server. |
+| **Start date** / **End date** | Calls made within a date range. |
+
+---
+
+## Scope
+
+The list is scoped to the current workspace and the current
+[environment](/platform/automation/deploy/environments). Switching either one in the left sidebar
+reloads the list and clears the filters. A call made through an MCP server in Production does not
+appear while you are looking at Development.
+
+---
+
+## Who can see it
+
+Organization admins see every workspace's invocations. Other users see a workspace's invocations when
+their [workspace role](/platform/automation/settings/users) lets them view workflows, which the
+built-in Viewer, Editor and Admin roles all do. Connected users of an embedded integration cannot read
+the log.
+
+---
+
+## Retention
+
+Records are deleted after 90 days. A cleanup job runs once a day, at 02:30 server time. In a
+multi-tenant installation it cleans up every tenant's records, and one tenant's failure does not stop
+the others.
+
+| Property | Purpose |
+|---|---|
+| `bytechef.tool-invocation-log.retention-days` | How many days a record is kept. Defaults to `90`. |
+
+---
+
+## See also
+
+- [MCP Servers](/platform/automation/deploy/mcp-servers) - expose component actions and workflows as
+  tools to AI clients.
+- [Workflow Executions](/platform/automation/monitor/workflow-executions) - the runs started when an
+  AI client calls a workflow tool.
