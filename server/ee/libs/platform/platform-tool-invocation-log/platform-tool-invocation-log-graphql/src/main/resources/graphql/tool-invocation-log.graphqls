@@ -1,0 +1,43 @@
+extend type Query {
+    toolInvocationLogs(
+        surface: String
+        outcome: String
+        mcpServerId: Long
+        connectedUserId: Long
+        integrationInstanceId: Long
+        fromDate: Long
+        toDate: Long
+        page: Int = 0
+    ): ToolInvocationLogPageType!
+}
+
+type ToolInvocationLogType {
+    id: ID!
+    surface: String!
+    kind: String!
+    toolName: String
+    componentName: String
+    componentVersion: Int
+    operationName: String
+    connectionId: Long
+    environment: Int
+    workspaceId: Long
+    externalUserId: String
+    connectedUserId: Long
+    integrationInstanceId: Long
+    mcpServerId: Long
+    jobId: Long
+    outcome: String!
+    errorType: String
+    errorMessage: String
+    durationMs: Int!
+    createdDate: Long
+}
+
+type ToolInvocationLogPageType {
+    content: [ToolInvocationLogType!]!
+    number: Int!
+    size: Int!
+    totalElements: Int!
+    totalPages: Int!
+}

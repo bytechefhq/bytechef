@@ -344,6 +344,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-impl"))
     implementation(project(":server:ee:libs:platform:platform-security-web:platform-security-web-impl"))
+    implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-tool-invocation-log:platform-tool-invocation-log-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-graphql"))
