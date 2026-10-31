@@ -126,23 +126,7 @@ const ProjectVersionHistorySheet = ({
                         const lastItem = index === projectVersions.length - 1;
 
                         return (
-                            <li
-                                aria-disabled={!published}
-                                aria-label={`Version ${version}`}
-                                aria-selected={selected}
-                                className={twMerge('flex gap-x-3', published && 'cursor-pointer')}
-                                key={version}
-                                onClick={() => published && setSelectedVersion(version)}
-                                onKeyDown={(event) => {
-                                    if (published && (event.key === 'Enter' || event.key === ' ')) {
-                                        event.preventDefault();
-
-                                        setSelectedVersion(version);
-                                    }
-                                }}
-                                role="option"
-                                tabIndex={published ? 0 : -1}
-                            >
+                            <li className="flex gap-x-3" key={version} role="none">
                                 <div className="flex w-10 shrink-0 flex-col items-center">
                                     <span
                                         className={twMerge(
@@ -159,40 +143,57 @@ const ProjectVersionHistorySheet = ({
                                 <div
                                     className={twMerge(
                                         'flex flex-1 items-center gap-x-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
-                                        published && 'hover:border-stroke-brand-secondary-hover',
+                                        published && 'cursor-pointer hover:border-stroke-brand-secondary-hover',
                                         selected && 'border-stroke-brand-primary hover:border-stroke-brand-primary'
                                     )}
+                                    onClick={() => published && setSelectedVersion(version)}
                                 >
                                     <div className="flex min-w-0 flex-1 flex-col gap-y-2">
-                                        <div className="flex items-center gap-x-2">
-                                            {published ? (
-                                                <Badge
-                                                    className="border-transparent"
-                                                    icon={<SendIcon />}
-                                                    label="Published"
-                                                    styleType="success-outline"
-                                                    weight="semibold"
-                                                />
-                                            ) : (
-                                                <Badge
-                                                    icon={<FileIcon />}
-                                                    label="Draft"
-                                                    styleType="warning-filled"
-                                                    weight="semibold"
-                                                />
-                                            )}
+                                        <div
+                                            aria-disabled={!published}
+                                            aria-label={`Version ${version}`}
+                                            aria-selected={selected}
+                                            className="flex flex-col gap-y-2 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                                            onKeyDown={(event) => {
+                                                if (published && (event.key === 'Enter' || event.key === ' ')) {
+                                                    event.preventDefault();
 
-                                            {projectVersion.publishedDate && (
-                                                <span className="text-sm text-muted-foreground">
-                                                    {formatVersionDate(projectVersion.publishedDate)}
-                                                </span>
-                                            )}
+                                                    setSelectedVersion(version);
+                                                }
+                                            }}
+                                            role="option"
+                                            tabIndex={published ? 0 : -1}
+                                        >
+                                            <div className="flex items-center gap-x-2">
+                                                {published ? (
+                                                    <Badge
+                                                        className="border-transparent"
+                                                        icon={<SendIcon />}
+                                                        label="Published"
+                                                        styleType="success-outline"
+                                                        weight="semibold"
+                                                    />
+                                                ) : (
+                                                    <Badge
+                                                        icon={<FileIcon />}
+                                                        label="Draft"
+                                                        styleType="warning-filled"
+                                                        weight="semibold"
+                                                    />
+                                                )}
+
+                                                {projectVersion.publishedDate && (
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {formatVersionDate(projectVersion.publishedDate)}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <p className="text-sm whitespace-pre-line">
+                                                {projectVersion.description ||
+                                                    (published ? 'No description.' : 'Current working version.')}
+                                            </p>
                                         </div>
-
-                                        <p className="text-sm whitespace-pre-line">
-                                            {projectVersion.description ||
-                                                (published ? 'No description.' : 'Current working version.')}
-                                        </p>
 
                                         {expanded && (
                                             <div

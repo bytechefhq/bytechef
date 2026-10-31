@@ -198,6 +198,22 @@ describe('ProjectVersionHistorySheet', () => {
         expect(screen.getByText('Sync orders')).toBeInTheDocument();
     });
 
+    it('keeps the draft expand control and changed workflows outside the disabled draft option', () => {
+        renderSheet();
+
+        const draftOption = screen.getByRole('option', {name: 'Version 3'});
+        const draftToggle = screen.getByRole('button', {name: 'Toggle changes of version 3'});
+
+        expect(draftOption).toHaveAttribute('aria-disabled', 'true');
+        expect(draftToggle.closest('[aria-disabled="true"]')).toBeNull();
+
+        fireEvent.click(draftToggle);
+        fireEvent.click(draftOption);
+
+        expect(screen.getByRole('button', {name: /^Open changes of/}).closest('[aria-disabled="true"]')).toBeNull();
+        expect(draftOption).toHaveAttribute('aria-selected', 'false');
+    });
+
     it('does not select the version when a changed workflow is clicked', () => {
         renderSheet();
 
