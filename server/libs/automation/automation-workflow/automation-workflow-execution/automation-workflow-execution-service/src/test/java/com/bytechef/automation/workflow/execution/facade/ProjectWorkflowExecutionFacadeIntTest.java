@@ -68,6 +68,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.cache.config.CacheConfiguration;
@@ -85,13 +86,17 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentServiceImpl;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.repository.WorkflowExecutionRowRepositoryImpl;
 import com.bytechef.platform.workflow.execution.repository.converter.JobResumeIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToJobResumeIdConverter;
@@ -105,12 +110,14 @@ import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExe
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobServiceImpl;
+import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionServiceImpl;
 import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowServiceImpl;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -163,6 +170,19 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
         """;
 
+    private static final String TRIGGER_WORKFLOW_DEFINITION = """
+        {
+          "label": "Trigger Workflow",
+          "triggers": [
+            {"name": "trigger_1", "type": "webhook/v1/newRequest", "parameters": {}},
+            {"name": "trigger_2", "type": "webhook/v1/newRequest", "parameters": {}}
+          ],
+          "tasks": [
+            {"name": "task", "type": "myComponent/v1/myAction", "parameters": {"evaluated": true}}
+          ]
+        }
+        """;
+
     @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
 
@@ -196,6 +216,9 @@ class ProjectWorkflowExecutionFacadeIntTest {
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
 
+    @MockitoSpyBean
+    private ProjectWorkflowService projectWorkflowService;
+
     @MockitoBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
@@ -207,6 +230,9 @@ class ProjectWorkflowExecutionFacadeIntTest {
 
     @Autowired
     private TaskFileStorage taskFileStorage;
+
+    @Autowired
+    private TriggerExecutionService triggerExecutionService;
 
     @MockitoBean
     private TriggerFileStorage triggerFileStorage;
@@ -718,6 +744,274 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
     }
 
+    /**
+     * A project with two versions of one workflow (same uuid, a new workflow id per version), both declaring
+     * {@code trigger_1} and {@code trigger_2}, and a deployment pointing at version 2.
+     */
+    @Nested
+    class WorkflowExecutionRowsIntTest {
+
+        private String previousVersionWorkflowId;
+        private Project project;
+        private ProjectDeployment projectDeployment;
+        private String workflowId;
+        private UUID workflowUuid;
+
+        @BeforeEach
+        void beforeEach() {
+            project = createProject(workspace);
+            workflowUuid = UUID.randomUUID();
+            previousVersionWorkflowId = createWorkflowId(project, 1, workflowUuid, TRIGGER_WORKFLOW_DEFINITION);
+            workflowId = createWorkflowId(project, 2, workflowUuid, TRIGGER_WORKFLOW_DEFINITION);
+            projectDeployment = createProjectDeployment(project, "trigger-rows", 2);
+        }
+
+        @Test
+        void testAFailedJoblessTriggerBecomesARowWithoutAJob() {
+            TriggerExecution triggerExecution = saveFailedTriggerExecution(
+                getId(projectDeployment), workflowUuid.toString(), "trigger_1");
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, null, null, null, null, getId(projectDeployment), workflowId, null, getId(workspace), 0);
+
+            assertThat(page.getTotalElements()).isEqualTo(1);
+
+            WorkflowExecutionDTO row = page.getContent()
+                .getFirst();
+
+            assertThat(row.id()).isEqualTo(triggerExecution.getId());
+            assertThat(row.isTriggerOnly()).isTrue();
+            assertThat(row.job()).isNull();
+            assertThat(row.workflow()).extracting(Workflow::getId)
+                .isEqualTo(workflowId);
+            assertThat(row.projectDeployment()).extracting(ProjectDeployment::getId)
+                .isEqualTo(projectDeployment.getId());
+            assertThat(row.projectVersion()).isEqualTo(2);
+            assertThat(row.triggerExecution()).isNotNull()
+                .extracting(TriggerExecutionDTO::status)
+                .isEqualTo(TriggerExecution.Status.FAILED);
+        }
+
+        @Test
+        void testTheEncodedWorkflowExecutionIdsOfEveryDeployedTriggerReachThePageQuery() {
+            Project otherProject = createProject(workspace);
+            UUID otherWorkflowUuid = UUID.randomUUID();
+
+            createWorkflowId(otherProject, 1, otherWorkflowUuid, TRIGGER_WORKFLOW_DEFINITION);
+
+            ProjectDeployment otherProjectDeployment = createProjectDeployment(otherProject, "other", 1);
+
+            TriggerExecution firstTriggerExecution = saveFailedTriggerExecution(
+                getId(projectDeployment), workflowUuid.toString(), "trigger_1");
+            TriggerExecution secondTriggerExecution = saveFailedTriggerExecution(
+                getId(projectDeployment), workflowUuid.toString(), "trigger_2");
+
+            saveFailedTriggerExecution(getId(projectDeployment), workflowUuid.toString(), "undeclaredTrigger");
+            saveFailedTriggerExecution(getId(otherProjectDeployment), otherWorkflowUuid.toString(), "trigger_1");
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, null, null, null, null, getId(projectDeployment), workflowId, null, getId(workspace), 0);
+
+            assertThat(page.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactlyInAnyOrder(firstTriggerExecution.getId(), secondTriggerExecution.getId());
+        }
+
+        @Test
+        void testAWorkflowFilterMatchesTheRunsOfEveryVersionOfThatWorkflow() {
+            Job previousVersionJob = saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+            Job job = saveDeployedJob(workflowId, Job.Status.COMPLETED);
+
+            saveDeployedJob(createWorkflowId(project, 2, UUID.randomUUID(), WORKFLOW_DEFINITION), Job.Status.COMPLETED);
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, Job.Status.COMPLETED, null, null, null, getId(projectDeployment), workflowId, null,
+                getId(workspace), 0);
+
+            assertThat(page.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactlyInAnyOrder(previousVersionJob.getId(), job.getId());
+        }
+
+        @Test
+        void testAWorkflowFilterPinnedToAProjectVersionMatchesOnlyTheRunsOfThatVersion() {
+            saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+
+            Job job = saveDeployedJob(workflowId, Job.Status.COMPLETED);
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, Job.Status.COMPLETED, null, null, null, getId(projectDeployment), workflowId, 2,
+                getId(workspace), 0);
+
+            assertThat(page.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(job.getId());
+        }
+
+        @Test
+        void testAWorkflowFilterPinnedToAProjectVersionTheWorkflowIsNotInReturnsAnEmptyPage() {
+            saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+            saveDeployedJob(workflowId, Job.Status.COMPLETED);
+            saveFailedTriggerExecution(getId(projectDeployment), workflowUuid.toString(), "trigger_1");
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, null, null, null, null, getId(projectDeployment), workflowId, 3, getId(workspace), 0);
+
+            assertThat(page.getTotalElements()).isZero();
+        }
+
+        @Test
+        void testAProjectVersionWithoutAWorkflowFilterLeavesTheProjectFilterMatchingEveryVersion() {
+            Job previousVersionJob = saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+            Job job = saveDeployedJob(workflowId, Job.Status.COMPLETED);
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, Job.Status.COMPLETED, null, null, getId(project), getId(projectDeployment), null, 2,
+                getId(workspace), 0);
+
+            assertThat(page.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactlyInAnyOrder(previousVersionJob.getId(), job.getId());
+        }
+
+        @Test
+        void testAJobRowCarriesTheProjectVersionItRanNotTheDeploymentVersion() {
+            Job previousVersionJob = saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, null, null, null, getId(project), getId(projectDeployment), null, null, getId(workspace),
+                0);
+
+            WorkflowExecutionDTO row = page.getContent()
+                .getFirst();
+
+            assertThat(row.id()).isEqualTo(previousVersionJob.getId());
+            assertThat(row.projectVersion()).isEqualTo(1);
+            assertThat(row.projectDeployment()).extracting(ProjectDeployment::getProjectVersion)
+                .isEqualTo(2);
+        }
+
+        @Test
+        void testTheDetailOfAJobCarriesTheProjectVersionItRanNotTheDeploymentVersion() {
+            Job previousVersionJob = saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+
+            WorkflowExecutionDTO detail = facade.getWorkflowExecution(getId(previousVersionJob));
+
+            assertThat(detail.id()).isEqualTo(previousVersionJob.getId());
+            assertThat(detail.projectVersion()).isEqualTo(1);
+        }
+
+        @Test
+        void testTheDetailOfAJobWhoseWorkflowIsNotAProjectWorkflowHasNoProjectVersion() {
+            Job previousVersionJob = saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+
+            // project and project_workflow are both resolved from project_workflow.workflow_id, so a job's workflow
+            // that has a project but no project workflow row cannot be stored; the spy drops the row
+            doReturn(List.of()).when(projectWorkflowService)
+                .getWorkflowProjectWorkflows(List.of(previousVersionWorkflowId));
+
+            WorkflowExecutionDTO detail = facade.getWorkflowExecution(getId(previousVersionJob));
+
+            assertThat(detail.projectVersion()).isNull();
+        }
+
+        @Test
+        void testAWorkflowFilterOnAnIdThatIsNotAProjectWorkflowMatchesOnlyThatId() {
+            Workflow standaloneWorkflow = workflowService.create(
+                WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+            saveDeployedJob(Objects.requireNonNull(standaloneWorkflow.getId()), Job.Status.COMPLETED);
+            saveDeployedJob(previousVersionWorkflowId, Job.Status.COMPLETED);
+            saveDeployedJob(workflowId, Job.Status.COMPLETED);
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+                false, null, Job.Status.COMPLETED, null, null, null, getId(projectDeployment),
+                standaloneWorkflow.getId(), null, getId(workspace), 0);
+
+            assertThat(page.getTotalElements()).isEqualTo(1);
+        }
+
+        @Test
+        void testTriggersStayOutOfThePageWhenTheStatusFilterIsNotFailed() {
+            Job job = saveDeployedJob(workflowId, Job.Status.COMPLETED);
+            TriggerExecution triggerExecution = saveFailedTriggerExecution(
+                getId(projectDeployment), workflowUuid.toString(), "trigger_1");
+
+            Page<WorkflowExecutionDTO> completedPage = facade.getWorkflowExecutions(
+                false, null, Job.Status.COMPLETED, null, null, null, getId(projectDeployment), workflowId, null,
+                getId(workspace), 0);
+
+            assertThat(completedPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(job.getId());
+
+            Page<WorkflowExecutionDTO> unfilteredPage = facade.getWorkflowExecutions(
+                false, null, null, null, null, null, getId(projectDeployment), workflowId, null, getId(workspace), 0);
+
+            assertThat(unfilteredPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactlyInAnyOrder(job.getId(), triggerExecution.getId());
+        }
+
+        @Test
+        void testTheDetailOfATriggerExecutionWhoseWorkflowIsGoneIsNotFound() {
+            TriggerExecution triggerExecution = saveFailedTriggerExecution(
+                getId(projectDeployment), UUID.randomUUID()
+                    .toString(),
+                "trigger_1");
+
+            assertThatThrownBy(() -> facade.getTriggerExecutionWorkflowExecution(getId(triggerExecution)))
+                .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        void testTheDetailOfATriggerExecutionHasNoJobAndItsTrigger() {
+            TriggerExecution triggerExecution = saveFailedTriggerExecution(
+                getId(projectDeployment), workflowUuid.toString(), "trigger_1");
+
+            WorkflowExecutionDTO detail = facade.getTriggerExecutionWorkflowExecution(getId(triggerExecution));
+
+            assertThat(detail.id()).isEqualTo(triggerExecution.getId());
+            assertThat(detail.job()).isNull();
+            assertThat(detail.triggerExecution()).isNotNull()
+                .extracting(TriggerExecutionDTO::title)
+                .isEqualTo("Title");
+            assertThat(detail.workflow()).extracting(Workflow::getId)
+                .isEqualTo(workflowId);
+        }
+
+        private Job saveDeployedJob(String jobWorkflowId, Job.Status status) {
+            Job job = new Job();
+
+            job.setStatus(status);
+            job.setWorkflowId(jobWorkflowId);
+
+            job = jobRepository.save(job);
+
+            principalJobService.create(getId(job), getId(projectDeployment), PlatformType.AUTOMATION);
+
+            return job;
+        }
+
+        private TriggerExecution saveFailedTriggerExecution(
+            long projectDeploymentId, String triggerWorkflowUuid, String triggerName) {
+
+            WorkflowTrigger workflowTrigger = new WorkflowTrigger(
+                Map.of("name", triggerName, "type", "webhook/v1/newRequest", "parameters", Map.of()));
+
+            TriggerExecution triggerExecution = TriggerExecution.builder()
+                .status(TriggerExecution.Status.FAILED)
+                .startDate(Instant.now())
+                .workflowExecutionId(
+                    WorkflowExecutionId.of(
+                        PlatformType.AUTOMATION, projectDeploymentId, triggerWorkflowUuid, triggerName))
+                .workflowTrigger(workflowTrigger)
+                .build();
+
+            return triggerExecutionService.create(triggerExecution);
+        }
+    }
+
     private Project createProject(Workspace projectWorkspace) {
         Project project = Project.builder()
             .name("project-" + UUID.randomUUID())
@@ -728,12 +1022,16 @@ class ProjectWorkflowExecutionFacadeIntTest {
     }
 
     private ProjectDeployment createProjectDeployment(Project project, String name) {
+        return createProjectDeployment(project, name, 1);
+    }
+
+    private ProjectDeployment createProjectDeployment(Project project, String name, int projectVersion) {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
         projectDeployment.setName(name);
         projectDeployment.setProjectId(project.getId());
-        projectDeployment.setProjectVersion(1);
+        projectDeployment.setProjectVersion(projectVersion);
 
         return projectDeploymentService.create(projectDeployment);
     }
@@ -743,7 +1041,11 @@ class ProjectWorkflowExecutionFacadeIntTest {
     }
 
     private String createWorkflowId(Project project, int projectVersion, UUID workflowUuid) {
-        Workflow workflow = workflowService.create(WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+        return createWorkflowId(project, projectVersion, workflowUuid, WORKFLOW_DEFINITION);
+    }
+
+    private String createWorkflowId(Project project, int projectVersion, UUID workflowUuid, String definition) {
+        Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         String workflowId = Objects.requireNonNull(workflow.getId());
 
@@ -771,6 +1073,10 @@ class ProjectWorkflowExecutionFacadeIntTest {
 
     private static long getId(TaskExecution taskExecution) {
         return Objects.requireNonNull(taskExecution.getId());
+    }
+
+    private static long getId(TriggerExecution triggerExecution) {
+        return Objects.requireNonNull(triggerExecution.getId());
     }
 
     private static long getId(Workspace workspace) {
