@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -69,6 +70,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private final @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker;
     private final AuthorityService authorityService;
     private final UserService userService;
+    private @Nullable AuthenticationEventPublisher authenticationEventPublisher;
 
     @SuppressFBWarnings("EI2")
     public TenantAwareJwtAuthenticationFilter(
@@ -89,6 +91,11 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         this.publicUrl = publicUrl;
         this.selfIssuedTokenRevocationChecker = selfIssuedTokenRevocationChecker;
         this.userService = userService;
+    }
+
+    @SuppressFBWarnings("EI2")
+    public void setAuthenticationEventPublisher(AuthenticationEventPublisher authenticationEventPublisher) {
+        this.authenticationEventPublisher = authenticationEventPublisher;
     }
 
     @Override
@@ -197,6 +204,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         securityContext.setAuthentication(authentication);
+
+        if (authenticationEventPublisher != null) {
+            TenantContext.runWithTenantId(
+                mcpJwtIdentity.tenantId(),
+                () -> authenticationEventPublisher.publishAuthenticationSuccess(authentication));
+        }
 
         TenantContext.runWithTenantId(
             mcpJwtIdentity.tenantId(), () -> filterChain.doFilter(request, response));
