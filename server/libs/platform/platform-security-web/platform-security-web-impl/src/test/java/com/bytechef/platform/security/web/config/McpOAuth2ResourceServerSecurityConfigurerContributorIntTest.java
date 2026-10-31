@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.platform.security.web.mcp.config.McpOAuth2ResourceServerCeOnlyIntTestConfiguration;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -50,19 +51,32 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.web.servlet.MockMvc;
@@ -76,7 +90,10 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = McpOAuth2ResourceServerCeOnlyIntTestConfiguration.class,
+    classes = {
+        McpOAuth2ResourceServerCeOnlyIntTestConfiguration.class,
+        McpOAuth2ResourceServerSecurityConfigurerContributorIntTest.AuthenticationEventConfiguration.class
+    },
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(PostgreSQLContainerConfiguration.class)
 class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
@@ -87,6 +104,11 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     private static final String MCP_SERVER_SECRET_KEY = String.valueOf(TenantKey.of("public"));
     private static final String CANONICAL_ENDPOINT_PATH = "/api/management/mcp";
     private static final String MANAGEMENT_ENDPOINT_PATH = "/api/management/" + MCP_SERVER_SECRET_KEY + "/mcp";
+    private static final String CLAIM_TENANT_ID = "000001";
+    private static final String PATH_TENANT_ID = "000002";
+
+    @Autowired
+    private AuthenticationEventRecorder authenticationEventRecorder;
 
     @Autowired
     private KeyPair mcpTestSigningKeyPair;
@@ -106,6 +128,8 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
     @BeforeEach
     void beforeEach() {
         Mockito.reset(propertyService, userService);
+
+        authenticationEventRecorder.clear();
 
         Property property = mock(Property.class);
 
@@ -343,6 +367,99 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
                 .isOk());
     }
 
+    @Test
+    void testJwtAuthenticationSuccessEventCarriesThePathTenant() throws Exception {
+        String pathTenantSecretKey = String.valueOf(TenantKey.of(PATH_TENANT_ID));
+
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim(TENANT_CLAIM, CLAIM_TENANT_ID)
+                .claim("scope", "mcp:management")
+                .audience(List.of("http://localhost:" + port + "/api/management/" + pathTenantSecretKey + "/mcp"))
+                .build());
+
+        postInitialize(token, pathTenantSecretKey);
+
+        Authentication authentication = authenticationEventRecorder.getAuthentication(
+            AuthenticationSuccessEvent.class);
+
+        assertThat(authentication).isInstanceOf(JwtAuthenticationToken.class);
+        assertThat(authentication.getDetails())
+            .isInstanceOfSatisfying(
+                TenantWebAuthenticationDetails.class,
+                details -> assertThat(details.getTenantId()).isEqualTo(PATH_TENANT_ID));
+    }
+
+    @Test
+    void testCanonicalEndpointJwtAuthenticationSuccessEventCarriesTheClaimTenant() throws Exception {
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim(TENANT_CLAIM, CLAIM_TENANT_ID)
+                .claim("scope", "mcp:management")
+                .audience(List.of("http://localhost:" + port + CANONICAL_ENDPOINT_PATH))
+                .build());
+
+        postInitializeTo(CANONICAL_ENDPOINT_PATH, token);
+
+        Authentication authentication = authenticationEventRecorder.getAuthentication(
+            AuthenticationSuccessEvent.class);
+
+        assertThat(authentication.getDetails())
+            .isInstanceOfSatisfying(
+                TenantWebAuthenticationDetails.class,
+                details -> assertThat(details.getTenantId()).isEqualTo(CLAIM_TENANT_ID));
+    }
+
+    @Test
+    void testCanonicalEndpointExternalIssuerJwtAuthenticationCarriesNoTenant() throws Exception {
+        String token = sign(
+            baseClaims("https://idp.customer.test")
+                .claim(TENANT_CLAIM, CLAIM_TENANT_ID)
+                .claim("scope", "mcp:management")
+                .audience(List.of("http://localhost:" + port + CANONICAL_ENDPOINT_PATH))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitializeTo(CANONICAL_ENDPOINT_PATH, token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+
+        Authentication authentication = authenticationEventRecorder.getAuthentication(
+            AbstractAuthenticationFailureEvent.class);
+
+        assertThat(authentication.getDetails())
+            .isInstanceOfSatisfying(
+                TenantWebAuthenticationDetails.class, details -> assertThat(details.getTenantId()).isNull());
+    }
+
+    @Test
+    void testExpiredJwtAuthenticationFailureEventCarriesThePathTenant() throws Exception {
+        String pathTenantSecretKey = String.valueOf(TenantKey.of(PATH_TENANT_ID));
+
+        String token = sign(
+            baseClaims(ISSUER_URI)
+                .claim(TENANT_CLAIM, CLAIM_TENANT_ID)
+                .claim("scope", "mcp:management")
+                .audience(List.of("http://localhost:" + port + "/api/management/" + pathTenantSecretKey + "/mcp"))
+                .issueTime(Date.from(Instant.now()
+                    .minus(20, ChronoUnit.MINUTES)))
+                .expirationTime(Date.from(Instant.now()
+                    .minus(10, ChronoUnit.MINUTES)))
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(token, pathTenantSecretKey);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(401);
+
+        Authentication authentication = authenticationEventRecorder.getAuthentication(
+            AbstractAuthenticationFailureEvent.class);
+
+        assertThat(authentication).isInstanceOf(BearerTokenAuthenticationToken.class);
+        assertThat(authentication.getDetails())
+            .isInstanceOfSatisfying(
+                TenantWebAuthenticationDetails.class,
+                details -> assertThat(details.getTenantId()).isEqualTo(PATH_TENANT_ID));
+    }
+
     private MockMvc createMockMvc() {
         return MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -436,6 +553,44 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
             return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+        }
+    }
+
+    @TestConfiguration(proxyBeanMethods = false)
+    static class AuthenticationEventConfiguration {
+
+        @Bean
+        AuthenticationEventPublisher authenticationEventPublisher(
+            ApplicationEventPublisher applicationEventPublisher) {
+
+            return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+        }
+
+        @Bean
+        AuthenticationEventRecorder authenticationEventRecorder() {
+            return new AuthenticationEventRecorder();
+        }
+    }
+
+    static class AuthenticationEventRecorder implements ApplicationListener<AbstractAuthenticationEvent> {
+
+        private final List<AbstractAuthenticationEvent> authenticationEvents = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void onApplicationEvent(AbstractAuthenticationEvent authenticationEvent) {
+            authenticationEvents.add(authenticationEvent);
+        }
+
+        void clear() {
+            authenticationEvents.clear();
+        }
+
+        Authentication getAuthentication(Class<? extends AbstractAuthenticationEvent> eventType) {
+            return authenticationEvents.stream()
+                .filter(eventType::isInstance)
+                .map(AbstractAuthenticationEvent::getAuthentication)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No " + eventType.getSimpleName() + " was published"));
         }
     }
 }
