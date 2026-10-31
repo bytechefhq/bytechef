@@ -92,6 +92,8 @@ public class AuditEventRetentionJob implements SchedulingConfigurer {
             return;
         }
 
+        purgeTenantEvents(cutoff, TenantContext.DEFAULT_TENANT_ID);
+
         for (String tenantId : tenantService.getTenantIds()) {
             purgeTenantEvents(cutoff, tenantId);
         }
