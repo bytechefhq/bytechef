@@ -17,8 +17,12 @@
 package com.bytechef.platform.knowledgebase.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.knowledgebase.config.KnowledgeBaseIntTestConfiguration;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
@@ -27,12 +31,17 @@ import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentChunk
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(classes = KnowledgeBaseIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
@@ -40,6 +49,12 @@ class KnowledgeBaseFacadeIntTest {
 
     @Autowired
     private KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade;
+
+    @Autowired
+    private KnowledgeBaseFacade knowledgeBaseFacade;
+
+    @MockitoBean(name = "knowledgeBasePgVectorStore")
+    private VectorStore vectorStore;
 
     @Autowired
     private KnowledgeBaseRepository knowledgeBaseRepository;
@@ -77,6 +92,8 @@ class KnowledgeBaseFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
+        EnvironmentContext.clear();
+
         knowledgeBaseDocumentChunkRepository.deleteAll();
         knowledgeBaseDocumentRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
@@ -95,5 +112,31 @@ class KnowledgeBaseFacadeIntTest {
             knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(chunk.getId(), "Updated content");
 
         assertThat(updatedChunk.getTextContent()).isEqualTo("Updated content");
+    }
+
+    @Test
+    void testSetsEnvironmentDuringSearchAndClearsAfter() {
+        KnowledgeBase stagingKnowledgeBase = new KnowledgeBase();
+
+        stagingKnowledgeBase.setEnvironment(Environment.STAGING);
+        stagingKnowledgeBase.setName("Staging KnowledgeBase");
+
+        stagingKnowledgeBase = knowledgeBaseRepository.save(stagingKnowledgeBase);
+
+        AtomicReference<Environment> observedEnvironment = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            observedEnvironment.set(EnvironmentContext.getCurrentEnvironment());
+
+            return List.of();
+        }).when(vectorStore)
+            .similaritySearch(any(SearchRequest.class));
+
+        List<KnowledgeBaseDocumentChunk> chunks =
+            knowledgeBaseFacade.searchKnowledgeBase(stagingKnowledgeBase.getId(), "query", null);
+
+        assertThat(chunks).isEmpty();
+        assertThat(observedEnvironment.get()).isEqualTo(Environment.STAGING);
+        assertThat(EnvironmentContext.getCurrentEnvironment()).isEqualTo(Environment.PRODUCTION);
     }
 }
