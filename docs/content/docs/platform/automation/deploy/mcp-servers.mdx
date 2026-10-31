@@ -40,7 +40,7 @@ A server exposes nothing until you add components or workflows to it.
 2. **Select a component** from the available components.
 3. **Select the actions** (tools) from that component you want to expose. Only the actions you pick become callable; everything else stays hidden.
 4. If the actions need authentication, attach one of your **connections** to the component. The assistant then runs those actions using that connection's credentials.
-5. Optionally pick the component's **Required Authorities** - the roles a caller must hold, one of them at least, to see this component's tools when the server has [Enforce tool authorization](#enforce-tool-authorization) on. The list of authorities is available on the Enterprise Edition.
+5. Optionally pick the component's **Required Authorities** - the roles a caller must hold, one of them at least, to see this component's tools when the server has [Enforce tool authorization](#enforce-tool-authorization) on. The list of authorities is available on the Enterprise Edition, and the picker is shown only when the `ff-6383` feature flag is on.
 
 You can add multiple components to one server, and enable or disable individual tools at any time: each tool row has a **Configure** button, its own **Enabled** toggle and an actions menu (**⋮**), and a disabled tool disappears from the server's tool list - connected assistants no longer see or can call it, as if it did not exist. Existing and newly added tools default to enabled. Switching a tool is a change to the workspace's MCP server, so it needs permission to edit that workspace's MCP servers. This complements the server-level toggle, which turns the whole server on or off at once. **Configure** opens the properties panel below, and the actions menu holds **Delete**.
 
@@ -139,6 +139,10 @@ Each MCP server has a **Require authentication** checkbox, in both the create an
 Keep the URL secret private in both modes - it is the server's only protection when authentication is off.
 
 ### Enforce tool authorization
+
+<Callout title="Availability">
+    Tool authorization is behind the `ff-6383` feature flag. When the flag is off, the **Enforce tool authorization** toggle and the components' **Required Authorities** picker are hidden.
+</Callout>
 
 Editing an existing server also offers **Enforce tool authorization**. With it on, a component's tools are listed and callable only for callers holding at least one of the component's [Required Authorities](#expose-component-actions); a component without any is hidden, and so is every workflow tool. The caller's authorities are those of the API key's owner, or those mapped from the JWT.
 
