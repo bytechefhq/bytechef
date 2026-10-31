@@ -100,7 +100,17 @@ Open **Settings → Project → Project History** to review the project's versio
 
 {/* TODO screenshot: the Project Version History sheet with version accordion entries */}
 
-Each entry shows the version number (`V<n>`), the published date, and a status badge (**PUBLISHED** or **DRAFT**). The draft entry is not expandable; published entries expand to show their details.
+Each entry shows the version number (`V<n>`), the published date, and a status badge (**PUBLISHED** or **DRAFT**). Every entry, the draft included, expands to show its details.
+
+An expanded entry also lists the workflows that changed in that version compared with the previous version: each added, removed or modified workflow with its change count, under a summary such as "3 workflows changed (1 added, 2 modified)". The draft is compared with the last published version.
+
+Click a workflow in the list to open its changes in a dialog with three tabs:
+
+- **Changes** - the trigger, task, cluster element, input and output changes, with old → new values for every changed parameter.
+- **Definition** - a side-by-side diff of the workflow definition.
+- **Canvas** - a read-only canvas of the workflow with added nodes in green, modified nodes in amber, moved nodes in blue and removed nodes in red. A toggle switches between the previous and the selected version.
+
+Values of sensitive parameters such as passwords, tokens and API keys are shown as `••••••`.
 
 ### Testing a workflow
 
