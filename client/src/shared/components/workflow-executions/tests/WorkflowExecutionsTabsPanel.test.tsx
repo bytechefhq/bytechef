@@ -151,6 +151,62 @@ describe('WorkflowExecutionsTabsPanel', () => {
         jobFileLogsQueryMock.mockReset();
     });
 
+    it("reads a foreground sub-agent run's input and output from its Task call's log entry", () => {
+        jobFileLogsQueryMock.mockImplementation(
+            (variables: {filter: {clusterElementCallId: string} | null}, options: {enabled: boolean}) => {
+                if (!options.enabled) {
+                    return undefined;
+                }
+
+                if (variables.filter?.clusterElementCallId === 's') {
+                    return {data: {jobFileLogs: {content: []}}, isLoading: false};
+                }
+
+                return {
+                    data: {
+                        jobFileLogs: {
+                            content: [
+                                {
+                                    message: JSON.stringify({
+                                        inputs: {description: 'Find it', prompt: 'Find the thing'},
+                                        output: '"found it"',
+                                        toolName: 'Task',
+                                    }),
+                                },
+                            ],
+                        },
+                    },
+                    isLoading: false,
+                };
+            }
+        );
+
+        const subagentRun = {
+            ...taskExecution,
+            clusterElementCallId: 's',
+            id: 's',
+            output: undefined,
+            parentTaskExecutionId: '10',
+            subagentTaskCallId: 't',
+        } as unknown as TaskExecution;
+
+        renderPanel({activeTab: 'input', job, selectedItem: subagentRun});
+
+        expect(jobFileLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                filter: {clusterElementCallId: 't', searchText: '"toolName":', taskExecutionId: '10'},
+            }),
+            {enabled: true}
+        );
+        expect(screen.getByTestId('json-view')).toHaveTextContent('{"prompt":"Find the thing"}');
+
+        renderPanel({activeTab: 'output', job, selectedItem: subagentRun});
+
+        expect(screen.getAllByText('found it')).not.toHaveLength(0);
+
+        jobFileLogsQueryMock.mockReset();
+    });
+
     it('has no logs to read when there is neither a job nor a trigger execution', () => {
         renderPanel({activeTab: 'logs', selectedItem: undefined, triggerExecution: undefined});
 

@@ -18,10 +18,24 @@ interface UseClusterElementCallValuesProps {
     jobId?: string;
 }
 
+interface UseToolCallLogEntriesProps {
+    clusterElementCallId?: string;
+    enabled: boolean;
+    isEditorEnvironment?: boolean;
+    jobId?: string;
+    taskExecutionId?: string;
+}
+
 interface ClusterElementCallValuesI {
     input?: unknown;
     isLoading: boolean;
     output?: unknown;
+}
+
+interface ToolCallLogEntriesI {
+    entries: ToolCallLogEntryI[];
+    isLoaded: boolean;
+    isLoading: boolean;
 }
 
 const parseValue = (value: unknown) => {
@@ -55,21 +69,23 @@ const parseToolCallLogEntry = (message: string): ToolCallLogEntryI | undefined =
     return undefined;
 };
 
-export default function useClusterElementCallValues({
-    callExecution,
+const findInput = (entries: ToolCallLogEntryI[]) => entries.findLast((entry) => entry.inputs != null)?.inputs;
+
+const findOutput = (entries: ToolCallLogEntryI[]) => entries.findLast((entry) => entry.output != null)?.output;
+
+const getPrompt = (inputs: unknown) =>
+    inputs && typeof inputs === 'object' && 'prompt' in inputs ? {prompt: inputs.prompt} : inputs;
+
+function useToolCallLogEntries({
+    clusterElementCallId,
+    enabled,
     isEditorEnvironment,
     jobId,
-}: UseClusterElementCallValuesProps): ClusterElementCallValuesI {
-    const hasOwnValues = callExecution?.input !== undefined || callExecution?.output !== undefined;
-    const enabled = !!callExecution && !hasOwnValues && !!jobId;
-
+    taskExecutionId,
+}: UseToolCallLogEntriesProps): ToolCallLogEntriesI {
     const queryVariables = {
-        filter: callExecution
-            ? {
-                  clusterElementCallId: callExecution.clusterElementCallId,
-                  searchText: TOOL_CALL_LOG_ENTRY_TEXT,
-                  taskExecutionId: callExecution.parentTaskExecutionId,
-              }
+        filter: clusterElementCallId
+            ? {clusterElementCallId, searchText: TOOL_CALL_LOG_ENTRY_TEXT, taskExecutionId}
             : null,
         jobId: jobId || '',
         page: 0,
@@ -86,7 +102,7 @@ export default function useClusterElementCallValues({
 
     const isLoading = enabled && (isEditorEnvironment ? editorQuery.isLoading : productionQuery.isLoading);
 
-    const toolCallLogEntries = useMemo(
+    const entries = useMemo(
         () =>
             (logEntries ?? [])
                 .map((logEntry) => parseToolCallLogEntry(logEntry.message))
@@ -94,16 +110,51 @@ export default function useClusterElementCallValues({
         [logEntries]
     );
 
-    const inputEntry = toolCallLogEntries.findLast((entry) => entry.inputs != null);
-    const outputEntry = toolCallLogEntries.findLast((entry) => entry.output != null);
+    return {entries, isLoaded: enabled && logEntries !== undefined, isLoading};
+}
+
+export default function useClusterElementCallValues({
+    callExecution,
+    isEditorEnvironment,
+    jobId,
+}: UseClusterElementCallValuesProps): ClusterElementCallValuesI {
+    const hasOwnValues = callExecution?.input !== undefined || callExecution?.output !== undefined;
+    const enabled = !!callExecution && !hasOwnValues && !!jobId;
+
+    const ownEntries = useToolCallLogEntries({
+        clusterElementCallId: callExecution?.clusterElementCallId,
+        enabled,
+        isEditorEnvironment,
+        jobId,
+        taskExecutionId: callExecution?.parentTaskExecutionId,
+    });
+
+    const subagentTaskCallId = callExecution?.subagentTaskCallId;
+    const readsTaskCall = ownEntries.isLoaded && ownEntries.entries.length === 0 && !!subagentTaskCallId;
+
+    const taskCallEntries = useToolCallLogEntries({
+        clusterElementCallId: subagentTaskCallId,
+        enabled: readsTaskCall,
+        isEditorEnvironment,
+        jobId,
+        taskExecutionId: callExecution?.parentTaskExecutionId,
+    });
 
     if (!callExecution || hasOwnValues) {
         return {input: callExecution?.input, isLoading: false, output: callExecution?.output};
     }
 
+    if (readsTaskCall) {
+        return {
+            input: getPrompt(findInput(taskCallEntries.entries)),
+            isLoading: taskCallEntries.isLoading,
+            output: parseValue(findOutput(taskCallEntries.entries)),
+        };
+    }
+
     return {
-        input: inputEntry?.inputs,
-        isLoading,
-        output: parseValue(outputEntry?.output),
+        input: findInput(ownEntries.entries),
+        isLoading: ownEntries.isLoading,
+        output: parseValue(findOutput(ownEntries.entries)),
     };
 }
