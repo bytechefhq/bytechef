@@ -327,6 +327,32 @@ class RequestTriggerApiControllerIntTest {
     }
 
     @Test
+    @WithMockUser(username = "user-1")
+    void testReferenceWhoseDeploymentWorkflowIsDisabledReturnsTheSameNotFoundAsAUserDisabledReference() {
+        stubConnectedUser("user-1", 1L);
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-40"), any()))
+            .thenReturn(List.of());
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-41"), any()))
+            .thenReturn(List.of());
+        when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of(referenceFor("uuid-40", 46L, true, false), referenceFor("uuid-41", 46L, false, false)));
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(46L, "uuid-40"))
+            .thenReturn(Optional.of("automation-workflow-40"));
+        when(workflowService.getWorkflow("automation-workflow-40"))
+            .thenReturn(requestTriggerWorkflow("trigger_40"));
+        when(webhookWorkflowExecutor.isWorkflowDisabled(any()))
+            .thenReturn(true);
+
+        EntityExchangeResult<Void> administratorDisabledResult = expectNotFoundWithoutBody("uuid-40");
+        EntityExchangeResult<Void> userDisabledResult = expectNotFoundWithoutBody("uuid-41");
+
+        assertIdenticalResponses(administratorDisabledResult, userDisabledResult);
+
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
     @WithMockUser(username = "login-a")
     void testCrossUserResolutionUsesOnlyTheCallersConnectedUserIdentity() {
         stubConnectedUser("login-a", 10L);
@@ -383,6 +409,36 @@ class RequestTriggerApiControllerIntTest {
 
         verify(connectedUserWorkflowReferenceFacade).getConnectedUserWorkflows(1L);
         verifyNoMoreInteractions(connectedUserWorkflowReferenceFacade);
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testOwnCopyWhoseDeploymentWorkflowIsDisabledReturnsNotFound() {
+        stubConnectedUser("user-1", 1L);
+
+        when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
+            .thenReturn(List.of(copyModeFor(200L, true, false)));
+
+        ProjectWorkflow projectWorkflow = new ProjectWorkflow(
+            6L, 2, "copy-wf-1", UUID.fromString("00000000-0000-0000-0000-000000000201"));
+
+        when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(),
+            eq(projectWorkflow.getUuidAsString()), any()))
+                .thenReturn(List.of());
+        when(projectWorkflowService.getProjectWorkflow(200L))
+            .thenReturn(projectWorkflow);
+        when(projectDeploymentService.getProjectDeploymentId(6L, Environment.PRODUCTION))
+            .thenReturn(500L);
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(500L, projectWorkflow.getUuidAsString()))
+            .thenReturn(Optional.of("copy-wf-1"));
+        when(workflowService.getWorkflow("copy-wf-1"))
+            .thenReturn(requestTriggerWorkflow("trigger_copy"));
+        when(webhookWorkflowExecutor.isWorkflowDisabled(any()))
+            .thenReturn(true);
+
+        expectNotFoundWithoutBody(projectWorkflow.getUuidAsString());
+
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
     }
 
     @Test
