@@ -7,17 +7,16 @@
 
 package com.bytechef.ee.embedded.connected.user.security;
 
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import org.springframework.stereotype.Component;
 
 /**
- * Connected-user checks for {@code @PreAuthorize} expressions, referenced as {@code @connectedUserSecurity}.
- *
  * @version ee
  *
  * @author Ivica Cardic
  */
-@Component("connectedUserSecurity")
-public class ConnectedUserSecurity {
+@Component
+public class ConnectedUserSecurity implements MethodSecurityExpressionContributor {
 
     public boolean isConnectedUser() {
         return ConnectedUserAuthentications.isConnectedUser();

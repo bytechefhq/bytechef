@@ -31,6 +31,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
@@ -298,8 +300,11 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         }
 
         @Bean
-        static MethodSecurityExpressionHandler methodSecurityExpressionHandler(PermissionService permissionService) {
-            return new AutomationMethodSecurityExpressionHandler(permissionService);
+        static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+            PermissionService permissionService,
+            ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
+            return new AutomationMethodSecurityExpressionHandler(
+                permissionService, methodSecurityExpressionContributorProvider);
         }
 
         @Bean
