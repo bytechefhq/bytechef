@@ -141,7 +141,7 @@ class IntegrationInstanceAdminFacadeIntTest {
     }
 
     @Test
-    void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndNonAdmins() {
+    void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndMembersWithoutTheManageScope() {
         authenticate(
             new EmbeddedApiKeyAuthenticationToken(
                 Environment.PRODUCTION.ordinal(), 1L, new User("external-user-1", "", List.of()), false));
@@ -153,7 +153,7 @@ class IntegrationInstanceAdminFacadeIntTest {
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_MANAGE")).thenReturn(false);
 
         assertThatThrownBy(
             () -> integrationInstanceAdminFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of()))
@@ -163,21 +163,20 @@ class IntegrationInstanceAdminFacadeIntTest {
     }
 
     @Test
-    void testProvisionIntegrationInstanceDelegatesForTenantAdmin() {
+    void testProvisionIntegrationInstanceDelegatesForAMemberWithTheManageScope() {
         authenticate(
-            new UsernamePasswordAuthenticationToken(
-                "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+            new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_MANAGE")).thenReturn(true);
 
         integrationInstanceAdminFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
 
         verify(connectedUserIntegrationFacade).provisionIntegrationInstance(
-            1L, 2L, Map.of("key", "v"), List.of(), "admin");
+            1L, 2L, Map.of("key", "v"), List.of(), "user");
     }
 
     @Test
-    void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndNonAdmins() {
+    void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndMembersWithoutTheViewScope() {
         authenticate(
             new EmbeddedApiKeyAuthenticationToken(
                 Environment.PRODUCTION.ordinal(), 1L, new User("external-user-1", "", List.of()), false));
@@ -188,7 +187,7 @@ class IntegrationInstanceAdminFacadeIntTest {
         authenticate(
             new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_VIEW")).thenReturn(false);
 
         assertThatThrownBy(() -> integrationInstanceAdminFacade.getProvisionableIntegrations(1L))
             .isInstanceOf(AccessDeniedException.class);
@@ -197,12 +196,11 @@ class IntegrationInstanceAdminFacadeIntTest {
     }
 
     @Test
-    void testGetProvisionableIntegrationsDelegatesForTenantAdmin() {
+    void testGetProvisionableIntegrationsDelegatesForAMemberWithTheViewScope() {
         authenticate(
-            new UsernamePasswordAuthenticationToken(
-                "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+            new UsernamePasswordAuthenticationToken("user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_VIEW")).thenReturn(true);
 
         integrationInstanceAdminFacade.getProvisionableIntegrations(1L);
 
