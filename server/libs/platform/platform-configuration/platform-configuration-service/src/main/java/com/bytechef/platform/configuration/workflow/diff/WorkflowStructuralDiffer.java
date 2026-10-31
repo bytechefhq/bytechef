@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.dto.WorkflowDefinitionValueChange;
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeKind;
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -67,8 +68,7 @@ public class WorkflowStructuralDiffer {
         }
 
         Map<String, WorkflowNode> oldNodes = index(WorkflowNodeCollector.collect(oldDefinition));
-        List<WorkflowNode> newNodeList = WorkflowNodeCollector.collect(newDefinition);
-        Map<String, WorkflowNode> newNodes = index(newNodeList);
+        Map<String, WorkflowNode> newNodes = index(WorkflowNodeCollector.collect(newDefinition));
 
         List<Set<WorkflowNodeChangeTarget>> groups = List.of(
             Set.of(
@@ -79,12 +79,15 @@ public class WorkflowStructuralDiffer {
         Set<String> movedKeys = findMovedKeys(oldNodes, newNodes);
 
         for (Set<WorkflowNodeChangeTarget> group : groups) {
-            for (WorkflowNode newNode : newNodeList) {
+            for (Map.Entry<String, WorkflowNode> newEntry : newNodes.entrySet()) {
+                String nodeKey = newEntry.getKey();
+                WorkflowNode newNode = newEntry.getValue();
+
                 if (!group.contains(newNode.target())) {
                     continue;
                 }
 
-                WorkflowNode oldNode = oldNodes.get(key(newNode));
+                WorkflowNode oldNode = oldNodes.get(nodeKey);
 
                 if (oldNode == null) {
                     changes.add(toChange(WorkflowNodeChangeKind.ADDED, newNode, List.of()));
@@ -93,7 +96,7 @@ public class WorkflowStructuralDiffer {
 
                     compareValues("", oldNode.attributes(), newNode.attributes(), valueChanges);
 
-                    if (movedKeys.contains(key(newNode))) {
+                    if (movedKeys.contains(nodeKey)) {
                         changes.add(toChange(WorkflowNodeChangeKind.MOVED, newNode, valueChanges));
                     } else if (!valueChanges.isEmpty()) {
                         changes.add(toChange(WorkflowNodeChangeKind.MODIFIED, newNode, valueChanges));
@@ -101,8 +104,10 @@ public class WorkflowStructuralDiffer {
                 }
             }
 
-            for (WorkflowNode oldNode : oldNodes.values()) {
-                if (group.contains(oldNode.target()) && !newNodes.containsKey(key(oldNode))) {
+            for (Map.Entry<String, WorkflowNode> oldEntry : oldNodes.entrySet()) {
+                WorkflowNode oldNode = oldEntry.getValue();
+
+                if (group.contains(oldNode.target()) && !newNodes.containsKey(oldEntry.getKey())) {
                     changes.add(toChange(WorkflowNodeChangeKind.REMOVED, oldNode, List.of()));
                 }
             }
@@ -172,16 +177,17 @@ public class WorkflowStructuralDiffer {
 
     private static Map<String, WorkflowNode> index(List<WorkflowNode> nodes) {
         Map<String, WorkflowNode> indexedNodes = new LinkedHashMap<>();
+        Map<String, Integer> occurrences = new HashMap<>();
 
         for (WorkflowNode node : nodes) {
-            indexedNodes.putIfAbsent(key(node), node);
+            String nameKey = node.target() + ":" + node.name();
+
+            int occurrence = occurrences.merge(nameKey, 1, Integer::sum) - 1;
+
+            indexedNodes.put(occurrence == 0 ? nameKey : nameKey + "#" + occurrence, node);
         }
 
         return indexedNodes;
-    }
-
-    private static String key(WorkflowNode node) {
-        return node.target() + ":" + node.name();
     }
 
     private static void compareValues(

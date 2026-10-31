@@ -364,6 +364,35 @@ class WorkflowStructuralDifferTest {
             .valueChanges()).containsExactly(new WorkflowDefinitionValueChange("settings.retry", "1", "2"));
     }
 
+    @Test
+    void testDuplicateNodeNamesArePairedByOccurrence() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(nested("a", "first"), nested("a", "second"))),
+            Map.of("tasks", List.of(nested("a", "first"), nested("a", "changed"))));
+
+        assertThat(changes).hasSize(1);
+
+        WorkflowDefinitionChange change = changes.get(0);
+
+        assertThat(change.kind()).isEqualTo(WorkflowNodeChangeKind.MODIFIED);
+        assertThat(change.name()).isEqualTo("a");
+        assertThat(change.valueChanges()).containsExactly(
+            new WorkflowDefinitionValueChange("parameters.p", "\"second\"", "\"changed\""));
+    }
+
+    @Test
+    void testRemovedDuplicateNodeNameIsReportedOnce() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(nested("a", "first"), nested("a", "second"))),
+            Map.of("tasks", List.of(nested("a", "first"))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.REMOVED);
+        assertThat(changes.get(0)
+            .name()).isEqualTo("a");
+    }
+
     private static Map<String, Object> nested(String name, String parameterValue) {
         return Map.of("name", name, "type", "a/v1/b", "parameters", Map.of("p", parameterValue));
     }
