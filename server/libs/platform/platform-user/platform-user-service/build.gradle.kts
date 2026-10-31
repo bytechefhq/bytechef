@@ -23,6 +23,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(project(":server:libs:config:cache-config"))
     testImplementation(project(":server:libs:core:encryption:encryption-api"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:config:jdbc-config"))
