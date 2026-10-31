@@ -34,7 +34,7 @@ const AuditEventDetailSheet = ({auditEvent, onOpenChange, open}: AuditEventDetai
                     <SheetCloseButton />
                 </header>
 
-                <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-3">
+                <div className="m-3 flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto rounded-lg bg-surface-neutral-primary p-3">
                     {auditEvent && (
                         <>
                             <dl className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2 text-sm">
