@@ -78,4 +78,6 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 }
