@@ -49,4 +49,16 @@ public class McpIntegrationComponentServiceImpl implements McpIntegrationCompone
     public List<McpIntegrationComponent> getIntegrationMcpIntegrationComponents(long integrationId) {
         return mcpIntegrationComponentRepository.findAllByIntegrationId(integrationId);
     }
+
+    @Override
+    public McpIntegrationComponent update(long mcpComponentId, long integrationId) {
+        McpIntegrationComponent mcpIntegrationComponent = mcpIntegrationComponentRepository
+            .findByMcpComponentId(mcpComponentId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "MCP component %s is not bound to an integration".formatted(mcpComponentId)));
+
+        mcpIntegrationComponent.setIntegrationId(integrationId);
+
+        return mcpIntegrationComponentRepository.save(mcpIntegrationComponent);
+    }
 }

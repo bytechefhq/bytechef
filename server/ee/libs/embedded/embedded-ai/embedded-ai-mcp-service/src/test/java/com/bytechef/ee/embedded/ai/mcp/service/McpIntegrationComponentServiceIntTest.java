@@ -112,6 +112,26 @@ class McpIntegrationComponentServiceIntTest {
     }
 
     @Test
+    void testUpdateMovesTheBindingToAnotherIntegration() {
+        mcpIntegrationComponentService.create(mcpComponentId, gmailIntegrationId);
+
+        mcpIntegrationComponentService.update(mcpComponentId, gmailCodeIntegrationId);
+
+        assertThat(mcpIntegrationComponentService.fetchMcpIntegrationComponent(mcpComponentId))
+            .hasValueSatisfying(mcpIntegrationComponent -> assertThat(mcpIntegrationComponent.getIntegrationId())
+                .isEqualTo(gmailCodeIntegrationId));
+        assertThat(mcpIntegrationComponentService.getIntegrationMcpIntegrationComponents(gmailIntegrationId))
+            .isEmpty();
+    }
+
+    @Test
+    void testUpdateRejectsAnUnboundComponent() {
+        assertThatThrownBy(() -> mcpIntegrationComponentService.update(mcpComponentId, gmailCodeIntegrationId))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("is not bound to an integration");
+    }
+
+    @Test
     void testDeletingTheMcpComponentDeletesItsBinding() {
         mcpIntegrationComponentService.create(mcpComponentId, gmailIntegrationId);
 
