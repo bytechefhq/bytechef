@@ -31,6 +31,6 @@ class ToolExecutionKindTest {
         assertThat(Arrays.stream(ToolExecutionKind.values())
             .map(Enum::name)
             .toList())
-                .containsExactly("COMPONENT", "WORKFLOW");
+                .containsExactly("COMPONENT", "WORKFLOW", "CONTRIBUTED", "MANAGEMENT_TOOL");
     }
 }

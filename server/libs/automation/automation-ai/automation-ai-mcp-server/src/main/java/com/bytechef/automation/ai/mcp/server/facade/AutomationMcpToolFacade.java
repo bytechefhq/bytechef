@@ -280,7 +280,8 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
             return toolExecutionRecorder.record(
                 ToolExecutionEvent
-                    .builder(ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, toolName)
+                    .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT,
+                        toolName)
                     .componentName(componentName)
                     .componentVersion(componentVersion)
                     .operationName(clusterElementName)
@@ -334,7 +335,8 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
             return toolExecutionRecorder.record(
                 ToolExecutionEvent
-                    .builder(ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW, toolName)
+                    .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW,
+                        toolName)
                     .mcpServerId(mcpServerId)
                     .workspaceId(workspaceId)
                     .jobId(jobId),

@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +57,8 @@ class ToolExecutionRecorderTest {
 
         Object result = toolExecutionRecorder.record(
             ToolExecutionEvent.builder(
-                ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, "slack_sendMessage"),
+                PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT,
+                "slack_sendMessage"),
             () -> output);
 
         assertThat(result).isSameAs(output);
@@ -67,6 +69,7 @@ class ToolExecutionRecorderTest {
         assertThat(event.surface()).isEqualTo(ToolExecutionSurface.MCP_AUTOMATION);
         assertThat(event.kind()).isEqualTo(ToolExecutionKind.COMPONENT);
         assertThat(event.toolName()).isEqualTo("slack_sendMessage");
+        assertThat(event.type()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(event.errorType()).isNull();
     }
 
@@ -75,7 +78,8 @@ class ToolExecutionRecorderTest {
         IllegalStateException failure = new IllegalStateException("boom");
 
         ToolExecutionEvent.Builder toolExecutionEventBuilder = ToolExecutionEvent.builder(
-            ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, "slack_sendMessage");
+            PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT,
+            "slack_sendMessage");
 
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(
@@ -95,7 +99,7 @@ class ToolExecutionRecorderTest {
     @Test
     void testRecordTimeoutIsClassifiedFromCauseChain() {
         ToolExecutionEvent.Builder toolExecutionEventBuilder = ToolExecutionEvent.builder(
-            ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW, "runWorkflow");
+            PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW, "runWorkflow");
 
         assertThatExceptionOfType(CompletionException.class)
             .isThrownBy(
@@ -109,11 +113,24 @@ class ToolExecutionRecorderTest {
     }
 
     @Test
+    void testRecordEventPublishesDirectly() {
+        ToolExecutionEvent connectionRequired = ToolExecutionEvent.builder(
+            PlatformType.EMBEDDED, ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionKind.COMPONENT, "slack_sendMessage")
+            .outcome(ToolExecutionOutcome.CONNECTION_REQUIRED)
+            .build();
+
+        toolExecutionRecorder.record(connectionRequired);
+
+        assertThat(capturePublishedEvent()).isSameAs(connectionRequired);
+    }
+
+    @Test
     void testErrorMessageIsTruncated() {
         String longMessage = "x".repeat(ToolExecutionEvent.ERROR_MESSAGE_MAX_LENGTH + 100);
 
         ToolExecutionEvent.Builder toolExecutionEventBuilder = ToolExecutionEvent.builder(
-            ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT, "slack_sendMessage");
+            PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.COMPONENT,
+            "slack_sendMessage");
 
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(

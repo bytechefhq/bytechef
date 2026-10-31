@@ -74,6 +74,11 @@ public class ToolExecutionRecorderImpl implements ToolExecutionRecorder {
         }
     }
 
+    @Override
+    public void record(ToolExecutionEvent event) {
+        emit(event);
+    }
+
     private void emit(ToolExecutionEvent event) {
         try {
             MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable();
@@ -90,8 +95,9 @@ public class ToolExecutionRecorderImpl implements ToolExecutionRecorder {
 
             if (log.isDebugEnabled()) {
                 log.debug(
-                    "Tool invocation surface={} kind={} tool={} outcome={} durationMs={}",
-                    event.surface(), event.kind(), event.toolName(), event.outcome(), event.durationMs());
+                    "Tool invocation type={} surface={} kind={} tool={} outcome={} durationMs={}",
+                    event.type(), event.surface(), event.kind(), event.toolName(), event.outcome(),
+                    event.durationMs());
             }
 
             applicationEventPublisher.publishEvent(event);

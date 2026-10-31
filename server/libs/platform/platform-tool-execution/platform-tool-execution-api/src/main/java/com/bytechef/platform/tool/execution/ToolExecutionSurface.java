@@ -21,5 +21,9 @@ package com.bytechef.platform.tool.execution;
  */
 public enum ToolExecutionSurface {
 
-    MCP_AUTOMATION
+    MCP_AUTOMATION,
+    MCP_EMBEDDED,
+    MCP_MANAGEMENT,
+    EMBEDDED_API_ACTION,
+    EMBEDDED_API_TOOL
 }
