@@ -7,8 +7,10 @@ import {twMerge} from 'tailwind-merge';
 
 import {extractClusterElementIcons} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
+import {useWorkflowChangeHighlight} from '../providers/workflowChangeHighlightContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
+import getChangeHighlightBorderClassName from '../utils/getChangeHighlightBorderClassName';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
 import {CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET, REGULAR_NODE_HANDLE_OFFSET} from '../utils/postDagreConstraints';
 import DisabledNodeBadge from './DisabledNodeBadge';
@@ -20,9 +22,11 @@ const MAX_VISIBLE_CLUSTER_ELEMENT_ICONS = 5;
 const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
+    const changeHighlights = useWorkflowChangeHighlight();
     const workflowTestNodeStates = useWorkflowTestNodeStates();
 
-    const testNodeState = workflowTestNodeStates[data.workflowNodeName];
+    const changeKind = changeHighlights ? changeHighlights[data.workflowNodeName || data.name] : undefined;
+    const testNodeState = changeHighlights ? undefined : workflowTestNodeStates[data.workflowNodeName];
 
     const clusterElementIcons = useMemo(() => {
         if (!data.clusterElements || Array.isArray(data.clusterElements)) {
@@ -58,12 +62,15 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
                 'relative flex cursor-grab items-center justify-center',
                 data.isEffectivelyDisabled && 'opacity-50 grayscale'
             )}
+            data-change-kind={changeKind}
         >
             <div
                 className={twMerge(
                     'relative flex items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow-sm',
                     clusterElementIcons.length ? 'h-auto min-h-18 flex-col' : 'size-18',
-                    getTestNodeStateBorderClassName(testNodeState)
+                    changeHighlights
+                        ? getChangeHighlightBorderClassName(changeKind)
+                        : getTestNodeStateBorderClassName(testNodeState)
                 )}
             >
                 {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
