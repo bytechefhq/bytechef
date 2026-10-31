@@ -45,9 +45,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Pins the CE behavior of {@link PermissionServiceImpl} against the real {@code ResourceOwnershipResolver} beans and
- * persisted rows: workspace checks are permissive for any authenticated caller, {@code hasResourceScope} enforces
- * owner isolation for owner-carrying resources, is permissive for workspace-mapped resources, and fails closed when
- * nothing is resolvable.
+ * persisted rows: workspace checks are permissive for any authenticated caller, {@code hasResourceScope} enforces owner
+ * isolation for owner-carrying resources, is permissive for workspace-mapped resources, and fails closed when nothing
+ * is resolvable.
  *
  * @author Ivica Cardic
  */
@@ -242,7 +242,8 @@ class PermissionServiceIntTest {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
         securityContext.setAuthentication(
-            new UsernamePasswordAuthenticationToken(username, username, List.of(new SimpleGrantedAuthority(authority))));
+            new UsernamePasswordAuthenticationToken(username, username,
+                List.of(new SimpleGrantedAuthority(authority))));
 
         SecurityContextHolder.setContext(securityContext);
     }
