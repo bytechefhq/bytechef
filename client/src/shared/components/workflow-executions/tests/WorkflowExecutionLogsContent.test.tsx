@@ -126,6 +126,24 @@ describe('WorkflowExecutionLogsContent', () => {
         expect(triggerExecutionFileLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
     });
 
+    it('filters the logs to a tool call', () => {
+        render(<WorkflowExecutionLogsContent clusterElementCallId="a" jobId="1" taskExecutionId="10" />);
+
+        expect(jobFileLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({filter: {clusterElementCallId: 'a', taskExecutionId: '10'}, jobId: '1'}),
+            {enabled: true}
+        );
+
+        render(
+            <WorkflowExecutionLogsContent clusterElementCallId="a" isEditorEnvironment jobId="1" taskExecutionId="10" />
+        );
+
+        expect(editorJobFileLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({filter: {clusterElementCallId: 'a', taskExecutionId: '10'}, jobId: '1'}),
+            {enabled: true}
+        );
+    });
+
     it('never asks for trigger logs in the editor, where a trigger is not executed', () => {
         editorJobFileLogsQueryMock.mockReturnValue({
             data: {editorJobFileLogs: logPage('editor entry', 'logger')},

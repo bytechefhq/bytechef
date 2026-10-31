@@ -69,6 +69,23 @@ describe('WorkflowExecutionsTabsPanel', () => {
         );
     });
 
+    it("asks for a call row's logs by its call and task execution", () => {
+        logsContentMock.mockClear();
+
+        const callExecution = {
+            ...taskExecution,
+            clusterElementCallId: 'a',
+            id: '10:a',
+            parentTaskExecutionId: '10',
+        } as unknown as TaskExecution;
+
+        renderPanel({activeTab: 'logs', job, selectedItem: callExecution});
+
+        expect(logsContentMock).toHaveBeenCalledWith(
+            expect.objectContaining({clusterElementCallId: 'a', jobId: '5', taskExecutionId: '10'})
+        );
+    });
+
     it('has no logs to read when there is neither a job nor a trigger execution', () => {
         renderPanel({activeTab: 'logs', selectedItem: undefined, triggerExecution: undefined});
 

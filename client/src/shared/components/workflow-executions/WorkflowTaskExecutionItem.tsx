@@ -3,11 +3,13 @@ import {
     formatExecutionDuration,
     useExecutionDuration,
 } from '@/shared/components/workflow-executions/hooks/useExecutionDuration';
+import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {
     getExecutionStatusIcon,
     getTaskExecutionDisplayStatus,
 } from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {TaskExecution, TaskExecutionStatusEnum} from '@/shared/middleware/platform/workflow/execution';
+import {CircleDashedIcon} from 'lucide-react';
 
 interface WorkflowTaskExecutionItemProps {
     attemptLabel?: string;
@@ -24,7 +26,14 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: Work
         startDate,
     });
 
-    const statusIcon = getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobEnded));
+    const callNote = isClusterElementCallTaskExecution(taskExecution)
+        ? taskExecution.clusterElementCallNote
+        : undefined;
+    const statusIcon = callNote ? (
+        <CircleDashedIcon className="size-4 text-muted-foreground" />
+    ) : (
+        getExecutionStatusIcon(getTaskExecutionDisplayStatus(status, jobEnded))
+    );
 
     return (
         <li className="flex w-full cursor-pointer items-center justify-between rounded-lg p-0 hover:bg-inherit">
@@ -40,6 +49,8 @@ const WorkflowTaskExecutionItem = ({attemptLabel, jobEnded, taskExecution}: Work
                         <span className="text-xs text-muted-foreground">
                             ({workflowTask?.name || workflowTask?.type})
                         </span>
+
+                        {callNote && <span className="text-xs text-muted-foreground">{callNote}</span>}
                     </div>
                 </div>
             </div>

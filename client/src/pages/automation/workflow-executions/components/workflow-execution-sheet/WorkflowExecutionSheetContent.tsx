@@ -15,6 +15,7 @@ import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/W
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
+import {isClusterElementCallTaskExecution} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {isJobEnded} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
@@ -78,7 +79,11 @@ const WorkflowExecutionSheetContent = ({
     taskExecutionCount,
     triggerExecution,
 }: WorkflowExecutionSheetContentProps) => {
-    const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
+    const isTaskSelected =
+        !!selectedItem &&
+        !isTriggerExecution &&
+        selectedItem.id !== undefined &&
+        !isClusterElementCallTaskExecution(selectedItem);
 
     const {useGetWorkflowExecutionTaskExecutionQuery} = useWorkflowExecutionDetailQueries();
 
