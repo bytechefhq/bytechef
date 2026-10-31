@@ -165,6 +165,34 @@ class ConnectedUserCsvParserTest {
             .rejectionReason()).isNotNull();
     }
 
+    @Test
+    void testRowNumberCountsBlankLinesLikeASpreadsheet() {
+        ParsedConnectedUsers parsedConnectedUsers = parse("externalId,plan\nu1,pro\n\nu2,eu\n\n\nu3,us\n");
+
+        assertThat(parsedConnectedUsers.rows())
+            .extracting(ParsedRow::rowNumber)
+            .containsExactly(2, 4, 7);
+    }
+
+    @Test
+    void testParseFindsTheHeaderAfterLeadingBlankLines() {
+        ParsedConnectedUsers parsedConnectedUsers = parse("\n\nexternalId,plan\nu1,pro\n");
+
+        assertThat(parsedConnectedUsers.rows())
+            .singleElement()
+            .satisfies(parsedRow -> {
+                assertThat(parsedRow.externalId()).isEqualTo("u1");
+                assertThat(parsedRow.rowNumber()).isEqualTo(4);
+            });
+    }
+
+    @Test
+    void testParseRefusesAFileWithOnlyBlankLines() {
+        assertThatThrownBy(() -> parse("\n\n\n"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("empty");
+    }
+
     private static ParsedConnectedUsers parse(String content) {
         InputStream inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
 

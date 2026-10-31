@@ -47,7 +47,7 @@ final class ConnectedUserCsvParser {
         List<CSVRecord> records;
 
         try (CSVParser csvParser = CSVFormat.RFC4180.builder()
-            .setIgnoreEmptyLines(true)
+            .setIgnoreEmptyLines(false)
             .get()
             .parse(new StringReader(content))) {
 
@@ -55,6 +55,10 @@ final class ConnectedUserCsvParser {
         } catch (IOException | RuntimeException exception) {
             throw new IllegalArgumentException("The file is not a valid CSV: " + exception.getMessage(), exception);
         }
+
+        records = records.stream()
+            .filter(csvRecord -> !isBlank(csvRecord))
+            .toList();
 
         if (records.isEmpty()) {
             throw new IllegalArgumentException("The file is empty; a header row with an externalId column is required");
@@ -159,6 +163,11 @@ final class ConnectedUserCsvParser {
         }
 
         return content;
+    }
+
+    private static boolean isBlank(CSVRecord csvRecord) {
+        return csvRecord.size() == 1 && csvRecord.get(0)
+            .isEmpty();
     }
 
     private static List<String> toList(CSVRecord csvRecord) {
