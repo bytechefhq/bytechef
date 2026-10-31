@@ -104,9 +104,6 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
- * Runs jobs in-process and waits for them. Every job it creates is marked with
- * {@link MetadataConstants#SYNC_EXECUTION}, which tells steps that the run can't suspend.
- *
  * @author Ivica Cardic
  */
 public class JobSyncExecutor {

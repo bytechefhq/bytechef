@@ -19,8 +19,6 @@ package com.bytechef.atlas.execution.repository.memory;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 
 /**
- * Saves task executions with their transient handled flag cleared, the way a persistent repository does.
- *
  * @author Ivica Cardic
  */
 public final class NonPersistentHandledFlagTaskExecutionRepository extends InMemoryTaskExecutionRepository {
