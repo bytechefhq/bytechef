@@ -72,6 +72,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -195,15 +196,15 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
     @Test
     void testExpiredJwtStillPublishesTheFailure() throws Exception {
+        Instant now = Instant.now();
+
         String token = sign(
             baseClaims(ISSUER_URI)
                 .claim(TENANT_CLAIM, "public")
                 .claim("scope", "mcp:management")
                 .audience(List.of(managementEndpointUrl()))
-                .issueTime(Date.from(Instant.now()
-                    .minus(20, ChronoUnit.MINUTES)))
-                .expirationTime(Date.from(Instant.now()
-                    .minus(10, ChronoUnit.MINUTES)))
+                .issueTime(Date.from(now.minus(20, ChronoUnit.MINUTES)))
+                .expirationTime(Date.from(now.minus(10, ChronoUnit.MINUTES)))
                 .build());
 
         HttpResponse<String> httpResponse = postInitialize(token);
@@ -537,8 +538,11 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
 
         @Override
         public void onApplicationEvent(AbstractAuthenticationEvent authenticationEvent) {
+            Authentication authentication = authenticationEvent.getAuthentication();
+
             recordedAuthenticationEvents.add(
-                new RecordedAuthenticationEvent(authenticationEvent, TenantContext.getCurrentTenantId()));
+                new RecordedAuthenticationEvent(
+                    authenticationEvent, TenantContext.getCurrentTenantId() + ":" + authentication.getName()));
         }
 
         void clear() {
@@ -548,14 +552,11 @@ class McpOAuth2ResourceServerSecurityConfigurerContributorIntTest {
         List<String> getEvents(Class<? extends AbstractAuthenticationEvent> eventType) {
             return recordedAuthenticationEvents.stream()
                 .filter(recordedAuthenticationEvent -> eventType.isInstance(recordedAuthenticationEvent.event()))
-                .map(recordedAuthenticationEvent -> recordedAuthenticationEvent.tenantId() + ":" +
-                    recordedAuthenticationEvent.event()
-                        .getAuthentication()
-                        .getName())
+                .map(RecordedAuthenticationEvent::tenantPrincipal)
                 .toList();
         }
     }
 
-    private record RecordedAuthenticationEvent(AbstractAuthenticationEvent event, String tenantId) {
+    private record RecordedAuthenticationEvent(AbstractAuthenticationEvent event, String tenantPrincipal) {
     }
 }

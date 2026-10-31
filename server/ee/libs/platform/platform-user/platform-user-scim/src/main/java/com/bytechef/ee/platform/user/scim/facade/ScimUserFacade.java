@@ -139,9 +139,9 @@ public class ScimUserFacade {
     }
 
     private Optional<User> applyReplace(long id, ScimUser scimUser) {
-        if (userService.fetchUser(id)
-            .isEmpty()) {
+        Optional<User> userOptional = userService.fetchUser(id);
 
+        if (userOptional.isEmpty()) {
             return Optional.empty();
         }
 

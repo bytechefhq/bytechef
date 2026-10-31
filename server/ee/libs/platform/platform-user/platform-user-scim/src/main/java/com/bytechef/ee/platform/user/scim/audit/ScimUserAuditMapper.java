@@ -42,9 +42,9 @@ public class ScimUserAuditMapper implements AuditMapper {
 
     @Override
     public @Nullable Object capture(AuditInvocation auditInvocation) {
-        if (auditInvocation.event()
-            .equals(ScimUserAuditEvents.SCIM_USER_CREATED)) {
+        String event = auditInvocation.event();
 
+        if (event.equals(ScimUserAuditEvents.SCIM_USER_CREATED)) {
             return null;
         }
 
@@ -74,9 +74,9 @@ public class ScimUserAuditMapper implements AuditMapper {
             putIfNotNull(data, "login", userState.login());
             putIfNotNull(data, "email", userState.email());
 
-            if (!auditInvocation.event()
-                .equals(ScimUserAuditEvents.SCIM_USER_DELETED)) {
+            String event = auditInvocation.event();
 
+            if (!event.equals(ScimUserAuditEvents.SCIM_USER_DELETED)) {
                 data.put("active", String.valueOf(userState.activated()));
             }
         } else if (auditInvocation.argument("scimUser") instanceof ScimUser scimUser) {

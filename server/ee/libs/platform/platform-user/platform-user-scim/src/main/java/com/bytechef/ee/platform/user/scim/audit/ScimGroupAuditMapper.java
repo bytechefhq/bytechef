@@ -40,9 +40,9 @@ public class ScimGroupAuditMapper implements AuditMapper {
 
     @Override
     public @Nullable Object capture(AuditInvocation auditInvocation) {
-        if (auditInvocation.event()
-            .equals(ScimGroupAuditEvents.SCIM_GROUP_CREATED)) {
+        String event = auditInvocation.event();
 
+        if (event.equals(ScimGroupAuditEvents.SCIM_GROUP_CREATED)) {
             return null;
         }
 

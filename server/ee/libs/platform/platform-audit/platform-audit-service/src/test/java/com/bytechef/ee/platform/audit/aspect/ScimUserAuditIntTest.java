@@ -42,6 +42,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -75,16 +76,19 @@ public class ScimUserAuditIntTest {
     public void beforeEach() {
         jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS " + TENANT_SCHEMA);
 
-        for (String table : List.of(
-            "\"user\"", "authority", "user_authority", "persistent_audit_event", "persistent_audit_event_data")) {
+        List<String> tables = List.of(
+            "\"user\"", "authority", "user_authority", "persistent_audit_event", "persistent_audit_event_data");
+
+        for (String table : tables) {
 
             jdbcTemplate.execute(
                 "CREATE TABLE IF NOT EXISTS " + TENANT_SCHEMA + "." + table + " (LIKE public." + table +
                     " INCLUDING ALL)");
         }
 
-        SecurityContextHolder.getContext()
-            .setAuthentication(new UsernamePasswordAuthenticationToken(SCIM_PRINCIPAL, null, List.of()));
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(SCIM_PRINCIPAL, null, List.of()));
     }
 
     @AfterEach

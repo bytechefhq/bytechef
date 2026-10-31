@@ -516,10 +516,11 @@ class ScimAuditIntTest {
         SavedAuditEvents firstSavedAuditEvents = savedAuditEvents.getFirst();
 
         assertThat(firstSavedAuditEvents.tenantId()).isEqualTo(TENANT_ID);
-        assertThat(firstSavedAuditEvents.persistentAuditEvents()).hasSize(1);
+        List<PersistentAuditEvent> persistentAuditEvents = firstSavedAuditEvents.persistentAuditEvents();
 
-        return firstSavedAuditEvents.persistentAuditEvents()
-            .getFirst();
+        assertThat(persistentAuditEvents).hasSize(1);
+
+        return persistentAuditEvents.getFirst();
     }
 
     private void mockExistingGroup() {
