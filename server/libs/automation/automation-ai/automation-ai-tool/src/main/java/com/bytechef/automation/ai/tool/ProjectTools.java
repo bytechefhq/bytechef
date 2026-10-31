@@ -272,6 +272,7 @@ public class ProjectTools {
         ToolContext toolContext) {
 
         scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.UPDATE_PROJECT);
+        scopedProjectGuard.checkProjectNotHidden(projectId, ProjectErrorType.UPDATE_PROJECT);
 
         try {
             ProjectDTO existingProjectDTO = projectFacade.getProject(projectId);
@@ -317,6 +318,7 @@ public class ProjectTools {
         @ToolParam(description = "The ID of the project to delete") long projectId, ToolContext toolContext) {
 
         scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.DELETE_PROJECT);
+        scopedProjectGuard.checkProjectNotHidden(projectId, ProjectErrorType.DELETE_PROJECT);
 
         try {
             ProjectDTO projectDTO = projectFacade.getProject(projectId);
@@ -347,6 +349,7 @@ public class ProjectTools {
         ToolContext toolContext) {
 
         scopedProjectGuard.checkProjectChangeAllowed(toolContext, ProjectErrorType.PUBLISH_PROJECT);
+        scopedProjectGuard.checkProjectNotHidden(projectId, ProjectErrorType.PUBLISH_PROJECT);
 
         try {
             int publishedVersion = projectFacade.publishProject(projectId, description, false);
