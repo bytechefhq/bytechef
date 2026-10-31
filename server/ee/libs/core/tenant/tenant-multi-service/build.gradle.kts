@@ -7,6 +7,12 @@ dependencies {
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
 
+    testImplementation("org.springframework.boot:spring-boot-jdbc")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
+
+    testRuntimeOnly("com.zaxxer:HikariCP")
+    testRuntimeOnly("org.postgresql:postgresql")
 }
