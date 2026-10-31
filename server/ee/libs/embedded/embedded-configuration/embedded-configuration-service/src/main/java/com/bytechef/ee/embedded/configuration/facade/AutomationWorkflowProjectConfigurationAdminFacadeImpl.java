@@ -94,7 +94,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     implements AutomationWorkflowProjectConfigurationAdminFacade {
 
@@ -181,6 +180,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         @AuditData(key = "enabled", value = "#enabled"),
         @AuditData(key = "automationHubVisible", value = "#automationHubVisible")
     })
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', #environmentId)")
     public long createConfiguration(
         long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
         boolean enabled, boolean automationHubVisible) {
@@ -212,6 +212,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         @AuditData(key = "configurationId", value = "#id")
     })
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')")
     public void deleteConfiguration(long id) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -255,6 +257,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             @AuditData(key = "configurationId", value = "#id"),
             @AuditData(key = "enabled", value = "#enable")
         })
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void enableConfiguration(long id, boolean enable) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.updateEnabled(id, enable);
@@ -270,6 +274,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             @AuditData(key = "workflowUuid", value = "#workflowUuid"),
             @AuditData(key = "enabled", value = "#enable")
         })
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
@@ -280,6 +286,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public AutomationWorkflowProjectConfigurationDTO getConfiguration(long id) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -289,6 +297,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW') and " +
+        "hasPermission(#id, 'AutomationWorkflowProjectConfiguration', 'CONNECTED_USER_VIEW')")
     public List<AutomationWorkflowProjectConfigurationConnectedUserDTO> getConfigurationConnectedUsers(long id) {
         automationWorkflowProjectConfigurationService.getConfiguration(id);
 
@@ -312,12 +323,14 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId) {
         return toDTOs(automationWorkflowProjectConfigurationService.getConfigurations(projectId));
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('INTEGRATION_INSTANCE_CONFIGURATION_VIEW', #environmentId)")
     public List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId, long environmentId) {
         return toDTOs(automationWorkflowProjectConfigurationService.getConfigurations(projectId, environmentId));
     }
@@ -337,6 +350,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#configurationId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
         long configurationId, String workflowUuid) {
 
@@ -363,6 +378,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#configurationId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public List<AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
         getConfigurationWorkflowInputOptions(
             long configurationId, String workflowUuid, String inputName, String propertyName, long connectionId,
@@ -401,6 +418,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public AutomationWorkflowProjectConfigurationDeleteImpactDTO getDeleteImpact(long id) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -415,6 +434,10 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#sourceId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW') and " +
+        "hasPermission(#targetId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public ConfigurationMoveImpactDTO getMoveImpact(long sourceId, long targetId, List<Long> connectedUserIds) {
         AutomationWorkflowProjectConfiguration sourceConfiguration =
             automationWorkflowProjectConfigurationService.getConfiguration(sourceId);
@@ -555,6 +578,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#targetId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public ConfigurationMoveImpactDTO getUpgradeImpact(long targetId, List<Long> connectedUserIds) {
         AutomationWorkflowProjectConfiguration targetConfiguration =
             automationWorkflowProjectConfigurationService.getConfiguration(targetId);
@@ -592,6 +617,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#configurationId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(
         long configurationId, int projectVersion) {
 
@@ -610,6 +637,10 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
         })
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @PreAuthorize("hasPermission(#sourceId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT') and " +
+        "hasPermission(#targetId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds) {
         if (sourceId == targetId) {
             throw new IllegalArgumentException("The source and target configurations must differ");
@@ -742,6 +773,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         @AuditData(key = "enabled", value = "#enabled"),
         @AuditData(key = "automationHubVisible", value = "#automationHubVisible")
     })
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateConfiguration(
         long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
         boolean automationHubVisible) {
@@ -773,6 +806,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateConfigurationWorkflow(
         long id, String workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs) {
 
@@ -819,6 +854,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
         })
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @PreAuthorize("hasPermission(#targetId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds) {
         AutomationWorkflowProjectConfiguration targetConfiguration =
             automationWorkflowProjectConfigurationService.getConfiguration(targetId);

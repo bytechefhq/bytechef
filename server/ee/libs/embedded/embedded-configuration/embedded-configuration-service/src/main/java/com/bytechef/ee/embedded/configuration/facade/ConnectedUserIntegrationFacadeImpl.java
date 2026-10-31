@@ -361,7 +361,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -399,7 +399,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
         @AuditData(key = "integrationInstanceId", value = "#result")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId,
         @Nullable Map<String, Object> connectionParameters,

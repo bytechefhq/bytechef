@@ -501,7 +501,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW') and " +
+        "hasPermission(#id, 'IntegrationInstanceConfiguration', 'CONNECTED_USER_VIEW')")
     public List<IntegrationInstanceConfigurationConnectedUserDTO> getIntegrationInstanceConfigurationConnectedUsers(
         long id) {
 
@@ -530,7 +532,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#sourceId, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW') and " +
+        "hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public ConfigurationMoveImpactDTO getMoveImpact(long sourceId, long targetId, List<Long> connectedUserIds) {
         IntegrationInstanceConfiguration sourceConfiguration =
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(sourceId);
@@ -639,7 +643,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public ConfigurationMoveImpactDTO getUpgradeImpact(long targetId, List<Long> connectedUserIds) {
         IntegrationInstanceConfiguration targetConfiguration =
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(targetId);
@@ -681,7 +685,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "targetIntegrationInstanceConfigurationId", value = "#targetId"),
         @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#sourceId, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT') and " +
+        "hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds) {
         if (sourceId == targetId) {
@@ -783,7 +789,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "targetIntegrationInstanceConfigurationId", value = "#targetId"),
         @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds) {
         IntegrationInstanceConfiguration targetConfiguration =

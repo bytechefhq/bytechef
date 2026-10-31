@@ -44,13 +44,13 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
         return connectedUserIntegrationFacade.getProvisionableIntegrations(connectedUserId);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId, Map<String, Object> connectionParameters,
         List<ProvisionIntegrationInstanceWorkflowDTO> workflows) {
