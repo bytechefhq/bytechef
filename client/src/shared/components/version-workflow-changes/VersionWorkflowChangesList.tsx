@@ -57,16 +57,16 @@ const VersionWorkflowChangesList = ({
                         <span className="truncate">{workflowName}</span>
 
                         <span className="flex shrink-0 items-center gap-2">
-                            <Badge
-                                label={getWorkflowChangeTypeLabel(workflow.changeType)}
-                                styleType={getWorkflowChangeTypeBadgeStyleType(workflow.changeType)}
-                            />
-
                             {workflow.changeType === WorkflowChangeType.Modified && (
                                 <span className="text-xs text-content-neutral-secondary">
                                     {workflow.changeCount === 1 ? '1 change' : `${workflow.changeCount} changes`}
                                 </span>
                             )}
+
+                            <Badge
+                                label={getWorkflowChangeTypeLabel(workflow.changeType)}
+                                styleType={getWorkflowChangeTypeBadgeStyleType(workflow.changeType)}
+                            />
                         </span>
                     </button>
                 );
