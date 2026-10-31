@@ -4,7 +4,16 @@ import {describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionsTabsPanel from '../WorkflowExecutionsTabsPanel';
 
-const {logsContentMock} = vi.hoisted(() => ({logsContentMock: vi.fn()}));
+const {jobFileLogsQueryMock, logsContentMock} = vi.hoisted(() => ({
+    jobFileLogsQueryMock: vi.fn(),
+    logsContentMock: vi.fn(),
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useEditorJobFileLogsQuery: () => ({data: undefined, isLoading: false}),
+    useJobFileLogsQuery: (variables: unknown, options: {enabled: boolean}) =>
+        jobFileLogsQueryMock(variables, options) ?? {data: undefined, isLoading: false},
+}));
 
 vi.mock('@/shared/components/workflow-executions/WorkflowExecutionLogsContent', () => ({
     default: (props: Record<string, unknown>) => {
@@ -84,6 +93,62 @@ describe('WorkflowExecutionsTabsPanel', () => {
         expect(logsContentMock).toHaveBeenCalledWith(
             expect.objectContaining({clusterElementCallId: 'a', jobId: '5', taskExecutionId: '10'})
         );
+    });
+
+    it("shows a stored call row's input and output from its tool log entries, even split across a resume", () => {
+        jobFileLogsQueryMock.mockImplementation((_variables, options: {enabled: boolean}) =>
+            options.enabled
+                ? {
+                      data: {
+                          jobFileLogs: {
+                              content: [
+                                  {
+                                      message: JSON.stringify({
+                                          inputs: {url: 'https://example.com'},
+                                          output: null,
+                                          toolName: 'get',
+                                      }),
+                                  },
+                                  {message: 'Fetching https://example.com'},
+                                  {
+                                      message: JSON.stringify({
+                                          inputs: null,
+                                          output: '{"status":200}',
+                                          toolName: 'get',
+                                      }),
+                                  },
+                              ],
+                          },
+                      },
+                      isLoading: false,
+                  }
+                : undefined
+        );
+
+        const callExecution = {
+            ...taskExecution,
+            clusterElementCallId: 'a',
+            id: '10:a',
+            output: undefined,
+            parentTaskExecutionId: '10',
+        } as unknown as TaskExecution;
+
+        renderPanel({activeTab: 'input', job, selectedItem: callExecution});
+
+        expect(jobFileLogsQueryMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                filter: {clusterElementCallId: 'a', searchText: '"toolName":', taskExecutionId: '10'},
+                jobId: '5',
+            }),
+            {enabled: true}
+        );
+        expect(screen.getByTestId('json-view')).toHaveTextContent('example.com');
+
+        renderPanel({activeTab: 'output', job, selectedItem: callExecution});
+
+        expect(screen.getAllByTestId('json-view')[1]).toHaveTextContent('200');
+
+        jobFileLogsQueryMock.mockReset();
     });
 
     it('has no logs to read when there is neither a job nor a trigger execution', () => {
