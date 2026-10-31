@@ -79,6 +79,14 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public Optional<IntegrationInstance> fetchIntegrationInstanceByIntegrationId(
+        long connectedUserId, long integrationId, Environment environment) {
+
+        return integrationInstanceRepository.findFirstByConnectedUserIdAndIntegrationIdAndEnvironment(
+            connectedUserId, integrationId, environment.ordinal());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public boolean existsByConnectionId(long connectionId) {
         return integrationInstanceRepository.existsByConnectionId(connectionId);
