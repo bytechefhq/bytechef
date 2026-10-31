@@ -788,6 +788,16 @@ class ProjectWorkflowFacadeIntTest {
         }
 
         @Test
+        void testVersionWorkflowChangesReadIsProtected() {
+            assertRequiresScope(
+                PROJECT_ID, "Project", "WORKFLOW_VIEW",
+                () -> projectWorkflowFacade.getProjectVersionWorkflowChanges(PROJECT_ID, 1));
+            assertRequiresScope(
+                PROJECT_ID, "Project", "WORKFLOW_VIEW",
+                () -> projectWorkflowFacade.getProjectVersionWorkflowChange(PROJECT_ID, 1, UUID_STRING));
+        }
+
+        @Test
         void testWorkflowVersionReadIsProtected() {
             assertRequiresScope(
                 PROJECT_ID, "Project", "WORKFLOW_VIEW",

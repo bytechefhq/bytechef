@@ -21,6 +21,8 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -50,6 +52,10 @@ public interface ProjectWorkflowFacade {
     List<ProjectWorkflowDTO> getProjectWorkflows(long projectId);
 
     List<ProjectWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion, boolean includeAllFields);
+
+    VersionWorkflowChange getProjectVersionWorkflowChange(long projectId, int projectVersion, String workflowUuid);
+
+    VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion);
 
     List<ProjectVersion> getProjectWorkflowVersions(long projectId, String workflowUuid);
 

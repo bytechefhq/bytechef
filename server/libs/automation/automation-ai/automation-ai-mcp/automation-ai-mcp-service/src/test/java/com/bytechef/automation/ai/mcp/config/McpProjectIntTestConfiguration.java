@@ -61,7 +61,8 @@ import tools.jackson.databind.ObjectMapper;
     basePackages = {
         "com.bytechef.automation.configuration",
         "com.bytechef.automation.ai.mcp", "com.bytechef.commons.util", "com.bytechef.jackson.config",
-        "com.bytechef.platform.category", "com.bytechef.platform.connection", "com.bytechef.platform.mcp",
+        "com.bytechef.platform.category", "com.bytechef.platform.configuration.workflow.diff",
+        "com.bytechef.platform.connection", "com.bytechef.platform.mcp",
         "com.bytechef.platform.tag"
     },
     excludeFilters = @Filter(
