@@ -18,11 +18,13 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -194,9 +196,11 @@ class IntegrationInstanceAdminFacadeIntTest {
 
         @Bean
         static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
-            @Lazy PermissionService permissionService) {
+            @Lazy PermissionService permissionService,
+            ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-            return new AutomationMethodSecurityExpressionHandler(permissionService);
+            return new AutomationMethodSecurityExpressionHandler(
+                permissionService, methodSecurityExpressionContributorProvider);
         }
     }
 }

@@ -29,6 +29,7 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -162,6 +163,28 @@ class AutomationMethodSecurityExpressionRootIntTest {
         verifyNoInteractions(permissionService);
     }
 
+    @Test
+    void testContributedExpressionResolvesByBareName() {
+        assertThat(guardedOperations.contributedOperation(7L)).isEqualTo(GRANTED);
+
+        assertThatThrownBy(() -> guardedOperations.contributedOperation(8L))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testContributedExpressionCombinesWithBuiltIn() {
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+
+        assertThat(guardedOperations.tenantAdminOrContributedOperation(8L)).isEqualTo(GRANTED);
+
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+
+        assertThat(guardedOperations.tenantAdminOrContributedOperation(7L)).isEqualTo(GRANTED);
+
+        assertThatThrownBy(() -> guardedOperations.tenantAdminOrContributedOperation(8L))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
     private static void authenticate(Authentication authentication) {
         SecurityContextHolder.getContext()
             .setAuthentication(authentication);
@@ -180,6 +203,18 @@ class AutomationMethodSecurityExpressionRootIntTest {
         @Bean("permissionService")
         PermissionService permissionService() {
             return mock(PermissionService.class);
+        }
+
+        @Bean
+        TestMethodSecurityExpressionContributor testMethodSecurityExpressionContributor() {
+            return new TestMethodSecurityExpressionContributor();
+        }
+    }
+
+    static class TestMethodSecurityExpressionContributor implements MethodSecurityExpressionContributor {
+
+        public boolean isContributedId(long id) {
+            return id == 7L;
         }
     }
 
@@ -201,6 +236,18 @@ class AutomationMethodSecurityExpressionRootIntTest {
         @PreAuthorize("isResourceOwner(#id, 'ApiKey')")
         @SuppressWarnings("PMD.UnusedFormalParameter")
         public String resourceOwnerOperation(long id) {
+            return grant();
+        }
+
+        @PreAuthorize("isContributedId(#id)")
+        @SuppressWarnings("PMD.UnusedFormalParameter")
+        public String contributedOperation(long id) {
+            return grant();
+        }
+
+        @PreAuthorize("isTenantAdmin() or isContributedId(#id)")
+        @SuppressWarnings("PMD.UnusedFormalParameter")
+        public String tenantAdminOrContributedOperation(long id) {
             return grant();
         }
 

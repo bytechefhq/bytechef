@@ -72,7 +72,7 @@ class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceTool
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isConnectedUser()")
+    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
     public void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId, boolean enable) {
         connectedUserIntegrationInstanceFacade.validateCurrentPrincipalIntegrationInstanceOwnership(
             integrationInstanceId);

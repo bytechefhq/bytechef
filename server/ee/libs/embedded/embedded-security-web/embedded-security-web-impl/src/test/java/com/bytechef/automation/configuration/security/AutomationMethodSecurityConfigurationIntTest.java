@@ -143,7 +143,7 @@ class AutomationMethodSecurityConfigurationIntTest {
             return "granted";
         }
 
-        @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isConnectedUser()")
+        @PreAuthorize("isTenantAdmin() or isConnectedUser()")
         public String connectedUserOperation() {
             return "granted";
         }

@@ -78,7 +78,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
@@ -88,7 +88,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
         requireOwned(connectedUserId, connectionId);
 
@@ -98,7 +98,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public List<ConnectionDTO> getConnectedUserConnections(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
@@ -135,7 +135,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin() or @connectedUserSecurity.isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters) {
         ConnectionDTO connectionDTO = requireOwned(connectedUserId, connectionId);
 
