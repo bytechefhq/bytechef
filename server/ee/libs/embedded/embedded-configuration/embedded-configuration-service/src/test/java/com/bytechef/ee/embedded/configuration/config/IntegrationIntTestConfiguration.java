@@ -58,7 +58,8 @@ import tools.jackson.databind.ObjectMapper;
 @ComponentScan(
     basePackages = {
         "com.bytechef.encryption", "com.bytechef.platform.category",
-        "com.bytechef.ee.embedded.configuration", "com.bytechef.platform.tag"
+        "com.bytechef.ee.embedded.configuration", "com.bytechef.platform.configuration.workflow.diff",
+        "com.bytechef.platform.tag"
     },
     excludeFilters = @Filter(
         type = FilterType.REGEX,

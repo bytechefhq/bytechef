@@ -10,6 +10,8 @@ package com.bytechef.ee.embedded.configuration.remote.client.facade;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +37,18 @@ public class RemoteIntegrationWorkflowFacadeClient implements IntegrationWorkflo
     @Override
     public List<IntegrationWorkflowDTO>
         getIntegrationVersionWorkflows(long id, int integrationVersion, boolean includeAllFields) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public VersionWorkflowChange getIntegrationVersionWorkflowChange(
+        long integrationId, int integrationVersion, String workflowUuid) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public VersionWorkflowChanges getIntegrationVersionWorkflowChanges(long integrationId, int integrationVersion) {
         throw new UnsupportedOperationException();
     }
 

@@ -51,6 +51,9 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
+import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
@@ -245,6 +248,70 @@ class IntegrationWorkflowFacadeIntTest {
 
         assertThat(integrationWorkflowRepository.findAllByIntegrationId(integrationId)).isEmpty();
         assertThat(getWorkflowCount()).isEqualTo(workflowCount);
+    }
+
+    @Test
+    void testGetIntegrationVersionWorkflowChangesReportsAddedWorkflow() {
+        long integrationId = createIntegration();
+
+        integrationWorkflowFacade.addWorkflow(integrationId, ORIGINAL_DEFINITION);
+
+        VersionWorkflowChanges versionWorkflowChanges =
+            integrationWorkflowFacade.getIntegrationVersionWorkflowChanges(integrationId, 1);
+
+        assertThat(versionWorkflowChanges.baseVersion()).isNull();
+        assertThat(versionWorkflowChanges.version()).isEqualTo(1);
+        assertThat(versionWorkflowChanges.workflows()).hasSize(1);
+        assertThat(versionWorkflowChanges.workflows()
+            .getFirst()
+            .changeType()).isEqualTo(WorkflowChangeType.ADDED);
+
+        String workflowUuid = versionWorkflowChanges.workflows()
+            .getFirst()
+            .workflowUuid();
+
+        VersionWorkflowChange versionWorkflowChange =
+            integrationWorkflowFacade.getIntegrationVersionWorkflowChange(integrationId, 1, workflowUuid);
+
+        assertThat(versionWorkflowChange.changeType()).isEqualTo(WorkflowChangeType.ADDED);
+        assertThat(versionWorkflowChange.oldDefinition()).isNull();
+        assertThat(versionWorkflowChange.newDefinition()).isNotNull();
+    }
+
+    @Test
+    void testGetIntegrationVersionWorkflowChangesRejectsUnknownVersion() {
+        long integrationId = createIntegration();
+
+        assertThatThrownBy(() -> integrationWorkflowFacade.getIntegrationVersionWorkflowChanges(integrationId, 9))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Integration version v=9 not found");
+    }
+
+    @Test
+    void testGetIntegrationVersionWorkflowChangeRejectsUnknownWorkflowUuid() {
+        long integrationId = createIntegration();
+
+        assertThatThrownBy(
+            () -> integrationWorkflowFacade.getIntegrationVersionWorkflowChange(integrationId, 1, "missing-uuid"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Workflow uuid=missing-uuid not found in integration version v=1");
+    }
+
+    @Test
+    void testIntegrationVersionWorkflowChangesRequireTenantAdmin() {
+        long integrationId = createIntegration();
+
+        for (Authentication authentication : List.of(nonAdmin(), connectedUser())) {
+            authenticate(authentication);
+
+            assertThatThrownBy(() -> integrationWorkflowFacade.getIntegrationVersionWorkflowChanges(integrationId, 1))
+                .as("changes denied to %s", authentication.getName())
+                .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(
+                () -> integrationWorkflowFacade.getIntegrationVersionWorkflowChange(integrationId, 1, "uuid"))
+                    .as("change denied to %s", authentication.getName())
+                    .isInstanceOf(AccessDeniedException.class);
+        }
     }
 
     @Test
