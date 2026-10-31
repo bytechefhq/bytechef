@@ -18,6 +18,7 @@
     "deploy/api-platform",
     "--- Monitor ---",
     "monitor/workflow-executions",
+    "monitor/tool-invocations",
     "monitor/approval-tasks",
     "--- Data ---",
     "data/knowledge-base",
