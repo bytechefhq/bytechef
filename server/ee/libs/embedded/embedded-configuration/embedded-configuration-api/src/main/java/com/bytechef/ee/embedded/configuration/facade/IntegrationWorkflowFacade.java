@@ -17,6 +17,8 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import java.util.List;
 
 /**
@@ -30,6 +32,11 @@ public interface IntegrationWorkflowFacade {
 
     List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(
         long id, int integrationVersion, boolean includeAllFields);
+
+    VersionWorkflowChange getIntegrationVersionWorkflowChange(
+        long integrationId, int integrationVersion, String workflowUuid);
+
+    VersionWorkflowChanges getIntegrationVersionWorkflowChanges(long integrationId, int integrationVersion);
 
     IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId);
 

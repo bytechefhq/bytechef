@@ -1,6 +1,9 @@
 extend type Query {
     integrationWorkflows: [IntegrationWorkflow!]!
     integrationWorkflowsByIntegrationId(integrationId: ID!): [IntegrationWorkflow!]!
+    integrationVersionWorkflowChanges(integrationId: ID!, integrationVersion: Int!): VersionWorkflowChanges!
+    integrationVersionWorkflowChange(
+        integrationId: ID!, integrationVersion: Int!, workflowUuid: String!): VersionWorkflowChange!
 }
 
 extend type Mutation {

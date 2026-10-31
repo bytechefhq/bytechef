@@ -12,6 +12,8 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -71,6 +73,19 @@ public class AutomationWorkflowProjectAdminFacadeImpl implements AutomationWorkf
     @Override
     public List<AutomationWorkflowProjectCategoryDTO> getCategories() {
         return automationWorkflowProjectFacade.getCategories();
+    }
+
+    @Override
+    public VersionWorkflowChange getProjectVersionWorkflowChange(
+        long projectId, int projectVersion, String workflowUuid) {
+
+        return automationWorkflowProjectFacade.getProjectVersionWorkflowChange(
+            projectId, projectVersion, workflowUuid);
+    }
+
+    @Override
+    public VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion) {
+        return automationWorkflowProjectFacade.getProjectVersionWorkflowChanges(projectId, projectVersion);
     }
 
     @Override
