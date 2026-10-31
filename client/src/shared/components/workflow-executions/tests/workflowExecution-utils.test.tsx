@@ -67,12 +67,11 @@ describe('workflowExecution-utils', () => {
             expect(icon).toBeInTheDocument();
         });
 
-        it('should return alert icon with destructive class for CANCELLED status', () => {
+        it('should return neutral ban icon for CANCELLED status', () => {
             const {container} = render(getExecutionStatusIcon('CANCELLED'));
 
-            const icon = container.querySelector('.text-destructive');
-
-            expect(icon).toBeInTheDocument();
+            expect(container.querySelector('.lucide-ban.text-content-neutral-secondary')).toBeInTheDocument();
+            expect(container.querySelector('.text-destructive')).not.toBeInTheDocument();
         });
 
         it('should return alert icon with destructive class for unknown status', () => {

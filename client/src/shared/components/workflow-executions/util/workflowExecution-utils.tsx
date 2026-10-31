@@ -1,5 +1,5 @@
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
-import {AlertTriangleIcon, CheckIcon, LoaderCircleIcon} from 'lucide-react';
+import {AlertTriangleIcon, BanIcon, CheckIcon, LoaderCircleIcon} from 'lucide-react';
 
 export type WorkflowStatusType = 'completed' | 'running' | 'failed' | 'stopped';
 
@@ -12,8 +12,9 @@ export function getExecutionStatusIcon(status: ExecutionStatusType) {
         case 'STARTED':
         case 'CREATED':
             return <LoaderCircleIcon className="size-4 animate-spin text-primary" />;
-        case 'FAILED':
         case 'CANCELLED':
+            return <BanIcon className="size-4 text-content-neutral-secondary" />;
+        case 'FAILED':
         default:
             return <AlertTriangleIcon className="size-4 text-destructive" />;
     }
