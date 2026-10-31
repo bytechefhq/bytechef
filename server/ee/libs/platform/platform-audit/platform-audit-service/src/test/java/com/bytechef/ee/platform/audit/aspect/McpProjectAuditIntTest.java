@@ -9,8 +9,6 @@ package com.bytechef.ee.platform.audit.aspect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,27 +26,30 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -56,7 +57,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = McpProjectAuditIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(classes = AuditIntTestConfiguration.class)
+@ActiveProfiles("testint")
+@Import({
+    McpProjectAuditMapper.class, McpProjectFacadeImpl.class, PostgreSQLContainerConfiguration.class
+})
 @MockitoBean(types = {
     ComponentConnectionFacade.class, ConnectionService.class, McpProjectService.class,
     McpProjectWorkflowService.class, McpServerService.class, ProjectDeploymentFacade.class,
@@ -72,13 +77,13 @@ class McpProjectAuditIntTest {
     private static final long PROJECT_ID = 3L;
 
     @Autowired
-    private AuditEventService auditEventService;
-
-    @Autowired
     private McpProjectFacade mcpProjectFacade;
 
     @Autowired
     private McpProjectService mcpProjectService;
+
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @Autowired
     private ProjectDeploymentFacade projectDeploymentFacade;
@@ -88,12 +93,12 @@ class McpProjectAuditIntTest {
 
     @BeforeEach
     void beforeEach() {
-        reset(auditEventService);
+        persistenceAuditEventRepository.deleteAll();
 
-        SecurityContextHolder.getContext()
-            .setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                    "alice", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken("alice", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
     @AfterEach
@@ -110,7 +115,7 @@ class McpProjectAuditIntTest {
 
         verify(projectDeploymentFacade).deleteProjectDeployment(PROJECT_DEPLOYMENT_ID);
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType()).isEqualTo(McpProjectAuditEvents.MCP_PROJECT_DELETED);
         assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
@@ -126,7 +131,7 @@ class McpProjectAuditIntTest {
         assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(MCP_SERVER_ID, PROJECT_ID, 1, List.of("workflow1")))
             .isInstanceOf(IllegalArgumentException.class);
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType()).isEqualTo(McpProjectAuditEvents.MCP_PROJECT_CREATED);
         assertThat(persistentAuditEvent.getData())
@@ -138,30 +143,14 @@ class McpProjectAuditIntTest {
             .doesNotContainKey("mcpProjectId");
     }
 
-    @SuppressWarnings("unchecked")
-    private PersistentAuditEvent captureSavedEvent() {
-        ArgumentCaptor<List<PersistentAuditEvent>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+    private PersistentAuditEvent findSingleEvent() {
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 25));
 
-        verify(auditEventService).saveAll(argumentCaptor.capture());
-
-        List<PersistentAuditEvent> persistentAuditEvents = argumentCaptor.getValue();
+        List<PersistentAuditEvent> persistentAuditEvents = page.getContent();
 
         assertThat(persistentAuditEvents).hasSize(1);
 
         return persistentAuditEvents.getFirst();
-    }
-
-    @SpringBootConfiguration
-    @EnableAspectJAutoProxy
-    @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditMapperResolver.class, McpProjectAuditMapper.class,
-        McpProjectFacadeImpl.class
-    })
-    static class Config {
-
-        @Bean
-        AuditEventService auditEventService() {
-            return mock(AuditEventService.class);
-        }
     }
 }
