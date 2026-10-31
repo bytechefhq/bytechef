@@ -1,3 +1,4 @@
+import useLayoutEngineStore from '@/pages/platform/workflow-editor/stores/useLayoutEngineStore';
 import {render, waitFor} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -5,6 +6,7 @@ import WorkflowChangeCanvas from '../WorkflowChangeCanvas';
 
 const mocks = vi.hoisted(() => ({
     buildWorkflowGraph: vi.fn(),
+    getElkLayoutElements: vi.fn(),
     getLayoutElements: vi.fn(),
 }));
 
@@ -12,6 +14,10 @@ vi.mock('@/pages/platform/workflow-editor/utils/buildWorkflowGraph', () => ({def
 
 vi.mock('@/pages/platform/workflow-editor/utils/layoutUtils', () => ({
     getLayoutElements: mocks.getLayoutElements,
+}));
+
+vi.mock('@/pages/platform/workflow-editor/utils/elkLayoutUtils', () => ({
+    getElkLayoutElements: mocks.getElkLayoutElements,
 }));
 
 vi.mock('@xyflow/react', async (importOriginal) => ({
@@ -35,7 +41,26 @@ const renderCanvas = () =>
 describe('WorkflowChangeCanvas', () => {
     beforeEach(() => {
         mocks.buildWorkflowGraph.mockReset();
+        mocks.getElkLayoutElements.mockReset();
         mocks.getLayoutElements.mockReset();
+
+        useLayoutEngineStore.setState({layoutEngine: 'dagre'});
+    });
+
+    it('lays out with ELK when the editor uses the ELK engine', async () => {
+        mocks.buildWorkflowGraph.mockReturnValue({
+            edges: [],
+            nodes: [{data: {}, id: 'a', position: {x: 0, y: 0}, type: 'workflow'}],
+        });
+        mocks.getElkLayoutElements.mockResolvedValue({edges: [], nodes: []});
+
+        useLayoutEngineStore.setState({layoutEngine: 'elk'});
+
+        renderCanvas();
+
+        await waitFor(() => expect(mocks.getElkLayoutElements).toHaveBeenCalled());
+
+        expect(mocks.getLayoutElements).not.toHaveBeenCalled();
     });
 
     it('skips the layout when only placeholder nodes remain', async () => {
