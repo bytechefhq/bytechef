@@ -9,4 +9,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
 
     testImplementation("org.springframework.security:spring-security-core")
+    testImplementation(project(":server:libs:core:commons:commons-data"))
+    testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }
