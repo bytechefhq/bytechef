@@ -48,7 +48,7 @@ class ToolInvocationLogServiceIntTest {
         create(ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.ERROR, 20L, Instant.now());
 
         Page<ToolInvocationLog> page = toolInvocationLogService.getToolInvocationLogs(
-            ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, 0);
+            PlatformType.EMBEDDED, null, ToolExecutionSurface.MCP_EMBEDDED, null, null, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()
@@ -66,12 +66,32 @@ class ToolInvocationLogServiceIntTest {
         create(ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionOutcome.ERROR, 99L, Instant.now());
 
         Page<ToolInvocationLog> page = toolInvocationLogService.getToolInvocationLogs(
-            null, ToolExecutionOutcome.ERROR, 10L, null, null, null, null, 0);
+            PlatformType.AUTOMATION, null, null, ToolExecutionOutcome.ERROR, 10L, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()
             .getFirst()
             .getOutcome()).isEqualTo(ToolExecutionOutcome.ERROR);
+    }
+
+    @Test
+    void testGetFilteredByEnvironmentExcludesRowsOfOtherEnvironments() {
+        createInEnvironment(ToolExecutionSurface.MCP_EMBEDDED, 2);
+        createInEnvironment(ToolExecutionSurface.EMBEDDED_API_ACTION, 2);
+        createInEnvironment(ToolExecutionSurface.MCP_EMBEDDED, 0);
+        create(ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.SUCCESS, 10L, Instant.now());
+
+        Page<ToolInvocationLog> page = toolInvocationLogService.getToolInvocationLogs(
+            PlatformType.EMBEDDED, 2, null, null, null, null, null, null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(page.getContent()).extracting(ToolInvocationLog::getEnvironment)
+            .containsOnly(2);
+
+        Page<ToolInvocationLog> unfilteredPage = toolInvocationLogService.getToolInvocationLogs(
+            PlatformType.EMBEDDED, null, null, null, null, null, null, null, null, 0);
+
+        assertThat(unfilteredPage.getTotalElements()).isEqualTo(4);
     }
 
     @Test
@@ -82,7 +102,7 @@ class ToolInvocationLogServiceIntTest {
         create(ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.SUCCESS, 5L, Instant.now());
 
         Page<ToolInvocationLog> page = toolInvocationLogService.getWorkspaceToolInvocationLogs(
-            7L, 2, null, null, null, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()).extracting(ToolInvocationLog::getWorkspaceId)
@@ -96,10 +116,50 @@ class ToolInvocationLogServiceIntTest {
         createInWorkspace(8L, 2, 6L);
 
         Page<ToolInvocationLog> page = toolInvocationLogService.getWorkspaceToolInvocationLogs(
-            7L, 2, null, null, 6L, null, null, null, null, 0);
+            PlatformType.AUTOMATION, 7L, 2, null, null, 6L, null, null, null, null, 0);
 
         assertThat(page.getTotalElements()).isZero();
         assertThat(page.getContent()).isEmpty();
+    }
+
+    @Test
+    void testTenantWideQueryForAutomationExcludesEmbeddedRows() {
+        create(ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionOutcome.SUCCESS, 10L, Instant.now());
+        create(ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.SUCCESS, 20L, Instant.now());
+
+        Page<ToolInvocationLog> page = toolInvocationLogService.getToolInvocationLogs(
+            PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent()).extracting(ToolInvocationLog::getType)
+            .containsExactly(PlatformType.AUTOMATION);
+        assertThat(page.getContent()).extracting(ToolInvocationLog::getMcpServerId)
+            .containsExactly(10L);
+    }
+
+    @Test
+    void testWorkspaceQueryForAutomationExcludesEmbeddedRowsOfTheSameWorkspace() {
+        createInWorkspace(7L, 2, 5L);
+
+        ToolInvocationLog embeddedToolInvocationLog = new ToolInvocationLog();
+
+        embeddedToolInvocationLog.setType(PlatformType.EMBEDDED);
+        embeddedToolInvocationLog.setSurface(ToolExecutionSurface.MCP_EMBEDDED);
+        embeddedToolInvocationLog.setKind(ToolExecutionKind.COMPONENT);
+        embeddedToolInvocationLog.setWorkspaceId(7L);
+        embeddedToolInvocationLog.setEnvironment(2);
+        embeddedToolInvocationLog.setMcpServerId(6L);
+        embeddedToolInvocationLog.setOutcome(ToolExecutionOutcome.SUCCESS);
+        embeddedToolInvocationLog.setCreatedDate(Instant.now());
+
+        toolInvocationLogService.create(embeddedToolInvocationLog);
+
+        Page<ToolInvocationLog> page = toolInvocationLogService.getWorkspaceToolInvocationLogs(
+            PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent()).extracting(ToolInvocationLog::getMcpServerId)
+            .containsExactly(5L);
     }
 
     @Test
@@ -115,6 +175,21 @@ class ToolInvocationLogServiceIntTest {
 
         assertThat(deleted).isEqualTo(1);
         assertThat(toolInvocationLogRepository.count()).isEqualTo(1);
+    }
+
+    private void createInEnvironment(ToolExecutionSurface surface, int environment) {
+        ToolInvocationLog toolInvocationLog = new ToolInvocationLog();
+
+        toolInvocationLog.setType(PlatformType.EMBEDDED);
+        toolInvocationLog.setSurface(surface);
+        toolInvocationLog.setKind(ToolExecutionKind.COMPONENT);
+        toolInvocationLog.setToolName("slack_sendMessage");
+        toolInvocationLog.setEnvironment(environment);
+        toolInvocationLog.setOutcome(ToolExecutionOutcome.SUCCESS);
+        toolInvocationLog.setDurationMs(5);
+        toolInvocationLog.setCreatedDate(Instant.now());
+
+        toolInvocationLogService.create(toolInvocationLog);
     }
 
     private void createInWorkspace(long workspaceId, int environment, long mcpServerId) {
@@ -139,7 +214,8 @@ class ToolInvocationLogServiceIntTest {
 
         ToolInvocationLog toolInvocationLog = new ToolInvocationLog();
 
-        toolInvocationLog.setType(PlatformType.AUTOMATION);
+        toolInvocationLog.setType(
+            surface == ToolExecutionSurface.MCP_AUTOMATION ? PlatformType.AUTOMATION : PlatformType.EMBEDDED);
         toolInvocationLog.setSurface(surface);
         toolInvocationLog.setKind(ToolExecutionKind.COMPONENT);
         toolInvocationLog.setToolName("slack_sendMessage");

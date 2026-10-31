@@ -1,5 +1,7 @@
 extend type Query {
     toolInvocationLogs(
+        type: PlatformType!
+        environmentId: ID
         surface: String
         outcome: String
         mcpServerId: Long
@@ -10,6 +12,7 @@ extend type Query {
         page: Int = 0
     ): ToolInvocationLogPageType!
     workspaceToolInvocationLogs(
+        type: PlatformType!
         workspaceId: ID!
         environmentId: ID!
         surface: String

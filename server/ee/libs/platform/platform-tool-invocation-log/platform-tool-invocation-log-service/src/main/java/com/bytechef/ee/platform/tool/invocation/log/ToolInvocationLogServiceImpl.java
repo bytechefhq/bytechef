@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.tool.invocation.log;
 
 import com.bytechef.ee.platform.tool.invocation.log.repository.ToolInvocationLogRepository;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,30 +53,32 @@ public class ToolInvocationLogServiceImpl implements ToolInvocationLogService {
     @Override
     @Transactional(readOnly = true)
     public Page<ToolInvocationLog> getToolInvocationLogs(
-        @Nullable ToolExecutionSurface surface, @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId,
-        @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
-        @Nullable Instant endDate, int pageNumber) {
+        PlatformType type, @Nullable Integer environment, @Nullable ToolExecutionSurface surface,
+        @Nullable ToolExecutionOutcome outcome,
+        @Nullable Long mcpServerId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
+        @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return findPage(
-            null, null, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId, startDate, endDate,
-            pageNumber);
+            type, null, environment, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId, startDate,
+            endDate, pageNumber);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ToolInvocationLog> getWorkspaceToolInvocationLogs(
-        long workspaceId, int environment, @Nullable ToolExecutionSurface surface,
+        PlatformType type, long workspaceId, int environment, @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         return findPage(
-            workspaceId, environment, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId,
+            type, workspaceId, environment, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId,
             startDate, endDate, pageNumber);
     }
 
     private Page<ToolInvocationLog> findPage(
-        @Nullable Long workspaceId, @Nullable Integer environment, @Nullable ToolExecutionSurface surface,
+        PlatformType type, @Nullable Long workspaceId, @Nullable Integer environment,
+        @Nullable ToolExecutionSurface surface,
         @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
@@ -86,11 +89,11 @@ public class ToolInvocationLogServiceImpl implements ToolInvocationLogService {
         PageRequest pageRequest = PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE);
 
         List<ToolInvocationLog> content = toolInvocationLogRepository.findFiltered(
-            workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
+            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
             integrationInstanceId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
 
         long total = toolInvocationLogRepository.countFiltered(
-            workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
+            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
             integrationInstanceId, startDate, endDate);
 
         return new PageImpl<>(content, pageRequest, total);

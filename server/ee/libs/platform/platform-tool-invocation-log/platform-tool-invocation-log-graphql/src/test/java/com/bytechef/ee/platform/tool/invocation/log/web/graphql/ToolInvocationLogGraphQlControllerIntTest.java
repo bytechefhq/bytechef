@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
 import com.bytechef.ee.platform.tool.invocation.log.facade.ToolInvocationLogFacade;
 import com.bytechef.ee.platform.tool.invocation.log.web.graphql.config.ToolInvocationLogGraphQlTestConfiguration;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tool.execution.ToolExecutionKind;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
@@ -65,7 +66,8 @@ class ToolInvocationLogGraphQlControllerIntTest {
     void testWorkspaceToolInvocationLogsPassesTheWorkspaceAndEnvironmentToTheFacade() {
         when(
             toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
-                eq(7L), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), eq(5L), isNull(), isNull(),
+                eq(PlatformType.AUTOMATION), eq(7L), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), eq(5L),
+                isNull(), isNull(),
                 isNull(), isNull(), eq(0)))
                     .thenReturn(new PageImpl<>(List.of(toolInvocationLog()), PageRequest.of(0, 50), 1));
 
@@ -73,7 +75,8 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .document("""
                 query {
                     workspaceToolInvocationLogs(
-                        workspaceId: "7", environmentId: "2", surface: "MCP_AUTOMATION", mcpServerId: 5
+                        type: AUTOMATION, workspaceId: "7", environmentId: "2", surface: "MCP_AUTOMATION",
+                        mcpServerId: 5
                     ) {
                         content {
                             surface
@@ -105,20 +108,21 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .isEqualTo(1);
 
         verify(toolInvocationLogFacade, never()).getToolInvocationLogs(
-            any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), any(), any(), any(), any(), any(), any(), any(), any(), anyInt());
     }
 
     @Test
     void testToolInvocationLogsUsesTheTenantWideFacadeQuery() {
         when(
             toolInvocationLogFacade.getToolInvocationLogs(
-                isNull(), isNull(), isNull(), eq(3L), isNull(), isNull(), isNull(), eq(0)))
+                eq(PlatformType.EMBEDDED), isNull(), isNull(), isNull(), isNull(), eq(3L), isNull(), isNull(), isNull(),
+                eq(0)))
                     .thenReturn(new PageImpl<>(List.of()));
 
         graphQlTester
             .document("""
                 query {
-                    toolInvocationLogs(connectedUserId: 3) {
+                    toolInvocationLogs(type: EMBEDDED, connectedUserId: 3) {
                         totalElements
                     }
                 }
@@ -129,7 +133,36 @@ class ToolInvocationLogGraphQlControllerIntTest {
             .isEqualTo(0);
 
         verify(toolInvocationLogFacade, never()).getWorkspaceToolInvocationLogs(
-            anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+            any(), anyLong(), anyLong(), any(), any(), any(), any(), any(), any(), any(), anyInt());
+    }
+
+    @Test
+    void testToolInvocationLogsPassesTheEnvironmentToTheFacade() {
+        when(
+            toolInvocationLogFacade.getToolInvocationLogs(
+                eq(PlatformType.AUTOMATION), eq(2L), eq(ToolExecutionSurface.MCP_AUTOMATION), isNull(), isNull(),
+                isNull(), isNull(), isNull(),
+                isNull(), eq(0)))
+                    .thenReturn(new PageImpl<>(List.of(toolInvocationLog()), PageRequest.of(0, 50), 1));
+
+        graphQlTester
+            .document("""
+                query {
+                    toolInvocationLogs(type: AUTOMATION, environmentId: "2", surface: "MCP_AUTOMATION") {
+                        content {
+                            environment
+                        }
+                        totalElements
+                    }
+                }
+                """)
+            .execute()
+            .path("toolInvocationLogs.content[0].environment")
+            .entity(Integer.class)
+            .isEqualTo(2)
+            .path("toolInvocationLogs.totalElements")
+            .entity(Integer.class)
+            .isEqualTo(1);
     }
 
     @Test

@@ -3,3 +3,8 @@ type Query {
 }
 
 scalar Long
+
+enum PlatformType {
+    AUTOMATION
+    EMBEDDED
+}
