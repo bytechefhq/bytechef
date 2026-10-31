@@ -34,7 +34,7 @@ const AuditEventDetailSheet = ({auditEvent, onOpenChange, open}: AuditEventDetai
                     <SheetCloseButton />
                 </header>
 
-                <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4">
+                <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-3">
                     {auditEvent && (
                         <>
                             <dl className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2 text-sm">
@@ -57,7 +57,7 @@ const AuditEventDetailSheet = ({auditEvent, onOpenChange, open}: AuditEventDetai
                                 <div className="flex flex-col gap-2">
                                     <span className="text-sm font-semibold">Data</span>
 
-                                    <dl className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2 rounded-md border bg-surface-neutral-primary p-3 text-sm">
+                                    <dl className="grid grid-cols-[120px_1fr] gap-x-4 gap-y-2 text-sm">
                                         {auditEvent.data.map((entry) => (
                                             <div className="contents" key={entry.key}>
                                                 <dt className="break-words text-muted-foreground">{entry.key}</dt>
