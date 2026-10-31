@@ -11,7 +11,9 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,5 +51,10 @@ public class AuditEventService {
     @Transactional(propagation = Propagation.NESTED)
     public void saveAll(List<PersistentAuditEvent> persistentAuditEvents) {
         persistenceAuditEventRepository.saveAll(persistentAuditEvents);
+    }
+
+    @Transactional
+    public void updateJobCreatedPlatform(long jobId, PlatformType platform, LocalDateTime since) {
+        persistenceAuditEventRepository.updateJobCreatedPlatform(jobId, platform, since);
     }
 }

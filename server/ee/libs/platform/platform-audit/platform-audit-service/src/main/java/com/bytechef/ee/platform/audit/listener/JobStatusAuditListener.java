@@ -17,6 +17,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class JobStatusAuditListener implements SharedApplicationEventListener {
 
+    private static final Duration JOB_CREATED_LOOKBACK = Duration.ofDays(1);
     private static final String SYSTEM_PRINCIPAL = "SYSTEM";
 
     private static final Logger log = LoggerFactory.getLogger(JobStatusAuditListener.class);
@@ -63,18 +65,22 @@ public class JobStatusAuditListener implements SharedApplicationEventListener {
             return;
         }
 
+        long jobId = jobStatusApplicationEvent.getJobId();
         Job.Status status = jobStatusApplicationEvent.getStatus();
 
         Map<String, String> data = new LinkedHashMap<>();
 
-        data.put("jobId", String.valueOf(jobStatusApplicationEvent.getJobId()));
+        data.put("jobId", String.valueOf(jobId));
         data.put("status", status.name());
 
         PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
 
-        persistentAuditEvent.setEventDate(LocalDateTime.now());
+        LocalDateTime eventDate = LocalDateTime.now();
+        PlatformType platform = resolvePlatform(jobId);
+
+        persistentAuditEvent.setEventDate(eventDate);
         persistentAuditEvent.setEventType("JOB_" + status.name());
-        persistentAuditEvent.setPlatform(resolvePlatform(jobStatusApplicationEvent.getJobId()));
+        persistentAuditEvent.setPlatform(platform);
         persistentAuditEvent.setPrincipal(SYSTEM_PRINCIPAL);
         persistentAuditEvent.setData(data);
 
@@ -84,6 +90,18 @@ public class JobStatusAuditListener implements SharedApplicationEventListener {
             log.error(
                 "AUDIT PERSISTENCE FAILURE: the job status event was not recorded \u2014 audit trail is incomplete: {}",
                 persistentAuditEvent, exception);
+        }
+
+        if (platform != null && status != Job.Status.CREATED) {
+            updateJobCreatedPlatform(jobId, platform, eventDate.minus(JOB_CREATED_LOOKBACK));
+        }
+    }
+
+    private void updateJobCreatedPlatform(long jobId, PlatformType platform, LocalDateTime since) {
+        try {
+            auditEventService.updateJobCreatedPlatform(jobId, platform, since);
+        } catch (Exception exception) {
+            log.warn("The platform of the created event of job {} could not be updated", jobId, exception);
         }
     }
 

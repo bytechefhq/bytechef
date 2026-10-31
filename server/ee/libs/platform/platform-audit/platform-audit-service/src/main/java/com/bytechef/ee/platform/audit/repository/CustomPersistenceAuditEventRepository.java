@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.audit.repository;
 
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.platform.constant.PlatformType;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -28,4 +29,7 @@ interface CustomPersistenceAuditEventRepository {
     Page<PersistentAuditEvent> findAllFiltered(AuditEventFilter auditEventFilter, Pageable pageable);
 
     List<String> findDistinctEventTypes();
+
+    @Transactional
+    int updateJobCreatedPlatform(long jobId, PlatformType platform, LocalDateTime since);
 }

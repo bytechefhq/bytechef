@@ -113,6 +113,16 @@ public class CustomPersistenceAuditEventRepositoryImpl implements CustomPersiste
             "SELECT DISTINCT event_type FROM persistent_audit_event ORDER BY event_type", String.class);
     }
 
+    @Override
+    public int updateJobCreatedPlatform(long jobId, PlatformType platform, LocalDateTime since) {
+        return jdbcTemplate.update(
+            "UPDATE persistent_audit_event e SET platform = ?"
+                + " WHERE e.event_type = 'JOB_CREATED' AND e.platform IS NULL AND e.event_date >= ?"
+                + " AND EXISTS (SELECT 1 FROM persistent_audit_event_data d"
+                + " WHERE d.persistent_audit_event_id = e.id AND d.key = 'jobId' AND d.value = ?)",
+            platform.name(), Timestamp.valueOf(since), String.valueOf(jobId));
+    }
+
     private String buildWhereClause(AuditEventFilter auditEventFilter, List<Object> arguments) {
         String eventType = auditEventFilter.eventType();
         LocalDateTime fromDate = auditEventFilter.fromDate();
