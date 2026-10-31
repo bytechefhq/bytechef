@@ -4,3 +4,5 @@ bytechef:
     repository:
       jdbc:
         enabled: true
+    test-output:
+      max-sample-items: 5
