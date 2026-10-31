@@ -356,7 +356,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             oAuth2AuthorizationParameters,
             oAuth2Service.getRedirectUri());
 
-        return connectedUserIntegrationDTO.withMcp(
+        connectedUserIntegrationDTO = connectedUserIntegrationDTO.withMcp(
             getMcpTools(
                 Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName(),
                 enabledEmbeddedMcpServerIds),
@@ -364,6 +364,9 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             attachInstanceMcpData(
                 connectedUserIntegrationDTO.integrationInstances(), connectedUser, enabledEmbeddedMcpServerIds,
                 enabledEmbeddedMcpToolIds));
+
+        return connectedUserIntegrationDTO.withStaticWebhookWorkflowUuids(
+            getStaticWebhookWorkflowUuids(filteredConfiguration));
     }
 
     @Override
@@ -389,7 +392,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -427,7 +430,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
         @AuditData(key = "integrationInstanceId", value = "#result")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId,
         @Nullable Map<String, Object> connectionParameters,
@@ -881,7 +884,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             connections, filteredConfiguration, integrationInstances, integrationInstanceWorkflows,
             integrationInstanceConfigurationsById);
 
-        return connectedUserIntegrationDTO.withMcp(
+        connectedUserIntegrationDTO = connectedUserIntegrationDTO.withMcp(
             getMcpTools(
                 Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName(),
                 enabledEmbeddedMcpServerIds),
@@ -889,6 +892,9 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             attachInstanceMcpData(
                 connectedUserIntegrationDTO.integrationInstances(), connectedUser, enabledEmbeddedMcpServerIds,
                 enabledEmbeddedMcpToolIds));
+
+        return connectedUserIntegrationDTO.withStaticWebhookWorkflowUuids(
+            getStaticWebhookWorkflowUuids(filteredConfiguration));
     }
 
     private ConnectedUserIntegrationDTO.@Nullable ConnectionConfig getConnectionConfig(
@@ -1100,7 +1106,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         return integrationInstances.stream()
             .map(integrationInstance -> new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
                 integrationInstance.connection(), integrationInstance.integrationInstance(),
-                integrationInstance.workflows(),
+                getWorkflowsWithStaticWebhookUrl(integrationInstance),
                 getMcpInstanceTools(getIntegrationInstanceId(integrationInstance), enabledEmbeddedMcpToolIds),
                 getMcpInstanceWorkflows(
                     integrationInstance.integrationInstance(), connectedUser, enabledEmbeddedMcpServerIds),
