@@ -3,6 +3,7 @@ import {VisuallyHidden} from 'radix-ui';
 
 import {AuditEventItemType} from '../types';
 import AuditEventOutcomeBadge from './AuditEventOutcomeBadge';
+import AuditEventPlatformLabel from './AuditEventPlatformLabel';
 
 interface AuditEventDetailSheetPropsI {
     auditEvent?: AuditEventItemType;
@@ -41,6 +42,12 @@ const AuditEventDetailSheet = ({auditEvent, onOpenChange, open}: AuditEventDetai
                                 <dt className="text-muted-foreground">Principal</dt>
 
                                 <dd>{auditEvent.principal}</dd>
+
+                                <dt className="text-muted-foreground">Platform</dt>
+
+                                <dd>
+                                    <AuditEventPlatformLabel platform={auditEvent.platform} />
+                                </dd>
 
                                 <dt className="text-muted-foreground">Result</dt>
 

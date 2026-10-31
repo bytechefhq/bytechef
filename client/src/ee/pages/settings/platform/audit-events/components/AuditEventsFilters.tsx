@@ -10,11 +10,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Popover, PopoverAnchor, PopoverContent} from '@/components/ui/popover';
-import {useAuditEventTypesQuery} from '@/shared/middleware/graphql';
+import {PlatformType, useAuditEventTypesQuery} from '@/shared/middleware/graphql';
 import {CalendarRangeIcon, CheckIcon, SlidersHorizontalIcon, XIcon} from 'lucide-react';
 import {useRef, useState} from 'react';
 
-import {AUDIT_EVENT_DATE_RANGE_PRESETS} from '../constants';
+import {AUDIT_EVENT_DATE_RANGE_PRESETS, AUDIT_EVENT_PLATFORMS} from '../constants';
 import {AuditEventDateRangePresetType, AuditEventFiltersI} from '../types';
 
 interface AuditEventsFiltersProps {
@@ -25,6 +25,7 @@ interface AuditEventsFiltersProps {
     onCustomToDateChange: (date?: Date) => void;
     onDateRangePresetChange: (dateRangePreset: AuditEventDateRangePresetType) => void;
     onEventTypeChange: (eventType?: string) => void;
+    onPlatformChange: (platform?: PlatformType) => void;
     onResetFilters: () => void;
 }
 
@@ -36,6 +37,7 @@ const AuditEventsFilters = ({
     onCustomToDateChange,
     onDateRangePresetChange,
     onEventTypeChange,
+    onPlatformChange,
     onResetFilters,
 }: AuditEventsFiltersProps) => {
     const [customRangeOpen, setCustomRangeOpen] = useState(false);
@@ -111,6 +113,33 @@ const AuditEventsFilters = ({
                                         </p>
                                     )}
                                 </DropdownMenuGroup>
+                            </DropdownMenuGroup>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuGroup aria-label="Platforms">
+                                <DropdownMenuLabel>Platform</DropdownMenuLabel>
+
+                                <DropdownMenuItem
+                                    className="flex items-center justify-between"
+                                    onClick={() => onPlatformChange(undefined)}
+                                >
+                                    <span>All</span>
+
+                                    {!filters.platform && <CheckIcon className="size-4" />}
+                                </DropdownMenuItem>
+
+                                {AUDIT_EVENT_PLATFORMS.map((platform) => (
+                                    <DropdownMenuItem
+                                        className="flex items-center justify-between"
+                                        key={platform.value}
+                                        onClick={() => onPlatformChange(platform.value)}
+                                    >
+                                        <span>{platform.label}</span>
+
+                                        {filters.platform === platform.value && <CheckIcon className="size-4" />}
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuGroup>
 
                             <DropdownMenuSeparator />

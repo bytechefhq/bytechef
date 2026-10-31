@@ -2,7 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {XIcon} from 'lucide-react';
 
-import {AUDIT_EVENT_DATE_RANGE_PRESETS} from '../constants';
+import {AUDIT_EVENT_DATE_RANGE_PRESETS, AUDIT_EVENT_PLATFORMS} from '../constants';
 import {AuditEventFiltersI} from '../types';
 
 interface AuditEventsActiveFilterBadgesProps {
@@ -11,6 +11,7 @@ interface AuditEventsActiveFilterBadgesProps {
     onClearDateRange: () => void;
     onClearEventType: () => void;
     onClearFromDate: () => void;
+    onClearPlatform: () => void;
     onClearToDate: () => void;
     onResetFilters: () => void;
 }
@@ -44,6 +45,7 @@ const AuditEventsActiveFilterBadges = ({
     onClearDateRange,
     onClearEventType,
     onClearFromDate,
+    onClearPlatform,
     onClearToDate,
     onResetFilters,
 }: AuditEventsActiveFilterBadgesProps) => {
@@ -51,11 +53,13 @@ const AuditEventsActiveFilterBadges = ({
         return null;
     }
 
-    const {dateRange, eventType, fromDate, toDate} = filters;
+    const {dateRange, eventType, fromDate, platform, toDate} = filters;
 
     const dateRangePreset = AUDIT_EVENT_DATE_RANGE_PRESETS.find(
         (dateRangePresetItem) => dateRangePresetItem.value === dateRange
     );
+
+    const selectedPlatform = AUDIT_EVENT_PLATFORMS.find((platformItem) => platformItem.value === platform);
 
     return (
         <div className="flex flex-wrap items-center gap-2">
@@ -64,6 +68,14 @@ const AuditEventsActiveFilterBadges = ({
                     clearLabel="Clear event type filter"
                     label={`Event type: ${eventType}`}
                     onClear={onClearEventType}
+                />
+            )}
+
+            {selectedPlatform && (
+                <ActiveFilterBadge
+                    clearLabel="Clear platform filter"
+                    label={`Platform: ${selectedPlatform.label}`}
+                    onClear={onClearPlatform}
                 />
             )}
 
