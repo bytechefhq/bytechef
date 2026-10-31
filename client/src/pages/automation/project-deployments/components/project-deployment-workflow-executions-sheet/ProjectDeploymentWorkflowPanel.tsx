@@ -2,7 +2,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import PageLoader from '@/components/PageLoader';
 import useWorkflowExecutionSheetWorkflowPanel from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutionSheetWorkflowPanel';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
-import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {preserveWorkflowDataStore} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ReactFlowProvider} from '@xyflow/react';
 import {Suspense, lazy, useEffect, useState} from 'react';
@@ -28,6 +28,8 @@ const ProjectDeploymentWorkflowPanel = ({workflow}: ProjectDeploymentWorkflowPan
     } = useWorkflowLayout();
 
     useEffect(() => {
+        const restoreWorkflowDataStore = preserveWorkflowDataStore();
+
         const frameId = requestAnimationFrame(() => {
             setReady(true);
         });
@@ -35,7 +37,7 @@ const ProjectDeploymentWorkflowPanel = ({workflow}: ProjectDeploymentWorkflowPan
         return () => {
             cancelAnimationFrame(frameId);
 
-            useWorkflowDataStore.getState().reset();
+            restoreWorkflowDataStore();
         };
     }, []);
 

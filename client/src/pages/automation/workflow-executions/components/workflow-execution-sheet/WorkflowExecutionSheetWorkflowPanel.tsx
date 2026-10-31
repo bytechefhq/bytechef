@@ -3,7 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import useJobExecutionOverlay from '@/pages/platform/workflow-editor/hooks/useJobExecutionOverlay';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {WorkflowExecutionOverlayContext} from '@/pages/platform/workflow-editor/providers/workflowExecutionOverlayContext';
-import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {preserveWorkflowDataStore} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {ReactFlowProvider} from '@xyflow/react';
@@ -45,6 +45,8 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
     useEffect(() => {
         setReady(false);
 
+        const restoreWorkflowDataStore = preserveWorkflowDataStore();
+
         const frameId = requestAnimationFrame(() => {
             setReady(true);
         });
@@ -52,7 +54,7 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
         return () => {
             cancelAnimationFrame(frameId);
 
-            useWorkflowDataStore.getState().reset();
+            restoreWorkflowDataStore();
         };
     }, [workflowExecution.id]);
 
