@@ -61,8 +61,8 @@ describe('ProjectVersionHistorySheet', () => {
                         : {
                               projectVersionWorkflowChange: {
                                   baseVersion: variables.projectVersion === 3 ? 2 : 1,
-                                  changes: [],
                                   changeType: 'MODIFIED',
+                                  changes: [],
                                   label: 'Sync orders',
                                   version: variables.projectVersion,
                                   workflowUuid: 'uuid-1',
