@@ -12,6 +12,7 @@ export interface McpSelectableComponentI {
     clusterElementsCount?: {[key: string]: number} | null;
     description?: string | null;
     icon?: string | null;
+    id?: string;
     name: string;
     title?: string | null;
     version: number | null;
@@ -63,7 +64,7 @@ const McpComponentSelectionGrid = <T extends McpSelectableComponentI>({
                 components.map((component) => (
                     <Card
                         className="cursor-pointer transition-shadow hover:shadow-md"
-                        key={`${component.name}-${component.version}`}
+                        key={component.id ?? `${component.name}-${component.version}`}
                         onClick={() => onComponentSelect(component)}
                     >
                         <CardHeader className="pb-2 text-center">

@@ -33,6 +33,7 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
         >
             {currentStep === 'components' && (
                 <McpComponentDialogComponentSelectionStep
+                    componentName={mcpComponent?.componentName}
                     onComponentSelect={handleComponentSelect}
                     open={open ?? true}
                 />

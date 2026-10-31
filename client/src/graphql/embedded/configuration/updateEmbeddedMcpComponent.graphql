@@ -1,5 +1,5 @@
-mutation updateEmbeddedMcpComponent($id: ID!, $input: McpComponentWithToolsInput!) {
-    updateEmbeddedMcpComponent(id: $id, input: $input) {
+mutation updateEmbeddedMcpComponent($id: ID!, $input: McpComponentWithToolsInput!, $integrationId: ID) {
+    updateEmbeddedMcpComponent(id: $id, input: $input, integrationId: $integrationId) {
         id
         componentName
         componentVersion
@@ -8,6 +8,7 @@ mutation updateEmbeddedMcpComponent($id: ID!, $input: McpComponentWithToolsInput
         connectionId
         createdBy
         createdDate
+        integrationId
         lastModifiedBy
         lastModifiedDate
         version

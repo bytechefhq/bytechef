@@ -12,9 +12,10 @@ import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 import McpComponentToolList from './McpComponentToolList';
 
 const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpComponent; mcpServer: McpServer}) => {
-    const {componentDefinition, setShowEditDialog, showEditDialog} = useMcpComponentListItem(
+    const {componentDefinition, integrationName, setShowEditDialog, showEditDialog} = useMcpComponentListItem(
         mcpComponent.componentName,
-        mcpComponent.componentVersion
+        mcpComponent.componentVersion,
+        mcpComponent.integrationId
     );
 
     const [expanded, setExpanded] = useState(false);
@@ -45,6 +46,38 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                         </span>
                     </button>
                 </CollapsibleTrigger>
+
+                {mcpComponent.integrationId ? (
+                    integrationName && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge
+                                    className="relative z-10"
+                                    label={integrationName}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Integration whose connection these tools use</TooltipContent>
+                        </Tooltip>
+                    )
+                ) : (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge
+                                className="relative z-10"
+                                label="No integration"
+                                styleType="warning-filled"
+                                weight="semibold"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            Edit this component to choose the integration whose connection its tools use.
+                        </TooltipContent>
+                    </Tooltip>
+                )}
 
                 <Tooltip>
                     <TooltipTrigger asChild>

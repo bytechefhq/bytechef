@@ -35,9 +35,12 @@ const mcpComponent = {
     componentName: 'gmail',
     componentVersion: 1,
     id: '7',
+    integrationId: '5',
     title: 'Gmail',
     version: 2,
 } as McpComponent;
+
+const unboundMcpComponent = {...mcpComponent, integrationId: null} as McpComponent;
 
 describe('useMcpComponentDialog', () => {
     beforeEach(() => {
@@ -51,12 +54,17 @@ describe('useMcpComponentDialog', () => {
     it('creates the component through the embedded mutation', () => {
         const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', open: true}));
 
-        act(() => result.current.handleComponentSelect({name: 'gmail', title: 'Gmail', version: 1} as never));
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '5', name: 'gmail', title: 'Gmail', version: 1})
+        );
 
         act(() => result.current.handleSave());
 
         expect(hoisted.createMutate).toHaveBeenCalledWith(
-            {input: {componentName: 'gmail', componentVersion: 1, mcpServerId: '1', tools: []}},
+            {
+                input: {componentName: 'gmail', componentVersion: 1, mcpServerId: '1', tools: []},
+                integrationId: '5',
+            },
             expect.objectContaining({onSuccess: expect.any(Function)})
         );
         expect(hoisted.updateMutate).not.toHaveBeenCalled();
@@ -71,10 +79,53 @@ describe('useMcpComponentDialog', () => {
             {
                 id: '7',
                 input: {componentName: 'gmail', componentVersion: 1, mcpServerId: '1', tools: [], version: 2},
+                integrationId: undefined,
             },
             expect.objectContaining({onSuccess: expect.any(Function)})
         );
         expect(hoisted.createMutate).not.toHaveBeenCalled();
+    });
+
+    it('does not create a component before an integration is selected', () => {
+        const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', open: true}));
+
+        act(() => result.current.handleComponentSelect({name: 'gmail', title: 'Gmail', version: 1}));
+
+        act(() => result.current.handleSave());
+
+        expect(hoisted.createMutate).not.toHaveBeenCalled();
+    });
+
+    it('opens a component without an integration on the integration step', () => {
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({mcpComponent: unboundMcpComponent, mcpServerId: '1', open: true})
+        );
+
+        expect(result.current.currentStep).toBe('components');
+        expect(result.current.selectedComponent).toBeNull();
+    });
+
+    it('binds a component without an integration to the selected integration when it is updated', () => {
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({mcpComponent: unboundMcpComponent, mcpServerId: '1', open: true})
+        );
+
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '6', name: 'gmail', title: 'Gmail Code', version: 1})
+        );
+
+        expect(result.current.currentStep).toBe('tools');
+
+        act(() => result.current.handleSave());
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith(
+            {
+                id: '7',
+                input: {componentName: 'gmail', componentVersion: 1, mcpServerId: '1', tools: [], version: 2},
+                integrationId: '6',
+            },
+            expect.objectContaining({onSuccess: expect.any(Function)})
+        );
     });
 
     it('loads the existing embedded tools only for a saved component while the dialog is open', () => {
@@ -129,7 +180,9 @@ describe('useMcpComponentDialog', () => {
 
         const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', onOpenChange, open: true}));
 
-        act(() => result.current.handleComponentSelect({name: 'gmail', title: 'Gmail', version: 1} as never));
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '5', name: 'gmail', title: 'Gmail', version: 1})
+        );
 
         expect(result.current.currentStep).toBe('tools');
 
