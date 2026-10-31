@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.tenant.sql.BaseDataSource;
@@ -64,6 +65,7 @@ public class CustomAuditEventRepositoryIntTest {
     private static final String OTHER_TENANT_SCHEMA = "bytechef_" + OTHER_TENANT_ID;
     private static final String TENANT_ID = "000001";
     private static final String TENANT_SCHEMA = "bytechef_" + TENANT_ID;
+    private static final String UNKNOWN_TENANT_ID = "000009";
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -92,6 +94,7 @@ public class CustomAuditEventRepositoryIntTest {
         createTenantSchema(OTHER_TENANT_SCHEMA);
 
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
+        when(tenantService.getTenantIds()).thenReturn(List.of(TENANT_ID, OTHER_TENANT_ID));
         when(tenantService.getTenantIdsByUserEmail("test1@gmail.com")).thenReturn(List.of(TENANT_ID, OTHER_TENANT_ID));
         when(tenantService.getTenantIdsByUserEmail("unknown@gmail.com")).thenReturn(List.of());
         when(tenantService.getTenantIdsByUserLogin("admin")).thenReturn(List.of(TENANT_ID));
@@ -120,6 +123,51 @@ public class CustomAuditEventRepositoryIntTest {
         assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
         assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
         assertThat(TenantContext.getCurrentTenantId()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
+    }
+
+    @Test
+    public void testDetailsTenantIsPreferredOverThePrincipalsFirstTenant() {
+        UsernamePasswordAuthenticationToken authentication =
+            UsernamePasswordAuthenticationToken.authenticated("test1@gmail.com", null, List.of());
+
+        authentication.setDetails(createDetails(OTHER_TENANT_ID));
+
+        applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(authentication));
+
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        verify(tenantService, never()).getTenantIdsByUserEmail(anyString());
+    }
+
+    @Test
+    public void testUnknownDetailsTenantFallsBackToThePrincipalLookup() {
+        UsernamePasswordAuthenticationToken authentication =
+            UsernamePasswordAuthenticationToken.authenticated("test1@gmail.com", null, List.of());
+
+        authentication.setDetails(createDetails(UNKNOWN_TENANT_ID));
+
+        applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(authentication));
+
+        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+    }
+
+    @Test
+    public void testSingleTenantIgnoresTheDetailsTenant() {
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+
+        UsernamePasswordAuthenticationToken authentication =
+            UsernamePasswordAuthenticationToken.authenticated("test1@gmail.com", null, List.of());
+
+        authentication.setDetails(createDetails(OTHER_TENANT_ID));
+
+        applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(authentication));
+
+        assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        verify(tenantService, never()).getTenantIds();
     }
 
     @Test
@@ -218,6 +266,10 @@ public class CustomAuditEventRepositoryIntTest {
         assertThat(countAllEvents(TENANT_SCHEMA)).isZero();
         verify(tenantService, never()).getTenantIdsByUserEmail(anyString());
         verify(tenantService, never()).getTenantIdsByUserLogin(anyString());
+    }
+
+    private static TenantWebAuthenticationDetails createDetails(String tenantId) {
+        return new TenantWebAuthenticationDetails("localhost", null, tenantId);
     }
 
     private static AuditEvent createAuditEvent(String principal, String type) {
