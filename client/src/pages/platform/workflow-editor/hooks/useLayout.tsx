@@ -185,6 +185,9 @@ export default function useLayout({
     );
 
     const isWorkflowLoaded = useWorkflowDataStore((state) => state.isWorkflowLoaded);
+    const isBorrowedByReadOnlyCanvas = useWorkflowDataStore((state) => state.isBorrowedByReadOnlyCanvas);
+
+    const editorCanvasSuspended = !readOnlyWorkflow && isBorrowedByReadOnlyCanvas;
 
     const tasks = readOnlyWorkflow ? readOnlyWorkflow.tasks : storeTasks;
     const triggers = readOnlyWorkflow ? readOnlyWorkflow.triggers : storeTriggers;
@@ -318,7 +321,7 @@ export default function useLayout({
         previousCopilotPanelOpenRef.current = copilotPanelOpen;
         previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
-        if (widthDelta === 0) {
+        if (widthDelta === 0 || (!isReadOnlyWorkflow && useWorkflowDataStore.getState().isBorrowedByReadOnlyCanvas)) {
             return;
         }
 
@@ -341,7 +344,7 @@ export default function useLayout({
         const shiftedNodes = shiftNodesHorizontally(currentNodes, shift);
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
-    }, [copilotPanelOpen, leftSidebarOpen]);
+    }, [copilotPanelOpen, isReadOnlyWorkflow, leftSidebarOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
@@ -360,6 +363,10 @@ export default function useLayout({
             });
 
             return () => unsubscribe();
+        }
+
+        if (editorCanvasSuspended) {
+            return;
         }
 
         if (!isWorkflowLoaded && !readOnlyWorkflow) {
@@ -656,11 +663,12 @@ export default function useLayout({
         nodesByRootId,
         clusterFrameLockedByRootId,
         clusterElementsViewMode,
+        editorCanvasSuspended,
     ]);
 
     useEffect(() => {
-        if (!isWorkflowLoaded && !readOnlyWorkflow) {
+        if (!isWorkflowLoaded && !readOnlyWorkflow && !editorCanvasSuspended) {
             clearCanvas();
         }
-    }, [clearCanvas, isWorkflowLoaded, readOnlyWorkflow]);
+    }, [clearCanvas, editorCanvasSuspended, isWorkflowLoaded, readOnlyWorkflow]);
 }

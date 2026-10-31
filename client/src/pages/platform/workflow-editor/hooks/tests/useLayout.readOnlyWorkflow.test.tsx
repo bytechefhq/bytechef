@@ -7,7 +7,7 @@ import {
     WorkflowExecutionOverlayContext,
     WorkflowExecutionOverlayI,
 } from '../../providers/workflowExecutionOverlayContext';
-import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
+import useWorkflowDataStore, {preserveWorkflowDataStore} from '../../stores/useWorkflowDataStore';
 import useLayout from '../useLayout';
 
 const {clusterRootIdsArguments} = vi.hoisted(() => ({clusterRootIdsArguments: [] as string[][]}));
@@ -74,6 +74,73 @@ describe('useLayout on a read-only canvas', () => {
                 expect(nodeIds).toContain('trigger_1');
                 expect(nodeIds).not.toContain('otherWorkflowTask_1');
                 expect(nodeIds).not.toContain('otherWorkflowTrigger_1');
+            },
+            {interval: 5, timeout: 5000}
+        );
+    });
+
+    it('keeps the read-only canvas when the editor underneath lays itself out again', async () => {
+        useWorkflowDataStore.setState({
+            workflow: {
+                ...useWorkflowDataStore.getState().workflow,
+                tasks: [{name: 'editorTask_1', type: 'var/v1/set'}],
+                triggers: [{name: 'editorTrigger_1', type: 'manual/v1/manual'}],
+            },
+        });
+
+        const editorLayout = renderHook(
+            ({canvasWidth}: {canvasWidth: number}) =>
+                useLayout({
+                    canvasHeight: 800,
+                    canvasWidth,
+                    componentDefinitions: [],
+                    taskDispatcherDefinitions: [],
+                }),
+            {initialProps: {canvasWidth: 1200}}
+        );
+
+        await waitFor(
+            () => {
+                expect(useWorkflowDataStore.getState().nodes.map((node) => node.id)).toContain('editorTask_1');
+            },
+            {interval: 5, timeout: 5000}
+        );
+
+        const restoreWorkflowDataStore = preserveWorkflowDataStore();
+
+        renderHook(
+            () =>
+                useLayout({
+                    canvasHeight: 800,
+                    canvasWidth: 1200,
+                    componentDefinitions: [],
+                    readOnlyWorkflow: READ_ONLY_WORKFLOW,
+                    taskDispatcherDefinitions: [],
+                }),
+            {wrapper}
+        );
+
+        await waitFor(
+            () => {
+                expect(useWorkflowDataStore.getState().nodes.map((node) => node.id)).toContain('var_1');
+            },
+            {interval: 5, timeout: 5000}
+        );
+
+        editorLayout.rerender({canvasWidth: 900});
+
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        const nodeIds = useWorkflowDataStore.getState().nodes.map((node) => node.id);
+
+        expect(nodeIds).toContain('var_1');
+        expect(nodeIds).not.toContain('editorTask_1');
+
+        restoreWorkflowDataStore();
+
+        await waitFor(
+            () => {
+                expect(useWorkflowDataStore.getState().nodes.map((node) => node.id)).toContain('editorTask_1');
             },
             {interval: 5, timeout: 5000}
         );
