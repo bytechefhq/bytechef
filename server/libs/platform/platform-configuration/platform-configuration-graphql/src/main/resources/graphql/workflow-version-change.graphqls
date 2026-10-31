@@ -1,0 +1,62 @@
+enum WorkflowChangeType {
+    ADDED
+    REMOVED
+    MODIFIED
+    UNCHANGED
+}
+
+enum WorkflowNodeChangeKind {
+    ADDED
+    REMOVED
+    MODIFIED
+    MOVED
+}
+
+enum WorkflowNodeChangeTarget {
+    WORKFLOW
+    TRIGGER
+    TASK
+    CLUSTER_ELEMENT
+    INPUT
+    OUTPUT
+}
+
+type WorkflowDefinitionValueChange {
+    path: String!
+    oldValue: String
+    newValue: String
+}
+
+type WorkflowDefinitionChange {
+    kind: WorkflowNodeChangeKind!
+    target: WorkflowNodeChangeTarget!
+    name: String
+    type: String
+    label: String
+    parentPath: String
+    valueChanges: [WorkflowDefinitionValueChange!]!
+}
+
+type VersionWorkflowChangeSummary {
+    workflowUuid: String!
+    label: String
+    changeType: WorkflowChangeType!
+    changeCount: Int!
+}
+
+type VersionWorkflowChanges {
+    baseVersion: Int
+    version: Int!
+    workflows: [VersionWorkflowChangeSummary!]!
+}
+
+type VersionWorkflowChange {
+    workflowUuid: String!
+    label: String
+    changeType: WorkflowChangeType!
+    baseVersion: Int
+    version: Int!
+    changes: [WorkflowDefinitionChange!]!
+    oldDefinition: String
+    newDefinition: String
+}

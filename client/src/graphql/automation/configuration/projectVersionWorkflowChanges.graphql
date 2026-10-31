@@ -1,0 +1,12 @@
+query projectVersionWorkflowChanges($projectId: ID!, $projectVersion: Int!) {
+    projectVersionWorkflowChanges(projectId: $projectId, projectVersion: $projectVersion) {
+        baseVersion
+        version
+        workflows {
+            workflowUuid
+            label
+            changeType
+            changeCount
+        }
+    }
+}

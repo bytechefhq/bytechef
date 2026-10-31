@@ -13,6 +13,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -22,16 +23,23 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +60,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final WorkflowCacheManager workflowCacheManager;
+    private final WorkflowDefinitionDiffService workflowDefinitionDiffService;
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowFacade workflowFacade;
@@ -64,8 +73,8 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
-        WorkflowCacheManager workflowCacheManager, WorkflowService workflowService, WorkflowFacade workflowFacade,
-        WorkflowValidatorFacade workflowValidatorFacade,
+        WorkflowCacheManager workflowCacheManager, WorkflowDefinitionDiffService workflowDefinitionDiffService,
+        WorkflowService workflowService, WorkflowFacade workflowFacade, WorkflowValidatorFacade workflowValidatorFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
@@ -75,6 +84,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.workflowCacheManager = workflowCacheManager;
+        this.workflowDefinitionDiffService = workflowDefinitionDiffService;
         this.workflowService = workflowService;
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowFacade = workflowFacade;
@@ -222,6 +232,32 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public VersionWorkflowChange getIntegrationVersionWorkflowChange(
+        long integrationId, int integrationVersion, String workflowUuid) {
+
+        Integer baseVersion = getBaseVersion(integrationId, integrationVersion);
+
+        return VersionWorkflowChangeCalculator.fetchChange(
+            baseVersion, integrationVersion, workflowUuid, getWorkflows(integrationId, baseVersion),
+            getWorkflows(integrationId, integrationVersion), workflowDefinitionDiffService)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Workflow uuid=%s not found in integration version v=%s".formatted(workflowUuid, integrationVersion)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isTenantAdmin()")
+    public VersionWorkflowChanges getIntegrationVersionWorkflowChanges(long integrationId, int integrationVersion) {
+        Integer baseVersion = getBaseVersion(integrationId, integrationVersion);
+
+        return VersionWorkflowChangeCalculator.summarize(
+            baseVersion, integrationVersion, getWorkflows(integrationId, baseVersion),
+            getWorkflows(integrationId, integrationVersion), workflowDefinitionDiffService);
+    }
+
+    @Override
     @PreAuthorize("isTenantAdmin()")
     public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         workflowValidatorFacade.validateNoReservedInputNames(definition);
@@ -236,5 +272,36 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         }
 
         return getIntegrationWorkflow(workflowId);
+    }
+
+    private @Nullable Integer getBaseVersion(long integrationId, int integrationVersion) {
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        List<Integer> versions =
+            CollectionUtils.map(integration.getIntegrationVersions(), IntegrationVersion::getVersion);
+
+        if (!versions.contains(integrationVersion)) {
+            throw new IllegalArgumentException("Integration version v=%s not found".formatted(integrationVersion));
+        }
+
+        return VersionWorkflowChangeCalculator.resolveBaseVersion(versions, integrationVersion);
+    }
+
+    private Map<String, Workflow> getWorkflows(long integrationId, @Nullable Integer integrationVersion) {
+        Map<String, Workflow> workflows = new LinkedHashMap<>();
+
+        if (integrationVersion == null) {
+            return workflows;
+        }
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
+            integrationId, integrationVersion)) {
+
+            workflows.put(
+                integrationWorkflow.getUuidAsString(),
+                workflowService.getWorkflow(integrationWorkflow.getWorkflowId()));
+        }
+
+        return workflows;
     }
 }

@@ -68,6 +68,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
         "com.bytechef.encryption",
         "com.bytechef.platform.category",
         "com.bytechef.platform.configuration.service",
+        "com.bytechef.platform.configuration.workflow.diff",
         "com.bytechef.platform.connection",
         "com.bytechef.platform.tag"
     },

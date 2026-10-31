@@ -16,6 +16,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProject;
@@ -39,6 +40,8 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
@@ -93,6 +96,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
     private final ProjectService projectService;
+    private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -111,6 +115,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, ProjectService projectService,
+        ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
@@ -126,6 +131,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
         this.projectService = projectService;
+        this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -292,6 +298,22 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
                 projectVersion.getStatus() == ProjectVersion.Status.PUBLISHED ? "PUBLISHED" : "DRAFT",
                 Objects.toString(projectVersion.getPublishedDate(), null), projectVersion.getDescription()))
             .toList();
+    }
+
+    @Override
+    public VersionWorkflowChange getProjectVersionWorkflowChange(
+        long projectId, int projectVersion, String workflowUuid) {
+
+        getProjectOfAutomationWorkflowProject(projectId);
+
+        return projectVersionWorkflowChangeService.getVersionWorkflowChange(projectId, projectVersion, workflowUuid);
+    }
+
+    @Override
+    public VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion) {
+        getProjectOfAutomationWorkflowProject(projectId);
+
+        return projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, projectVersion);
     }
 
     @Override

@@ -20,6 +20,14 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateD
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
+import com.bytechef.platform.configuration.dto.WorkflowChangeType;
+import com.bytechef.platform.configuration.dto.WorkflowDefinitionChange;
+import com.bytechef.platform.configuration.dto.WorkflowDefinitionValueChange;
+import com.bytechef.platform.configuration.dto.WorkflowNodeChangeKind;
+import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -518,6 +526,102 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
             .valueIsNull();
 
         verify(automationWorkflowProjectFacade).getProjectVersions(5L);
+    }
+
+    @Test
+    void testAutomationWorkflowProjectVersionWorkflowChanges() {
+        when(automationWorkflowProjectFacade.getProjectVersionWorkflowChanges(5L, 2))
+            .thenReturn(new VersionWorkflowChanges(
+                1, 2, List.of(new VersionWorkflowChangeSummary(
+                    SOURCE_WORKFLOW_UUID, "Workflow One", WorkflowChangeType.MODIFIED, 3))));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationWorkflowProjectVersionWorkflowChanges(id: "5", projectVersion: 2) {
+                        baseVersion
+                        version
+                        workflows {
+                            workflowUuid
+                            label
+                            changeType
+                            changeCount
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("automationWorkflowProjectVersionWorkflowChanges.baseVersion")
+            .entity(Integer.class)
+            .isEqualTo(1)
+            .path("automationWorkflowProjectVersionWorkflowChanges.version")
+            .entity(Integer.class)
+            .isEqualTo(2)
+            .path("automationWorkflowProjectVersionWorkflowChanges.workflows[0].workflowUuid")
+            .entity(String.class)
+            .isEqualTo(SOURCE_WORKFLOW_UUID)
+            .path("automationWorkflowProjectVersionWorkflowChanges.workflows[0].changeType")
+            .entity(String.class)
+            .isEqualTo("MODIFIED")
+            .path("automationWorkflowProjectVersionWorkflowChanges.workflows[0].changeCount")
+            .entity(Integer.class)
+            .isEqualTo(3);
+
+        verify(automationWorkflowProjectFacade).getProjectVersionWorkflowChanges(5L, 2);
+    }
+
+    @Test
+    void testAutomationWorkflowProjectVersionWorkflowChange() {
+        when(automationWorkflowProjectFacade.getProjectVersionWorkflowChange(5L, 2, SOURCE_WORKFLOW_UUID))
+            .thenReturn(new VersionWorkflowChange(
+                SOURCE_WORKFLOW_UUID, "Workflow One", WorkflowChangeType.MODIFIED, 1, 2,
+                List.of(new WorkflowDefinitionChange(
+                    WorkflowNodeChangeKind.MODIFIED, WorkflowNodeChangeTarget.TASK, "gmail_1", "gmail/v1/sendEmail",
+                    "Send", null, List.of(new WorkflowDefinitionValueChange("parameters.to", "a", "b")))),
+                "{}", "{\"label\":\"x\"}"));
+
+        this.graphQlTester
+            .document("""
+                query($workflowUuid: String!) {
+                    automationWorkflowProjectVersionWorkflowChange(
+                        id: "5", projectVersion: 2, workflowUuid: $workflowUuid) {
+                        workflowUuid
+                        changeType
+                        baseVersion
+                        version
+                        newDefinition
+                        changes {
+                            kind
+                            target
+                            valueChanges {
+                                path
+                            }
+                        }
+                    }
+                }
+                """)
+            .variable("workflowUuid", SOURCE_WORKFLOW_UUID)
+            .execute()
+            .path("automationWorkflowProjectVersionWorkflowChange.changeType")
+            .entity(String.class)
+            .isEqualTo("MODIFIED")
+            .path("automationWorkflowProjectVersionWorkflowChange.baseVersion")
+            .entity(Integer.class)
+            .isEqualTo(1)
+            .path("automationWorkflowProjectVersionWorkflowChange.newDefinition")
+            .entity(String.class)
+            .isEqualTo("{\"label\":\"x\"}")
+            .path("automationWorkflowProjectVersionWorkflowChange.changes[0].kind")
+            .entity(String.class)
+            .isEqualTo("MODIFIED")
+            .path("automationWorkflowProjectVersionWorkflowChange.changes[0].target")
+            .entity(String.class)
+            .isEqualTo("TASK")
+            .path("automationWorkflowProjectVersionWorkflowChange.changes[0].valueChanges[0].path")
+            .entity(String.class)
+            .isEqualTo("parameters.to");
+
+        verify(automationWorkflowProjectFacade).getProjectVersionWorkflowChange(5L, 2, SOURCE_WORKFLOW_UUID);
     }
 
     @Test

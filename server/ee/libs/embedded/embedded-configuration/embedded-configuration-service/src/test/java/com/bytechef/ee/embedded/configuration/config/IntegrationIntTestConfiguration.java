@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
@@ -41,6 +42,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -58,7 +60,8 @@ import tools.jackson.databind.ObjectMapper;
 @ComponentScan(
     basePackages = {
         "com.bytechef.encryption", "com.bytechef.platform.category",
-        "com.bytechef.ee.embedded.configuration", "com.bytechef.platform.tag"
+        "com.bytechef.ee.embedded.configuration", "com.bytechef.platform.configuration.workflow.diff",
+        "com.bytechef.platform.tag"
     },
     excludeFilters = @Filter(
         type = FilterType.REGEX,
@@ -84,6 +87,12 @@ public class IntegrationIntTestConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService() {
+        return mock(ProjectVersionWorkflowChangeService.class);
     }
 
     @Bean

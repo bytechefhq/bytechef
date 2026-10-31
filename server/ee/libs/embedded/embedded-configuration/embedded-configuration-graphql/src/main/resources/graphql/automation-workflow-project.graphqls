@@ -52,6 +52,9 @@ extend type Query {
     automationWorkflowProjectCategories: [AutomationWorkflowProjectCategory!]!
     automationWorkflowProjectTags: [AutomationWorkflowProjectTag!]!
     automationWorkflowProjectVersions(id: ID!): [AutomationWorkflowProjectVersion!]!
+    automationWorkflowProjectVersionWorkflowChanges(id: ID!, projectVersion: Int!): VersionWorkflowChanges!
+    automationWorkflowProjectVersionWorkflowChange(
+        id: ID!, projectVersion: Int!, workflowUuid: String!): VersionWorkflowChange!
 }
 
 extend type Mutation {

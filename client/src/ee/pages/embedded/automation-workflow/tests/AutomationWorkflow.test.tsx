@@ -18,7 +18,8 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/shared/middleware/graphql', () => ({
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<Record<string, unknown>>()),
     LogLevel: {
         Debug: 'DEBUG',
         Error: 'ERROR',

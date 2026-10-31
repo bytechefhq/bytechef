@@ -1,8 +1,10 @@
+import {WorkflowNodeChangeKind} from '@/shared/middleware/graphql';
 import {NodeDataType} from '@/shared/types';
 import {render, screen} from '@testing-library/react';
 import {ReactFlowProvider} from '@xyflow/react';
 import {describe, expect, it, vi} from 'vitest';
 
+import {WorkflowChangeHighlightContext} from '../providers/workflowChangeHighlightContext';
 import {
     WorkflowExecutionOverlayContext,
     type WorkflowExecutionOverlayI,
@@ -168,5 +170,37 @@ describe('ReadOnlyNode', () => {
         renderNodeWithExecution(BASE_DATA, {other_1: {durationMillis: 10, status: 'COMPLETED'}});
 
         expect(screen.queryByText('10ms')).not.toBeInTheDocument();
+    });
+
+    it('applies the change highlight border when a highlight context is present', () => {
+        const {container} = render(
+            <ReactFlowProvider>
+                <WorkflowExecutionOverlayContext.Provider
+                    value={{
+                        isRunning: false,
+                        nodeStates: {approval_1: {durationMillis: 10, status: 'FAILED'}},
+                        taskExecutions: [],
+                    }}
+                >
+                    <WorkflowChangeHighlightContext.Provider value={{approval_1: WorkflowNodeChangeKind.Modified}}>
+                        <ReadOnlyNode data={BASE_DATA} />
+                    </WorkflowChangeHighlightContext.Provider>
+                </WorkflowExecutionOverlayContext.Provider>
+            </ReactFlowProvider>
+        );
+
+        const border = container.querySelector('div.border-2');
+
+        expect(container.querySelector('[data-change-kind="MODIFIED"]')).toBe(container.firstElementChild);
+        expect(border).toHaveClass('border-amber-500');
+        expect(border).not.toHaveClass('border-red-500');
+        expect(screen.queryByText('10ms')).not.toBeInTheDocument();
+    });
+
+    it('keeps the test state border and no change kind without a highlight context', () => {
+        const {container} = renderNodeWithExecution(BASE_DATA, {approval_1: {durationMillis: 10, status: 'FAILED'}});
+
+        expect(container.querySelector('div.border-2')).toHaveClass('border-red-500');
+        expect(container.querySelector('[data-change-kind]')).toBeNull();
     });
 });
