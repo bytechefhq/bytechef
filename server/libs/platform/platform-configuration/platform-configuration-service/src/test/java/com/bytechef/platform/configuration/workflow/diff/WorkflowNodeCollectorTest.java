@@ -114,6 +114,24 @@ class WorkflowNodeCollectorTest {
     }
 
     @Test
+    void testCollectsEachIterateeTaskObject() {
+        List<WorkflowNode> nodes = WorkflowNodeCollector.collect(
+            Map.of(
+                "tasks", List.of(
+                    Map.of(
+                        "name", "each_1", "type", "each/v1",
+                        "parameters", Map.of("items", "x", "iteratee", task("a"))))));
+
+        assertThat(nodes).extracting(WorkflowNode::name)
+            .containsExactly("each_1", "a");
+        assertThat(nodes.get(1)
+            .parentPath()).isEqualTo("each_1.iteratee");
+        assertThat(nodes.get(0)
+            .attributes()).isEqualTo(
+                Map.of("name", "each_1", "type", "each/v1", "parameters", Map.of("items", "x")));
+    }
+
+    @Test
     void testCollectsBranchCasesAndDefaultTasks() {
         List<WorkflowNode> nodes = WorkflowNodeCollector.collect(
             Map.of(

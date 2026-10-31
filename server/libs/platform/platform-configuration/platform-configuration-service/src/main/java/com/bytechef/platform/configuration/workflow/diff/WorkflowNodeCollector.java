@@ -141,8 +141,14 @@ public class WorkflowNodeCollector {
             Map<String, Object> remaining = new LinkedHashMap<>();
 
             for (Map.Entry<?, ?> entry : map.entrySet()) {
-                remaining.put(
-                    String.valueOf(entry.getKey()), prune(entry.getValue(), path + "." + entry.getKey(), childNodes));
+                String entryPath = path + "." + entry.getKey();
+                Object entryValue = entry.getValue();
+
+                if (isTask(entryValue)) {
+                    collectNode(WorkflowNodeChangeTarget.TASK, (Map<?, ?>) entryValue, entryPath, 0, childNodes);
+                } else {
+                    remaining.put(String.valueOf(entry.getKey()), prune(entryValue, entryPath, childNodes));
+                }
             }
 
             return remaining;

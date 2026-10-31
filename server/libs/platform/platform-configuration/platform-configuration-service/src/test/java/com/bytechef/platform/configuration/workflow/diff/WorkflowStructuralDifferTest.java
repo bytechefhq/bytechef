@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.workflow.diff;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.platform.configuration.dto.WorkflowDefinitionChange;
 import com.bytechef.platform.configuration.dto.WorkflowDefinitionValueChange;
@@ -252,6 +253,34 @@ class WorkflowStructuralDifferTest {
     }
 
     @Test
+    void testNestedTaskParameterChangeInsideEach() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(each(nested("a", "x")))),
+            Map.of("tasks", List.of(each(nested("a", "y")))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.MODIFIED);
+        assertThat(changes.get(0)
+            .name()).isEqualTo("a");
+        assertThat(changes.get(0)
+            .parentPath()).isEqualTo("each_1.iteratee");
+        assertThat(changes.get(0)
+            .valueChanges()).containsExactly(new WorkflowDefinitionValueChange("parameters.p", "\"x\"", "\"y\""));
+    }
+
+    @Test
+    void testRenamedTaskInsideEachIsRemovedAndAdded() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(each(nested("a", "x")))),
+            Map.of("tasks", List.of(each(nested("b", "x")))));
+
+        assertThat(changes).extracting(WorkflowDefinitionChange::kind, WorkflowDefinitionChange::name)
+            .containsExactly(
+                tuple(WorkflowNodeChangeKind.ADDED, "b"), tuple(WorkflowNodeChangeKind.REMOVED, "a"));
+    }
+
+    @Test
     void testTaskMovedBetweenConditionBranches() {
         List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
             Map.of("tasks", List.of(condition(List.of(nested("a", "x")), List.of()))),
@@ -414,6 +443,10 @@ class WorkflowStructuralDifferTest {
         return Map.of(
             "name", "condition_1", "type", "condition/v1",
             "parameters", Map.of("rawExpression", "x", "caseTrue", caseTrue, "caseFalse", caseFalse));
+    }
+
+    private static Map<String, Object> each(Map<String, Object> iteratee) {
+        return Map.of("name", "each_1", "type", "each/v1", "parameters", Map.of("items", "x", "iteratee", iteratee));
     }
 
     private static Map<String, Object> loop(List<Object> iteratee) {
