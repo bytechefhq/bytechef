@@ -216,14 +216,21 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
         if (mcpIntegrationComponentOptional.isPresent()) {
             McpIntegrationComponent mcpIntegrationComponent = mcpIntegrationComponentOptional.get();
+            long boundIntegrationId = mcpIntegrationComponent.getIntegrationId();
 
-            if (integrationId != null && integrationId.longValue() != mcpIntegrationComponent.getIntegrationId()) {
-                throw new IllegalArgumentException(
-                    "MCP component %s is already bound to integration %s".formatted(
-                        mcpComponent.getId(), mcpIntegrationComponent.getIntegrationId()));
+            if (integrationId != null && integrationId.longValue() != boundIntegrationId) {
+                if (isIntegrationAvailable(boundIntegrationId)) {
+                    throw new IllegalArgumentException(
+                        "MCP component %s is already bound to integration %s".formatted(
+                            mcpComponent.getId(), boundIntegrationId));
+                }
+
+                checkIntegrationComponent(integrationId, mcpComponent.getComponentName());
+
+                mcpIntegrationComponentService.update(mcpComponent.getId(), integrationId);
+            } else {
+                checkIntegrationComponent(boundIntegrationId, mcpComponent.getComponentName());
             }
-
-            checkIntegrationComponent(mcpIntegrationComponent.getIntegrationId(), mcpComponent.getComponentName());
         } else if (integrationId != null) {
             checkIntegrationComponent(integrationId, mcpComponent.getComponentName());
 
@@ -334,5 +341,11 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         checkEmbeddedMcpComponent(mcpTool.getMcpComponentId());
 
         return mcpTool;
+    }
+
+    private boolean isIntegrationAvailable(long integrationId) {
+        return getConfiguredPublishedIntegrations()
+            .stream()
+            .anyMatch(integration -> integration.getId() == integrationId);
     }
 }
