@@ -136,11 +136,9 @@ const useWorkflowEditorCanvas = ({
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: UseWorkflowEditorCanvasParamsI) => {
-    let workflow = useWorkflowDataStore((state) => state.workflow);
+    const storeWorkflow = useWorkflowDataStore((state) => state.workflow);
 
-    if (!workflow.tasks && readOnlyWorkflow) {
-        workflow = {...workflow, ...readOnlyWorkflow};
-    }
+    const workflow = readOnlyWorkflow || storeWorkflow;
 
     const workflowId = workflow.id!;
     const {incrementLayoutResetCounter, onNodesChange, setIsNodeDragging, setNodes} = useWorkflowDataStore(
@@ -532,7 +530,7 @@ const useWorkflowEditorCanvas = ({
 
     useCanvasHeightViewport({enabled: !readOnlyWorkflow});
 
-    const workflowUuid = workflow.workflowUuid;
+    const workflowUuid = readOnlyWorkflow ? undefined : storeWorkflow.workflowUuid;
 
     useEffect(() => {
         if (!readOnlyWorkflow) {
