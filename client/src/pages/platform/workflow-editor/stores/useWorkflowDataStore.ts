@@ -395,6 +395,20 @@ export function runWithoutHistory(updater: () => void): void {
     }
 }
 
+export function preserveWorkflowDataStore(): () => void {
+    const preservedState = useWorkflowDataStore.getState();
+
+    return () => {
+        runWithoutHistory(() => {
+            if (preservedState.isWorkflowLoaded) {
+                useWorkflowDataStore.setState(preservedState);
+            } else {
+                useWorkflowDataStore.getState().reset();
+            }
+        });
+    };
+}
+
 export function clearWorkflowHistory(): void {
     useWorkflowDataStore.temporal.getState().clear();
 }
