@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
-import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
+import {IntegrationStatus, IntegrationVersion} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {VisuallyHidden} from 'radix-ui';
 import {useState} from 'react';
@@ -13,12 +13,63 @@ interface IntegrationVersionHistorySheetProps {
     integrationId: number;
 }
 
+interface IntegrationVersionAccordionProps {
+    integrationId: number;
+    integrationVersions: IntegrationVersion[];
+}
+
+const IntegrationVersionAccordion = ({integrationId, integrationVersions}: IntegrationVersionAccordionProps) => {
+    const [openValues, setOpenValues] = useState<string[]>(
+        integrationVersions.length > 1 ? [integrationVersions[1]!.version!.toString()] : []
+    );
+
+    return (
+        <Accordion onValueChange={setOpenValues} type="multiple" value={openValues}>
+            {integrationVersions.map((integrationVersion) => (
+                <AccordionItem key={integrationVersion.version} value={integrationVersion.version?.toString() || ''}>
+                    <AccordionTrigger>
+                        <div className="flex w-full items-center justify-between pr-2">
+                            <span className="text-sm font-semibold">{`V${integrationVersion.version}`}</span>
+
+                            <div className="flex items-center space-x-4">
+                                {integrationVersion.publishedDate && (
+                                    <span className="text-sm">
+                                        {`${integrationVersion.publishedDate?.toLocaleDateString()} ${integrationVersion.publishedDate?.toLocaleTimeString()}`}
+                                    </span>
+                                )}
+
+                                <Badge
+                                    className="border-transparent"
+                                    label={integrationVersion.status ?? ''}
+                                    styleType={
+                                        integrationVersion.status === IntegrationStatus.Published
+                                            ? 'success-outline'
+                                            : 'secondary-filled'
+                                    }
+                                    weight="semibold"
+                                />
+                            </div>
+                        </div>
+                    </AccordionTrigger>
+
+                    <AccordionContent className="text-muted-foreground">
+                        <p>{integrationVersion.description ? integrationVersion.description : 'No description.'}</p>
+
+                        <IntegrationVersionWorkflowChanges
+                            draft={integrationVersion.status === IntegrationStatus.Draft}
+                            expanded={openValues.includes(integrationVersion.version?.toString() || '')}
+                            integrationId={integrationId}
+                            integrationVersion={integrationVersion.version!}
+                        />
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
+        </Accordion>
+    );
+};
+
 const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVersionHistorySheetProps) => {
     const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId);
-
-    const [openValues, setOpenValues] = useState<string[]>(
-        integrationVersions && integrationVersions.length > 1 ? [integrationVersions[1]!.version!.toString()] : []
-    );
 
     return (
         <Sheet onOpenChange={() => onClose()} open>
@@ -39,54 +90,10 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
 
                 <div className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg bg-surface-neutral-primary p-3">
                     {integrationVersions && (
-                        <Accordion onValueChange={setOpenValues} type="multiple" value={openValues}>
-                            {integrationVersions.map((integrationVersion) => (
-                                <AccordionItem
-                                    key={integrationVersion.version}
-                                    value={integrationVersion.version?.toString() || ''}
-                                >
-                                    <AccordionTrigger>
-                                        <div className="flex w-full items-center justify-between pr-2">
-                                            <span className="text-sm font-semibold">{`V${integrationVersion.version}`}</span>
-
-                                            <div className="flex items-center space-x-4">
-                                                {integrationVersion.publishedDate && (
-                                                    <span className="text-sm">
-                                                        {`${integrationVersion.publishedDate?.toLocaleDateString()} ${integrationVersion.publishedDate?.toLocaleTimeString()}`}
-                                                    </span>
-                                                )}
-
-                                                <Badge
-                                                    className="border-transparent"
-                                                    label={integrationVersion.status ?? ''}
-                                                    styleType={
-                                                        integrationVersion.status === IntegrationStatus.Published
-                                                            ? 'success-outline'
-                                                            : 'secondary-filled'
-                                                    }
-                                                    weight="semibold"
-                                                />
-                                            </div>
-                                        </div>
-                                    </AccordionTrigger>
-
-                                    <AccordionContent className="text-muted-foreground">
-                                        <p>
-                                            {integrationVersion.description
-                                                ? integrationVersion.description
-                                                : 'No description.'}
-                                        </p>
-
-                                        <IntegrationVersionWorkflowChanges
-                                            draft={integrationVersion.status === IntegrationStatus.Draft}
-                                            expanded={openValues.includes(integrationVersion.version?.toString() || '')}
-                                            integrationId={integrationId}
-                                            integrationVersion={integrationVersion.version!}
-                                        />
-                                    </AccordionContent>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
+                        <IntegrationVersionAccordion
+                            integrationId={integrationId}
+                            integrationVersions={integrationVersions}
+                        />
                     )}
                 </div>
             </SheetContent>

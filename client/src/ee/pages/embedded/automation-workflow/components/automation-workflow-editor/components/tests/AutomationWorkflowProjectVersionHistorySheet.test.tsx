@@ -5,9 +5,11 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 const {
     useAutomationWorkflowProjectVersionWorkflowChangeQuery,
     useAutomationWorkflowProjectVersionWorkflowChangesQuery,
+    useAutomationWorkflowProjectVersionsQuery,
 } = vi.hoisted(() => ({
     useAutomationWorkflowProjectVersionWorkflowChangeQuery: vi.fn(),
     useAutomationWorkflowProjectVersionWorkflowChangesQuery: vi.fn(),
+    useAutomationWorkflowProjectVersionsQuery: vi.fn(),
 }));
 
 vi.mock('@/shared/components/version-workflow-changes/WorkflowVersionChangesDialog', () => ({
@@ -20,24 +22,28 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<Record<string, unknown>>()),
     useAutomationWorkflowProjectVersionWorkflowChangeQuery,
     useAutomationWorkflowProjectVersionWorkflowChangesQuery,
-    useAutomationWorkflowProjectVersionsQuery: () => ({
-        data: {
-            automationWorkflowProjectVersions: [
-                {description: null, publishedDate: null, status: 'DRAFT', version: 3},
-                {
-                    description: 'Adds greeting\nFixes typo',
-                    publishedDate: '2026-10-07T14:25:20Z',
-                    status: 'PUBLISHED',
-                    version: 2,
-                },
-                {description: null, publishedDate: '2026-10-07T14:11:03Z', status: 'PUBLISHED', version: 1},
-            ],
-        },
-    }),
+    useAutomationWorkflowProjectVersionsQuery,
 }));
+
+const versionsResult = {
+    data: {
+        automationWorkflowProjectVersions: [
+            {description: null, publishedDate: null, status: 'DRAFT', version: 3},
+            {
+                description: 'Adds greeting\nFixes typo',
+                publishedDate: '2026-10-07T14:25:20Z',
+                status: 'PUBLISHED',
+                version: 2,
+            },
+            {description: null, publishedDate: '2026-10-07T14:11:03Z', status: 'PUBLISHED', version: 1},
+        ],
+    },
+};
 
 describe('AutomationWorkflowProjectVersionHistorySheet', () => {
     beforeEach(() => {
+        useAutomationWorkflowProjectVersionsQuery.mockReset();
+        useAutomationWorkflowProjectVersionsQuery.mockReturnValue(versionsResult);
         useAutomationWorkflowProjectVersionWorkflowChangesQuery.mockReset();
         useAutomationWorkflowProjectVersionWorkflowChangeQuery.mockReset();
 
@@ -124,5 +130,23 @@ describe('AutomationWorkflowProjectVersionHistorySheet', () => {
         fireEvent.click(screen.getAllByText('Sync orders')[0]!);
 
         expect(screen.getAllByTestId('mock-changes-dialog')[0]).toHaveTextContent('V2|Draft');
+    });
+
+    it('expands the latest published version once the version data loads', () => {
+        useAutomationWorkflowProjectVersionsQuery.mockReturnValue({data: undefined});
+
+        const {rerender} = render(
+            <AutomationWorkflowProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />
+        );
+
+        useAutomationWorkflowProjectVersionsQuery.mockReturnValue(versionsResult);
+
+        rerender(<AutomationWorkflowProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />);
+
+        expect(useAutomationWorkflowProjectVersionWorkflowChangesQuery).toHaveBeenCalledWith(
+            {id: 'project-1', projectVersion: 2},
+            expect.objectContaining({enabled: true})
+        );
+        expect(screen.getByText('Fixes typo')).toBeInTheDocument();
     });
 });

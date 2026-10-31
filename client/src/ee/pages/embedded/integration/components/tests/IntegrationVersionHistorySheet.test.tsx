@@ -3,25 +3,30 @@ import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {useIntegrationVersionWorkflowChangeQuery, useIntegrationVersionWorkflowChangesQuery} = vi.hoisted(() => ({
+const {
+    useGetIntegrationVersionsQuery,
+    useIntegrationVersionWorkflowChangeQuery,
+    useIntegrationVersionWorkflowChangesQuery,
+} = vi.hoisted(() => ({
+    useGetIntegrationVersionsQuery: vi.fn(),
     useIntegrationVersionWorkflowChangeQuery: vi.fn(),
     useIntegrationVersionWorkflowChangesQuery: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationVersions.queries', () => ({
-    useGetIntegrationVersionsQuery: () => ({
-        data: [
-            {status: IntegrationStatus.Draft, version: 3},
-            {
-                description: 'Second release',
-                publishedDate: new Date('2026-10-10T10:00:00Z'),
-                status: IntegrationStatus.Published,
-                version: 2,
-            },
-            {publishedDate: new Date('2026-10-09T10:00:00Z'), status: IntegrationStatus.Published, version: 1},
-        ],
-    }),
+    useGetIntegrationVersionsQuery,
 }));
+
+const integrationVersions = [
+    {status: IntegrationStatus.Draft, version: 3},
+    {
+        description: 'Second release',
+        publishedDate: new Date('2026-10-10T10:00:00Z'),
+        status: IntegrationStatus.Published,
+        version: 2,
+    },
+    {publishedDate: new Date('2026-10-09T10:00:00Z'), status: IntegrationStatus.Published, version: 1},
+];
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<Record<string, unknown>>()),
@@ -37,6 +42,8 @@ vi.mock('@/shared/components/version-workflow-changes/WorkflowVersionChangesDial
 
 describe('IntegrationVersionHistorySheet', () => {
     beforeEach(() => {
+        useGetIntegrationVersionsQuery.mockReset();
+        useGetIntegrationVersionsQuery.mockReturnValue({data: integrationVersions});
         useIntegrationVersionWorkflowChangesQuery.mockReset();
         useIntegrationVersionWorkflowChangeQuery.mockReset();
 
@@ -113,5 +120,21 @@ describe('IntegrationVersionHistorySheet', () => {
         fireEvent.click(screen.getAllByText('Sync orders')[0]!);
 
         expect(screen.getAllByTestId('mock-changes-dialog')[0]).toHaveTextContent('V2|Draft');
+    });
+
+    it('expands the latest published version once the version data loads', () => {
+        useGetIntegrationVersionsQuery.mockReturnValue({data: undefined});
+
+        const {rerender} = render(<IntegrationVersionHistorySheet integrationId={7} onClose={vi.fn()} />);
+
+        useGetIntegrationVersionsQuery.mockReturnValue({data: integrationVersions});
+
+        rerender(<IntegrationVersionHistorySheet integrationId={7} onClose={vi.fn()} />);
+
+        expect(useIntegrationVersionWorkflowChangesQuery).toHaveBeenCalledWith(
+            {integrationId: '7', integrationVersion: 2},
+            expect.objectContaining({enabled: true})
+        );
+        expect(screen.getByText('Second release')).toBeInTheDocument();
     });
 });
