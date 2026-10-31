@@ -43,7 +43,9 @@ const WorkflowVersionChangesTabs = ({baseVersionLabel, change, versionLabel}: Wo
             </div>
 
             <TabsContent value="changes">
-                <WorkflowDefinitionChangesList changeType={change.changeType} changes={change.changes} />
+                <div className="h-[70vh] overflow-y-auto">
+                    <WorkflowDefinitionChangesList changeType={change.changeType} changes={change.changes} />
+                </div>
             </TabsContent>
 
             <TabsContent value="canvas">
