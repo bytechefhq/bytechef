@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -140,7 +141,7 @@ class ScopedProjectGuardTest {
                     .doesNotThrowAnyException();
 
         verify(projectOwnershipService).getOwnedProjectIds(
-            List.of(OWN_PROJECT_ID), EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT));
+            List.of(OWN_PROJECT_ID), EnumSet.allOf(ProjectOwner.class));
     }
 
     @Test
@@ -149,7 +150,7 @@ class ScopedProjectGuardTest {
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
             .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-1"));
         when(projectOwnershipService.getOwnedProjectIds(
-            List.of(OWN_PROJECT_ID), EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+            List.of(OWN_PROJECT_ID), EnumSet.allOf(ProjectOwner.class)))
                 .thenReturn(Set.of(OWN_PROJECT_ID));
 
         ScopedProjectGuard scopedProjectGuard = newGuard();
@@ -167,7 +168,7 @@ class ScopedProjectGuardTest {
         when(permissionService.hasWorkspaceScopeForProject(OWN_PROJECT_ID, ScopedProjectGuard.WORKFLOW_VIEW))
             .thenReturn(true);
         when(projectOwnershipService.getOwnedProjectIds(
-            List.of(OWN_PROJECT_ID), EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+            List.of(OWN_PROJECT_ID), EnumSet.allOf(ProjectOwner.class)))
                 .thenReturn(Set.of(OWN_PROJECT_ID));
 
         ScopedProjectGuard scopedProjectGuard = newGuard();
@@ -183,21 +184,84 @@ class ScopedProjectGuardTest {
     @Test
     void testCheckProjectNotHiddenAllowsAProjectWithoutAHiddenOwner() {
         assertThatCode(
-            () -> newGuard().checkProjectNotHidden(OWN_PROJECT_ID, ProjectErrorType.DELETE_PROJECT))
+            () -> newGuard().checkProjectNotHidden(OWN_PROJECT_ID, null, ProjectErrorType.DELETE_PROJECT))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void testCheckProjectNotHiddenRejectsAConnectedUserProject() {
         when(projectOwnershipService.getOwnedProjectIds(
-            List.of(OWN_PROJECT_ID), EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+            List.of(OWN_PROJECT_ID), EnumSet.allOf(ProjectOwner.class)))
                 .thenReturn(Set.of(OWN_PROJECT_ID));
 
         ScopedProjectGuard scopedProjectGuard = newGuard();
 
-        assertThatCode(() -> scopedProjectGuard.checkProjectNotHidden(OWN_PROJECT_ID, ProjectErrorType.DELETE_PROJECT))
-            .isInstanceOf(ExecutionException.class)
-            .hasMessage("Project 7 was not found or you do not have access to it.");
+        assertThatCode(
+            () -> scopedProjectGuard.checkProjectNotHidden(OWN_PROJECT_ID, null, ProjectErrorType.DELETE_PROJECT))
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage("Project 7 was not found or you do not have access to it.");
+    }
+
+    @Test
+    void testCheckWorkflowRejectsAnUnconfinedRunOnAWorkflowOfAnEmbeddedAutomationWorkflowProject() {
+        when(permissionService.hasWorkflowScope("wf-1", ScopedProjectGuard.WORKFLOW_EDIT)).thenReturn(true);
+        when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
+            .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-1"));
+
+        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkWorkflow(
+                "wf-1", ScopedProjectGuard.WORKFLOW_EDIT, new ToolContext(Map.of()),
+                ProjectWorkflowErrorType.UPDATE_WORKFLOW))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage("Workflow wf-1 was not found or you do not have access to it.");
+    }
+
+    @Test
+    void testCheckWorkflowAllowsAWorkflowOfAnEmbeddedAutomationWorkflowProjectWhenTheRunDeclaresItsOwner() {
+        when(permissionService.hasWorkflowScope("wf-1", ScopedProjectGuard.WORKFLOW_EDIT)).thenReturn(true);
+        when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
+            .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-1"));
+
+        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+
+        assertThatCode(
+            () -> newGuard().checkWorkflow(
+                "wf-1", ScopedProjectGuard.WORKFLOW_EDIT,
+                declaredOwnerToolContext(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT.name()),
+                ProjectWorkflowErrorType.UPDATE_WORKFLOW))
+                    .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testCheckProjectNotHiddenRejectsAConnectedUserProjectEvenWhenTheRunDeclaresItsOwner() {
+        givenOwnedProject(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
+
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+        ToolContext toolContext = declaredOwnerToolContext(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT.name());
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkProjectNotHidden(OWN_PROJECT_ID, toolContext,
+                ProjectErrorType.DELETE_PROJECT))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage("Project 7 was not found or you do not have access to it.");
+    }
+
+    @Test
+    void testCheckProjectNotHiddenRejectsAnEmbeddedAutomationWorkflowProjectWhenTheDeclaredOwnerIsUnknown() {
+        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+
+        ScopedProjectGuard scopedProjectGuard = newGuard();
+        ToolContext toolContext = declaredOwnerToolContext("UNKNOWN_OWNER");
+
+        assertThatCode(
+            () -> scopedProjectGuard.checkProjectNotHidden(OWN_PROJECT_ID, toolContext,
+                ProjectErrorType.DELETE_PROJECT))
+                    .isInstanceOf(ExecutionException.class)
+                    .hasMessage("Project 7 was not found or you do not have access to it.");
     }
 
     @Test
@@ -304,6 +368,19 @@ class ScopedProjectGuardTest {
                 .doesNotThrowAnyException();
 
         verify(scopedConnectionGuard).fetchDenialMessage(null, 42L, toolContext);
+    }
+
+    private static ToolContext declaredOwnerToolContext(String projectOwner) {
+        return new ToolContext(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY, projectOwner));
+    }
+
+    private void givenOwnedProject(ProjectOwner projectOwner) {
+        when(projectOwnershipService.getOwnedProjectIds(any(), any()))
+            .thenAnswer(invocation -> {
+                Set<ProjectOwner> projectOwners = invocation.getArgument(1);
+
+                return projectOwners.contains(projectOwner) ? Set.of(OWN_PROJECT_ID) : Set.of();
+            });
     }
 
     private ScopedProjectGuard newGuard() {

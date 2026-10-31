@@ -29,6 +29,7 @@ import com.bytechef.exception.ExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -55,9 +56,6 @@ public class ScopedProjectGuard {
     public static final String WORKFLOW_DELETE = "WORKFLOW_DELETE";
     public static final String WORKFLOW_EDIT = "WORKFLOW_EDIT";
     public static final String WORKFLOW_VIEW = "WORKFLOW_VIEW";
-
-    private static final Set<ProjectOwner> HIDDEN_PROJECT_OWNERS = EnumSet.of(
-        ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
 
     private static final Logger log = LoggerFactory.getLogger(ScopedProjectGuard.class);
 
@@ -104,7 +102,7 @@ public class ScopedProjectGuard {
                 throw new ExecutionException(getWorkflowNotAccessibleMessage(workflowId), errorType);
             }
 
-            if (isHiddenProject(getWorkflowProjectId(workflowId, errorType), errorType)) {
+            if (isHiddenProject(getWorkflowProjectId(workflowId, errorType), toolContext, errorType)) {
                 log.warn("Rejected workflow {}: its project is not reachable from automation tools", workflowId);
 
                 throw new ExecutionException(getWorkflowNotAccessibleMessage(workflowId), errorType);
@@ -150,7 +148,7 @@ public class ScopedProjectGuard {
                 throw new ExecutionException(getProjectNotAccessibleMessage(projectId), errorType);
             }
 
-            checkProjectNotHidden(projectId, errorType);
+            checkProjectNotHidden(projectId, toolContext, errorType);
 
             return;
         }
@@ -170,8 +168,8 @@ public class ScopedProjectGuard {
         }
     }
 
-    public void checkProjectNotHidden(long projectId, ErrorType errorType) {
-        if (isHiddenProject(projectId, errorType)) {
+    public void checkProjectNotHidden(long projectId, @Nullable ToolContext toolContext, ErrorType errorType) {
+        if (isHiddenProject(projectId, toolContext, errorType)) {
             log.warn("Rejected project {}: it is not reachable from automation tools", projectId);
 
             throw new ExecutionException(getProjectNotAccessibleMessage(projectId), errorType);
@@ -208,7 +206,39 @@ public class ScopedProjectGuard {
         return projectWorkflow.getProjectId();
     }
 
-    private boolean isHiddenProject(long projectId, ErrorType errorType) {
+    static Set<ProjectOwner> getHiddenProjectOwners(@Nullable ToolContext toolContext) {
+        Set<ProjectOwner> hiddenProjectOwners = EnumSet.allOf(ProjectOwner.class);
+
+        ProjectOwner declaredProjectOwner = fetchDeclaredProjectOwner(toolContext);
+
+        if (declaredProjectOwner != null && declaredProjectOwner != ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT) {
+            hiddenProjectOwners.remove(declaredProjectOwner);
+        }
+
+        return hiddenProjectOwners;
+    }
+
+    private static @Nullable ProjectOwner fetchDeclaredProjectOwner(@Nullable ToolContext toolContext) {
+        if (toolContext == null) {
+            return null;
+        }
+
+        Map<String, Object> context = toolContext.getContext();
+
+        if (context == null ||
+            !(context.get(AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY) instanceof String name)) {
+
+            return null;
+        }
+
+        try {
+            return ProjectOwner.valueOf(name);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return null;
+        }
+    }
+
+    private boolean isHiddenProject(long projectId, @Nullable ToolContext toolContext, ErrorType errorType) {
         if (projectOwnershipService == null) {
             log.error("Rejected project {}: no project ownership lookup is available", projectId);
 
@@ -216,7 +246,7 @@ public class ScopedProjectGuard {
         }
 
         Set<Long> hiddenProjectIds = projectOwnershipService.getOwnedProjectIds(
-            List.of(projectId), HIDDEN_PROJECT_OWNERS);
+            List.of(projectId), getHiddenProjectOwners(toolContext));
 
         return !hiddenProjectIds.isEmpty();
     }
