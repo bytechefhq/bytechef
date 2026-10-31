@@ -1,0 +1,8 @@
+# Test-only GraphQL base operations and scalar stubs for GraphQL slice tests.
+
+# Base operation type so that 'extend type Query' from main resources can merge.
+type Query {
+    _placeholder: Boolean
+}
+
+scalar Long
