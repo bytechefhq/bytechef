@@ -18,26 +18,50 @@ package com.bytechef.platform.security.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditOutcome;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.config.PlatformSecurityIntTestConfiguration;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.repository.UserRepository;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-class ApiKeyAuditMapperTest {
+@SpringBootTest(classes = PlatformSecurityIntTestConfiguration.class)
+class ApiKeyAuditMapperIntTest {
 
-    private final ApiKeyRepository apiKeyRepository = mock(ApiKeyRepository.class);
-    private final ApiKeyAuditMapper apiKeyAuditMapper = new ApiKeyAuditMapper(apiKeyRepository);
+    @Autowired
+    private ApiKeyAuditMapper apiKeyAuditMapper;
+
+    @Autowired
+    private ApiKeyRepository apiKeyRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private User user;
+
+    @BeforeEach
+    void beforeEach() {
+        user = userRepository.save(newUser());
+    }
+
+    @AfterEach
+    void afterEach() {
+        apiKeyRepository.deleteAll();
+        userRepository.deleteAll();
+    }
 
     @Test
     void testCreatedRecordsIdNameAndTypeWithoutSecretKey() {
@@ -106,25 +130,29 @@ class ApiKeyAuditMapperTest {
     void testDeleteCapturesTheStoredApiKeyType() {
         ApiKey apiKey = createApiKey();
 
+        apiKey.setSecretKey(String.valueOf(UUID.randomUUID()));
         apiKey.setType(PlatformType.EMBEDDED);
+        apiKey.setUserId(user.getId());
 
-        when(apiKeyRepository.findById(7L)).thenReturn(Optional.of(apiKey));
+        ApiKey savedApiKey = apiKeyRepository.save(apiKey);
+
+        Map<String, Object> arguments = Map.of("id", savedApiKey.getId());
 
         Object captured = apiKeyAuditMapper.capture(new AuditInvocation(
-            ApiKeyAuditEvents.API_KEY_DELETED, Map.of("id", 7L), null, null, AuditOutcome.SUCCESS, null));
+            ApiKeyAuditEvents.API_KEY_DELETED, arguments, null, null, AuditOutcome.SUCCESS, null));
+
+        apiKeyRepository.deleteById(savedApiKey.getId());
 
         assertThat(captured).isEqualTo(PlatformType.EMBEDDED);
         assertThat(apiKeyAuditMapper.platform(new AuditInvocation(
-            ApiKeyAuditEvents.API_KEY_DELETED, Map.of("id", 7L), null, captured, AuditOutcome.SUCCESS, null)))
+            ApiKeyAuditEvents.API_KEY_DELETED, arguments, null, captured, AuditOutcome.SUCCESS, null)))
                 .isEqualTo(PlatformType.EMBEDDED);
     }
 
     @Test
     void testDeleteOfAnUnknownApiKeyHasNoPlatform() {
-        when(apiKeyRepository.findById(7L)).thenReturn(Optional.empty());
-
         AuditInvocation auditInvocation = new AuditInvocation(
-            ApiKeyAuditEvents.API_KEY_DELETED, Map.of("id", 7L), null, null, AuditOutcome.SUCCESS, null);
+            ApiKeyAuditEvents.API_KEY_DELETED, Map.of("id", Long.MAX_VALUE), null, null, AuditOutcome.SUCCESS, null);
 
         assertThat(apiKeyAuditMapper.capture(auditInvocation)).isNull();
         assertThat(apiKeyAuditMapper.platform(auditInvocation)).isNull();
@@ -145,5 +173,18 @@ class ApiKeyAuditMapperTest {
         apiKey.setType(PlatformType.AUTOMATION);
 
         return apiKey;
+    }
+
+    private static User newUser() {
+        User user = new User();
+
+        user.setActivated(true);
+        user.setEmail("api-key-audit-mapper@localhost");
+        user.setLangKey("en");
+        user.setLogin("api-key-audit-mapper");
+        user.setPassword("$2a$10$" + "a".repeat(53));
+        user.setUuid(UUID.randomUUID());
+
+        return user;
     }
 }
