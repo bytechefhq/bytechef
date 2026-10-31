@@ -1,0 +1,6 @@
+bytechef:
+  webhook-url: http://localhost:9555/webhooks/{id}
+  workflow:
+    repository:
+      jdbc:
+        enabled: true
