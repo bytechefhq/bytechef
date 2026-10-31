@@ -48,14 +48,14 @@ class AuditEventServiceTest {
         Pageable pageable = PageRequest.of(2, 25);
 
         when(persistenceAuditEventRepository.findAllFiltered(
-            new AuditEventFilter("PERMISSION_CHECK", fromDate, toDate, "ProjectFacade", true), pageable))
+            new AuditEventFilter("PERMISSION_CHECK", fromDate, toDate, "ProjectFacade", true, null), pageable))
                 .thenReturn(page);
 
         Page<PersistentAuditEvent> result = auditEventService.fetchAuditEvents(
-            new AuditEventFilter("PERMISSION_CHECK", fromDate, toDate, "ProjectFacade", true), pageable);
+            new AuditEventFilter("PERMISSION_CHECK", fromDate, toDate, "ProjectFacade", true, null), pageable);
 
         verify(persistenceAuditEventRepository).findAllFiltered(
-            new AuditEventFilter("PERMISSION_CHECK", fromDate, toDate, "ProjectFacade", true), pageable);
+            new AuditEventFilter("PERMISSION_CHECK", fromDate, toDate, "ProjectFacade", true, null), pageable);
 
         assertThat(result.getContent()).hasSize(1);
 

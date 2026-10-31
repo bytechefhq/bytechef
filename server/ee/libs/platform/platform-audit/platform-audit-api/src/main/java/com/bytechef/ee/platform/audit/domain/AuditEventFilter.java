@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.audit.domain;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.time.LocalDateTime;
 import org.jspecify.annotations.Nullable;
 
@@ -17,9 +18,9 @@ import org.jspecify.annotations.Nullable;
  */
 public record AuditEventFilter(
     @Nullable String eventType, @Nullable LocalDateTime fromDate, @Nullable LocalDateTime toDate,
-    @Nullable String search, boolean searchPrincipal) {
+    @Nullable String search, boolean searchPrincipal, @Nullable PlatformType platform) {
 
     public static AuditEventFilter empty() {
-        return new AuditEventFilter(null, null, null, null, true);
+        return new AuditEventFilter(null, null, null, null, true, null);
     }
 }

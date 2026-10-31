@@ -10,3 +10,8 @@ type Mutation {
 }
 
 scalar Long
+
+enum PlatformType {
+    AUTOMATION
+    EMBEDDED
+}

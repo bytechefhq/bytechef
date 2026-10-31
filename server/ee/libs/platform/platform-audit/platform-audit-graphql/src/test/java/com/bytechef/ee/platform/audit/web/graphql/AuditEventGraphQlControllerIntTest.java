@@ -20,6 +20,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.facade.AuditEventFacade;
 import com.bytechef.ee.platform.audit.web.graphql.config.AuditGraphQlTestConfiguration;
+import com.bytechef.platform.constant.PlatformType;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -142,13 +143,82 @@ public class AuditEventGraphQlControllerIntTest {
 
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
+    public void testAuditEventPlatformIsReturned() {
+        PersistentAuditEvent embeddedAuditEvent = new PersistentAuditEvent();
+
+        embeddedAuditEvent.setId(1L);
+        embeddedAuditEvent.setPrincipal("alice");
+        embeddedAuditEvent.setEventType("PERMISSION_CHECK");
+        embeddedAuditEvent.setEventDate(LocalDateTime.now());
+        embeddedAuditEvent.setPlatform(PlatformType.EMBEDDED);
+        embeddedAuditEvent.setData(Map.of("result", "ALLOWED"));
+
+        PersistentAuditEvent platformlessAuditEvent = new PersistentAuditEvent();
+
+        platformlessAuditEvent.setId(2L);
+        platformlessAuditEvent.setPrincipal("alice");
+        platformlessAuditEvent.setEventType("AUTHENTICATION_SUCCESS");
+        platformlessAuditEvent.setEventDate(LocalDateTime.now());
+        platformlessAuditEvent.setData(Map.of());
+
+        when(auditEventFacade.fetchAuditEvents(any(), any()))
+            .thenReturn(new PageImpl<>(List.of(embeddedAuditEvent, platformlessAuditEvent)));
+
+        graphQlTester
+            .document("""
+                query {
+                    auditEvents {
+                        content {
+                            platform
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("auditEvents.content[0].platform")
+            .entity(String.class)
+            .isEqualTo("EMBEDDED")
+            .path("auditEvents.content[1].platform")
+            .valueIsNull();
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    public void testAuditEventsPlatformArgumentIsOptional() {
+        when(auditEventFacade.fetchAuditEvents(any(), any())).thenReturn(Page.empty());
+
+        assertThat(fetchAuditEventFilter("auditEvents(platform: AUTOMATION)").platform())
+            .isEqualTo(PlatformType.AUTOMATION);
+        assertThat(fetchAuditEventFilter("auditEvents").platform()).isNull();
+    }
+
+    private AuditEventFilter fetchAuditEventFilter(String auditEventsField) {
+        graphQlTester
+            .document("query { " + auditEventsField + " { totalElements } }")
+            .execute()
+            .path("auditEvents.totalElements")
+            .entity(Long.class)
+            .isEqualTo(0L);
+
+        ArgumentCaptor<AuditEventFilter> auditEventFilterArgumentCaptor = ArgumentCaptor.forClass(
+            AuditEventFilter.class);
+
+        verify(auditEventFacade, atLeastOnce()).fetchAuditEvents(auditEventFilterArgumentCaptor.capture(), any());
+
+        return auditEventFilterArgumentCaptor.getValue();
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     public void testAuditEventsPassesEveryFilterArgumentToTheFacade() {
         when(auditEventFacade.fetchAuditEvents(any(), any())).thenReturn(Page.empty());
 
         graphQlTester
             .document("""
                 query {
-                    auditEvents(eventType: "WORKSPACE_USER_ADDED", fromDate: 1000, toDate: 2000, search: "needle") {
+                    auditEvents(
+                        eventType: "WORKSPACE_USER_ADDED", fromDate: 1000, toDate: 2000, search: "needle",
+                        platform: EMBEDDED) {
                         totalElements
                     }
                 }
@@ -164,7 +234,8 @@ public class AuditEventGraphQlControllerIntTest {
         verify(auditEventFacade, atLeastOnce()).fetchAuditEvents(auditEventFilterArgumentCaptor.capture(), any());
 
         assertThat(auditEventFilterArgumentCaptor.getValue()).isEqualTo(
-            new AuditEventFilter("WORKSPACE_USER_ADDED", toLocalDateTime(1000), toLocalDateTime(2000), "needle", true));
+            new AuditEventFilter("WORKSPACE_USER_ADDED", toLocalDateTime(1000), toLocalDateTime(2000), "needle", true,
+                PlatformType.EMBEDDED));
     }
 
     @Test
@@ -366,7 +437,7 @@ public class AuditEventGraphQlControllerIntTest {
             verify(auditEventFacade, atLeastOnce()).fetchAuditEvents(auditEventFilterArgumentCaptor.capture(), any());
 
             assertThat(auditEventFilterArgumentCaptor.getValue())
-                .isEqualTo(new AuditEventFilter(null, null, null, "alice", false));
+                .isEqualTo(new AuditEventFilter(null, null, null, "alice", false, null));
         }
 
         @TestConfiguration

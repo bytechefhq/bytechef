@@ -14,6 +14,7 @@ import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.AuditOutcome;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
@@ -267,16 +268,20 @@ public class AuditAspect {
             return null;
         }
 
-        String targetMethod = methodSignature.getDeclaringTypeName() + "." + method.getName();
+        String declaringTypeName = methodSignature.getDeclaringTypeName();
+
+        String targetMethod = declaringTypeName + "." + method.getName();
 
         Map<String, String> data = new LinkedHashMap<>();
+        PlatformType platform = null;
 
         if (audited != null) {
             AuditInvocation auditInvocation = AuditJoinPoints.createInvocation(
                 proceedingJoinPoint, audited.event(), result, auditFrame.getCaptured(), auditOutcome, errorClass);
+            AuditMapper auditMapper = null;
 
             try {
-                AuditMapper auditMapper = auditMapperResolver.resolve(audited.mapper());
+                auditMapper = auditMapperResolver.resolve(audited.mapper());
 
                 if (!auditMapper.shouldRecord(auditInvocation)) {
                     return null;
@@ -289,6 +294,14 @@ public class AuditAspect {
 
                 reportMapperFailure(audited, exception);
             }
+
+            if (auditMapper != null) {
+                platform = resolveMapperPlatform(auditMapper, auditInvocation, audited, data);
+            }
+        }
+
+        if (platform == null) {
+            platform = resolvePackagePlatform(declaringTypeName);
         }
 
         data.put(METHOD, truncate(targetMethod));
@@ -308,10 +321,42 @@ public class AuditAspect {
 
         persistentAuditEvent.setEventDate(LocalDateTime.now());
         persistentAuditEvent.setEventType(audited == null ? PERMISSION_CHECK : audited.event());
+        persistentAuditEvent.setPlatform(platform);
         persistentAuditEvent.setPrincipal(truncate(principal));
         persistentAuditEvent.setData(data);
 
         return persistentAuditEvent;
+    }
+
+    private @Nullable PlatformType resolveMapperPlatform(
+        AuditMapper auditMapper, AuditInvocation auditInvocation, Audited audited, Map<String, String> data) {
+
+        try {
+            return auditMapper.platform(auditInvocation);
+        } catch (Exception | LinkageError | StackOverflowError exception) {
+            data.putIfAbsent(MAPPER_ERROR, truncate(exception.getClass()
+                .getName()));
+
+            reportMapperFailure(audited, exception);
+
+            return null;
+        }
+    }
+
+    static @Nullable PlatformType resolvePackagePlatform(@Nullable String declaringTypeName) {
+        if (declaringTypeName == null) {
+            return null;
+        }
+
+        if (declaringTypeName.contains(".embedded.")) {
+            return PlatformType.EMBEDDED;
+        }
+
+        if (declaringTypeName.contains(".automation.")) {
+            return PlatformType.AUTOMATION;
+        }
+
+        return null;
     }
 
     private void putMapperData(Map<String, String> data, Audited audited, @Nullable Map<String, String> mapperData) {

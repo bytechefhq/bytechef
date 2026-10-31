@@ -8,10 +8,12 @@
 package com.bytechef.ee.platform.audit.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,7 +70,81 @@ public class PersistenceAuditEventRepositoryIntTest {
                 indexDefinition -> assertThat(indexDefinition).contains("(principal, event_date DESC)"))
             .hasEntrySatisfying(
                 "idx_persistent_audit_event_event_type_event_date",
-                indexDefinition -> assertThat(indexDefinition).contains("(event_type, event_date DESC)"));
+                indexDefinition -> assertThat(indexDefinition).contains("(event_type, event_date DESC)"))
+            .hasEntrySatisfying(
+                "idx_persistent_audit_event_platform_event_date",
+                indexDefinition -> assertThat(indexDefinition).contains("(platform, event_date DESC)"));
+    }
+
+    @Test
+    public void testPlatformIsStoredAndReadBack() {
+        LocalDateTime now = LocalDateTime.now();
+
+        save("alice", "PERMISSION_CHECK", now, PlatformType.EMBEDDED);
+        save("bob", "PERMISSION_CHECK", now.minusMinutes(1), (PlatformType) null);
+
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 25));
+
+        assertThat(page.getContent())
+            .extracting(PersistentAuditEvent::getPrincipal, PersistentAuditEvent::getPlatform)
+            .containsExactly(
+                tuple("alice", PlatformType.EMBEDDED),
+                tuple("bob", null));
+    }
+
+    @Test
+    public void testFindAllFilteredByPlatformExcludesOtherAndNullPlatforms() {
+        LocalDateTime now = LocalDateTime.now();
+
+        save("alice", "PERMISSION_CHECK", now, PlatformType.AUTOMATION);
+        save("bob", "PERMISSION_CHECK", now.minusMinutes(1), PlatformType.EMBEDDED);
+        save("carol", "PERMISSION_CHECK", now.minusMinutes(2), (PlatformType) null);
+
+        Page<PersistentAuditEvent> automationPage = persistenceAuditEventRepository.findAllFiltered(
+            new AuditEventFilter(null, null, null, null, true, PlatformType.AUTOMATION), PageRequest.of(0, 25));
+
+        assertThat(automationPage.getTotalElements()).isEqualTo(1);
+        assertThat(automationPage.getContent())
+            .extracting(PersistentAuditEvent::getPrincipal)
+            .containsExactly("alice");
+
+        Page<PersistentAuditEvent> embeddedPage = persistenceAuditEventRepository.findAllFiltered(
+            new AuditEventFilter(null, null, null, null, true, PlatformType.EMBEDDED), PageRequest.of(0, 25));
+
+        assertThat(embeddedPage.getTotalElements()).isEqualTo(1);
+        assertThat(embeddedPage.getContent())
+            .extracting(PersistentAuditEvent::getPrincipal)
+            .containsExactly("bob");
+
+        Page<PersistentAuditEvent> unfilteredPage = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 25));
+
+        assertThat(unfilteredPage.getTotalElements()).isEqualTo(3);
+    }
+
+    @Test
+    public void testFindAllFilteredByPlatformCombinesWithTheOtherFilters() {
+        LocalDateTime now = LocalDateTime.now();
+
+        save("alice", "WORKSPACE_USER_ADDED", now, PlatformType.AUTOMATION, Map.of("note", "needle"));
+        save("alice", "WORKSPACE_USER_ADDED", now.minusMinutes(1), PlatformType.EMBEDDED, Map.of("note", "needle"));
+        save("alice", "PERMISSION_CHECK", now.minusMinutes(2), PlatformType.AUTOMATION, Map.of("note", "needle"));
+        save("alice", "WORKSPACE_USER_ADDED", now.minusMinutes(3), PlatformType.AUTOMATION, Map.of("note", "hay"));
+        save("alice", "WORKSPACE_USER_ADDED", now.minusDays(3), PlatformType.AUTOMATION, Map.of("note", "needle"));
+        save("alice", "WORKSPACE_USER_ADDED", now.minusMinutes(4), null, Map.of("note", "needle"));
+
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            new AuditEventFilter(
+                "WORKSPACE_USER_ADDED", now.minusDays(1), now, "needle", true, PlatformType.AUTOMATION),
+            PageRequest.of(0, 25));
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent()).singleElement()
+            .satisfies(persistentAuditEvent -> {
+                assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+                assertThat(persistentAuditEvent.getData()).containsEntry("note", "needle");
+            });
     }
 
     @Test
@@ -77,14 +153,14 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("bob", "PERMISSION_CHECK", LocalDateTime.now());
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "ALICE@", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "ALICE@", true, null), PageRequest.of(0, 25));
 
         assertThat(page.getContent())
             .singleElement()
             .satisfies(event -> assertThat(event.getPrincipal()).isEqualTo("alice@example.com"));
 
         Page<PersistentAuditEvent> wildcardPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "a_ice", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "a_ice", true, null), PageRequest.of(0, 25));
 
         assertThat(wildcardPage.getContent()).isEmpty();
     }
@@ -96,7 +172,7 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("carol", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("userLogin", "dave"));
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "alice", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "alice", true, null), PageRequest.of(0, 25));
 
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent())
@@ -110,7 +186,7 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("bob", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("userLogin", "alice"));
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "alice", false), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "alice", false, null), PageRequest.of(0, 25));
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent())
@@ -124,7 +200,8 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("alice", "CONNECTION_CREATED", LocalDateTime.now());
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter("CONNECTION_CREATED", null, null, null, true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter("CONNECTION_CREATED", null, null, null, true, null),
+                PageRequest.of(0, 25));
 
         assertThat(page.getContent())
             .hasSize(1)
@@ -139,7 +216,8 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("alice", "PERMISSION_CHECK", now.minusDays(1));
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, now.minusDays(5), now, null, true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, now.minusDays(5), now, null, true, null),
+                PageRequest.of(0, 25));
 
         assertThat(page.getContent()).hasSize(1);
     }
@@ -223,7 +301,8 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("method", "com.bytechef.UserFacade.create"));
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "projectfacade", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "projectfacade", true, null),
+                PageRequest.of(0, 25));
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent())
@@ -238,19 +317,19 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("note", "100% done_now"));
 
         Page<PersistentAuditEvent> percentPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "%", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "%", true, null), PageRequest.of(0, 25));
 
         assertThat(percentPage.getContent())
             .hasSize(1)
             .allSatisfy(event -> assertThat(event.getData()).containsKey("note"));
 
         Page<PersistentAuditEvent> underscorePage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "done_now", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "done_now", true, null), PageRequest.of(0, 25));
 
         assertThat(underscorePage.getContent()).hasSize(1);
 
         Page<PersistentAuditEvent> noMatchPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "d_ne", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "d_ne", true, null), PageRequest.of(0, 25));
 
         assertThat(noMatchPage.getContent()).isEmpty();
     }
@@ -265,7 +344,7 @@ public class PersistenceAuditEventRepositoryIntTest {
         persistenceAuditEventRepository.deleteByEventDateBefore(now.minusDays(365));
 
         Page<PersistentAuditEvent> expiredPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "expired", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "expired", true, null), PageRequest.of(0, 25));
 
         assertThat(expiredPage.getContent()).isEmpty();
 
@@ -292,7 +371,7 @@ public class PersistenceAuditEventRepositoryIntTest {
 
         for (int pageNumber = 0; pageNumber < 3; pageNumber++) {
             Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
-                new AuditEventFilter("TARGET_EVENT", base.minusMinutes(35), base, "needle", true),
+                new AuditEventFilter("TARGET_EVENT", base.minusMinutes(35), base, "needle", true, null),
                 PageRequest.of(pageNumber, 4));
 
             assertThat(page.getTotalElements()).isEqualTo(10);
@@ -340,14 +419,14 @@ public class PersistenceAuditEventRepositoryIntTest {
         save("alice", "PERMISSION_CHECK", LocalDateTime.now(), Map.of("path", "C:/temp/file"));
 
         Page<PersistentAuditEvent> backslashPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "C:\\te", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "C:\\te", true, null), PageRequest.of(0, 25));
 
         assertThat(backslashPage.getContent())
             .singleElement()
             .satisfies(event -> assertThat(event.getData()).containsEntry("path", "C:\\temp\\file"));
 
         Page<PersistentAuditEvent> trailingBackslashPage = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "temp\\", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "temp\\", true, null), PageRequest.of(0, 25));
 
         assertThat(trailingBackslashPage.getContent()).hasSize(1);
     }
@@ -357,8 +436,19 @@ public class PersistenceAuditEventRepositoryIntTest {
     }
 
     private void save(String principal, String eventType, LocalDateTime eventDate, Map<String, String> data) {
+        save(principal, eventType, eventDate, null, data);
+    }
+
+    private void save(String principal, String eventType, LocalDateTime eventDate, PlatformType platform) {
+        save(principal, eventType, eventDate, platform, Map.of("k", "v"));
+    }
+
+    private void save(
+        String principal, String eventType, LocalDateTime eventDate, PlatformType platform, Map<String, String> data) {
+
         PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
 
+        persistentAuditEvent.setPlatform(platform);
         persistentAuditEvent.setPrincipal(principal);
         persistentAuditEvent.setEventType(eventType);
         persistentAuditEvent.setEventDate(eventDate);

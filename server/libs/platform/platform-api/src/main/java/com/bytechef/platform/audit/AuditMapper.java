@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.audit;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
@@ -29,6 +30,10 @@ public interface AuditMapper {
     }
 
     Map<String, String> map(AuditInvocation auditInvocation);
+
+    default @Nullable PlatformType platform(AuditInvocation auditInvocation) {
+        return null;
+    }
 
     default boolean shouldRecord(AuditInvocation auditInvocation) {
         return true;

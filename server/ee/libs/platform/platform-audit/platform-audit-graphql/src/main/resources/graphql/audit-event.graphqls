@@ -4,6 +4,7 @@ extend type Query {
         fromDate: Long
         toDate: Long
         search: String
+        platform: PlatformType
         page: Int = 0
         size: Int = 25
     ): AuditEventPageType!
@@ -17,6 +18,7 @@ type AuditEventType {
     eventType: String!
     id: ID!
     outcome: AuditEventOutcome
+    platform: PlatformType
     principal: String!
 }
 

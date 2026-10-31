@@ -26,6 +26,7 @@ import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.service.ApiKeyServiceImpl;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,6 +95,27 @@ class ApiKeyAuditIntTest {
             .containsEntry("name", "automation key")
             .containsEntry("type", "AUTOMATION")
             .doesNotContainValue(createdApiKey.getSecretKey());
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+    }
+
+    @Test
+    void testDeleteRecordsThePlatformOfTheDeletedApiKey() {
+        ApiKey apiKey = createApiKey();
+
+        apiKey.setType(PlatformType.EMBEDDED);
+
+        when(apiKeyRepository.findById(7L)).thenReturn(Optional.of(apiKey));
+
+        apiKeyService.delete(7L);
+
+        assertThat(captureSavedEvent().getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+    }
+
+    @Test
+    void testDeleteOfAnUnknownApiKeyHasNoPlatform() {
+        apiKeyService.delete(7L);
+
+        assertThat(captureSavedEvent().getPlatform()).isNull();
     }
 
     @Test
