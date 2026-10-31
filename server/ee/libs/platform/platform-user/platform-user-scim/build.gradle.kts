@@ -13,9 +13,4 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
-
-    testImplementation("jakarta.servlet:jakarta.servlet-api")
-    testImplementation("org.springframework:spring-test")
-    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
-    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
 }
