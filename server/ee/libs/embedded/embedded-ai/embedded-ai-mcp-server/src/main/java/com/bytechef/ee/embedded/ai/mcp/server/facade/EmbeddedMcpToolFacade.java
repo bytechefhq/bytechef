@@ -20,9 +20,11 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -108,6 +110,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final IntegrationService integrationService;
     private final JobCompletionAwaiter jobCompletionAwaiter;
     private final McpComponentService mcpComponentService;
+    private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
@@ -128,7 +131,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
         JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
-        McpComponentService mcpComponentService,
+        McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
@@ -147,6 +150,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.integrationService = integrationService;
         this.jobCompletionAwaiter = jobCompletionAwaiter;
         this.mcpComponentService = mcpComponentService;
+        this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
@@ -164,14 +168,16 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             return null;
         }
 
-        Long integrationInstanceId = fetchIntegrationInstanceId(
-            externalUserId, mcpTool.getMcpComponentId(), environment);
+        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
 
-        if (integrationInstanceId != null && !isToolEnabled(integrationInstanceId, mcpTool.getId())) {
+        Long integrationId = fetchMcpComponentIntegrationId(mcpComponent);
+
+        IntegrationInstance integrationInstance = fetchIntegrationInstance(
+            externalUserId, mcpComponent.getComponentName(), integrationId, environment);
+
+        if (integrationInstance != null && !isToolEnabled(integrationInstance.getId(), mcpTool.getId())) {
             return null;
         }
-
-        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
 
         ClusterElementDefinition clusterElementDefinition =
             clusterElementDefinitionService.getClusterElementDefinition(
@@ -188,7 +194,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 getClusterElementToolCallbackFunction(
                     externalUserId, clusterElementDefinition.getComponentName(),
                     clusterElementDefinition.getComponentVersion(),
-                    clusterElementDefinition.getName(), mcpTool.getParameters(),
+                    clusterElementDefinition.getName(), mcpTool.getParameters(), integrationId,
                     mcpComponent.getMcpServerId(), environment, tenantId))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
@@ -286,16 +292,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         return toolCallbacks;
     }
 
-    private @Nullable Long fetchIntegrationInstanceId(
-        @Nullable String externalUserId, long mcpComponentId, Environment environment) {
-
-        McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
-
-        return fetchIntegrationInstanceId(externalUserId, mcpComponent.getComponentName(), environment);
-    }
-
-    private @Nullable Long fetchConnectionId(
-        @Nullable String externalUserId, String componentName, Environment environment) {
+    private @Nullable IntegrationInstance fetchIntegrationInstance(
+        @Nullable String externalUserId, String componentName, @Nullable Long integrationId,
+        Environment environment) {
 
         if (externalUserId == null) {
             return null;
@@ -303,24 +302,16 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
         return connectedUserService.fetchConnectedUser(externalUserId, environment)
             .map(ConnectedUser::getId)
-            .flatMap(connectedUserId -> integrationInstanceService.fetchIntegrationInstance(
-                connectedUserId, componentName, environment))
-            .map(IntegrationInstance::getConnectionId)
+            .flatMap(connectedUserId -> integrationId == null
+                ? integrationInstanceService.fetchIntegrationInstance(connectedUserId, componentName, environment)
+                : integrationInstanceService.fetchIntegrationInstanceByIntegrationId(
+                    connectedUserId, integrationId, environment))
             .orElse(null);
     }
 
-    private @Nullable Long fetchIntegrationInstanceId(
-        @Nullable String externalUserId, String componentName, Environment environment) {
-
-        if (externalUserId == null) {
-            return null;
-        }
-
-        return connectedUserService.fetchConnectedUser(externalUserId, environment)
-            .map(ConnectedUser::getId)
-            .flatMap(connectedUserId -> integrationInstanceService.fetchIntegrationInstance(
-                connectedUserId, componentName, environment))
-            .map(IntegrationInstance::getId)
+    private @Nullable Long fetchMcpComponentIntegrationId(McpComponent mcpComponent) {
+        return mcpIntegrationComponentService.fetchMcpIntegrationComponent(mcpComponent.getId())
+            .map(McpIntegrationComponent::getIntegrationId)
             .orElse(null);
     }
 
@@ -341,7 +332,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private Function<Map<String, Object>, Object> getClusterElementToolCallbackFunction(
         @Nullable String externalUserId, String componentName, int componentVersion, String clusterElementName,
-        Map<String, ?> parameters, long mcpServerId, Environment environment, String tenantId) {
+        Map<String, ?> parameters, @Nullable Long integrationId, long mcpServerId, Environment environment,
+        String tenantId) {
+
         return request -> {
             McpServer mcpServer = readMcpServerConfiguration(() -> mcpServerService.getMcpServer(mcpServerId));
 
@@ -349,7 +342,10 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 throw new IllegalStateException("MCP server is disabled");
             }
 
-            Long connectionId = fetchConnectionId(externalUserId, componentName, environment);
+            IntegrationInstance integrationInstance = fetchIntegrationInstance(
+                externalUserId, componentName, integrationId, environment);
+
+            Long connectionId = integrationInstance == null ? null : integrationInstance.getConnectionId();
 
             if (connectionId == null
                 && isConnectionRequired(componentDefinitionService, componentName, componentVersion)) {
@@ -358,10 +354,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                     throw new IllegalStateException(getConnectedUserRequiredMessage(componentName));
                 }
 
-                long integrationId = getIntegrationId(componentName);
-
                 return getConnectionRequiredResponse(
-                    componentName, environment, externalUserId, integrationId, tenantId);
+                    componentName, environment, externalUserId,
+                    integrationId == null ? getIntegrationId(componentName) : integrationId, tenantId);
             }
 
             Map<String, Object> resolvedParameters = new HashMap<>();

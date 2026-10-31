@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.server.config.EmbeddedMcpServerIntTestConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -142,6 +143,9 @@ class EmbeddedMcpToolFacadeIntTest {
     private McpComponentRepository mcpComponentRepository;
 
     @Autowired
+    private McpIntegrationComponentService mcpIntegrationComponentService;
+
+    @Autowired
     private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
 
     @MockitoSpyBean
@@ -170,6 +174,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @AfterEach
     void afterEach() {
+        jdbcTemplate.update("DELETE FROM mcp_integration_component");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_tool");
@@ -501,6 +506,120 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Test
+    void testBoundClusterElementToolIsListedWhenTheUserHasANewerInstanceOfAnotherIntegrationOnTheSameComponent() {
+        McpTool mcpTool = saveMcpTool("post", Map.of(), true);
+
+        long connectedUserId = insertConnectedUser();
+        long integrationId = insertIntegration("httpClient");
+
+        long ownIntegrationInstanceId =
+            insertIntegrationInstance(integrationId, connectedUserId, insertConnection(), 0);
+        long siblingIntegrationInstanceId = insertIntegrationInstance(
+            insertIntegration("httpClient Code"), connectedUserId, insertConnection(), 1);
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), integrationId);
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
+            ownIntegrationInstanceId, Objects.requireNonNull(mcpTool.getId()), true);
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
+            siblingIntegrationInstanceId, Objects.requireNonNull(mcpTool.getId()), false);
+
+        mockPostClusterElementDefinition();
+
+        assertThat(
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant"))
+                    .isNotNull();
+    }
+
+    @Test
+    void testBoundClusterElementToolRunsWithTheConnectionOfItsOwnIntegrationInstance() {
+        McpTool mcpTool = saveMcpTool("post", Map.of(), true);
+
+        long connectedUserId = insertConnectedUser();
+        long integrationId = insertIntegration("httpClient");
+        long ownConnectionId = insertConnection();
+
+        long ownIntegrationInstanceId = insertIntegrationInstance(integrationId, connectedUserId, ownConnectionId, 0);
+
+        insertIntegrationInstance(insertIntegration("httpClient Code"), connectedUserId, insertConnection(), 1);
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), integrationId);
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
+            ownIntegrationInstanceId, Objects.requireNonNull(mcpTool.getId()), true);
+
+        mockPostClusterElementDefinition();
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+
+        assertThat(functionToolCallback).isNotNull();
+
+        when(clusterElementDefinitionFacade.executeTool(eq("httpClient"), eq(1), eq("post"), any(), any()))
+            .thenReturn(Map.of("ok", true));
+
+        functionToolCallback.call("{}");
+
+        verify(clusterElementDefinitionFacade).executeTool(
+            eq("httpClient"), eq(1), eq("post"), any(), eq(ownConnectionId));
+    }
+
+    @Test
+    void testBoundClusterElementToolLinksTheConnectPageToItsOwnIntegration() {
+        McpTool mcpTool = saveMcpTool("post", Map.of(), true);
+
+        insertConnectedUser();
+        insertIntegration("httpClient");
+
+        long boundIntegrationId = insertIntegration("httpClient Code");
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), boundIntegrationId);
+
+        mockPostClusterElementDefinition();
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.getConnection()).thenReturn(mock(ConnectionDefinition.class));
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+
+        assertThat(functionToolCallback).isNotNull();
+
+        functionToolCallback.call("{}");
+
+        verify(jwtTokenService).generateJwtToken(
+            eq(CONNECTED_EXTERNAL_USER_ID), eq(boundIntegrationId), anyInt(), any());
+        verify(clusterElementDefinitionFacade, never()).executeTool(any(), anyInt(), any(), any(), any());
+    }
+
+    @Test
+    void testUnboundClusterElementToolFollowsTheNewestInstanceOfItsComponent() {
+        McpTool mcpTool = saveMcpTool("post", Map.of(), true);
+
+        long connectedUserId = insertConnectedUser();
+
+        long olderIntegrationInstanceId = insertIntegrationInstance(
+            insertIntegration("httpClient"), connectedUserId, insertConnection(), 0);
+        long newerIntegrationInstanceId = insertIntegrationInstance(
+            insertIntegration("httpClient Code"), connectedUserId, insertConnection(), 1);
+
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
+            olderIntegrationInstanceId, Objects.requireNonNull(mcpTool.getId()), true);
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
+            newerIntegrationInstanceId, Objects.requireNonNull(mcpTool.getId()), false);
+
+        mockPostClusterElementDefinition();
+
+        assertThat(
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant"))
+                    .isNull();
+    }
+
+    @Test
     void testTimedOutJobReturnsAnErrorThatNamesTheJob() {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(
             List.of(Map.of("name", "requestApproval_1", "type", "approval/v1/requestApproval")));
@@ -726,6 +845,74 @@ class EmbeddedMcpToolFacadeIntTest {
         return Objects.requireNonNull(jdbcTemplate.queryForObject(sql, Long.class, arguments));
     }
 
+    private long insertConnectedUser() {
+        return insert(
+            """
+                INSERT INTO connected_user (external_id, enabled, environment, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, true, ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION.ordinal());
+    }
+
+    private long insertConnection() {
+        return insert(
+            """
+                INSERT INTO connection (name, component_name, environment, connection_version, parameters,
+                    credential_status, type, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES ('httpClient', 'httpClient', ?, 1, '{}', 0, 0, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            Environment.PRODUCTION.ordinal());
+    }
+
+    private long insertIntegration(String name) {
+        return insert(
+            """
+                INSERT INTO integration (name, component_name, allow_multiple_instances, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, 'httpClient', false, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            name);
+    }
+
+    private long insertIntegrationInstance(
+        long integrationId, long connectedUserId, long connectionId, int createdMinutesFromNow) {
+
+        long integrationInstanceConfigurationId = insert(
+            """
+                INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
+                    environment, connection_parameters, authorization_type, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, 1, 'httpClient', true, ?, ?, 0, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            integrationId, Environment.PRODUCTION.ordinal(), encryption.encrypt("{}"));
+
+        return insert(
+            """
+                INSERT INTO integration_instance (integration_instance_configuration_id, connected_user_id,
+                    connection_id, enabled, created_date, created_by, last_modified_date, last_modified_by,
+                    version)
+                VALUES (?, ?, ?, true, now() + make_interval(mins => ?), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            integrationInstanceConfigurationId, connectedUserId, connectionId, createdMinutesFromNow);
+    }
+
+    private void mockPostClusterElementDefinition() {
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getComponentName()).thenReturn("httpClient");
+        when(clusterElementDefinition.getComponentVersion()).thenReturn(1);
+        when(clusterElementDefinition.getName()).thenReturn("post");
+        when(clusterElementDefinition.getDescription()).thenReturn(CLUSTER_ELEMENT_DESCRIPTION);
+        when(clusterElementDefinitionService.getClusterElementDefinition("httpClient", 1, "post"))
+            .thenReturn(clusterElementDefinition);
+    }
+
     private McpTool saveMcpTool(String name, Map<String, Object> parameters, boolean enabled) {
         McpServer mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
@@ -775,6 +962,7 @@ class EmbeddedMcpToolFacadeIntTest {
             IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
             IntegrationService integrationService, JobCompletionAwaiter jobCompletionAwaiter,
             JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
+            McpIntegrationComponentService mcpIntegrationComponentService,
             McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
             McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
             PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
@@ -785,7 +973,7 @@ class EmbeddedMcpToolFacadeIntTest {
                 connectedUserService, evaluator, integrationInstanceConfigurationService,
                 integrationInstanceConfigurationWorkflowService, integrationInstanceService,
                 integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
-                mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+                mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
                 mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade, "http://localhost:8080",
                 taskExecutionService, taskFileStorage, workflowService);
         }
