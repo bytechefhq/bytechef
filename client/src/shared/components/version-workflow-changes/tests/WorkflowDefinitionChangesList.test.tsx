@@ -1,4 +1,4 @@
-import {WorkflowChangeType, WorkflowNodeChangeKind, WorkflowNodeChangeTarget} from '@/shared/middleware/graphql';
+import {WorkflowNodeChangeKind, WorkflowNodeChangeTarget} from '@/shared/middleware/graphql';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it} from 'vitest';
 
@@ -82,24 +82,9 @@ describe('WorkflowDefinitionChangesList', () => {
         expect(screen.getByText('No structural changes.')).toBeInTheDocument();
     });
 
-    it('says the workflow was added instead of listing no changes', () => {
-        render(<WorkflowDefinitionChangesList changeType={WorkflowChangeType.Added} changes={[]} />);
-
-        expect(screen.getByText('Workflow added in this version.')).toBeInTheDocument();
-        expect(screen.queryByText('No structural changes.')).not.toBeInTheDocument();
-    });
-
-    it('says the workflow was removed instead of listing no changes', () => {
-        render(<WorkflowDefinitionChangesList changeType={WorkflowChangeType.Removed} changes={[]} />);
-
-        expect(screen.getByText('Workflow removed in this version.')).toBeInTheDocument();
-        expect(screen.queryByText('No structural changes.')).not.toBeInTheDocument();
-    });
-
     it('titles a workflow-level change as Workflow', () => {
         render(
             <WorkflowDefinitionChangesList
-                changeType={WorkflowChangeType.Modified}
                 changes={[
                     {
                         kind: WorkflowNodeChangeKind.Modified,

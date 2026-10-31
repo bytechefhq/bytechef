@@ -1,6 +1,6 @@
 import Badge, {BadgeStyleType} from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {WorkflowChangeType, WorkflowDefinitionChange, WorkflowNodeChangeKind} from '@/shared/middleware/graphql';
+import {WorkflowDefinitionChange, WorkflowNodeChangeKind} from '@/shared/middleware/graphql';
 import {useState} from 'react';
 
 const KIND_BADGES: Record<WorkflowNodeChangeKind, {label: string; styleType: BadgeStyleType}> = {
@@ -38,19 +38,10 @@ const ValueChangeText = ({text}: ValueChangeTextProps) => {
 };
 
 interface WorkflowDefinitionChangesListProps {
-    changeType?: WorkflowChangeType;
     changes: WorkflowDefinitionChange[];
 }
 
-const WorkflowDefinitionChangesList = ({changeType, changes}: WorkflowDefinitionChangesListProps) => {
-    if (changeType === WorkflowChangeType.Added) {
-        return <p className="text-sm text-content-neutral-secondary">Workflow added in this version.</p>;
-    }
-
-    if (changeType === WorkflowChangeType.Removed) {
-        return <p className="text-sm text-content-neutral-secondary">Workflow removed in this version.</p>;
-    }
-
+const WorkflowDefinitionChangesList = ({changes}: WorkflowDefinitionChangesListProps) => {
     if (changes.length === 0) {
         return <p className="text-sm text-content-neutral-secondary">No structural changes.</p>;
     }

@@ -66,17 +66,18 @@ describe('VersionWorkflowChangesList', () => {
         expect(onWorkflowClick).toHaveBeenCalledWith('uuid-2');
     });
 
-    it('opens only modified workflows, since added and removed ones have nothing to compare', async () => {
+    it('opens added and removed workflows too', async () => {
         const onWorkflowClick = vi.fn();
 
         render(<VersionWorkflowChangesList changes={changes} isLoading={false} onWorkflowClick={onWorkflowClick} />);
 
-        expect(screen.getAllByRole('button')).toHaveLength(1);
+        expect(screen.getAllByRole('button')).toHaveLength(3);
 
-        await userEvent.click(screen.getByText('First'));
-        await userEvent.click(screen.getByText('Gone'));
+        await userEvent.click(screen.getByLabelText('Open changes of First'));
+        await userEvent.click(screen.getByLabelText('Open changes of Gone'));
 
-        expect(onWorkflowClick).not.toHaveBeenCalled();
+        expect(onWorkflowClick).toHaveBeenNthCalledWith(1, 'uuid-1');
+        expect(onWorkflowClick).toHaveBeenNthCalledWith(2, 'uuid-3');
     });
 
     it('shows the loading icon while loading', () => {

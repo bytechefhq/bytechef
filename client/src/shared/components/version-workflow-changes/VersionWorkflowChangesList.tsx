@@ -1,16 +1,12 @@
 import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
 import {VersionWorkflowChanges, WorkflowChangeType} from '@/shared/middleware/graphql';
-import {twMerge} from 'tailwind-merge';
 
 import {
     formatVersionWorkflowChangesSummary,
     getWorkflowChangeTypeBadgeStyleType,
     getWorkflowChangeTypeLabel,
 } from './versionWorkflowChangesUtils';
-
-const ROW_CLASS_NAME =
-    'flex items-center justify-between gap-2 rounded-md border border-stroke-neutral-secondary px-3 py-2 text-sm';
 
 interface VersionWorkflowChangesListProps {
     changes?: VersionWorkflowChanges;
@@ -50,8 +46,14 @@ const VersionWorkflowChangesList = ({
             {changes.workflows.map((workflow) => {
                 const workflowName = workflow.label || workflow.workflowUuid;
 
-                const rowContent = (
-                    <>
+                return (
+                    <button
+                        aria-label={`Open changes of ${workflowName}`}
+                        className="flex items-center justify-between gap-2 rounded-md border border-stroke-neutral-secondary px-3 py-2 text-left text-sm hover:bg-surface-neutral-primary-hover"
+                        key={workflow.workflowUuid}
+                        onClick={() => onWorkflowClick(workflow.workflowUuid)}
+                        type="button"
+                    >
                         <span className="truncate">{workflowName}</span>
 
                         <span className="flex shrink-0 items-center gap-2">
@@ -66,26 +68,6 @@ const VersionWorkflowChangesList = ({
                                 styleType={getWorkflowChangeTypeBadgeStyleType(workflow.changeType)}
                             />
                         </span>
-                    </>
-                );
-
-                if (workflow.changeType !== WorkflowChangeType.Modified) {
-                    return (
-                        <div className={ROW_CLASS_NAME} key={workflow.workflowUuid}>
-                            {rowContent}
-                        </div>
-                    );
-                }
-
-                return (
-                    <button
-                        aria-label={`Open changes of ${workflowName}`}
-                        className={twMerge(ROW_CLASS_NAME, 'text-left hover:bg-surface-neutral-primary-hover')}
-                        key={workflow.workflowUuid}
-                        onClick={() => onWorkflowClick(workflow.workflowUuid)}
-                        type="button"
-                    >
-                        {rowContent}
                     </button>
                 );
             })}

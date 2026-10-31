@@ -1,5 +1,10 @@
 import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
-import {VersionWorkflowChange, WorkflowNodeChangeKind, WorkflowNodeChangeTarget} from '@/shared/middleware/graphql';
+import {
+    VersionWorkflowChange,
+    WorkflowChangeType,
+    WorkflowNodeChangeKind,
+    WorkflowNodeChangeTarget,
+} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useMemo} from 'react';
@@ -95,15 +100,17 @@ export const WorkflowChangeCanvasToolbar = ({
             </ToggleGroup>
         )}
 
-        <ul className="flex items-center gap-3 text-xs text-content-neutral-secondary">
-            {LEGEND.map((legendItem) => (
-                <li className="flex items-center gap-1" key={legendItem.label}>
-                    <span className={`size-2.5 rounded-sm ${legendItem.className}`} />
+        {change.changeType === WorkflowChangeType.Modified && (
+            <ul className="flex items-center gap-3 text-xs text-content-neutral-secondary">
+                {LEGEND.map((legendItem) => (
+                    <li className="flex items-center gap-1" key={legendItem.label}>
+                        <span className={`size-2.5 rounded-sm ${legendItem.className}`} />
 
-                    {legendItem.label}
-                </li>
-            ))}
-        </ul>
+                        {legendItem.label}
+                    </li>
+                ))}
+            </ul>
+        )}
     </div>
 );
 
