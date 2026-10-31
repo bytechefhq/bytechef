@@ -8,6 +8,9 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditEvents;
 import com.bytechef.automation.configuration.audit.WorkspaceApiKeyAuditMapper;
@@ -40,6 +43,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @version ee
@@ -62,7 +66,7 @@ class WorkspaceApiKeyAuditIntTest {
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private WorkspaceApiKeyRepository workspaceApiKeyRepository;
 
     @Autowired
@@ -158,6 +162,8 @@ class WorkspaceApiKeyAuditIntTest {
         long workspaceApiKeyId = saveWorkspaceApiKey();
 
         workspaceApiKeyService.delete(UNKNOWN_WORKSPACE_API_KEY_ID);
+
+        verify(workspaceApiKeyRepository, never()).deleteById(anyLong());
 
         assertThat(workspaceApiKeyRepository.findById(workspaceApiKeyId)).isPresent();
         assertThat(findAllEvents()).isEmpty();
