@@ -13,6 +13,8 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,21 @@ public class IntegrationWorkflowGraphQlController {
 
         this.integrationWorkflowFacade = integrationWorkflowFacade;
         this.integrationWorkflowService = integrationWorkflowService;
+    }
+
+    @QueryMapping
+    VersionWorkflowChange integrationVersionWorkflowChange(
+        @Argument long integrationId, @Argument int integrationVersion, @Argument String workflowUuid) {
+
+        return integrationWorkflowFacade.getIntegrationVersionWorkflowChange(
+            integrationId, integrationVersion, workflowUuid);
+    }
+
+    @QueryMapping
+    VersionWorkflowChanges integrationVersionWorkflowChanges(
+        @Argument long integrationId, @Argument int integrationVersion) {
+
+        return integrationWorkflowFacade.getIntegrationVersionWorkflowChanges(integrationId, integrationVersion);
     }
 
     @QueryMapping

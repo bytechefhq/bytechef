@@ -14,6 +14,8 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDT
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectAdminFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
@@ -122,6 +124,21 @@ public class AutomationWorkflowProjectGraphQlController {
         automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
 
         return true;
+    }
+
+    @QueryMapping
+    public VersionWorkflowChange automationWorkflowProjectVersionWorkflowChange(
+        @Argument String id, @Argument int projectVersion, @Argument String workflowUuid) {
+
+        return automationWorkflowProjectFacade.getProjectVersionWorkflowChange(
+            Long.parseLong(id), projectVersion, workflowUuid);
+    }
+
+    @QueryMapping
+    public VersionWorkflowChanges automationWorkflowProjectVersionWorkflowChanges(
+        @Argument String id, @Argument int projectVersion) {
+
+        return automationWorkflowProjectFacade.getProjectVersionWorkflowChanges(Long.parseLong(id), projectVersion);
     }
 
     @QueryMapping
