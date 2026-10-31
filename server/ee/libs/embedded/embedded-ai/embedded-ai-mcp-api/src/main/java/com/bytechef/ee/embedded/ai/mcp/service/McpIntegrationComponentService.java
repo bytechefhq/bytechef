@@ -23,4 +23,6 @@ public interface McpIntegrationComponentService {
     Optional<McpIntegrationComponent> fetchMcpIntegrationComponent(long mcpComponentId);
 
     List<McpIntegrationComponent> getIntegrationMcpIntegrationComponents(long integrationId);
+
+    McpIntegrationComponent update(long mcpComponentId, long integrationId);
 }

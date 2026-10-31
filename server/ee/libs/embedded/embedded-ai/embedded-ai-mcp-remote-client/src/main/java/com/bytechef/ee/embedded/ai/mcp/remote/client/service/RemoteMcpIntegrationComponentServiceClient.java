@@ -37,4 +37,9 @@ public class RemoteMcpIntegrationComponentServiceClient implements McpIntegratio
     public List<McpIntegrationComponent> getIntegrationMcpIntegrationComponents(long integrationId) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public McpIntegrationComponent update(long mcpComponentId, long integrationId) {
+        throw new UnsupportedOperationException();
+    }
 }
