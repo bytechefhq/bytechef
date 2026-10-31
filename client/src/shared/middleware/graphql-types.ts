@@ -214,8 +214,6 @@ export type AiAgentJudgeVerdict = {
   judgeName: Scalars['String']['output'];
   judgeScope: AiAgentJudgeScope;
   judgeType: AiAgentJudgeType;
-  /** @deprecated Use status */
-  passed: Scalars['Boolean']['output'];
   reasonCode?: Maybe<Scalars['String']['output']>;
   score?: Maybe<Scalars['Float']['output']>;
   status: AiAgentJudgeVerdictStatus;
