@@ -20,7 +20,6 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
-    testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
@@ -30,8 +29,8 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
-    testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
 
     testRuntimeOnly(project(":server:libs:platform:platform-security:platform-security-service"))
