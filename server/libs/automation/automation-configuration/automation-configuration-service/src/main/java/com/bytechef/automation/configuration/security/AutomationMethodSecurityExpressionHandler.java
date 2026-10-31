@@ -91,10 +91,10 @@ public class AutomationMethodSecurityExpressionHandler extends DefaultMethodSecu
     private static List<MethodResolver> createContributorMethodResolvers(
         ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-        Map<String, String> methodOwners = new HashMap<>();
+        Map<String, Object> methodOwners = new HashMap<>();
 
         for (Method method : AutomationMethodSecurityExpressionRoot.class.getMethods()) {
-            methodOwners.put(method.getName(), AutomationMethodSecurityExpressionRoot.class.getName());
+            methodOwners.put(method.getName(), AutomationMethodSecurityExpressionRoot.class);
         }
 
         List<MethodResolver> methodResolvers = new ArrayList<>();
@@ -108,12 +108,12 @@ public class AutomationMethodSecurityExpressionHandler extends DefaultMethodSecu
                         continue;
                     }
 
-                    String owner = methodOwners.putIfAbsent(method.getName(), contributorClass.getName());
+                    Object owner = methodOwners.putIfAbsent(method.getName(), contributor);
 
-                    if (owner != null && !owner.equals(contributorClass.getName())) {
+                    if (owner != null && owner != contributor) {
                         throw new IllegalStateException(
                             "Method security expression '%s' of %s is already defined by %s".formatted(
-                                method.getName(), contributorClass.getName(), owner));
+                                method.getName(), describe(contributor), describe(owner)));
                     }
                 }
 
@@ -121,5 +121,16 @@ public class AutomationMethodSecurityExpressionHandler extends DefaultMethodSecu
             });
 
         return List.copyOf(methodResolvers);
+    }
+
+    private static String describe(Object owner) {
+        if (owner instanceof Class<?> ownerClass) {
+            return ownerClass.getName();
+        }
+
+        Class<?> ownerClass = ClassUtils.getUserClass(owner);
+
+        return "contributor bean %s@%s".formatted(
+            ownerClass.getName(), Integer.toHexString(System.identityHashCode(owner)));
     }
 }
