@@ -24,13 +24,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 
 /**
- * Test configuration for platform billing REST integration tests.
+ * Test configuration for platform billing REST integration tests. The MapStruct mappers need the core DateTimeMapper
+ * and are only used by BillingApiController, so they are left out of the scan.
  *
  * @author Ivica Cardic
  */
 @ComponentScan(
     basePackages = "com.bytechef.platform.billing.web.rest",
-    excludeFilters = @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
+    excludeFilters = {
+        @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+        @Filter(type = FilterType.REGEX, pattern = "com\\.bytechef\\.platform\\.billing\\.web\\.rest\\.mapper\\..*")
+    })
 @Configuration
 @EnableAutoConfiguration
 public class PlatformBillingRestTestConfiguration {
