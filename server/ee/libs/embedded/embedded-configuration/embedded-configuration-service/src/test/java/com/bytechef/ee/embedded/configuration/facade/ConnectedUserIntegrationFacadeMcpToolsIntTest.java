@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -24,11 +25,13 @@ import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @version ee
@@ -41,12 +44,19 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
     private static final String COMPONENT_NAME =
         ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration.COMPONENT_NAME;
+    private static final long INTEGRATION_ID = 1L;
 
     @Autowired
     private ConnectedUserIntegrationFacadeImpl connectedUserIntegrationFacade;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private McpComponentRepository mcpComponentRepository;
+
+    @Autowired
+    private McpIntegrationComponentService mcpIntegrationComponentService;
 
     @Autowired
     private McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
@@ -59,6 +69,9 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
     @AfterEach
     void afterEach() {
+        jdbcTemplate.update("DELETE FROM mcp_integration_component");
+        jdbcTemplate.update("DELETE FROM integration");
+
         mcpToolRepository.deleteAll();
         mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
@@ -69,7 +82,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
 
         List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME);
+            connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME);
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "sendEmail", "Send Email", "Send an email"));
@@ -80,7 +93,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "getEmail");
 
         List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME);
+            connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME);
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "getEmail", null, "Get an email"));
@@ -90,14 +103,14 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsSkipsToolsOfDisabledMcpServer() {
         createMcpTool(PlatformType.EMBEDDED, false, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME)).isEmpty();
+        assertThat(connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME)).isEmpty();
     }
 
     @Test
     void testGetMcpToolsSkipsToolsOfNonEmbeddedMcpServer() {
         createMcpTool(PlatformType.AUTOMATION, true, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME)).isEmpty();
+        assertThat(connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME)).isEmpty();
     }
 
     @Test
@@ -106,9 +119,34 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
         createDisabledMcpTool(enabledMcpTool.getMcpComponentId(), "getEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME))
+        assertThat(connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME))
             .extracting(ConnectedUserIntegrationDTO.McpToolInfo::id)
             .containsExactly(enabledMcpTool.getId());
+    }
+
+    @Test
+    void testGetMcpToolsListsAToolBoundToTheIntegration() {
+        McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
+
+        long integrationId = insertIntegration("Gmail");
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), integrationId);
+
+        assertThat(connectedUserIntegrationFacade.getMcpTools(integrationId, COMPONENT_NAME))
+            .extracting(ConnectedUserIntegrationDTO.McpToolInfo::id)
+            .containsExactly(mcpTool.getId());
+    }
+
+    @Test
+    void testGetMcpToolsSkipsAToolBoundToAnotherIntegrationOnTheSameComponent() {
+        McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
+
+        long integrationId = insertIntegration("Gmail");
+        long siblingIntegrationId = insertIntegration("Gmail Code");
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), siblingIntegrationId);
+
+        assertThat(connectedUserIntegrationFacade.getMcpTools(integrationId, COMPONENT_NAME)).isEmpty();
     }
 
     @Test
@@ -123,6 +161,19 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
         assertThat(connectedUserIntegrationFacade.getMcpInstanceTools(1L)).containsExactly(
             new ConnectedUserIntegrationDTO.McpInstanceToolInfo(enabledMcpTool.getId(), true));
+    }
+
+    private long insertIntegration(String name) {
+        Long id = jdbcTemplate.queryForObject(
+            """
+                INSERT INTO integration (name, component_name, allow_multiple_instances, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, ?, false, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            Long.class, name, COMPONENT_NAME);
+
+        return Objects.requireNonNull(id);
     }
 
     private McpTool createDisabledMcpTool(long mcpComponentId, String name) {
