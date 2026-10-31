@@ -24,13 +24,10 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
 import com.bytechef.component.script.action.ScriptPythonAction;
-import com.bytechef.component.script.action.ScriptRubyAction;
 import com.bytechef.component.script.cluster.datastream.ScriptJavaScriptItemProcessor;
 import com.bytechef.component.script.cluster.datastream.ScriptPythonItemProcessor;
-import com.bytechef.component.script.cluster.datastream.ScriptRubyItemProcessor;
 import com.bytechef.component.script.cluster.tool.ScriptJavaScriptTool;
 import com.bytechef.component.script.cluster.tool.ScriptPythonTool;
-import com.bytechef.component.script.cluster.tool.ScriptRubyTool;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
@@ -62,24 +59,21 @@ public class ScriptComponentHandler implements ComponentHandler {
                 component(SCRIPT)
                     .title("Script")
                     .description(
-                        "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.")
+                        "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python or R programming languages.")
                     .icon("path:assets/script.svg")
                     .categories(ComponentCategory.HELPERS, ComponentCategory.DEVELOPER_TOOLS)
                     .actions(
                         ScriptJavaScriptAction.of(polyglotEngine),
-                        ScriptPythonAction.of(polyglotEngine),
+                        ScriptPythonAction.of(polyglotEngine))
 //                        ScriptRAction.of(polyglotEngine),
 //                        ScriptJavaAction.of(polyglotEngine),
-                        ScriptRubyAction.of(polyglotEngine))
                     .clusterElements(
                         ScriptJavaScriptTool.of(polyglotEngine),
                         ScriptPythonTool.of(polyglotEngine),
-                        ScriptRubyTool.of(polyglotEngine),
 //                        ScriptJavaItemProcessor.of(polyglotEngine),
 //                        ScriptRAction.of(polyglotEngine),
                         ScriptJavaScriptItemProcessor.of(polyglotEngine),
-                        ScriptPythonItemProcessor.of(polyglotEngine),
-                        ScriptRubyItemProcessor.of(polyglotEngine)));
+                        ScriptPythonItemProcessor.of(polyglotEngine)));
         }
     }
 }
