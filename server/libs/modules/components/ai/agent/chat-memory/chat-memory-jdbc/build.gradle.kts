@@ -12,4 +12,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("com.h2database:h2")
+    testImplementation("org.postgresql:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
 }
