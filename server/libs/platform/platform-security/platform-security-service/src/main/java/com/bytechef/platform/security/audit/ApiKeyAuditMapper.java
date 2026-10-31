@@ -20,8 +20,11 @@ import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
+import com.bytechef.platform.security.repository.ApiKeyRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +32,28 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ApiKeyAuditMapper implements AuditMapper {
+
+    private final ApiKeyRepository apiKeyRepository;
+
+    @SuppressFBWarnings("EI")
+    public ApiKeyAuditMapper(ApiKeyRepository apiKeyRepository) {
+        this.apiKeyRepository = apiKeyRepository;
+    }
+
+    @Override
+    public @Nullable Object capture(AuditInvocation auditInvocation) {
+        String event = auditInvocation.event();
+
+        if (!event.equals(ApiKeyAuditEvents.API_KEY_DELETED)) {
+            return null;
+        }
+
+        long apiKeyId = (Long) auditInvocation.requireArgument("id");
+
+        return apiKeyRepository.findById(apiKeyId)
+            .map(ApiKey::getType)
+            .orElse(null);
+    }
 
     @Override
     public Map<String, String> map(AuditInvocation auditInvocation) {
@@ -63,5 +88,22 @@ public class ApiKeyAuditMapper implements AuditMapper {
         }
 
         return data;
+    }
+
+    @Override
+    public @Nullable PlatformType platform(AuditInvocation auditInvocation) {
+        if (auditInvocation.result() instanceof ApiKey apiKey) {
+            return apiKey.getType();
+        }
+
+        if (auditInvocation.argument("apiKey") instanceof ApiKey apiKey) {
+            return apiKey.getType();
+        }
+
+        if (auditInvocation.captured() instanceof PlatformType platformType) {
+            return platformType;
+        }
+
+        return null;
     }
 }

@@ -80,6 +80,7 @@ class JobStatusAuditListenerIntTest {
             .containsEntry("jobId", "42")
             .containsEntry("status", status);
         assertThat(persistentAuditEvent.getEventDate()).isNotNull();
+        assertThat(persistentAuditEvent.getPlatform()).isNull();
     }
 
     @Test
@@ -89,7 +90,7 @@ class JobStatusAuditListenerIntTest {
         jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(7L, Job.Status.COMPLETED));
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository
-            .findAllFiltered(new AuditEventFilter(null, null, null, "7", true), PageRequest.of(0, 25));
+            .findAllFiltered(new AuditEventFilter(null, null, null, "7", true, null), PageRequest.of(0, 25));
 
         List<String> eventTypes = page.getContent()
             .stream()
@@ -129,7 +130,7 @@ class JobStatusAuditListenerIntTest {
 
     private List<PersistentAuditEvent> findAll() {
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
-            new AuditEventFilter(null, null, null, null, true), PageRequest.of(0, 25));
+            new AuditEventFilter(null, null, null, null, true, null), PageRequest.of(0, 25));
 
         return page.getContent();
     }

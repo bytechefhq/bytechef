@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.audit.repository;
 
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,8 +55,8 @@ public class CustomPersistenceAuditEventRepositoryImpl implements CustomPersiste
             return Page.empty(pageable);
         }
 
-        String dataQuery = "SELECT e.id, e.principal, e.event_date, e.event_type, d.key, d.value"
-            + " FROM (SELECT e.id, e.principal, e.event_date, e.event_type FROM persistent_audit_event e"
+        String dataQuery = "SELECT e.id, e.principal, e.event_date, e.event_type, e.platform, d.key, d.value"
+            + " FROM (SELECT e.id, e.principal, e.event_date, e.event_type, e.platform FROM persistent_audit_event e"
             + whereClause
             + " ORDER BY e.event_date DESC, e.id DESC"
             + " LIMIT ? OFFSET ?) e"
@@ -117,6 +118,7 @@ public class CustomPersistenceAuditEventRepositoryImpl implements CustomPersiste
         LocalDateTime fromDate = auditEventFilter.fromDate();
         LocalDateTime toDate = auditEventFilter.toDate();
         String search = auditEventFilter.search();
+        PlatformType platform = auditEventFilter.platform();
 
         List<String> predicates = new ArrayList<>();
 
@@ -124,6 +126,12 @@ public class CustomPersistenceAuditEventRepositoryImpl implements CustomPersiste
             predicates.add("e.event_type = ?");
 
             arguments.add(eventType);
+        }
+
+        if (platform != null) {
+            predicates.add("e.platform = ?");
+
+            arguments.add(platform.name());
         }
 
         if (fromDate != null) {
@@ -185,6 +193,12 @@ public class CustomPersistenceAuditEventRepositoryImpl implements CustomPersiste
         }
 
         persistentAuditEvent.setEventType(resultSet.getString("event_type"));
+
+        String platform = resultSet.getString("platform");
+
+        if (platform != null) {
+            persistentAuditEvent.setPlatform(PlatformType.valueOf(platform));
+        }
 
         return persistentAuditEvent;
     }

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.audit.domain;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,6 +37,9 @@ public class PersistentAuditEvent {
 
     @Id
     private Long id;
+
+    @Column("platform")
+    private PlatformType platform;
 
     @Column
     private String principal;
@@ -75,6 +79,10 @@ public class PersistentAuditEvent {
         return id;
     }
 
+    public PlatformType getPlatform() {
+        return platform;
+    }
+
     public String getPrincipal() {
         return principal;
     }
@@ -99,6 +107,10 @@ public class PersistentAuditEvent {
         this.id = id;
     }
 
+    public void setPlatform(PlatformType platform) {
+        this.platform = platform;
+    }
+
     public void setPrincipal(String principal) {
         this.principal = principal;
     }
@@ -110,6 +122,7 @@ public class PersistentAuditEvent {
             ", principal='" + principal + '\'' +
             ", eventDate=" + eventDate +
             ", eventType='" + eventType + '\'' +
+            ", platform=" + platform +
             ", data=" + data +
             '}';
     }

@@ -14,13 +14,18 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -40,12 +45,16 @@ public class JobStatusAuditListener implements SharedApplicationEventListener {
     private static final Logger log = LoggerFactory.getLogger(JobStatusAuditListener.class);
 
     private final AuditEventService auditEventService;
+    private final ObjectProvider<PrincipalJobService> principalJobServiceProvider;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
     })
-    public JobStatusAuditListener(AuditEventService auditEventService) {
+    public JobStatusAuditListener(
+        AuditEventService auditEventService, ObjectProvider<PrincipalJobService> principalJobServiceProvider) {
+
         this.auditEventService = auditEventService;
+        this.principalJobServiceProvider = principalJobServiceProvider;
     }
 
     @Override
@@ -65,6 +74,7 @@ public class JobStatusAuditListener implements SharedApplicationEventListener {
 
         persistentAuditEvent.setEventDate(LocalDateTime.now());
         persistentAuditEvent.setEventType("JOB_" + status.name());
+        persistentAuditEvent.setPlatform(resolvePlatform(jobStatusApplicationEvent.getJobId()));
         persistentAuditEvent.setPrincipal(SYSTEM_PRINCIPAL);
         persistentAuditEvent.setData(data);
 
@@ -75,5 +85,28 @@ public class JobStatusAuditListener implements SharedApplicationEventListener {
                 "AUDIT PERSISTENCE FAILURE: the job status event was not recorded \u2014 audit trail is incomplete: {}",
                 persistentAuditEvent, exception);
         }
+    }
+
+    private @Nullable PlatformType resolvePlatform(long jobId) {
+        try {
+            PrincipalJobService principalJobService = principalJobServiceProvider.getIfAvailable();
+
+            if (principalJobService == null) {
+                return null;
+            }
+
+            for (PlatformType platformType : PlatformType.values()) {
+                Optional<Long> principalIdOptional = principalJobService.fetchJobPrincipalId(jobId, platformType);
+
+                if (principalIdOptional.isPresent()) {
+                    return platformType;
+                }
+            }
+        } catch (Exception exception) {
+            log.warn("The platform of job {} could not be resolved; its audit event is recorded without it", jobId,
+                exception);
+        }
+
+        return null;
     }
 }

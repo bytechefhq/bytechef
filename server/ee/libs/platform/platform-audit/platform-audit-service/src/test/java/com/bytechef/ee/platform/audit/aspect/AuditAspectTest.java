@@ -21,9 +21,11 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.access.AccessDeniedException;
@@ -667,6 +670,134 @@ class AuditAspectTest {
         }
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {
+        "com.bytechef.ee.embedded.configuration.facade.ConnectedUserFacade,EMBEDDED",
+        "com.bytechef.automation.configuration.facade.ProjectFacade,AUTOMATION",
+        "com.bytechef.ee.automation.configuration.service.WorkspaceUserService,AUTOMATION",
+        "com.bytechef.automation.embedded.SomeFacade,EMBEDDED",
+        "com.bytechef.platform.security.service.ApiKeyService,NULL",
+        "TestService,NULL"
+    }, nullValues = "NULL")
+    void testPackagePlatformRule(String declaringTypeName, PlatformType expectedPlatform) {
+        assertThat(AuditAspect.resolvePackagePlatform(declaringTypeName)).isEqualTo(expectedPlatform);
+    }
+
+    @Test
+    void testPermissionCheckOnEmbeddedTypeRecordsEmbeddedPlatform() throws Throwable {
+        useDeclaringType("com.bytechef.ee.embedded.configuration.facade.ConnectedUserFacade");
+
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        aspect.audit(joinPoint);
+
+        PersistentAuditEvent captured = captureSavedEvent();
+
+        assertThat(captured.getEventType()).isEqualTo("PERMISSION_CHECK");
+        assertThat(captured.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+    }
+
+    @Test
+    void testPermissionCheckOnAutomationTypeRecordsAutomationPlatform() throws Throwable {
+        useDeclaringType("com.bytechef.automation.configuration.facade.ProjectFacade");
+
+        when(joinPoint.proceed()).thenThrow(new AccessDeniedException("denied"));
+
+        assertThatThrownBy(() -> aspect.audit(joinPoint)).isInstanceOf(AccessDeniedException.class);
+
+        PersistentAuditEvent captured = captureSavedEvent();
+
+        assertThat(captured.getEventType()).isEqualTo("PERMISSION_CHECK");
+        assertThat(captured.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+    }
+
+    @Test
+    void testPermissionCheckOnPlatformNeutralTypeRecordsNoPlatform() throws Throwable {
+        useDeclaringType("com.bytechef.platform.security.service.ApiKeyService");
+
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        aspect.audit(joinPoint);
+
+        assertThat(captureSavedEvent().getPlatform()).isNull();
+    }
+
+    @Test
+    void testMapperPlatformWinsOverThePackageRule() throws Throwable {
+        useAuditedTargetMethod(42L);
+        useDeclaringType("com.bytechef.automation.configuration.service.ProjectService");
+
+        when(auditMapperResolver.resolve(TestAuditMapper.class))
+            .thenReturn(new PlatformAuditMapper(auditInvocation -> PlatformType.EMBEDDED));
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        aspect.audit(joinPoint);
+
+        PersistentAuditEvent captured = captureSavedEvent();
+
+        assertThat(captured.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(captured.getData()).doesNotContainKey("mapperError");
+    }
+
+    @Test
+    void testNullMapperPlatformFallsBackToThePackageRule() throws Throwable {
+        useAuditedTargetMethod(42L);
+        useDeclaringType("com.bytechef.automation.configuration.service.ProjectService");
+
+        when(auditMapperResolver.resolve(TestAuditMapper.class)).thenReturn(new TestAuditMapper());
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        aspect.audit(joinPoint);
+
+        assertThat(captureSavedEvent().getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+    }
+
+    @Test
+    void testThrowingMapperPlatformFallsBackToThePackageRuleAndStillWritesTheRow() throws Throwable {
+        useAuditedTargetMethod(42L);
+        useDeclaringType("com.bytechef.ee.embedded.configuration.service.IntegrationService");
+
+        when(auditMapperResolver.resolve(TestAuditMapper.class))
+            .thenReturn(new PlatformAuditMapper(auditInvocation -> {
+                throw new IllegalStateException("bad platform");
+            }));
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        assertThat(aspect.audit(joinPoint)).isEqualTo("ok");
+
+        PersistentAuditEvent captured = captureSavedEvent();
+
+        assertThat(captured.getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(captured.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("userId", "42")
+            .containsEntry("mapperError", IllegalStateException.class.getName());
+    }
+
+    @Test
+    void testThrowingMapperStillGetsThePackagePlatform() throws Throwable {
+        useAuditedTargetMethod(42L);
+        useDeclaringType("com.bytechef.automation.configuration.service.ProjectService");
+
+        when(auditMapperResolver.resolve(TestAuditMapper.class)).thenReturn(auditInvocation -> {
+            throw new IllegalArgumentException("bad mapper");
+        });
+        when(joinPoint.proceed()).thenReturn("ok");
+
+        aspect.audit(joinPoint);
+
+        PersistentAuditEvent captured = captureSavedEvent();
+
+        assertThat(captured.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(captured.getData()).containsEntry("mapperError", IllegalArgumentException.class.getName());
+    }
+
+    private void useDeclaringType(String declaringTypeName) {
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+
+        when(methodSignature.getDeclaringTypeName()).thenReturn(declaringTypeName);
+    }
+
     private void useAuditedTargetMethod(long userId) throws NoSuchMethodException {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 
@@ -701,6 +832,20 @@ class AuditAspectTest {
             }
 
             return data;
+        }
+    }
+
+    static class PlatformAuditMapper extends TestAuditMapper {
+
+        private final Function<AuditInvocation, PlatformType> platformFunction;
+
+        PlatformAuditMapper(Function<AuditInvocation, PlatformType> platformFunction) {
+            this.platformFunction = platformFunction;
+        }
+
+        @Override
+        public PlatformType platform(AuditInvocation auditInvocation) {
+            return platformFunction.apply(auditInvocation);
         }
     }
 }

@@ -14,6 +14,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.facade.AuditEventFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -55,14 +56,15 @@ public class AuditEventGraphQlController {
     @QueryMapping(name = "auditEvents")
     public AuditEventPage auditEvents(
         @Argument String eventType, @Argument Long fromDate, @Argument Long toDate, @Argument String search,
-        @Argument Integer page, @Argument Integer size) {
+        @Argument PlatformType platform, @Argument Integer page, @Argument Integer size) {
 
         PageRequest pageRequest = PageRequest.of(
             page == null ? 0 : Math.max(0, page),
             size == null ? DEFAULT_PAGE_SIZE : Math.clamp(size, 1, MAX_PAGE_SIZE));
 
         AuditEventFilter auditEventFilter = new AuditEventFilter(
-            eventType, toLocalDateTime(fromDate), toLocalDateTime(toDate), search, !maskPrincipals);
+            eventType, toLocalDateTime(fromDate), toLocalDateTime(toDate), search, !maskPrincipals,
+            platform);
 
         Page<PersistentAuditEvent> persistentPage = auditEventFacade.fetchAuditEvents(auditEventFilter, pageRequest);
 
@@ -106,6 +108,7 @@ public class AuditEventGraphQlController {
             persistentAuditEvent.getEventType(),
             persistentAuditEvent.getId(),
             toOutcome(dataMap.get("result")),
+            persistentAuditEvent.getPlatform(),
             maskPrincipals ? maskPrincipal(principal) : principal);
     }
 
@@ -141,7 +144,7 @@ public class AuditEventGraphQlController {
 
     record AuditEvent(
         List<AuditEventDataEntry> data, Long eventDate, String eventType, Long id, @Nullable AuditEventOutcome outcome,
-        String principal) {
+        @Nullable PlatformType platform, String principal) {
     }
 
     record AuditEventDataEntry(String key, String value) {
