@@ -2,8 +2,8 @@ import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {ensureMonacoConfigured, getMonacoInstance, isMonacoConfigured} from '@/shared/components/monacoSetup';
 import useIsDarkMode from '@/shared/hooks/useIsDarkMode';
 import {MONACO_DARK_THEME, MONACO_LIGHT_THEME, defineMonacoDarkTheme} from '@/shared/util/monacoTheme-utils';
-import {DiffEditor} from '@monaco-editor/react';
-import {useEffect, useState} from 'react';
+import {DiffEditor, type MonacoDiffEditor} from '@monaco-editor/react';
+import {useEffect, useRef, useState} from 'react';
 
 interface MonacoDiffEditorProps {
     className?: string;
@@ -22,7 +22,13 @@ const DIFF_EDITOR_OPTIONS = {
 const MonacoDiffEditorWrapper = ({className, language, modified, original}: MonacoDiffEditorProps) => {
     const [isReady, setIsReady] = useState(isMonacoConfigured());
 
+    const diffEditorRef = useRef<MonacoDiffEditor | null>(null);
+
     const isDarkMode = useIsDarkMode();
+
+    const handleMount = (diffEditor: MonacoDiffEditor) => {
+        diffEditorRef.current = diffEditor;
+    };
 
     useEffect(() => {
         if (!isReady) {
@@ -38,6 +44,26 @@ const MonacoDiffEditorWrapper = ({className, language, modified, original}: Mona
         }
     }, [isDarkMode, isReady]);
 
+    useEffect(
+        () => () => {
+            const diffEditor = diffEditorRef.current;
+
+            if (!diffEditor) {
+                return;
+            }
+
+            const diffEditorModel = diffEditor.getModel();
+
+            diffEditor.setModel(null);
+
+            diffEditorModel?.original.dispose();
+            diffEditorModel?.modified.dispose();
+
+            diffEditorRef.current = null;
+        },
+        []
+    );
+
     if (!isReady) {
         return <MonacoEditorLoader />;
     }
@@ -45,9 +71,12 @@ const MonacoDiffEditorWrapper = ({className, language, modified, original}: Mona
     return (
         <DiffEditor
             className={className}
+            keepCurrentModifiedModel
+            keepCurrentOriginalModel
             language={language}
             loading={<MonacoEditorLoader />}
             modified={modified}
+            onMount={handleMount}
             options={DIFF_EDITOR_OPTIONS}
             original={original}
             theme={isDarkMode ? MONACO_DARK_THEME : MONACO_LIGHT_THEME}
