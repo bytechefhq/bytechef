@@ -68,7 +68,7 @@ class AuditEventRetentionJobTest {
     }
 
     @Test
-    void testPurgeExpiredEventsRunsOncePerTenantWhenMultiTenant() {
+    void testPurgeExpiredEventsRunsForTheDefaultSchemaAndOncePerTenantWhenMultiTenant() {
         List<String> purgedTenantIds = new ArrayList<>();
 
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
@@ -87,11 +87,12 @@ class AuditEventRetentionJobTest {
 
         createJob(30L, "0 0 2 * * *").purgeExpiredEvents();
 
-        verify(persistenceAuditEventRepository, times(3)).deleteByEventDateBefore(any());
+        verify(persistenceAuditEventRepository, times(4)).deleteByEventDateBefore(any());
 
-        assertThat(purgedTenantIds).containsExactly("tenant_a", "tenant_b", "tenant_c");
+        assertThat(purgedTenantIds).containsExactly(TenantContext.DEFAULT_TENANT_ID, "tenant_a", "tenant_b",
+            "tenant_c");
         assertThat(counterValue(AuditEventRetentionJob.FAILURE_METRIC)).isEqualTo(1.0);
-        assertThat(counterValue(AuditEventRetentionJob.PURGED_METRIC)).isEqualTo(2.0);
+        assertThat(counterValue(AuditEventRetentionJob.PURGED_METRIC)).isEqualTo(3.0);
     }
 
     @Test
