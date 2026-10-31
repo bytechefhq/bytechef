@@ -127,7 +127,7 @@ describe('WorkflowChangeCanvasTab', () => {
     it('renders no canvas for a malformed definition', () => {
         render(
             <WorkflowChangeCanvasTab
-                change={{...BASE_CHANGE, baseVersion: null, oldDefinition: null, newDefinition: 'null'}}
+                change={{...BASE_CHANGE, baseVersion: null, newDefinition: 'null', oldDefinition: null}}
                 versionLabel="V2"
             />
         );
