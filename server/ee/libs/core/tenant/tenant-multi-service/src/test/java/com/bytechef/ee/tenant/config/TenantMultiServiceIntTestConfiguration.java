@@ -12,6 +12,7 @@ import org.springframework.boot.context.TypeExcludeFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnectionAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,8 @@ import org.springframework.context.annotation.FilterType;
     })
 @Configuration
 @EnableConfigurationProperties(LiquibaseProperties.class)
-@ImportAutoConfiguration(DataSourceAutoConfiguration.class)
+@ImportAutoConfiguration({
+    DataSourceAutoConfiguration.class, ServiceConnectionAutoConfiguration.class
+})
 public class TenantMultiServiceIntTestConfiguration {
 }
