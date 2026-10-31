@@ -13,12 +13,12 @@ const TASKS = [
 ];
 
 describe('readOnlyClusterFrames', () => {
-    it('frames every cluster root on a read-only canvas with an execution overlay', () => {
-        expect(getReadOnlyFramedClusterRootIds(TASKS, true)).toEqual(['aiAgent_1']);
+    it('frames every cluster root on a read-only canvas, with or without an execution overlay', () => {
+        expect(getReadOnlyFramedClusterRootIds(TASKS)).toEqual(['aiAgent_1']);
     });
 
-    it('frames nothing on a read-only canvas without an execution overlay', () => {
-        expect(getReadOnlyFramedClusterRootIds(TASKS, false)).toEqual([]);
+    it('frames nothing when the read-only workflow has no tasks', () => {
+        expect(getReadOnlyFramedClusterRootIds(undefined)).toEqual([]);
     });
 
     it('drops placeholder members and the edges that lead to them', () => {

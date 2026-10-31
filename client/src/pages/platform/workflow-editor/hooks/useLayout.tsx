@@ -19,7 +19,6 @@ import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import useClusterElementNodes from '../../cluster-element-editor/hooks/useClusterElementNodes';
 import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
-import {useWorkflowExecutionOverlay} from '../providers/workflowExecutionOverlayContext';
 import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
@@ -215,16 +214,12 @@ export default function useLayout({
         workflowId ? state.collapsedByWorkflowId[workflowId] : undefined
     );
 
-    const workflowExecutionOverlay = useWorkflowExecutionOverlay();
-
     const isReadOnlyWorkflow = !!readOnlyWorkflow;
     const readOnlyWorkflowTasks = readOnlyWorkflow?.tasks;
 
-    const framesReadOnlyClusterRoots = isReadOnlyWorkflow && !!workflowExecutionOverlay;
-
     const boxModeClusterRootIds = useMemo(() => {
         if (isReadOnlyWorkflow) {
-            return getReadOnlyFramedClusterRootIds(readOnlyWorkflowTasks, framesReadOnlyClusterRoots);
+            return getReadOnlyFramedClusterRootIds(readOnlyWorkflowTasks);
         }
 
         return clusterElementsViewMode === 'box'
@@ -232,18 +227,11 @@ export default function useLayout({
                   .filter((task) => task.clusterRoot && !collapsedClusterRootIds?.[task.name])
                   .map((task) => task.name)
             : [];
-    }, [
-        clusterElementsViewMode,
-        collapsedClusterRootIds,
-        framesReadOnlyClusterRoots,
-        isReadOnlyWorkflow,
-        readOnlyWorkflowTasks,
-        tasks,
-    ]);
+    }, [clusterElementsViewMode, collapsedClusterRootIds, isReadOnlyWorkflow, readOnlyWorkflowTasks, tasks]);
 
     const {definitionsReady, edgesByRootId, nodesByRootId} = useClusterElementNodes(
         boxModeClusterRootIds,
-        framesReadOnlyClusterRoots ? readOnlyWorkflow?.definition : undefined
+        readOnlyWorkflow?.definition
     );
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
