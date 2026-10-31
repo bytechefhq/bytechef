@@ -23,6 +23,7 @@ import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import RoundedSmoothStepEdge from '../edges/RoundedSmoothStepEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
+import useCanvasHeightViewport from '../hooks/useCanvasHeightViewport';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useInitialViewport from '../hooks/useInitialViewport';
 import useLayout from '../hooks/useLayout';
@@ -528,6 +529,8 @@ const useWorkflowEditorCanvas = ({
     });
 
     const {getViewportOffsetX} = useOverlayPanelsViewport({enabled: !readOnlyWorkflow});
+
+    useCanvasHeightViewport({enabled: !readOnlyWorkflow});
 
     const workflowUuid = workflow.workflowUuid;
 
