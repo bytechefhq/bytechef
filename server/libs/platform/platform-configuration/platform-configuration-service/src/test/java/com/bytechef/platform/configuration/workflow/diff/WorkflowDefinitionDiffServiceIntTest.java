@@ -19,21 +19,28 @@ package com.bytechef.platform.configuration.workflow.diff;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.jackson.config.JacksonConfiguration;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.dto.WorkflowDefinitionDiff;
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(ObjectMapperSetupExtension.class)
-class WorkflowDefinitionDiffServiceTest {
+@SpringBootTest(classes = WorkflowDefinitionDiffServiceIntTest.WorkflowDefinitionDiffServiceIntTestConfiguration.class)
+class WorkflowDefinitionDiffServiceIntTest {
 
-    private final WorkflowDefinitionDiffService diffService = new WorkflowDefinitionDiffServiceImpl();
+    @Autowired
+    private WorkflowDefinitionDiffService diffService;
 
     @Test
     void testDiffReportsAddedWhenOldIsNull() {
@@ -109,5 +116,14 @@ class WorkflowDefinitionDiffServiceTest {
 
     private static Workflow json(String definition) {
         return new Workflow(definition, Workflow.Format.JSON);
+    }
+
+    @Configuration
+    @EnableAutoConfiguration
+    @Import({
+        JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class,
+        WorkflowDefinitionDiffServiceImpl.class
+    })
+    static class WorkflowDefinitionDiffServiceIntTestConfiguration {
     }
 }
