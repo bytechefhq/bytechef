@@ -286,6 +286,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                     .componentVersion(componentVersion)
                     .operationName(clusterElementName)
                     .connectionId(connectionId)
+                    .environment(Math.toIntExact(mcpServer.getEnvironmentId()))
                     .mcpServerId(mcpServerId)
                     .workspaceId(workspaceId),
                 () -> clusterElementDefinitionFacade.executeTool(
@@ -337,6 +338,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 ToolExecutionEvent
                     .builder(PlatformType.AUTOMATION, ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionKind.WORKFLOW,
                         toolName)
+                    .environment(Math.toIntExact(mcpServer.getEnvironmentId()))
                     .mcpServerId(mcpServerId)
                     .workspaceId(workspaceId)
                     .jobId(jobId),
