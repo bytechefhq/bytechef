@@ -12,6 +12,7 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConve
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.ai.mcp.event.McpToolBeforeDeleteEventListener;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
 import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.encryption.Encryption;
@@ -33,8 +34,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Boots the real {@link McpToolServiceImpl}, {@link McpIntegrationInstanceToolServiceImpl} and
- * {@link McpToolBeforeDeleteEventListener} on a PostgreSQL schema built from every changelog on the test classpath.
+ * Boots the real {@link McpToolServiceImpl}, {@link McpIntegrationComponentServiceImpl},
+ * {@link McpIntegrationInstanceToolServiceImpl} and {@link McpToolBeforeDeleteEventListener} on a PostgreSQL schema
+ * built from every changelog on the test classpath.
  *
  * @version ee
  *
@@ -42,7 +44,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Import({
     EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class, JacksonConfiguration.class,
-    LiquibaseConfiguration.class,
+    LiquibaseConfiguration.class, McpIntegrationComponentServiceImpl.class,
     McpIntegrationInstanceToolServiceImpl.class, McpToolBeforeDeleteEventListener.class, McpToolServiceImpl.class,
     PostgreSQLContainerConfiguration.class
 })
