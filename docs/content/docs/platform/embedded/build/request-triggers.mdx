@@ -94,7 +94,7 @@ With **Auto Respond with HTTP 200 Status**, the response is always `200` with no
 |---|---|
 | `200`, no body | The integration workflow is disabled for the connected user. Nothing runs. |
 | `400` | The connected user or their integration instance does not exist in this environment, or the workflow failed or timed out. The body is a problem detail with the error message. |
-| `404` | The uuid matches no integration workflow and none of the user's automation workflows, or the matching automation workflow is disabled or [dangling](/platform/embedded/build/automations/automation-code-workflows#dangling-references). |
+| `404` | The uuid matches no integration workflow and none of the user's automation workflows, or the matching automation workflow is disabled (by the connected user, or by the administrator through the project's configuration) or [dangling](/platform/embedded/build/automations/automation-code-workflows#dangling-references). |
 
 ## Related
 
