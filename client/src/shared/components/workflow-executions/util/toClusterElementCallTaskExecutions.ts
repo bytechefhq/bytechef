@@ -13,7 +13,10 @@ export interface ClusterElementCallTaskExecutionI extends TaskExecution {
     clusterElementCallNote?: string;
     clusterElementCallOutcome?: ClusterElementCallOutcomeType;
     parentTaskExecutionId: string;
+    subagentTaskCallId?: string;
 }
+
+const TASK_TOOL_NAME = 'Task';
 
 const WAITING_NOTE = 'Waiting for a response';
 const STILL_RUNNING_NOTE = 'Still running when the agent finished';
@@ -119,6 +122,7 @@ export default function toClusterElementCallTaskExecutions(
     }
 
     const callNumbers = getCallNumbers(records);
+    const recordById = new Map(records.map((record) => [record.id, record]));
     const executionById = new Map<string, ClusterElementCallTaskExecutionI>();
 
     records.forEach((record) => {
@@ -141,6 +145,10 @@ export default function toClusterElementCallTaskExecutions(
             priority: taskExecution.priority,
             startDate: record.startDate as Date,
             status: getStatus(record.status),
+            subagentTaskCallId:
+                record.parentId && recordById.get(record.parentId)?.toolName === TASK_TOOL_NAME
+                    ? record.parentId
+                    : undefined,
             title,
             workflowTask: {label: title, name: record.workflowNodeName},
         } as ClusterElementCallTaskExecutionI);

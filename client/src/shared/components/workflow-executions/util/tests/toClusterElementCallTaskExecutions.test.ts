@@ -6,6 +6,7 @@ import {
 import {describe, expect, it} from 'vitest';
 
 import toClusterElementCallTaskExecutions, {
+    ClusterElementCallTaskExecutionI,
     getClusterElementCallOutcome,
     isClusterElementCallTaskExecution,
 } from '../toClusterElementCallTaskExecutions';
@@ -52,6 +53,24 @@ describe('toClusterElementCallTaskExecutions', () => {
         expect(executions[0].workflowTask).toEqual({label: 't', name: 'tools_1'});
         expect(isClusterElementCallTaskExecution(executions[0])).toBe(true);
         expect(isClusterElementCallTaskExecution(createTaskExecution())).toBe(false);
+    });
+
+    it('points a sub-agent run at its Task call, and nothing else', () => {
+        const executions = toClusterElementCallTaskExecutions(
+            createTaskExecution([
+                createRecord({id: 't', toolName: 'Task'}),
+                createRecord({id: 's', parentId: 't', toolName: 'Analyst'}),
+                createRecord({id: 'f', parentId: 's', toolName: 'fetch'}),
+            ])
+        );
+
+        const taskCall = executions[0];
+        const subagentRun = taskCall.children?.[0] as ClusterElementCallTaskExecutionI;
+        const innerCall = subagentRun.children?.[0] as ClusterElementCallTaskExecutionI;
+
+        expect(taskCall.subagentTaskCallId).toBeUndefined();
+        expect(subagentRun.subagentTaskCallId).toBe('t');
+        expect(innerCall.subagentTaskCallId).toBeUndefined();
     });
 
     it('numbers an element called more than once', () => {
