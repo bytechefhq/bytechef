@@ -17,11 +17,13 @@
 package com.bytechef.platform.data.table.configuration.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -32,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Ivica Cardic
@@ -44,11 +47,17 @@ class DataTableServiceIntTest {
     private static final long STAGE_ENVIRONMENT_ID = 1;
 
     @Autowired
+    private DataTableRepository dataTableRepository;
+
+    @Autowired
     private DataTableService dataTableService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void beforeEach() {
-        for (String baseName : List.of("registered", "original", "copy")) {
+        for (String baseName : List.of("registered", "original", "copy", "dropped")) {
             dataTableService.dropTable(baseName, DEV_ENVIRONMENT_ID);
             dataTableService.dropTable(baseName, STAGE_ENVIRONMENT_ID);
         }
@@ -102,5 +111,58 @@ class DataTableServiceIntTest {
         dataTableService.duplicateTable("original", "copy", DEV_ENVIRONMENT_ID);
 
         assertEquals("copy", dataTableService.getBaseNameById(dataTableService.getIdByBaseName("copy")));
+    }
+
+    @Test
+    void testDropTableShouldDeleteMetadataWhenNoPhysicalTablesRemain() {
+        dataTableService.createTable(
+            "dropped", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableService.dropTable("dropped", DEV_ENVIRONMENT_ID);
+
+        assertFalse(physicalTableExists("dt_0_dropped"));
+        assertTrue(
+            dataTableRepository.findByName("dropped")
+                .isEmpty(),
+            "The registry row must go once the last physical table is dropped");
+    }
+
+    @Test
+    void testDropTableShouldUseTheLowercasedNameForBothLayers() {
+        dataTableService.createTable(
+            "dropped", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableService.dropTable("Dropped", DEV_ENVIRONMENT_ID);
+
+        assertFalse(physicalTableExists("dt_0_dropped"));
+        assertTrue(
+            dataTableRepository.findByName("dropped")
+                .isEmpty(),
+            "A mixed-case drop must remove the registry row stored under the lowercased name");
+    }
+
+    @Test
+    void testDropTableShouldPreserveMetadataWhenPhysicalTablesExistInOtherEnvironments() {
+        dataTableService.createTable(
+            "dropped", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        dataTableService.createTable(
+            "dropped", null, List.of(new ColumnSpec("title", ColumnType.STRING)), STAGE_ENVIRONMENT_ID);
+
+        dataTableService.dropTable("dropped", DEV_ENVIRONMENT_ID);
+
+        assertFalse(physicalTableExists("dt_0_dropped"));
+        assertTrue(physicalTableExists("dt_1_dropped"));
+        assertTrue(
+            dataTableRepository.findByName("dropped")
+                .isPresent(),
+            "The registry row must survive while another environment still has the physical table");
+    }
+
+    private boolean physicalTableExists(String physicalName) {
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = current_schema() AND table_name = ?",
+            Integer.class, physicalName);
+
+        return count != null && count > 0;
     }
 }
