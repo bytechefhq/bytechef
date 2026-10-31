@@ -838,7 +838,7 @@ class IntegrationInstanceFacadeIntTest {
         private ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
 
         @Test
-        void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndNonAdmins() {
+        void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndMembersWithoutTheManageScope() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
 
             assertThatThrownBy(
@@ -846,6 +846,8 @@ class IntegrationInstanceFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
 
             authenticate(createNonAdminAuthentication());
+
+            when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_MANAGE")).thenReturn(false);
 
             assertThatThrownBy(
                 () -> integrationInstanceFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of()))
@@ -855,23 +857,27 @@ class IntegrationInstanceFacadeIntTest {
         }
 
         @Test
-        void testProvisionIntegrationInstanceDelegatesForTenantAdmin() {
-            authenticate(createTenantAdminAuthentication());
+        void testProvisionIntegrationInstanceDelegatesForAMemberWithTheManageScope() {
+            authenticate(createNonAdminAuthentication());
+
+            when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_MANAGE")).thenReturn(true);
 
             integrationInstanceFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
 
             verify(connectedUserIntegrationFacade).provisionIntegrationInstance(
-                1L, 2L, Map.of("key", "v"), List.of(), "admin@localhost.com");
+                1L, 2L, Map.of("key", "v"), List.of(), "user");
         }
 
         @Test
-        void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndNonAdmins() {
+        void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndMembersWithoutTheViewScope() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
 
             assertThatThrownBy(() -> integrationInstanceFacade.getProvisionableIntegrations(1L))
                 .isInstanceOf(AccessDeniedException.class);
 
             authenticate(createNonAdminAuthentication());
+
+            when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_VIEW")).thenReturn(false);
 
             assertThatThrownBy(() -> integrationInstanceFacade.getProvisionableIntegrations(1L))
                 .isInstanceOf(AccessDeniedException.class);
@@ -880,8 +886,10 @@ class IntegrationInstanceFacadeIntTest {
         }
 
         @Test
-        void testGetProvisionableIntegrationsDelegatesForTenantAdmin() {
-            authenticate(createTenantAdminAuthentication());
+        void testGetProvisionableIntegrationsDelegatesForAMemberWithTheViewScope() {
+            authenticate(createNonAdminAuthentication());
+
+            when(permissionService.hasResourceScope(1L, "ConnectedUser", "CONNECTED_USER_VIEW")).thenReturn(true);
 
             integrationInstanceFacade.getProvisionableIntegrations(1L);
 

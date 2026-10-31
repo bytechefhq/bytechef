@@ -304,7 +304,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
         ConnectedUserIntegrationFacade connectedUserIntegrationFacade =
@@ -314,7 +314,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId, Map<String, Object> connectionParameters,
