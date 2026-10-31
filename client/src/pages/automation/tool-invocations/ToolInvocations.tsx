@@ -7,7 +7,10 @@ import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ToolInvocationsTable from '@/pages/automation/tool-invocations/components/ToolInvocationsTable';
-import {useToolInvocations} from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
+import {
+    ToolInvocationsWorkspaceScopeI,
+    useToolInvocations,
+} from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -37,9 +40,10 @@ const surfaceOptions = [
 
 interface ToolInvocationsProps {
     mcpServerOptions?: Array<ComboBoxItemType>;
+    workspaceScope?: ToolInvocationsWorkspaceScopeI;
 }
 
-export const ToolInvocations = ({mcpServerOptions}: ToolInvocationsProps) => {
+export const ToolInvocations = ({mcpServerOptions, workspaceScope}: ToolInvocationsProps) => {
     const {
         filterEndDate,
         filterMcpServerId,
@@ -59,7 +63,7 @@ export const ToolInvocations = ({mcpServerOptions}: ToolInvocationsProps) => {
         toolInvocationLogsError,
         toolInvocationLogsIsFetching,
         toolInvocationLogsIsLoading,
-    } = useToolInvocations();
+    } = useToolInvocations(workspaceScope);
 
     return (
         <LayoutContainer
