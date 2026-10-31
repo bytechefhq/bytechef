@@ -19,14 +19,7 @@ function toNonInteractiveNode(node: Node): Node {
     };
 }
 
-export function getReadOnlyFramedClusterRootIds(
-    tasks: ClusterRootTaskI[] | undefined,
-    hasExecutionOverlay: boolean
-): string[] {
-    if (!hasExecutionOverlay) {
-        return [];
-    }
-
+export function getReadOnlyFramedClusterRootIds(tasks: ClusterRootTaskI[] | undefined): string[] {
     return (tasks ?? []).filter((task) => task.clusterRoot).map((task) => task.name);
 }
 
