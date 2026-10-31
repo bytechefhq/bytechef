@@ -15,6 +15,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -62,7 +63,8 @@ class EmbeddedMcpServerConfigurationIntTest {
         IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
         IntegrationInstanceService.class, IntegrationInstanceWorkflowService.class, IntegrationService.class,
         JobCompletionAwaiter.class, JwtTokenService.class, McpComponentService.class,
-        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
+        McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
+        McpIntegrationInstanceConfigurationWorkflowService.class,
         McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class,
         PrincipalJobFacade.class, SigningKeyService.class, TaskExecutionService.class, WorkflowService.class);
 
