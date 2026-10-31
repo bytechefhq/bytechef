@@ -64,7 +64,8 @@ import tools.jackson.databind.ObjectMapper;
     EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, McpPermissionScopeProvider.class,
     PermissionScopeRegistry.class, PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class,
     ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class,
-    WorkflowPermissionScopeProvider.class, WorkspacePermissionIntTestConfiguration.WorkspacePermissionJdbcConfiguration.class,
+    WorkflowPermissionScopeProvider.class,
+    WorkspacePermissionIntTestConfiguration.WorkspacePermissionJdbcConfiguration.class,
     WorkspaceScopeCacheService.class, WorkspaceUserAuditMapper.class
 })
 @SpringBootConfiguration
@@ -75,7 +76,8 @@ public class WorkspacePermissionIntTestConfiguration {
 
     @Bean
     CustomRoleScopeResolver customRoleScopeResolver() {
-        return customRoleId -> customRoleId == CUSTOM_ROLE_ID ? Optional.of(Set.of(CUSTOM_ROLE_SCOPE)) : Optional.empty();
+        return customRoleId -> customRoleId == CUSTOM_ROLE_ID ? Optional.of(Set.of(CUSTOM_ROLE_SCOPE))
+            : Optional.empty();
     }
 
     @Bean

@@ -27,8 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
- * Runs {@link WorkspaceUserAuditMapper} over real {@code workspace_user} rows, so the previous role it captures is
- * read from the database.
+ * Runs {@link WorkspaceUserAuditMapper} over real {@code workspace_user} rows, so the previous role it captures is read
+ * from the database.
  *
  * @version ee
  *
