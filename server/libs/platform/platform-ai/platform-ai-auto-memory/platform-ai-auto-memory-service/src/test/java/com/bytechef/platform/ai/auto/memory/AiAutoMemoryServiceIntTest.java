@@ -552,8 +552,8 @@ class AiAutoMemoryServiceIntTest {
 
     /**
      * Runs {@code lockingStatement} in a transaction that stays open until {@code serviceCall}, started on another
-     * thread, is blocked by Postgres on the row or unique-index lock that statement took. The transaction then
-     * commits, so the service call proceeds against the concurrently committed state, the way a real race does.
+     * thread, is blocked by Postgres on the row or unique-index lock that statement took. The transaction then commits,
+     * so the service call proceeds against the concurrently committed state, the way a real race does.
      */
     private Throwable failureOfCallBlockedByConcurrentTransaction(Runnable lockingStatement, Runnable serviceCall)
         throws InterruptedException {
