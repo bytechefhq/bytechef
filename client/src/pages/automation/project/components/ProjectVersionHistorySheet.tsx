@@ -142,18 +142,18 @@ const ProjectVersionHistorySheet = ({
 
                                 <div
                                     className={twMerge(
-                                        'flex flex-1 items-center gap-x-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
+                                        'flex min-w-0 flex-1 flex-col gap-y-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
                                         published && 'cursor-pointer hover:border-stroke-brand-secondary-hover',
                                         selected && 'border-stroke-brand-primary hover:border-stroke-brand-primary'
                                     )}
                                     onClick={() => published && setSelectedVersion(version)}
                                 >
-                                    <div className="flex min-w-0 flex-1 flex-col gap-y-2">
+                                    <div className="flex items-center gap-x-2">
                                         <div
                                             aria-disabled={!published}
                                             aria-label={`Version ${version}`}
                                             aria-selected={selected}
-                                            className="flex flex-col gap-y-2 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                                            className="flex min-w-0 flex-1 flex-col gap-y-2 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                                             onKeyDown={(event) => {
                                                 if (published && (event.key === 'Enter' || event.key === ' ')) {
                                                     event.preventDefault();
@@ -195,72 +195,75 @@ const ProjectVersionHistorySheet = ({
                                             </p>
                                         </div>
 
-                                        {expanded && (
-                                            <div
-                                                onClick={(event) => event.stopPropagation()}
-                                                onKeyDown={(event) => event.stopPropagation()}
-                                            >
-                                                <ProjectVersionWorkflowChanges
-                                                    draft={!published}
-                                                    expanded={expanded}
-                                                    projectId={projectId}
-                                                    projectVersion={version}
+                                        <Button
+                                            aria-expanded={expanded}
+                                            aria-label={`Toggle changes of version ${version}`}
+                                            className="size-6"
+                                            icon={expanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+
+                                                handleToggleExpanded(version);
+                                            }}
+                                            onKeyDown={(event) => event.stopPropagation()}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-label={`Version ${version} actions`}
+                                                    className="size-6"
+                                                    icon={<EllipsisVerticalIcon />}
+                                                    onClick={(event) => event.stopPropagation()}
+                                                    onKeyDown={(event) => event.stopPropagation()}
+                                                    size="icon"
+                                                    variant="ghost"
                                                 />
-                                            </div>
-                                        )}
+                                            </DropdownMenuTrigger>
+
+                                            <DropdownMenuContent
+                                                align="end"
+                                                onClick={(event) => event.stopPropagation()}
+                                            >
+                                                <DropdownMenuItem
+                                                    icon={<DownloadIcon />}
+                                                    label="Export"
+                                                    onClick={() =>
+                                                        (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
+                                                    }
+                                                />
+
+                                                {published && (
+                                                    <>
+                                                        <DropdownMenuSeparator />
+
+                                                        <DropdownMenuItem
+                                                            icon={<Trash2Icon />}
+                                                            label="Delete"
+                                                            onClick={() => setDeleteCandidateVersion(version)}
+                                                            variant="destructive"
+                                                        />
+                                                    </>
+                                                )}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
 
-                                    <Button
-                                        aria-expanded={expanded}
-                                        aria-label={`Toggle changes of version ${version}`}
-                                        className="size-6"
-                                        icon={expanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-
-                                            handleToggleExpanded(version);
-                                        }}
-                                        onKeyDown={(event) => event.stopPropagation()}
-                                        size="icon"
-                                        variant="ghost"
-                                    />
-
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label={`Version ${version} actions`}
-                                                className="size-6"
-                                                icon={<EllipsisVerticalIcon />}
-                                                onClick={(event) => event.stopPropagation()}
-                                                onKeyDown={(event) => event.stopPropagation()}
-                                                size="icon"
-                                                variant="ghost"
+                                    {expanded && (
+                                        <div
+                                            onClick={(event) => event.stopPropagation()}
+                                            onKeyDown={(event) => event.stopPropagation()}
+                                        >
+                                            <ProjectVersionWorkflowChanges
+                                                draft={!published}
+                                                expanded={expanded}
+                                                projectId={projectId}
+                                                projectVersion={version}
                                             />
-                                        </DropdownMenuTrigger>
-
-                                        <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
-                                            <DropdownMenuItem
-                                                icon={<DownloadIcon />}
-                                                label="Export"
-                                                onClick={() =>
-                                                    (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
-                                                }
-                                            />
-
-                                            {published && (
-                                                <>
-                                                    <DropdownMenuSeparator />
-
-                                                    <DropdownMenuItem
-                                                        icon={<Trash2Icon />}
-                                                        label="Delete"
-                                                        onClick={() => setDeleteCandidateVersion(version)}
-                                                        variant="destructive"
-                                                    />
-                                                </>
-                                            )}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                        </div>
+                                    )}
                                 </div>
                             </li>
                         );
