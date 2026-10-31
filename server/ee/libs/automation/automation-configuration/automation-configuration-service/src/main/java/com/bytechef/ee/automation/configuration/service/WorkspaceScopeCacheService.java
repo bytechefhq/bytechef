@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import com.bytechef.automation.configuration.service.PermissionService.UserWorkspacePair;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -230,8 +231,13 @@ public class WorkspaceScopeCacheService {
             return Collections.emptySet();
         }
 
-        return customRoleScopeResolver.resolveScopes(customRoleId)
-            .orElseGet(Collections::emptySet);
+        Set<String> scopeNames = new HashSet<>(
+            customRoleScopeResolver.resolveScopes(customRoleId)
+                .orElseGet(Collections::emptySet));
+
+        scopeNames.retainAll(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.AUTOMATION));
+
+        return scopeNames;
     }
 
     private void safeEvictAllEntries(Runnable eviction) {

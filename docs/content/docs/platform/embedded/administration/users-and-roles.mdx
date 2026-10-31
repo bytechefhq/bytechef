@@ -1,6 +1,6 @@
 ---
 title: Users and Roles
-description: Give people access to the embedded side of ByteChef with built-in roles, permission scopes and per-environment roles.
+description: Give people access to the embedded side of ByteChef with built-in and custom roles, permission scopes and per-environment roles.
 ---
 
 <EEBadge />
@@ -32,6 +32,17 @@ Membership is opt-in. Being a user in the organization does not give anyone acce
 | **Viewer** | Read-only. Sees integrations, workflows, configurations, connected users and runs with their status, but not run details, API keys or credentials. |
 
 Roles are ranked, so Viewer is contained in Editor and Editor is contained in Admin.
+
+---
+
+## Custom roles
+
+When no built-in role fits, an embedded member can hold a custom role instead: a named set of the embedded [permission scopes](#permission-scopes). Embedded custom roles are created by organization admins on **Settings → Roles**, choosing **Embedded members** as the role's members. See [Custom roles](/platform/settings/users#custom-roles).
+
+- Every role picker on this page lists the built-in roles followed by the embedded custom roles: adding a member, the role for every environment, and each per-environment role.
+- A custom role made for workspace members cannot be assigned here.
+- You can only give a role whose scopes you hold yourself in the environments it applies to. A custom role is checked scope by scope.
+- A custom role is never an Admin, so moving the last Admin of an environment onto one is refused like any other demotion (see [Notable rules](#notable-rules)).
 
 ---
 

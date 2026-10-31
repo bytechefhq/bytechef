@@ -514,7 +514,7 @@ export type CreateCustomRoleMutationVariables = Exact<{
 }>;
 
 
-export type CreateCustomRoleMutation = { createCustomRole: { id: string, name: string, description: string | null, scopes: Array<string> } };
+export type CreateCustomRoleMutation = { createCustomRole: { id: string, name: string, description: string | null, scopes: Array<string>, side: Types.PermissionScopeSide } };
 
 export type CreateMcpProjectMutationVariables = Exact<{
   input: Types.CreateMcpProjectInput;
@@ -548,10 +548,11 @@ export type CreateMcpServerMutation = { createWorkspaceMcpServer: { id: string, 
 
 export type CustomRolesQueryVariables = Exact<{
   workspaceId?: string | number | null | undefined;
+  side?: Types.PermissionScopeSide | null | undefined;
 }>;
 
 
-export type CustomRolesQuery = { customRoles: Array<{ id: string, name: string, description: string | null, scopes: Array<string> }> };
+export type CustomRolesQuery = { customRoles: Array<{ id: string, name: string, description: string | null, scopes: Array<string>, side: Types.PermissionScopeSide }> };
 
 export type DeleteA2aProjectMutationVariables = Exact<{
   id: string | number;
@@ -748,7 +749,9 @@ export type OrganizationConnectionsQueryVariables = Exact<{
 
 export type OrganizationConnectionsQuery = { organizationConnections: Array<{ id: string, name: string, componentName: string, environmentId: number, visibility: Types.ResourceVisibility, createdBy: string | null, createdDate: string | null, lastModifiedDate: string | null }> };
 
-export type PermissionScopeGroupsQueryVariables = Exact<{ [key: string]: never; }>;
+export type PermissionScopeGroupsQueryVariables = Exact<{
+  side?: Types.PermissionScopeSide | null | undefined;
+}>;
 
 
 export type PermissionScopeGroupsQuery = { permissionScopeGroups: Array<{ name: string, scopes: Array<string> }> };
@@ -1358,7 +1361,8 @@ export type AutomationSearchQuery = { automationSearch: Array<
 
 export type AddEmbeddedUserMutationVariables = Exact<{
   userId: string | number;
-  role: Types.WorkspaceRole;
+  role?: Types.WorkspaceRole | null | undefined;
+  customRoleId?: string | number | null | undefined;
 }>;
 
 
@@ -1366,7 +1370,8 @@ export type AddEmbeddedUserMutation = { addEmbeddedUser: { id: string | null, us
 
 export type AddEmbeddedUserByEmailMutationVariables = Exact<{
   email: string;
-  role: Types.WorkspaceRole;
+  role?: Types.WorkspaceRole | null | undefined;
+  customRoleId?: string | number | null | undefined;
 }>;
 
 
@@ -1808,7 +1813,8 @@ export type RemoveEmbeddedUserEnvironmentRoleMutation = { removeEmbeddedUserEnvi
 export type SetEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
   userId: string | number;
   environment: Types.EnvironmentEnum;
-  role: Types.WorkspaceRole;
+  role?: Types.WorkspaceRole | null | undefined;
+  customRoleId?: string | number | null | undefined;
 }>;
 
 
@@ -1906,11 +1912,12 @@ export type UpdateEmbeddedMcpToolEnabledMutation = { updateEmbeddedMcpToolEnable
 
 export type UpdateEmbeddedUserRoleMutationVariables = Exact<{
   userId: string | number;
-  role: Types.WorkspaceRole;
+  role?: Types.WorkspaceRole | null | undefined;
+  customRoleId?: string | number | null | undefined;
 }>;
 
 
-export type UpdateEmbeddedUserRoleMutation = { updateEmbeddedUserRole: { id: string | null, embeddedRole: Types.WorkspaceRole | null } };
+export type UpdateEmbeddedUserRoleMutation = { updateEmbeddedUserRole: { id: string | null, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null } };
 
 export type UpdateIntegrationWorkflowPermissionExpressionMutationVariables = Exact<{
   integrationWorkflowId: string | number;
@@ -4507,6 +4514,7 @@ export const CreateCustomRoleDocument = new TypedDocumentString(`
     name
     description
     scopes
+    side
   }
 }
     `);
@@ -4616,12 +4624,13 @@ export const useCreateMcpServerMutation = <
     )};
 
 export const CustomRolesDocument = new TypedDocumentString(`
-    query CustomRoles($workspaceId: ID) {
-  customRoles(workspaceId: $workspaceId) {
+    query CustomRoles($workspaceId: ID, $side: PermissionScopeSide) {
+  customRoles(workspaceId: $workspaceId, side: $side) {
     id
     name
     description
     scopes
+    side
   }
 }
     `);
@@ -5259,8 +5268,8 @@ export const useOrganizationConnectionsQuery = <
     )};
 
 export const PermissionScopeGroupsDocument = new TypedDocumentString(`
-    query PermissionScopeGroups {
-  permissionScopeGroups {
+    query PermissionScopeGroups($side: PermissionScopeSide) {
+  permissionScopeGroups(side: $side) {
     name
     scopes
   }
@@ -7251,8 +7260,8 @@ export const useAutomationSearchQuery = <
     )};
 
 export const AddEmbeddedUserDocument = new TypedDocumentString(`
-    mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
-  addEmbeddedUser(userId: $userId, role: $role) {
+    mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole, $customRoleId: ID) {
+  addEmbeddedUser(userId: $userId, role: $role, customRoleId: $customRoleId) {
     id
     userId
     embeddedRole
@@ -7280,8 +7289,8 @@ export const useAddEmbeddedUserMutation = <
     )};
 
 export const AddEmbeddedUserByEmailDocument = new TypedDocumentString(`
-    mutation AddEmbeddedUserByEmail($email: String!, $role: WorkspaceRole!) {
-  addEmbeddedUserByEmail(email: $email, role: $role) {
+    mutation AddEmbeddedUserByEmail($email: String!, $role: WorkspaceRole, $customRoleId: ID) {
+  addEmbeddedUserByEmail(email: $email, role: $role, customRoleId: $customRoleId) {
     id
     userId
     embeddedRole
@@ -8944,11 +8953,12 @@ export const useRemoveEmbeddedUserEnvironmentRoleMutation = <
     )};
 
 export const SetEmbeddedUserEnvironmentRoleDocument = new TypedDocumentString(`
-    mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole!) {
+    mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole, $customRoleId: ID) {
   setEmbeddedUserEnvironmentRole(
     userId: $userId
     environment: $environment
     role: $role
+    customRoleId: $customRoleId
   ) {
     id
     userId
@@ -9249,10 +9259,15 @@ export const useUpdateEmbeddedMcpToolEnabledMutation = <
     )};
 
 export const UpdateEmbeddedUserRoleDocument = new TypedDocumentString(`
-    mutation UpdateEmbeddedUserRole($userId: ID!, $role: WorkspaceRole!) {
-  updateEmbeddedUserRole(userId: $userId, role: $role) {
+    mutation UpdateEmbeddedUserRole($userId: ID!, $role: WorkspaceRole, $customRoleId: ID) {
+  updateEmbeddedUserRole(
+    userId: $userId
+    role: $role
+    customRoleId: $customRoleId
+  ) {
     id
     embeddedRole
+    customRoleId
   }
 }
     `);
