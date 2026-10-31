@@ -9,6 +9,18 @@ extend type Query {
         toDate: Long
         page: Int = 0
     ): ToolInvocationLogPageType!
+    workspaceToolInvocationLogs(
+        workspaceId: ID!
+        environmentId: ID!
+        surface: String
+        outcome: String
+        mcpServerId: Long
+        connectedUserId: Long
+        integrationInstanceId: Long
+        fromDate: Long
+        toDate: Long
+        page: Int = 0
+    ): ToolInvocationLogPageType!
 }
 
 type ToolInvocationLogType {
