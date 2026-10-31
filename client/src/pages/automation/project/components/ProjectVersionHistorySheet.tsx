@@ -11,9 +11,21 @@ import {
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
-import {CheckIcon, DownloadIcon, EllipsisVerticalIcon, FileIcon, HistoryIcon, SendIcon, Trash2Icon} from 'lucide-react';
+import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    DownloadIcon,
+    EllipsisVerticalIcon,
+    FileIcon,
+    HistoryIcon,
+    SendIcon,
+    Trash2Icon,
+} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+import ProjectVersionWorkflowChanges from './ProjectVersionWorkflowChanges';
 
 interface ProjectVersionHistorySheetProps {
     deleteProjectVersionPending?: boolean;
@@ -40,6 +52,7 @@ const ProjectVersionHistorySheet = ({
     sheetOpen,
 }: ProjectVersionHistorySheetProps) => {
     const [deleteCandidateVersion, setDeleteCandidateVersion] = useState<number | undefined>();
+    const [expandedVersions, setExpandedVersions] = useState<Set<number>>(new Set());
     const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
 
@@ -54,6 +67,20 @@ const ProjectVersionHistorySheet = ({
             }
 
             setDeleteCandidateVersion(undefined);
+        });
+    };
+
+    const handleToggleExpanded = (version: number) => {
+        setExpandedVersions((previousVersions) => {
+            const nextVersions = new Set(previousVersions);
+
+            if (nextVersions.has(version)) {
+                nextVersions.delete(version);
+            } else {
+                nextVersions.add(version);
+            }
+
+            return nextVersions;
         });
     };
 
@@ -95,26 +122,11 @@ const ProjectVersionHistorySheet = ({
                         const version = projectVersion.version!;
                         const published = projectVersion.status === ProjectStatus.Published;
                         const selected = selectedVersion === version;
+                        const expanded = expandedVersions.has(version);
                         const lastItem = index === projectVersions.length - 1;
 
                         return (
-                            <li
-                                aria-disabled={!published}
-                                aria-label={`Version ${version}`}
-                                aria-selected={selected}
-                                className={twMerge('flex gap-x-3', published && 'cursor-pointer')}
-                                key={version}
-                                onClick={() => published && setSelectedVersion(version)}
-                                onKeyDown={(event) => {
-                                    if (published && (event.key === 'Enter' || event.key === ' ')) {
-                                        event.preventDefault();
-
-                                        setSelectedVersion(version);
-                                    }
-                                }}
-                                role="option"
-                                tabIndex={published ? 0 : -1}
-                            >
+                            <li className="flex gap-x-3" key={version} role="none">
                                 <div className="flex w-10 shrink-0 flex-col items-center">
                                     <span
                                         className={twMerge(
@@ -130,79 +142,128 @@ const ProjectVersionHistorySheet = ({
 
                                 <div
                                     className={twMerge(
-                                        'flex flex-1 items-center gap-x-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
-                                        published && 'hover:border-stroke-brand-secondary-hover',
+                                        'flex min-w-0 flex-1 flex-col gap-y-2 rounded-md border border-transparent bg-surface-neutral-primary p-3',
+                                        published && 'cursor-pointer hover:border-stroke-brand-secondary-hover',
                                         selected && 'border-stroke-brand-primary hover:border-stroke-brand-primary'
                                     )}
                                 >
-                                    <div className="flex min-w-0 flex-1 flex-col gap-y-2">
-                                        <div className="flex items-center gap-x-2">
-                                            {published ? (
-                                                <Badge
-                                                    className="border-transparent"
-                                                    icon={<SendIcon />}
-                                                    label="Published"
-                                                    styleType="success-outline"
-                                                    weight="semibold"
-                                                />
-                                            ) : (
-                                                <Badge
-                                                    icon={<FileIcon />}
-                                                    label="Draft"
-                                                    styleType="warning-filled"
-                                                    weight="semibold"
-                                                />
-                                            )}
+                                    <div className="flex items-center gap-x-2">
+                                        <div
+                                            aria-disabled={!published}
+                                            aria-label={`Version ${version}`}
+                                            aria-selected={selected}
+                                            className="flex min-w-0 flex-1 flex-col gap-y-2 rounded-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                                            onClick={() => published && setSelectedVersion(version)}
+                                            onKeyDown={(event) => {
+                                                if (published && (event.key === 'Enter' || event.key === ' ')) {
+                                                    event.preventDefault();
 
-                                            {projectVersion.publishedDate && (
-                                                <span className="text-sm text-muted-foreground">
-                                                    {formatVersionDate(projectVersion.publishedDate)}
-                                                </span>
-                                            )}
+                                                    setSelectedVersion(version);
+                                                }
+                                            }}
+                                            role="option"
+                                            tabIndex={published ? 0 : -1}
+                                        >
+                                            <div className="flex items-center gap-x-2">
+                                                {published ? (
+                                                    <Badge
+                                                        className="border-transparent"
+                                                        icon={<SendIcon />}
+                                                        label="Published"
+                                                        styleType="success-outline"
+                                                        weight="semibold"
+                                                    />
+                                                ) : (
+                                                    <Badge
+                                                        icon={<FileIcon />}
+                                                        label="Draft"
+                                                        styleType="warning-filled"
+                                                        weight="semibold"
+                                                    />
+                                                )}
+
+                                                {projectVersion.publishedDate && (
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {formatVersionDate(projectVersion.publishedDate)}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <p className="text-sm whitespace-pre-line">
+                                                {projectVersion.description ||
+                                                    (published ? 'No description.' : 'Current working version.')}
+                                            </p>
                                         </div>
 
-                                        <p className="text-sm whitespace-pre-line">
-                                            {projectVersion.description ||
-                                                (published ? 'No description.' : 'Current working version.')}
-                                        </p>
+                                        <Button
+                                            aria-expanded={expanded}
+                                            aria-label={`Toggle changes of version ${version}`}
+                                            className="size-6"
+                                            icon={expanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+
+                                                handleToggleExpanded(version);
+                                            }}
+                                            onKeyDown={(event) => event.stopPropagation()}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-label={`Version ${version} actions`}
+                                                    className="size-6"
+                                                    icon={<EllipsisVerticalIcon />}
+                                                    onClick={(event) => event.stopPropagation()}
+                                                    onKeyDown={(event) => event.stopPropagation()}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            </DropdownMenuTrigger>
+
+                                            <DropdownMenuContent
+                                                align="end"
+                                                onClick={(event) => event.stopPropagation()}
+                                            >
+                                                <DropdownMenuItem
+                                                    icon={<DownloadIcon />}
+                                                    label="Export"
+                                                    onClick={() =>
+                                                        (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
+                                                    }
+                                                />
+
+                                                {published && (
+                                                    <>
+                                                        <DropdownMenuSeparator />
+
+                                                        <DropdownMenuItem
+                                                            icon={<Trash2Icon />}
+                                                            label="Delete"
+                                                            onClick={() => setDeleteCandidateVersion(version)}
+                                                            variant="destructive"
+                                                        />
+                                                    </>
+                                                )}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label={`Version ${version} actions`}
-                                                className="size-6"
-                                                icon={<EllipsisVerticalIcon />}
-                                                onClick={(event) => event.stopPropagation()}
-                                                onKeyDown={(event) => event.stopPropagation()}
-                                                size="icon"
-                                                variant="ghost"
+                                    {expanded && (
+                                        <div
+                                            onClick={(event) => event.stopPropagation()}
+                                            onKeyDown={(event) => event.stopPropagation()}
+                                        >
+                                            <ProjectVersionWorkflowChanges
+                                                draft={!published}
+                                                expanded={expanded}
+                                                projectId={projectId}
+                                                projectVersion={version}
                                             />
-                                        </DropdownMenuTrigger>
-
-                                        <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
-                                            <DropdownMenuItem
-                                                icon={<DownloadIcon />}
-                                                label="Export"
-                                                onClick={() =>
-                                                    (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
-                                                }
-                                            />
-
-                                            {published && (
-                                                <>
-                                                    <DropdownMenuSeparator />
-
-                                                    <DropdownMenuItem
-                                                        icon={<Trash2Icon />}
-                                                        label="Delete"
-                                                        onClick={() => setDeleteCandidateVersion(version)}
-                                                        variant="destructive"
-                                                    />
-                                                </>
-                                            )}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                        </div>
+                                    )}
                                 </div>
                             </li>
                         );
