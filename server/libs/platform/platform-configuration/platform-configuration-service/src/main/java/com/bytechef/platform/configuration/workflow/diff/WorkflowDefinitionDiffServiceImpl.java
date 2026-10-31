@@ -54,6 +54,8 @@ public class WorkflowDefinitionDiffServiceImpl implements WorkflowDefinitionDiff
                 WorkflowChangeType.UNCHANGED, List.of(), oldDefinition, newDefinition);
         }
 
-        return new WorkflowDefinitionDiff(WorkflowChangeType.MODIFIED, List.of(), oldDefinition, newDefinition);
+        return new WorkflowDefinitionDiff(
+            WorkflowChangeType.MODIFIED, WorkflowStructuralDiffer.diff(oldNormalized, newNormalized), oldDefinition,
+            newDefinition);
     }
 }

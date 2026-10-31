@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author Ivica Cardic
@@ -43,9 +44,9 @@ public class SensitiveValueMasker {
     }
 
     public static boolean isSensitiveKey(String key) {
-        String normalizedKey = key.toLowerCase()
-            .replace("_", "")
-            .replace("-", "");
+        String lowerCaseKey = key.toLowerCase();
+        String withoutUnderscores = lowerCaseKey.replace("_", "");
+        String normalizedKey = withoutUnderscores.replace("-", "");
 
         return SENSITIVE_KEYS.contains(normalizedKey);
     }
@@ -86,6 +87,35 @@ public class SensitiveValueMasker {
         return value;
     }
 
+    @SuppressWarnings("unchecked")
+    public static Object plainMasks(Object value) {
+        if (value instanceof Map<?, ?> map) {
+            Map<String, Object> plainMap = new TreeMap<>();
+
+            for (Map.Entry<String, Object> entry : ((Map<String, Object>) map).entrySet()) {
+                plainMap.put(entry.getKey(), plainMasks(entry.getValue()));
+            }
+
+            return plainMap;
+        }
+
+        if (value instanceof List<?> list) {
+            List<Object> plainList = new ArrayList<>();
+
+            for (Object item : list) {
+                plainList.add(plainMasks(item));
+            }
+
+            return plainList;
+        }
+
+        if (value instanceof String string && string.startsWith(MASK)) {
+            return MASK;
+        }
+
+        return value;
+    }
+
     private static boolean isExpression(Object value) {
         return value instanceof String string && string.startsWith("${");
     }
@@ -94,12 +124,14 @@ public class SensitiveValueMasker {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 
-            byte[] digest = messageDigest.digest(JsonUtils.write(value)
-                .getBytes(StandardCharsets.UTF_8));
+            String json = JsonUtils.write(value);
 
-            return MASK + ":" + HexFormat.of()
-                .formatHex(digest)
-                .substring(0, DIGEST_HEX_LENGTH);
+            byte[] digest = messageDigest.digest(json.getBytes(StandardCharsets.UTF_8));
+
+            String hex = HexFormat.of()
+                .formatHex(digest);
+
+            return MASK + ":" + hex.substring(0, DIGEST_HEX_LENGTH);
         } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
             throw new IllegalStateException(noSuchAlgorithmException);
         }

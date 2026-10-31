@@ -1,0 +1,157 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.platform.configuration.workflow.diff;
+
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.configuration.dto.WorkflowDefinitionChange;
+import com.bytechef.platform.configuration.dto.WorkflowDefinitionValueChange;
+import com.bytechef.platform.configuration.dto.WorkflowNodeChangeKind;
+import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * @author Ivica Cardic
+ */
+public class WorkflowStructuralDiffer {
+
+    private WorkflowStructuralDiffer() {
+    }
+
+    public static List<WorkflowDefinitionChange> diff(
+        Map<String, Object> oldDefinition, Map<String, Object> newDefinition) {
+
+        List<WorkflowDefinitionChange> changes = new ArrayList<>();
+
+        List<WorkflowDefinitionValueChange> workflowValueChanges = new ArrayList<>();
+
+        for (String key : List.of("label", "description")) {
+            compareValues(key, oldDefinition.get(key), newDefinition.get(key), workflowValueChanges);
+        }
+
+        if (!workflowValueChanges.isEmpty()) {
+            changes.add(
+                new WorkflowDefinitionChange(
+                    WorkflowNodeChangeKind.MODIFIED, WorkflowNodeChangeTarget.WORKFLOW, null, null, null, null,
+                    workflowValueChanges));
+        }
+
+        Map<String, WorkflowNode> oldNodes = index(WorkflowNodeCollector.collect(oldDefinition));
+        List<WorkflowNode> newNodeList = WorkflowNodeCollector.collect(newDefinition);
+        Map<String, WorkflowNode> newNodes = index(newNodeList);
+
+        List<Set<WorkflowNodeChangeTarget>> groups = List.of(
+            Set.of(WorkflowNodeChangeTarget.TRIGGER, WorkflowNodeChangeTarget.TASK),
+            Set.of(WorkflowNodeChangeTarget.INPUT), Set.of(WorkflowNodeChangeTarget.OUTPUT));
+
+        for (Set<WorkflowNodeChangeTarget> group : groups) {
+            for (WorkflowNode newNode : newNodeList) {
+                if (!group.contains(newNode.target())) {
+                    continue;
+                }
+
+                WorkflowNode oldNode = oldNodes.get(key(newNode));
+
+                if (oldNode == null) {
+                    changes.add(toChange(WorkflowNodeChangeKind.ADDED, newNode, List.of()));
+                } else {
+                    List<WorkflowDefinitionValueChange> valueChanges = new ArrayList<>();
+
+                    compareValues("", oldNode.attributes(), newNode.attributes(), valueChanges);
+
+                    if (!valueChanges.isEmpty()) {
+                        changes.add(toChange(WorkflowNodeChangeKind.MODIFIED, newNode, valueChanges));
+                    }
+                }
+            }
+
+            for (WorkflowNode oldNode : oldNodes.values()) {
+                if (group.contains(oldNode.target()) && !newNodes.containsKey(key(oldNode))) {
+                    changes.add(toChange(WorkflowNodeChangeKind.REMOVED, oldNode, List.of()));
+                }
+            }
+        }
+
+        return changes;
+    }
+
+    private static WorkflowDefinitionChange toChange(
+        WorkflowNodeChangeKind kind, WorkflowNode node, List<WorkflowDefinitionValueChange> valueChanges) {
+
+        return new WorkflowDefinitionChange(
+            kind, node.target(), node.name(), node.type(), node.label(), node.parentPath(), valueChanges);
+    }
+
+    private static Map<String, WorkflowNode> index(List<WorkflowNode> nodes) {
+        Map<String, WorkflowNode> indexedNodes = new LinkedHashMap<>();
+
+        for (WorkflowNode node : nodes) {
+            indexedNodes.putIfAbsent(key(node), node);
+        }
+
+        return indexedNodes;
+    }
+
+    private static String key(WorkflowNode node) {
+        return node.target() + ":" + node.name();
+    }
+
+    private static void compareValues(
+        String path, @Nullable Object oldValue, @Nullable Object newValue,
+        List<WorkflowDefinitionValueChange> valueChanges) {
+
+        if (oldValue instanceof Map<?, ?> oldMap && newValue instanceof Map<?, ?> newMap) {
+            Set<Object> keys = new LinkedHashSet<>(oldMap.keySet());
+
+            keys.addAll(newMap.keySet());
+
+            for (Object key : keys) {
+                String childPath = path.isEmpty() ? String.valueOf(key) : path + "." + key;
+
+                compareValues(childPath, oldMap.get(key), newMap.get(key), valueChanges);
+            }
+
+            return;
+        }
+
+        if (oldValue instanceof List<?> oldList && newValue instanceof List<?> newList) {
+            int size = Math.max(oldList.size(), newList.size());
+
+            for (int index = 0; index < size; index++) {
+                compareValues(
+                    path + "[" + index + "]", index < oldList.size() ? oldList.get(index) : null,
+                    index < newList.size() ? newList.get(index) : null, valueChanges);
+            }
+
+            return;
+        }
+
+        if (!Objects.equals(oldValue, newValue)) {
+            valueChanges.add(new WorkflowDefinitionValueChange(path, write(oldValue), write(newValue)));
+        }
+    }
+
+    private static @Nullable String write(@Nullable Object value) {
+        return value == null ? null : JsonUtils.write(SensitiveValueMasker.plainMasks(value));
+    }
+}

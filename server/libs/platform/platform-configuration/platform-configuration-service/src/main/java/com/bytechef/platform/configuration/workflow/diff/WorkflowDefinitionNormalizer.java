@@ -40,10 +40,12 @@ public class WorkflowDefinitionNormalizer {
         Map<String, Object> definitionMap;
 
         try {
+            String definition = workflow.getDefinition();
+
+            byte[] definitionBytes = definition.getBytes(StandardCharsets.UTF_8);
+
             WorkflowResource workflowResource = new WorkflowResource(
-                "diff", Map.of(), new ByteArrayResource(workflow.getDefinition()
-                    .getBytes(StandardCharsets.UTF_8)),
-                workflow.getFormat());
+                "diff", Map.of(), new ByteArrayResource(definitionBytes), workflow.getFormat());
 
             definitionMap = WorkflowReader.readWorkflowMap(workflowResource);
         } catch (Exception exception) {
@@ -64,10 +66,9 @@ public class WorkflowDefinitionNormalizer {
     }
 
     public static String toJson(Map<String, Object> normalized) {
-        return JsonUtils.writeWithDefaultPrettyPrinter(plainMasks(normalized));
+        return JsonUtils.writeWithDefaultPrettyPrinter(SensitiveValueMasker.plainMasks(normalized));
     }
 
-    @SuppressWarnings("unchecked")
     private static Map<String, Object> sort(Map<String, Object> map) {
         Map<String, Object> sortedMap = new TreeMap<>();
 
@@ -92,35 +93,6 @@ public class WorkflowDefinitionNormalizer {
             }
 
             return sortedList;
-        }
-
-        return value;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Object plainMasks(Object value) {
-        if (value instanceof Map<?, ?> map) {
-            Map<String, Object> plainMap = new TreeMap<>();
-
-            for (Map.Entry<String, Object> entry : ((Map<String, Object>) map).entrySet()) {
-                plainMap.put(entry.getKey(), plainMasks(entry.getValue()));
-            }
-
-            return plainMap;
-        }
-
-        if (value instanceof List<?> list) {
-            List<Object> plainList = new ArrayList<>();
-
-            for (Object item : list) {
-                plainList.add(plainMasks(item));
-            }
-
-            return plainList;
-        }
-
-        if (value instanceof String string && string.startsWith(SensitiveValueMasker.MASK)) {
-            return SensitiveValueMasker.MASK;
         }
 
         return value;

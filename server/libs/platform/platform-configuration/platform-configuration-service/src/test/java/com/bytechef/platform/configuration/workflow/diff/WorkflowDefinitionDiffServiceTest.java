@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.dto.WorkflowDefinitionDiff;
+import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,19 @@ class WorkflowDefinitionDiffServiceTest {
             .doesNotContain("\"x\"");
         assertThat(diff.newDefinition()).contains(SensitiveValueMasker.MASK)
             .doesNotContain("\"y\"");
+    }
+
+    @Test
+    void testDiffReportsModifiedWithChanges() {
+        WorkflowDefinitionDiff diff = diffService.diff(
+            json("{\"label\":\"A\",\"tasks\":[{\"name\":\"t\",\"type\":\"a/v1/b\"}]}"),
+            json("{\"label\":\"B\",\"tasks\":[{\"name\":\"t\",\"type\":\"a/v1/b\"}]}"));
+
+        assertThat(diff.changeType()).isEqualTo(WorkflowChangeType.MODIFIED);
+        assertThat(diff.changes()).hasSize(1);
+        assertThat(diff.changes()
+            .get(0)
+            .target()).isEqualTo(WorkflowNodeChangeTarget.WORKFLOW);
     }
 
     private static Workflow json(String definition) {
