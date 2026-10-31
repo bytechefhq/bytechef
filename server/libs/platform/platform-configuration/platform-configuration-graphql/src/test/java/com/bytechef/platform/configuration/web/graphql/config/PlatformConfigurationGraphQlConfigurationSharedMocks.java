@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.web.graphql.config;
 
+import com.bytechef.platform.ai.provider.facade.AiProviderCatalogFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeScriptFacade;
 import java.lang.annotation.ElementType;
@@ -30,6 +31,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
+    AiProviderCatalogFacade.class,
     WorkflowNodeParameterFacade.class,
     WorkflowNodeScriptFacade.class
 })
