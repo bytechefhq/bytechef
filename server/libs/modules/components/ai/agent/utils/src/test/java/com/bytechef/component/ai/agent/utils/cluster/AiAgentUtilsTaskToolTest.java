@@ -19,14 +19,20 @@ package com.bytechef.component.ai.agent.utils.cluster;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
@@ -109,6 +115,77 @@ class AiAgentUtilsTaskToolTest {
         assertThat(events).extracting(event -> event.record()
             .componentName())
             .containsOnly("httpClient");
+    }
+
+    @Test
+    void testSubagentToolCallsAreLoggedInsideTheirCall() throws Exception {
+        AiAgentToolFacade aiAgentToolFacade = mock(AiAgentToolFacade.class);
+        ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
+
+        when(clusterElementDefinitionService.<MultipleConnectionsToolFunction>getClusterElement(
+            eq("httpClient"), eq(1), eq("get")))
+                .thenReturn(mock(MultipleConnectionsToolFunction.class));
+        when(aiAgentToolFacade.getFunctionToolCallback(any(ClusterElement.class), anyMap(), any(), any()))
+            .thenReturn(namedToolCallback("get"));
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getJobId()).thenReturn(63336L);
+        when(actionContext.getTaskExecutionId()).thenReturn(633361L);
+
+        List<String> loggedMessages = new CopyOnWriteArrayList<>();
+        List<String> loggedCallIds = new CopyOnWriteArrayList<>();
+
+        Context.Log log = mock(Context.Log.class);
+
+        doAnswer(invocation -> {
+            loggedMessages.add(invocation.getArgument(0));
+
+            return null;
+        }).when(log)
+            .info(anyString());
+
+        doAnswer(invocation -> {
+            ClusterElementCallRef clusterElementCallRef = ClusterElementCallScope.current();
+
+            loggedCallIds.add(clusterElementCallRef == null ? "none" : clusterElementCallRef.id());
+
+            Context.ContextConsumer<Context.Log> logConsumer = invocation.getArgument(0);
+
+            logConsumer.accept(log);
+
+            return null;
+        }).when(actionContext)
+            .log(any());
+
+        ClusterElement subagentClusterElement = new ClusterElement(
+            null, null,
+            Map.of(
+                "clusterElements",
+                Map.of("tools", List.of(Map.of("name", "httpClient_9", "type", "httpClient/v1/get", "parameters",
+                    Map.of())))),
+            null, "aiAgentUtils/v1/subagentTool", Map.of("subagentName", "Analyst"), "subagent_1");
+
+        List<ClusterElementCallRecord> records;
+
+        try {
+            List<ToolCallback> toolCallbacks = new AiAgentUtilsTaskTool(
+                aiAgentToolFacade, clusterElementDefinitionService)
+                    .buildSubagentToolCallbacks(subagentClusterElement, Map.of(), actionContext);
+
+            toolCallbacks.getFirst()
+                .call("{\"url\":\"https://example.com\"}");
+        } finally {
+            records = ClusterElementCallRecorder.getInstance()
+                .drain(633361L)
+                .records();
+        }
+
+        assertThat(records).hasSize(1);
+        assertThat(loggedCallIds).containsExactly(records.getFirst()
+            .id());
+        assertThat(loggedMessages).containsExactly(
+            "{\"inputs\":{\"url\":\"https://example.com\"},\"output\":\"called\",\"toolName\":\"get\"}");
     }
 
     private static ToolCallback namedToolCallback(String toolName) {

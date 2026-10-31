@@ -37,6 +37,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
+import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
 import com.bytechef.component.ai.agent.tool.ConversationState;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
@@ -55,6 +56,8 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionConversationHistoryReader;
@@ -73,6 +76,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1525,6 +1529,50 @@ class AbstractAiAgentChatActionTest {
             verify(context, never()).log(any());
         }
 
+        @Test
+        void testASuspendedToolCallLogsItsInputs() {
+            String suspendedToolResult = "__bytechef_tool_suspended__:approval";
+            ActionContextAware context = mock(ActionContextAware.class);
+
+            when(context.getSuspend()).thenReturn(
+                new ActionContext.Suspend(
+                    Map.of(ToolSuspension.SUSPENDED_TOOL_RESULT, suspendedToolResult), Instant.now()));
+
+            Context.Log log = mockLog(context);
+
+            ToolCallback observableToolCallback = AbstractAiAgentChatAction.createObservableToolCallback(
+                createReturningToolCallback(suspendedToolResult), new AtomicReference<>(),
+                toolExecutionEvent -> {
+                    throw new AssertionError("A suspended tool call must not be reported as executed");
+                },
+                context);
+
+            assertThat(observableToolCallback.call("{\"customerId\":\"42\"}")).isEqualTo(suspendedToolResult);
+
+            verify(log).info("{\"inputs\":{\"customerId\":\"42\"},\"output\":null,\"toolName\":\"lookUp\"}");
+        }
+
+        private static ToolCallback createReturningToolCallback(String toolResult) {
+            ToolDefinition toolDefinition = DefaultToolDefinition.builder()
+                .name("lookUp")
+                .description("Looks up a customer")
+                .inputSchema("{}")
+                .build();
+
+            return new ToolCallback() {
+
+                @Override
+                public ToolDefinition getToolDefinition() {
+                    return toolDefinition;
+                }
+
+                @Override
+                public String call(String toolInput) {
+                    return toolResult;
+                }
+            };
+        }
+
         private static ToolCallback createFailingToolCallback(RuntimeException toolFailure) {
             ToolDefinition toolDefinition = DefaultToolDefinition.builder()
                 .name("lookUp")
@@ -1595,6 +1643,30 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
+    void testToolExecutionListenerRunsInsideTheToolsCall() throws Exception {
+        List<ClusterElementCallRef> listenerCallRefs = new CopyOnWriteArrayList<>();
+
+        List<ClusterElementCallRecord> records;
+
+        try {
+            List<ToolCallback> toolCallbacks = buildToolCallbacks(
+                Map.of(), toolExecutionEvent -> listenerCallRefs.add(ClusterElementCallScope.current()),
+                "httpClient_1");
+
+            findToolCallback(toolCallbacks, "httpClient_1").call("{}");
+        } finally {
+            records = ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID)
+                .records();
+        }
+
+        assertThat(records).hasSize(1);
+        assertThat(listenerCallRefs).extracting(callRef -> callRef == null ? null : callRef.id())
+            .containsExactly(records.getFirst()
+                .id());
+    }
+
+    @Test
     void testResumeCompletesTheSuspendedCall() throws Exception {
         stubModelLookup();
 
@@ -1645,6 +1717,79 @@ class AbstractAiAgentChatActionTest {
             .status()).isEqualTo(ClusterElementCallRecord.Status.COMPLETED);
         assertThat(records.getFirst()
             .output()).isEqualTo("{\"approved\":true}");
+    }
+
+    @Test
+    void testResumeLogsTheAnswerInsideTheSuspendedCall() throws Exception {
+        stubModelLookup();
+
+        String suspendedToolResult = createSuspendedToolResult();
+
+        ActionContext.Suspend suspend = new ActionContext.Suspend(
+            Map.of(
+                AgentToolSuspension.CONTINUE_PARAMETER_KEY,
+                new AgentToolSuspension(
+                    ConversationState.from(
+                        List.of(
+                            ToolResponseMessage.builder()
+                                .responses(
+                                    List.of(
+                                        new ToolResponseMessage.ToolResponse(
+                                            "call-1", "requestApproval", suspendedToolResult)))
+                                .build())),
+                    "call-1", suspendedToolResult, "id-2", "approval_1")),
+            Instant.now());
+
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "model_1", new ComponentConnection("testComponent", 1, 1L, Map.of(), null));
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+
+        ActionContextAware actionContext = createToolCallActionContext();
+
+        List<String> loggedCallIds = new CopyOnWriteArrayList<>();
+        List<String> loggedMessages = new CopyOnWriteArrayList<>();
+
+        Context.Log log = mock(Context.Log.class);
+
+        doAnswer(invocation -> {
+            loggedMessages.add(invocation.getArgument(0));
+
+            return null;
+        }).when(log)
+            .info(anyString());
+
+        doAnswer(invocation -> {
+            ClusterElementCallRef clusterElementCallRef = ClusterElementCallScope.current();
+
+            loggedCallIds.add(clusterElementCallRef == null ? "none" : clusterElementCallRef.id());
+
+            Context.ContextConsumer<Context.Log> logConsumer = invocation.getArgument(0);
+
+            logConsumer.accept(log);
+
+            return null;
+        }).when(actionContext)
+            .log(any());
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            action.buildResumedRequestSpec(
+                MockParametersFactory.create(Map.of()), connectionParameters,
+                MockParametersFactory.create(Map.of("clusterElements", Map.of("model", buildModelClusterElement()))),
+                MockParametersFactory.create(new HashMap<String, Object>(suspend.continueParameters())),
+                MockParametersFactory.create(Map.of("approved", true)), null, actionContext);
+        } finally {
+            ClusterElementCallRecorder.getInstance()
+                .drain(TOOL_CALL_TASK_EXECUTION_ID);
+        }
+
+        assertThat(loggedCallIds).containsExactly("id-2");
+        assertThat(loggedMessages).containsExactly(
+            "{\"inputs\":null,\"output\":\"{\\\"approved\\\":true}\",\"toolName\":\"approval_1\"}");
     }
 
     @Test
@@ -1702,6 +1847,13 @@ class AbstractAiAgentChatActionTest {
     private List<ToolCallback> buildToolCallbacks(Map<String, Object> inputParameterValues, String... workflowNodeNames)
         throws Exception {
 
+        return buildToolCallbacks(inputParameterValues, null, workflowNodeNames);
+    }
+
+    private List<ToolCallback> buildToolCallbacks(
+        Map<String, Object> inputParameterValues, @Nullable ToolExecutionListener toolExecutionListener,
+        String... workflowNodeNames) throws Exception {
+
         Map<String, Object> clusterElements = new HashMap<>();
 
         clusterElements.put("model", buildModelClusterElement());
@@ -1736,7 +1888,7 @@ class AbstractAiAgentChatActionTest {
 
             ChatClient.ChatClientRequestSpec chatClientRequestSpec = action.getChatClientRequestSpec(
                 MockParametersFactory.create(inputParameterValues), connectionParameters,
-                MockParametersFactory.create(Map.of("clusterElements", clusterElements)), null,
+                MockParametersFactory.create(Map.of("clusterElements", clusterElements)), toolExecutionListener,
                 createToolCallActionContext());
 
             return ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getToolCallbacks();

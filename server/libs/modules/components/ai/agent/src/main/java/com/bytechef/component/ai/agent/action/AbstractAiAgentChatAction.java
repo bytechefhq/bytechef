@@ -46,6 +46,7 @@ import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConvert
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.tool.ClusterElementCallObservingToolCallback;
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
+import com.bytechef.component.ai.llm.tool.ToolCallLoggingToolCallback;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -59,6 +60,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallScope;
 import com.bytechef.platform.component.definition.ai.agent.ConversationHistoryReader;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
@@ -293,6 +295,8 @@ public abstract class AbstractAiAgentChatAction {
                 if (context instanceof ActionContextAware actionContextAware &&
                     ToolSuspension.isSuspendedToolResult(result, actionContextAware.getSuspend())) {
 
+                    ToolCallLoggingToolCallback.logCall(context, toolDefinition.name(), inputs, null);
+
                     return result;
                 }
 
@@ -384,9 +388,15 @@ public abstract class AbstractAiAgentChatAction {
         }
 
         ClusterElementCallRecorder clusterElementCallRecorder = ClusterElementCallRecorder.getInstance();
+        ClusterElementCallRef clusterElementCallRef = new ClusterElementCallRef(callId, workflowNodeName);
 
-        clusterElementCallRecorder.callCompleted(
-            jobId, taskExecutionId, new ClusterElementCallRef(callId, workflowNodeName), toolResult);
+        clusterElementCallRecorder.callCompleted(jobId, taskExecutionId, clusterElementCallRef, toolResult);
+
+        ClusterElementCallScope.callWith(clusterElementCallRef, () -> {
+            ToolCallLoggingToolCallback.logCall(context, workflowNodeName, null, toolResult);
+
+            return null;
+        });
     }
 
     private static ChatClient.ChatClientRequestSpec createPrompt(
@@ -665,6 +675,7 @@ public abstract class AbstractAiAgentChatAction {
         @Nullable Map<String, Map<String, String>> toolSimulations, ChatModel chatModel,
         @Nullable String conversationId, ActionContext context) {
 
+        AtomicReference<@Nullable AgentThinking> thinkingReference = new AtomicReference<>();
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (ClusterElement clusterElement : toolClusterElements) {
@@ -676,6 +687,13 @@ public abstract class AbstractAiAgentChatAction {
                 clusterElementCallbacks = clusterElementCallbacks.stream()
                     .map(toolCallback -> createSimulationAwareToolCallback(
                         toolCallback, toolSimulations, chatModel, context))
+                    .toList();
+            }
+
+            if (toolExecutionListener != null) {
+                clusterElementCallbacks = clusterElementCallbacks.stream()
+                    .map(toolCallback -> createObservableToolCallback(
+                        toolCallback, thinkingReference, toolExecutionListener, context))
                     .toList();
             }
 
@@ -691,17 +709,9 @@ public abstract class AbstractAiAgentChatAction {
                 .toList();
         }
 
-        AtomicReference<@Nullable AgentThinking> thinkingReference = new AtomicReference<>();
-
-        List<ToolCallback> observableToolCallbacks = toolCallbacks.stream()
-            .map(
-                toolCallback -> createObservableToolCallback(
-                    toolCallback, thinkingReference, toolExecutionListener, context))
-            .toList();
-
         AugmentedToolCallbackProvider<AgentThinking> augmentedToolCallbackProvider =
             AugmentedToolCallbackProvider.<AgentThinking>builder()
-                .delegate(() -> observableToolCallbacks.toArray(ToolCallback[]::new))
+                .delegate(() -> toolCallbacks.toArray(ToolCallback[]::new))
                 .argumentType(AgentThinking.class)
                 .argumentConsumer(event -> thinkingReference.set(event.arguments()))
                 .removeExtraArgumentsAfterProcessing(true)
