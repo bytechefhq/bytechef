@@ -1,5 +1,5 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {renderHook} from '@testing-library/react';
+import {renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -43,6 +43,40 @@ describe('useLayout on a read-only canvas', () => {
         clusterRootIdsArguments.length = 0;
 
         useWorkflowDataStore.setState({edges: [], isWorkflowLoaded: true, layoutResetCounter: 0, nodes: []});
+    });
+
+    it('draws the read-only workflow even when the editor store still holds another workflow', async () => {
+        useWorkflowDataStore.setState({
+            workflow: {
+                ...useWorkflowDataStore.getState().workflow,
+                tasks: [{name: 'otherWorkflowTask_1', type: 'var/v1/set'}],
+                triggers: [{name: 'otherWorkflowTrigger_1', type: 'manual/v1/manual'}],
+            },
+        });
+
+        renderHook(
+            () =>
+                useLayout({
+                    canvasHeight: 800,
+                    canvasWidth: 1200,
+                    componentDefinitions: [],
+                    readOnlyWorkflow: READ_ONLY_WORKFLOW,
+                    taskDispatcherDefinitions: [],
+                }),
+            {wrapper}
+        );
+
+        await waitFor(
+            () => {
+                const nodeIds = useWorkflowDataStore.getState().nodes.map((node) => node.id);
+
+                expect(nodeIds).toContain('var_1');
+                expect(nodeIds).toContain('trigger_1');
+                expect(nodeIds).not.toContain('otherWorkflowTask_1');
+                expect(nodeIds).not.toContain('otherWorkflowTrigger_1');
+            },
+            {interval: 5, timeout: 5000}
+        );
     });
 
     it('keeps the framed root ids when the read-only workflow is a new object with the same tasks', () => {

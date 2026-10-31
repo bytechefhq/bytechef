@@ -186,8 +186,8 @@ export default function useLayout({
 
     const isWorkflowLoaded = useWorkflowDataStore((state) => state.isWorkflowLoaded);
 
-    const tasks = storeTasks || readOnlyWorkflow?.tasks;
-    const triggers = storeTriggers || readOnlyWorkflow?.triggers;
+    const tasks = readOnlyWorkflow ? readOnlyWorkflow.tasks : storeTasks;
+    const triggers = readOnlyWorkflow ? readOnlyWorkflow.triggers : storeTriggers;
 
     const disabledTaskNames = useMemo(() => getEffectivelyDisabledTaskNames(tasks ?? []), [tasks]);
 
