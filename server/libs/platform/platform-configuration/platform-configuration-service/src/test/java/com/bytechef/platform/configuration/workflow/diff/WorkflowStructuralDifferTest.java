@@ -377,4 +377,19 @@ class WorkflowStructuralDifferTest {
     private static Map<String, Object> loop(List<Object> iteratee) {
         return Map.of("name", "loop_1", "type", "loop/v1", "parameters", Map.of("iteratee", iteratee));
     }
+
+    @Test
+    void testEmptyListVersusMissingKeyIsReported() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks",
+                List.of(Map.of("name", "t1", "type", "a/v1/b", "parameters", Map.of("headers", List.of())))),
+            Map.of("tasks", List.of(Map.of("name", "t1", "type", "a/v1/b", "parameters", Map.of()))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.MODIFIED);
+        assertThat(changes.get(0)
+            .valueChanges()).extracting(WorkflowDefinitionValueChange::path)
+                .containsExactly("parameters.headers");
+    }
 }

@@ -32,7 +32,6 @@ public class WorkflowNodeCollector {
     private static final String CLUSTER_ELEMENTS = "clusterElements";
     private static final Set<String> NON_CONTAINER_KEYS = Set.of("name", "type", "label", "description", "metadata");
     private static final String PARAMETERS = "parameters";
-    private static final Object REMOVED = new Object();
 
     private WorkflowNodeCollector() {
     }
@@ -90,9 +89,7 @@ public class WorkflowNodeCollector {
                 value = prune(value, valuePath, childNodes);
             }
 
-            if (value != REMOVED) {
-                attributes.put(attributeKey, value);
-            }
+            attributes.put(attributeKey, value);
         }
 
         nodes.add(
@@ -126,63 +123,32 @@ public class WorkflowNodeCollector {
     private static Object prune(Object value, String path, List<WorkflowNode> childNodes) {
         if (value instanceof List<?> list) {
             List<Object> remaining = new ArrayList<>();
-            boolean removedAny = list.isEmpty();
 
             for (int index = 0; index < list.size(); index++) {
                 Object item = list.get(index);
-                String itemPath = path + "[" + index + "]";
 
                 if (isTask(item)) {
-                    collectNode(
-                        WorkflowNodeChangeTarget.TASK, (Map<?, ?>) item, path, index, childNodes);
-
-                    removedAny = true;
-                } else if (item instanceof List<?> nestedList) {
-                    Object pruned = prune(nestedList, itemPath, childNodes);
-
-                    if (pruned == REMOVED) {
-                        removedAny = true;
-                    } else {
-                        remaining.add(pruned);
-                    }
-                } else if (item instanceof Map<?, ?> map) {
-                    Object pruned = pruneMap(map, itemPath, childNodes);
-
-                    if (pruned == REMOVED) {
-                        removedAny = true;
-                    } else {
-                        remaining.add(pruned);
-                    }
+                    collectNode(WorkflowNodeChangeTarget.TASK, (Map<?, ?>) item, path, index, childNodes);
                 } else {
-                    remaining.add(item);
+                    remaining.add(prune(item, path + "[" + index + "]", childNodes));
                 }
             }
 
-            return remaining.isEmpty() && removedAny ? REMOVED : remaining;
+            return remaining;
         }
 
         if (value instanceof Map<?, ?> map) {
-            return pruneMap(map, path, childNodes);
+            Map<String, Object> remaining = new LinkedHashMap<>();
+
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                remaining.put(
+                    String.valueOf(entry.getKey()), prune(entry.getValue(), path + "." + entry.getKey(), childNodes));
+            }
+
+            return remaining;
         }
 
         return value;
-    }
-
-    private static Object pruneMap(Map<?, ?> map, String path, List<WorkflowNode> childNodes) {
-        Map<String, Object> remaining = new LinkedHashMap<>();
-        boolean removedAny = false;
-
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
-            Object pruned = prune(entry.getValue(), path + "." + entry.getKey(), childNodes);
-
-            if (pruned == REMOVED) {
-                removedAny = true;
-            } else {
-                remaining.put(String.valueOf(entry.getKey()), pruned);
-            }
-        }
-
-        return remaining.isEmpty() && removedAny ? REMOVED : remaining;
     }
 
     private static boolean isTask(Object item) {

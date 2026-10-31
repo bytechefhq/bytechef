@@ -129,7 +129,11 @@ class WorkflowNodeCollectorTest {
             .attributes()).isEqualTo(
                 Map.of(
                     "name", "branch_1", "type", "branch/v1",
-                    "parameters", Map.of("cases", List.of(Map.of("key", "one"), Map.of("key", "two")))));
+                    "parameters",
+                    Map.of(
+                        "cases",
+                        List.of(Map.of("key", "one", "tasks", List.of()), Map.of("key", "two", "tasks", List.of())),
+                        "default", List.of())));
     }
 
     @Test
@@ -178,7 +182,8 @@ class WorkflowNodeCollectorTest {
         assertThat(nodes.get(0)
             .attributes()).isEqualTo(
                 Map.of(
-                    "name", "condition_1", "type", "condition/v1", "parameters", Map.of("rawExpression", "x")));
+                    "name", "condition_1", "type", "condition/v1", "parameters",
+                    Map.of("rawExpression", "x", "caseTrue", List.of(), "caseFalse", List.of())));
     }
 
     @Test
@@ -245,5 +250,21 @@ class WorkflowNodeCollectorTest {
 
     private static Map<String, Object> task(String name) {
         return Map.of("name", name, "type", "a/v1/b");
+    }
+
+    @Test
+    void testEmptyListParameterIsKeptInAttributes() {
+        List<WorkflowNode> nodes = WorkflowNodeCollector.collect(
+            Map.of(
+                "tasks", List.of(
+                    Map.of(
+                        "name", "t1", "type", "a/v1/b",
+                        "parameters", Map.of("headers", List.of(), "body", Map.of("values", List.of()))))));
+
+        assertThat(nodes.get(0)
+            .attributes()).isEqualTo(
+                Map.of(
+                    "name", "t1", "type", "a/v1/b", "parameters",
+                    Map.of("headers", List.of(), "body", Map.of("values", List.of()))));
     }
 }
