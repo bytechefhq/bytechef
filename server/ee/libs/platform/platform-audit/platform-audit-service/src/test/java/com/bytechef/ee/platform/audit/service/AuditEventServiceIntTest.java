@@ -17,6 +17,7 @@ import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -51,7 +52,7 @@ class AuditEventServiceIntTest {
 
     @Test
     void testSaveAllStoresEveryEventWithItsData() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = getNow();
 
         auditEventService.saveAll(
             List.of(
@@ -71,7 +72,7 @@ class AuditEventServiceIntTest {
 
     @Test
     void testFetchAuditEventsAppliesTheFilterAndThePage() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = getNow();
 
         auditEventService.saveAll(
             List.of(
@@ -94,7 +95,7 @@ class AuditEventServiceIntTest {
 
     @Test
     void testFetchEventTypesReturnsEachStoredTypeOnce() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = getNow();
 
         auditEventService.saveAll(
             List.of(
@@ -107,7 +108,7 @@ class AuditEventServiceIntTest {
 
     @Test
     void testUpdateJobCreatedPlatformCommitsThePlatformOfTheJobsCreatedEvent() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = getNow();
 
         auditEventService.saveAll(
             List.of(
@@ -125,6 +126,12 @@ class AuditEventServiceIntTest {
             .singleElement()
             .satisfies(
                 persistentAuditEvent -> assertThat(persistentAuditEvent.getData()).containsEntry("jobId", "42"));
+    }
+
+    private static LocalDateTime getNow() {
+        LocalDateTime now = LocalDateTime.now();
+
+        return now.truncatedTo(ChronoUnit.MICROS);
     }
 
     private static PersistentAuditEvent createEvent(
