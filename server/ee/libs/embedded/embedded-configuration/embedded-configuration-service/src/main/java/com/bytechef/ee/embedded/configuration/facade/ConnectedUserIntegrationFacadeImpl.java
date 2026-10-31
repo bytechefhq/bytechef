@@ -11,8 +11,10 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -114,6 +116,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final McpComponentService mcpComponentService;
+    private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
@@ -137,6 +140,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
         IntegrationService integrationService, McpComponentService mcpComponentService,
+        McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
@@ -158,6 +162,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.mcpComponentService = mcpComponentService;
+        this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
@@ -300,7 +305,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             oAuth2Service.getRedirectUri());
 
         return connectedUserIntegrationDTO.withMcp(
-            getMcpTools(integrationDTO.componentName()), mcpWorkflows,
+            getMcpTools(Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
     }
 
@@ -792,7 +797,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             integrationInstanceConfigurationsById);
 
         return connectedUserIntegrationDTO.withMcp(
-            getMcpTools(integrationDTO.componentName()), mcpWorkflows,
+            getMcpTools(Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
     }
 
@@ -876,16 +881,24 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .toList();
     }
 
+    private boolean isMcpComponentOfIntegration(long mcpComponentId, long integrationId) {
+        return mcpIntegrationComponentService.fetchMcpIntegrationComponent(mcpComponentId)
+            .map(McpIntegrationComponent::getIntegrationId)
+            .map(boundIntegrationId -> boundIntegrationId == integrationId)
+            .orElse(true);
+    }
+
     private boolean isEmbeddedMcpServerEnabled(long mcpServerId) {
         McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
         return mcpServer.getType() == PlatformType.EMBEDDED && mcpServer.isEnabled();
     }
 
-    List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(String componentName) {
+    List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(long integrationId, String componentName) {
         return mcpComponentService.getMcpComponentsByComponentName(componentName)
             .stream()
             .filter(mcpComponent -> isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId()))
+            .filter(mcpComponent -> isMcpComponentOfIntegration(mcpComponent.getId(), integrationId))
             .flatMap(mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
                 .stream()
                 .filter(McpTool::isEnabled)

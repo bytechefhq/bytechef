@@ -17,6 +17,8 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.encryption.EncryptionImpl;
@@ -50,7 +52,7 @@ import tools.jackson.databind.ObjectMapper;
 @EnableAutoConfiguration
 @Import({
     EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class, JacksonConfiguration.class,
-    LiquibaseConfiguration.class, McpComponentServiceImpl.class,
+    LiquibaseConfiguration.class, McpComponentServiceImpl.class, McpIntegrationComponentServiceImpl.class,
     McpServerServiceImpl.class, McpToolServiceImpl.class
 })
 @Configuration
@@ -91,13 +93,14 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
     @Bean
     ConnectedUserIntegrationFacadeImpl connectedUserIntegrationFacade(
         ClusterElementDefinitionService clusterElementDefinitionService, McpComponentService mcpComponentService,
+        McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         McpToolService mcpToolService) {
 
         return new ConnectedUserIntegrationFacadeImpl(
             clusterElementDefinitionService, null, null, null, null, null, null, null, null, null, null, null, null,
-            mcpComponentService, null, null, mcpIntegrationInstanceToolService, mcpServerService, mcpToolService, null,
-            null, null, null, null);
+            mcpComponentService, mcpIntegrationComponentService, null, null, mcpIntegrationInstanceToolService,
+            mcpServerService, mcpToolService, null, null, null, null, null);
     }
 
     @Bean
