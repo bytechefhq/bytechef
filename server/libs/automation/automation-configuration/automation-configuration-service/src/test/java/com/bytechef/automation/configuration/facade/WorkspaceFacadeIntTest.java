@@ -53,10 +53,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Verifies that {@link WorkspaceFacadeImpl#getUserWorkspaces(long)} reads the persisted workspaces through the real
- * {@link com.bytechef.automation.configuration.service.WorkspaceService} and filters them by
- * {@link PermissionService}: tenant admins see every workspace, while a regular user only sees the workspaces they hold
- * a role in. {@link PermissionService} stays a mock because the workspace role it answers is an Enterprise Edition
- * concept the CE implementation does not model.
+ * {@link com.bytechef.automation.configuration.service.WorkspaceService} and filters them by {@link PermissionService}:
+ * tenant admins see every workspace, while a regular user only sees the workspaces they hold a role in.
+ * {@link PermissionService} stays a mock because the workspace role it answers is an Enterprise Edition concept the CE
+ * implementation does not model.
  *
  * @author Ivica Cardic
  */

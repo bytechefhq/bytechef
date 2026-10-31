@@ -124,8 +124,9 @@ class ProjectDeploymentWorkflowServiceIntTest {
         assertThat(
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeployment.getId(), "workflow-1"))
                 .isEqualTo(projectDeploymentWorkflow);
-        assertThat(projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(projectDeployment.getId(), "missing"))
-            .isEmpty();
+        assertThat(
+            projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(projectDeployment.getId(), "missing"))
+                .isEmpty();
     }
 
     @Test
