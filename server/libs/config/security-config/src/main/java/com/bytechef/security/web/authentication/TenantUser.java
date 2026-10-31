@@ -16,6 +16,7 @@
 
 package com.bytechef.security.web.authentication;
 
+import com.bytechef.platform.security.web.authentication.TenantPrincipal;
 import java.util.Collection;
 import java.util.Objects;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,7 +27,7 @@ import org.springframework.security.core.userdetails.User;
  *
  * @author Ivica Cardic
  */
-public final class TenantUser extends User {
+public final class TenantUser extends User implements TenantPrincipal {
 
     private final String tenantId;
 
@@ -38,6 +39,7 @@ public final class TenantUser extends User {
         this.tenantId = Objects.requireNonNull(tenantId, "tenantId");
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }

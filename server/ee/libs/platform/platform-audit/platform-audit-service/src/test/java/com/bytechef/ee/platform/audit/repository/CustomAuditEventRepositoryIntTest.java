@@ -15,8 +15,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.platform.security.web.authentication.TenantPrincipal;
 import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
@@ -47,6 +49,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -120,10 +124,10 @@ public class CustomAuditEventRepositoryIntTest {
     public void testAuthenticationSuccessEventIsPersistedInTheUsersTenantSchema() {
         applicationEventPublisher.publishEvent(
             new AuthenticationSuccessEvent(
-                UsernamePasswordAuthenticationToken.authenticated("test1@gmail.com", null, List.of())));
+                UsernamePasswordAuthenticationToken.authenticated("admin", null, List.of())));
 
-        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
-        assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEvents(TENANT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(DEFAULT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isZero();
         assertThat(TenantContext.getCurrentTenantId()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
     }
 
@@ -160,15 +164,88 @@ public class CustomAuditEventRepositoryIntTest {
     @Test
     public void testUnknownDetailsTenantFallsBackToThePrincipalLookup() {
         UsernamePasswordAuthenticationToken authentication =
-            UsernamePasswordAuthenticationToken.authenticated("test1@gmail.com", null, List.of());
+            UsernamePasswordAuthenticationToken.authenticated("admin", null, List.of());
 
         authentication.setDetails(createDetails(UNKNOWN_TENANT_ID));
 
         applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(authentication));
 
-        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
-        assertThat(countEvents(OTHER_TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEvents(TENANT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEvents(DEFAULT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isZero();
+    }
+
+    @Test
+    public void testTenantPrincipalIsPersistedInItsTenantSchemaWithoutLookup() {
+        TenantUser tenantUser = new TenantUser("test1@gmail.com", OTHER_TENANT_ID);
+
+        applicationEventPublisher.publishEvent(
+            new AuthenticationSuccessEvent(
+                UsernamePasswordAuthenticationToken.authenticated(tenantUser, null, List.of())));
+
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
         assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "AUTHENTICATION_SUCCESS")).isZero();
+        assertThat(countEventData(OTHER_TENANT_SCHEMA, CustomAuditEventRepository.TENANT_ID_DATA_KEY)).isZero();
+        verify(tenantService, never()).getTenantIdsByUserEmail(anyString());
+    }
+
+    @Test
+    public void testUnknownTenantPrincipalFallsBackToThePrincipalLookup() {
+        applicationEventPublisher.publishEvent(
+            new AuthenticationSuccessEvent(
+                UsernamePasswordAuthenticationToken.authenticated(
+                    new TenantUser("admin", UNKNOWN_TENANT_ID), null, List.of())));
+
+        assertThat(countEvents(TENANT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(DEFAULT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isZero();
+    }
+
+    @Test
+    public void testOAuth2ClientAuthenticationIsPersistedInTheDefaultSchema() {
+        OAuth2ClientAuthenticationToken authentication = new OAuth2ClientAuthenticationToken(
+            "admin", ClientAuthenticationMethod.CLIENT_SECRET_BASIC, "client-secret", null);
+
+        applicationEventPublisher.publishEvent(
+            new AuthenticationFailureBadCredentialsEvent(
+                authentication, new BadCredentialsException("Bad client credentials")));
+
+        assertThat(countEvents(DEFAULT_SCHEMA, "admin", "AUTHENTICATION_FAILURE")).isEqualTo(1);
+        assertThat(countEvents(TENANT_SCHEMA, "admin", "AUTHENTICATION_FAILURE")).isZero();
+        assertThat(countEventData(DEFAULT_SCHEMA, CustomAuditEventRepository.TENANT_ID_DATA_KEY)).isZero();
+        verify(tenantService, never()).getTenantIdsByUserLogin(anyString());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSystemUserIsPersistedInTheDefaultSchema() {
+        ApplicationProperties.Security security = new ApplicationProperties.Security();
+
+        ApplicationProperties.Security.System system = security.getSystem();
+
+        system.setUsername("admin");
+
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.setSecurity(security);
+
+        ObjectProvider<ApplicationProperties> applicationPropertiesProvider = mock(ObjectProvider.class);
+
+        when(applicationPropertiesProvider.getIfAvailable()).thenReturn(applicationProperties);
+
+        ObjectProvider<TenantService> tenantServiceProvider = mock(ObjectProvider.class);
+
+        when(tenantServiceProvider.getIfAvailable()).thenReturn(tenantService);
+
+        CustomAuditEventRepository systemUserAuditEventRepository = new CustomAuditEventRepository(
+            persistenceAuditEventRepository, auditEventConverter, tenantServiceProvider, transactionManagerProvider,
+            applicationPropertiesProvider);
+
+        systemUserAuditEventRepository.add(createAuditEvent("admin", "AUTHENTICATION_SUCCESS"));
+
+        assertThat(countEvents(DEFAULT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(TENANT_SCHEMA, "admin", "AUTHENTICATION_SUCCESS")).isZero();
+        verify(tenantService, never()).getTenantIdsByUserLogin(anyString());
     }
 
     @Test
@@ -199,13 +276,23 @@ public class CustomAuditEventRepositoryIntTest {
     }
 
     @Test
-    public void testEmailPrincipalIsPersistedInItsFirstTenantSchema() {
+    public void testEmailPrincipalOfSeveralTenantsIsPersistedInTheDefaultSchema() {
         customAuditEventRepository.add(createAuditEvent("test1@gmail.com", "LOGOUT_SUCCESS"));
 
-        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "LOGOUT_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "LOGOUT_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(TENANT_SCHEMA, "test1@gmail.com", "LOGOUT_SUCCESS")).isZero();
         assertThat(countEvents(OTHER_TENANT_SCHEMA, "test1@gmail.com", "LOGOUT_SUCCESS")).isZero();
-        assertThat(countEvents(DEFAULT_SCHEMA, "test1@gmail.com", "LOGOUT_SUCCESS")).isZero();
         verify(tenantService, never()).getTenantIdsByUserLogin(anyString());
+    }
+
+    @Test
+    public void testEmailPrincipalOfOneTenantIsPersistedInItsTenantSchema() {
+        when(tenantService.getTenantIdsByUserEmail("test2@gmail.com")).thenReturn(List.of(OTHER_TENANT_ID));
+
+        customAuditEventRepository.add(createAuditEvent("test2@gmail.com", "LOGOUT_SUCCESS"));
+
+        assertThat(countEvents(OTHER_TENANT_SCHEMA, "test2@gmail.com", "LOGOUT_SUCCESS")).isEqualTo(1);
+        assertThat(countEvents(DEFAULT_SCHEMA, "test2@gmail.com", "LOGOUT_SUCCESS")).isZero();
     }
 
     @Test
@@ -265,7 +352,8 @@ public class CustomAuditEventRepositoryIntTest {
         ObjectProvider<TenantService> tenantServiceProvider = mock(ObjectProvider.class);
 
         CustomAuditEventRepository noTenantServiceAuditEventRepository = new CustomAuditEventRepository(
-            persistenceAuditEventRepository, auditEventConverter, tenantServiceProvider, transactionManagerProvider);
+            persistenceAuditEventRepository, auditEventConverter, tenantServiceProvider, transactionManagerProvider,
+            mock(ObjectProvider.class));
 
         noTenantServiceAuditEventRepository.add(createAuditEvent("admin", "AUTHENTICATION_SUCCESS"));
 
@@ -310,6 +398,12 @@ public class CustomAuditEventRepositoryIntTest {
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private Integer countEventData(String schema, String key) {
+        return jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM " + schema + ".persistent_audit_event_data WHERE key = ?", Integer.class, key);
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private Integer countEvents(String schema, String principal, String eventType) {
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM " + schema + ".persistent_audit_event WHERE principal = ? AND event_type = ?",
@@ -337,6 +431,23 @@ public class CustomAuditEventRepositoryIntTest {
                     return bean;
                 }
             };
+        }
+    }
+
+    @SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
+    private static final class TenantUser extends User implements TenantPrincipal {
+
+        private final String tenantId;
+
+        private TenantUser(String username, String tenantId) {
+            super(username, "", List.of());
+
+            this.tenantId = tenantId;
+        }
+
+        @Override
+        public String getTenantId() {
+            return tenantId;
         }
     }
 
