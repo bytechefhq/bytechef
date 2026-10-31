@@ -24,8 +24,6 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpBearerTokenResolver;
 import com.bytechef.platform.security.web.mcp.oauth2.McpEndpointRequestMatcher;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.McpProtectedResourceUrls;
-import com.bytechef.platform.security.web.mcp.oauth2.McpTenantAuthenticationDetailsSource;
-import com.bytechef.platform.security.web.mcp.oauth2.McpTenantJwtAuthenticationProvider;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataAuthenticationEntryPoint;
 import com.bytechef.platform.security.web.mcp.oauth2.MultiIssuerJwtDecoder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,11 +44,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationConverter;
-import org.springframework.security.web.authentication.AuthenticationConverter;
 
 /**
  * @author Ivica Cardic
@@ -117,36 +114,21 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
             .validateAudienceClaim(false)
             .jwtDecoder(multiIssuerJwtDecoder)
             .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
-                .authenticationConverter(
-                    createBearerTokenAuthenticationConverter(mcpBearerTokenResolver, mcpEndpointRequestMatcher))
+                .bearerTokenResolver(mcpBearerTokenResolver)
                 .authenticationEntryPoint(new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(
                     mcpEndpointRequestMatcher, publicUrl))
                 .jwt(jwt -> jwt.authenticationManager(createJwtAuthenticationManager(multiIssuerJwtDecoder))));
     }
 
     private AuthenticationManager createJwtAuthenticationManager(JwtDecoder jwtDecoder) {
-        ProviderManager providerManager = new ProviderManager(
-            new McpTenantJwtAuthenticationProvider(
-                new JwtAuthenticationProvider(jwtDecoder), mcpResourceServerProperties));
+        ProviderManager providerManager = new ProviderManager(new JwtAuthenticationProvider(jwtDecoder));
 
         if (authenticationEventPublisher != null) {
-            providerManager.setAuthenticationEventPublisher(authenticationEventPublisher);
+            providerManager.setAuthenticationEventPublisher(
+                new FailureAuthenticationEventPublisher(authenticationEventPublisher));
         }
 
         return providerManager;
-    }
-
-    private static AuthenticationConverter createBearerTokenAuthenticationConverter(
-        BearerTokenResolver bearerTokenResolver, McpEndpointRequestMatcher mcpEndpointRequestMatcher) {
-
-        BearerTokenAuthenticationConverter bearerTokenAuthenticationConverter =
-            new BearerTokenAuthenticationConverter();
-
-        bearerTokenAuthenticationConverter.setAuthenticationDetailsSource(
-            new McpTenantAuthenticationDetailsSource(mcpEndpointRequestMatcher));
-        bearerTokenAuthenticationConverter.setBearerTokenResolver(bearerTokenResolver);
-
-        return bearerTokenAuthenticationConverter;
     }
 
     private void customizeResourceClaims(
@@ -176,5 +158,20 @@ public class McpOAuth2ResourceServerSecurityConfigurerContributor implements Sec
             .map(Issuer::getUri)
             .filter(Objects::nonNull)
             .toList();
+    }
+
+    private record FailureAuthenticationEventPublisher(AuthenticationEventPublisher authenticationEventPublisher)
+        implements AuthenticationEventPublisher {
+
+        @Override
+        public void publishAuthenticationSuccess(Authentication authentication) {
+        }
+
+        @Override
+        public void publishAuthenticationFailure(
+            AuthenticationException authenticationException, Authentication authentication) {
+
+            authenticationEventPublisher.publishAuthenticationFailure(authenticationException, authentication);
+        }
     }
 }

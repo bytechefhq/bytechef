@@ -29,7 +29,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
@@ -46,6 +48,7 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
     private final @Nullable String publicUrl;
     private final ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider;
     private final UserService userService;
+    private @Nullable AuthenticationEventPublisher authenticationEventPublisher;
 
     @SuppressFBWarnings("EI2")
     public McpJwtSecurityConfigurerContributor(
@@ -62,6 +65,12 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
         this.publicUrl = applicationProperties.getPublicUrl();
         this.selfIssuedTokenRevocationCheckerProvider = selfIssuedTokenRevocationCheckerProvider;
         this.userService = userService;
+    }
+
+    @Autowired(required = false)
+    @SuppressFBWarnings("EI2")
+    public void setAuthenticationEventPublisher(AuthenticationEventPublisher authenticationEventPublisher) {
+        this.authenticationEventPublisher = authenticationEventPublisher;
     }
 
     @Override
@@ -85,13 +94,18 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
                     "bean exists; enable the ByteChef authorization server or remove the self issuer");
         }
 
-        return (T) new McpJwtSecurityConfigurer(
-            new TenantAwareJwtAuthenticationFilter(
-                new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties, userService,
-                authorityService, mcpEndpoints,
-                mcpServerSecretVerifierProvider.orderedStream()
-                    .toList(),
-                selfIssuedTokenRevocationChecker, publicUrl));
+        TenantAwareJwtAuthenticationFilter tenantAwareJwtAuthenticationFilter = new TenantAwareJwtAuthenticationFilter(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties, userService,
+            authorityService, mcpEndpoints,
+            mcpServerSecretVerifierProvider.orderedStream()
+                .toList(),
+            selfIssuedTokenRevocationChecker, publicUrl);
+
+        if (authenticationEventPublisher != null) {
+            tenantAwareJwtAuthenticationFilter.setAuthenticationEventPublisher(authenticationEventPublisher);
+        }
+
+        return (T) new McpJwtSecurityConfigurer(tenantAwareJwtAuthenticationFilter);
     }
 
     private boolean hasSelfIssuer() {

@@ -50,10 +50,6 @@ public class TenantWebAuthenticationDetails extends WebAuthenticationDetails {
         return tenantId;
     }
 
-    public TenantWebAuthenticationDetails withTenantId(String tenantId) {
-        return new TenantWebAuthenticationDetails(getRemoteAddress(), getSessionId(), tenantId);
-    }
-
     @Override
     public boolean equals(@Nullable Object object) {
         if (!super.equals(object)) {
