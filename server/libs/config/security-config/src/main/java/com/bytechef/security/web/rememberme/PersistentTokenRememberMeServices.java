@@ -344,9 +344,6 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         PersistentToken token = optionalToken.orElseThrow();
 
-        // We have a match for this user/series combination
-        log.info("presentedToken={} / tokenValue={}", presentedToken, token.getTokenValue());
-
         if (!presentedToken.equals(token.getTokenValue())) {
             // Token doesn't match series value. Delete this session and throw an exception.
             if (tenantService.isMultiTenantEnabled()) {
@@ -426,7 +423,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
     private record UpgradedRememberMeToken(String[] upgradedToken, String userLogin) implements Serializable {
 
         String getUserLoginIfValid(String[] currentToken) {
-            if (currentToken[0].equals(this.upgradedToken[0]) && currentToken[1].equals(this.upgradedToken[1])) {
+            if (Arrays.equals(currentToken, this.upgradedToken)) {
                 return this.userLogin;
             }
 
