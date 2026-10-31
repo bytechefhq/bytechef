@@ -75,6 +75,34 @@ class ToolInvocationLogServiceIntTest {
     }
 
     @Test
+    void testWorkspaceQueryReturnsOnlyThatWorkspacesRowsInThatEnvironment() {
+        createInWorkspace(7L, 2, 5L);
+        createInWorkspace(7L, 0, 5L);
+        createInWorkspace(8L, 2, 6L);
+        create(ToolExecutionSurface.MCP_EMBEDDED, ToolExecutionOutcome.SUCCESS, 5L, Instant.now());
+
+        Page<ToolInvocationLog> page = toolInvocationLogService.getWorkspaceToolInvocationLogs(
+            7L, 2, null, null, null, null, null, null, null, 0);
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent()).extracting(ToolInvocationLog::getWorkspaceId)
+            .containsOnly(7L);
+        assertThat(page.getContent()).extracting(ToolInvocationLog::getEnvironment)
+            .containsOnly(2);
+    }
+
+    @Test
+    void testWorkspaceQueryNamingAnotherWorkspacesMcpServerMatchesNothing() {
+        createInWorkspace(8L, 2, 6L);
+
+        Page<ToolInvocationLog> page = toolInvocationLogService.getWorkspaceToolInvocationLogs(
+            7L, 2, null, null, 6L, null, null, null, null, 0);
+
+        assertThat(page.getTotalElements()).isZero();
+        assertThat(page.getContent()).isEmpty();
+    }
+
+    @Test
     void testRetentionDeletesOldRows() {
         create(ToolExecutionSurface.MCP_AUTOMATION, ToolExecutionOutcome.SUCCESS, 1L,
             Instant.now()
@@ -87,6 +115,23 @@ class ToolInvocationLogServiceIntTest {
 
         assertThat(deleted).isEqualTo(1);
         assertThat(toolInvocationLogRepository.count()).isEqualTo(1);
+    }
+
+    private void createInWorkspace(long workspaceId, int environment, long mcpServerId) {
+        ToolInvocationLog toolInvocationLog = new ToolInvocationLog();
+
+        toolInvocationLog.setType(PlatformType.AUTOMATION);
+        toolInvocationLog.setSurface(ToolExecutionSurface.MCP_AUTOMATION);
+        toolInvocationLog.setKind(ToolExecutionKind.COMPONENT);
+        toolInvocationLog.setToolName("slack_sendMessage");
+        toolInvocationLog.setWorkspaceId(workspaceId);
+        toolInvocationLog.setEnvironment(environment);
+        toolInvocationLog.setMcpServerId(mcpServerId);
+        toolInvocationLog.setOutcome(ToolExecutionOutcome.SUCCESS);
+        toolInvocationLog.setDurationMs(5);
+        toolInvocationLog.setCreatedDate(Instant.now());
+
+        toolInvocationLogService.create(toolInvocationLog);
     }
 
     private void create(

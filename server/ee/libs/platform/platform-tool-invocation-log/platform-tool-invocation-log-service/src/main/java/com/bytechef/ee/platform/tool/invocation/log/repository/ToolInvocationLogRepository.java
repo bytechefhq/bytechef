@@ -25,7 +25,9 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
 
     @Query("""
         SELECT * FROM tool_invocation_log
-        WHERE (:surface IS NULL OR surface = :surface)
+        WHERE (:workspaceId IS NULL OR workspace_id = :workspaceId)
+            AND (:environment IS NULL OR environment = :environment)
+            AND (:surface IS NULL OR surface = :surface)
             AND (:outcome IS NULL OR outcome = :outcome)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
@@ -36,6 +38,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
         LIMIT :limit OFFSET :offset
         """)
     List<ToolInvocationLog> findFiltered(
+        @Param("workspaceId") @Nullable Long workspaceId, @Param("environment") @Nullable Integer environment,
         @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("connectedUserId") @Nullable Long connectedUserId,
         @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
@@ -44,7 +47,9 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
 
     @Query("""
         SELECT COUNT(*) FROM tool_invocation_log
-        WHERE (:surface IS NULL OR surface = :surface)
+        WHERE (:workspaceId IS NULL OR workspace_id = :workspaceId)
+            AND (:environment IS NULL OR environment = :environment)
+            AND (:surface IS NULL OR surface = :surface)
             AND (:outcome IS NULL OR outcome = :outcome)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
@@ -53,6 +58,7 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
             AND (CAST(:endDate AS TIMESTAMP) IS NULL OR created_date <= CAST(:endDate AS TIMESTAMP))
         """)
     long countFiltered(
+        @Param("workspaceId") @Nullable Long workspaceId, @Param("environment") @Nullable Integer environment,
         @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("connectedUserId") @Nullable Long connectedUserId,
         @Param("integrationInstanceId") @Nullable Long integrationInstanceId,

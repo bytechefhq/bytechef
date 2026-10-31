@@ -56,17 +56,42 @@ public class ToolInvocationLogServiceImpl implements ToolInvocationLogService {
         @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
         @Nullable Instant endDate, int pageNumber) {
 
+        return findPage(
+            null, null, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId, startDate, endDate,
+            pageNumber);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ToolInvocationLog> getWorkspaceToolInvocationLogs(
+        long workspaceId, int environment, @Nullable ToolExecutionSurface surface,
+        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
+        @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
+        int pageNumber) {
+
+        return findPage(
+            workspaceId, environment, surface, outcome, mcpServerId, connectedUserId, integrationInstanceId,
+            startDate, endDate, pageNumber);
+    }
+
+    private Page<ToolInvocationLog> findPage(
+        @Nullable Long workspaceId, @Nullable Integer environment, @Nullable ToolExecutionSurface surface,
+        @Nullable ToolExecutionOutcome outcome, @Nullable Long mcpServerId, @Nullable Long connectedUserId,
+        @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
+        int pageNumber) {
+
         Integer surfaceOrdinal = surface == null ? null : surface.ordinal();
         Integer outcomeOrdinal = outcome == null ? null : outcome.ordinal();
 
         PageRequest pageRequest = PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE);
 
         List<ToolInvocationLog> content = toolInvocationLogRepository.findFiltered(
-            surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId, integrationInstanceId, startDate, endDate,
-            pageRequest.getPageSize(), pageRequest.getOffset());
+            workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
+            integrationInstanceId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
 
         long total = toolInvocationLogRepository.countFiltered(
-            surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId, integrationInstanceId, startDate, endDate);
+            workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, connectedUserId,
+            integrationInstanceId, startDate, endDate);
 
         return new PageImpl<>(content, pageRequest, total);
     }

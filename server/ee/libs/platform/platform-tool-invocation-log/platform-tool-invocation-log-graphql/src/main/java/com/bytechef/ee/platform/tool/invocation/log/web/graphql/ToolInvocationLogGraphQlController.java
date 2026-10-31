@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.tool.invocation.log.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLog;
-import com.bytechef.ee.platform.tool.invocation.log.ToolInvocationLogService;
+import com.bytechef.ee.platform.tool.invocation.log.facade.ToolInvocationLogFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.tool.execution.ToolExecutionOutcome;
 import com.bytechef.platform.tool.execution.ToolExecutionSurface;
@@ -32,11 +32,11 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ToolInvocationLogGraphQlController {
 
-    private final ToolInvocationLogService toolInvocationLogService;
+    private final ToolInvocationLogFacade toolInvocationLogFacade;
 
     @SuppressFBWarnings("EI")
-    public ToolInvocationLogGraphQlController(ToolInvocationLogService toolInvocationLogService) {
-        this.toolInvocationLogService = toolInvocationLogService;
+    public ToolInvocationLogGraphQlController(ToolInvocationLogFacade toolInvocationLogFacade) {
+        this.toolInvocationLogFacade = toolInvocationLogFacade;
     }
 
     @QueryMapping(name = "toolInvocationLogs")
@@ -45,10 +45,26 @@ public class ToolInvocationLogGraphQlController {
         @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
         @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
-        Page<ToolInvocationLog> toolInvocationLogPage = toolInvocationLogService.getToolInvocationLogs(
-            toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId, integrationInstanceId,
-            toInstant(fromDate), toInstant(toDate), page == null ? 0 : page);
+        return toPage(
+            toolInvocationLogFacade.getToolInvocationLogs(
+                toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId, integrationInstanceId,
+                toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+    }
 
+    @QueryMapping(name = "workspaceToolInvocationLogs")
+    public ToolInvocationLogPage workspaceToolInvocationLogs(
+        @Argument long workspaceId, @Argument long environmentId, @Argument @Nullable String surface,
+        @Argument @Nullable String outcome, @Argument @Nullable Long mcpServerId,
+        @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
+        @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
+
+        return toPage(
+            toolInvocationLogFacade.getWorkspaceToolInvocationLogs(
+                workspaceId, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, connectedUserId,
+                integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
+    }
+
+    private static ToolInvocationLogPage toPage(Page<ToolInvocationLog> toolInvocationLogPage) {
         List<ToolInvocationLogItem> content = toolInvocationLogPage.getContent()
             .stream()
             .map(ToolInvocationLogGraphQlController::toItem)

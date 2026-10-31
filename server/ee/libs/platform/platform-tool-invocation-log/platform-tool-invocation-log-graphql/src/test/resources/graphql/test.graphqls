@@ -1,0 +1,5 @@
+type Query {
+    _placeholder: Boolean
+}
+
+scalar Long
