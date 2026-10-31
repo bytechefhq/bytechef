@@ -236,10 +236,13 @@ public final class ClusterElementCallRecorder {
         TaskExecutionCalls taskExecutionCalls = callsByTaskExecution.get(
             TenantCacheKeyUtils.getKey(taskExecutionId), key -> new TaskExecutionCalls());
 
+        boolean listened = listenersByJob.containsKey(TenantCacheKeyUtils.getKey(jobId));
+
         synchronized (taskExecutionCalls) {
             ClusterElementCall merged = taskExecutionCalls.record(type, ref.workflowNodeName(), error);
             ClusterElementCallRecord callRecord = taskExecutionCalls.recordCall(
-                type, ref, componentName, toolName, parentId, input, output, error);
+                type, ref, componentName, toolName, parentId, listened ? input : null, listened ? output : null,
+                error);
 
             Status status = merged.status();
 
