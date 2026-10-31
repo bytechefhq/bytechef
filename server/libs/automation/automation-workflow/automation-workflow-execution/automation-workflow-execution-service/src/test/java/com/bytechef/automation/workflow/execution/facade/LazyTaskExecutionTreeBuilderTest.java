@@ -530,6 +530,44 @@ class LazyTaskExecutionTreeBuilderTest {
     }
 
     @Test
+    void getFocusPathPicksLastCancelledLeafBeforeLastStartedTask() {
+        TaskExecution loopTaskExecution = createTaskExecution(1L, null, "loop", "loop/v1", 0);
+        TaskExecution cancelledTaskExecution = createTaskExecution(9L, 1L, "x", "myComponent/v1/a", 2);
+
+        when(taskExecutionService.fetchLastCancelledLeafJobTaskExecution(JOB_ID))
+            .thenReturn(Optional.of(cancelledTaskExecution));
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(loopTaskExecution));
+        when(taskExecutionService.getIterationIndex(cancelledTaskExecution))
+            .thenReturn(2);
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(loopTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(1L, null, null),
+            new FocusPathElementDTO(9L, 2, null));
+
+        verify(taskExecutionService, never()).fetchLastStartedJobTaskExecution(JOB_ID);
+    }
+
+    @Test
+    void getFocusPathPicksFailureBeforeLastCancelledLeaf() {
+        TaskExecution failedTaskExecution = createTaskExecution(4L, null, "a", "myComponent/v1/a", 0);
+        TaskExecution cancelledTaskExecution = createTaskExecution(5L, null, "b", "myComponent/v1/a", 1);
+
+        when(taskExecutionService.getLatestAttemptFailedLeafJobTaskExecutions(JOB_ID, List.of(), 0,
+            FOCUS_CANDIDATE_PAGE_SIZE))
+                .thenReturn(List.of(failedTaskExecution));
+
+        List<FocusPathElementDTO> focusPath = lazyTaskExecutionTreeBuilder.getFocusPath(
+            JOB_ID, List.of(failedTaskExecution, cancelledTaskExecution));
+
+        assertThat(focusPath).containsExactly(new FocusPathElementDTO(4L, null, null));
+
+        verify(taskExecutionService, never()).fetchLastCancelledLeafJobTaskExecution(JOB_ID);
+    }
+
+    @Test
     void getFocusPathFallsBackToLastStartedTaskBeforeNewerQueuedTask() {
         TaskExecution startedTaskExecution = createTaskExecution(4L, null, "a", "myComponent/v1/a", 0);
         TaskExecution queuedTaskExecution = createTaskExecution(5L, null, "b", "myComponent/v1/a", 1);

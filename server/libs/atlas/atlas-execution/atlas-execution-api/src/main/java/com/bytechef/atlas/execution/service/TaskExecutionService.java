@@ -38,6 +38,8 @@ public interface TaskExecutionService {
 
     void deleteJobTaskExecutions(long jobId);
 
+    Optional<TaskExecution> fetchLastCancelledLeafJobTaskExecution(long jobId);
+
     Optional<TaskExecution> fetchLastJobTaskExecution(long jobId);
 
     Optional<TaskExecution> fetchLastStartedJobTaskExecution(long jobId);

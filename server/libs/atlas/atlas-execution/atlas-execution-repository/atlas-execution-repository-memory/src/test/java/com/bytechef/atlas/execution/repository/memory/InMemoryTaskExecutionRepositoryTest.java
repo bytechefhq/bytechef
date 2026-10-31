@@ -526,6 +526,35 @@ class InMemoryTaskExecutionRepositoryTest {
     }
 
     @Test
+    void testFindLastCancelledLeafByJobId() {
+        Instant baseDate = Instant.parse("2026-01-01T00:00:00Z");
+
+        long cancelledParentId = saveTaskExecutionId(472L, null, TaskExecution.Status.CANCELLED, baseDate);
+
+        saveTaskExecutionId(472L, cancelledParentId, TaskExecution.Status.CANCELLED, baseDate.plusSeconds(1));
+        saveTaskExecutionId(472L, cancelledParentId, TaskExecution.Status.COMPLETED, baseDate.plusSeconds(2));
+
+        long lastCancelledLeafId = saveTaskExecutionId(
+            472L, cancelledParentId, TaskExecution.Status.CANCELLED, baseDate.plusSeconds(3));
+
+        long newerCancelledParentId = saveTaskExecutionId(
+            472L, null, TaskExecution.Status.CANCELLED, baseDate.plusSeconds(4));
+
+        saveTaskExecutionId(472L, newerCancelledParentId, TaskExecution.Status.COMPLETED, baseDate.plusSeconds(5));
+
+        assertEquals(
+            lastCancelledLeafId, inMemoryTaskExecutionRepository.findLastCancelledLeafByJobId(472L)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+
+        saveTaskExecutionId(473L, null, TaskExecution.Status.COMPLETED, baseDate);
+        saveTaskExecutionId(473L, null, TaskExecution.Status.FAILED, baseDate.plusSeconds(1));
+
+        assertTrue(inMemoryTaskExecutionRepository.findLastCancelledLeafByJobId(473L)
+            .isEmpty());
+    }
+
+    @Test
     void testFindAllUnfinishedByJobId() {
         long createdId = saveTaskExecutionId(501L, TaskExecution.Status.CREATED);
         long startedId = saveTaskExecutionId(501L, TaskExecution.Status.STARTED);
@@ -575,6 +604,22 @@ class InMemoryTaskExecutionRepositoryTest {
 
         taskExecution.setJobId(jobId);
         taskExecution.setStatus(status);
+
+        taskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
+
+        return Objects.requireNonNull(taskExecution.getId());
+    }
+
+    private long saveTaskExecutionId(
+        long jobId, Long parentId, TaskExecution.Status status, Instant createdDate) {
+
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.setJobId(jobId);
+        taskExecution.setParentId(parentId);
+        taskExecution.setStatus(status);
+
+        setCreatedDate(taskExecution, createdDate);
 
         taskExecution = inMemoryTaskExecutionRepository.save(taskExecution);
 

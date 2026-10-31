@@ -121,6 +121,12 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<TaskExecution> fetchLastCancelledLeafJobTaskExecution(long jobId) {
+        return taskExecutionRepository.findLastCancelledLeafByJobId(jobId);
+    }
+
+    @Override
     public Optional<TaskExecution> fetchLastJobTaskExecution(long jobId) {
         return taskExecutionRepository.findLastByJobId(jobId);
     }

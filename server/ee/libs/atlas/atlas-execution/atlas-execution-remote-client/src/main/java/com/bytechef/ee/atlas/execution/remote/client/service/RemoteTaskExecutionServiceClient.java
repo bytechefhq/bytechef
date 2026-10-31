@@ -80,6 +80,11 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public Optional<TaskExecution> fetchLastCancelledLeafJobTaskExecution(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<TaskExecution> fetchLastJobTaskExecution(long jobId) {
         throw new UnsupportedOperationException();
     }
