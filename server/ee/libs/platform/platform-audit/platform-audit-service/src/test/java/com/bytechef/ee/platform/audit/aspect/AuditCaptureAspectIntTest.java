@@ -9,15 +9,15 @@ package com.bytechef.ee.platform.audit.aspect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 
+import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditMapper;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -25,43 +25,49 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = AuditCaptureAspectIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(classes = AuditIntTestConfiguration.class)
+@ActiveProfiles("testint")
+@Import({
+    PostgreSQLContainerConfiguration.class, AuditCaptureAspectIntTest.CaptureServiceConfiguration.class
+})
 @SuppressFBWarnings(
     value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
     justification = "Guarded calls inside assertThatThrownBy are expected to throw, so their return value is irrelevant")
 class AuditCaptureAspectIntTest {
 
     @Autowired
-    private AuditEventService auditEventService;
+    private GuardedAuditedService guardedAuditedService;
 
     @Autowired
-    private GuardedAuditedService guardedAuditedService;
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @Autowired
     private RecordingAuditMapper recordingAuditMapper;
 
     @BeforeEach
     void beforeEach() {
-        reset(auditEventService);
+        persistenceAuditEventRepository.deleteAll();
 
         recordingAuditMapper.captureCount.set(0);
     }
@@ -79,9 +85,10 @@ class AuditCaptureAspectIntTest {
 
         assertThat(recordingAuditMapper.captureCount.get()).isZero();
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        PersistentAuditEvent persistentAuditEvent = findSingle();
 
         assertThat(persistentAuditEvent.getEventType()).isEqualTo("TEST_EVENT");
+        assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "DENIED")
             .doesNotContainKey("captured");
@@ -94,9 +101,10 @@ class AuditCaptureAspectIntTest {
         assertThat(guardedAuditedService.adminOnly(7L)).isEqualTo("ok");
 
         assertThat(recordingAuditMapper.captureCount.get()).isEqualTo(1);
-        assertThat(captureSavedEvent().getData())
+        assertThat(findSingle().getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("captured", "before-7");
+        assertThat(AuditFrame.current()).isNull();
     }
 
     @Test
@@ -105,7 +113,7 @@ class AuditCaptureAspectIntTest {
 
         assertThat(guardedAuditedService.throwingCapture(7L)).isEqualTo("ok");
 
-        assertThat(captureSavedEvent().getData())
+        assertThat(findSingle().getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("captureError", IllegalStateException.class.getName())
             .doesNotContainKey("captured")
@@ -113,36 +121,30 @@ class AuditCaptureAspectIntTest {
     }
 
     private void authenticate(String authority) {
-        SecurityContextHolder.getContext()
-            .setAuthentication(
-                new UsernamePasswordAuthenticationToken("alice", "n/a",
-                    List.of(new SimpleGrantedAuthority(authority))));
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken("alice", "n/a", List.of(new SimpleGrantedAuthority(authority))));
     }
 
-    @SuppressWarnings("unchecked")
-    private PersistentAuditEvent captureSavedEvent() {
-        ArgumentCaptor<List<PersistentAuditEvent>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+    private PersistentAuditEvent findSingle() {
+        Page<PersistentAuditEvent> page =
+            persistenceAuditEventRepository.findAllFiltered(AuditEventFilter.empty(), PageRequest.of(0, 25));
 
-        verify(auditEventService).saveAll(argumentCaptor.capture());
-
-        List<PersistentAuditEvent> persistentAuditEvents = argumentCaptor.getValue();
+        List<PersistentAuditEvent> persistentAuditEvents = page.getContent();
 
         assertThat(persistentAuditEvents).hasSize(1);
 
         return persistentAuditEvents.getFirst();
     }
 
-    @SpringBootConfiguration
-    @EnableAspectJAutoProxy
+    @Configuration
     @EnableMethodSecurity
-    @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditMapperResolver.class
-    })
-    static class Config {
+    static class CaptureServiceConfiguration {
 
         @Bean
-        AuditEventService auditEventService() {
-            return mock(AuditEventService.class);
+        GuardedAuditedService guardedAuditedService() {
+            return new GuardedAuditedService();
         }
 
         @Bean
@@ -153,11 +155,6 @@ class AuditCaptureAspectIntTest {
         @Bean
         ThrowingCaptureAuditMapper throwingCaptureAuditMapper() {
             return new ThrowingCaptureAuditMapper();
-        }
-
-        @Bean
-        GuardedAuditedService guardedAuditedService() {
-            return new GuardedAuditedService();
         }
     }
 
