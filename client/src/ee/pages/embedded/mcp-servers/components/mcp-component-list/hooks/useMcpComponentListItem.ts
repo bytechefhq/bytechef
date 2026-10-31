@@ -21,9 +21,12 @@ export default function useMcpComponentListItem(
         [integrationId, integrationsData]
     );
 
+    const integrationUnavailable = !!integrationId && !!integrationsData && !integrationName;
+
     return {
         componentDefinition,
         integrationName,
+        integrationUnavailable,
         setShowEditDialog,
         showEditDialog,
     };

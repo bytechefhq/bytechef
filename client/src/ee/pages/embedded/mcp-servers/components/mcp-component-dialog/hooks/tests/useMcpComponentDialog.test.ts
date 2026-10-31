@@ -217,6 +217,59 @@ describe('useMcpComponentDialog', () => {
         expect(result.current.selectedComponent?.integrationId).toBe('5');
     });
 
+    it('opens a component whose integration is unavailable on the integration step', () => {
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({integrationUnavailable: true, mcpComponent, mcpServerId: '1', open: true})
+        );
+
+        expect(result.current.currentStep).toBe('components');
+        expect(result.current.selectedComponent).toBeNull();
+    });
+
+    it('rebinds a component whose integration is unavailable to the selected integration', () => {
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({integrationUnavailable: true, mcpComponent, mcpServerId: '1', open: true})
+        );
+
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '6', name: 'gmail', title: 'Gmail Code', version: 1})
+        );
+
+        act(() => result.current.handleSave());
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith(
+            {
+                id: '7',
+                input: {componentName: 'gmail', componentVersion: 1, mcpServerId: '1', tools: [], version: 2},
+                integrationId: '6',
+            },
+            expect.objectContaining({onSuccess: expect.any(Function)})
+        );
+    });
+
+    it('returns to the integration step when going back from a component whose integration is unavailable', () => {
+        const onOpenChange = vi.fn();
+
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({
+                integrationUnavailable: true,
+                mcpComponent,
+                mcpServerId: '1',
+                onOpenChange,
+                open: true,
+            })
+        );
+
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '6', name: 'gmail', title: 'Gmail Code', version: 1})
+        );
+
+        act(() => result.current.handleBack());
+
+        expect(onOpenChange).not.toHaveBeenCalled();
+        expect(result.current.currentStep).toBe('components');
+    });
+
     it('loads the existing embedded tools only for a saved component while the dialog is open', () => {
         const existingTools = {embeddedMcpToolsByComponentId: [{name: 'sendEmail'}]};
 

@@ -6,7 +6,14 @@ import McpComponentDialogComponentSelectionStep from './McpComponentDialogCompon
 import McpComponentDialogToolSelectionStep from './McpComponentDialogToolSelectionStep';
 import useMcpComponentDialog from './hooks/useMcpComponentDialog';
 
-const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, triggerNode}: McpComponentDialogProps) => {
+const McpComponentDialog = ({
+    integrationUnavailable,
+    mcpComponent,
+    mcpServerId,
+    onOpenChange,
+    open,
+    triggerNode,
+}: McpComponentDialogProps & {integrationUnavailable?: boolean}) => {
     const {
         currentStep,
         existingTools,
@@ -17,7 +24,7 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
         selectedComponent,
         selectedTools,
         setSelectedTools,
-    } = useMcpComponentDialog({mcpComponent, mcpServerId, onOpenChange, open});
+    } = useMcpComponentDialog({integrationUnavailable, mcpComponent, mcpServerId, onOpenChange, open});
 
     return (
         <McpComponentDialogShell

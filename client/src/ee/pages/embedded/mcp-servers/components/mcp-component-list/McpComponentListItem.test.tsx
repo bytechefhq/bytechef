@@ -23,7 +23,10 @@ vi.mock('@/pages/automation/mcp-servers/components/mcp-component-list/McpCompone
 }));
 
 vi.mock('../mcp-component-dialog/McpComponentDialog', () => ({
-    default: ({open}: {open: boolean}) => (open ? <div data-testid="mcp-component-dialog" /> : null),
+    default: ({integrationUnavailable, open}: {integrationUnavailable?: boolean; open: boolean}) =>
+        open ? (
+            <div data-integration-unavailable={String(integrationUnavailable)} data-testid="mcp-component-dialog" />
+        ) : null,
 }));
 
 vi.mock('./McpComponentToolList', () => ({
@@ -126,5 +129,21 @@ describe('McpComponentListItem', () => {
         renderItem(boundMcpComponent);
 
         expect(screen.getByTestId('mcp-component-dialog')).toBeInTheDocument();
+    });
+
+    it('warns that the integration of a bound component is unavailable and lets the dialog rebind it', () => {
+        hoisted.useMcpComponentListItem.mockReturnValue({
+            componentDefinition: undefined,
+            integrationName: undefined,
+            integrationUnavailable: true,
+            setShowEditDialog: hoisted.setShowEditDialog,
+            showEditDialog: true,
+        });
+
+        renderItem(boundMcpComponent);
+
+        expect(screen.getByText('Integration unavailable')).toBeInTheDocument();
+        expect(screen.queryByText('No integration')).not.toBeInTheDocument();
+        expect(screen.getByTestId('mcp-component-dialog')).toHaveAttribute('data-integration-unavailable', 'true');
     });
 });

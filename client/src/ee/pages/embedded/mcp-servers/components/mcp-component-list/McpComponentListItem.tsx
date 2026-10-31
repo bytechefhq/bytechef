@@ -12,11 +12,8 @@ import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 import McpComponentToolList from './McpComponentToolList';
 
 const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpComponent; mcpServer: McpServer}) => {
-    const {componentDefinition, integrationName, setShowEditDialog, showEditDialog} = useMcpComponentListItem(
-        mcpComponent.componentName,
-        mcpComponent.componentVersion,
-        mcpComponent.integrationId
-    );
+    const {componentDefinition, integrationName, integrationUnavailable, setShowEditDialog, showEditDialog} =
+        useMcpComponentListItem(mcpComponent.componentName, mcpComponent.componentVersion, mcpComponent.integrationId);
 
     const [expanded, setExpanded] = useState(false);
 
@@ -48,7 +45,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 </CollapsibleTrigger>
 
                 {mcpComponent.integrationId ? (
-                    integrationName && (
+                    integrationName ? (
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Badge
@@ -61,6 +58,24 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
 
                             <TooltipContent>Integration whose connection these tools use</TooltipContent>
                         </Tooltip>
+                    ) : (
+                        integrationUnavailable && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge
+                                        className="relative z-10"
+                                        label="Integration unavailable"
+                                        styleType="warning-filled"
+                                        weight="semibold"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>
+                                    The integration of this component is no longer published or configured. Edit this
+                                    component to choose another integration.
+                                </TooltipContent>
+                            </Tooltip>
+                        )
                     )
                 ) : (
                     <Tooltip>
@@ -123,6 +138,8 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
             </CollapsibleContent>
 
             <McpComponentDialog
+                integrationUnavailable={integrationUnavailable}
+                key={String(integrationUnavailable)}
                 mcpComponent={mcpComponent}
                 mcpServerId={mcpServer.id}
                 onOpenChange={setShowEditDialog}
