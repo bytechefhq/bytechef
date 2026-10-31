@@ -17,14 +17,17 @@
 package com.bytechef.platform.configuration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,10 +42,15 @@ import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
@@ -74,6 +82,12 @@ class WorkflowNodeOptionFacadeTest {
     private ClusterElementDefinitionService clusterElementDefinitionService;
 
     @Mock
+    private ComponentConnectionFacade componentConnectionFacade;
+
+    @Mock
+    private ConnectionService connectionService;
+
+    @Mock
     private Evaluator evaluator;
 
     @Mock
@@ -97,6 +111,8 @@ class WorkflowNodeOptionFacadeTest {
     void setUp() {
         workflowNodeOptionFacade = new WorkflowNodeOptionFacadeImpl(
             evaluator, actionDefinitionFacade, clusterElementDefinitionFacade, clusterElementDefinitionService,
+            new ComponentOperationConnectionResolver(
+                componentConnectionFacade, connectionService, workflowTestConfigurationService),
             taskDispatcherDefinitionService, triggerDefinitionFacade, workflowService, workflowNodeOutputFacade,
             workflowTestConfigurationService);
     }
@@ -379,5 +395,78 @@ class WorkflowNodeOptionFacadeTest {
         assertEquals(true, capturedInputParameters.containsKey("hubspot_1"));
         assertEquals("secret", capturedInputParameters.get("hubspot_1")
             .get("apiKey"));
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationOptionsResolvesDeclaredConnection() {
+        Map<String, Object> parameters = Map.of("baseId", "app1");
+        List<Option> expectedOptions = List.of(mock(Option.class));
+
+        when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "script_1"))
+            .thenReturn(List.of(new ComponentConnection("airtable", 1, "script_1", "at", true)));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "script_1", 1L))
+            .thenReturn(List.of(new WorkflowTestConfigurationConnection(100L, "at", "script_1")));
+        Connection boundConnection = connectionOf("airtable");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
+        when(actionDefinitionFacade.executeOptions(
+            "airtable", 1, "createRecord", "tableId", parameters, List.of("baseId"), null, 100L))
+                .thenReturn(expectedOptions);
+
+        List<Option> result = workflowNodeOptionFacade.getWorkflowNodeComponentOperationOptions(
+            "workflow1", "script_1", null, new ComponentOperation("airtable", 1, "createRecord", false), "tableId",
+            "at", parameters, List.of("baseId"), 1L);
+
+        assertEquals(expectedOptions, result);
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationOptionsRunsTriggerOptionsForClusterElement() {
+        List<Option> expectedOptions = List.of(mock(Option.class));
+
+        when(componentConnectionFacade.getClusterElementComponentConnections(
+            "workflow1", "aiAgent_1", "tools", "script_1"))
+                .thenReturn(List.of(new ComponentConnection("airtable", 1, "script_1", "at", true)));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "aiAgent_1", 1L))
+            .thenReturn(List.of(new WorkflowTestConfigurationConnection(100L, "at", "aiAgent_1")));
+        Connection boundConnection = connectionOf("airtable");
+
+        when(connectionService.fetchConnection(100L))
+            .thenReturn(Optional.of(boundConnection));
+        when(triggerDefinitionFacade.executeOptions(
+            "airtable", 1, "newRecord", "tableId", Map.of(), List.of(), null, 100L))
+                .thenReturn(expectedOptions);
+
+        List<Option> result = workflowNodeOptionFacade.getWorkflowNodeComponentOperationOptions(
+            "workflow1", "aiAgent_1", new ClusterElementNode("tools", "script_1"),
+            new ComponentOperation("airtable", 1, "newRecord", true), "tableId", null, Map.of(), List.of(), 1L);
+
+        assertEquals(expectedOptions, result);
+    }
+
+    @Test
+    void testGetWorkflowNodeComponentOperationOptionsReturnsEmptyWithoutTestConnection() {
+        when(componentConnectionFacade.getWorkflowNodeComponentConnections("workflow1", "script_1"))
+            .thenReturn(List.of(new ComponentConnection("airtable", 1, "script_1", "at", true)));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("workflow1", "script_1", 1L))
+            .thenReturn(List.of());
+
+        List<Option> result = workflowNodeOptionFacade.getWorkflowNodeComponentOperationOptions(
+            "workflow1", "script_1", null, new ComponentOperation("airtable", 1, "createRecord", false), "tableId",
+            "at", Map.of(), List.of(), 1L);
+
+        assertTrue(result.isEmpty());
+
+        verify(actionDefinitionFacade, never()).executeOptions(
+            anyString(), eq(1), anyString(), anyString(), anyMap(), anyList(), any(), any(Long.class));
+    }
+
+    private static Connection connectionOf(String componentName) {
+        Connection connection = mock(Connection.class);
+
+        when(connection.getComponentName()).thenReturn(componentName);
+
+        return connection;
     }
 }

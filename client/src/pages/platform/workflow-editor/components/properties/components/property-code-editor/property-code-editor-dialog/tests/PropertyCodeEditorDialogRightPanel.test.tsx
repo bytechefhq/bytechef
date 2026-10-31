@@ -1,7 +1,8 @@
-import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyCodeEditorDialogRightPanel from '../PropertyCodeEditorDialogRightPanel';
+import {usePropertyCodeEditorDialogStore} from '../stores/usePropertyCodeEditorDialogStore';
 
 vi.mock('../PropertyCodeEditorDialogRightPanelInput', () => ({
     default: ({input}: {input: {[key: string]: object}}) => (
@@ -91,6 +92,7 @@ describe('PropertyCodeEditorDialogRightPanel', () => {
     });
 
     afterEach(() => {
+        usePropertyCodeEditorDialogStore.getState().reset();
         resetAll();
         vi.clearAllMocks();
     });
@@ -153,6 +155,24 @@ describe('PropertyCodeEditorDialogRightPanel', () => {
             render(<PropertyCodeEditorDialogRightPanel {...defaultProps} />);
 
             expect(screen.getByTestId('connections-count')).toHaveTextContent('0');
+        });
+    });
+
+    describe('completion state', () => {
+        it('stores the connections and input for completions', async () => {
+            render(<PropertyCodeEditorDialogRightPanel {...defaultProps} />);
+
+            await waitFor(() =>
+                expect(usePropertyCodeEditorDialogStore.getState().componentConnections).toEqual([
+                    {componentName: 'slack', componentVersion: 1, name: 'slack_1'},
+                    {componentName: 'github', componentVersion: 1, name: 'github_1'},
+                ])
+            );
+
+            expect(usePropertyCodeEditorDialogStore.getState().scriptInput).toEqual({
+                param1: 'value1',
+                param2: 'value2',
+            });
         });
     });
 });

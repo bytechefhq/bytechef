@@ -5,6 +5,7 @@ All URIs are relative to */api/platform/internal*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**getClusterElementNodeDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getclusterelementnodedynamicproperties) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName} | Get dynamic properties for an action or trigger property shown in the editor |
+| [**getWorkflowNodeComponentOperationDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getworkflownodecomponentoperationdynamicproperties) | **POST** /workflows/{id}/workflow-nodes/{workflowNodeName}/component-operations/dynamic-properties/{propertyName} | Get dynamic properties for a property of a component action or trigger using a connection declared on a workflow node |
 | [**getWorkflowNodeDynamicProperties**](WorkflowNodeDynamicPropertiesApi.md#getworkflownodedynamicproperties) | **GET** /workflows/{id}/workflow-nodes/{workflowNodeName}/dynamic-properties/{propertyName} | Get dynamic properties for an action or trigger property shown in the editor |
 
 
@@ -90,6 +91,85 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The list of options. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getWorkflowNodeComponentOperationDynamicProperties
+
+> Array&lt;Property&gt; getWorkflowNodeComponentOperationDynamicProperties(id, workflowNodeName, propertyName, environmentId, componentOperationPropertyRequest)
+
+Get dynamic properties for a property of a component action or trigger using a connection declared on a workflow node
+
+Get dynamic properties for a property of a component action or trigger, using a connection declared on a workflow node or on one of its cluster elements.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowNodeDynamicPropertiesApi,
+} from '';
+import type { GetWorkflowNodeComponentOperationDynamicPropertiesRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowNodeDynamicPropertiesApi();
+
+  const body = {
+    // string | The workflow id
+    id: id_example,
+    // string | The name of a workflow\'s task or trigger (E.g. script_1)
+    workflowNodeName: workflowNodeName_example,
+    // string | The name of a property.
+    propertyName: propertyName_example,
+    // number | The id of an environment.
+    environmentId: 789,
+    // ComponentOperationPropertyRequest
+    componentOperationPropertyRequest: ...,
+  } satisfies GetWorkflowNodeComponentOperationDynamicPropertiesRequest;
+
+  try {
+    const data = await api.getWorkflowNodeComponentOperationDynamicProperties(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` | The workflow id | [Defaults to `undefined`] |
+| **workflowNodeName** | `string` | The name of a workflow\&#39;s task or trigger (E.g. script_1) | [Defaults to `undefined`] |
+| **propertyName** | `string` | The name of a property. | [Defaults to `undefined`] |
+| **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
+| **componentOperationPropertyRequest** | [ComponentOperationPropertyRequest](ComponentOperationPropertyRequest.md) |  | |
+
+### Return type
+
+[**Array&lt;Property&gt;**](Property.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The list of dynamic properties. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

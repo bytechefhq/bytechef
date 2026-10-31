@@ -31,8 +31,11 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentOperationConnectionResolver.ResolvedConnection;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -40,6 +43,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -54,6 +58,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ComponentOperationConnectionResolver componentOperationConnectionResolver;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
@@ -65,6 +70,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         Evaluator evaluator, ActionDefinitionFacade actionDefinitionFacade,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
+        ComponentOperationConnectionResolver componentOperationConnectionResolver,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
@@ -74,11 +80,41 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.componentOperationConnectionResolver = componentOperationConnectionResolver;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+    }
+
+    @Override
+    public List<Option> getWorkflowNodeComponentOperationOptions(
+        String workflowId, String workflowNodeName, @Nullable ClusterElementNode clusterElementNode,
+        ComponentOperation componentOperation, String propertyName, @Nullable String connectionKey,
+        Map<String, ?> parameters, List<String> lookupDependsOnPaths, long environmentId) {
+
+        Optional<ResolvedConnection> resolvedConnection = componentOperationConnectionResolver.resolve(
+            workflowId, workflowNodeName, clusterElementNode, componentOperation.componentName(), connectionKey,
+            environmentId);
+
+        if (resolvedConnection.isEmpty()) {
+            return List.of();
+        }
+
+        Long connectionId = resolvedConnection.get()
+            .connectionId();
+
+        if (componentOperation.trigger()) {
+            return triggerDefinitionFacade.executeOptions(
+                componentOperation.componentName(), componentOperation.componentVersion(),
+                componentOperation.operationName(), propertyName, parameters, lookupDependsOnPaths, null,
+                connectionId);
+        }
+
+        return actionDefinitionFacade.executeOptions(
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName(), propertyName, parameters, lookupDependsOnPaths, null, connectionId);
     }
 
     @Override

@@ -7,12 +7,19 @@ import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import RunDisabledReasons from '@/pages/platform/workflow-editor/components/RunDisabledReasons';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
+import {useEvaluatorFunctionDefinitions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/useEvaluatorFunctionDefinitions';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/workflow-test-configuration/WorkflowTestConfigurationDialog';
 import useWorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/hooks/useWorkflowCodeEditorSheet';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
+import {CompletionContextType} from '@/shared/components/monaco/completion/completionTypes';
+import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
+import {useComponentCatalog} from '@/shared/components/monaco/completion/useComponentCatalog';
+import {useOperationPropertyLoaders} from '@/shared/components/monaco/completion/useOperationPropertyLoaders';
+import {useWorkflowNodeOutputsForCompletion} from '@/shared/components/monaco/completion/useWorkflowNodeOutputsForCompletion';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
     AlertTriangleIcon,
@@ -27,8 +34,10 @@ import {
     SquareIcon,
 } from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
-import {Suspense, lazy} from 'react';
+import {Suspense, lazy, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+import type {editor} from 'monaco-editor';
 
 interface WorkflowCodeEditorSheetProps {
     invalidateWorkflowQueries: () => void;
@@ -53,6 +62,8 @@ const WorkflowCodeEditorSheet = ({
     workflow,
     workflowTestConfiguration,
 }: WorkflowCodeEditorSheetProps) => {
+    const [model, setModel] = useState<editor.ITextModel>();
+
     const {
         copilotEnabled,
         copilotPanelOpen,
@@ -85,6 +96,26 @@ const WorkflowCodeEditorSheet = ({
 
     const ff_4076 = useFeatureFlagsStore()('ff-4076');
     const showBottomPanel = useWorkflowEditorStore((state) => state.showBottomPanel);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const components = useComponentCatalog();
+    const functions = useEvaluatorFunctionDefinitions();
+    const getNodeOutputs = useWorkflowNodeOutputsForCompletion(workflow.id, currentEnvironmentId);
+    const operationPropertyLoaders = useOperationPropertyLoaders(workflow.id, currentEnvironmentId);
+
+    const completionContext = useMemo<CompletionContextType>(
+        () => ({
+            components,
+            format: workflow.format?.toLowerCase() === 'yaml' ? 'yaml' : 'json',
+            functions,
+            getNodeOutputs,
+            kind: 'workflowDefinition',
+            ...operationPropertyLoaders,
+        }),
+        [components, functions, getNodeOutputs, operationPropertyLoaders, workflow.format]
+    );
+
+    useCompletionContext(model, completionContext);
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={sheetOpen}>
@@ -212,11 +243,19 @@ const WorkflowCodeEditorSheet = ({
                                         className="size-full py-3"
                                         defaultLanguage={workflow.format?.toLowerCase() ?? 'json'}
                                         onChange={(value) => handleDefinitionChange(value as string)}
-                                        onMount={(editor) => editor.focus()}
+                                        onMount={(mountedEditor) => {
+                                            mountedEditor.focus();
+
+                                            setModel(mountedEditor.getModel() ?? undefined);
+                                        }}
                                         onValidate={handleValidate}
                                         options={{
                                             folding: true,
                                             foldingStrategy: 'indentation',
+                                            ...(workflow.format?.toLowerCase() === 'yaml' && {
+                                                quickSuggestions: {comments: 'off', other: 'on', strings: 'on'},
+                                                wordBasedSuggestions: 'off',
+                                            }),
                                         }}
                                         value={definition}
                                     />

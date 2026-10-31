@@ -353,6 +353,24 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
+        it('skips toast for editor autocomplete dynamic property lookups', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Connection failed', title: 'Internal Server Error'},
+                status: 500,
+                url: 'http://localhost/internal/workflows/w1/workflow-nodes/script_1/component-operations/dynamic-properties/fields?environmentId=1',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
         it('skips toast for AdminUserDTO with errorKey 100', async () => {
             renderHook(() => useFetchInterceptor());
 

@@ -1,12 +1,26 @@
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {Workflow, WorkflowFormat} from '@/shared/middleware/platform/configuration';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useWorkflowCodeEditorSheet from '../useWorkflowCodeEditorSheet';
 
 import type {editor} from 'monaco-editor';
+
+const hoisted = vi.hoisted(() => ({
+    invalidateQueries: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-query', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@tanstack/react-query')>()),
+    useQueryClient: () => ({invalidateQueries: hoisted.invalidateQueries}),
+}));
+
+vi.mock('@/pages/platform/workflow-editor/utils/saveWorkflowDefinitionUpdate', () => ({
+    default: ({onSuccess}: {onSuccess?: () => void}) => onSuccess?.(),
+}));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({updateWorkflowMutation: undefined}),
@@ -28,6 +42,11 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: (selector: (state: {ai: {copilot: {enabled: boolean}}}) => unknown) =>
         selector({ai: {copilot: {enabled: true}}}),
+}));
+
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) =>
+        selector({currentEnvironmentId: 1}),
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -63,7 +82,32 @@ const expectOriginalConversationRestored = () => {
 };
 
 describe('useWorkflowCodeEditorSheet', () => {
+    describe('save', () => {
+        it('invalidates the previous workflow node outputs after a successful save', () => {
+            const invalidateWorkflowQueries = vi.fn();
+
+            const {result} = renderHook(() =>
+                useWorkflowCodeEditorSheet({
+                    invalidateWorkflowQueries,
+                    onSheetOpenClose: vi.fn(),
+                    workflow: {definition: ORIGINAL_DEFINITION, id: 'workflow-1'} as Workflow,
+                })
+            );
+
+            act(() => result.current.handleSaveClick({id: 'workflow-1'} as Workflow, ORIGINAL_DEFINITION));
+
+            expect(hoisted.invalidateQueries).toHaveBeenCalledWith({
+                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                    environmentId: 1,
+                    id: 'workflow-1',
+                }),
+            });
+            expect(invalidateWorkflowQueries).toHaveBeenCalled();
+        });
+    });
+
     beforeEach(() => {
+        hoisted.invalidateQueries.mockClear();
         useCopilotPostTurnRegistry.setState({callbacks: {}});
         useCopilotStore.setState({
             context: originalContext,
