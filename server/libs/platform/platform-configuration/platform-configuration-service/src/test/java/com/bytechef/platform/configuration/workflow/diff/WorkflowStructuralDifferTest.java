@@ -220,4 +220,161 @@ class WorkflowStructuralDifferTest {
     private static Map<String, Object> tasks(Map<String, Object> task) {
         return Map.of("tasks", List.of(task));
     }
+
+    @Test
+    void testNestedTaskAddedInsideCondition() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(condition(List.of(), List.of()))),
+            Map.of("tasks", List.of(condition(List.of(nested("a", "x")), List.of()))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.ADDED);
+        assertThat(changes.get(0)
+            .name()).isEqualTo("a");
+        assertThat(changes.get(0)
+            .parentPath()).isEqualTo("condition_1.caseTrue");
+    }
+
+    @Test
+    void testNestedTaskParameterChangeInsideLoop() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(loop(List.of(nested("a", "x"))))),
+            Map.of("tasks", List.of(loop(List.of(nested("a", "y"))))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.MODIFIED);
+        assertThat(changes.get(0)
+            .name()).isEqualTo("a");
+        assertThat(changes.get(0)
+            .valueChanges()).containsExactly(new WorkflowDefinitionValueChange("parameters.p", "\"x\"", "\"y\""));
+    }
+
+    @Test
+    void testTaskMovedBetweenConditionBranches() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(condition(List.of(nested("a", "x")), List.of()))),
+            Map.of("tasks", List.of(condition(List.of(), List.of(nested("a", "x"))))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.MOVED);
+        assertThat(changes.get(0)
+            .parentPath()).isEqualTo("condition_1.caseFalse");
+    }
+
+    @Test
+    void testTaskMovedToTopLevel() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(condition(List.of(nested("a", "x")), List.of()))),
+            Map.of("tasks", List.of(condition(List.of(), List.of()), nested("a", "x"))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.MOVED);
+        assertThat(changes.get(0)
+            .parentPath()).isNull();
+    }
+
+    @Test
+    void testReorderedSiblingsAreMoved() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(nested("a", "x"), nested("b", "x"), nested("c", "x"))),
+            Map.of("tasks", List.of(nested("a", "x"), nested("c", "x"), nested("b", "x"))));
+
+        assertThat(changes).extracting(WorkflowDefinitionChange::name)
+            .containsExactly("c", "b");
+        assertThat(changes).extracting(WorkflowDefinitionChange::kind)
+            .containsOnly(WorkflowNodeChangeKind.MOVED);
+    }
+
+    @Test
+    void testTopLevelReorderProducesMovedChanges() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(nested("a", "x"), nested("b", "x"))),
+            Map.of("tasks", List.of(nested("b", "x"), nested("a", "x"))));
+
+        assertThat(changes).hasSize(2);
+        assertThat(changes).extracting(WorkflowDefinitionChange::kind)
+            .containsOnly(WorkflowNodeChangeKind.MOVED);
+    }
+
+    @Test
+    void testInsertingSiblingDoesNotMoveOthers() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(nested("a", "x"), nested("c", "x"))),
+            Map.of("tasks", List.of(nested("a", "x"), nested("b", "x"), nested("c", "x"))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.ADDED);
+        assertThat(changes.get(0)
+            .name()).isEqualTo("b");
+    }
+
+    @Test
+    void testClusterElementAddedRemovedModified() {
+        Map<String, Object> oldTask = Map.of(
+            "name", "agent_1", "type", "aiAgent/v1",
+            "clusterElements", Map.of(
+                "model", Map.of("name", "m1", "type", "a/v1/m", "parameters", Map.of("p", "x")),
+                "tools", List.of(Map.of("name", "t1", "type", "a/v1/t"))));
+        Map<String, Object> newTask = Map.of(
+            "name", "agent_1", "type", "aiAgent/v1",
+            "clusterElements", Map.of(
+                "model", Map.of("name", "m1", "type", "a/v1/m", "parameters", Map.of("p", "y")),
+                "tools", List.of(Map.of("name", "t2", "type", "a/v1/t"))));
+
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(oldTask)), Map.of("tasks", List.of(newTask)));
+
+        assertThat(changes).hasSize(3);
+        assertThat(changes).extracting(WorkflowDefinitionChange::target)
+            .containsOnly(WorkflowNodeChangeTarget.CLUSTER_ELEMENT);
+        assertThat(changes).extracting(WorkflowDefinitionChange::kind)
+            .containsExactlyInAnyOrder(
+                WorkflowNodeChangeKind.MODIFIED, WorkflowNodeChangeKind.ADDED, WorkflowNodeChangeKind.REMOVED);
+        assertThat(changes).extracting(WorkflowDefinitionChange::parentPath)
+            .containsOnly("agent_1.clusterElements.model", "agent_1.clusterElements.tools");
+    }
+
+    @Test
+    void testMovedTaskWithParameterChangeStaysMoved() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(condition(List.of(nested("a", "x")), List.of()))),
+            Map.of("tasks", List.of(condition(List.of(), List.of(nested("a", "y"))))));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .kind()).isEqualTo(WorkflowNodeChangeKind.MOVED);
+        assertThat(changes.get(0)
+            .valueChanges()).hasSize(1);
+    }
+
+    @Test
+    void testOtherTopLevelWorkflowKeyChangeIsReportedOnWorkflowEntry() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("label", "A", "settings", Map.of("retry", 1)), Map.of("label", "A", "settings", Map.of("retry", 2)));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0)
+            .target()).isEqualTo(WorkflowNodeChangeTarget.WORKFLOW);
+        assertThat(changes.get(0)
+            .valueChanges()).containsExactly(new WorkflowDefinitionValueChange("settings.retry", "1", "2"));
+    }
+
+    private static Map<String, Object> nested(String name, String parameterValue) {
+        return Map.of("name", name, "type", "a/v1/b", "parameters", Map.of("p", parameterValue));
+    }
+
+    private static Map<String, Object> condition(List<Object> caseTrue, List<Object> caseFalse) {
+        return Map.of(
+            "name", "condition_1", "type", "condition/v1",
+            "parameters", Map.of("rawExpression", "x", "caseTrue", caseTrue, "caseFalse", caseFalse));
+    }
+
+    private static Map<String, Object> loop(List<Object> iteratee) {
+        return Map.of("name", "loop_1", "type", "loop/v1", "parameters", Map.of("iteratee", iteratee));
+    }
 }

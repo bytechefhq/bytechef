@@ -97,6 +97,16 @@ class WorkflowDefinitionDiffServiceTest {
             .target()).isEqualTo(WorkflowNodeChangeTarget.WORKFLOW);
     }
 
+    @Test
+    void testModifiedDiffAlwaysHasChanges() {
+        WorkflowDefinitionDiff diff = diffService.diff(
+            json("{\"tasks\":[{\"name\":\"a\",\"type\":\"x/v1/y\"},{\"name\":\"b\",\"type\":\"x/v1/y\"}]}"),
+            json("{\"tasks\":[{\"name\":\"b\",\"type\":\"x/v1/y\"},{\"name\":\"a\",\"type\":\"x/v1/y\"}]}"));
+
+        assertThat(diff.changeType()).isEqualTo(WorkflowChangeType.MODIFIED);
+        assertThat(diff.changes()).isNotEmpty();
+    }
+
     private static Workflow json(String definition) {
         return new Workflow(definition, Workflow.Format.JSON);
     }

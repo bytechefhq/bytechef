@@ -22,18 +22,22 @@ import com.bytechef.platform.configuration.dto.WorkflowDefinitionValueChange;
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeKind;
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public class WorkflowStructuralDiffer {
+
+    private static final Set<String> STRUCTURAL_KEYS = Set.of("tasks", "triggers", "inputs", "outputs");
 
     private WorkflowStructuralDiffer() {
     }
@@ -45,7 +49,13 @@ public class WorkflowStructuralDiffer {
 
         List<WorkflowDefinitionValueChange> workflowValueChanges = new ArrayList<>();
 
-        for (String key : List.of("label", "description")) {
+        Set<String> workflowKeys = new LinkedHashSet<>(List.of("label", "description"));
+
+        workflowKeys.addAll(new TreeSet<>(oldDefinition.keySet()));
+        workflowKeys.addAll(new TreeSet<>(newDefinition.keySet()));
+        workflowKeys.removeAll(STRUCTURAL_KEYS);
+
+        for (String key : workflowKeys) {
             compareValues(key, oldDefinition.get(key), newDefinition.get(key), workflowValueChanges);
         }
 
@@ -61,8 +71,12 @@ public class WorkflowStructuralDiffer {
         Map<String, WorkflowNode> newNodes = index(newNodeList);
 
         List<Set<WorkflowNodeChangeTarget>> groups = List.of(
-            Set.of(WorkflowNodeChangeTarget.TRIGGER, WorkflowNodeChangeTarget.TASK),
+            Set.of(
+                WorkflowNodeChangeTarget.TRIGGER, WorkflowNodeChangeTarget.TASK,
+                WorkflowNodeChangeTarget.CLUSTER_ELEMENT),
             Set.of(WorkflowNodeChangeTarget.INPUT), Set.of(WorkflowNodeChangeTarget.OUTPUT));
+
+        Set<String> movedKeys = findMovedKeys(oldNodes, newNodes);
 
         for (Set<WorkflowNodeChangeTarget> group : groups) {
             for (WorkflowNode newNode : newNodeList) {
@@ -79,7 +93,9 @@ public class WorkflowStructuralDiffer {
 
                     compareValues("", oldNode.attributes(), newNode.attributes(), valueChanges);
 
-                    if (!valueChanges.isEmpty()) {
+                    if (movedKeys.contains(key(newNode))) {
+                        changes.add(toChange(WorkflowNodeChangeKind.MOVED, newNode, valueChanges));
+                    } else if (!valueChanges.isEmpty()) {
                         changes.add(toChange(WorkflowNodeChangeKind.MODIFIED, newNode, valueChanges));
                     }
                 }
@@ -93,6 +109,58 @@ public class WorkflowStructuralDiffer {
         }
 
         return changes;
+    }
+
+    private static Set<String> findMovedKeys(
+        Map<String, WorkflowNode> oldNodes, Map<String, WorkflowNode> newNodes) {
+
+        Set<String> movedKeys = new HashSet<>();
+        Map<String, List<String>> oldSiblings = new LinkedHashMap<>();
+        Map<String, List<String>> newSiblings = new LinkedHashMap<>();
+
+        for (Map.Entry<String, WorkflowNode> entry : oldNodes.entrySet()) {
+            WorkflowNode oldNode = entry.getValue();
+            WorkflowNode newNode = newNodes.get(entry.getKey());
+
+            if (newNode == null) {
+                continue;
+            }
+
+            if (Objects.equals(oldNode.parentPath(), newNode.parentPath())) {
+                oldSiblings.computeIfAbsent(siblingGroup(oldNode), groupKey -> new ArrayList<>())
+                    .add(entry.getKey());
+            } else {
+                movedKeys.add(entry.getKey());
+            }
+        }
+
+        for (Map.Entry<String, WorkflowNode> entry : newNodes.entrySet()) {
+            WorkflowNode newNode = entry.getValue();
+            WorkflowNode oldNode = oldNodes.get(entry.getKey());
+
+            if (oldNode != null && Objects.equals(oldNode.parentPath(), newNode.parentPath())) {
+                newSiblings.computeIfAbsent(siblingGroup(newNode), groupKey -> new ArrayList<>())
+                    .add(entry.getKey());
+            }
+        }
+
+        for (Map.Entry<String, List<String>> entry : oldSiblings.entrySet()) {
+            List<String> oldOrder = entry.getValue();
+            List<String> newOrder = newSiblings.get(entry.getKey());
+
+            for (int index = 0; index < oldOrder.size(); index++) {
+                if (!oldOrder.get(index)
+                    .equals(newOrder.get(index))) {
+                    movedKeys.add(oldOrder.get(index));
+                }
+            }
+        }
+
+        return movedKeys;
+    }
+
+    private static String siblingGroup(WorkflowNode node) {
+        return node.target() + ":" + node.parentPath();
     }
 
     private static WorkflowDefinitionChange toChange(

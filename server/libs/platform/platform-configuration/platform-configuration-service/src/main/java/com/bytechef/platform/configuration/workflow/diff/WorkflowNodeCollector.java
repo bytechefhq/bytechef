@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -28,6 +30,9 @@ import java.util.Map;
 public class WorkflowNodeCollector {
 
     private static final String CLUSTER_ELEMENTS = "clusterElements";
+    private static final Set<String> NON_CONTAINER_KEYS = Set.of("name", "type", "label", "description", "metadata");
+    private static final String PARAMETERS = "parameters";
+    private static final Object REMOVED = new Object();
 
     private WorkflowNodeCollector() {
     }
@@ -52,28 +57,135 @@ public class WorkflowNodeCollector {
 
         for (int index = 0; index < items.size(); index++) {
             if (items.get(index) instanceof Map<?, ?> item) {
-                nodes.add(toNode(target, item, index));
+                collectNode(target, item, null, index, nodes);
             }
         }
     }
 
-    private static WorkflowNode toNode(WorkflowNodeChangeTarget target, Map<?, ?> item, int index) {
-        Map<String, Object> attributes = new LinkedHashMap<>();
-
-        for (Map.Entry<?, ?> entry : item.entrySet()) {
-            String attributeKey = String.valueOf(entry.getKey());
-
-            if (!CLUSTER_ELEMENTS.equals(attributeKey)) {
-                attributes.put(attributeKey, entry.getValue());
-            }
-        }
+    private static void collectNode(
+        WorkflowNodeChangeTarget target, Map<?, ?> item, @Nullable String parentPath, int index,
+        List<WorkflowNode> nodes) {
 
         Object name = item.get("name");
         Object type = item.get("type");
         Object label = item.get("label");
 
-        return new WorkflowNode(
-            target, name == null ? "" : String.valueOf(name), type == null ? null : String.valueOf(type),
-            label == null ? null : String.valueOf(label), null, index, attributes);
+        String nodeName = name == null ? "" : String.valueOf(name);
+
+        Map<String, Object> attributes = new LinkedHashMap<>();
+        List<WorkflowNode> childNodes = new ArrayList<>();
+
+        for (Map.Entry<?, ?> entry : item.entrySet()) {
+            String attributeKey = String.valueOf(entry.getKey());
+
+            if (CLUSTER_ELEMENTS.equals(attributeKey)) {
+                continue;
+            }
+
+            Object value = entry.getValue();
+
+            if (target != WorkflowNodeChangeTarget.CLUSTER_ELEMENT && !NON_CONTAINER_KEYS.contains(attributeKey)) {
+                String valuePath = PARAMETERS.equals(attributeKey) ? nodeName : nodeName + "." + attributeKey;
+
+                value = prune(value, valuePath, childNodes);
+            }
+
+            if (value != REMOVED) {
+                attributes.put(attributeKey, value);
+            }
+        }
+
+        nodes.add(
+            new WorkflowNode(
+                target, nodeName, type == null ? null : String.valueOf(type),
+                label == null ? null : String.valueOf(label), parentPath, index, attributes));
+        nodes.addAll(childNodes);
+
+        if (item.get(CLUSTER_ELEMENTS) instanceof Map<?, ?> clusterElements) {
+            collectClusterElements(nodeName, clusterElements, nodes);
+        }
+    }
+
+    private static void collectClusterElements(String ownerName, Map<?, ?> clusterElements, List<WorkflowNode> nodes) {
+        for (Map.Entry<?, ?> entry : clusterElements.entrySet()) {
+            String parentPath = ownerName + "." + CLUSTER_ELEMENTS + "." + entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof Map<?, ?> element) {
+                collectNode(WorkflowNodeChangeTarget.CLUSTER_ELEMENT, element, parentPath, 0, nodes);
+            } else if (value instanceof List<?> elements) {
+                for (int index = 0; index < elements.size(); index++) {
+                    if (elements.get(index) instanceof Map<?, ?> element) {
+                        collectNode(WorkflowNodeChangeTarget.CLUSTER_ELEMENT, element, parentPath, index, nodes);
+                    }
+                }
+            }
+        }
+    }
+
+    private static Object prune(Object value, String path, List<WorkflowNode> childNodes) {
+        if (value instanceof List<?> list) {
+            List<Object> remaining = new ArrayList<>();
+            boolean removedAny = list.isEmpty();
+
+            for (int index = 0; index < list.size(); index++) {
+                Object item = list.get(index);
+                String itemPath = path + "[" + index + "]";
+
+                if (isTask(item)) {
+                    collectNode(
+                        WorkflowNodeChangeTarget.TASK, (Map<?, ?>) item, path, index, childNodes);
+
+                    removedAny = true;
+                } else if (item instanceof List<?> nestedList) {
+                    Object pruned = prune(nestedList, itemPath, childNodes);
+
+                    if (pruned == REMOVED) {
+                        removedAny = true;
+                    } else {
+                        remaining.add(pruned);
+                    }
+                } else if (item instanceof Map<?, ?> map) {
+                    Object pruned = pruneMap(map, itemPath, childNodes);
+
+                    if (pruned == REMOVED) {
+                        removedAny = true;
+                    } else {
+                        remaining.add(pruned);
+                    }
+                } else {
+                    remaining.add(item);
+                }
+            }
+
+            return remaining.isEmpty() && removedAny ? REMOVED : remaining;
+        }
+
+        if (value instanceof Map<?, ?> map) {
+            return pruneMap(map, path, childNodes);
+        }
+
+        return value;
+    }
+
+    private static Object pruneMap(Map<?, ?> map, String path, List<WorkflowNode> childNodes) {
+        Map<String, Object> remaining = new LinkedHashMap<>();
+        boolean removedAny = false;
+
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            Object pruned = prune(entry.getValue(), path + "." + entry.getKey(), childNodes);
+
+            if (pruned == REMOVED) {
+                removedAny = true;
+            } else {
+                remaining.put(String.valueOf(entry.getKey()), pruned);
+            }
+        }
+
+        return remaining.isEmpty() && removedAny ? REMOVED : remaining;
+    }
+
+    private static boolean isTask(Object item) {
+        return item instanceof Map<?, ?> map && map.get("name") instanceof String && map.get("type") instanceof String;
     }
 }
