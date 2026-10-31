@@ -9,15 +9,12 @@ package com.bytechef.ee.platform.audit.aspect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
-import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.audit.ApiKeyAuditEvents;
 import com.bytechef.platform.security.audit.ApiKeyAuditMapper;
@@ -25,73 +22,89 @@ import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.service.ApiKeyServiceImpl;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = ApiKeyAuditIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(classes = AuditIntTestConfiguration.class)
+@ActiveProfiles("testint")
+@Import({
+    ApiKeyAuditMapper.class, ApiKeyServiceImpl.class, PostgreSQLContainerConfiguration.class
+})
 class ApiKeyAuditIntTest {
 
-    @Autowired
+    private static final long UNKNOWN_API_KEY_ID = Long.MAX_VALUE;
+
+    @MockitoSpyBean
     private ApiKeyRepository apiKeyRepository;
 
     @Autowired
     private ApiKeyService apiKeyService;
 
     @Autowired
-    private AuditEventService auditEventService;
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    private long userId;
 
     @BeforeEach
     void beforeEach() {
-        reset(apiKeyRepository, auditEventService);
+        persistenceAuditEventRepository.deleteAll();
 
-        SecurityContextHolder.getContext()
-            .setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                    "alice", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+        userId = insertUser();
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken("alice", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
     }
 
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+
+        jdbcTemplate.update("DELETE FROM api_key WHERE user_id = ?", userId);
+        jdbcTemplate.update("DELETE FROM \"user\" WHERE id = ?", userId);
     }
 
     @Test
     void testCreateRecordsTheSavedApiKeyWithoutItsSecretKey() {
-        when(apiKeyRepository.save(any(ApiKey.class))).thenAnswer(invocation -> {
-            ApiKey apiKey = invocation.getArgument(0);
+        ApiKey createdApiKey = apiKeyService.create(createApiKey(PlatformType.AUTOMATION));
 
-            apiKey.setId(7L);
+        Long createdApiKeyId = createdApiKey.getId();
 
-            return apiKey;
-        });
+        assertThat(apiKeyRepository.findById(Objects.requireNonNull(createdApiKeyId))).isPresent();
 
-        ApiKey createdApiKey = apiKeyService.create(createApiKey());
-
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType()).isEqualTo(ApiKeyAuditEvents.API_KEY_CREATED);
         assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("apiKeyId", "7")
+            .containsEntry("apiKeyId", String.valueOf(createdApiKeyId))
             .containsEntry("name", "automation key")
             .containsEntry("type", "AUTOMATION")
             .doesNotContainValue(createdApiKey.getSecretKey());
@@ -100,99 +113,109 @@ class ApiKeyAuditIntTest {
 
     @Test
     void testDeleteRecordsThePlatformOfTheDeletedApiKey() {
-        ApiKey apiKey = createApiKey();
+        long apiKeyId = saveApiKey(PlatformType.EMBEDDED);
 
-        apiKey.setType(PlatformType.EMBEDDED);
+        apiKeyService.delete(apiKeyId);
 
-        when(apiKeyRepository.findById(7L)).thenReturn(Optional.of(apiKey));
-
-        apiKeyService.delete(7L);
-
-        assertThat(captureSavedEvent().getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(apiKeyRepository.findById(apiKeyId)).isEmpty();
+        assertThat(findSingleEvent().getPlatform()).isEqualTo(PlatformType.EMBEDDED);
     }
 
     @Test
     void testDeleteOfAnUnknownApiKeyHasNoPlatform() {
-        apiKeyService.delete(7L);
+        apiKeyService.delete(UNKNOWN_API_KEY_ID);
 
-        assertThat(captureSavedEvent().getPlatform()).isNull();
+        assertThat(findSingleEvent().getPlatform()).isNull();
     }
 
     @Test
     void testDeleteRecordsTheApiKeyId() {
-        apiKeyService.delete(7L);
+        long apiKeyId = saveApiKey(PlatformType.AUTOMATION);
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        apiKeyService.delete(apiKeyId);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType()).isEqualTo(ApiKeyAuditEvents.API_KEY_DELETED);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("apiKeyId", "7");
+            .containsEntry("apiKeyId", String.valueOf(apiKeyId));
     }
 
     @Test
     void testFailedDeleteRecordsAnErrorAndStillFails() {
+        long apiKeyId = saveApiKey(PlatformType.AUTOMATION);
+
         doThrow(new IllegalStateException("boom")).when(apiKeyRepository)
-            .deleteById(7L);
+            .deleteById(apiKeyId);
 
-        assertThatThrownBy(() -> apiKeyService.delete(7L)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> apiKeyService.delete(apiKeyId)).isInstanceOf(IllegalStateException.class);
 
-        PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+        assertThat(apiKeyRepository.findById(apiKeyId)).isPresent();
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent();
 
         assertThat(persistentAuditEvent.getEventType()).isEqualTo(ApiKeyAuditEvents.API_KEY_DELETED);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "ERROR")
             .containsEntry("errorClass", IllegalStateException.class.getName())
-            .containsEntry("apiKeyId", "7");
+            .containsEntry("apiKeyId", String.valueOf(apiKeyId));
     }
 
     @Test
     void testDeleteWithoutAnAuthenticatedUserIsRecordedUnderSystem() {
+        long apiKeyId = saveApiKey(PlatformType.AUTOMATION);
+
         SecurityContextHolder.clearContext();
 
-        apiKeyService.delete(7L);
+        apiKeyService.delete(apiKeyId);
 
-        assertThat(captureSavedEvent().getPrincipal()).isEqualTo("SYSTEM");
+        assertThat(findSingleEvent().getPrincipal()).isEqualTo("SYSTEM");
     }
 
-    private static ApiKey createApiKey() {
+    private ApiKey createApiKey(PlatformType platformType) {
         ApiKey apiKey = new ApiKey();
 
         apiKey.setName("automation key");
-        apiKey.setType(PlatformType.AUTOMATION);
+        apiKey.setType(platformType);
+        apiKey.setUserId(userId);
 
         return apiKey;
     }
 
-    @SuppressWarnings("unchecked")
-    private PersistentAuditEvent captureSavedEvent() {
-        ArgumentCaptor<List<PersistentAuditEvent>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+    private PersistentAuditEvent findSingleEvent() {
+        Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
+            AuditEventFilter.empty(), PageRequest.of(0, 25));
 
-        verify(auditEventService).saveAll(argumentCaptor.capture());
-
-        List<PersistentAuditEvent> persistentAuditEvents = argumentCaptor.getValue();
+        List<PersistentAuditEvent> persistentAuditEvents = page.getContent();
 
         assertThat(persistentAuditEvents).hasSize(1);
 
         return persistentAuditEvents.getFirst();
     }
 
-    @SpringBootConfiguration
-    @EnableAspectJAutoProxy
-    @Import({
-        ApiKeyAuditMapper.class, ApiKeyServiceImpl.class, AuditAspect.class, AuditCaptureAspect.class,
-        AuditMapperResolver.class
-    })
-    static class Config {
+    private long insertUser() {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO "user"
+                        (login, password_hash, email, activated, uuid, created_by, created_date, last_modified_by,
+                         last_modified_date)
+                    VALUES ('api-key-audit', 'n/a', 'api-key-audit@example.com', true, gen_random_uuid(), 'test',
+                        now(), 'test', now())
+                    RETURNING id
+                    """,
+                Long.class),
+            "user id");
+    }
 
-        @Bean
-        ApiKeyRepository apiKeyRepository() {
-            return mock(ApiKeyRepository.class);
-        }
+    private long saveApiKey(PlatformType platformType) {
+        ApiKey apiKey = createApiKey(platformType);
 
-        @Bean
-        AuditEventService auditEventService() {
-            return mock(AuditEventService.class);
-        }
+        apiKey.setSecretKey(String.valueOf(UUID.randomUUID()));
+
+        ApiKey savedApiKey = apiKeyRepository.save(apiKey);
+
+        return Objects.requireNonNull(savedApiKey.getId());
     }
 }
