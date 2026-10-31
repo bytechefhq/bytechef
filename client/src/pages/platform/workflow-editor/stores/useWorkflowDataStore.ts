@@ -37,6 +37,8 @@ interface WorkflowDataStateI {
     savedPositionCrossAxisShift: number;
     setSavedPositionCrossAxisShift: (shift: number) => void;
 
+    isBorrowedByReadOnlyCanvas: boolean;
+
     isWorkflowLoaded: boolean;
     setIsWorkflowLoaded: (loaded: boolean) => void;
 
@@ -225,6 +227,8 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                 savedPositionCrossAxisShift: 0,
                 setSavedPositionCrossAxisShift: (shift) => set({savedPositionCrossAxisShift: shift}),
 
+                isBorrowedByReadOnlyCanvas: false,
+
                 isWorkflowLoaded: false,
                 setIsWorkflowLoaded: (loaded) => set({isWorkflowLoaded: loaded}),
 
@@ -251,6 +255,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                         dataPills: [],
                         sampleOutputs: {},
                         edges: [],
+                        isBorrowedByReadOnlyCanvas: false,
                         isWorkflowLoaded: false,
                         nodes: [],
                         workflow: {
@@ -397,6 +402,8 @@ export function runWithoutHistory(updater: () => void): void {
 
 export function preserveWorkflowDataStore(): () => void {
     const preservedState = useWorkflowDataStore.getState();
+
+    useWorkflowDataStore.setState({isBorrowedByReadOnlyCanvas: true});
 
     return () => {
         runWithoutHistory(() => {
