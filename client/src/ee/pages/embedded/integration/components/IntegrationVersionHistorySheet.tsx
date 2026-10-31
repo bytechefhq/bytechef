@@ -3,8 +3,10 @@ import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/co
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
-import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {VisuallyHidden} from 'radix-ui';
+import {useState} from 'react';
+
+import IntegrationVersionWorkflowChanges from './IntegrationVersionWorkflowChanges';
 
 interface IntegrationVersionHistorySheetProps {
     onClose: () => void;
@@ -13,6 +15,10 @@ interface IntegrationVersionHistorySheetProps {
 
 const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVersionHistorySheetProps) => {
     const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId);
+
+    const [openValues, setOpenValues] = useState<string[]>(
+        integrationVersions && integrationVersions.length > 1 ? [integrationVersions[1]!.version!.toString()] : []
+    );
 
     return (
         <Sheet onOpenChange={() => onClose()} open>
@@ -33,18 +39,13 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
 
                 <div className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg bg-surface-neutral-primary p-3">
                     {integrationVersions && (
-                        <Accordion
-                            defaultValue={
-                                integrationVersions.length > 1 ? [integrationVersions[1]!.version!.toString()] : []
-                            }
-                            type="multiple"
-                        >
+                        <Accordion onValueChange={setOpenValues} type="multiple" value={openValues}>
                             {integrationVersions.map((integrationVersion) => (
                                 <AccordionItem
                                     key={integrationVersion.version}
                                     value={integrationVersion.version?.toString() || ''}
                                 >
-                                    <AccordionTrigger disabled={integrationVersion.status === ProjectStatus.Draft}>
+                                    <AccordionTrigger>
                                         <div className="flex w-full items-center justify-between pr-2">
                                             <span className="text-sm font-semibold">{`V${integrationVersion.version}`}</span>
 
@@ -70,9 +71,18 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                                     </AccordionTrigger>
 
                                     <AccordionContent className="text-muted-foreground">
-                                        {integrationVersion.description
-                                            ? integrationVersion.description
-                                            : 'No description.'}
+                                        <p>
+                                            {integrationVersion.description
+                                                ? integrationVersion.description
+                                                : 'No description.'}
+                                        </p>
+
+                                        <IntegrationVersionWorkflowChanges
+                                            draft={integrationVersion.status === IntegrationStatus.Draft}
+                                            expanded={openValues.includes(integrationVersion.version?.toString() || '')}
+                                            integrationId={integrationId}
+                                            integrationVersion={integrationVersion.version!}
+                                        />
                                     </AccordionContent>
                                 </AccordionItem>
                             ))}

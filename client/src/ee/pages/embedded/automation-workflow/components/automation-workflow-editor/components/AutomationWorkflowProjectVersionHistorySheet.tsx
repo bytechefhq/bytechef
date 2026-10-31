@@ -3,6 +3,9 @@ import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/co
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {useAutomationWorkflowProjectVersionsQuery} from '@/shared/middleware/graphql';
 import {VisuallyHidden} from 'radix-ui';
+import {useState} from 'react';
+
+import AutomationWorkflowProjectVersionWorkflowChanges from './AutomationWorkflowProjectVersionWorkflowChanges';
 
 interface AutomationWorkflowProjectVersionHistorySheetPropsI {
     onClose: () => void;
@@ -18,6 +21,10 @@ const AutomationWorkflowProjectVersionHistorySheet = ({
     const {data: versions} = useAutomationWorkflowProjectVersionsQuery({id: projectId}, {enabled: open});
 
     const projectVersions = versions?.automationWorkflowProjectVersions ?? [];
+
+    const [openValues, setOpenValues] = useState<string[]>(
+        projectVersions.length > 1 ? [projectVersions[1]!.version.toString()] : []
+    );
 
     return (
         <Sheet onOpenChange={(value) => !value && onClose()} open={open}>
@@ -37,13 +44,10 @@ const AutomationWorkflowProjectVersionHistorySheet = ({
                 </header>
 
                 <div className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg bg-surface-neutral-primary p-3">
-                    <Accordion
-                        defaultValue={projectVersions.length > 1 ? [projectVersions[1]!.version.toString()] : []}
-                        type="multiple"
-                    >
+                    <Accordion onValueChange={setOpenValues} type="multiple" value={openValues}>
                         {projectVersions.map((projectVersion) => (
                             <AccordionItem key={projectVersion.version} value={projectVersion.version.toString()}>
-                                <AccordionTrigger disabled={projectVersion.status === 'DRAFT'}>
+                                <AccordionTrigger>
                                     <div className="flex w-full items-center justify-between pr-2">
                                         <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>
 
@@ -69,15 +73,24 @@ const AutomationWorkflowProjectVersionHistorySheet = ({
                                 </AccordionTrigger>
 
                                 <AccordionContent className="text-muted-foreground">
-                                    {projectVersion.description
-                                        ? projectVersion.description.split('\n').map((line, index) => (
-                                              <span key={index}>
-                                                  {line}
+                                    <p>
+                                        {projectVersion.description
+                                            ? projectVersion.description.split('\n').map((line, index) => (
+                                                  <span key={index}>
+                                                      {line}
 
-                                                  <br />
-                                              </span>
-                                          ))
-                                        : 'No description.'}
+                                                      <br />
+                                                  </span>
+                                              ))
+                                            : 'No description.'}
+                                    </p>
+
+                                    <AutomationWorkflowProjectVersionWorkflowChanges
+                                        draft={projectVersion.status === 'DRAFT'}
+                                        expanded={openValues.includes(projectVersion.version.toString())}
+                                        projectId={projectId}
+                                        projectVersion={projectVersion.version}
+                                    />
                                 </AccordionContent>
                             </AccordionItem>
                         ))}
