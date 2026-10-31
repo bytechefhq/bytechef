@@ -134,6 +134,16 @@ class ClusterElementCallObservingToolCallbackTest {
     }
 
     @Test
+    void testFailedToolCallClaimsItsException() {
+        IllegalStateException exception = new IllegalStateException("boom");
+
+        when(delegate.call("{}")).thenThrow(exception);
+
+        assertThatThrownBy(() -> createToolCallback(null).call("{}")).isSameAs(exception);
+        assertThat(recorder.claimFailure(10, exception)).isFalse();
+    }
+
+    @Test
     void testSuspensionFailureIsRecordedAsFailed() {
         ToolSuspensionException exception = new ToolSuspensionException(
             "The approval request could not be sent: boom", new RuntimeException("boom"));

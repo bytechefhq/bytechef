@@ -70,6 +70,32 @@ public final class MaskEntityMapUtils {
         return Pattern.compile(regex.toString(), Pattern.UNICODE_CHARACTER_CLASS);
     }
 
+    public static int countMatches(String text, Map<String, List<String>> entities) {
+        if (text == null || text.isEmpty() || entities == null || entities.isEmpty()) {
+            return 0;
+        }
+
+        List<Span> spans = new ArrayList<>();
+        Map<String, Pattern> patternCache = new HashMap<>();
+        CharSequence bounded = RegexParserUtils.bounded(text);
+
+        for (Map.Entry<String, List<String>> entry : entities.entrySet()) {
+            List<String> values = entry.getValue();
+
+            if (values == null) {
+                continue;
+            }
+
+            for (String value : values) {
+                if (value != null && !value.isEmpty()) {
+                    addSpans(spans, patternCache, bounded, value, entry.getKey());
+                }
+            }
+        }
+
+        return deduplicateOverlaps(spans).size();
+    }
+
     public void merge(Map<String, List<String>> additions) {
         if (additions == null || additions.isEmpty()) {
             return;
@@ -149,12 +175,7 @@ public final class MaskEntityMapUtils {
         CharSequence bounded = RegexParserUtils.bounded(text);
 
         for (Pair pair : pairs) {
-            Pattern pattern = patternCache.computeIfAbsent(pair.value(), MaskEntityMapUtils::boundaryAwarePattern);
-            Matcher matcher = pattern.matcher(bounded);
-
-            while (matcher.find()) {
-                spans.add(new Span(matcher.start(), matcher.end(), pair.type()));
-            }
+            addSpans(spans, patternCache, bounded, pair.value(), pair.type());
         }
 
         if (spans.isEmpty()) {
@@ -182,6 +203,17 @@ public final class MaskEntityMapUtils {
 
     private void warn(String format, Object... args) {
         context.log(contextLog -> contextLog.warn(format, args));
+    }
+
+    private static void addSpans(
+        List<Span> spans, Map<String, Pattern> patternCache, CharSequence text, String value, String type) {
+
+        Pattern pattern = patternCache.computeIfAbsent(value, MaskEntityMapUtils::boundaryAwarePattern);
+        Matcher matcher = pattern.matcher(text);
+
+        while (matcher.find()) {
+            spans.add(new Span(matcher.start(), matcher.end(), type));
+        }
     }
 
     private static List<Span> deduplicateOverlaps(List<Span> spans) {

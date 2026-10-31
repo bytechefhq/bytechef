@@ -10,8 +10,10 @@ import {
 import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import getClusterRootOutcome from '../utils/getClusterRootOutcome';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
 import ClusterFrameShell from './ClusterFrameShell';
+import ClusterRootOutcomeBadge from './ClusterRootOutcomeBadge';
 import ClusterSlotHandles from './ClusterSlotHandles';
 import DisabledNodeBadge from './DisabledNodeBadge';
 import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
@@ -37,6 +39,14 @@ const ReadOnlyClusterRootNode = ({data, id}: {data: NodeDataType; id: string}) =
         [clusterRootComponentDefinition, data.clusterElementName, data.clusterElementType, data.operationName]
     );
 
+    const clusterRootOutcome = useMemo(
+        () =>
+            data.clusterElements && !Array.isArray(data.clusterElements)
+                ? getClusterRootOutcome(data.clusterElements, workflowTestNodeStates)
+                : undefined,
+        [data.clusterElements, workflowTestNodeStates]
+    );
+
     const nodeWidth = calculateNodeWidth(clusterElementTypeNames.length);
 
     return (
@@ -50,6 +60,8 @@ const ReadOnlyClusterRootNode = ({data, id}: {data: NodeDataType; id: string}) =
                 style={{width: `${nodeWidth}px`}}
             >
                 {testNodeState && <WorkflowTestNodeStatus durationPlacement="top" testNodeState={testNodeState} />}
+
+                {clusterRootOutcome && <ClusterRootOutcomeBadge outcome={clusterRootOutcome} />}
 
                 {data.icon ? data.icon : <ComponentIcon className="size-9 text-content-neutral-primary" />}
 

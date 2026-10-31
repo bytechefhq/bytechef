@@ -6,9 +6,12 @@ import {
     TriggerExecution,
 } from '@/shared/middleware/platform/workflow/execution';
 
+export type ClusterElementCallOutcomeType = 'BLOCKED' | 'REDACTED' | 'WITHHELD';
+
 export interface ClusterElementCallTaskExecutionI extends TaskExecution {
     clusterElementCallId: string;
     clusterElementCallNote?: string;
+    clusterElementCallOutcome?: ClusterElementCallOutcomeType;
     parentTaskExecutionId: string;
 }
 
@@ -27,12 +30,20 @@ const parseValue = (value?: string) => {
     }
 };
 
+const OUTCOME_BY_STATUS: Partial<Record<ClusterElementCallRecordStatusEnum, ClusterElementCallOutcomeType>> = {
+    [ClusterElementCallRecordStatusEnum.Blocked]: 'BLOCKED',
+    [ClusterElementCallRecordStatusEnum.Redacted]: 'REDACTED',
+    [ClusterElementCallRecordStatusEnum.Withheld]: 'WITHHELD',
+};
+
 const getTitle = (record: ClusterElementCallRecord) => record.toolName ?? record.workflowNodeName;
 
 const getCallNumbers = (records: ClusterElementCallRecord[]) => {
     const callCountByTitle = new Map<string | undefined, number>();
 
-    records.forEach((record) => {
+    const numberedRecords = records.filter((record) => OUTCOME_BY_STATUS[record.status] === undefined);
+
+    numberedRecords.forEach((record) => {
         const title = getTitle(record);
 
         callCountByTitle.set(title, (callCountByTitle.get(title) ?? 0) + 1);
@@ -41,7 +52,7 @@ const getCallNumbers = (records: ClusterElementCallRecord[]) => {
     const nextNumberByTitle = new Map<string | undefined, number>();
     const numberByRecordId = new Map<string, number>();
 
-    records
+    numberedRecords
         .map((record, index) => ({index, record}))
         .sort(
             (first, second) =>
@@ -78,7 +89,7 @@ const getNote = (record: ClusterElementCallRecord, taskStatus: TaskExecutionStat
 };
 
 const getStatus = (status: ClusterElementCallRecordStatusEnum): TaskExecutionStatusEnum => {
-    if (status === ClusterElementCallRecordStatusEnum.Completed) {
+    if (status === ClusterElementCallRecordStatusEnum.Completed || OUTCOME_BY_STATUS[status] !== undefined) {
         return TaskExecutionStatusEnum.Completed;
     }
 
@@ -92,6 +103,11 @@ const getStatus = (status: ClusterElementCallRecordStatusEnum): TaskExecutionSta
 export const isClusterElementCallTaskExecution = (
     execution: TaskExecution | TriggerExecution
 ): execution is ClusterElementCallTaskExecutionI => 'clusterElementCallId' in execution;
+
+export const getClusterElementCallOutcome = (
+    execution: TaskExecution | TriggerExecution | undefined
+): ClusterElementCallOutcomeType | undefined =>
+    execution && isClusterElementCallTaskExecution(execution) ? execution.clusterElementCallOutcome : undefined;
 
 export default function toClusterElementCallTaskExecutions(
     taskExecution: TaskExecution
@@ -113,6 +129,7 @@ export default function toClusterElementCallTaskExecutions(
         executionById.set(record.id, {
             clusterElementCallId: record.id,
             clusterElementCallNote: getNote(record, taskExecution.status),
+            clusterElementCallOutcome: OUTCOME_BY_STATUS[record.status],
             endDate: record.endDate,
             error: record.error === undefined ? undefined : {message: record.error},
             icon: `/icons/${record.componentName}.svg`,

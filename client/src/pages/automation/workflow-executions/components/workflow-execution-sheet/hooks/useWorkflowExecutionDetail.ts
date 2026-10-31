@@ -1,6 +1,7 @@
 import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
 import {groupTaskExecutionAttempts} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
+import {getClusterElementCallOutcome} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {
     FocusPathElement,
@@ -156,7 +157,9 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     );
 
     const handleTaskClick = (taskExecution: TaskExecution | TriggerExecution) => {
-        setActiveTab(taskExecution.error ? 'error' : 'output');
+        setActiveTab(
+            taskExecution.error ? 'error' : getClusterElementCallOutcome(taskExecution) ? 'details' : 'output'
+        );
 
         setSelectedItem(taskExecution);
     };

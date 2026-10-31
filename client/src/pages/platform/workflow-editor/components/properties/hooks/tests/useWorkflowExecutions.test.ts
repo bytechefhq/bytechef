@@ -140,4 +140,26 @@ describe('useWorkflowExecutions', () => {
         expect(result.current.selectedExecution?.id).toBe('11');
         expect(result.current.activeTab).toBe('error');
     });
+
+    it('opens the Details tab when an outcome row is clicked', () => {
+        const {result} = renderHook(() =>
+            useWorkflowExecutions({
+                workflowTestExecution: createSnapshot('COMPLETED', [
+                    createTaskExecution('10', 'COMPLETED', {
+                        clusterElementCallRecords: [
+                            {id: 'call-1', status: 'BLOCKED', workflowNodeName: 'checkForViolations_1'},
+                        ],
+                    } as Partial<TaskExecution>),
+                ]),
+            })
+        );
+
+        const [outcomeRow] = toClusterElementCallTaskExecutions(result.current.taskExecutions[0]);
+
+        act(() => {
+            result.current.handleExecutionClick(outcomeRow as TaskExecution);
+        });
+
+        expect(result.current.activeTab).toBe('details');
+    });
 });

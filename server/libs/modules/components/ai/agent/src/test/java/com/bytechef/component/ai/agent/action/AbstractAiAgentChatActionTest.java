@@ -55,6 +55,7 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementFailureAttributingAdvisor;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.SessionConversationHistoryReader;
@@ -345,7 +346,7 @@ class AbstractAiAgentChatActionTest {
             clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
                 eq("sanitizeText"), eq(1), eq("sanitizeText")))
                     .thenReturn(guardrailsFunction);
-        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any()))
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(advisor);
 
         ComponentConnection componentConnection = new ComponentConnection(
@@ -399,7 +400,7 @@ class AbstractAiAgentChatActionTest {
             clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
                 eq("checkForViolations"), eq(1), eq("checkForViolations")))
                     .thenReturn(guardrailsFunction);
-        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any()))
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenThrow(new RuntimeException("simulated guardrail init failure"));
 
         ComponentConnection componentConnection = new ComponentConnection(
@@ -626,7 +627,7 @@ class AbstractAiAgentChatActionTest {
                 .orElseThrow(() -> new AssertionError("ToolCallingAdvisor missing from advisor chain"));
 
             Advisor chatMemoryAdvisor = advisors.stream()
-                .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
+                .filter(AbstractAiAgentChatActionTest::isChatMemoryAdvisor)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
 
@@ -696,7 +697,7 @@ class AbstractAiAgentChatActionTest {
             ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
 
             Advisor chatMemoryAdvisor = advisors.stream()
-                .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
+                .filter(AbstractAiAgentChatActionTest::isChatMemoryAdvisor)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
 
@@ -1046,7 +1047,7 @@ class AbstractAiAgentChatActionTest {
             clusterElementMap, connectionParameters, chatModel, actionContext, chatMemoryResult, null);
 
         Advisor wrappedChatMemoryAdvisor = advisors.stream()
-            .filter(BlankReplySkippingChatMemoryAdvisor.class::isInstance)
+            .filter(AbstractAiAgentChatActionTest::isChatMemoryAdvisor)
             .findFirst()
             .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
 
@@ -1384,6 +1385,11 @@ class AbstractAiAgentChatActionTest {
                 return "echoed";
             }
         };
+    }
+
+    private static boolean isChatMemoryAdvisor(Advisor advisor) {
+        return advisor instanceof BaseChatMemoryAdvisor || advisor instanceof BlankReplySkippingChatMemoryAdvisor ||
+            advisor instanceof ClusterElementFailureAttributingAdvisor;
     }
 
     private static ToolCallingAdvisor findToolCallAdvisor(List<Advisor> advisors) {

@@ -1,6 +1,8 @@
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {getErrorItem, getInitialSelectedItem} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
-import toClusterElementCallTaskExecutions from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
+import toClusterElementCallTaskExecutions, {
+    getClusterElementCallOutcome,
+} from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {TaskExecution as PlatformTaskExecution} from '@/shared/middleware/platform/workflow/execution';
 import {
@@ -169,7 +171,9 @@ const useWorkflowExecutions = ({
     };
 
     const handleExecutionClick = (taskExecution: TaskExecution | TriggerExecution) => {
-        setActiveTab(taskExecution.error ? 'error' : 'output');
+        setActiveTab(
+            taskExecution.error ? 'error' : getClusterElementCallOutcome(taskExecution) ? 'details' : 'output'
+        );
 
         setSelectedExecution(taskExecution);
     };

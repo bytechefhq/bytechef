@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsCons
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VALIDATE_OUTPUT;
 import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsConstants.VIOLATIONS_METADATA_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -236,33 +237,22 @@ class CheckForViolationsAdvisorCriticalFixesTest {
     }
 
     @Test
-    void testStreamUpstreamErrorFailsClosedWithBlockedResponse() {
+    void testStreamUpstreamErrorPropagates() {
         CheckForViolationsAdvisor advisor = CheckForViolationsAdvisor.builder()
             .blockedMessage("BLOCKED")
             .add("noop", (text, context) -> Optional.empty(), null, null, null)
             .context(mock(Context.class))
             .build();
 
+        RuntimeException upstreamError = new RuntimeException("upstream blew up");
         StreamAdvisorChain streamChain = mock(StreamAdvisorChain.class);
-        when(streamChain.nextStream(any())).thenReturn(Flux.error(new RuntimeException("upstream blew up")));
 
-        List<ChatClientResponse> responses = Objects.requireNonNull(
-            advisor.adviseStream(requestWithUser("hello"), streamChain)
-                .collectList()
-                .block(),
-            "responses");
+        when(streamChain.nextStream(any())).thenReturn(Flux.error(upstreamError));
 
-        assertThat(responses).hasSize(1);
+        Flux<ChatClientResponse> stream = advisor.adviseStream(requestWithUser("hello"), streamChain);
 
-        ChatClientResponse blocked = responses.get(0);
-
-        ChatResponse chatResponse = Objects.requireNonNull(blocked.chatResponse(), "chatResponse");
-        Generation result = Objects.requireNonNull(chatResponse.getResult(), "result");
-
-        assertThat(result.getOutput()
-            .getText())
-                .as("upstream stream error converts to a blocked response, never propagating raw error")
-                .isEqualTo("BLOCKED");
+        assertThatThrownBy(() -> stream.collectList()
+            .block()).isSameAs(upstreamError);
     }
 
     @Test

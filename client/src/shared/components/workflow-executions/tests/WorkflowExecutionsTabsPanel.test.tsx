@@ -119,4 +119,40 @@ describe('WorkflowExecutionsTabsPanel', () => {
 
         expect(screen.getByTestId('json-view')).toHaveTextContent('rows');
     });
+
+    describe('cluster element call rows', () => {
+        const outcomeExecution = {
+            ...taskExecution,
+            clusterElementCallId: 'a',
+            clusterElementCallOutcome: 'BLOCKED',
+            id: '10:a',
+            output: {matchCount: 2, side: 'INPUT'},
+            parentTaskExecutionId: '10',
+        } as unknown as TaskExecution;
+
+        it('shows Details instead of Input and Output for an outcome row', () => {
+            renderPanel({activeTab: 'details', job, selectedItem: outcomeExecution});
+
+            expect(screen.getByRole('tab', {name: 'Details'})).toBeInTheDocument();
+            expect(screen.queryByRole('tab', {name: 'Input'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('tab', {name: 'Output'})).not.toBeInTheDocument();
+            expect(screen.getByRole('tab', {name: 'Logs'})).toBeInTheDocument();
+            expect(screen.getByTestId('json-view')).toHaveTextContent('matchCount');
+        });
+
+        it('keeps Input and Output for a tool call row', () => {
+            const toolCallExecution = {
+                ...taskExecution,
+                clusterElementCallId: 'a',
+                id: '10:a',
+                parentTaskExecutionId: '10',
+            } as unknown as TaskExecution;
+
+            renderPanel({activeTab: 'output', job, selectedItem: toolCallExecution});
+
+            expect(screen.getByRole('tab', {name: 'Input'})).toBeInTheDocument();
+            expect(screen.getByRole('tab', {name: 'Output'})).toBeInTheDocument();
+            expect(screen.queryByRole('tab', {name: 'Details'})).not.toBeInTheDocument();
+        });
+    });
 });

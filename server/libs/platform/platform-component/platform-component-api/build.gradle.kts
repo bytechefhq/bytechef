@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
 
+    testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.assertj:assertj-core")
     testImplementation(project(":server:libs:test:test-support"))
 }

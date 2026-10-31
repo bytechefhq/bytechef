@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.utils.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,9 +25,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallEvent;
+import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecord;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
+import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
@@ -39,7 +45,12 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
@@ -111,6 +122,70 @@ class AiAgentUtilsTaskToolTest {
             .containsOnly("httpClient");
     }
 
+    @Test
+    void testSubagentModelFailureIsRecordedOnTheSubagentModelElement() throws Exception {
+        AiAgentToolFacade aiAgentToolFacade = mock(AiAgentToolFacade.class);
+        ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
+
+        ModelFunction modelFunction =
+            (inputParameters, connectionParameters, responseFormatRequired) -> new FailingChatModel();
+
+        when(clusterElementDefinitionService.<ModelFunction>getClusterElement(eq("openAi"), eq(1), eq("model")))
+            .thenReturn(modelFunction);
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getJobId()).thenReturn(63336L);
+        when(actionContext.getTaskExecutionId()).thenReturn(633361L);
+
+        Map<String, Object> subagentElementMap = Map.of(
+            "name", "subagent_1", "type", "aiAgentUtils/v1/subagentTool", "parameters",
+            Map.of("subagentName", "Analyst", "description", "Analyses things", "instructions", "Analyse carefully"),
+            "clusterElements",
+            Map.of("model", Map.of("name", "openAi_3", "type", "openAi/v1/model", "parameters", Map.of())));
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of("clusterElements", Map.of("subagent", List.of(subagentElementMap))));
+
+        AiAgentUtilsTaskTool aiAgentUtilsTaskTool = new AiAgentUtilsTaskTool(
+            aiAgentToolFacade, clusterElementDefinitionService);
+
+        MultipleConnectionsToolCallbackProviderFunction toolCallbackProviderFunction =
+            aiAgentUtilsTaskTool.clusterElementDefinition.getElement();
+
+        ToolCallbackProvider toolCallbackProvider = toolCallbackProviderFunction.apply(
+            MockParametersFactory.create(Map.of()), MockParametersFactory.create(Map.of()), extensions, Map.of(),
+            actionContext);
+
+        ToolCallback taskToolCallback = toolCallbackProvider.getToolCallbacks()[0];
+
+        assertThatThrownBy(() -> taskToolCallback.call(
+            "{\"description\":\"Analyse\",\"prompt\":\"Analyse the thing\",\"subagent_type\":\"Analyst\"}"))
+                .hasMessageContaining("model unavailable");
+
+        List<ClusterElementCallRecord> records = ClusterElementCallRecorder.getInstance()
+            .drain(633361L)
+            .records();
+
+        ClusterElementCallRecord taskCallRecord = records.stream()
+            .filter(callRecord -> "subagent_1".equals(callRecord.workflowNodeName()))
+            .findFirst()
+            .orElseThrow();
+
+        List<ClusterElementCallRecord> modelRecords = records.stream()
+            .filter(callRecord -> "openAi_3".equals(callRecord.workflowNodeName()))
+            .toList();
+
+        assertThat(taskCallRecord.status()).isEqualTo(ClusterElementCallRecord.Status.FAILED);
+        assertThat(modelRecords).hasSize(1);
+        assertThat(modelRecords.getFirst()
+            .status()).isEqualTo(ClusterElementCallRecord.Status.FAILED);
+        assertThat(modelRecords.getFirst()
+            .componentName()).isEqualTo("openAi");
+        assertThat(modelRecords.getFirst()
+            .parentId()).isEqualTo(taskCallRecord.id());
+    }
+
     private static ToolCallback namedToolCallback(String toolName) {
         return new ToolCallback() {
 
@@ -128,5 +203,19 @@ class AiAgentUtilsTaskToolTest {
                 return "called";
             }
         };
+    }
+
+    private static final class FailingChatModel implements ChatModel {
+
+        @Override
+        public ChatResponse call(Prompt prompt) {
+            throw new IllegalStateException("model unavailable");
+        }
+
+        @Override
+        public ChatOptions getDefaultOptions() {
+            return ChatOptions.builder()
+                .build();
+        }
     }
 }

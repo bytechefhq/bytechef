@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementCall", description = "The outcome of the calls a task made to one of its cluster elements.")
 @JsonTypeName("ClusterElementCall")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-30T10:43:50.550870+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-30T11:10:54.162712+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ClusterElementCallModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -39,14 +39,20 @@ public class ClusterElementCallModel {
   private OffsetDateTime startDate;
 
   /**
-   * FAILED if any call failed, otherwise the state of the latest call.
+   * FAILED if any call failed; BLOCKED or WITHHELD once a guardrail reported it; otherwise the state of the latest call.
    */
   public enum StatusEnum {
     STARTED("STARTED"),
     
     COMPLETED("COMPLETED"),
     
-    FAILED("FAILED");
+    FAILED("FAILED"),
+    
+    BLOCKED("BLOCKED"),
+    
+    REDACTED("REDACTED"),
+    
+    WITHHELD("WITHHELD");
 
     private final String value;
 
@@ -180,11 +186,11 @@ public class ClusterElementCallModel {
   }
 
   /**
-   * FAILED if any call failed, otherwise the state of the latest call.
+   * FAILED if any call failed; BLOCKED or WITHHELD once a guardrail reported it; otherwise the state of the latest call.
    * @return status
    */
   @NotNull 
-  @Schema(name = "status", description = "FAILED if any call failed, otherwise the state of the latest call.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "status", description = "FAILED if any call failed; BLOCKED or WITHHELD once a guardrail reported it; otherwise the state of the latest call.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("status")
   public StatusEnum getStatus() {
     return status;

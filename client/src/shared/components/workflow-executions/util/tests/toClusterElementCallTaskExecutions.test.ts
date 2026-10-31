@@ -6,6 +6,7 @@ import {
 import {describe, expect, it} from 'vitest';
 
 import toClusterElementCallTaskExecutions, {
+    getClusterElementCallOutcome,
     isClusterElementCallTaskExecution,
 } from '../toClusterElementCallTaskExecutions';
 
@@ -127,5 +128,58 @@ describe('toClusterElementCallTaskExecutions', () => {
     it('returns no rows for a task execution without call records', () => {
         expect(toClusterElementCallTaskExecutions(createTaskExecution())).toEqual([]);
         expect(toClusterElementCallTaskExecutions(createTaskExecution([]))).toEqual([]);
+    });
+
+    it('maps a blocked record to a completed row with a BLOCKED outcome and parsed details', () => {
+        const [execution] = toClusterElementCallTaskExecutions(
+            createTaskExecution([
+                createRecord({
+                    id: 'b',
+                    output: '{"side":"INPUT","matchCount":2,"confidenceScore":0.9}',
+                    status: ClusterElementCallRecordStatusEnum.Blocked,
+                }),
+            ])
+        );
+
+        expect(execution.status).toBe('COMPLETED');
+        expect(execution.clusterElementCallOutcome).toBe('BLOCKED');
+        expect(execution.output).toEqual({confidenceScore: 0.9, matchCount: 2, side: 'INPUT'});
+    });
+
+    it('nests a blocked check under its frame row', () => {
+        const [frame] = toClusterElementCallTaskExecutions(
+            createTaskExecution([
+                createRecord({id: 'frame'}),
+                createRecord({id: 'check', parentId: 'frame', status: ClusterElementCallRecordStatusEnum.Blocked}),
+            ])
+        );
+
+        expect(frame.children?.map((child) => child.id)).toEqual(['check']);
+        expect(getClusterElementCallOutcome(frame.children?.[0])).toBe('BLOCKED');
+    });
+
+    it('gives an outcome row no note', () => {
+        const [redacted, withheld] = toClusterElementCallTaskExecutions(
+            createTaskExecution([
+                createRecord({id: 'r', status: ClusterElementCallRecordStatusEnum.Redacted}),
+                createRecord({id: 'w', status: ClusterElementCallRecordStatusEnum.Withheld}),
+            ])
+        );
+
+        expect(redacted.clusterElementCallNote).toBeUndefined();
+        expect(redacted.clusterElementCallOutcome).toBe('REDACTED');
+        expect(withheld.clusterElementCallNote).toBeUndefined();
+        expect(withheld.clusterElementCallOutcome).toBe('WITHHELD');
+    });
+
+    it('does not number outcome rows that share a title', () => {
+        const executions = toClusterElementCallTaskExecutions(
+            createTaskExecution([
+                createRecord({id: 'a', status: ClusterElementCallRecordStatusEnum.Blocked, toolName: 'check'}),
+                createRecord({id: 'b', status: ClusterElementCallRecordStatusEnum.Blocked, toolName: 'check'}),
+            ])
+        );
+
+        expect(executions.map((execution) => execution.title)).toEqual(['check', 'check']);
     });
 });

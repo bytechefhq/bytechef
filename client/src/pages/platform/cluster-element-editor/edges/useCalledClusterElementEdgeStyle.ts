@@ -24,7 +24,9 @@ export default function useCalledClusterElementEdgeStyle(
         'fill-none stroke-stroke-neutral-tertiary stroke-2',
         status === 'RUNNING' && styles.runningPath,
         status === 'COMPLETED' && 'stroke-green-500',
-        status === 'FAILED' && 'stroke-red-500'
+        status === 'FAILED' && 'stroke-red-500',
+        (status === 'BLOCKED' || status === 'WITHHELD') && 'stroke-amber-500',
+        status === 'REDACTED' && 'stroke-sky-500'
     );
 
     if (!status || !style) {

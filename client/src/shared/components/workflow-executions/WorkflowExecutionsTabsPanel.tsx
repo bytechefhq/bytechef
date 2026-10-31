@@ -14,7 +14,7 @@ import {
 import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
-import {AlertCircleIcon, ExpandIcon, ScrollTextIcon, SquarePenIcon} from 'lucide-react';
+import {AlertCircleIcon, ExpandIcon, ListIcon, ScrollTextIcon, SquarePenIcon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -82,6 +82,8 @@ const WorkflowExecutionsTabsPanel = ({
         selectedItem && isClusterElementCallTaskExecution(selectedItem as TaskExecution)
             ? (selectedItem as ClusterElementCallTaskExecutionI)
             : undefined;
+
+    const hasOutcome = callExecution?.clusterElementCallOutcome !== undefined;
 
     const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
 
@@ -179,9 +181,19 @@ const WorkflowExecutionsTabsPanel = ({
 
             <div className="flex items-center justify-between px-3">
                 <TabsList>
-                    <TabsTrigger value="input">Input</TabsTrigger>
+                    {hasOutcome ? (
+                        <TabsTrigger className="flex items-center gap-x-1" value="details">
+                            <ListIcon className="size-4" />
 
-                    <TabsTrigger value="output">Output</TabsTrigger>
+                            <span>Details</span>
+                        </TabsTrigger>
+                    ) : (
+                        <>
+                            <TabsTrigger value="input">Input</TabsTrigger>
+
+                            <TabsTrigger value="output">Output</TabsTrigger>
+                        </>
+                    )}
 
                     {selectedItem?.error && (
                         <TabsTrigger className="flex items-center gap-x-1" value="error">
@@ -276,6 +288,10 @@ const WorkflowExecutionsTabsPanel = ({
                                 <span className="text-sm text-muted-foreground">No output data</span>
                             </div>
                         )}
+                    </TabsContent>
+
+                    <TabsContent className="p-3" value="details">
+                        <WorkflowExecutionContent output={callExecution?.output} />
                     </TabsContent>
 
                     <TabsContent className="p-3" value="error">
