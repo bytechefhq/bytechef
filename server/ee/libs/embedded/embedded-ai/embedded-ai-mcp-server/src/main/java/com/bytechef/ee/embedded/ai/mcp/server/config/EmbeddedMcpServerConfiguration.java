@@ -14,6 +14,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer.EmbeddedMcpServerSecurityConfigurer;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -106,7 +107,7 @@ public class EmbeddedMcpServerConfiguration {
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
         JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
-        McpComponentService mcpComponentService,
+        McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
@@ -117,7 +118,7 @@ public class EmbeddedMcpServerConfiguration {
             connectedUserService, evaluator, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationInstanceService,
             integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
-            mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+            mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
             mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade,
             applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage, workflowService);
     }
