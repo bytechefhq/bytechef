@@ -9,11 +9,15 @@ package com.bytechef.ee.platform.audit.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
+import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.LocalDateTime;
@@ -35,6 +39,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @version ee
@@ -50,6 +55,9 @@ class AuditEventFacadeIntTest {
 
     @Autowired
     private AuditEventFacade auditEventFacade;
+
+    @MockitoSpyBean
+    private AuditEventService auditEventService;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
@@ -72,6 +80,8 @@ class AuditEventFacadeIntTest {
 
         assertThatThrownBy(() -> auditEventFacade.fetchEventTypes())
             .isInstanceOf(AccessDeniedException.class);
+
+        verify(auditEventService, never()).fetchEventTypes();
     }
 
     @Test
@@ -80,6 +90,8 @@ class AuditEventFacadeIntTest {
 
         assertThatThrownBy(() -> auditEventFacade.fetchAuditEvents(AuditEventFilter.empty(), PageRequest.of(0, 25)))
             .isInstanceOf(AccessDeniedException.class);
+
+        verify(auditEventService, never()).fetchAuditEvents(any(), any());
     }
 
     @Test
