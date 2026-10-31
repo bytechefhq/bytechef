@@ -524,13 +524,17 @@ public class UserServiceImpl implements UserService {
                 user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
-                user.setAuthorities(
-                    userDTO.getAuthorities()
-                        .stream()
-                        .map(authorityRepository::findByName)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toSet()));
+
+                Set<String> authorityNames = userDTO.getAuthorities();
+
+                if (authorityNames != null) {
+                    user.setAuthorities(
+                        authorityNames.stream()
+                            .map(authorityRepository::findByName)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toSet()));
+                }
 
                 user = userRepository.save(user);
 
