@@ -97,8 +97,11 @@ public record ClusterElementCallRecord(
     }
 
     public ClusterElementCallRecord withoutValues() {
+        boolean outcome = status == Status.BLOCKED || status == Status.REDACTED || status == Status.WITHHELD;
+
         return new ClusterElementCallRecord(
-            id, parentId, workflowNodeName, componentName, toolName, status, startDate, endDate, null, null, error);
+            id, parentId, workflowNodeName, componentName, toolName, status, startDate, endDate, null,
+            outcome ? output : null, error);
     }
 
     private static ClusterElementCallRecord mergeRecord(

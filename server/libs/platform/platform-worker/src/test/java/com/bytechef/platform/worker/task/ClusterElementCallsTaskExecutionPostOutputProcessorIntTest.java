@@ -185,6 +185,29 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
     }
 
     @Test
+    void testKeepsAnOutcomesDetailsOnItsStoredRecord() {
+        TaskExecution taskExecution = createTaskExecution("recordRedactedOutcome/v1");
+
+        testTaskHandlerRegistry.register("recordRedactedOutcome/v1", clonedTaskExecution -> {
+            recorder.recordOutcome(
+                Objects.requireNonNull(clonedTaskExecution.getJobId()),
+                Objects.requireNonNull(clonedTaskExecution.getId()), "sanitizeText_1", "aiAgentGuardrails", null,
+                ClusterElementCallRecord.Status.REDACTED, "{\"maskCount\":2,\"side\":\"input\"}", null);
+
+            return "output";
+        });
+
+        List<ClusterElementCallRecord> records = getRecords(execute(taskExecution));
+
+        assertEquals(1, records.size());
+
+        ClusterElementCallRecord record = records.get(0);
+
+        assertEquals(ClusterElementCallRecord.Status.REDACTED, record.status());
+        assertEquals("{\"maskCount\":2,\"side\":\"input\"}", record.output());
+    }
+
+    @Test
     void testMergesWithExistingMetadata() {
         TaskExecution taskExecution = createTaskExecution("recordCompletedCall/v1");
 
