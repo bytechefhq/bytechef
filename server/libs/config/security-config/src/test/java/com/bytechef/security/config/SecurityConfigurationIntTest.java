@@ -16,16 +16,33 @@
 
 package com.bytechef.security.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
+import com.bytechef.platform.user.domain.PersistentToken;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.PersistentTokenService;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.rememberme.PersistentTokenRememberMeServices;
+import com.bytechef.tenant.service.TenantService;
+import jakarta.servlet.http.Cookie;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,7 +52,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -270,6 +293,169 @@ class SecurityConfigurationIntTest {
                     return "workflow-builder";
                 }
             }
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @AutoConfigureMockMvc
+    @EnableConfigurationProperties(ApplicationProperties.class)
+    @SpringBootTest(
+        classes = {
+            SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class,
+            RememberMeAutoLogin.RememberMeAutoLoginConfiguration.class
+        })
+    class RememberMeAutoLogin {
+
+        private static final String COOKIE_TENANT_ID = "000003";
+        private static final String FIRST_TENANT_ID = "000002";
+        private static final String SERIES = "series";
+        private static final String TOKEN_VALUE = "token-value";
+
+        @MockitoBean
+        private AuthenticationFailureHandler authenticationFailureHandler;
+
+        @MockitoBean
+        private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+        @Autowired
+        private AuthenticationSuccessEventRecorder authenticationSuccessEventRecorder;
+
+        @MockitoBean(name = "corsConfigurationSource")
+        private CorsConfigurationSource corsConfigurationSource;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockitoBean
+        private PasswordEncoder passwordEncoder;
+
+        @MockitoBean
+        private PersistentTokenService persistentTokenService;
+
+        @MockitoBean
+        private TenantService tenantService;
+
+        @MockitoBean
+        private UserDetailsService userDetailsService;
+
+        @MockitoBean
+        private UserService userService;
+
+        @Test
+        void testRememberMeAutoLoginAuthenticationSuccessEventCarriesTheCookieTenant() throws Exception {
+            User user = new User();
+
+            user.setId(1L);
+            user.setLogin("jane");
+
+            PersistentToken persistentToken = new PersistentToken();
+
+            persistentToken.setSeries(SERIES);
+            persistentToken.setTokenDate(LocalDate.now());
+            persistentToken.setTokenValue(TOKEN_VALUE);
+            persistentToken.setUser(user);
+
+            when(tenantService.isMultiTenantEnabled()).thenReturn(true);
+            when(tenantService.getTenantIdsByUserLogin("jane")).thenReturn(List.of(FIRST_TENANT_ID));
+            when(persistentTokenService.fetchPersistentToken(SERIES)).thenReturn(Optional.of(persistentToken));
+            when(userService.getUser(1L)).thenReturn(user);
+            when(userDetailsService.loadUserByUsername("jane"))
+                .thenReturn(
+                    new org.springframework.security.core.userdetails.User(
+                        "jane", "", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            authenticationSuccessEventRecorder.clear();
+
+            mockMvc.perform(
+                get("/api/remember-me-probe")
+                    .cookie(new Cookie("remember-me", encodeCookie(SERIES, TOKEN_VALUE, COOKIE_TENANT_ID)))
+                    .header("User-Agent", "Test agent"))
+                .andExpect(status().isOk());
+
+            Authentication authentication = authenticationSuccessEventRecorder.getAuthentication();
+
+            assertThat(authentication).isInstanceOf(RememberMeAuthenticationToken.class);
+            assertThat(authentication.getName()).isEqualTo("jane");
+            assertThat(authentication.getDetails())
+                .isInstanceOfSatisfying(
+                    TenantWebAuthenticationDetails.class,
+                    details -> assertThat(details.getTenantId()).isEqualTo(COOKIE_TENANT_ID));
+        }
+
+        private static String encodeCookie(String... cookieTokens) {
+            List<String> encodedCookieTokens = Arrays.stream(cookieTokens)
+                .map(cookieToken -> URLEncoder.encode(cookieToken, StandardCharsets.UTF_8))
+                .toList();
+
+            Base64.Encoder encoder = Base64.getEncoder();
+
+            return encoder.encodeToString(
+                String.join(":", encodedCookieTokens)
+                    .getBytes(StandardCharsets.UTF_8));
+        }
+
+        @TestConfiguration
+        static class RememberMeAutoLoginConfiguration {
+
+            @Bean
+            AuthenticationSuccessEventRecorder authenticationSuccessEventRecorder() {
+                return new AuthenticationSuccessEventRecorder();
+            }
+
+            @Bean
+            List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors() {
+                return List.of();
+            }
+
+            @Bean
+            RememberMeServices rememberMeServices(
+                RememberMeKey rememberMeKey, UserDetailsService userDetailsService,
+                PersistentTokenService persistentTokenService, TenantService tenantService) {
+
+                return new PersistentTokenRememberMeServices(
+                    rememberMeKey, userDetailsService, persistentTokenService, tenantService);
+            }
+
+            @Bean
+            List<SecurityConfigurerContributor> securityConfigurerContributors() {
+                return List.of();
+            }
+
+            @Bean
+            List<SpaWebFilterContributor> spaWebFilterContributors() {
+                return List.of();
+            }
+
+            @RestController
+            static class RememberMeProbeController {
+
+                @GetMapping("/api/remember-me-probe")
+                String rememberMeProbe() {
+                    return "ok";
+                }
+            }
+        }
+    }
+
+    static class AuthenticationSuccessEventRecorder implements ApplicationListener<AuthenticationSuccessEvent> {
+
+        private final List<AuthenticationSuccessEvent> authenticationSuccessEvents = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void onApplicationEvent(AuthenticationSuccessEvent authenticationSuccessEvent) {
+            authenticationSuccessEvents.add(authenticationSuccessEvent);
+        }
+
+        void clear() {
+            authenticationSuccessEvents.clear();
+        }
+
+        Authentication getAuthentication() {
+            return authenticationSuccessEvents.stream()
+                .map(AuthenticationSuccessEvent::getAuthentication)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No AuthenticationSuccessEvent was published"));
         }
     }
 }

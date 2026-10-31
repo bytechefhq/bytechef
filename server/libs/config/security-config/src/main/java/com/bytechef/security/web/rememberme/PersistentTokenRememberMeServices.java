@@ -17,6 +17,7 @@
 package com.bytechef.security.web.rememberme;
 
 import com.bytechef.commons.util.RandomUtils;
+import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.PersistentTokenService;
@@ -41,6 +42,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -84,6 +86,8 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     private static final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
 
+    private static final String AUTO_LOGIN_TENANT_ID_ATTRIBUTE =
+        PersistentTokenRememberMeServices.class.getName() + ".AUTO_LOGIN_TENANT_ID";
     private static final String ISSUED_TOKEN_ATTRIBUTE =
         PersistentTokenRememberMeServices.class.getName() + ".ISSUED_TOKEN";
     private static final ReentrantLock LOCK = new ReentrantLock();
@@ -171,10 +175,25 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
             session.setAttribute(TenantConstants.CURRENT_TENANT_ID, tenantId);
 
+            request.setAttribute(AUTO_LOGIN_TENANT_ID_ATTRIBUTE, tenantId);
+
             return getUserDetailsService().loadUserByUsername(login);
         } finally {
             LOCK.unlock();
         }
+    }
+
+    @Override
+    protected Authentication createSuccessfulAuthentication(HttpServletRequest request, UserDetails user) {
+        Authentication authentication = super.createSuccessfulAuthentication(request, user);
+
+        if (authentication instanceof AbstractAuthenticationToken abstractAuthenticationToken &&
+            request.getAttribute(AUTO_LOGIN_TENANT_ID_ATTRIBUTE) instanceof String tenantId) {
+
+            abstractAuthenticationToken.setDetails(new TenantWebAuthenticationDetails(request, tenantId));
+        }
+
+        return authentication;
     }
 
     @Override
