@@ -44,6 +44,9 @@ class WorkflowEditFacadeAuthorizationTest {
             + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)";
     private static final String IN_REQUESTED_ENVIRONMENT =
         "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)";
+    private static final String IN_REQUESTED_ENVIRONMENT_WITH_A_VISIBLE_CONNECTION =
+        IN_REQUESTED_ENVIRONMENT + " && " +
+            "hasResourceScopeIfProjectWorkflow(#workflowId, #connectionId, 'Connection', 'CONNECTION_VIEW')";
 
     @ParameterizedTest
     @MethodSource("guardedFacades")
@@ -107,11 +110,11 @@ class WorkflowEditFacadeAuthorizationTest {
                 WorkflowTestConfigurationFacadeImpl.class,
                 Map.of(
                     "deleteWorkflowTestConfigurationConnection", IN_REQUESTED_ENVIRONMENT,
-                    "saveClusterElementTestConfigurationConnection", IN_REQUESTED_ENVIRONMENT,
+                    "saveClusterElementTestConfigurationConnection", IN_REQUESTED_ENVIRONMENT_WITH_A_VISIBLE_CONNECTION,
                     "saveWorkflowTestConfiguration",
                     "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowTestConfiguration.workflowId, "
                         + "'WORKFLOW_EDIT', #workflowTestConfiguration.environmentId)",
-                    "saveWorkflowTestConfigurationConnection", IN_REQUESTED_ENVIRONMENT,
+                    "saveWorkflowTestConfigurationConnection", IN_REQUESTED_ENVIRONMENT_WITH_A_VISIBLE_CONNECTION,
                     "saveWorkflowTestConfigurationInputs", IN_REQUESTED_ENVIRONMENT)));
     }
 }

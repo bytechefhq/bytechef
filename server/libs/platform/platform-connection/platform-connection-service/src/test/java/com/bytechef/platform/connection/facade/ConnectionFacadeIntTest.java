@@ -39,6 +39,7 @@ import com.bytechef.platform.connection.security.ConnectionOwnershipExemption;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -432,7 +433,7 @@ class ConnectionFacadeIntTest {
 
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
-        connectionService.updateCreatedBy(connectionId, "external-user-id");
+        connectionService.reassignOwner(connectionId, "external-user-id");
 
         Assertions.assertThat(connectionRepository.findById(connectionId))
             .hasValueSatisfying(connection -> Assertions.assertThat(connection.getCreatedBy())
@@ -487,6 +488,67 @@ class ConnectionFacadeIntTest {
 
         Assertions.assertThat(connectionRepository.findById(connectionId))
             .isEmpty();
+    }
+
+    @Test
+    void testEveryAdminCanReplaceTheCredentialsOfAnOrganizationConnection() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("admin-a@localhost.com", null, AuthorityConstants.ADMIN));
+
+        long connectionId = connectionFacade.create(connectionDTO(), PlatformType.AUTOMATION);
+
+        setCreatedBy(connectionId, "admin-a@localhost.com");
+        setVisibility(connectionId, ResourceVisibility.ORGANIZATION);
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "member")))
+            .isInstanceOf(AccessDeniedException.class);
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("admin-b@localhost.com", null, AuthorityConstants.ADMIN));
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value"));
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getParameters()
+                .get("key"))
+                .isEqualTo("value"));
+    }
+
+    @Test
+    void testTheReassignedOwnerCanReplaceTheCredentialsAndThePreviousOwnerCannot() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("user@localhost.com", null, AuthorityConstants.USER));
+
+        long connectionId = connectionFacade.create(connectionDTO(), PlatformType.AUTOMATION);
+
+        Connection connection = connectionRepository.findById(connectionId)
+            .orElseThrow();
+
+        connection.reassignOwner("new-owner@localhost.com");
+
+        connectionRepository.save(connection);
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "previous")))
+            .isInstanceOf(AccessDeniedException.class);
+
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("new-owner@localhost.com", null, AuthorityConstants.USER));
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value"));
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .hasValueSatisfying(updatedConnection -> Assertions.assertThat(updatedConnection.getParameters()
+                .get("key"))
+                .isEqualTo("value"));
     }
 
     @Test
@@ -708,6 +770,10 @@ class ConnectionFacadeIntTest {
                 public String getWorkflowUuid(String workflowId) {
                     return "";
                 }
+
+                @Override
+                public void validateConnectionsForJob(long jobPrincipalId, String workflowUuid) {
+                }
             };
         }
 
@@ -722,6 +788,15 @@ class ConnectionFacadeIntTest {
             .orElseThrow();
 
         connection.setCreatedBy(createdBy);
+
+        connectionRepository.save(connection);
+    }
+
+    private void setVisibility(long connectionId, ResourceVisibility visibility) {
+        Connection connection = connectionRepository.findById(connectionId)
+            .orElseThrow();
+
+        connection.setVisibility(visibility);
 
         connectionRepository.save(connection);
     }

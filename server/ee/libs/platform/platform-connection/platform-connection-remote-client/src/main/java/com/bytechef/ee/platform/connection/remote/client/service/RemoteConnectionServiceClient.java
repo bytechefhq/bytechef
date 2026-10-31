@@ -13,6 +13,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public List<Connection> getConnectionsByVisibility(ResourceVisibility visibility, PlatformType type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         throw new UnsupportedOperationException();
     }
@@ -118,7 +124,12 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public Connection updateCreatedBy(long id, String newCreatedBy) {
+    public boolean updateConnectionStatusIfOwnedBy(long connectionId, String ownerLogin, ConnectionStatus status) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection reassignOwner(long id, String newOwnerLogin) {
         throw new UnsupportedOperationException();
     }
 
@@ -129,6 +140,21 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection updateVisibility(long id, ResourceVisibility visibility) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getInactiveConnections(List<Long> connectionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void validateConnectionsActive(long jobPrincipalId, String workflowId, List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 }

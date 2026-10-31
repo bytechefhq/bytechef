@@ -29,6 +29,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -52,20 +53,6 @@ class WorkspaceConnectionFacadeAuthorizationTest {
     private static final long WORKSPACE_ID = 42L;
 
     @Test
-    void testDeleteDeniesWhenTheConnectionDeleteScopeIsRefused() throws Exception {
-        assertResourceGuard(deleteMethod(), new Object[] {
-            CONNECTION_ID
-        }, "CONNECTION_DELETE", false);
-    }
-
-    @Test
-    void testDeleteAllowsWhenTheConnectionDeleteScopeIsGranted() throws Exception {
-        assertResourceGuard(deleteMethod(), new Object[] {
-            CONNECTION_ID
-        }, "CONNECTION_DELETE", true);
-    }
-
-    @Test
     void testGetConnectionDeniesWhenTheConnectionViewScopeIsRefused() throws Exception {
         assertResourceGuard(getConnectionMethod(), new Object[] {
             CONNECTION_ID
@@ -80,31 +67,126 @@ class WorkspaceConnectionFacadeAuthorizationTest {
     }
 
     @Test
-    void testUpdateDeniesWhenTheConnectionEditScopeIsRefused() throws Exception {
-        assertResourceGuard(updateMethod(), new Object[] {
+    void testGetConnectionDeniesTheOwnerWithoutTheConnectionViewScope() throws Exception {
+        PermissionService permissionService = mock(PermissionService.class);
+
+        when(permissionService.isResourceOwner(CONNECTION_TYPE, CONNECTION_ID)).thenReturn(true);
+
+        assertThat(evaluateGuard(permissionService, getConnectionMethod(), new Object[] {
+            CONNECTION_ID
+        })).isFalse();
+    }
+
+    @Test
+    void testDeleteAllowsTheOwnerHoldingTheScope() throws Exception {
+        assertScopeAndOwnerGuard(deleteMethod(), new Object[] {
+            CONNECTION_ID
+        }, "CONNECTION_DELETE", true, true, false, true);
+    }
+
+    @Test
+    void testDeleteDeniesTheOwnerWithoutTheScope() throws Exception {
+        assertScopeAndOwnerGuard(deleteMethod(), new Object[] {
+            CONNECTION_ID
+        }, "CONNECTION_DELETE", false, true, false, false);
+    }
+
+    @Test
+    void testDeleteDeniesAScopeHolderWhoIsNotTheOwner() throws Exception {
+        assertScopeAndOwnerGuard(deleteMethod(), new Object[] {
+            CONNECTION_ID
+        }, "CONNECTION_DELETE", true, false, false, false);
+    }
+
+    @Test
+    void testDeleteAllowsTheTenantAdmin() throws Exception {
+        assertScopeAndOwnerGuard(deleteMethod(), new Object[] {
+            CONNECTION_ID
+        }, "CONNECTION_DELETE", true, false, true, true);
+    }
+
+    @Test
+    void testUpdateAllowsTheOwnerHoldingTheScope() throws Exception {
+        assertScopeAndOwnerGuard(updateMethod(), new Object[] {
             CONNECTION_ID, "name", List.of(), 1
-        }, "CONNECTION_EDIT", false);
+        }, "CONNECTION_EDIT", true, true, false, true);
     }
 
     @Test
-    void testUpdateAllowsWhenTheConnectionEditScopeIsGranted() throws Exception {
-        assertResourceGuard(updateMethod(), new Object[] {
+    void testUpdateDeniesTheOwnerWithoutTheScope() throws Exception {
+        assertScopeAndOwnerGuard(updateMethod(), new Object[] {
             CONNECTION_ID, "name", List.of(), 1
-        }, "CONNECTION_EDIT", true);
+        }, "CONNECTION_EDIT", false, true, false, false);
     }
 
     @Test
-    void testUpdateTagsDeniesWhenTheConnectionEditScopeIsRefused() throws Exception {
-        assertResourceGuard(updateTagsMethod(), new Object[] {
-            CONNECTION_ID, List.of()
-        }, "CONNECTION_EDIT", false);
+    void testUpdateDeniesAScopeHolderWhoIsNotTheOwner() throws Exception {
+        assertScopeAndOwnerGuard(updateMethod(), new Object[] {
+            CONNECTION_ID, "name", List.of(), 1
+        }, "CONNECTION_EDIT", true, false, false, false);
     }
 
     @Test
-    void testUpdateTagsAllowsWhenTheConnectionEditScopeIsGranted() throws Exception {
-        assertResourceGuard(updateTagsMethod(), new Object[] {
+    void testUpdateAllowsTheTenantAdmin() throws Exception {
+        assertScopeAndOwnerGuard(updateMethod(), new Object[] {
+            CONNECTION_ID, "name", List.of(), 1
+        }, "CONNECTION_EDIT", true, false, true, true);
+    }
+
+    @Test
+    void testUpdateTagsAllowsTheOwnerHoldingTheScope() throws Exception {
+        assertScopeAndOwnerGuard(updateTagsMethod(), new Object[] {
             CONNECTION_ID, List.of()
-        }, "CONNECTION_EDIT", true);
+        }, "CONNECTION_EDIT", true, true, false, true);
+    }
+
+    @Test
+    void testUpdateTagsDeniesTheOwnerWithoutTheScope() throws Exception {
+        assertScopeAndOwnerGuard(updateTagsMethod(), new Object[] {
+            CONNECTION_ID, List.of()
+        }, "CONNECTION_EDIT", false, true, false, false);
+    }
+
+    @Test
+    void testUpdateTagsDeniesAScopeHolderWhoIsNotTheOwner() throws Exception {
+        assertScopeAndOwnerGuard(updateTagsMethod(), new Object[] {
+            CONNECTION_ID, List.of()
+        }, "CONNECTION_EDIT", true, false, false, false);
+    }
+
+    @Test
+    void testUpdateTagsAllowsTheTenantAdmin() throws Exception {
+        assertScopeAndOwnerGuard(updateTagsMethod(), new Object[] {
+            CONNECTION_ID, List.of()
+        }, "CONNECTION_EDIT", true, false, true, true);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsAllowsTheOwnerHoldingTheScope() throws Exception {
+        assertScopeAndOwnerGuard(updateConnectionCredentialsMethod(), new Object[] {
+            CONNECTION_ID, Map.of(), 1
+        }, "CONNECTION_EDIT", true, true, false, true);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDeniesTheOwnerWithoutTheScope() throws Exception {
+        assertScopeAndOwnerGuard(updateConnectionCredentialsMethod(), new Object[] {
+            CONNECTION_ID, Map.of(), 1
+        }, "CONNECTION_EDIT", false, true, false, false);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsDeniesAScopeHolderWhoIsNotTheOwner() throws Exception {
+        assertScopeAndOwnerGuard(updateConnectionCredentialsMethod(), new Object[] {
+            CONNECTION_ID, Map.of(), 1
+        }, "CONNECTION_EDIT", true, false, false, false);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsHasNoTenantAdminAlternative() throws Exception {
+        assertScopeAndOwnerGuard(updateConnectionCredentialsMethod(), new Object[] {
+            CONNECTION_ID, Map.of(), 1
+        }, "CONNECTION_EDIT", true, false, true, false);
     }
 
     @Test
@@ -151,6 +233,21 @@ class WorkspaceConnectionFacadeAuthorizationTest {
 
         verify(permissionService).hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, expectedScope);
         verifyNoMoreInteractions(permissionService);
+    }
+
+    private void assertScopeAndOwnerGuard(
+        Method method, Object[] arguments, String scope, boolean scopeGranted, boolean owner, boolean admin,
+        boolean expected) {
+
+        PermissionService permissionService = mock(PermissionService.class);
+
+        when(permissionService.hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, scope)).thenReturn(scopeGranted);
+        when(permissionService.isResourceOwner(CONNECTION_TYPE, CONNECTION_ID)).thenReturn(owner);
+        when(permissionService.isTenantAdmin()).thenReturn(admin);
+
+        assertThat(evaluateGuard(permissionService, method, arguments))
+            .as("%s with scope %s=%s, owner=%s, tenantAdmin=%s", method.getName(), scope, scopeGranted, owner, admin)
+            .isEqualTo(expected);
     }
 
     private void assertCreateGuard(boolean granted) throws Exception {
@@ -233,6 +330,11 @@ class WorkspaceConnectionFacadeAuthorizationTest {
     private static Method updateMethod() throws NoSuchMethodException {
         return WorkspaceConnectionFacadeImpl.class.getMethod(
             "update", long.class, String.class, List.class, int.class);
+    }
+
+    private static Method updateConnectionCredentialsMethod() throws NoSuchMethodException {
+        return WorkspaceConnectionFacadeImpl.class.getMethod(
+            "updateConnectionCredentials", long.class, Map.class, int.class);
     }
 
     private static Method updateTagsMethod() throws NoSuchMethodException {

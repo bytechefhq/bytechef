@@ -24,6 +24,8 @@ Name | Type
 `name` | string
 `parameters` | { [key: string]: any; }
 `tags` | [Array&lt;Tag&gt;](Tag.md)
+`status` | string
+`visibility` | string
 `version` | number
 `workspaceId` | number
 
@@ -51,6 +53,8 @@ const example = {
   "name": null,
   "parameters": null,
   "tags": null,
+  "status": null,
+  "visibility": null,
   "version": null,
   "workspaceId": null,
 } satisfies Connection

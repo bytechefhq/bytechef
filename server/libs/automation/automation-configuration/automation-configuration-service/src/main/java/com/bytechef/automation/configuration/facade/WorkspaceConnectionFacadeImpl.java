@@ -16,28 +16,45 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.HashMap;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,48 +64,96 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnCEVersion
 public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(WorkspaceConnectionFacadeImpl.class);
 
     private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
     private static final String CONNECTION_TYPE = "Connection";
 
-    private final ConnectionFacade connectionFacade;
-    private final ConnectionLifecycleFacade connectionLifecycleFacade;
-    private final ConnectionService connectionService;
-    private final PermissionService permissionService;
-    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final WorkflowTestConfigurationService workflowTestConfigurationService;
-    private final WorkspaceConnectionService workspaceConnectionService;
+    protected final ConnectionFacade connectionFacade;
+    protected final ConnectionLifecycleFacade connectionLifecycleFacade;
+    protected final ConnectionService connectionService;
+    protected final ResourceVisibilityResolver resourceVisibilityResolver;
+    protected final MeterRegistry meterRegistry;
+    protected final PermissionService permissionService;
+    protected final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    protected final ProjectService projectService;
+    protected final UserService userService;
+    protected final WorkflowTestConfigurationService workflowTestConfigurationService;
+    protected final WorkspaceConnectionService workspaceConnectionService;
+    protected final WorkspaceFacade workspaceFacade;
 
-    @SuppressFBWarnings("EI")
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI", "EI2"
+    })
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ConnectionService connectionService, PermissionService permissionService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkspaceConnectionService workspaceConnectionService) {
+        ConnectionService connectionService, ResourceVisibilityResolver resourceVisibilityResolver,
+        ObjectProvider<MeterRegistry> meterRegistryProvider, PermissionService permissionService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
+        UserService userService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        WorkspaceConnectionService workspaceConnectionService, WorkspaceFacade workspaceFacade) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
         this.connectionService = connectionService;
+        this.resourceVisibilityResolver = resourceVisibilityResolver;
+        this.meterRegistry = meterRegistryProvider.getIfAvailable();
         this.permissionService = permissionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectService = projectService;
+        this.userService = userService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
+        this.workspaceFacade = workspaceFacade;
+    }
+
+    private void incrementCreateCounter(ResourceVisibility visibility) {
+        if (meterRegistry == null) {
+            return;
+        }
+
+        Counter.builder("bytechef_connection_create")
+            .tag("visibility", visibility == null ? "PRIVATE" : visibility.name())
+            .description("Connections created via the workspace facade, tagged by visibility")
+            .register(meterRegistry)
+            .increment();
     }
 
     @Override
     @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
+        ResourceVisibility requestedVisibility = connectionDTO.visibility();
+
+        if (requestedVisibility != null && requestedVisibility != ResourceVisibility.PRIVATE
+            && requestedVisibility != ResourceVisibility.WORKSPACE) {
+
+            throw new ConfigurationException(
+                "Only PRIVATE or WORKSPACE visibility can be set on connection creation; got %s".formatted(
+                    requestedVisibility),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        validateCurrentUserIsWorkspaceMember(workspaceId);
+
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
         workspaceConnectionService.create(connectionId, workspaceId);
+
+        // Read the persisted visibility (ConnectionFacadeImpl forces WORKSPACE in CE) so the metric tag matches
+        // what was actually stored, not the unsanitized request body.
+        ConnectionDTO connection = connectionFacade.getConnection(connectionId);
+
+        incrementCreateCounter(connection.visibility());
 
         return connectionId;
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void delete(long connectionId) {
         requireAutomation(connectionId);
 
@@ -102,6 +167,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     public void disconnectConnection(long connectionId) {
         rejectNonAutomation(connectionId);
 
+        // Visibility is intentionally preserved on disconnect: a workspace-shared connection that no
+        // longer participates in any workflow is still discoverable by other workspace members and may
+        // be re-attached to a new workflow. Demoting on disconnect would surprise admins.
         projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(connectionId);
         workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(connectionId);
     }
@@ -114,40 +182,81 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         ConnectionDTO connectionDTO = connectionFacade.getConnection(connectionId);
 
-        return canSeeCredentials(
-            connectionDTO, permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT))
-                ? connectionDTO : connectionDTO.withoutCredentials();
+        return canSeeCredentials(connectionId, connectionDTO) ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
     @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_VIEW', #environmentId)")
+    @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
-        List<Long> connectionIds = CollectionUtils.map(
-            workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
+        List<Long> connectionIds = CollectionUtils.concatDistinct(
+            CollectionUtils.map(
+                workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId),
+            getSharedConnectionIds());
 
         if (connectionIds.isEmpty()) {
             return List.of();
         }
 
-        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
-            componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION);
+        List<ConnectionDTO> visibleConnectionDTOs = filterVisible(
+            connectionFacade.getConnections(
+                componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION),
+            workspaceId);
 
-        Map<Integer, Boolean> canEditByEnvironmentId = new HashMap<>();
-        List<ConnectionDTO> redactedConnectionDTOs = new ArrayList<>();
+        return CollectionUtils.map(
+            visibleConnectionDTOs,
+            connectionDTO -> canSeeCredentials(connectionDTO.id(), connectionDTO)
+                ? connectionDTO : connectionDTO.withoutCredentials());
+    }
 
-        for (ConnectionDTO connectionDTO : connectionDTOs) {
-            boolean canEdit = canEditByEnvironmentId.computeIfAbsent(
-                connectionDTO.environmentId(),
-                connectionEnvironmentId -> permissionService.hasResourceScope(
-                    connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
+    protected List<Long> getSharedConnectionIds() {
+        return List.of();
+    }
 
-            redactedConnectionDTOs.add(
-                canSeeCredentials(connectionDTO, canEdit) ? connectionDTO : connectionDTO.withoutCredentials());
+    /**
+     * Narrow the loaded connections to those the current principal may see. The resolver answers in ids, so this maps
+     * each DTO to the three facts it needs and filters on the returned set — keeping the resolver free of any DTO type
+     * and reusable by every resource that gains visibility later.
+     */
+    private List<ConnectionDTO> filterVisible(List<ConnectionDTO> connectionDTOs, long workspaceId) {
+        Set<Long> visibleIds = resourceVisibilityResolver.filterVisibleIds(
+            "Connection", workspaceId,
+            CollectionUtils.map(
+                connectionDTOs,
+                connectionDTO -> new VisibilityRecord(
+                    connectionDTO.id(), connectionDTO.visibility(), connectionDTO.createdBy())));
+
+        return CollectionUtils.filter(connectionDTOs, connectionDTO -> visibleIds.contains(connectionDTO.id()));
+    }
+
+    /**
+     * Reject a create request whose {@code workspaceId} the caller is not a member of. In CE this is a permissive no-op
+     * because {@link WorkspaceFacade#getUserWorkspaces(long)} returns every workspace (CE has no membership table). In
+     * EE it delegates to the real {@code WorkspaceUserService} and blocks cross-workspace attaches.
+     */
+    protected void validateCurrentUserIsWorkspaceMember(long workspaceId) {
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin();
+
+        if (currentUserLogin == null) {
+            throw new ConfigurationException(
+                "Cannot create a connection without an authenticated user", ConnectionErrorType.INVALID_CONNECTION);
         }
 
-        return redactedConnectionDTOs;
+        User currentUser = userService.fetchUserByLogin(currentUserLogin)
+            .orElseThrow(() -> new ConfigurationException(
+                "Authenticated user %s was not found".formatted(currentUserLogin),
+                ConnectionErrorType.INVALID_CONNECTION));
+
+        List<Long> memberWorkspaceIds = CollectionUtils.map(
+            workspaceFacade.getUserWorkspaces(currentUser.getId()), Workspace::getId);
+
+        if (!memberWorkspaceIds.contains(workspaceId)) {
+            throw new ConfigurationException(
+                "Current user is not a member of workspace id=%s".formatted(workspaceId),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
     }
 
     @Override
@@ -170,7 +279,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         requireAutomation(connectionId);
 
@@ -178,20 +288,53 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "isResourceOwner(#connectionId, 'Connection')")
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
+        requireAutomation(connectionId);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        validateSecretOwner(connection);
+
+        if (connection.getStatus() != ConnectionStatus.ACTIVE) {
+            throw new ConfigurationException(
+                "Credentials cannot be replaced on a connection with status %s".formatted(connection.getStatus()),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        if (connection.getVersion() != version) {
+            throw new ConfigurationException(
+                "Connection id=%s was modified by someone else; reload and try again".formatted(connectionId),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, parameters);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void updateTags(long connectionId, List<Tag> tags) {
         requireAutomation(connectionId);
 
         connectionFacade.update(connectionId, tags);
     }
 
-    private static boolean canSeeCredentials(ConnectionDTO connectionDTO, boolean canEdit) {
-        if (!canEdit) {
+    private boolean canSeeCredentials(long connectionId, ConnectionDTO connectionDTO) {
+        if (!permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT)) {
             return false;
         }
 
         return ConnectedUserAuthentications.isConnectedUser() ||
-            ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy());
+            ConnectionSecrets.canCurrentUserAccessSecrets(connectionDTO.createdBy(), connectionDTO.visibility());
+    }
+
+    private void validateSecretOwner(Connection connection) {
+        if (!ConnectionSecrets.canCurrentUserAccessSecrets(connection.getCreatedBy(), connection.getVisibility())) {
+            throw new AccessDeniedException(
+                "Only the connection owner can replace the credentials of connection " + connection.getId());
+        }
     }
 
     private void rejectNonAutomation(long connectionId) {

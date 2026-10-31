@@ -1,0 +1,3 @@
+mutation SetProjectVisibility($workspaceId: ID!, $projectId: ID!, $visibility: ResourceVisibility!) {
+    setProjectVisibility(workspaceId: $workspaceId, projectId: $projectId, visibility: $visibility)
+}
