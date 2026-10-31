@@ -14,6 +14,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {PlatformType, useAutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
@@ -144,6 +145,12 @@ const AutomationWorkflow = () => {
             setWorkflow({});
         };
     }, [setWorkflow]);
+
+    useEffect(() => {
+        return useCopilotStateContributorRegistry
+            .getState()
+            .register(() => ({projectOwner: 'EMBEDDED_AUTOMATION_WORKFLOW_PROJECT'}));
+    }, []);
 
     return (
         <div className="flex w-full">
