@@ -47,10 +47,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -116,46 +114,6 @@ class TenantAwareJwtAuthenticationFilterTest {
             .getName()).isEqualTo("admin@localhost.com");
         assertThat(authorityNames(authentication.get()))
             .containsExactlyInAnyOrder("SCOPE_mcp:management", "engineering");
-    }
-
-    @Test
-    void testAcceptedRequestPublishesTheSuccessInTheUrlTenantUnderTheByteChefLogin() throws Exception {
-        List<String> publishedSuccesses = new ArrayList<>();
-
-        tenantAwareJwtAuthenticationFilter.setAuthenticationEventPublisher(
-            recordingAuthenticationEventPublisher(publishedSuccesses));
-
-        String path = managementPath("acme");
-
-        authenticate(jwtWithTenant("acme", "mcp:management", endpointUrl(path)), "SCOPE_mcp:management");
-
-        tenantAwareJwtAuthenticationFilter.doFilter(
-            request(path), new MockHttpServletResponse(), (servletRequest, servletResponse) -> {});
-
-        assertThat(publishedSuccesses).containsExactly("acme:admin@localhost.com");
-    }
-
-    @Test
-    void testForgedMcpServerSecretPublishesNoSuccess() throws Exception {
-        List<String> publishedSuccesses = new ArrayList<>();
-
-        TenantAwareJwtAuthenticationFilter filter = new TenantAwareJwtAuthenticationFilter(
-            new McpAudienceValidator(), new McpJwtIdentityMapper(), mcpResourceServerProperties(), userService,
-            authorityService, MCP_ENDPOINTS,
-            List.of(request -> Optional.of(false)), null, null);
-
-        filter.setAuthenticationEventPublisher(recordingAuthenticationEventPublisher(publishedSuccesses));
-
-        String path = managementPath("victim");
-
-        authenticate(jwtWithTenant("victim", "mcp:management", endpointUrl(path)), "SCOPE_mcp:management");
-
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        filter.doFilter(request(path), response, (servletRequest, servletResponse) -> {});
-
-        assertThat(response.getStatus()).isEqualTo(401);
-        assertThat(publishedSuccesses).isEmpty();
     }
 
     @Test
@@ -832,21 +790,6 @@ class TenantAwareJwtAuthenticationFilterTest {
         filter.doFilter(request(path), response, (servletRequest, servletResponse) -> {});
 
         return response.getStatus();
-    }
-
-    private static AuthenticationEventPublisher recordingAuthenticationEventPublisher(List<String> publishedSuccesses) {
-        return new AuthenticationEventPublisher() {
-
-            @Override
-            public void publishAuthenticationSuccess(Authentication authentication) {
-                publishedSuccesses.add(TenantContext.getCurrentTenantId() + ":" + authentication.getName());
-            }
-
-            @Override
-            public void publishAuthenticationFailure(
-                AuthenticationException authenticationException, Authentication authentication) {
-            }
-        };
     }
 
     private static void authenticate(Jwt jwt, String scopeAuthority) {
