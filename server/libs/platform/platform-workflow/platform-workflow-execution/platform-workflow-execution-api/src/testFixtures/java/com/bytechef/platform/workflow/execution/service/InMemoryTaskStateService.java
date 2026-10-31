@@ -40,6 +40,11 @@ public final class InMemoryTaskStateService implements TaskStateService {
     }
 
     @Override
+    public <T> Optional<T> fetchUnlockedValue(JobResumeId jobResumeId) {
+        return fetchValue(jobResumeId);
+    }
+
+    @Override
     public void save(JobResumeId jobResumeId, Object value) {
         store.put(jobResumeId, value);
     }

@@ -134,7 +134,7 @@ class ApprovalFormFacadeTest {
             .getParameters();
         doReturn(Map.of()).when(taskExecution)
             .getMetadata();
-        when(taskStateService.<Suspend>fetchValue(jobResumeId)).thenReturn(
+        when(taskStateService.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(
             Optional.of(
                 new Suspend(
                     Map.of(MetadataConstants.APPROVAL_FORM_PARAMETERS, Map.of("formTitle", "Refund order 42")),
@@ -155,7 +155,7 @@ class ApprovalFormFacadeTest {
             .getParameters();
         doReturn(Map.of()).when(taskExecution)
             .getMetadata();
-        when(taskStateService.<Suspend>fetchValue(jobResumeId)).thenReturn(
+        when(taskStateService.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(
             Optional.of(new Suspend(Map.of("formUrl", "https://example.com/resume/abc"), null)));
 
         Map<String, ?> approvalForm = approvalFormFacade.getApprovalForm(jobResumeId.toString());
@@ -227,7 +227,7 @@ class ApprovalFormFacadeTest {
             .getParameters();
         doReturn(Map.of()).when(taskExecution)
             .getMetadata();
-        when(taskStateService.<Suspend>fetchValue(jobResumeId)).thenReturn(Optional.empty());
+        when(taskStateService.<Suspend>fetchUnlockedValue(jobResumeId)).thenReturn(Optional.empty());
     }
 
     private static Job stoppedJob(JobResumeId storedJobResumeId) {

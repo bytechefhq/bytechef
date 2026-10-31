@@ -133,7 +133,7 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
     @SuppressWarnings("unchecked")
     private Map<String, ?> getFormParameters(JobResumeId jobResumeId, TaskExecution taskExecution) {
-        Optional<Suspend> suspendOptional = taskStateService.fetchValue(jobResumeId);
+        Optional<Suspend> suspendOptional = taskStateService.fetchUnlockedValue(jobResumeId);
 
         if (suspendOptional.isPresent()) {
             Suspend suspend = suspendOptional.get();
