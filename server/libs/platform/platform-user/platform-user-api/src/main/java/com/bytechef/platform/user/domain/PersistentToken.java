@@ -106,7 +106,7 @@ public class PersistentToken implements Persistable<String> {
     }
 
     public void setUserAgent(String userAgent) {
-        if (userAgent.length() >= MAX_USER_AGENT_LEN) {
+        if (userAgent != null && userAgent.length() >= MAX_USER_AGENT_LEN) {
             this.userAgent = userAgent.substring(0, MAX_USER_AGENT_LEN - 1);
         } else {
             this.userAgent = userAgent;

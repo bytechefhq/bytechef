@@ -17,7 +17,9 @@
 package com.bytechef.security.web.rememberme;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -37,6 +39,7 @@ import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +55,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 
 /**
  * @author Ivica Cardic
@@ -61,11 +65,14 @@ class PersistentTokenRememberMeServicesTest {
     private static final String LOGIN = "jane";
     private static final String FIRST_TENANT_ID = "000002";
     private static final String SECOND_TENANT_ID = "000003";
+    private static final String SERIES = "series";
+    private static final String TOKEN_VALUE = "token-value";
 
     private final PersistentTokenService persistentTokenService = mock(PersistentTokenService.class);
     private final List<String> savedTokenTenantIds = new ArrayList<>();
     private final List<PersistentToken> savedTokens = new ArrayList<>();
     private final TenantService tenantService = mock(TenantService.class);
+    private final UserDetailsService userDetailsService = mock(UserDetailsService.class);
     private final UserService userService = mock(UserService.class);
     private PersistentTokenRememberMeServices persistentTokenRememberMeServices;
 
@@ -76,7 +83,7 @@ class PersistentTokenRememberMeServicesTest {
         when(rememberMeKey.getKey()).thenReturn("remember-me-test-key");
 
         persistentTokenRememberMeServices = new PersistentTokenRememberMeServices(
-            rememberMeKey, mock(UserDetailsService.class), persistentTokenService, tenantService);
+            rememberMeKey, userDetailsService, persistentTokenService, tenantService);
 
         ApplicationContext applicationContext = mock(ApplicationContext.class);
 
@@ -97,6 +104,60 @@ class PersistentTokenRememberMeServicesTest {
 
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(tenantService.getTenantIdsByUserLogin(LOGIN)).thenReturn(List.of(FIRST_TENANT_ID, SECOND_TENANT_ID));
+    }
+
+    @Test
+    void testAutoLoginReplayedWithinTheUpgradeWindowSucceedsForTheSameTenant() {
+        mockStoredToken();
+
+        String[] cookieTokens = {
+            SERIES, TOKEN_VALUE, FIRST_TENANT_ID
+        };
+
+        persistentTokenRememberMeServices.processAutoLoginCookie(
+            cookieTokens, createAutoLoginRequest(), new MockHttpServletResponse());
+
+        UserDetails userDetails = persistentTokenRememberMeServices.processAutoLoginCookie(
+            cookieTokens, createAutoLoginRequest(), new MockHttpServletResponse());
+
+        assertThat(userDetails.getUsername()).isEqualTo(LOGIN);
+    }
+
+    @Test
+    void testAutoLoginReplayedWithinTheUpgradeWindowIsRejectedForAnotherTenant() {
+        mockStoredToken();
+
+        persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, TOKEN_VALUE, FIRST_TENANT_ID
+            }, createAutoLoginRequest(), new MockHttpServletResponse());
+
+        MockHttpServletRequest request = createAutoLoginRequest();
+
+        assertThatThrownBy(() -> persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, TOKEN_VALUE, SECOND_TENANT_ID
+            }, request, new MockHttpServletResponse()))
+                .isInstanceOf(RememberMeAuthenticationException.class);
+
+        assertThat(request.getSession(false)).isNull();
+    }
+
+    @Test
+    void testAutoLoginWithoutUserAgentStoresTheRefreshedToken() {
+        mockStoredToken();
+
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/account");
+
+        UserDetails userDetails = persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, TOKEN_VALUE, FIRST_TENANT_ID
+            }, request, new MockHttpServletResponse());
+
+        assertThat(userDetails.getUsername()).isEqualTo(LOGIN);
+        assertThat(savedTokens).hasSize(1);
+        assertThat(savedTokens.getFirst()
+            .getUserAgent()).isNull();
     }
 
     @Test
@@ -192,6 +253,32 @@ class PersistentTokenRememberMeServicesTest {
         persistentTokenRememberMeServices.loginFail(request, new MockHttpServletResponse());
 
         verify(persistentTokenService, never()).delete(anyString());
+    }
+
+    private void mockStoredToken() {
+        PersistentToken persistentToken = new PersistentToken();
+
+        persistentToken.setSeries(SERIES);
+        persistentToken.setTokenDate(LocalDate.now());
+        persistentToken.setTokenValue(TOKEN_VALUE);
+        persistentToken.setUser(createUser(FIRST_TENANT_ID));
+
+        when(persistentTokenService.fetchPersistentToken(SERIES)).thenAnswer(invocation -> {
+            String currentTenantId = TenantContext.getCurrentTenantId();
+
+            return currentTenantId.equals(FIRST_TENANT_ID) ? Optional.of(persistentToken) : Optional.empty();
+        });
+        when(userService.getUser(anyLong())).thenAnswer(
+            invocation -> createUser(TenantContext.getCurrentTenantId()));
+        when(userDetailsService.loadUserByUsername(LOGIN)).thenReturn(createPlainUser());
+    }
+
+    private static MockHttpServletRequest createAutoLoginRequest() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/account");
+
+        request.addHeader("User-Agent", "Test agent");
+
+        return request;
     }
 
     private static Authentication createAuthentication(UserDetails userDetails) {
