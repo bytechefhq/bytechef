@@ -33,6 +33,7 @@ import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ExecutionException;
 import java.util.Map;
@@ -51,6 +52,9 @@ class ScriptToolsTest {
 
     private static final long FOREIGN_PROJECT_ID = 9L;
     private static final long OWN_PROJECT_ID = 7L;
+
+    @Mock
+    private ProjectOwnershipService projectOwnershipService;
 
     @Mock
     private ProjectWorkflowFacade projectWorkflowFacade;
@@ -106,7 +110,8 @@ class ScriptToolsTest {
     private ScriptTools newTools() {
         return new ScriptTools(
             projectWorkflowFacade,
-            new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService, scopedConnectionGuard));
+            new ScopedProjectGuard(new GrantingPermissionService(), projectOwnershipService, projectWorkflowService,
+                scopedConnectionGuard));
     }
 
     private static ToolContext scopedToolContext() {
