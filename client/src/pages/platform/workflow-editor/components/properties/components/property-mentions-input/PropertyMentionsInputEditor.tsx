@@ -72,6 +72,7 @@ interface PropertyMentionsInputEditorProps {
     path?: string;
     onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
+    onFormulaKey?: () => void;
     onSinglePillAbandoned?: () => boolean | void;
     onValueChange?: (value: string | number) => void;
     pillRequired?: boolean;
@@ -138,6 +139,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             legacyMixed = false,
             onChange,
             onFocus,
+            onFormulaKey,
             onSinglePillAbandoned,
             onValueChange,
             path,
@@ -168,6 +170,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const autoFocusAppliedRef = useRef(false);
         const isFormulaModeRef = useRef(isFormulaMode);
         const setIsFormulaModeRef = useRef(setIsFormulaMode);
+        const onFormulaKeyRef = useRef(onFormulaKey);
         const restoreFocusAfterExitRef = useRef(false);
         const appliedFocusTokenRef = useRef<number | undefined>(undefined);
         const previousFormulaModeRef = useRef(isFormulaMode);
@@ -175,6 +178,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         editorValueRef.current = editorValue;
         isFormulaModeRef.current = isFormulaMode;
         setIsFormulaModeRef.current = setIsFormulaMode;
+        onFormulaKeyRef.current = onFormulaKey;
 
         const {currentNode} = useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
@@ -610,6 +614,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     const isEditorEmpty = editorView.state.doc.textContent.length === 0 && mentionCount === 0;
 
                     if ((event.key === '=' && isEditorEmpty && !singlePill) || isFormulaMode) {
+                        return;
+                    }
+
+                    if (event.key === '=' && isEditorEmpty && onFormulaKeyRef.current) {
+                        event.preventDefault();
+
+                        onFormulaKeyRef.current();
+
                         return;
                     }
 

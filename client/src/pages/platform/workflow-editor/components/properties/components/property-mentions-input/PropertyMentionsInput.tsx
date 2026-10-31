@@ -378,6 +378,9 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             legacyMixed={legacyMixed}
                             onChange={(editorValue) => handleEditorValueChange(editorValue)}
                             onFocus={onFocus}
+                            onFormulaKey={
+                                singlePill && showInputTypeSwitchButton ? handleInputTypeSwitchButtonClick : undefined
+                            }
                             onSinglePillAbandoned={onSinglePillAbandoned}
                             onValueChange={onValueChange}
                             path={path}
