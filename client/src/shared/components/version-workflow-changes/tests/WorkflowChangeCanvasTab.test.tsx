@@ -177,7 +177,7 @@ describe('WorkflowChangeCanvasToolbar', () => {
         expect(onSelectedSideChange).toHaveBeenCalledWith('old');
     });
 
-    it('hides the toggle but keeps the legend for an added workflow', () => {
+    it('hides the toggle and the legend for an added workflow, which has no highlights', () => {
         render(
             <WorkflowChangeCanvasToolbar
                 change={{...BASE_CHANGE, baseVersion: null, changeType: WorkflowChangeType.Added, oldDefinition: null}}
@@ -188,7 +188,7 @@ describe('WorkflowChangeCanvasToolbar', () => {
         );
 
         expect(screen.queryAllByRole('radio')).toHaveLength(0);
-        expect(screen.getByText('Added')).toBeInTheDocument();
+        expect(screen.queryByText('Added')).not.toBeInTheDocument();
     });
 
     it('hides the toggle for a removed workflow', () => {
@@ -203,5 +203,6 @@ describe('WorkflowChangeCanvasToolbar', () => {
         );
 
         expect(screen.queryAllByRole('radio')).toHaveLength(0);
+        expect(screen.queryByText('Removed')).not.toBeInTheDocument();
     });
 });

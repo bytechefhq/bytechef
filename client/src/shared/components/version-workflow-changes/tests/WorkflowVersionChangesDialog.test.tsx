@@ -10,6 +10,10 @@ vi.mock('@/shared/components/MonacoDiffEditorWrapper', () => ({
     ),
 }));
 
+vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
+    default: ({value}: {value: string}) => <div data-testid="mock-editor" data-value={value} />,
+}));
+
 vi.mock('../WorkflowChangeCanvasTab', () => ({
     WorkflowChangeCanvasToolbar: ({
         onSelectedSideChange,
@@ -99,10 +103,16 @@ describe('WorkflowVersionChangesDialog', () => {
         expect(diffEditor).toHaveAttribute('data-modified', '{"new":true}');
     });
 
-    it('renders an added workflow without a baseline', async () => {
+    it('opens an added workflow on its canvas without a Changes tab and shows its definition without a diff', async () => {
         render(
             <WorkflowVersionChangesDialog
-                change={{...change, baseVersion: null, changeType: WorkflowChangeType.Added, oldDefinition: null}}
+                change={{
+                    ...change,
+                    baseVersion: null,
+                    changeType: WorkflowChangeType.Added,
+                    changes: [],
+                    oldDefinition: null,
+                }}
                 isLoading={false}
                 onClose={vi.fn()}
                 open
@@ -111,10 +121,33 @@ describe('WorkflowVersionChangesDialog', () => {
         );
 
         expect(screen.getByText('V2')).toBeInTheDocument();
+        expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Canvas', 'Definition']);
+        expect(screen.getByTestId('mock-canvas-tab')).toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('tab', {name: 'Definition'}));
 
-        expect(await screen.findByTestId('mock-diff-editor')).toHaveAttribute('data-original', '');
+        expect(await screen.findByTestId('mock-editor')).toHaveAttribute('data-value', '{"new":true}');
+        expect(screen.queryByTestId('mock-diff-editor')).not.toBeInTheDocument();
+    });
+
+    it('opens a removed workflow on its canvas and shows its old definition without a diff', async () => {
+        render(
+            <WorkflowVersionChangesDialog
+                baseVersionLabel="V1"
+                change={{...change, changeType: WorkflowChangeType.Removed, changes: [], newDefinition: null}}
+                isLoading={false}
+                onClose={vi.fn()}
+                open
+                versionLabel="V2"
+            />
+        );
+
+        expect(screen.queryByRole('tab', {name: 'Changes'})).not.toBeInTheDocument();
+        expect(screen.getByTestId('mock-canvas-tab')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Definition'}));
+
+        expect(await screen.findByTestId('mock-editor')).toHaveAttribute('data-value', '{"old":true}');
     });
 
     it('shows the loading icon while loading', () => {
@@ -171,19 +204,5 @@ describe('WorkflowVersionChangesDialog', () => {
         expect(screen.getByText("Couldn't load the workflow changes.")).toBeInTheDocument();
         expect(screen.getByText('Workflow changes')).toBeInTheDocument();
         expect(document.querySelector('svg.animate-spin')).not.toBeInTheDocument();
-    });
-
-    it('says an added workflow was added on the Changes tab', () => {
-        render(
-            <WorkflowVersionChangesDialog
-                change={{...change, baseVersion: null, changeType: WorkflowChangeType.Added, changes: []}}
-                isLoading={false}
-                onClose={vi.fn()}
-                open
-                versionLabel="V2"
-            />
-        );
-
-        expect(screen.getByText('Workflow added in this version.')).toBeInTheDocument();
     });
 });
