@@ -70,11 +70,19 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -528,6 +536,67 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             .executeTriggerEnable(
                 any(), argThat(workflowExecutionId -> isFor(workflowExecutionId, integrationInstanceId)), any(),
                 any(), eq(newConnectionId), any(), anyLong());
+    }
+
+    @Test
+    void testTheListReadStillHasExactlyOneCaller() throws IOException {
+        Path sourceRoot = moduleSourceRoot();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            List<String> callers = paths.filter(path -> path.toString()
+                .endsWith(".java"))
+                .filter(path -> {
+                    try {
+                        String source = Files.readString(path);
+
+                        return source.contains("getIntegrationInstanceConfigurationIntegrations(")
+                            && !path.endsWith("IntegrationInstanceConfigurationFacadeImpl.java");
+                    } catch (IOException exception) {
+                        throw new UncheckedIOException(exception);
+                    }
+                })
+                .map(path -> String.valueOf(path.getFileName()))
+                .toList();
+
+            assertThat(callers)
+                .as(
+                    "a new caller of the unguarded list read must apply its own per-row filtering; see the method's " +
+                        "Javadoc")
+                .containsExactly("ConnectedUserIntegrationFacadeImpl.java");
+        }
+    }
+
+    @Test
+    void testTheListReadStillHasExactlyOneCallerWorthOfArguments() throws NoSuchMethodException {
+        Method method = IntegrationInstanceConfigurationFacadeImpl.class.getMethod(
+            "getIntegrationInstanceConfigurationIntegrations", boolean.class, Environment.class);
+
+        assertThat(Arrays.stream(method.getParameterTypes()))
+            .noneMatch(parameterType -> parameterType == long.class || parameterType == Long.class);
+    }
+
+    private static Path moduleSourceRoot() {
+        Path path;
+
+        try {
+            path = Path.of(
+                IntegrationInstanceConfigurationFacadeIntTest.class.getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI());
+        } catch (URISyntaxException exception) {
+            throw new IllegalStateException(exception);
+        }
+
+        while (path != null && !Files.isDirectory(path.resolve("src/main/java"))) {
+            path = path.getParent();
+        }
+
+        if (path == null) {
+            throw new IllegalStateException("Could not locate the module's src/main/java");
+        }
+
+        return path.resolve("src/main/java");
     }
 
     private static Authentication admin() {
