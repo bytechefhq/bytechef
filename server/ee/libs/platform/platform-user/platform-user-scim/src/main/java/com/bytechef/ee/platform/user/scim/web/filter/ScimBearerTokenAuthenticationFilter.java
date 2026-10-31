@@ -18,7 +18,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.web.filter.OncePerRequestFilter;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
@@ -36,6 +42,8 @@ import tools.jackson.databind.node.ObjectNode;
 public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final int PRINCIPAL_MAX_LENGTH = 50;
+    private static final String PRINCIPAL_PREFIX = "scim:";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String SCIM_PATH_PREFIX = "/api/scim/v2/";
 
@@ -77,18 +85,54 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String matchedTenantId = findTenantIdByScimApiKey(bearerToken);
+        ScimClient scimClient = findScimClientByScimApiKey(bearerToken);
 
-        if (matchedTenantId == null) {
+        if (scimClient == null) {
             sendUnauthorized(response, "Invalid SCIM API key");
 
             return;
         }
 
-        TenantContext.runWithTenantId(matchedTenantId, () -> filterChain.doFilter(request, response));
+        TenantContext.runWithTenantId(
+            scimClient.tenantId(),
+            () -> doFilterAsScimClient(request, response, filterChain, scimClient.principal()));
     }
 
-    private String findTenantIdByScimApiKey(String apiKey) {
+    private static String toPrincipal(IdentityProvider identityProvider) {
+        String suffix = " (" + identityProvider.getId() + ")";
+        String name = Objects.requireNonNullElse(identityProvider.getName(), "");
+
+        int maxNameLength = PRINCIPAL_MAX_LENGTH - PRINCIPAL_PREFIX.length() - suffix.length();
+
+        if (name.length() > maxNameLength) {
+            name = name.substring(0, Math.max(0, maxNameLength));
+        }
+
+        return PRINCIPAL_PREFIX + name + suffix;
+    }
+
+    private void doFilterAsScimClient(
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String principal)
+        throws IOException, ServletException {
+
+        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+
+        SecurityContext previousSecurityContext = securityContextHolderStrategy.getContext();
+        SecurityContext securityContext = securityContextHolderStrategy.createEmptyContext();
+
+        securityContext.setAuthentication(
+            UsernamePasswordAuthenticationToken.authenticated(principal, null, List.of()));
+
+        securityContextHolderStrategy.setContext(securityContext);
+
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            securityContextHolderStrategy.setContext(previousSecurityContext);
+        }
+    }
+
+    private @Nullable ScimClient findScimClientByScimApiKey(String apiKey) {
         List<String> tenantIds = tenantService.getTenantIds();
 
         for (String tenantId : tenantIds) {
@@ -96,7 +140,7 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
                 tenantId, () -> identityProviderService.fetchByScimApiKey(apiKey));
 
             if (identityProvider.isPresent()) {
-                return tenantId;
+                return new ScimClient(tenantId, toPrincipal(identityProvider.get()));
             }
         }
 
@@ -118,5 +162,8 @@ public class ScimBearerTokenAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/scim+json");
         response.getWriter()
             .write(OBJECT_MAPPER.writeValueAsString(errorNode));
+    }
+
+    private record ScimClient(String tenantId, String principal) {
     }
 }
