@@ -24,9 +24,11 @@ import com.bytechef.component.ai.agent.utils.cluster.subagent.ClusterElementCall
 import com.bytechef.component.ai.agent.utils.cluster.subagent.ClusterElementSubagentExecutor;
 import com.bytechef.component.ai.agent.utils.cluster.subagent.ClusterElementSubagentResolver;
 import com.bytechef.component.ai.agent.utils.cluster.subagent.TenantAwareTaskRepository;
+import com.bytechef.component.ai.agent.utils.cluster.subagent.ToolCallLoggingSubagentExecutor;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.tool.ClusterElementCallObservingToolCallback;
 import com.bytechef.component.ai.llm.tool.ClusterElementToolCallbacks;
+import com.bytechef.component.ai.llm.tool.ToolCallLoggingToolCallback;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -133,8 +135,10 @@ public class AiAgentUtilsTaskTool {
         for (ClusterElement toolClusterElement : subagentClusterElementMap.getClusterElements(TOOLS)) {
             toolCallbacks.addAll(
                 ClusterElementCallObservingToolCallback.wrap(
-                    clusterElementToolCallbacks.build(
-                        toolClusterElement, componentConnections, (ActionContext) context),
+                    ToolCallLoggingToolCallback.wrap(
+                        clusterElementToolCallbacks.build(
+                            toolClusterElement, componentConnections, (ActionContext) context),
+                        context),
                     toolClusterElement.getWorkflowNodeName(), toolClusterElement.getComponentName(), context));
         }
 
@@ -154,7 +158,8 @@ public class AiAgentUtilsTaskTool {
         }
 
         return new ClusterElementCallObservingSubagentExecutor(
-            subagentExecutor, jobId, taskExecutionId, ClusterElementCallRecorder.getInstance());
+            new ToolCallLoggingSubagentExecutor(subagentExecutor, context), jobId, taskExecutionId,
+            ClusterElementCallRecorder.getInstance());
     }
 
     @Nullable
