@@ -284,7 +284,7 @@ class WorkflowStructuralDifferTest {
             Map.of("tasks", List.of(nested("a", "x"), nested("c", "x"), nested("b", "x"))));
 
         assertThat(changes).extracting(WorkflowDefinitionChange::name)
-            .containsExactly("c", "b");
+            .containsExactly("c");
         assertThat(changes).extracting(WorkflowDefinitionChange::kind)
             .containsOnly(WorkflowNodeChangeKind.MOVED);
     }
@@ -295,7 +295,20 @@ class WorkflowStructuralDifferTest {
             Map.of("tasks", List.of(nested("a", "x"), nested("b", "x"))),
             Map.of("tasks", List.of(nested("b", "x"), nested("a", "x"))));
 
-        assertThat(changes).hasSize(2);
+        assertThat(changes).extracting(WorkflowDefinitionChange::name)
+            .containsExactly("b");
+        assertThat(changes).extracting(WorkflowDefinitionChange::kind)
+            .containsOnly(WorkflowNodeChangeKind.MOVED);
+    }
+
+    @Test
+    void testMovingOneTaskToTheEndMovesOnlyThatTask() {
+        List<WorkflowDefinitionChange> changes = WorkflowStructuralDiffer.diff(
+            Map.of("tasks", List.of(nested("a", "x"), nested("b", "x"), nested("c", "x"), nested("d", "x"))),
+            Map.of("tasks", List.of(nested("b", "x"), nested("c", "x"), nested("d", "x"), nested("a", "x"))));
+
+        assertThat(changes).extracting(WorkflowDefinitionChange::name)
+            .containsExactly("a");
         assertThat(changes).extracting(WorkflowDefinitionChange::kind)
             .containsOnly(WorkflowNodeChangeKind.MOVED);
     }

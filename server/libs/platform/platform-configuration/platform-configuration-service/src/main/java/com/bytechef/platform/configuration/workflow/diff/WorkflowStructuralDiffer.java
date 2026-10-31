@@ -153,15 +153,68 @@ public class WorkflowStructuralDiffer {
             List<String> oldOrder = entry.getValue();
             List<String> newOrder = newSiblings.get(entry.getKey());
 
+            Map<String, Integer> oldPositions = new HashMap<>();
+
             for (int index = 0; index < oldOrder.size(); index++) {
-                if (!oldOrder.get(index)
-                    .equals(newOrder.get(index))) {
-                    movedKeys.add(oldOrder.get(index));
+                oldPositions.put(oldOrder.get(index), index);
+            }
+
+            int[] oldPositionsInNewOrder = new int[newOrder.size()];
+
+            for (int index = 0; index < newOrder.size(); index++) {
+                oldPositionsInNewOrder[index] = oldPositions.get(newOrder.get(index));
+            }
+
+            Set<Integer> stableIndexes = findLongestIncreasingSubsequence(oldPositionsInNewOrder);
+
+            for (int index = 0; index < newOrder.size(); index++) {
+                if (!stableIndexes.contains(index)) {
+                    movedKeys.add(newOrder.get(index));
                 }
             }
         }
 
         return movedKeys;
+    }
+
+    /**
+     * Returns the indexes of one longest strictly increasing subsequence of the given values. Siblings on that
+     * subsequence kept their relative order; only the others are reported as moved.
+     */
+    private static Set<Integer> findLongestIncreasingSubsequence(int[] values) {
+        int[] tailIndexes = new int[values.length];
+        int[] previousIndexes = new int[values.length];
+        int length = 0;
+
+        for (int index = 0; index < values.length; index++) {
+            int low = 0;
+            int high = length;
+
+            while (low < high) {
+                int middle = (low + high) >>> 1;
+
+                if (values[tailIndexes[middle]] < values[index]) {
+                    low = middle + 1;
+                } else {
+                    high = middle;
+                }
+            }
+
+            previousIndexes[index] = low > 0 ? tailIndexes[low - 1] : -1;
+            tailIndexes[low] = index;
+
+            if (low == length) {
+                length++;
+            }
+        }
+
+        Set<Integer> stableIndexes = new HashSet<>();
+
+        for (int index = length > 0 ? tailIndexes[length - 1] : -1; index >= 0; index = previousIndexes[index]) {
+            stableIndexes.add(index);
+        }
+
+        return stableIndexes;
     }
 
     private static String siblingGroup(WorkflowNode node) {
