@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.workflow.diff;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
 class SensitiveValueMaskerTest {
+
+    private static final String MASKED_VALUE_PATTERN = "^" + SensitiveValueMasker.MASK + ":[0-9a-f]{16}$";
 
     @Test
     void testMasksSensitiveKeysCaseAndSeparatorInsensitive() {
@@ -73,5 +76,44 @@ class SensitiveValueMaskerTest {
 
         assertThat(first.get("password")).isNotEqualTo(second.get("password"));
         assertThat(first.get("password")).isEqualTo(repeated.get("password"));
+    }
+
+    @Test
+    void testMasksKeysEndingWithSensitiveSuffix() {
+        Map<String, Object> masked = SensitiveValueMasker.mask(
+            Map.ofEntries(
+                Map.entry("X-API-Key", "a"), Map.entry("X-Auth-Token", "b"), Map.entry("Proxy-Authorization", "c"),
+                Map.entry("webhookSecret", "d"), Map.entry("secretKey", "e"), Map.entry("secretAccessKey", "f"),
+                Map.entry("bearerToken", "g"), Map.entry("authToken", "h"), Map.entry("db_passwd", "i"),
+                Map.entry("awsCredential", "j"), Map.entry("sshPassphrase", "k")));
+
+        assertThat(masked).hasSize(11);
+
+        for (Map.Entry<String, Object> entry : masked.entrySet()) {
+            assertThat(entry.getValue()).as(entry.getKey())
+                .asString()
+                .matches(MASKED_VALUE_PATTERN);
+        }
+    }
+
+    @Test
+    void testKeepsKeysThatOnlyContainSensitiveWords() {
+        Map<String, Object> masked = SensitiveValueMasker.mask(
+            Map.of("maxTokens", 100, "tokenUrl", "https://example.com/token", "tokenType", "Bearer"));
+
+        assertThat(masked).containsExactlyInAnyOrderEntriesOf(
+            Map.of("maxTokens", 100, "tokenUrl", "https://example.com/token", "tokenType", "Bearer"));
+    }
+
+    @Test
+    void testMasksListAndMapValuesOfSensitiveKeysAsAWhole() {
+        Map<String, Object> masked = SensitiveValueMasker.mask(
+            Map.of("apiKey", List.of("a", "b"), "clientCredentials", Map.of("id", "x", "secret", "y")));
+
+        assertThat(masked).containsOnlyKeys("apiKey", "clientCredentials");
+        assertThat(masked.get("apiKey")).asString()
+            .matches(MASKED_VALUE_PATTERN);
+        assertThat(masked.get("clientCredentials")).asString()
+            .matches(MASKED_VALUE_PATTERN);
     }
 }

@@ -25,7 +25,6 @@ import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -36,9 +35,9 @@ public class SensitiveValueMasker {
     public static final String MASK = "••••••";
 
     private static final int DIGEST_HEX_LENGTH = 16;
-    private static final Set<String> SENSITIVE_KEYS = Set.of(
-        "password", "secret", "clientsecret", "token", "accesstoken", "refreshtoken", "apikey", "apitoken",
-        "authorization", "privatekey", "credentials", "passphrase");
+    private static final List<String> SENSITIVE_KEY_SUFFIXES = List.of(
+        "password", "passwd", "secret", "token", "apikey", "apitoken", "authorization", "privatekey", "credentials",
+        "credential", "passphrase", "secretkey", "accesskey");
 
     private SensitiveValueMasker() {
     }
@@ -48,7 +47,13 @@ public class SensitiveValueMasker {
         String withoutUnderscores = lowerCaseKey.replace("_", "");
         String normalizedKey = withoutUnderscores.replace("-", "");
 
-        return SENSITIVE_KEYS.contains(normalizedKey);
+        for (String sensitiveKeySuffix : SENSITIVE_KEY_SUFFIXES) {
+            if (normalizedKey.endsWith(sensitiveKeySuffix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static Map<String, Object> mask(Map<String, Object> map) {
