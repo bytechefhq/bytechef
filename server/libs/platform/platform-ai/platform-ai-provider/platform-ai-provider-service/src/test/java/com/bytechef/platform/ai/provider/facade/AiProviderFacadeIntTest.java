@@ -30,10 +30,14 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
 import com.bytechef.platform.ai.provider.dto.AiProviderCatalogItemDTO;
+import com.bytechef.platform.ai.provider.dto.AiProviderDTO;
 import com.bytechef.platform.ai.provider.ollama.OllamaModelClient;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
+import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.configuration.service.PropertyServiceImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -45,6 +49,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,6 +93,9 @@ class AiProviderFacadeIntTest {
 
     @Autowired
     private PropertyRepository propertyRepository;
+
+    @Autowired
+    private PropertyService propertyService;
 
     private HttpServer ollamaServer;
 
@@ -154,6 +162,11 @@ class AiProviderFacadeIntTest {
             .getOllama()
             .getOptions()
             .setModel(null);
+
+        applicationProperties.getAi()
+            .getProvider()
+            .getOllama()
+            .setUrl(null);
     }
 
     @Test
@@ -220,11 +233,127 @@ class AiProviderFacadeIntTest {
         assertThat(defaultModel).isEqualTo(new AiDefaultModelDTO(Provider.OLLAMA.getKey(), "qwen3:8b"));
     }
 
+    @Test
+    void testUpdateAiProviderEnabledUpdatesProperty() {
+        aiProviderFacade.updateAiProvider(Provider.OLLAMA.getId(), true, ENVIRONMENT);
+
+        assertThat(getSavedProperty(Provider.OLLAMA).isEnabled()).isTrue();
+        assertThat(getAiProvider(Provider.OLLAMA).enabled()).isTrue();
+
+        aiProviderFacade.updateAiProvider(Provider.OLLAMA.getId(), false, ENVIRONMENT);
+
+        assertThat(getSavedProperty(Provider.OLLAMA).isEnabled()).isFalse();
+        assertThat(getAiProvider(Provider.OLLAMA).enabled()).isFalse();
+    }
+
+    @Test
+    void testEmbeddingProvidersSupportEmbeddings() {
+        List<AiProviderDTO> aiProviders = aiProviderFacade.getAiProviders(ENVIRONMENT);
+
+        assertThat(aiProviders).hasSize(Provider.values().length);
+
+        for (AiProviderDTO aiProvider : aiProviders) {
+            Provider matchingProvider = Arrays.stream(Provider.values())
+                .filter(provider -> provider.getId() == aiProvider.id())
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(aiProvider.supportsEmbeddings())
+                .as("Provider %s supports embeddings iff in Provider.EMBEDDING_PROVIDERS", matchingProvider)
+                .isEqualTo(Provider.EMBEDDING_PROVIDERS.contains(matchingProvider));
+        }
+    }
+
+    @Test
+    void testKeylessProviderConfiguredWithUrlInApplicationPropertiesIsEnabled() {
+        applicationProperties.getAi()
+            .getProvider()
+            .getOllama()
+            .setUrl("http://localhost:11434");
+
+        AiProviderDTO ollama = getAiProvider(Provider.OLLAMA);
+
+        assertThat(ollama.enabled()).isTrue();
+        assertThat(ollama.url()).isEqualTo("http://localhost:11434");
+    }
+
+    @Test
+    void testKeylessProviderWithoutUrlInApplicationPropertiesIsDisabled() {
+        AiProviderDTO ollama = getAiProvider(Provider.OLLAMA);
+
+        assertThat(ollama.enabled()).isFalse();
+    }
+
+    @Test
+    void testKeyedProviderWithoutApiKeyInApplicationPropertiesIsDisabled() {
+        AiProviderDTO openAi = getAiProvider(Provider.OPEN_AI);
+
+        assertThat(openAi.enabled()).isFalse();
+    }
+
+    @Test
+    void testUpdateAiProviderKeepsSavedApiKeyWhenNoneIsSent() {
+        saveOllamaProperty(Map.of("apiKey", "secret-token", "url", "http://ollama.internal:11434"));
+
+        aiProviderFacade.updateAiProvider(Provider.OLLAMA.getId(), null, "http://ollama.example:11434", ENVIRONMENT);
+
+        assertThat(getSavedProperty(Provider.OLLAMA).getValue())
+            .isEqualTo(Map.of("apiKey", "secret-token", "url", "http://ollama.example:11434"));
+    }
+
+    @Test
+    void testUpdateAiProviderRemovesSavedUrlWhenBlankUrlIsSent() {
+        saveOllamaProperty(Map.of("apiKey", "secret-token", "url", "http://ollama.internal:11434"));
+
+        aiProviderFacade.updateAiProvider(Provider.OLLAMA.getId(), null, "", ENVIRONMENT);
+
+        assertThat(getSavedProperty(Provider.OLLAMA).getValue()).isEqualTo(Map.of("apiKey", "secret-token"));
+    }
+
+    @Test
+    void testUpdateAiProviderRemovesSavedApiKeyWhenBlankApiKeyIsSent() {
+        saveOllamaProperty(Map.of("apiKey", "secret-token", "url", "http://ollama.internal:11434"));
+
+        aiProviderFacade.updateAiProvider(Provider.OLLAMA.getId(), "", "http://ollama.internal:11434", ENVIRONMENT);
+
+        assertThat(getSavedProperty(Provider.OLLAMA).getValue())
+            .isEqualTo(Map.of("url", "http://ollama.internal:11434"));
+    }
+
+    @Test
+    void testUpdateAiProviderSavesNewApiKeyAndUrl() {
+        assertThat(propertyService.fetchProperty(Provider.OLLAMA.getKey(), Scope.PLATFORM, null, (long) ENVIRONMENT))
+            .isEmpty();
+
+        aiProviderFacade.updateAiProvider(
+            Provider.OLLAMA.getId(), "secret-token", "http://ollama.example:11434", ENVIRONMENT);
+
+        assertThat(getSavedProperty(Provider.OLLAMA).getValue())
+            .isEqualTo(Map.of("apiKey", "secret-token", "url", "http://ollama.example:11434"));
+    }
+
     private void enableOllama() {
         String url = "http://localhost:" + ollamaServer.getAddress()
             .getPort();
 
         aiProviderFacade.updateAiProvider(Provider.OLLAMA.getId(), null, url, ENVIRONMENT);
+    }
+
+    private AiProviderDTO getAiProvider(Provider provider) {
+        return aiProviderFacade.getAiProviders(ENVIRONMENT)
+            .stream()
+            .filter(aiProvider -> aiProvider.id() == provider.getId())
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private Property getSavedProperty(Provider provider) {
+        return propertyService.fetchProperty(provider.getKey(), Scope.PLATFORM, null, (long) ENVIRONMENT)
+            .orElseThrow();
+    }
+
+    private void saveOllamaProperty(Map<String, ?> value) {
+        propertyService.save(Provider.OLLAMA.getKey(), value, Scope.PLATFORM, null, (long) ENVIRONMENT);
     }
 
     @ComponentScan(basePackages = "com.bytechef.encryption")
