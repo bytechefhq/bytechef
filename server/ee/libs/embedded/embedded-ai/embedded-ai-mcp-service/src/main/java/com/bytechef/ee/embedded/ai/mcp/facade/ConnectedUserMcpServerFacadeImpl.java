@@ -289,7 +289,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ProvisionableConnectedUserMcpServerDTO> getProvisionableMcpServers(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -323,7 +323,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public void provisionMcpServer(long connectedUserId, long mcpServerId) {
         ProvisionableConnectedUserMcpServerDTO provisionableMcpServer = getProvisionableMcpServers(connectedUserId)
             .stream()
