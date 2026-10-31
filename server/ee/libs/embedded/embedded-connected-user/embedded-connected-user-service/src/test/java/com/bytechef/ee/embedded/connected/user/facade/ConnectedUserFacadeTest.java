@@ -121,6 +121,23 @@ class ConnectedUserFacadeTest {
     }
 
     @Test
+    void testImportSkipsARowWhoseExternalIdIsCreatedConcurrently() {
+        Environment environment = Environment.DEVELOPMENT;
+
+        when(connectedUserService.fetchConnectedUser("u1", environment))
+            .thenReturn(Optional.empty(), Optional.of(new ConnectedUser()));
+        when(connectedUserService.createConnectedUser("u1", environment, null, null, Map.of()))
+            .thenThrow(new IllegalArgumentException("A connected user with externalId 'u1' already exists"));
+
+        ConnectedUserImportResultDTO result = connectedUserFacade.importConnectedUsers(
+            environment, csv("externalId\nu1\n"));
+
+        assertThat(result.createdCount()).isZero();
+        assertThat(result.skippedExternalIds()).containsExactly("u1");
+        assertThat(result.rejectedRows()).isEmpty();
+    }
+
+    @Test
     void testImportDoesNotCountARejectedRowAsSeen() {
         Environment environment = Environment.DEVELOPMENT;
 
