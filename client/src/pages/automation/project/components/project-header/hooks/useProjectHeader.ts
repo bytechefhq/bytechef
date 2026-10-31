@@ -10,7 +10,10 @@ import {Project} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectVersionKeys} from '@/shared/queries/automation/projectVersions.queries';
-import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {
+    useGetProjectVersionWorkflowsQuery,
+    useGetProjectWorkflowsQuery,
+} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
@@ -67,6 +70,15 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
 
     const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
 
+    const lastPublishedProjectVersion = (project?.lastProjectVersion ?? 0) - 1;
+
+    const {data: lastPublishedProjectWorkflows} = useGetProjectVersionWorkflowsQuery(
+        projectId,
+        lastPublishedProjectVersion,
+        false,
+        !!projectId && !!project?.lastPublishedDate && lastPublishedProjectVersion > 0
+    );
+
     const queryClient = useQueryClient();
 
     const {
@@ -110,15 +122,28 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         },
     });
 
-    // Publishing duplicates every project workflow, so each draft workflow starts at version 1. Any workflow with a
-    // higher version has been edited since the last publish.
     const hasUnpublishedChanges = useMemo(() => {
         if (!project?.lastPublishedDate) {
             return true;
         }
 
-        return (projectWorkflows ?? []).some((projectWorkflow) => (projectWorkflow.version ?? 1) > 1);
-    }, [project?.lastPublishedDate, projectWorkflows]);
+        if ((projectWorkflows ?? []).some((projectWorkflow) => (projectWorkflow.version ?? 1) > 1)) {
+            return true;
+        }
+
+        if (!projectWorkflows || !lastPublishedProjectWorkflows) {
+            return false;
+        }
+
+        const publishedWorkflowUuids = new Set(
+            lastPublishedProjectWorkflows.map((publishedWorkflow) => publishedWorkflow.workflowUuid)
+        );
+
+        return (
+            projectWorkflows.length !== publishedWorkflowUuids.size ||
+            projectWorkflows.some((projectWorkflow) => !publishedWorkflowUuids.has(projectWorkflow.workflowUuid))
+        );
+    }, [lastPublishedProjectWorkflows, project?.lastPublishedDate, projectWorkflows]);
 
     const handleProjectWorkflowValueChange = useCallback(
         (projectWorkflowId: number) => {
