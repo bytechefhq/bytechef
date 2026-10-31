@@ -39,6 +39,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,11 @@ class DataTableRowServiceIntTest {
         dataTableService.dropTable("rows", DEV_ENVIRONMENT_ID);
         dataTableService.createTable(
             "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+    }
+
+    @AfterEach
+    void afterEach() {
+        dataTableService.dropTable("rows", DEV_ENVIRONMENT_ID);
     }
 
     @Test
@@ -254,6 +260,7 @@ class DataTableRowServiceIntTest {
         return deletedEvent.getPayload();
     }
 
+    @SuppressWarnings("PMD.UnusedReturnValue")
     private static Connection reportH2(Connection connection) throws SQLException {
         DatabaseMetaData databaseMetaData = connection.getMetaData();
 
