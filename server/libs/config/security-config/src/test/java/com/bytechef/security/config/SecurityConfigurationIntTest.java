@@ -390,9 +390,9 @@ class SecurityConfigurationIntTest {
 
             Base64.Encoder encoder = Base64.getEncoder();
 
-            return encoder.encodeToString(
-                String.join(":", encodedCookieTokens)
-                    .getBytes(StandardCharsets.UTF_8));
+            String cookieValue = String.join(":", encodedCookieTokens);
+
+            return encoder.encodeToString(cookieValue.getBytes(StandardCharsets.UTF_8));
         }
 
         @TestConfiguration

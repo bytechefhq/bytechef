@@ -47,9 +47,9 @@ public class ScimGroupFacade {
 
     @Audited(event = ScimGroupAuditEvents.SCIM_GROUP_DELETED, mapper = ScimGroupAuditMapper.class)
     public boolean deleteGroup(long id) {
-        if (authorityService.fetchAuthority(id)
-            .isEmpty()) {
+        Optional<Authority> authorityOptional = authorityService.fetchAuthority(id);
 
+        if (authorityOptional.isEmpty()) {
             return false;
         }
 
