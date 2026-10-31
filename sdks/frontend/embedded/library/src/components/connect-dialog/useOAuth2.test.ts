@@ -14,30 +14,20 @@ const pkceQueryParameters = {
 
 describe('useOAuth2', () => {
     const originalOpen = window.open;
-    const messageListeners: EventListenerOrEventListenerObject[] = [];
+    const stopAuthFunctions: (() => void)[] = [];
 
     beforeEach(() => {
-        const originalAddEventListener = window.addEventListener.bind(window);
-
-        vi.spyOn(window, 'addEventListener').mockImplementation((type, listener, options) => {
-            if (type === 'message') {
-                messageListeners.push(listener);
-            }
-
-            originalAddEventListener(type, listener, options);
-        });
-
         window.open = vi.fn().mockReturnValue({close: vi.fn(), window: {closed: false}} as unknown as Window);
 
         sessionStorage.clear();
     });
 
     afterEach(() => {
-        for (const listener of messageListeners) {
-            window.removeEventListener('message', listener);
+        for (const stopAuth of stopAuthFunctions) {
+            stopAuth();
         }
 
-        messageListeners.length = 0;
+        stopAuthFunctions.length = 0;
 
         vi.restoreAllMocks();
 
@@ -58,7 +48,7 @@ describe('useOAuth2', () => {
         );
 
         act(() => {
-            result.current.getAuth();
+            stopAuthFunctions.push(result.current.getAuth());
         });
 
         const url = new URL(vi.mocked(window.open).mock.calls[0][0] as string);
@@ -83,7 +73,7 @@ describe('useOAuth2', () => {
         );
 
         act(() => {
-            result.current.getAuth();
+            stopAuthFunctions.push(result.current.getAuth());
         });
 
         const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
