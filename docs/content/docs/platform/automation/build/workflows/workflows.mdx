@@ -588,6 +588,20 @@ every version regardless of which environment, if any, currently has it pinned.
 
 ![Project Version History, listing the draft and each published version](workflows/project-history.png)
 
+Click the chevron next to a version, the draft included, to see which workflows changed in it compared
+with the previous version. The list shows each added, removed or modified workflow, with the change
+count for modified workflows, under a summary such as "3 workflows changed (1 added, 2 modified)". The draft is compared with
+the last published version. Expanding or clicking inside the list doesn't select the version for restore.
+
+Click a workflow in the list to open its changes in a dialog with two tabs:
+
+- **Changes** - workflow-level changes such as the label and description, and the trigger, task, cluster
+  element, input and output changes, with old → new values for every changed parameter. An added or
+  removed workflow says so instead of listing changes.
+- **Definition** - a side-by-side diff of the workflow definition.
+
+Values of sensitive parameters such as passwords, tokens and API keys are shown as `••••••`.
+
 ### Test with Chat
 
 For a chat-triggered workflow, the test chat panel lets you exchange messages with the workflow the
