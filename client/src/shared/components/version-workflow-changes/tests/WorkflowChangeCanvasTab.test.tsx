@@ -19,8 +19,12 @@ vi.mock('../WorkflowChangeCanvas', () => ({
     ),
 }));
 
+const hoisted = vi.hoisted(() => ({
+    useGetComponentDefinitionsQuery: vi.fn(() => ({data: []})),
+}));
+
 vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
-    useGetComponentDefinitionsQuery: () => ({data: []}),
+    useGetComponentDefinitionsQuery: hoisted.useGetComponentDefinitionsQuery,
 }));
 
 vi.mock('@/shared/queries/platform/taskDispatcherDefinitions.queries', () => ({
@@ -59,6 +63,29 @@ describe('WorkflowChangeCanvasTab', () => {
 
         expect(screen.getByTestId('mock-change-canvas')).toHaveAttribute('data-label', 'New label');
         expect(getHighlights()).toEqual({added_1: 'ADDED', modified_1: 'MODIFIED', moved_1: 'MOVED'});
+    });
+
+    it('requests the definitions of the workflow components with their actions, triggers and cluster elements', () => {
+        render(
+            <WorkflowChangeCanvasTab
+                baseVersionLabel="V1"
+                change={{
+                    ...BASE_CHANGE,
+                    newDefinition: '{"label":"New label","tasks":[{"name":"http_1","type":"httpClient/v1/get"}]}',
+                }}
+                versionLabel="V2"
+            />
+        );
+
+        expect(hoisted.useGetComponentDefinitionsQuery).toHaveBeenCalledWith(
+            {
+                actionDefinitions: true,
+                clusterElementDefinitions: true,
+                include: ['httpClient'],
+                triggerDefinitions: true,
+            },
+            true
+        );
     });
 
     it('switches to the old canvas with removed, modified and moved highlights', async () => {

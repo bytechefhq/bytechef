@@ -86,7 +86,7 @@ const WorkflowChangeCanvasTab = ({baseVersionLabel, change, versionLabel}: Workf
     const componentNames = useMemo(() => (workflow ? collectComponentNames(workflow) : []), [workflow]);
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery(
-        {include: componentNames},
+        {actionDefinitions: true, clusterElementDefinitions: true, include: componentNames, triggerDefinitions: true},
         componentNames.length > 0
     );
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
