@@ -10,8 +10,13 @@ package com.bytechef.ee.platform.audit.listener;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
@@ -22,18 +27,24 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
@@ -54,6 +65,9 @@ class JobStatusAuditListenerIntTest {
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @MockitoBean
+    private PrincipalJobService principalJobService;
 
     @BeforeEach
     void beforeEach() {
@@ -126,6 +140,108 @@ class JobStatusAuditListenerIntTest {
                 .doesNotThrowAnyException();
 
         assertThat(findAll()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @EnumSource(PlatformType.class)
+    void testPlatformIsTheTypeOfTheJobPrincipal(PlatformType platformType) {
+        when(principalJobService.fetchJobPrincipalId(42L, platformType)).thenReturn(Optional.of(5L));
+
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.COMPLETED));
+
+        assertThat(findSingle("JOB_COMPLETED").getPlatform()).isEqualTo(platformType);
+    }
+
+    @Test
+    void testUnavailablePrincipalJobServiceStillWritesTheRowWithoutPlatform() {
+        @SuppressWarnings("unchecked")
+        ObjectProvider<PrincipalJobService> principalJobServiceProvider = mock(ObjectProvider.class);
+
+        JobStatusAuditListener listener = new JobStatusAuditListener(auditEventService, principalJobServiceProvider);
+
+        listener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.FAILED));
+
+        PersistentAuditEvent persistentAuditEvent = findSingle("JOB_FAILED");
+
+        assertThat(persistentAuditEvent.getPlatform()).isNull();
+        assertThat(persistentAuditEvent.getData()).containsEntry("jobId", "42");
+    }
+
+    @Test
+    void testFailingLookupStillWritesTheRowWithoutPlatform() {
+        when(principalJobService.fetchJobPrincipalId(eq(42L), any()))
+            .thenThrow(new IllegalStateException("execution app down"));
+
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.COMPLETED));
+
+        assertThat(findSingle("JOB_COMPLETED").getPlatform()).isNull();
+    }
+
+    @Test
+    void testLaterStatusFillsInThePlatformOfTheCreatedEvent() {
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.CREATED));
+
+        assertThat(findSingle("JOB_CREATED").getPlatform()).isNull();
+
+        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.EMBEDDED)).thenReturn(Optional.of(5L));
+
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.STARTED));
+
+        assertThat(findSingle("JOB_CREATED").getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+        assertThat(findSingle("JOB_STARTED").getPlatform()).isEqualTo(PlatformType.EMBEDDED);
+    }
+
+    @Test
+    void testLaterStatusLeavesTheCreatedEventOfAnotherJobAlone() {
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(7L, Job.Status.CREATED));
+
+        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.AUTOMATION)).thenReturn(Optional.of(5L));
+
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.STARTED));
+
+        assertThat(findSingle("JOB_CREATED").getPlatform()).isNull();
+    }
+
+    @Test
+    void testCreatedEventDoesNotUpdateItself() {
+        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.AUTOMATION)).thenReturn(Optional.of(5L));
+
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.CREATED));
+
+        assertThat(findSingle("JOB_CREATED").getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        verify(auditEventService, never()).updateJobCreatedPlatform(anyLong(), any(), any());
+    }
+
+    @Test
+    void testLaterStatusWithoutPlatformDoesNotUpdateTheCreatedEvent() {
+        jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.STARTED));
+
+        verify(auditEventService, never()).updateJobCreatedPlatform(anyLong(), any(), any());
+    }
+
+    @Test
+    void testFailingCreatedEventUpdateKeepsTheLaterStatusRow() {
+        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.AUTOMATION)).thenReturn(Optional.of(5L));
+        doThrow(new IllegalStateException("database down")).when(auditEventService)
+            .updateJobCreatedPlatform(anyLong(), any(), any());
+
+        assertThatCode(
+            () -> jobStatusAuditListener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.COMPLETED)))
+                .doesNotThrowAnyException();
+
+        assertThat(findSingle("JOB_COMPLETED").getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+    }
+
+    private PersistentAuditEvent findSingle(String eventType) {
+        List<PersistentAuditEvent> allPersistentAuditEvents = findAll();
+
+        List<PersistentAuditEvent> persistentAuditEvents = allPersistentAuditEvents.stream()
+            .filter(persistentAuditEvent -> eventType.equals(persistentAuditEvent.getEventType()))
+            .toList();
+
+        assertThat(persistentAuditEvents).hasSize(1);
+
+        return persistentAuditEvents.getFirst();
     }
 
     private List<PersistentAuditEvent> findAll() {
