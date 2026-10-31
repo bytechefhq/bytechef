@@ -1,4 +1,4 @@
-import {render, resetAll, screen} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import McpComponentSelectionGrid from '../McpComponentSelectionGrid';
@@ -27,6 +27,25 @@ describe('McpComponentSelectionGrid', () => {
 
         expect(screen.getByText('Slack')).toBeInTheDocument();
         expect(screen.queryByText('No components found')).not.toBeInTheDocument();
+    });
+
+    it('should render components that share a name and version by their id', async () => {
+        const onComponentSelect = vi.fn();
+        const codeComponent = {id: '6', name: 'googleMail', title: 'Gmail Code', version: 1};
+
+        render(
+            <McpComponentSelectionGrid
+                {...defaultProps}
+                components={[{id: '5', name: 'googleMail', title: 'Gmail', version: 1}, codeComponent]}
+                onComponentSelect={onComponentSelect}
+            />
+        );
+
+        expect(screen.getByText('Gmail')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByText('Gmail Code'));
+
+        expect(onComponentSelect).toHaveBeenCalledWith(codeComponent);
     });
 
     it('should name the search term when it matches no component', () => {

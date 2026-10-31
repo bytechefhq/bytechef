@@ -128,6 +128,95 @@ describe('useMcpComponentDialog', () => {
         );
     });
 
+    it('opens a component bound to an integration on the tool step with its integration selected', () => {
+        const {result} = renderHook(() => useMcpComponentDialog({mcpComponent, mcpServerId: '1', open: true}));
+
+        expect(result.current.currentStep).toBe('tools');
+        expect(result.current.selectedComponent).toEqual({
+            integrationId: '5',
+            name: 'gmail',
+            title: 'Gmail',
+            version: 1,
+        });
+    });
+
+    it('closes the dialog when going back from a component bound to an integration', () => {
+        const onOpenChange = vi.fn();
+
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({mcpComponent, mcpServerId: '1', onOpenChange, open: true})
+        );
+
+        act(() => result.current.handleBack());
+
+        expect(onOpenChange).toHaveBeenCalledWith(false);
+        expect(result.current.currentStep).toBe('tools');
+        expect(result.current.selectedComponent?.integrationId).toBe('5');
+    });
+
+    it('returns to the integration step when going back from a component without an integration', () => {
+        const onOpenChange = vi.fn();
+
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({mcpComponent: unboundMcpComponent, mcpServerId: '1', onOpenChange, open: true})
+        );
+
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '6', name: 'gmail', title: 'Gmail Code', version: 1})
+        );
+
+        act(() => result.current.handleBack());
+
+        expect(onOpenChange).not.toHaveBeenCalled();
+        expect(result.current.currentStep).toBe('components');
+        expect(result.current.selectedComponent).toBeNull();
+    });
+
+    it('forgets an unsaved integration choice when a component without an integration is closed', () => {
+        const onOpenChange = vi.fn();
+
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({mcpComponent: unboundMcpComponent, mcpServerId: '1', onOpenChange, open: true})
+        );
+
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '6', name: 'gmail', title: 'Gmail Code', version: 1})
+        );
+
+        act(() => result.current.handleOpenChange(false));
+
+        expect(onOpenChange).toHaveBeenCalledWith(false);
+        expect(result.current.currentStep).toBe('components');
+        expect(result.current.selectedComponent).toBeNull();
+
+        act(() =>
+            result.current.handleComponentSelect({integrationId: '6', name: 'gmail', title: 'Gmail Code', version: 1})
+        );
+
+        act(() => result.current.handleClose());
+
+        expect(result.current.currentStep).toBe('components');
+        expect(result.current.selectedComponent).toBeNull();
+    });
+
+    it('keeps the tool step after a component bound to an integration is saved', () => {
+        const onOpenChange = vi.fn();
+
+        const {result} = renderHook(() =>
+            useMcpComponentDialog({mcpComponent, mcpServerId: '1', onOpenChange, open: true})
+        );
+
+        act(() => result.current.handleSave());
+
+        const saveOptions = hoisted.updateMutate.mock.calls[0][1];
+
+        act(() => saveOptions.onSuccess());
+
+        expect(onOpenChange).toHaveBeenCalledWith(false);
+        expect(result.current.currentStep).toBe('tools');
+        expect(result.current.selectedComponent?.integrationId).toBe('5');
+    });
+
     it('loads the existing embedded tools only for a saved component while the dialog is open', () => {
         const existingTools = {embeddedMcpToolsByComponentId: [{name: 'sendEmail'}]};
 
