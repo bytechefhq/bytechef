@@ -14,5 +14,10 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation(project(":server:libs:config:jackson-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:commons:commons-data"))
+    testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
