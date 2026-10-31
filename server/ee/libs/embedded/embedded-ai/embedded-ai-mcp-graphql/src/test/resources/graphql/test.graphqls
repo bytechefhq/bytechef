@@ -22,6 +22,8 @@ type ComponentDefinition {
 
 type Integration {
     id: ID
+    componentName: String
+    name: String
 }
 
 type IntegrationWorkflow {

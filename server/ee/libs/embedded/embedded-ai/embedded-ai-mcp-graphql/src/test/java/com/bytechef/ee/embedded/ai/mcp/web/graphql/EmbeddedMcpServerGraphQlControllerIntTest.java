@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.ai.mcp.facade.EmbeddedMcpServerFacade;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -244,7 +246,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
         @Test
         void testCreateEmbeddedMcpComponent() {
-            when(embeddedMcpServerFacade.createEmbeddedMcpComponent(any(), anyList()))
+            when(embeddedMcpServerFacade.createEmbeddedMcpComponent(any(), anyLong(), anyList()))
                 .thenReturn(createMcpComponent());
 
             graphQlTester.document("""
@@ -252,7 +254,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
                     createEmbeddedMcpComponent(input: {
                         componentName: "gmail", componentVersion: 1, mcpServerId: "1", connectionId: "7",
                         tools: [{name: "sendEmail", parameters: {to: "x"}}]
-                    }) {
+                    }, integrationId: "5") {
                         id
                     }
                 }
@@ -267,7 +269,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
             ArgumentCaptor<List<McpTool>> mcpToolsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
             verify(embeddedMcpServerFacade).createEmbeddedMcpComponent(
-                mcpComponentArgumentCaptor.capture(), mcpToolsArgumentCaptor.capture());
+                mcpComponentArgumentCaptor.capture(), eq(5L), mcpToolsArgumentCaptor.capture());
 
             McpComponent mcpComponent = mcpComponentArgumentCaptor.getValue();
 
@@ -287,7 +289,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
         @Test
         void testCreateEmbeddedMcpComponentWithoutToolParameters() {
-            when(embeddedMcpServerFacade.createEmbeddedMcpComponent(any(), anyList()))
+            when(embeddedMcpServerFacade.createEmbeddedMcpComponent(any(), anyLong(), anyList()))
                 .thenReturn(createMcpComponent());
 
             graphQlTester.document("""
@@ -295,7 +297,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
                     createEmbeddedMcpComponent(input: {
                         componentName: "gmail", componentVersion: 1, mcpServerId: "1", connectionId: "7",
                         tools: [{name: "sendEmail"}]
-                    }) {
+                    }, integrationId: "5") {
                         id
                     }
                 }
@@ -308,7 +310,8 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
             @SuppressWarnings("unchecked")
             ArgumentCaptor<List<McpTool>> mcpToolsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
-            verify(embeddedMcpServerFacade).createEmbeddedMcpComponent(any(), mcpToolsArgumentCaptor.capture());
+            verify(embeddedMcpServerFacade).createEmbeddedMcpComponent(
+                any(), anyLong(), mcpToolsArgumentCaptor.capture());
 
             assertThat(mcpToolsArgumentCaptor.getValue())
                 .singleElement()
@@ -317,7 +320,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
         @Test
         void testUpdateEmbeddedMcpComponent() {
-            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), anyList()))
+            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), any(), anyList()))
                 .thenReturn(createMcpComponent());
 
             graphQlTester.document("""
@@ -337,7 +340,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
             ArgumentCaptor<McpComponent> mcpComponentArgumentCaptor = ArgumentCaptor.forClass(McpComponent.class);
 
             verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(
-                mcpComponentArgumentCaptor.capture(), isNull(), eq(List.of()));
+                mcpComponentArgumentCaptor.capture(), isNull(), isNull(), eq(List.of()));
 
             McpComponent mcpComponent = mcpComponentArgumentCaptor.getValue();
 
@@ -348,7 +351,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
 
         @Test
         void testUpdateEmbeddedMcpComponentWithEmptyRequiredAuthorities() {
-            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), anyList()))
+            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), any(), anyList()))
                 .thenReturn(createMcpComponent());
 
             graphQlTester.document("""
@@ -366,12 +369,12 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
                 .entity(String.class)
                 .isEqualTo("2");
 
-            verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(any(), eq(Set.of()), eq(List.of()));
+            verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(any(), isNull(), eq(Set.of()), eq(List.of()));
         }
 
         @Test
         void testUpdateEmbeddedMcpComponentWithRequiredAuthorities() {
-            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), anyList()))
+            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), any(), anyList()))
                 .thenReturn(createMcpComponent());
 
             graphQlTester.document("""
@@ -390,7 +393,74 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
                 .isEqualTo("2");
 
             verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(
-                any(), eq(Set.of("ROLE_ADMIN")), eq(List.of()));
+                any(), isNull(), eq(Set.of("ROLE_ADMIN")), eq(List.of()));
+        }
+
+        @Test
+        void testUpdateEmbeddedMcpComponentBindsTheIntegration() {
+            when(embeddedMcpServerFacade.updateEmbeddedMcpComponent(any(), any(), any(), anyList()))
+                .thenReturn(createMcpComponent());
+
+            graphQlTester.document("""
+                mutation {
+                    updateEmbeddedMcpComponent(id: "2", input: {
+                        componentName: "gmail", componentVersion: 1, mcpServerId: "1", tools: [], version: 3
+                    }, integrationId: "5") {
+                        id
+                    }
+                }
+                """)
+                .execute()
+                .path("updateEmbeddedMcpComponent.id")
+                .entity(String.class)
+                .isEqualTo("2");
+
+            verify(embeddedMcpServerFacade).updateEmbeddedMcpComponent(any(), eq(5L), isNull(), eq(List.of()));
+        }
+
+        @Test
+        void testEmbeddedMcpComponentsByServerIdResolvesTheIntegrationId() {
+            when(embeddedMcpServerFacade.getEmbeddedMcpServerMcpComponents(1L))
+                .thenReturn(List.of(createMcpComponent()));
+            when(embeddedMcpServerFacade.fetchEmbeddedMcpComponentIntegrationId(2L)).thenReturn(5L);
+
+            graphQlTester.document("""
+                query {
+                    embeddedMcpComponentsByServerId(mcpServerId: "1") {
+                        id
+                        integrationId
+                    }
+                }
+                """)
+                .execute()
+                .path("embeddedMcpComponentsByServerId[0].integrationId")
+                .entity(String.class)
+                .isEqualTo("5");
+        }
+
+        @Test
+        void testMcpComponentIntegrations() {
+            Integration integration = new Integration();
+
+            integration.setComponentName("googleMail");
+            integration.setId(5L);
+            integration.setName("Gmail");
+
+            when(embeddedMcpServerFacade.getMcpComponentIntegrations()).thenReturn(List.of(integration));
+
+            graphQlTester.document("""
+                query {
+                    mcpComponentIntegrations {
+                        id
+                        componentName
+                        name
+                    }
+                }
+                """)
+                .execute()
+                .path("mcpComponentIntegrations[0].name")
+                .entity(String.class)
+                .isEqualTo("Gmail");
         }
 
         @Test
@@ -408,7 +478,7 @@ class EmbeddedMcpServerGraphQlControllerIntTest {
                 .errors()
                 .satisfy(errors -> assertThat(errors).hasSize(1));
 
-            verify(embeddedMcpServerFacade, never()).updateEmbeddedMcpComponent(any(), any(), anyList());
+            verify(embeddedMcpServerFacade, never()).updateEmbeddedMcpComponent(any(), any(), any(), anyList());
         }
 
         @Test

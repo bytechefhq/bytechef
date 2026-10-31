@@ -4,20 +4,25 @@ extend type Query {
     embeddedMcpServerTags: [Tag]
     embeddedMcpToolsByComponentId(mcpComponentId: ID!): [McpTool]
     mcpComponentDefinitions: [ComponentDefinition!]!
+    mcpComponentIntegrations: [Integration!]!
 }
 
 extend type Mutation {
-    createEmbeddedMcpComponent(input: McpComponentWithToolsInput!): McpComponent
+    createEmbeddedMcpComponent(input: McpComponentWithToolsInput!, integrationId: ID!): McpComponent
     createEmbeddedMcpServer(input: CreateEmbeddedMcpServerInput!): McpServer
     deleteEmbeddedMcpComponent(id: ID!): Boolean
     deleteEmbeddedMcpServer(mcpServerId: ID!): Boolean
     deleteEmbeddedMcpTool(id: ID!): Boolean
-    updateEmbeddedMcpComponent(id: ID!, input: McpComponentWithToolsInput!): McpComponent
+    updateEmbeddedMcpComponent(id: ID!, input: McpComponentWithToolsInput!, integrationId: ID): McpComponent
     updateEmbeddedMcpServer(id: ID!, input: McpServerUpdateInput!): McpServer
     updateEmbeddedMcpServerTags(id: ID!, tags: [TagInput!]!): [Tag]
     updateEmbeddedMcpServerUrl(id: ID!): McpServer
     updateEmbeddedMcpTool(id: ID!, input: McpToolInput!): McpTool
     updateEmbeddedMcpToolEnabled(id: ID!, enabled: Boolean!): McpTool
+}
+
+extend type McpComponent {
+    integrationId: ID
 }
 
 input CreateEmbeddedMcpServerInput {

@@ -8,6 +8,8 @@
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
@@ -29,6 +31,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +52,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
     private final McpComponentService mcpComponentService;
+    private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
@@ -60,6 +64,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         ComponentDefinitionService componentDefinitionService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, McpComponentService mcpComponentService,
+        McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerFacade mcpServerFacade,
         McpServerService mcpServerService, McpToolService mcpToolService, TagService tagService) {
 
@@ -67,6 +72,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
         this.mcpComponentService = mcpComponentService;
+        this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
@@ -76,10 +82,17 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
-    public McpComponent createEmbeddedMcpComponent(McpComponent mcpComponent, List<McpTool> mcpTools) {
-        getEmbeddedMcpServer(mcpComponent.getMcpServerId());
+    public McpComponent createEmbeddedMcpComponent(
+        McpComponent mcpComponent, long integrationId, List<McpTool> mcpTools) {
 
-        return mcpServerFacade.create(mcpComponent, mcpTools);
+        getEmbeddedMcpServer(mcpComponent.getMcpServerId());
+        checkIntegrationComponent(integrationId, mcpComponent.getComponentName());
+
+        McpComponent createdMcpComponent = mcpServerFacade.create(mcpComponent, mcpTools);
+
+        mcpIntegrationComponentService.create(createdMcpComponent.getId(), integrationId);
+
+        return createdMcpComponent;
     }
 
     @Override
@@ -116,6 +129,16 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         McpTool mcpTool = getEmbeddedMcpTool(mcpToolId);
 
         mcpToolService.delete(mcpTool);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public @Nullable Long fetchEmbeddedMcpComponentIntegrationId(long mcpComponentId) {
+        checkEmbeddedMcpComponent(mcpComponentId);
+
+        return mcpIntegrationComponentService.fetchMcpIntegrationComponent(mcpComponentId)
+            .map(McpIntegrationComponent::getIntegrationId)
+            .orElse(null);
     }
 
     @Override
@@ -159,11 +182,8 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     @Override
     @PreAuthorize("isTenantAdmin()")
     public List<ComponentDefinition> getMcpComponentDefinitions() {
-        Set<Long> configuredIntegrationIds = Set.copyOf(integrationInstanceConfigurationService.getIntegrationIds());
-
-        List<String> componentNames = integrationService.getIntegrations(null, List.of(), null, Status.PUBLISHED)
+        List<String> componentNames = getConfiguredPublishedIntegrations()
             .stream()
-            .filter(integration -> configuredIntegrationIds.contains(integration.getId()))
             .map(Integration::getComponentName)
             .distinct()
             .toList();
@@ -178,11 +198,37 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public List<Integration> getMcpComponentIntegrations() {
+        return getConfiguredPublishedIntegrations();
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public McpComponent updateEmbeddedMcpComponent(
-        McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
+        McpComponent mcpComponent, @Nullable Long integrationId, @Nullable Set<String> requiredAuthorities,
+        List<McpTool> mcpTools) {
 
         checkEmbeddedMcpComponent(mcpComponent.getId());
         getEmbeddedMcpServer(mcpComponent.getMcpServerId());
+
+        Optional<McpIntegrationComponent> mcpIntegrationComponentOptional =
+            mcpIntegrationComponentService.fetchMcpIntegrationComponent(mcpComponent.getId());
+
+        if (mcpIntegrationComponentOptional.isPresent()) {
+            McpIntegrationComponent mcpIntegrationComponent = mcpIntegrationComponentOptional.get();
+
+            if (integrationId != null && integrationId.longValue() != mcpIntegrationComponent.getIntegrationId()) {
+                throw new IllegalArgumentException(
+                    "MCP component %s is already bound to integration %s".formatted(
+                        mcpComponent.getId(), mcpIntegrationComponent.getIntegrationId()));
+            }
+
+            checkIntegrationComponent(mcpIntegrationComponent.getIntegrationId(), mcpComponent.getComponentName());
+        } else if (integrationId != null) {
+            checkIntegrationComponent(integrationId, mcpComponent.getComponentName());
+
+            mcpIntegrationComponentService.create(mcpComponent.getId(), integrationId);
+        }
 
         return mcpServerFacade.update(mcpComponent, requiredAuthorities, mcpTools);
     }
@@ -247,10 +293,28 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         return getEmbeddedMcpTool(mcpToolId);
     }
 
+    private void checkIntegrationComponent(long integrationId, String componentName) {
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        if (!componentName.equals(integration.getComponentName())) {
+            throw new IllegalArgumentException(
+                "Integration %s is not built on component %s".formatted(integrationId, componentName));
+        }
+    }
+
     private void checkEmbeddedMcpComponent(long mcpComponentId) {
         McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
 
         getEmbeddedMcpServer(mcpComponent.getMcpServerId());
+    }
+
+    private List<Integration> getConfiguredPublishedIntegrations() {
+        Set<Long> configuredIntegrationIds = Set.copyOf(integrationInstanceConfigurationService.getIntegrationIds());
+
+        return integrationService.getIntegrations(null, List.of(), null, Status.PUBLISHED)
+            .stream()
+            .filter(integration -> configuredIntegrationIds.contains(integration.getId()))
+            .toList();
     }
 
     private McpServer getEmbeddedMcpServer(long mcpServerId) {
