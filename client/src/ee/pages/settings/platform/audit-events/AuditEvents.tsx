@@ -23,11 +23,13 @@ const AuditEvents = () => {
         handleClearDateRange,
         handleClearEventType,
         handleClearFromDate,
+        handleClearPlatform,
         handleClearToDate,
         handleCustomFromDateChange,
         handleCustomToDateChange,
         handleDateRangePresetChange,
         handleEventTypeChange,
+        handlePlatformChange,
         handleResetFilters,
         hasActiveFilters,
         page,
@@ -41,6 +43,7 @@ const AuditEvents = () => {
         eventType: filters.eventType,
         fromDate: filters.fromDate,
         page,
+        platform: filters.platform,
         search,
         size: PAGE_SIZE,
         toDate: filters.toDate,
@@ -67,6 +70,7 @@ const AuditEvents = () => {
                                 onCustomToDateChange={handleCustomToDateChange}
                                 onDateRangePresetChange={handleDateRangePresetChange}
                                 onEventTypeChange={handleEventTypeChange}
+                                onPlatformChange={handlePlatformChange}
                                 onResetFilters={handleResetFilters}
                             />
                         </div>
@@ -83,6 +87,7 @@ const AuditEvents = () => {
                     onClearDateRange={handleClearDateRange}
                     onClearEventType={handleClearEventType}
                     onClearFromDate={handleClearFromDate}
+                    onClearPlatform={handleClearPlatform}
                     onClearToDate={handleClearToDate}
                     onResetFilters={handleResetFilters}
                 />

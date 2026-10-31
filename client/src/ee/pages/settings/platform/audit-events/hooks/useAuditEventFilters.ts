@@ -1,3 +1,4 @@
+import {PlatformType} from '@/shared/middleware/graphql';
 import {useCallback, useEffect, useState} from 'react';
 
 import {AUDIT_EVENT_DATE_RANGE_PRESETS} from '../constants';
@@ -19,7 +20,7 @@ export const useAuditEventFilters = () => {
     const [search, setSearch] = useState<string>();
     const [searchInput, setSearchInput] = useState('');
 
-    const hasActiveFilters = !!(filters.eventType || filters.fromDate || filters.toDate);
+    const hasActiveFilters = !!(filters.eventType || filters.fromDate || filters.platform || filters.toDate);
 
     const updateFilters = useCallback((updater: (previousFilters: AuditEventFiltersI) => AuditEventFiltersI) => {
         setFilters(updater);
@@ -63,6 +64,11 @@ export const useAuditEventFilters = () => {
         [updateCustomDateRange]
     );
 
+    const handleClearPlatform = useCallback(
+        () => updateFilters((previousFilters) => ({...previousFilters, platform: undefined})),
+        [updateFilters]
+    );
+
     const handleClearToDate = useCallback(() => updateCustomDateRange({toDate: undefined}), [updateCustomDateRange]);
 
     const handleCustomFromDateChange = useCallback(
@@ -100,6 +106,11 @@ export const useAuditEventFilters = () => {
         [updateFilters]
     );
 
+    const handlePlatformChange = useCallback(
+        (platform?: PlatformType) => updateFilters((previousFilters) => ({...previousFilters, platform})),
+        [updateFilters]
+    );
+
     const handleResetFilters = useCallback(() => updateFilters(() => CLEARED_FILTERS), [updateFilters]);
 
     useEffect(() => {
@@ -122,11 +133,13 @@ export const useAuditEventFilters = () => {
         handleClearDateRange,
         handleClearEventType,
         handleClearFromDate,
+        handleClearPlatform,
         handleClearToDate,
         handleCustomFromDateChange,
         handleCustomToDateChange,
         handleDateRangePresetChange,
         handleEventTypeChange,
+        handlePlatformChange,
         handleResetFilters,
         hasActiveFilters,
         page,

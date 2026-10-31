@@ -4,6 +4,7 @@ import {ChevronRightIcon} from 'lucide-react';
 
 import {AuditEventItemType} from '../types';
 import AuditEventOutcomeBadge from './AuditEventOutcomeBadge';
+import AuditEventPlatformLabel from './AuditEventPlatformLabel';
 
 interface AuditEventsTablePropsI {
     auditEvents: AuditEventItemType[];
@@ -25,6 +26,8 @@ const AuditEventsTable = ({auditEvents, onRowClick}: AuditEventsTablePropsI) => 
 
                     <TableHead>Principal</TableHead>
 
+                    <TableHead>Platform</TableHead>
+
                     <TableHead>Event Type</TableHead>
 
                     <TableHead>Result</TableHead>
@@ -41,6 +44,10 @@ const AuditEventsTable = ({auditEvents, onRowClick}: AuditEventsTablePropsI) => 
                         </TableCell>
 
                         <TableCell>{auditEvent.principal}</TableCell>
+
+                        <TableCell>
+                            <AuditEventPlatformLabel platform={auditEvent.platform} />
+                        </TableCell>
 
                         <TableCell>{auditEvent.eventType}</TableCell>
 

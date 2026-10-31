@@ -21,6 +21,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
         RolledBack: 'ROLLED_BACK',
         Success: 'SUCCESS',
     },
+    PlatformType: {
+        Automation: 'AUTOMATION',
+        Embedded: 'EMBEDDED',
+    },
     useAuditEventTypesQuery: () => hoisted.auditEventTypesQueryResult,
     useAuditEventsQuery: (variables: Record<string, unknown>) => {
         hoisted.useAuditEventsQueryMock(variables);
@@ -63,6 +67,7 @@ const auditEvent = {
     eventType: 'PERMISSION_CHECK',
     id: '1',
     outcome: 'DENIED',
+    platform: 'AUTOMATION',
     principal: 'alice@example.com',
 };
 
@@ -104,6 +109,42 @@ describe('AuditEvents', () => {
         expect(screen.getByText('alice@example.com')).toBeInTheDocument();
         expect(screen.getByText('PERMISSION_CHECK')).toBeInTheDocument();
         expect(screen.getByText('DENIED')).toBeInTheDocument();
+    });
+
+    it('shows the platform column between Principal and Event Type', () => {
+        render(<AuditEvents />);
+
+        const columnHeaders = screen.getAllByRole('columnheader').map((columnHeader) => columnHeader.textContent);
+
+        expect(columnHeaders.slice(0, 4)).toEqual(['Date', 'Principal', 'Platform', 'Event Type']);
+        expect(screen.getByRole('cell', {name: 'Automation'})).toBeInTheDocument();
+    });
+
+    it('renders Embedded and a dash for an event without a platform', () => {
+        hoisted.auditEventsQueryResult = {
+            data: {
+                auditEvents: {
+                    content: [
+                        {...auditEvent, id: '1', platform: 'EMBEDDED'},
+                        {...auditEvent, id: '2', outcome: 'ALLOWED', platform: null},
+                    ],
+                    number: 0,
+                    size: 25,
+                    totalElements: 2,
+                    totalPages: 1,
+                },
+            },
+            isError: false,
+            isLoading: false,
+            refetch: hoisted.refetchMock,
+        };
+
+        render(<AuditEvents />);
+
+        const [, embeddedRow, platformlessRow] = screen.getAllByRole('row');
+
+        expect(within(embeddedRow).getAllByRole('cell')[2]).toHaveTextContent('Embedded');
+        expect(within(platformlessRow).getAllByRole('cell')[2]).toHaveTextContent('—');
     });
 
     it('names the details button of each row after its event', () => {
@@ -171,6 +212,8 @@ describe('AuditEvents', () => {
         expect(within(dialog).getByText('PERMISSION_CHECK')).toBeInTheDocument();
         expect(within(dialog).getByText('alice@example.com')).toBeInTheDocument();
         expect(within(dialog).getByText('DENIED')).toBeInTheDocument();
+        expect(within(dialog).getByText('Platform')).toBeInTheDocument();
+        expect(within(dialog).getByText('Automation')).toBeInTheDocument();
         expect(within(dialog).getByText('method')).toBeInTheDocument();
         expect(within(dialog).getByText('com.bytechef.ProjectFacade.delete')).toBeInTheDocument();
     });
@@ -196,8 +239,9 @@ describe('AuditEvents', () => {
 
         expect(within(menu).getByText('Filter Audit Events')).toBeInTheDocument();
 
+        expect(within(menu).getAllByRole('menuitem', {name: /^All$/})).toHaveLength(2);
+
         for (const menuItemName of [
-            /^All$/,
             /^JOB_COMPLETED/,
             /^PERMISSION_CHECK/,
             /^All time/,
@@ -251,7 +295,11 @@ describe('AuditEvents', () => {
                 .getByRole('menuitem', {name: /^JOB_COMPLETED/})
                 .querySelector('svg')
         ).not.toBeNull();
-        expect(within(menu).getByRole('menuitem', {name: /^All$/}).querySelector('svg')).toBeNull();
+        expect(
+            within(within(menu).getByRole('group', {name: 'Event types'}))
+                .getByRole('menuitem', {name: /^All$/})
+                .querySelector('svg')
+        ).toBeNull();
     });
 
     it('filters a date preset relative to now with no upper bound', async () => {
@@ -438,5 +486,93 @@ describe('AuditEvents', () => {
         expect(lastQueryVariables()).toMatchObject({eventType: undefined, page: 0, search: 'createProject'});
         expect(screen.getByRole('textbox', {name: 'Search'})).toHaveValue('createProject');
         expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-transparent');
+    });
+
+    it('lists All, Automation and Embedded in the Platform section with All checked', async () => {
+        render(<AuditEvents />);
+
+        const menu = await openFilterMenu();
+
+        const platformGroup = within(menu).getByRole('group', {name: 'Platforms'});
+
+        expect(within(platformGroup).getByText('Platform')).toBeInTheDocument();
+        expect(
+            within(platformGroup)
+                .getAllByRole('menuitem')
+                .map((menuItem) => menuItem.textContent)
+        ).toEqual(['All', 'Automation', 'Embedded']);
+        expect(within(platformGroup).getByRole('menuitem', {name: /^All$/}).querySelector('svg')).not.toBeNull();
+    });
+
+    it('filters by the selected platform, returns to the first page and shows a chip', async () => {
+        render(<AuditEvents />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+
+        await selectMenuItem(/^Embedded/);
+
+        expect(lastQueryVariables()).toMatchObject({page: 0, platform: 'EMBEDDED'});
+        expect(screen.getByText('Platform: Embedded')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-surface-brand-primary');
+
+        const menu = await openFilterMenu();
+
+        const platformGroup = within(menu).getByRole('group', {name: 'Platforms'});
+
+        expect(
+            within(platformGroup)
+                .getByRole('menuitem', {name: /^Embedded/})
+                .querySelector('svg')
+        ).not.toBeNull();
+        expect(within(platformGroup).getByRole('menuitem', {name: /^All$/}).querySelector('svg')).toBeNull();
+    });
+
+    it('removes only the platform filter when its chip is cleared', async () => {
+        render(<AuditEvents />);
+
+        await selectMenuItem(/^Automation/);
+        await selectMenuItem(/^JOB_COMPLETED/);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Clear platform filter'}));
+
+        expect(lastQueryVariables()).toMatchObject({eventType: 'JOB_COMPLETED', platform: undefined});
+        expect(screen.queryByText('Platform: Automation')).not.toBeInTheDocument();
+        expect(screen.getByText('Event type: JOB_COMPLETED')).toBeInTheDocument();
+    });
+
+    it('turns the filter highlight off once the platform chip is cleared', async () => {
+        render(<AuditEvents />);
+
+        await selectMenuItem(/^Automation/);
+
+        expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-surface-brand-primary');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Clear platform filter'}));
+
+        expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-transparent');
+        expect(screen.queryByRole('button', {name: 'Clear all'})).not.toBeInTheDocument();
+    });
+
+    it('clears the platform filter with Clear all', async () => {
+        render(<AuditEvents />);
+
+        await selectMenuItem(/^Embedded/);
+        await selectMenuItem(/^Last 24 hours/);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Clear all'}));
+
+        expect(lastQueryVariables()).toMatchObject({fromDate: undefined, page: 0, platform: undefined});
+        expect(screen.queryByText('Platform: Embedded')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Filter options'})).toHaveClass('bg-transparent');
+    });
+
+    it('clears the platform filter from the Clear all filters menu item', async () => {
+        render(<AuditEvents />);
+
+        await selectMenuItem(/^Automation/);
+        await selectMenuItem('Clear all filters');
+
+        expect(lastQueryVariables()).toMatchObject({platform: undefined});
+        expect(screen.queryByText('Platform: Automation')).not.toBeInTheDocument();
     });
 });

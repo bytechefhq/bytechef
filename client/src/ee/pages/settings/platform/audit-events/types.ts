@@ -1,4 +1,4 @@
-import {AuditEventsQuery} from '@/shared/middleware/graphql';
+import {AuditEventsQuery, PlatformType} from '@/shared/middleware/graphql';
 
 export type AuditEventItemType = NonNullable<AuditEventsQuery['auditEvents']['content']>[number];
 
@@ -12,9 +12,15 @@ export interface AuditEventDateRangePresetI {
     value: AuditEventDateRangePresetType;
 }
 
+export interface AuditEventPlatformI {
+    label: string;
+    value: PlatformType;
+}
+
 export interface AuditEventFiltersI {
     dateRange: AuditEventDateRangeType;
     eventType?: string;
     fromDate?: number;
+    platform?: PlatformType;
     toDate?: number;
 }
