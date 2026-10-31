@@ -66,7 +66,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@PreAuthorize("isTenantAdmin()")
 public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     implements AutomationWorkflowProjectConfigurationAdminFacade {
 
@@ -110,6 +109,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', #environmentId)")
     public long createConfiguration(
         long projectId, long environmentId, int projectVersion, boolean enabled, boolean automationHubVisible) {
 
@@ -138,6 +138,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')")
     public void deleteConfiguration(long id) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -161,6 +163,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void enableConfiguration(long id, boolean enable) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.updateEnabled(id, enable);
@@ -169,6 +173,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.updateWorkflowEnabled(
@@ -179,6 +185,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public List<AutomationWorkflowProjectConfigurationDTO> getConfigurations(long projectId) {
         return automationWorkflowProjectConfigurationService.getConfigurations(projectId)
             .stream()
@@ -188,6 +195,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#configurationId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public AutomationWorkflowProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
         long configurationId, String workflowUuid) {
 
@@ -217,6 +226,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#configurationId, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public AutomationWorkflowProjectConfigurationVersionImpactDTO getVersionImpact(
         long configurationId, int projectVersion) {
 
@@ -285,6 +296,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateConfiguration(long id, int projectVersion, boolean enabled, boolean automationHubVisible) {
         AutomationWorkflowProjectConfiguration configuration =
             automationWorkflowProjectConfigurationService.getConfiguration(id);
@@ -302,6 +315,8 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'AutomationWorkflowProjectConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateConfigurationWorkflow(
         long id, String workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs) {
 

@@ -1642,13 +1642,16 @@ class ConnectedUserIntegrationFacadeIntTest {
             }
 
             @Test
-            void testTenantAdminProvisionsThroughTheGuardedChain() {
+            void testAMemberWithTheConnectedUserScopesProvisionsThroughTheGuardedChain() {
                 SecurityContextHolder.getContext()
                     .setAuthentication(
                         new UsernamePasswordAuthenticationToken(
-                            "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+                            "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-                when(permissionService.isTenantAdmin()).thenReturn(true);
+                when(permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_VIEW"))
+                    .thenReturn(true);
+                when(permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_MANAGE"))
+                    .thenReturn(true);
                 when(permissionService.hasResourceScope(anyLong(), eq("IntegrationInstance"), anyString()))
                     .thenReturn(true);
 
