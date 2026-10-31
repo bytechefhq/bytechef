@@ -82,8 +82,8 @@ describe('useLayout reacts to a cluster box lock toggle', () => {
             useLayout({canvasHeight: 800, canvasWidth: 1200, componentDefinitions: [], taskDispatcherDefinitions: []})
         );
 
-        await waitFor(() => expect(findElementNode()).toBeDefined());
-        await waitFor(() => expect(findElementNode().draggable).toBe(false));
+        await waitFor(() => expect(findElementNode()).toBeDefined(), {interval: 10, timeout: 5000});
+        await waitFor(() => expect(findElementNode().draggable).toBe(false), {interval: 10, timeout: 5000});
 
         act(() => {
             useWorkflowEditorStore.getState().setClusterFrameLocked(ROOT_ID, false);

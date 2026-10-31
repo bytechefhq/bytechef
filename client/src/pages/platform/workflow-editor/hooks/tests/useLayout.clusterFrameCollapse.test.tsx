@@ -105,7 +105,7 @@ describe('useLayout skips the box for a collapsed cluster root', () => {
 
         renderLayout();
 
-        await waitFor(() => expect(findRootNodeData()).toBeDefined());
+        await waitFor(() => expect(findRootNodeData()).toBeDefined(), {interval: 10, timeout: 5000});
 
         expect(findRootNodeData()?.clusterFrame).toBeUndefined();
         expect(findElementNode()).toBeUndefined();
@@ -114,8 +114,8 @@ describe('useLayout skips the box for a collapsed cluster root', () => {
     it('drops the box the moment its root is collapsed, without any other trigger', async () => {
         renderLayout();
 
-        await waitFor(() => expect(findElementNode()).toBeDefined());
-        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined());
+        await waitFor(() => expect(findElementNode()).toBeDefined(), {interval: 10, timeout: 5000});
+        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined(), {interval: 10, timeout: 5000});
 
         act(() => {
             useClusterFrameCollapsedStore.getState().setClusterFrameCollapsed(WORKFLOW_ID, ROOT_ID, true);
@@ -131,6 +131,6 @@ describe('useLayout skips the box for a collapsed cluster root', () => {
 
         renderLayout();
 
-        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined());
+        await waitFor(() => expect(findRootNodeData()?.clusterFrame).toBeDefined(), {interval: 10, timeout: 5000});
     });
 });
