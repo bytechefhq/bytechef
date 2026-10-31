@@ -5,6 +5,7 @@ query embeddedMcpComponentsByServerId($mcpServerId: ID!) {
         componentVersion
         title
         connectionId
+        integrationId
         lastModifiedDate
         mcpServerId
         mcpTools {

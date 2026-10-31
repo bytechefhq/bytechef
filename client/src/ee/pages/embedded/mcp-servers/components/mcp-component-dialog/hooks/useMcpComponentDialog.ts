@@ -12,6 +12,25 @@ import {SelectedToolI} from './useMcpComponentDialogToolSelectionStep';
 
 export type StepType = 'components' | 'tools';
 
+export interface McpIntegrationComponentOptionI extends ComponentDefinition {
+    id?: string;
+    integrationId?: string;
+    version: number | null;
+}
+
+const getInitialStep = (mcpComponent?: McpComponent): StepType =>
+    mcpComponent?.integrationId ? 'tools' : 'components';
+
+const getInitialSelectedComponent = (mcpComponent?: McpComponent): McpIntegrationComponentOptionI | null =>
+    mcpComponent?.integrationId
+        ? {
+              integrationId: mcpComponent.integrationId,
+              name: mcpComponent.componentName,
+              title: mcpComponent.title || mcpComponent.componentName,
+              version: mcpComponent.componentVersion,
+          }
+        : null;
+
 const useMcpComponentDialog = ({
     mcpComponent,
     mcpServerId,
@@ -23,15 +42,9 @@ const useMcpComponentDialog = ({
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
 }) => {
-    const [currentStep, setCurrentStep] = useState<StepType>(mcpComponent ? 'tools' : 'components');
-    const [selectedComponent, setSelectedComponent] = useState<ComponentDefinition | null>(
-        mcpComponent
-            ? ({
-                  name: mcpComponent.componentName,
-                  title: mcpComponent.title || mcpComponent.componentName,
-                  version: mcpComponent.componentVersion,
-              } as ComponentDefinition)
-            : null
+    const [currentStep, setCurrentStep] = useState<StepType>(getInitialStep(mcpComponent));
+    const [selectedComponent, setSelectedComponent] = useState<McpIntegrationComponentOptionI | null>(
+        getInitialSelectedComponent(mcpComponent)
     );
     const [selectedTools, setSelectedTools] = useState<SelectedToolI[]>([]);
 
@@ -59,7 +72,7 @@ const useMcpComponentDialog = ({
         onSuccess: invalidateMcpQueries,
     });
 
-    const handleComponentSelect = (component: ComponentDefinition) => {
+    const handleComponentSelect = (component: McpIntegrationComponentOptionI) => {
         setSelectedComponent(component);
         setSelectedTools([]);
         setCurrentStep('tools');
@@ -70,16 +83,8 @@ const useMcpComponentDialog = ({
             onOpenChange(false);
         }
 
-        setCurrentStep(mcpComponent ? 'tools' : 'components');
-        setSelectedComponent(
-            mcpComponent
-                ? ({
-                      name: mcpComponent.componentName,
-                      title: mcpComponent.title || mcpComponent.componentName,
-                      version: mcpComponent.componentVersion,
-                  } as ComponentDefinition)
-                : null
-        );
+        setCurrentStep(getInitialStep(mcpComponent));
+        setSelectedComponent(getInitialSelectedComponent(mcpComponent));
 
         if (!mcpComponent) {
             setSelectedTools([]);
@@ -91,7 +96,7 @@ const useMcpComponentDialog = ({
             onOpenChange(false);
         }
 
-        setCurrentStep(mcpComponent ? 'tools' : 'components');
+        setCurrentStep(getInitialStep(mcpComponent));
 
         if (!mcpComponent) {
             setSelectedComponent(null);
@@ -101,7 +106,7 @@ const useMcpComponentDialog = ({
     };
 
     const handleSave = () => {
-        if (!selectedComponent) {
+        if (!selectedComponent?.integrationId) {
             return;
         }
 
@@ -119,6 +124,7 @@ const useMcpComponentDialog = ({
                         })),
                         version: mcpComponent.version,
                     },
+                    integrationId: mcpComponent.integrationId ? undefined : selectedComponent.integrationId,
                 },
                 {onSuccess: handleSaveSuccess}
             );
@@ -134,6 +140,7 @@ const useMcpComponentDialog = ({
                             parameters: {},
                         })),
                     },
+                    integrationId: selectedComponent.integrationId,
                 },
                 {onSuccess: handleSaveSuccess}
             );
@@ -141,7 +148,7 @@ const useMcpComponentDialog = ({
     };
 
     const handleBack = () => {
-        if (mcpComponent) {
+        if (mcpComponent?.integrationId) {
             handleClose();
         } else {
             setCurrentStep('components');
@@ -156,16 +163,8 @@ const useMcpComponentDialog = ({
         }
 
         if (!newOpen) {
-            setCurrentStep(mcpComponent ? 'tools' : 'components');
-            setSelectedComponent(
-                mcpComponent
-                    ? ({
-                          name: mcpComponent.componentName,
-                          title: mcpComponent.title || mcpComponent.componentName,
-                          version: mcpComponent.componentVersion,
-                      } as ComponentDefinition)
-                    : null
-            );
+            setCurrentStep(getInitialStep(mcpComponent));
+            setSelectedComponent(getInitialSelectedComponent(mcpComponent));
 
             if (!mcpComponent) {
                 setSelectedTools([]);

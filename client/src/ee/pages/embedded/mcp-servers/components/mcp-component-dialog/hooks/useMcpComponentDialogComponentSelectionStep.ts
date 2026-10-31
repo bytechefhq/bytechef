@@ -1,29 +1,58 @@
-import {useMcpComponentDefinitionsQuery} from '@/shared/middleware/graphql';
-import {useState} from 'react';
+import {useMcpComponentDefinitionsQuery, useMcpComponentIntegrationsQuery} from '@/shared/middleware/graphql';
+import {useMemo, useState} from 'react';
 
-const useMcpComponentDialogComponentSelectionStep = (open: boolean) => {
+import {McpIntegrationComponentOptionI} from './useMcpComponentDialog';
+
+const useMcpComponentDialogComponentSelectionStep = (open: boolean, componentName?: string) => {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const {data, isLoading: isLoadingComponents} = useMcpComponentDefinitionsQuery(
+    const {data: componentDefinitionsData, isLoading: isLoadingComponentDefinitions} = useMcpComponentDefinitionsQuery(
         {},
-        {
-            enabled: open,
-        }
+        {enabled: open}
     );
 
-    const components = data?.mcpComponentDefinitions ?? [];
+    const {data: integrationsData, isLoading: isLoadingIntegrations} = useMcpComponentIntegrationsQuery(
+        {},
+        {enabled: open}
+    );
 
-    const filteredComponents = components.filter((component) => {
+    const integrationComponentOptions = useMemo(() => {
+        const componentDefinitions = componentDefinitionsData?.mcpComponentDefinitions ?? [];
+
+        return (integrationsData?.mcpComponentIntegrations ?? [])
+            .filter((integration) => !componentName || integration.componentName === componentName)
+            .flatMap((integration): McpIntegrationComponentOptionI[] => {
+                const componentDefinition = componentDefinitions.find(
+                    (definition) => definition.name === integration.componentName
+                );
+
+                if (!componentDefinition) {
+                    return [];
+                }
+
+                return [
+                    {
+                        ...componentDefinition,
+                        id: integration.id,
+                        integrationId: integration.id,
+                        title: integration.name,
+                        version: componentDefinition.version ?? null,
+                    },
+                ];
+            });
+    }, [componentDefinitionsData, componentName, integrationsData]);
+
+    const filteredComponents = integrationComponentOptions.filter((integrationComponentOption) => {
         const searchLower = searchTerm.toLowerCase();
-        const nameMatch = component.name.toLowerCase().includes(searchLower);
-        const titleMatch = component.title?.toLowerCase().includes(searchLower);
+        const nameMatch = integrationComponentOption.name.toLowerCase().includes(searchLower);
+        const titleMatch = integrationComponentOption.title?.toLowerCase().includes(searchLower);
 
         return nameMatch || titleMatch;
     });
 
     return {
         filteredComponents,
-        isLoadingComponents,
+        isLoadingComponents: isLoadingComponentDefinitions || isLoadingIntegrations,
         searchTerm,
         setSearchTerm,
     };
