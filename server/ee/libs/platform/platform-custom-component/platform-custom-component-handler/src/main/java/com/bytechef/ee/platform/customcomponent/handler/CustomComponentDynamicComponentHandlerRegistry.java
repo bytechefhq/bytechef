@@ -60,15 +60,16 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
         List<ComponentHandler> componentHandlers = new ArrayList<>();
 
         for (CustomComponent customComponent : customComponentService.getCustomComponents()) {
-            if (!customComponent.isEnabled()) {
+            if (!customComponent.isEnabled() || customComponent.getStatus() != CustomComponent.Status.PUBLISHED) {
                 continue;
             }
 
             try {
-                componentHandlers.add(loadComponentHandler(customComponent, customComponent.getComponentVersion()));
+                componentHandlers.add(
+                    loadComponentHandler(customComponent, customComponent.getComponentVersion()));
             } catch (RuntimeException exception) {
                 log.warn(
-                    "Skipping custom component {} (version {}), could not load it", customComponent.getName(),
+                    "Skipping custom component {} (version {}) — could not load it", customComponent.getName(),
                     customComponent.getComponentVersion(), exception);
             }
         }
@@ -79,6 +80,7 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
     @Override
     public Optional<ComponentHandler> fetchComponentHandler(String name, int componentVersion) {
         return customComponentService.fetchCustomComponent(name, componentVersion)
+            .filter(customComponent -> customComponent.getStatus() == CustomComponent.Status.PUBLISHED)
             .map(customComponent -> loadComponentHandler(customComponent, componentVersion));
     }
 
@@ -86,8 +88,8 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
         URL url = customComponentFileStorage.getCustomComponentFileURL(customComponent.getComponent());
 
         ComponentHandler componentHandler = ComponentHandlerLoader.loadComponentHandler(
-            url, customComponent.getLanguage(), EncodingUtils.base64EncodeToString(customComponent.toString()),
-            cacheManager);
+            url, customComponent.getLanguage(),
+            EncodingUtils.base64EncodeToString(customComponent.toString()), cacheManager);
 
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 

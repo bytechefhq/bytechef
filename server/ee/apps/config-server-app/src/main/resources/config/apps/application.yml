@@ -221,6 +221,9 @@ bytechef:
   cache:
     # Cache provider (CAFFEINE) default: CAFFEINE
     provider: CAFFEINE
+  component:
+    custom-component:
+      java-enabled: true
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true

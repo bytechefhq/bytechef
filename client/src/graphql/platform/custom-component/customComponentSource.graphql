@@ -1,0 +1,3 @@
+query customComponentSource($id: ID!) {
+    customComponentSource(id: $id)
+}

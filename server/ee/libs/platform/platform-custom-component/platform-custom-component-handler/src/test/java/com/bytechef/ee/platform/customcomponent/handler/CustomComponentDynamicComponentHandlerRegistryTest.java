@@ -24,49 +24,73 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
  *
- * @author Ivica Cardic
+ * @author Claude Fable 5
  */
+@ExtendWith(MockitoExtension.class)
 class CustomComponentDynamicComponentHandlerRegistryTest {
 
-    private final CustomComponentService customComponentService = mock(CustomComponentService.class);
+    @Mock
+    private CacheManager cacheManager;
+
+    @Mock
+    private CustomComponentFileStorage customComponentFileStorage;
+
+    @Mock
+    private CustomComponentService customComponentService;
 
     private CustomComponentDynamicComponentHandlerRegistry registry;
 
     @BeforeEach
-    void beforeEach() {
+    void setUp() {
         registry = new CustomComponentDynamicComponentHandlerRegistry(
-            mock(CacheManager.class), mock(CustomComponentFileStorage.class), customComponentService);
+            cacheManager, customComponentFileStorage, customComponentService);
+    }
+
+    @Test
+    void testGetComponentHandlersExcludesDrafts() {
+        CustomComponent draft = new CustomComponent();
+
+        draft.setEnabled(true);
+        draft.setName("test");
+        draft.setStatus(CustomComponent.Status.DRAFT);
+
+        when(customComponentService.getCustomComponents()).thenReturn(List.of(draft));
+
+        assertThat(registry.getComponentHandlers()).isEmpty();
     }
 
     @Test
     void testGetComponentHandlersExcludesDisabled() {
-        CustomComponent disabledCustomComponent = customComponent("disabled", 1, CustomComponent.Language.JAVASCRIPT);
+        CustomComponent disabled = new CustomComponent();
 
-        disabledCustomComponent.setEnabled(false);
+        disabled.setEnabled(false);
+        disabled.setName("test");
+        disabled.setStatus(CustomComponent.Status.PUBLISHED);
 
-        when(customComponentService.getCustomComponents()).thenReturn(List.of(disabledCustomComponent));
+        when(customComponentService.getCustomComponents()).thenReturn(List.of(disabled));
 
         assertThat(registry.getComponentHandlers()).isEmpty();
     }
 
     @Test
     void testGetComponentHandlersSkipsAComponentThatFailsToLoad() {
-        CustomComponent unloadableCustomComponent = customComponent("unloadable", 1, CustomComponent.Language.RUBY);
-        CustomComponent loadableCustomComponent = customComponent("loadable", 7, CustomComponent.Language.JAVASCRIPT);
+        CustomComponent unloadable = publishedCustomComponent("unloadable", 1, CustomComponent.Language.PYTHON);
+        CustomComponent loadable = publishedCustomComponent("loadable", 7, CustomComponent.Language.JAVASCRIPT);
 
-        when(customComponentService.getCustomComponents())
-            .thenReturn(List.of(unloadableCustomComponent, loadableCustomComponent));
+        when(customComponentService.getCustomComponents()).thenReturn(List.of(unloadable, loadable));
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
         when(componentDefinition.getName()).thenReturn("loadable");
-        when(componentDefinition.getActions()).thenReturn(Optional.empty());
 
         ComponentHandler componentHandler = mock(ComponentHandler.class);
 
@@ -75,8 +99,8 @@ class CustomComponentDynamicComponentHandlerRegistryTest {
         try (MockedStatic<ComponentHandlerLoader> componentHandlerLoader = mockStatic(ComponentHandlerLoader.class)) {
             componentHandlerLoader
                 .when(() -> ComponentHandlerLoader.loadComponentHandler(
-                    any(), eq(CustomComponent.Language.RUBY), any(), any()))
-                .thenThrow(new IllegalArgumentException("A language with id 'ruby' is not installed."));
+                    any(), eq(CustomComponent.Language.PYTHON), any(), any()))
+                .thenThrow(new RuntimeException("language 'python' is not installed"));
             componentHandlerLoader
                 .when(() -> ComponentHandlerLoader.loadComponentHandler(
                     any(), eq(CustomComponent.Language.JAVASCRIPT), any(), any()))
@@ -86,15 +110,27 @@ class CustomComponentDynamicComponentHandlerRegistryTest {
 
             assertThat(componentHandlers).hasSize(1);
 
-            ComponentDefinition loadedComponentDefinition = componentHandlers.getFirst()
+            ComponentDefinition survivingDefinition = componentHandlers.get(0)
                 .getDefinition();
 
-            assertThat(loadedComponentDefinition.getName()).isEqualTo("loadable");
-            assertThat(loadedComponentDefinition.getVersion()).isEqualTo(7);
+            assertThat(survivingDefinition.getName()).isEqualTo("loadable");
+            assertThat(survivingDefinition.getVersion()).isEqualTo(7);
         }
     }
 
-    private static CustomComponent customComponent(
+    @Test
+    void testFetchComponentHandlerExcludesDraft() {
+        CustomComponent draft = new CustomComponent();
+
+        draft.setName("test");
+        draft.setStatus(CustomComponent.Status.DRAFT);
+
+        when(customComponentService.fetchCustomComponent("test", 2)).thenReturn(Optional.of(draft));
+
+        assertThat(registry.fetchComponentHandler("test", 2)).isEmpty();
+    }
+
+    private static CustomComponent publishedCustomComponent(
         String name, int componentVersion, CustomComponent.Language language) {
 
         CustomComponent customComponent = new CustomComponent();
@@ -103,6 +139,7 @@ class CustomComponentDynamicComponentHandlerRegistryTest {
         customComponent.setEnabled(true);
         customComponent.setLanguage(language);
         customComponent.setName(name);
+        customComponent.setStatus(CustomComponent.Status.PUBLISHED);
 
         return customComponent;
     }

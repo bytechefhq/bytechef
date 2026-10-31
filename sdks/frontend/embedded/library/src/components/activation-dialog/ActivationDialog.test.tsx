@@ -828,4 +828,73 @@ describe('ActivationDialog', () => {
             expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
         });
     });
+
+    describe('Connect', () => {
+        it('is offered while the user has not connected the integration', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            expect(await within(row).findByRole('button', {name: 'Connect'})).toBeInTheDocument();
+        });
+
+        it('stays offered once the user has a working connection, to add another account', async () => {
+            connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
+
+            renderDialog({workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await within(row).findByRole('option', {name: 'Team Slack'});
+
+            expect(within(row).getByRole('button', {name: 'Connect'})).toBeInTheDocument();
+        });
+
+        it('asks the connect dialog for a new connection', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await userEvent.click(await within(row).findByRole('button', {name: 'Connect'}));
+
+            await waitFor(() =>
+                expect(useConnectDialogMock).toHaveBeenCalledWith(
+                    expect.objectContaining({connectionOnly: true, newConnection: true})
+                )
+            );
+        });
+    });
+
+    describe('an empty account list', () => {
+        it('tells the user where to connect when creating connections is turned off', async () => {
+            renderDialog({connectionCreationAllowed: false, workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            expect(
+                await within(row).findByText('No Slack accounts yet. Connect Slack from your integrations first.')
+            ).toBeInTheDocument();
+        });
+
+        it('offers Connect instead of the hint when creating connections is allowed', async () => {
+            renderDialog({workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            expect(await within(row).findByRole('button', {name: 'Connect'})).toBeInTheDocument();
+            expect(within(row).queryByText(/No Slack accounts yet/)).not.toBeInTheDocument();
+        });
+
+        it('shows no hint while the user has accounts', async () => {
+            connections = [{componentName: 'slack', id: 9, name: 'Team Slack'}];
+
+            renderDialog({connectionCreationAllowed: false, workflowTemplateId: 'wf-slack-channel'});
+
+            const row = await screen.findByTestId('connect-row-slack');
+
+            await within(row).findByRole('option', {name: 'Team Slack'});
+
+            expect(within(row).queryByText(/No Slack accounts yet/)).not.toBeInTheDocument();
+        });
+    });
 });
