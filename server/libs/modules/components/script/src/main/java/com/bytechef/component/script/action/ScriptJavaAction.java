@@ -32,15 +32,24 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.script.action.definition.ScriptActionDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.platform.component.runner.TaskRunnerRegistry;
 
 /**
+ * Not registered in {@code ScriptComponentHandler} - its entry there is commented out.
+ *
+ * <p>
+ * It passes the registry to {@link ScriptActionDefinition}, so {@code perform} would route through the selected runner,
+ * but it contributes no {@code taskRunner} property the way {@link ScriptJavaScriptAction} does. Re-enabling it as it
+ * stands therefore yields an action that routes through a runner a workflow author cannot select: with no property in
+ * the definition, every task falls back to {@code graalvm}. Whoever re-enables it must add
+ * {@code TaskRunnerPropertyFactory.taskRunnerProperty(...)} to the property list as well.
+ *
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
 public class ScriptJavaAction {
 
-    public static ScriptActionDefinition of(PolyglotEngine polyglotEngine) {
+    public static ScriptActionDefinition of(TaskRunnerRegistry taskRunnerRegistry) {
         return new ScriptActionDefinition(
             action("java")
                 .title("Java")
@@ -60,7 +69,7 @@ public class ScriptJavaAction {
                             "public static Object perform(Map<String, ?> input, Context context) {\n\treturn null;\n}")
                         .required(true))
                 .output(),
-            "java", polyglotEngine);
+            "java", taskRunnerRegistry);
     }
 
     private ScriptJavaAction() {

@@ -33,7 +33,7 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.script.cluster.tool.definition.ScriptToolDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.platform.component.runner.PolyglotEngine;
 
 /**
  * @author Ivica Cardic

@@ -183,7 +183,7 @@ public class ApplicationProperties {
     private Resources resources = new Resources();
 
     /**
-     * Script execution configuration: the guest polyglot sandbox.
+     * Script execution configuration: the guest polyglot sandbox and the task runner allowlist.
      */
     private Script script = new Script();
 
@@ -4441,8 +4441,38 @@ public class ApplicationProperties {
 
         private Sandbox sandbox = new Sandbox();
 
+        private boolean injectConnections;
+
+        private RunnerLimits runnerLimits = new RunnerLimits();
+
+        private Map<String, Runner> runners = new HashMap<>();
+
+        public RunnerLimits getRunnerLimits() {
+            return runnerLimits;
+        }
+
+        public Map<String, Runner> getRunners() {
+            return runners;
+        }
+
         public Sandbox getSandbox() {
             return sandbox;
+        }
+
+        public boolean isInjectConnections() {
+            return injectConnections;
+        }
+
+        public void setInjectConnections(boolean injectConnections) {
+            this.injectConnections = injectConnections;
+        }
+
+        public void setRunnerLimits(RunnerLimits runnerLimits) {
+            this.runnerLimits = runnerLimits;
+        }
+
+        public void setRunners(Map<String, Runner> runners) {
+            this.runners = runners;
         }
 
         public void setSandbox(Sandbox sandbox) {
@@ -4491,6 +4521,62 @@ public class ApplicationProperties {
 
             public void setMaxHeapMemory(DataSize maxHeapMemory) {
                 this.maxHeapMemory = maxHeapMemory;
+            }
+        }
+
+        public static class Runner {
+
+            private boolean enabled;
+
+            private Map<String, String> properties = new HashMap<>();
+
+            public Map<String, String> getProperties() {
+                return properties;
+            }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public void setProperties(Map<String, String> properties) {
+                this.properties = properties;
+            }
+        }
+
+        public static class RunnerLimits {
+
+            private Duration maxWait;
+
+            private DataSize maxLogBytes;
+
+            private DataSize maxTransferBytes;
+
+            public DataSize getMaxLogBytes() {
+                return maxLogBytes;
+            }
+
+            public DataSize getMaxTransferBytes() {
+                return maxTransferBytes;
+            }
+
+            public Duration getMaxWait() {
+                return maxWait;
+            }
+
+            public void setMaxLogBytes(DataSize maxLogBytes) {
+                this.maxLogBytes = maxLogBytes;
+            }
+
+            public void setMaxTransferBytes(DataSize maxTransferBytes) {
+                this.maxTransferBytes = maxTransferBytes;
+            }
+
+            public void setMaxWait(Duration maxWait) {
+                this.maxWait = maxWait;
             }
         }
     }

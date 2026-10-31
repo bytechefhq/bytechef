@@ -1,0 +1,519 @@
+The Commands component runs a list of shell, Python or Node commands in an external task runner - a runner that
+executes outside this JVM, in its own process. It is the counterpart to the **Script** component's `graalvm` runner:
+where Script executes inline `perform(input, context)` source with access to `context.component.*`, Commands executes
+plain interpreter commands with none of that in-process access, and gets a plain process's environment, timeout and
+file handling in exchange.
+
+## Available actions
+
+The three actions - Shell, Python and Node - differ only in the interpreter they hand the commands to; their
+properties are identical. Each action's `commands` are lines fed to that action's own interpreter - a `Shell`
+action's commands are shell lines, a `Python` action's commands are Python statements, a `Node` action's commands are
+JavaScript statements. They are never mixed: a `Python` action does not accept shell syntax, and vice versa.
+
+**Properties (for all three actions):**
+- `commands` (array of strings, required): the lines handed to the interpreter, in order.
+- `taskRunner` (object, required if a runner is enabled): selects which task runner executes the commands. See
+  below.
+- `warnOnStdErr` (boolean, default `true`): logs a warning when the execution writes to standard error. It never
+  fails the task by itself - a non-zero exit code is what fails the task, and that happens regardless of this
+  setting.
+
+Depending on which task runner is selected, additional properties may appear: `env` (environment variables),
+`inputFiles`, `outputFiles` (glob patterns matched after the run), `timeout` (seconds), and the selected runner's own
+properties - the Process runner's `interpreter` override, or the Docker runner's `image` and container settings.
+
+## Task runners
+
+Commands only offers runners that declare the **Commands** capability - that excludes GraalVM entirely, since
+GraalVM's in-process component bridge cannot run a list of shell commands. Four built-in runners declare it:
+
+| Runner | Type | What it does |
+| --- | --- | --- |
+| Process | `process` | Runs the commands in a child process on the same host, with the server's own environment cleared. |
+| Docker | `docker` | Runs the commands in a single-use container, on the local daemon or on whichever daemon the operator's `host` names. |
+| Kubernetes | `kubernetes` | Enterprise. Runs the commands as a pod on the cluster the task's **Kubernetes** connection names. |
+| AWS Batch | `aws-batch` | Enterprise. Runs the commands as an AWS Batch job in the account the task's **AWS** connection names. |
+
+All four are **off** until an operator turns them on with `bytechef.script.runners.<type>.enabled=true` - the shipped
+configuration enables only `graalvm`, which Commands never offers. So this list is what your installation *may* have,
+not what it has; it may also include a runner contributed by another module. If no runner declaring the Commands
+capability is enabled at all, running any of these actions fails with a message naming the configuration key to set.
+
+### Operator configuration
+
+Every key these runners read, together, with its default:
+
+```yaml
+bytechef:
+  script:
+    runners:
+      graalvm:
+        enabled: true
+        properties:
+          trusted-enabled: false
+      process:
+        enabled: false
+      docker:
+        enabled: false
+        properties:
+          host: ""
+          allow-task-host: false
+          allow-volume-mounts: false
+      aws-batch:
+        enabled: false
+      kubernetes:
+        enabled: false
+      inject-connections: true
+    runner-limits:
+      max-wait: PT1H
+      max-log-bytes: 1MB
+      max-transfer-bytes: 512MB
+```
+
+Only `graalvm` is enabled by the shipped configuration; `process`, `docker`, `kubernetes` and `aws-batch` need their own `enabled: true` before
+anything else under them takes effect. What each key costs to turn on:
+
+- `graalvm.trusted-enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
+  sandbox entirely and grants the guest context full host access (`HostAccess.ALL`) with no resource ceilings - the
+  same access the server process itself has. Off by default for that reason.
+- `process.enabled`: any workflow author can run arbitrary commands on the ByteChef host as the server's user - with
+  that user's files, credentials and network reach. Leave it off unless every workflow author is trusted with the host.
+- `docker.enabled`: any workflow author can choose any image, `user`, `privileged: true` and `networkMode: host` -
+  effectively root on the daemon's host. Turn it on only where workflow authors are trusted with that host.
+- `kubernetes.enabled`: any workflow author with a Kubernetes connection can run any image on that connection's cluster, within what the connection's credentials allow. Authors choose the pod's `namespace` and `serviceAccountName`, so the pod can run in any namespace the connection can create pods in, as any service account there. ByteChef adds no limits of its own beyond `runner-limits`; give the connection a dedicated namespace and enforce Pod Security Admission (for example the `restricted` level) on it.
+- `aws-batch.enabled`: any workflow author with an AWS connection can run any image on that account's Batch queues, as any job and task role the connection's identity may pass. Give the connection's identity a policy scoped to the queues, bucket and roles below.
+- `docker.host`: points the runner at a remote Docker daemon instead of the local socket. Whoever controls that
+  daemon controls every container this runner starts, so this is only as safe as the daemon it names.
+- `docker.allow-task-host`: lets a workflow name its own Docker API through the runner's `host` property; whoever
+  controls that daemon controls every container it starts, so leave it off unless workflow authors are trusted with the
+  daemons they can reach.
+- `docker.allow-volume-mounts`: offers the runner's `volumes` property; a host bind mount chosen by a workflow author is
+  a container escape.
+- `inject-connections`: when `true` (as in the shipped `application-bytechef.yml`; the Java default is `false`), the connections a task declares are handed to external runners as
+  environment variables and masked in the output; see **Connections in external runners**. Set it to `false` to
+  inject nothing and mask nothing.
+- `runner-limits`: ceilings on what a remote execution may cost this server: the longest a worker waits on one job, the
+  most log bytes it keeps, and the most bytes it moves in or out; any runner may override them under its own
+  `properties`.
+
+**The published property list below is configuration-dependent, and this page's is not necessarily yours.** The
+`taskRunner` property's schema on this reference page - the JSON-derived `{type, interpreter}` shown in the
+**Properties** table above and in the JSON example - is assembled by `TaskRunnerPropertyFactory` from whichever
+runners were enabled in the registry that generated this page's snapshot, filtered to the ones declaring the
+Commands capability. That registry enables only `process`, so this page's generated table shows the `process`
+runner's own shape and never Docker's (`image`, `cpu`, `memory`, `networkMode`, ...) - not because Docker is
+unsupported, but because it was not enabled when the snapshot was captured. Your own deployment's editor renders the
+select and properties for whichever runners *you* enabled, which may add or omit entries this page shows. The
+Docker runner's actual properties are documented by hand below, not derived from the snapshot.
+
+Each action's default interpreter, when the Process runner's `interpreter` property is left blank:
+
+| Action | Default interpreter |
+| --- | --- |
+| Shell | `/bin/sh` |
+| Python | `python3` |
+| Node | `node` |
+
+### The Docker runner
+
+The Docker runner is the Process runner's sibling: the same working directory, the same `env`, `inputFiles`,
+`outputFiles` and `timeout` handling, the same five-key result. What differs is that the interpreter is reached
+through a container image instead of the host's `PATH`, so the commands run with the host filesystem, the host's
+installed packages and the host's users all out of reach.
+
+Its own properties:
+
+| Property | What it does |
+| --- | --- |
+| `image` | The container image the task runs in. Optional - see the defaults below. |
+| `entrypoint` | Replaces the interpreter the source file is handed to. The source file is appended either way. |
+| `user` | The user the container runs as, as a name or a numeric `uid[:gid]`. |
+| `cpu` | How many CPUs the container may use, as a decimal fraction of one CPU. |
+| `memory` | How much memory the container may use, in bytes or with a `b`, `k`, `m` or `g` suffix. |
+| `networkMode` | `bridge`, `none`, `host` or a named network; left blank the daemon's default applies. |
+| `extraHosts` | Additional entries for the container's hosts file, each written as `host:ip`. |
+| `privileged` | Gives the container every capability of the daemon's host. |
+| `credentials` | `registry`, `username`, `password`, `registryToken` for a private registry. |
+| `killGracePeriod` | How long a still-running container is given to stop on its own when it is killed - on a timeout or a non-resumable shutdown - before it is forced, as an ISO-8601 duration. Zero (the default) forces it at once. |
+| `host` | The Docker API this task talks to; only when the operator set `allow-task-host`. |
+| `volumes` | Bind mounts; only when the operator set `allow-volume-mounts`; each entry `host-path:container-path[:ro]`. |
+| `pullPolicy` | When the image is pulled from its registry: `ALWAYS`, `IF_NOT_PRESENT` (default) or `NEVER`. |
+| `resume` | After a server restart, re-attach to the job this task execution already started instead of starting another one. Defaults to `true`. |
+| `delete` | Remove the job and whatever it left behind once it has finished. Turn it off to inspect a failed job by hand. Defaults to `true`. |
+| `waitUntilRunning` | How long the job may take to be scheduled, pull its image and start, as an ISO-8601 duration. Defaults to `PT10M`. |
+| `waitUntilCompletion` | How long the job may run before it is killed, as an ISO-8601 duration. The task's Timeout, when set, takes precedence; both are capped by the operator's `max-wait`. Defaults to `PT1H`. |
+
+Each action runs in a default image when `image` is left blank:
+
+| Action | Default image |
+| --- | --- |
+| Shell | `ubuntu:24.04` |
+| Python | `python:3.12-slim` |
+| Node | `node:22-alpine` |
+
+**`HOME` is the working directory under both runners.** Several interpreters write caches relative to it and fall
+over when it is unset, so the Process runner re-seeds it and the Docker runner sets it to the container's working
+directory rather than leaving it to the image - where it would be `/root`, or `/` for a numeric `user` that appears in
+no `/etc/passwd`. Without that, `pip install --user` under `user: "1000:1000"` succeeds on the Process runner and
+fails on the Docker runner with a permission error, for a reason that has nothing to do with the execution
+environment. A declared `env` entry named `HOME` still wins.
+
+**Resource limits are the workflow's own choice.** `cpu` and `memory` are applied exactly as written and nothing is
+applied when they are blank. The operator's only ceilings are the `runner-limits` above, which bound what the *server*
+spends on a job, not what the container may use.
+
+**A restart does not lose a running container.** Every container carries an `io.bytechef.managed-by=bytechef` label and
+an `io.bytechef.task-execution-id` label whose value combines the tenant, the job and the task execution
+(`<tenant>-<job>-<task execution>`), so executions of different tenants never share a key. When a task execution is
+redelivered - after a server restart, say - the runner finds the container that execution already started and waits
+for it instead of starting another (`resume`). With `delete: false` the finished container is kept, so a failed run can
+be inspected by hand.
+
+Re-attaching only happens when something redelivers the task, which takes a durable message broker. With the default
+in-memory broker nothing is redelivered after a restart, so a graceful shutdown with `resume` on leaves the container
+behind: keep `delete` on, and remove leftovers by hand with
+`docker rm -f $(docker ps -aq --filter label=io.bytechef.managed-by=bytechef)`. The key is unique within one ByteChef
+installation only, so two installations should not share one Docker daemon while `resume` is on.
+
+### The Kubernetes runner (Enterprise)
+
+The Kubernetes runner is the Docker runner's sibling for clusters: the same `env`, `inputFiles`, `outputFiles` and
+`timeout` handling and the same five-key result, but the task runs as a single-use pod on the cluster that the task's
+**Kubernetes** connection names. It is available with `bytechef.edition=ee` and `bytechef.script.runners.kubernetes.enabled=true`.
+
+**What it needs.** A `kubernetes` connection with the API server URL, an optional CA certificate (PEM or base64 PEM), a
+bearer token or a client certificate and key, a default namespace, and "Skip TLS Verification" for test clusters only.
+Client keys may be RSA or EC in PEM `BEGIN EC PRIVATE KEY` form; an EC key in PKCS#8 form (`BEGIN PRIVATE KEY`) is read
+as RSA and does not work. The task's image must provide `/bin/sh`.
+
+Its own properties:
+
+| Property | What it does |
+| --- | --- |
+| `image` | The container image the task runs in. Optional - the defaults are the Docker runner's. |
+| `entrypoint` | Replaces the interpreter the source file is handed to. The source file is appended either way. |
+| `namespace` | The namespace the pod runs in; defaults to the connection's namespace. |
+| `serviceAccountName` | The service account the pod runs as. Without one, no service account token is mounted into the pod. |
+| `resources` | `cpuRequest`, `cpuLimit`, `memoryRequest`, `memoryLimit`, each a Kubernetes quantity such as `500m` or `256Mi`. |
+| `nodeSelector` | Node labels the pod must match. |
+| `tolerations` | Taints the pod tolerates. |
+| `labels` | Additional labels for the pod. |
+| `annotations` | Additional annotations for the pod. Keys under `bytechef.io/` are reserved. |
+| `credentials` | `registry`, `username`, `password` for a private registry. Becomes a temporary image pull secret that is owned by the pod, so it is removed with the pod. |
+| `fileSidecarImage` | The image of the file sidecar containers. Defaults to `busybox:1.36`; it needs `sh`, `head`, `tar`, `test`, `sleep` and `touch`. |
+| `killGracePeriod` | How long a still-running pod is given to stop on its own when it is killed - on a timeout or a non-resumable shutdown - before it is forced, as an ISO-8601 duration. A finished pod is deleted at once. |
+| `pullPolicy` | When the image is pulled from its registry: `ALWAYS`, `IF_NOT_PRESENT` (default) or `NEVER`. |
+| `resume` | After a server restart, re-attach to the pod this task execution already started instead of starting another one. Defaults to `true`. |
+| `delete` | Remove the pod and its pull secret once it has finished. Turn it off to inspect a failed pod by hand. Defaults to `true`. |
+| `waitUntilRunning` | How long the pod may take to be scheduled, pull its images and start, as an ISO-8601 duration. Defaults to `PT10M`. |
+| `waitUntilCompletion` | How long the pod may run before it is killed, as an ISO-8601 duration. The task's Timeout, when set, takes precedence; both are capped by the operator's `max-wait`. Defaults to `PT1H`. |
+
+**How a run works.**
+
+- The pod has three containers sharing an `emptyDir` sized at twice `max-transfer-bytes`. The file sidecar (an init
+  container) receives the inputs, `main` runs the task with stderr redirected to `.stderr`, and the output sidecar hands
+  back `output/` and `.stderr` before the pod completes. Inputs are sent as one archive that the file sidecar unpacks
+  with `sh -c "head -c <size> | tar -xf - -C /bytechef/work"` over `pods/exec`, because the exec protocol cannot signal
+  the end of its input.
+- `activeDeadlineSeconds` is the completion budget plus one minute, so a pod whose ByteChef worker died still stops.
+- Image pull and configuration errors fail within seconds.
+- A pod that cannot be scheduled fails after `waitUntilRunning` with the cluster's scheduling message.
+- `OOMKilled` and evictions are named in the failure.
+
+**Resume.**
+
+- Pods carry `bytechef.io/managed-by=bytechef` and `bytechef.io/task-execution-id` (the tenant-job-task key, or a `k-`
+  SHA-256 prefix when it does not fit a label value). The full key is in the annotation `bytechef.io/key`.
+- A redelivered task re-attaches to a pod whose inputs were delivered and whose outputs were not yet collected. Any
+  other match is deleted and the task resubmitted.
+- The same durable-broker caveat as Docker applies. Clean up leftovers with
+  `kubectl delete pod -l bytechef.io/managed-by=bytechef` and
+  `kubectl delete secret -l bytechef.io/managed-by=bytechef`.
+- The key is unique within one ByteChef installation only, so two installations must not share one namespace while
+  `resume` is on.
+
+**RBAC.** The connection's identity needs a Role like this one:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bytechef-task-runner
+  namespace: <namespace>
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create", "get"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list"]
+```
+
+Secrets are only needed when tasks use `credentials`; `patch` ties each pull secret to its pod through an owner
+reference, so the cluster removes the secret with the pod even when ByteChef cannot. Without `events`, scheduling failures are reported without the
+cluster's message.
+
+### The AWS Batch runner (Enterprise)
+
+The AWS Batch runner is the Kubernetes runner's sibling for AWS: the same `env`, `inputFiles`, `outputFiles` and
+`timeout` handling and the same five-key result, but the task runs as an AWS Batch job in the account that the task's
+**AWS** connection names. It is available with `bytechef.edition=ee` and `bytechef.script.runners.aws-batch.enabled=true`.
+
+**What it needs.**
+
+- An `aws` connection: access key ID, secret access key, region, and optionally a role ARN and external ID. With a
+  role, its maximum session duration must cover the completion budget plus 10 minutes, at most 12 hours.
+- An **ECS-backed** job queue (Fargate or EC2; EKS queues are not supported).
+- A staging bucket.
+- On Fargate, an execution role. If the subnets have no NAT gateway, use public subnets with **Assign Public IP**, so
+  the task can pull images and reach S3.
+- The task's image must provide `/bin/sh`.
+
+Its own properties:
+
+| Property | What it does |
+| --- | --- |
+| `image` | The container image the task runs in. Optional - the defaults are the Docker runner's. |
+| `entrypoint` | Replaces the interpreter the source file is handed to. The source file is appended either way. |
+| `jobQueue` | The ECS-backed job queue the job is submitted to. |
+| `bucket` | The staging bucket for the input and output archives. |
+| `platform` | `FARGATE` (default) or `EC2`. |
+| `executionRoleArn` | The role Fargate uses to pull images and write logs. Required on Fargate. |
+| `taskRoleArn` | The role the task itself runs as. Without one, the task has no AWS permissions. |
+| `vcpu` | The task's total vCPU, sidecars included. Defaults to `1`. |
+| `memory` | The task's total memory in MiB, sidecars included. Defaults to `2048`. |
+| `assignPublicIp` | Gives the Fargate task a public IP, so it can pull images and reach S3 from public subnets. |
+| `completionCheckInterval` | How often the job's status and logs are polled, as an ISO-8601 duration. Defaults to `PT5S`. |
+| `fileSidecarImage` | The image of the file sidecar containers. Defaults to `curlimages/curl:8.11.1`; it needs `sh`, `curl` and `tar`. |
+| `pullPolicy` | Shared with the other runners, and ignored by Batch. |
+| `resume` | After a server restart, re-attach to the job this task execution already started instead of starting another one. Defaults to `true`. |
+| `delete` | Deregister the job definition and delete the staged objects once the job has finished. Defaults to `true`. |
+| `waitUntilRunning` | How long the job may stay queued, pending or starting before it fails, as an ISO-8601 duration. Defaults to `PT10M`. |
+| `waitUntilCompletion` | How long the job may run before it is killed, as an ISO-8601 duration. The task's Timeout, when set, takes precedence; both are capped by the operator's `max-wait`. Defaults to `PT1H`. |
+
+**Sizing.**
+
+- `vcpu` and `memory` are the task's totals. The two file sidecars take 0.25 vCPU / 64 MiB each, and the task's own
+  container gets the rest.
+- On Fargate the total must be a Fargate combination of at least 1 vCPU:
+
+| vCPU | Memory (MiB) | Step (MiB) |
+| --- | --- | --- |
+| 1 | 2048 to 8192 | 1024 |
+| 2 | 4096 to 16384 | 1024 |
+| 4 | 8192 to 30720 | 1024 |
+| 8 | 16384 to 61440 | 4096 |
+| 16 | 32768 to 122880 | 8192 |
+
+- EC2 queues are not checked beyond the sidecar minimum.
+
+**How a run works.**
+
+- Inputs go to `s3://<bucket>/bytechef/<job>/<name>-<random>/input.tar`. A job definition is registered for the run,
+  with three containers sharing an ephemeral volume:
+  - the file sidecar downloads and unpacks the inputs through a presigned GET;
+  - `main` runs the task with stderr redirected to `.stderr`;
+  - the essential output sidecar tars `output/` and `.stderr` and uploads them through a presigned PUT, then the job
+    ends.
+- The presigned URLs are valid for the completion budget plus 10 minutes. They sit in the job definition's
+  environment, readable by anyone allowed `batch:DescribeJobDefinitions`, and the definition is deregistered after the
+  run.
+- The same holds for the task's `env` values: they are stored in the job definition, readable through
+  `batch:DescribeJobDefinitions` and `batch:DescribeJobs`, and deregistered after the run unless the job is detached.
+  Do not put secrets in `env` on this runner.
+- The job's attempt timeout is the completion budget plus one minute.
+- The result's exit code is `main`'s, even when the job itself reports `SUCCEEDED`. If `main` succeeds but the output
+  upload fails, the task fails.
+- A job stuck in `RUNNABLE` fails after `waitUntilRunning` with "the job queue may have no capacity".
+- Logs are tailed from CloudWatch `/aws/batch/job`.
+
+**Resume.**
+
+- Jobs are named `bytechef-<key>` (`k-` plus a SHA-256 prefix when the key does not fit) and tagged `bytechef.io/key`.
+- A redelivered task re-attaches to the newest job with that key that has not finished.
+- The same durable-broker caveat as the other runners applies, and two installations must not share one queue with
+  `resume` on.
+- Clean up leftovers by terminating jobs named `bytechef-*`, deregistering `bytechef-*` job definitions, and deleting
+  `s3://<bucket>/bytechef/`.
+
+**IAM.** The connection's identity needs a policy like this one:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "batch:RegisterJobDefinition", "batch:DeregisterJobDefinition", "batch:SubmitJob", "batch:DescribeJobs",
+        "batch:ListJobs", "batch:TerminateJob", "batch:TagResource"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::<bucket>/bytechef/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::<bucket>",
+      "Condition": {"StringLike": {"s3:prefix": "bytechef/*"}}
+    },
+    {
+      "Effect": "Allow",
+      "Action": "logs:GetLogEvents",
+      "Resource": "arn:aws:logs:*:*:log-group:/aws/batch/job:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": ["<execution role ARN>", "<task role ARN>"]
+    }
+  ]
+}
+```
+
+Without `s3:ListBucket`, S3 answers 403 instead of 404 for a missing object, so a run that produced no outputs would
+fail instead of reading as "no outputs".
+
+**Verifying it.** The automated tests cover the job definition and the S3 staging (against LocalStack), but not Batch
+itself. Check these by hand on a real account:
+
+- Run a Python script and a shell command with an output file on a Fargate queue.
+- Confirm the job definition and the `bytechef/` prefix are gone afterwards.
+- Confirm a stuck queue fails after `waitUntilRunning`.
+- Confirm an init-container failure (for example an expired input URL or an unreachable S3) ends the job promptly
+  with a failure, instead of hanging until the job timeout.
+- Confirm a task declaring a connection sees `BYTECHEF_CONNECTION_*` in `main`, and its value appears as `******` in
+  the task's stdout.
+- Confirm a missing output object reads as "no outputs". This relies on the role and bucket granting
+  `s3:ListBucket`; without it S3 answers 403 instead of 404.
+
+### Connections in external runners
+
+The Process, Docker, Kubernetes and AWS Batch runners receive the connections the task declares as environment
+variables, so a script or command can authenticate without the credentials being written into its source.
+
+**What is injected.** Every connection the task declares, except `taskRunner`, becomes:
+
+- `BYTECHEF_CONNECTION_<KEY>`: a JSON object holding all of the connection's parameters.
+- `BYTECHEF_CONNECTION_<KEY>_<PARAM>`: one variable per parameter. Strings are exported as-is, enums by name, other
+  values as JSON, and null parameters are skipped. A string containing a NUL character cannot be an environment
+  value, so it is left out of this flat form (it stays in the JSON form) and the server log warns, naming the
+  connection and parameter but never the value.
+
+`<KEY>` is the name the connection is declared under in the task's `connections`, and `<PARAM>` is the parameter
+name. Both are converted the same way: the name is split at camelCase boundaries first (an `_` is inserted between a
+lowercase letter or digit and an uppercase letter), then upper-cased, then every character outside `[A-Z0-9_]`
+becomes `_`. So `github-bot` becomes `GITHUB_BOT`, `accessKeyId` becomes `ACCESS_KEY_ID`, `authorizationType`
+becomes `AUTHORIZATION_TYPE` and `awsProd` becomes `AWS_PROD`. A connection `github-bot` with an `accessToken`
+parameter therefore gives `BYTECHEF_CONNECTION_GITHUB_BOT` and `BYTECHEF_CONNECTION_GITHUB_BOT_ACCESS_TOKEN`. If two
+names convert to the same variable, the task fails before anything starts with a message naming both, so rename one.
+
+**Precedence.** The task's own `env` overrides an injected name, and the runner's `BYTECHEF_WORKING_DIR`,
+`BYTECHEF_INPUT_FILE` and `BYTECHEF_OUTPUT_DIR` always win. For a tool that expects fixed names, remap in the command:
+
+```sh
+export AWS_ACCESS_KEY_ID="$BYTECHEF_CONNECTION_AWS_ACCESS_KEY_ID"
+```
+
+**Masking.** Every string value of the injected connections' parameters (nested values included), and each
+connection's JSON form, is replaced by `******` in `stdout`, `stderr`, failure messages and the server log. Values
+shorter than 6 characters are not masked, and the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain are exported but never
+masked (the name match ignores case, `_`, `-` and `.`).
+Masking is best effort: a transformed value (base64, a substring) is not caught, and `vars` and `outputFiles` are not
+masked. It is applied where the captured text is read and on each logged line, and each line of a multi-line secret is
+masked too. Very long lines (over 8192 characters) are split before logging, so a secret crossing that split may
+appear in fragments in the server log.
+
+**Exposure.** Environment variables are readable outside the script. All parameters are injected, including long-lived
+credentials such as an OAuth2 `refresh_token` and `clientSecret`:
+
+| Runner | Readable by |
+| --- | --- |
+| Process | the same OS user (`/proc/<pid>/environ`) |
+| Docker | anyone with `docker inspect` on the host |
+| Kubernetes | anyone who can `get pods` in the namespace (the pod spec, stored in etcd) |
+| AWS Batch | anyone with `DescribeJobDefinitions` / `DescribeJobs`; the values persist in AWS Batch after the run |
+
+On AWS Batch the values are written into a per-run job definition. Deregistering it makes it INACTIVE, not deleted, and
+it stays visible via `DescribeJobDefinitions`; `DescribeJobs` keeps returning job details for some days; on detach the
+definition stays ACTIVE. The values persist in AWS Batch after the run regardless. The injected values also grow the
+job definition, and a definition AWS rejects fails as "registering the
+job definition: ClientException (HTTP 400)". Pass large values such as a service-account JSON through `inputFiles`
+instead. On AWS Batch the variables reach only the `main` container, never the sidecars.
+
+**Snapshot.** Values are read when the run starts. An OAuth access token is not refreshed during the run, so it can
+expire in a long one.
+
+**Operator switch.** `bytechef.script.inject-connections` (`true` in the shipped configuration, `application-bytechef.yml`; without that file the Java default is `false`)
+turns the whole feature off when `false`: nothing is injected and nothing is masked.
+
+**GraalVM.** Scripts on the GraalVM runner keep using connections through `context.component.<component>.<action>(input,
+connectionName)` and never see the values.
+
+## Workflow data reaches commands through `env`, not `${…}`
+
+Commands are **not** evaluated as workflow expressions. POSIX shell parameter expansion is written `${VAR}`, which
+is character-for-character the workflow evaluator's own accessor syntax - if commands were evaluated the ordinary
+way, a line as unremarkable as `echo ${GREETING:-hi}` would fail the whole task with `Invalid expression`, naming
+neither this component nor the `commands` property, because a shell default is not a valid accessor. The same goes
+for `${#items[@]}` and every other expansion form that is not a bare name. A bare `${HOME}` fares worse rather than
+better: it *is* a valid accessor, so it would be resolved against the workflow context instead of the shell's
+environment. To avoid all of that, the `commands` property is held back from expression evaluation entirely.
+
+Workflow data reaches a command through the `env` property instead, whose values *are* evaluated normally:
+
+```yaml
+env:
+  GREETING_TARGET: ${trigger.name}
+commands:
+  - echo "Hello, $GREETING_TARGET"
+```
+
+Reference an `env` entry the normal way for the interpreter you selected - `$VAR` or `${VAR}` in shell, `os.environ`
+in Python, `process.env` in Node.
+
+## Result
+
+Every action returns:
+
+```json
+{
+  "exitCode": 0,
+  "stdout": "...",
+  "stderr": "",
+  "vars": {},
+  "outputFiles": {}
+}
+```
+
+`vars` carries whatever structured output the execution wrote, if any. Unlike the Script component's `graalvm`
+runner, Commands has no in-process runner to fall back to, so this five-key map is always the result shape - there
+is no bare-value variant.
+
+`stdout` and `stderr` are **truncated**: the first 32 KiB and the last 32 KiB of each stream are kept - 64 KiB in
+all - and anything between them is replaced by a `... N bytes elided ...` marker. Both ends are kept because the
+head carries what the run started doing and the tail carries how it ended. An execution that writes less than that
+is stored whole.
+
+## Log volume
+
+The child's standard output and standard error are also written to the **server log** in full, line by line, as
+they arrive - stdout at INFO, stderr at WARN. That is deliberate: it is the only place the elided middle of a long
+stream still exists. It also means log volume is proportional to how much your commands print, without a ceiling of
+its own. A command that emits megabytes per run emits megabytes into the server log on every run, so keep chatty
+output (progress bars, per-row tracing, `set -x`) out of production commands or redirect it to a file the run
+discards.
