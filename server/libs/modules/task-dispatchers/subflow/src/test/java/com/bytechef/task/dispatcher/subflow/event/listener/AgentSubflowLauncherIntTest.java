@@ -100,12 +100,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.test.context.TestPropertySource;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
  */
 @TaskDispatcherIntTest
+@TestPropertySource(properties = "spring.liquibase.enabled=false")
 class AgentSubflowLauncherIntTest {
 
     private static final String AGENT_WORKFLOW = "agent-subflow-bridge-agent";
