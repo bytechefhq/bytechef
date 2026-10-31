@@ -1,24 +1,82 @@
 ---
 title: Automation Code Workflows
-description: Author a code workflow once as a plain automation project and serve it to every connected user by reference, deployed through the embedded bridge.
+description: Author a code workflow once - in ByteChef or as an uploaded file - and serve it to every connected user by reference through the embedded catalog.
 comingSoon: true
 ---
 
 An **automation code workflow** lets you author a [code workflow](/platform/automation/build/workflows/code-workflows)
-- a `ProjectHandler` artifact, the same contract a standalone automation project uses - and make it
+- the same project contract a standalone automation project uses, in JavaScript, Python or Java - and make it
 invocable by your connected users, without hand-authoring it in the visual [Automation Workflow
 editor](/platform/embedded/build/automations) and without giving every connected user their own private copy.
 A deployed workflow reaches connected users only through an enabled configuration in their environment.
 
-The artifact itself says nothing about being "embedded". What makes it embedded-servable is **which
-endpoint you deploy it through**:
+The source itself says nothing about being "embedded". What makes it embedded-servable is that it lives in the
+embedded catalog as a **catalog code project**. The [sample projects](#sample-projects) show a complete one in each
+language.
 
-- `POST /api/automation/v1/projects/deploy` creates a plain automation project. Nothing about it is
-  reachable from embedded.
-- `POST /api/embedded/internal/automation/projects/deploy` deploys the identical artifact behind the
-  embedded catalog - an internal, `ADMIN`-only surface with the same Java-hardening posture
-  (`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`, the Espresso sandbox loader) as
-  `/integrations/deploy`. The multipart field is `projectFile`.
+## Creating a catalog code project
+
+There are three ways in, and all of them land in the same catalog project:
+
+- **New Code Project** (Embedded → **Automation Workflows** → the arrow next to **New Project**) creates a JavaScript
+  or Python project from a starter source. Give it a name, a description, a category, tags and an optional
+  [permission expression](/platform/embedded/build/permission-expressions); the project is created as an unpublished
+  draft and opens in the code editor. See [Editing in ByteChef](#editing-in-bytechef).
+- **Import Code Project** in the same menu uploads a `.js`, `.py` or `.jar` file and publishes it.
+- **The public deploy endpoint** does the same as Import, from your CI pipeline:
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/embedded/v1/automation-project-code-workflows/deploy" \
+  -H "Authorization: Bearer $BYTECHEF_EMBEDDED_API_KEY" \
+  -H "X-Environment: DEVELOPMENT" \
+  -F "projectFile=@src/sample_catalog_code_project.py"
+```
+
+`POST /api/embedded/v1/automation-project-code-workflows/deploy` takes a `multipart/form-data` body with one file
+part, `projectFile`; the file name's extension picks the language. Authenticate with an **Embedded API key**
+(Embedded → Settings → **API Keys**) that belongs to an administrator - deploying requires the admin role, and an
+organization admin key is rejected with `401`. The key is looked up in the environment named by the `X-Environment`
+header (`PRODUCTION` when absent), and the request runs as the key's own ByteChef user, not as a connected user. A
+successful deploy returns `200` with the import warnings, for example `{"warnings": []}`.
+`GET /api/embedded/v1/automation-project-code-workflows` lists the published catalog code projects.
+
+Uploads of Java are subject to the same
+[`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows)
+switch as automation projects. A catalog project's name must be unique:
+creating a second one with a name already in use is refused.
+
+## Sample projects
+
+| Language | Sample |
+|---|---|
+| Java | [bytechef-embedded-automation-sample-code-workflow-java](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-java) |
+| JavaScript | [bytechef-embedded-automation-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-javascript) |
+| Python | [bytechef-embedded-automation-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-python) |
+
+Each one has a `greetOnRequest` workflow with a Request trigger, so it can be called through the sync endpoint as
+soon as a connected user holds a reference to it. The others run on the connected user's own connections, which
+provisioning binds: `summarizeNewEmail` on a Gmail trigger, `fetchRecentEmails` through a declared `gmail` connection,
+and `notifySlackOnNewEmail` through a declared `slack` connection, with a `channel` input that provisioning stores from
+the request's `inputs`.
+
+## Editing in ByteChef
+
+Clicking a catalog code project, or any of its workflows, opens the project's **code editor** instead of the canvas;
+the row menu has **Edit Source** too. One source covers all of the project's workflows.
+
+- **Save** checks the source before storing it: source that fails to load is rejected with the loader's error and
+  the draft stays as it was. The `name` declared in the source must stay the project's name - renaming through the
+  source is not supported.
+- Saves change the **draft** only. Connected users keep running the last published version.
+- **Publish** (in the editor header, disabled while there are unsaved edits) publishes the draft as a new version. It
+  reaches connected users once an environment's configuration points at it - see
+  [Deploy once, reference per user](#deploy-once-reference-per-user).
+- Uploading (Import Code Project or the deploy endpoint) saves the upload as the draft and publishes it, so an upload
+  **replaces any unpublished editor changes**. After an upload the editor continues from the uploaded source.
+- Publishing a code project whose draft has no source is refused, so an empty version can never be released.
+
+The workflow-structure actions of the visual catalog don't apply to a code project: its workflows come from the
+source, so you add, rename or remove a workflow by editing the source, and duplicating a code project is refused.
 
 ## Deploy once, reference per user
 
@@ -35,16 +93,16 @@ Practically:
 
 - The catalog project is created on the first deploy and reused by later deploys. It is kept out of
   the regular Automation screens because Embedded owns it.
-- Redeploying the same artifact **publishes a new version**. It reaches an environment's connected
-  users when that environment's [configuration](/platform/embedded/build/automations#configurations)
+- Redeploying the same artifact, or publishing an edit, **publishes a new version**. It reaches an environment's
+  connected users when that environment's [configuration](/platform/embedded/build/automations#configurations)
   is moved to it, which then upgrades every referencing user's workflow in that environment at once -
   there is no per-user version pinning and no per-user bespoke deploy. To deploy and release in one
-  call, pass the optional `release` flag: the deploy then also points the request environment's
+  call, send the optional multipart form field `release=true` beside `projectFile` in the deploy request (`X-Environment` picks the environment): the deploy then also points the request environment's
   configuration at the new version, creating an enabled configuration if there is none. It never turns
   a disabled environment back on. Without the flag, nothing is exposed or upgraded until an
   administrator releases the version. To stage a change, release it to a separate environment first.
-- A workflow keeps the same identity (its `ProjectWorkflow` uuid) across redeploys as long as its name
-  doesn't change, so existing references keep pointing at the right workflow after an upgrade.
+- A workflow keeps the same identity (its `ProjectWorkflow` uuid) across uploads, editor saves and publishes as
+  long as its name doesn't change, so existing references keep pointing at the right workflow after an upgrade.
 
 The project appears in the same catalog listing as visual workflow templates, distinguished by a
 `kind` field:
@@ -164,15 +222,14 @@ administrator disables the environment's configuration or one of its workflows, 
 configuration, the reference is switched off and marked as needing attention with that reason. Its
 connections and inputs are kept, the user's own enabled choice is untouched, and turning the
 configuration or workflow back on, or recreating the configuration, restores the reference exactly as
-the user had it. Disabling a dangling reference removes its deployment entry but keeps the row. Uuid carry-forward
-only spans one deploy of history: if you restore a same-named workflow in a *later* deploy (after an
-intervening deploy that dropped it), the restored workflow gets a **new** uuid, not the one the
-dangling reference still points at. Recovering means de-provisioning the dangling reference and
-provisioning a fresh one against the workflow's new uuid - the connection auto-wiring runs again from
-scratch, so nothing carries over automatically.
+the user had it. Disabling a dangling reference removes its deployment entry but keeps the row. A workflow added back
+under a name that is in the **last published** version gets that version's uuid back, but once a publish has dropped
+the name, a same-named workflow restored in a *later* publish gets a **new** uuid, not the one the dangling reference
+still points at. Recovering means de-provisioning the dangling reference and provisioning a fresh one against the
+workflow's new uuid - the connection auto-wiring runs again from scratch, so nothing carries over automatically.
 
-Dangling only ever compares one catalog project's previous deploy against its current one - a
-redeploy of one catalog project never dangles a reference into a different catalog project.
+Dangling only ever compares one catalog project's previous published version against its new one - publishing one
+catalog project never dangles a reference into a different catalog project.
 
 ## Limits
 
@@ -182,11 +239,10 @@ redeploy of one catalog project never dangles a reference into a different catal
 - **No per-user editing.** A reference has no definition of its own - the workflow update/edit APIs
   reject reference rows outright. If a connected user needs their own customized copy, that's what
   the visual bridge's copy-mode is for.
-- **Catalog projects are not editable in the code editor.** The in-app code workflow editor excludes
-  bridge catalog projects from its project list and rejects saves on them: an editor draft would
-  interleave containers into the same deploy history the bridge's one-deploy-back uuid carry-forward
-  reads, minting new workflow uuids on the next redeploy and permanently dangling connected-user
-  references. The only write path for a catalog project is the deploy endpoint itself.
+- **Edited in the catalog only.** A catalog code project is edited in its own code editor under Embedded →
+  Automation Workflows. The automation **Projects** code editor excludes catalog projects and rejects saves on them,
+  because an editor draft there would bypass the catalog's publish path.
+- **No Java in the editor.** Java catalog projects are uploaded only.
 - **Resolution differs by kind.** A code-workflow reference always resolves to the workflow in the version its
   environment's configuration points at. A visual copy resolves to **its own, independently deployed**
   workflow - the connected user's copy, not the template it was copied from. Two connected users

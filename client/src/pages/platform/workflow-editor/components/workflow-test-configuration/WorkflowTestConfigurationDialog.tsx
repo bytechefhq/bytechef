@@ -65,6 +65,7 @@ const WorkflowTestConfigurationDialog = ({
 
     const {
         ConnectionKeys,
+        codeWorkflow,
         useCreateConnectionMutation,
         useGetComponentDefinitionsQuery,
         useGetConnectionTagsQuery,
@@ -230,6 +231,11 @@ const WorkflowTestConfigurationDialog = ({
                                         <InputConfigurationList
                                             control={control as unknown as Control<FieldValues>}
                                             controlPath="inputs"
+                                            emptyStateMessage={
+                                                codeWorkflow
+                                                    ? "Declare them in the workflow's source, then set their test values here."
+                                                    : undefined
+                                            }
                                             formState={formState}
                                             inputs={inputs}
                                             onOpenInputs={handleOpenInputs}

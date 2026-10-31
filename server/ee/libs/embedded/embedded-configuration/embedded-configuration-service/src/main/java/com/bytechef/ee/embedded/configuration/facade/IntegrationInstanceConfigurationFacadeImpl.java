@@ -13,6 +13,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -23,6 +24,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -36,6 +38,10 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.component.domain.Authorization;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -52,6 +58,7 @@ import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -77,6 +84,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationInstanceConfigurationFacade {
 
+    private static final List<AuthorizationType> ADMIN_OAUTH2_AUTHORIZATION_TYPES = List.of(
+        AuthorizationType.OAUTH2_AUTHORIZATION_CODE, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE,
+        AuthorizationType.OAUTH2_IMPLICIT_CODE);
+
+    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final EnvironmentService environmentService;
@@ -99,8 +111,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
-        ConnectedUserService connectedUserService, ConnectionService connectionService,
-        EnvironmentService environmentService, PrincipalJobFacade principalJobFacade,
+        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
+        ConnectionService connectionService, EnvironmentService environmentService,
+        PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade,
         IntegrationInstanceConfigurationDTOAssembler integrationInstanceConfigurationDTOAssembler,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
@@ -111,6 +124,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         TriggerExecutionService triggerExecutionService, ComponentConnectionFacade componentConnectionFacade,
         WorkflowService workflowService) {
 
+        this.componentDefinitionService = componentDefinitionService;
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.environmentService = environmentService;
@@ -291,6 +305,25 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         integrationInstanceConfigurationWorkflowService.updateEnabled(
             integrationInstanceConfigurationWorkflow.getId(), enable);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public long enableIntegrationVersion(long integrationId, int integrationVersion, Environment environment) {
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                environment, integrationId, null);
+
+        if (integrationInstanceConfigurations.isEmpty()) {
+            return createEnabledIntegrationInstanceConfiguration(integrationId, integrationVersion, environment);
+        }
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = selectIntegrationInstanceConfiguration(
+            integrationInstanceConfigurations, integrationId, environment);
+
+        moveIntegrationInstanceConfiguration(integrationInstanceConfiguration, integrationVersion);
+
+        return Objects.requireNonNull(integrationInstanceConfiguration.getId());
     }
 
     @Override
@@ -657,8 +690,229 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
     }
 
+    private long createEnabledIntegrationInstanceConfiguration(
+        long integrationId, int integrationVersion, Environment environment) {
+
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs =
+            integrationWorkflowService.getIntegrationWorkflows(integrationId, integrationVersion)
+                .stream()
+                .map(integrationWorkflow -> toIntegrationInstanceConfigurationWorkflowDTO(
+                    integrationWorkflow.getWorkflowId(), List.of(), Map.of(), false))
+                .toList();
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .authorizationType(resolveAuthorizationType(integration.getComponentName()))
+                .connectionParameters(Map.of())
+                .environment(environment)
+                .integrationId(integrationId)
+                .integrationInstanceConfigurationWorkflows(integrationInstanceConfigurationWorkflowDTOs)
+                .integrationVersion(integrationVersion)
+                .name(integration.getName())
+                .tags(List.of())
+                .build();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            integrationInstanceConfigurationDTO);
+
+        for (IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO : integrationInstanceConfigurationWorkflowDTOs) {
+
+            String workflowId = integrationInstanceConfigurationWorkflowDTO.workflowId();
+
+            if (getRequiredAdminComponentConnections(integration, workflowId).isEmpty()) {
+                enableIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId, workflowId, true);
+            }
+        }
+
+        enableIntegrationInstanceConfiguration(integrationInstanceConfigurationId, true);
+
+        return integrationInstanceConfigurationId;
+    }
+
+    private void moveIntegrationInstanceConfiguration(
+        IntegrationInstanceConfiguration integrationInstanceConfiguration, int integrationVersion) {
+
+        long integrationInstanceConfigurationId = Objects.requireNonNull(integrationInstanceConfiguration.getId());
+
+        List<IntegrationWorkflow> allIntegrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            integrationInstanceConfiguration.getIntegrationId());
+        List<IntegrationInstanceConfigurationWorkflow> oldIntegrationInstanceConfigurationWorkflows =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                integrationInstanceConfigurationId);
+
+        Map<String, String> workflowIdUuids = allIntegrationWorkflows.stream()
+            .collect(
+                Collectors.toMap(
+                    IntegrationWorkflow::getWorkflowId, IntegrationWorkflow::getUuidAsString,
+                    (firstUuid, secondUuid) -> firstUuid));
+
+        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs =
+            new ArrayList<>();
+        List<String> newWorkflowIds = new ArrayList<>();
+
+        for (IntegrationWorkflow integrationWorkflow : allIntegrationWorkflows) {
+            if (integrationWorkflow.getIntegrationVersion() != integrationVersion) {
+                continue;
+            }
+
+            Optional<IntegrationInstanceConfigurationWorkflow> oldIntegrationInstanceConfigurationWorkflow =
+                oldIntegrationInstanceConfigurationWorkflows.stream()
+                    .filter(curIntegrationInstanceConfigurationWorkflow -> Objects.equals(
+                        workflowIdUuids.get(curIntegrationInstanceConfigurationWorkflow.getWorkflowId()),
+                        integrationWorkflow.getUuidAsString()))
+                    .findFirst();
+
+            if (oldIntegrationInstanceConfigurationWorkflow.isPresent()) {
+                IntegrationInstanceConfigurationWorkflow curIntegrationInstanceConfigurationWorkflow =
+                    oldIntegrationInstanceConfigurationWorkflow.get();
+
+                integrationInstanceConfigurationWorkflowDTOs.add(
+                    toIntegrationInstanceConfigurationWorkflowDTO(
+                        integrationWorkflow.getWorkflowId(),
+                        curIntegrationInstanceConfigurationWorkflow.getConnections(),
+                        curIntegrationInstanceConfigurationWorkflow.getInputs(),
+                        curIntegrationInstanceConfigurationWorkflow.isEnabled()));
+            } else {
+                integrationInstanceConfigurationWorkflowDTOs.add(
+                    toIntegrationInstanceConfigurationWorkflowDTO(
+                        integrationWorkflow.getWorkflowId(), List.of(), Map.of(), false));
+
+                newWorkflowIds.add(integrationWorkflow.getWorkflowId());
+            }
+        }
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            new IntegrationInstanceConfigurationDTO(integrationInstanceConfiguration)
+                .toBuilder()
+                .integrationInstanceConfigurationWorkflows(integrationInstanceConfigurationWorkflowDTOs)
+                .integrationVersion(integrationVersion)
+                .tags(tagService.getTags(integrationInstanceConfiguration.getTagIds()))
+                .build();
+
+        updateIntegrationInstanceConfiguration(integrationInstanceConfigurationDTO);
+
+        Integration integration =
+            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
+
+        for (String newWorkflowId : newWorkflowIds) {
+            if (getRequiredAdminComponentConnections(integration, newWorkflowId).isEmpty()) {
+                enableIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceConfigurationId, newWorkflowId, true);
+            }
+        }
+
+        if (!integrationInstanceConfiguration.isEnabled()) {
+            enableIntegrationInstanceConfiguration(integrationInstanceConfigurationId, true);
+        }
+    }
+
+    /**
+     * Picks the authorization type the admin UI would pick: an OAuth2 type whose client credentials an admin registers,
+     * usable here only through a predefined OAuth2 app, otherwise the first type the connected user completes alone. A
+     * component without authorizations gets the column's default, API_KEY, as a configuration created without one does.
+     */
+    private AuthorizationType resolveAuthorizationType(String componentName) {
+        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+            componentName, null);
+
+        ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
+
+        List<AuthorizationType> authorizationTypes = connectionDefinition == null
+            ? List.of()
+            : connectionDefinition.getAuthorizations()
+                .stream()
+                .map(Authorization::getType)
+                .toList();
+
+        Optional<AuthorizationType> adminOAuth2AuthorizationType = authorizationTypes.stream()
+            .filter(ADMIN_OAUTH2_AUTHORIZATION_TYPES::contains)
+            .findFirst();
+
+        List<String> predefinedApps = oAuth2Service.getPredefinedApps();
+
+        if (adminOAuth2AuthorizationType.isPresent() && predefinedApps.contains(componentName)) {
+            return adminOAuth2AuthorizationType.get();
+        }
+
+        Optional<AuthorizationType> userAuthorizationType = authorizationTypes.stream()
+            .filter(authorizationType -> !ADMIN_OAUTH2_AUTHORIZATION_TYPES.contains(authorizationType))
+            .findFirst();
+
+        if (userAuthorizationType.isPresent()) {
+            return userAuthorizationType.get();
+        }
+
+        if (adminOAuth2AuthorizationType.isPresent()) {
+            throw new ConfigurationException(
+                ("Component '%s' authorizes through OAuth2 with client credentials an admin must register, so an " +
+                    "instance configuration cannot be created without them; create it on the instance " +
+                    "configurations page first").formatted(componentName),
+                CodeWorkflowErrorType.INSTANCE_CONFIGURATION_REQUIRES_OAUTH2_APP);
+        }
+
+        return AuthorizationType.API_KEY;
+    }
+
+    private static IntegrationInstanceConfiguration selectIntegrationInstanceConfiguration(
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations, long integrationId,
+        Environment environment) {
+
+        if (integrationInstanceConfigurations.size() == 1) {
+            return integrationInstanceConfigurations.getFirst();
+        }
+
+        List<IntegrationInstanceConfiguration> enabledIntegrationInstanceConfigurations =
+            integrationInstanceConfigurations.stream()
+                .filter(IntegrationInstanceConfiguration::isEnabled)
+                .toList();
+
+        if (enabledIntegrationInstanceConfigurations.size() == 1) {
+            return enabledIntegrationInstanceConfigurations.getFirst();
+        }
+
+        throw new ConfigurationException(
+            ("Integration id=%s has %s instance configurations in environment %s and %s of them enabled, so it is " +
+                "ambiguous which one to move to the new version")
+                    .formatted(
+                        integrationId, integrationInstanceConfigurations.size(), environment,
+                        enabledIntegrationInstanceConfigurations.size()),
+            CodeWorkflowErrorType.INSTANCE_CONFIGURATION_AMBIGUOUS);
+    }
+
+    private static IntegrationInstanceConfigurationWorkflowDTO toIntegrationInstanceConfigurationWorkflowDTO(
+        String workflowId, List<IntegrationInstanceConfigurationWorkflowConnection> connections, Map<String, ?> inputs,
+        boolean enabled) {
+
+        return new IntegrationInstanceConfigurationWorkflowDTO(
+            connections, null, null, inputs, enabled, null, null, null, null, null, 0, null, workflowId, null,
+            Map.of());
+    }
+
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
+    }
+
+    private List<ComponentConnection> getRequiredAdminComponentConnections(Integration integration, String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        return CollectionUtils.concat(
+            WorkflowTrigger.of(workflow)
+                .stream()
+                .flatMap(workflowTrigger -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTrigger)))
+                .toList(),
+            workflow.getTasks(true)
+                .stream()
+                .flatMap(workflowTask -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTask)))
+                .toList())
+            .stream()
+            .filter(ComponentConnection::required)
+            .filter(componentConnection -> !Objects.equals(
+                componentConnection.componentName(), integration.getComponentName()))
+            .toList();
     }
 
     private IntegrationInstanceConfigurationWorkflow doEnableIntegrationInstanceConfigurationWorkflow(
@@ -671,26 +925,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         if (enable) {
             Integration integration = integrationService.getIntegrationInstanceConfigurationIntegration(
                 integrationInstanceConfigurationId);
-            Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
-                WorkflowTrigger.of(workflow)
-                    .stream()
-                    .flatMap(workflowTrigger -> CollectionUtils.stream(
-                        componentConnectionFacade.getComponentConnections(workflowTrigger)))
-                    .filter(ComponentConnection::required)
-                    .toList(),
-                workflow.getTasks(true)
-                    .stream()
-                    .flatMap(workflowTask -> CollectionUtils.stream(
-                        componentConnectionFacade.getComponentConnections(workflowTask)))
-                    .filter(ComponentConnection::required)
-                    .toList());
-
-            requiredComponentConnections = requiredComponentConnections.stream()
-                .filter(workflowConnection -> !Objects.equals(
-                    workflowConnection.componentName(), integration.getComponentName()))
-                .toList();
+            List<ComponentConnection> requiredComponentConnections = getRequiredAdminComponentConnections(
+                integration, workflowId);
 
             List<String> workflowNodeNames = requiredComponentConnections.stream()
                 .map(ComponentConnection::workflowNodeName)
@@ -704,7 +941,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connections.size()) {
                 throw new ConfigurationException(
-                    "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
+                    "Not all required connections are set for a workflow with id=%s".formatted(workflowId),
                     IntegrationInstanceConfigurationErrorType.WORKFLOW_CONNECTIONS_NOT_FOUND);
             }
         }

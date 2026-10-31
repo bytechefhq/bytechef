@@ -12,13 +12,8 @@ import {
     useGetIntegrationsQuery,
 } from '@/ee/pages/embedded/automation-hub/queries/automationHub.queries';
 import HubReconnectDialog from '@/ee/pages/embedded/automation-hub/views/components/HubReconnectDialog';
-import {
-    Connection,
-    ConnectionInUseError,
-    ConnectionInUseErrorReasonEnum,
-    ResponseError,
-} from '@/ee/shared/middleware/embedded/public';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {Connection, ConnectionInUseError, ConnectionInUseErrorReasonEnum, ResponseError} from '@bytechef/embedded-api';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
 import {Fragment, useMemo, useState} from 'react';

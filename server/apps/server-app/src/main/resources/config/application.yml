@@ -66,6 +66,9 @@ info:
   userGuiding:
     containerId: ${bytechef.user-guiding.container-id:}
     enabled: ${bytechef.user-guiding.enabled}
+  workflow:
+    codeWorkflow:
+      javaEnabled: ${bytechef.workflow.code-workflow.java-enabled:true}
 
 logging:
   level:

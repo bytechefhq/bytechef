@@ -474,7 +474,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
 
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
+        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids, environment)
             .stream()
             .filter(reference -> reference.enabled() && !reference.dangling() &&
                 Objects.equals(reference.environment(), environment.name()))
@@ -521,10 +521,9 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
             .map(ProjectWorkflow::getUuidAsString)
             .collect(Collectors.toSet());
 
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
+        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids, environment)
             .stream()
-            .filter(reference -> Objects.equals(reference.environment(), environment.name()) &&
-                reference.workflowId() != null)
+            .filter(reference -> reference.workflowId() != null)
             .collect(
                 Collectors.groupingBy(
                     ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid,
@@ -601,7 +600,7 @@ public class AutomationWorkflowProjectConfigurationAdminFacadeImpl
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
         Set<String> missingWorkflowUuids = connectedUserWorkflowReferenceAdminFacade
-            .getReferences(currentWorkflowUuids)
+            .getReferences(currentWorkflowUuids, environment)
             .stream()
             .filter(reference -> !reference.dangling() && Objects.equals(reference.environment(), environment.name()))
             .map(ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid)

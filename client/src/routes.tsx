@@ -88,6 +88,9 @@ const IdentityProvidersPage = lazy(
 );
 const RegisteredClients = lazy(() => import('@/ee/pages/settings/platform/registered-clients/RegisteredClients'));
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
+const AutomationWorkflowProjectCodeWorkflow = lazy(
+    () => import('@/ee/pages/embedded/automation-workflow-project-code-workflow/AutomationWorkflowProjectCodeWorkflow')
+);
 const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-workflow/AutomationWorkflow'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
 const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
@@ -1019,6 +1022,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'automation-workflows/:workflowUuid/editor',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <AutomationWorkflowProjectCodeWorkflow />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'automation-workflows/projects/:automationWorkflowProjectId/code',
                                 },
                                 {
                                     element: (

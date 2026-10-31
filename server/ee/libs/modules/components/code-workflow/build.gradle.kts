@@ -7,12 +7,15 @@ dependencies {
     implementation(rootProject.libs.org.graalvm.polyglot.python)
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
-    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-polyglot"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     implementation(project(":server:ee:libs:automation:automation-code-workflow-loader"))
+    implementation(project(":server:ee:libs:embedded:embedded-code-workflow-loader"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
 
@@ -20,4 +23,5 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

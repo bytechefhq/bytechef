@@ -43,6 +43,7 @@ const AutomationWorkflowProjectWorkflowList = ({
                     <ul className="divide-y divide-stroke-neutral-primary">
                         {workflows.map((workflow) => (
                             <AutomationWorkflowProjectWorkflowListItem
+                                codeWorkflowProject={project.codeWorkflowProject}
                                 key={workflow.workflowUuid}
                                 onDeleteWorkflow={setWorkflowUuidToDelete}
                                 onEditWorkflow={onEditWorkflow}
@@ -57,7 +58,11 @@ const AutomationWorkflowProjectWorkflowList = ({
                     <EmptyList
                         button={<Button label="Create Workflow" onClick={() => onCreateWorkflow(project.id)} />}
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new workflow."
+                        message={
+                            project.codeWorkflowProject
+                                ? 'Add a workflow to the project source.'
+                                : 'Get started by creating a new workflow.'
+                        }
                         title="No Workflows"
                     />
                 </div>

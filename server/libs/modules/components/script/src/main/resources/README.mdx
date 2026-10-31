@@ -66,6 +66,32 @@ function perform(input, context) {
 <iframe src="https://www.guidejar.com/embed/6ec7275a-fbd9-4bd9-b97b-1c1a460acd9a?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
 </iframe></div>
 
+### Reading Connection Parameters
+
+Declare `perform` with a `connection` argument between `input` and `context` to read the parameters of the connections defined in the **Connections** panel at the bottom right of the Script editor, keyed by the connection name, the same way `input` holds the input parameters:
+
+```javascript
+function perform(input, connection, context) {
+    const token = connection['googleMaps'].api_token;
+
+    return null;
+}
+```
+
+In Python, read a parameter by subscript:
+
+```python
+def perform(input, connection, context):
+    token = connection["googleMaps"]["api_token"]
+
+    return None
+```
+
+Declare `connection` as a plain, required parameter. ByteChef counts the required parameters of `perform` to decide whether to pass it, so a JavaScript default value on `connection` makes the script receive `perform(input, context)` instead. Scripts that declare `perform(input, context)`, with or without further optional parameters, keep working unchanged.
+
+The same `perform(input, connection, context)` receives the connections under the Process, Docker, Kubernetes and AWS Batch runners, read from the task's `connections.json` file. See **Connections In External Runners**.
+
+Datastream item processors and AI skill scripts receive an empty `connection`. A Script tool's return value is sent to the AI model, so don't return connection parameters from a tool.
 
 ### Task Runners
 
@@ -81,7 +107,8 @@ Each action runs in the environment selected by its **Task Runner** property. Th
 
 The `Script Task Runners Demo` sample workflow (`demo/script-runners.json` in `automation-demo-config`, seeded into
 the Demo project on a `demo` profile install) shows this authoring shape as one `javascript` action: a workflow
-input passed through **Input** and a computed value returned from `perform()`. It runs unchanged under the shipped
+input passed through **Input**, a `perform(input, connection, context)` that would receive the task's connections
+under any runner, and a computed value returned from `perform()`. It runs unchanged under the shipped
 configuration because it leaves **Task Runner** unset, which falls back to GraalVM - the one runner every
 installation has enabled. The same task runs unchanged under `process` or `docker` too: once an operator enables one
 of them, setting the task's `taskRunner.type` to `process` or `docker` is the only edit needed, and the only thing
@@ -96,7 +123,28 @@ Workflow data reaches a script through the **Input** property, not by interpolat
 
 ### Connections In External Runners
 
-Under Process, Docker, Kubernetes and AWS Batch the connections a task declares (except `taskRunner`) reach the script as environment variables: `BYTECHEF_CONNECTION_<KEY>` holds all parameters as one JSON object and `BYTECHEF_CONNECTION_<KEY>_<PARAM>` one parameter each. Names are split at camelCase boundaries, upper-cased, and any character outside `[A-Z0-9_]` becomes `_`, so connection `github-bot` with parameter `accessToken` gives `BYTECHEF_CONNECTION_GITHUB_BOT_ACCESS_TOKEN`. The task's own `env` overrides an injected name. Values of 6 or more characters are replaced by `******` in `stdout`, `stderr`, failure messages and the server log, except the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain, which are exported but never masked; very long lines (over 8192 characters) are split before logging, so a secret crossing that split may appear in fragments in the server log. Masking is best effort, and `vars` and `outputFiles` are not masked. GraalVM scripts keep using `context.component.*` and never see the values. Environment variables are readable outside the script on some runners; the **Commands** component's README has the exposure table and the `bytechef.script.inject-connections` switch.
+Under Process, Docker, Kubernetes and AWS Batch the connections a task declares (except `taskRunner`) are written to `connections.json` in the working directory, beside the input file, as one JSON object that maps each connection's name to its parameters - the same map a GraalVM script receives. `BYTECHEF_CONNECTIONS_FILE` holds its path (inside the container on Docker, Kubernetes and AWS Batch), and the task's own `env` cannot override it. No connection parameter is exported as an environment variable, and the file lies outside the output directory, so it never comes back in `outputFiles`.
+
+The appended bootstrap loads the file and passes the map to `perform` when `perform` declares three or more required parameters - in Python, required positional parameters, counted with `inspect.signature` - and otherwise calls `perform(input, context)` as before:
+
+```python
+def perform(input, connection, context):
+    token = connection["slack"]["token"]
+
+    return {"authorized": bool(token)}
+```
+
+```javascript
+function perform(input, connection, context) {
+    const token = connection["slack"].token;
+
+    return {authorized: Boolean(token)};
+}
+```
+
+A shell script or a command of the **Commands** component reads the file itself, for example `jq -r '.slack.token' "$BYTECHEF_CONNECTIONS_FILE"`.
+
+Values of 6 or more characters, each connection's JSON form and the whole file's JSON are replaced by `******` in `stdout`, `stderr`, failure messages and the server log, except the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain, which are delivered but never masked; very long lines (over 8192 characters) are split before logging, so a secret crossing that split may appear in fragments in the server log. Masking is best effort, and `vars` and `outputFiles` are not masked. With `bytechef.script.inject-connections` off no file is written and `connection` is an empty map. The **Commands** component's README has the exposure table for each runner.
 
 ### Result Shape
 

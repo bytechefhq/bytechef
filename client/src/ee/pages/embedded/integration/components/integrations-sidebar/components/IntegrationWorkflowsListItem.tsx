@@ -86,7 +86,8 @@ const IntegrationWorkflowsListItem = ({
             editedTimeAgo={timeAgo}
             label={workflow.label}
             menu={
-                integration && (
+                integration &&
+                !integration.codeWorkflow && (
                     <IntegrationWorkflowsListItemDropdownMenu
                         currentWorkflowId={currentWorkflowId}
                         integration={integration}

@@ -21,3 +21,10 @@ type ConnectedUser {
 type Workflow {
     id: ID!
 }
+
+enum CodeWorkflowLanguage {
+    JAVA
+    JAVASCRIPT
+    PYTHON
+    RUBY
+}

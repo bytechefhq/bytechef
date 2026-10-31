@@ -8,6 +8,9 @@ type AutomationWorkflowProject {
     version: Int!
     lastPublishedVersion: Int
     permissionExpression: String
+    codeWorkflowProject: Boolean!
+    codeWorkflowLanguage: CodeWorkflowLanguage
+    codeWorkflowDraftPublishable: Boolean
     configurationCount: Int!
     lastPublishedDate: String
     workflowTemplates: [AutomationWorkflowProjectWorkflowTemplate!]!

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.dto;
 
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -110,14 +111,31 @@ public record ConnectedUserWorkflowTemplateDTO(
         }
     }
 
-    public record Input(String name, String label, String type, boolean required, boolean provided) {
+    /**
+     * @param componentReference the component input group this input takes its value from; null when the input does not
+     *                           reference a component
+     */
+    public record Input(
+        String name, String label, String type, boolean required,
+        WorkflowInput.@Nullable ComponentInputReference componentReference, boolean provided) {
 
         public Input(String name, String label, String type, boolean required) {
-            this(name, label, type, required, false);
+            this(name, label, type, required, null, false);
+        }
+
+        public Input(String name, String label, String type, boolean required, boolean provided) {
+            this(name, label, type, required, null, provided);
+        }
+
+        public Input(
+            String name, String label, String type, boolean required,
+            WorkflowInput.@Nullable ComponentInputReference componentReference) {
+
+            this(name, label, type, required, componentReference, false);
         }
 
         public Input withProvided(boolean provided) {
-            return new Input(name, label, type, required, provided);
+            return new Input(name, label, type, required, componentReference, provided);
         }
     }
 }

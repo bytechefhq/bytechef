@@ -177,8 +177,8 @@ class AiAgentUtilsSkillsToolTest {
         when(inputParameters.getList("skills", Long.class, List.of())).thenReturn(List.of(1L));
         when(aiSkillFacade.getAiSkillDownload(1L)).thenReturn(zipBytes);
         when(polyglotEngine.execute(
-            eq(ScriptSandboxMode.STRICT), isNull(), eq("js"), any(Parameters.class), eq(Map.of()), eq(context)))
-                .thenReturn(Map.of());
+            eq(ScriptSandboxMode.STRICT), isNull(), eq("js"), any(Parameters.class), eq(Map.of()), eq(false),
+            eq(context))).thenReturn(Map.of());
 
         ToolCallback scriptToolCallback = Arrays.stream(invokeApply().getToolCallbacks())
             .filter(toolCallback -> "release_notes_group_commits".equals(toolCallback.getToolDefinition()
@@ -188,9 +188,9 @@ class AiAgentUtilsSkillsToolTest {
 
         ToolDefinition toolDefinition = scriptToolCallback.getToolDefinition();
 
-        Map<String, ?> inputSchema = JsonUtils.readMap(toolDefinition.inputSchema());
+        Map<String, Object> inputSchema = JsonUtils.readMap(toolDefinition.inputSchema(), Object.class);
 
-        assertThat(inputSchema.get("required")).isEqualTo(List.of("input"));
+        assertThat(inputSchema).containsEntry("required", List.of("input"));
         assertThat(inputSchema).extractingByKey("properties", InstanceOfAssertFactories.MAP)
             .containsKey("input");
         assertThat(toolDefinition.description()).contains("scripts/group_commits.js", "release-notes");
@@ -201,7 +201,7 @@ class AiAgentUtilsSkillsToolTest {
 
         verify(polyglotEngine).execute(
             eq(ScriptSandboxMode.STRICT), isNull(), eq("js"), parametersArgumentCaptor.capture(), eq(Map.of()),
-            eq(context));
+            eq(false), eq(context));
 
         Parameters scriptParameters = parametersArgumentCaptor.getValue();
 

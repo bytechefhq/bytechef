@@ -96,6 +96,15 @@ class IntegrationServiceIntTest {
     }
 
     @Test
+    void testFetchIntegration() {
+        Integration integration = integrationRepository.save(getIntegration());
+
+        assertThat(integrationService.fetchIntegration("componentName")).hasValue(integration);
+        assertThat(integrationService.fetchIntegration("COMPONENTNAME")).hasValue(integration);
+        assertThat(integrationService.fetchIntegration("nonExistentComponentName")).isEmpty();
+    }
+
+    @Test
     void testGetIntegration() {
         Integration integration = integrationRepository.save(getIntegration());
 

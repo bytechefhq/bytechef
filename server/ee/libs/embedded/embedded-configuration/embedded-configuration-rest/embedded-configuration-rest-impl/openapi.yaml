@@ -22,6 +22,10 @@ tags:
     description: "The Embedded Tag Internal API"
   - name: "integration"
     description: "The Embedded Integration Internal API"
+  - name: "automation-project-code-workflow"
+    description: "The Embedded Automation Project Code Workflow Internal API"
+  - name: "integration-code-workflow"
+    description: "The Embedded Integration Code Workflow Internal API"
   - name: "unified-integration"
     description: "The Embedded Unified Integration Management Internal API"
   - name: "webhook-trigger-test"
@@ -1032,6 +1036,63 @@ paths:
               schema:
                 type: integer
                 format: int64
+  /integrations/deploy:
+    post:
+      description: "Deploy a new code based integration."
+      summary: "Deploy a new code based integration"
+      tags:
+      - "integration-code-workflow"
+      operationId: "deployIntegration"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                integrationFile:
+                  description: "The file of a code-native integration."
+                  type: "string"
+                  format: "binary"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+  /automation/projects/deploy:
+    post:
+      description: "Deploy a new automation code workflow into the embedded catalog."
+      summary: "Deploy a new automation code workflow into the embedded catalog"
+      tags:
+      - "automation-project-code-workflow"
+      operationId: "deployAutomationProjectCodeWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              properties:
+                projectFile:
+                  description: "The file of a code-native automation project."
+                  type: "string"
+                  format: "binary"
+                release:
+                  description: "Whether to also point the configuration of the request environment at the newly published version."
+                  type: "boolean"
+                  default: false
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationProjectCodeWorkflowDeployResult"
   /integrations/categories:
     get:
       description: "Get integration categories."
@@ -1484,6 +1545,15 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    AutomationProjectCodeWorkflowDeployResult:
+      type: "object"
+      description: "The result of deploying an automation code workflow into the embedded catalog."
+      properties:
+        warnings:
+          description: "Deploy-time trigger validation warnings; a deployed workflow is still usable even with warnings."
+          type: "array"
+          items:
+            type: "string"
     Category:
       $ref: "../../../../../../libs/platform/platform-category/platform-category-rest/openapi.yaml#/components/schemas/Category"
     ConnectedUserProjectWorkflow:
@@ -1550,6 +1620,14 @@ components:
           properties:
             category:
               $ref: "#/components/schemas/Category"
+            codeWorkflow:
+              description: "Whether the integration is backed by a code workflow."
+              type: "boolean"
+              readOnly: true
+            codeWorkflowLanguage:
+              description: "The programming language of the code workflow, if the integration is code-backed."
+              type: "string"
+              readOnly: true
             developmentConfigurationCount:
               description: "The number of the integration's instance configurations in the Development environment. Only set by the integration list."
               type: "integer"

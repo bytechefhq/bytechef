@@ -26,8 +26,19 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
 
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
+val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    configOptions.set(
+        mapOf(
+            "importFileExtension" to ".js"
+        )
+    )
+    generatorName.set("typescript-fetch")
+    inputSpec.set("$projectDir/openapi.yaml")
+    outputDir.set("$rootDir/sdks/api/typescript/src/webhook")
+}
+
 tasks.register("generateOpenAPI") {
-    dependsOn(generateOpenAPISpring/*, generateOpenAPITypeScriptFetch*/)
+    dependsOn(generateOpenAPISpring, generateOpenAPITypeScriptFetch)
 }
 
 dependencies {

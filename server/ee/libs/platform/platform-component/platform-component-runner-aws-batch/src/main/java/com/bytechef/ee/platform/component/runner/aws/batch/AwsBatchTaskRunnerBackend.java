@@ -31,12 +31,12 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -201,7 +201,9 @@ public class AwsBatchTaskRunnerBackend implements RemoteTaskRunnerBackend {
         Path archivePath = Files.createTempFile("bytechef-aws-batch-input-" + UUID.randomUUID() + "-", ".tar");
 
         try (AwsBatchOperations operations = operationsFactory.create(connectionSettings, urlValidity)) {
-            Files.copy(inputArchive, archivePath, StandardCopyOption.REPLACE_EXISTING);
+            try (OutputStream archiveOutputStream = Files.newOutputStream(archivePath)) {
+                inputArchive.transferTo(archiveOutputStream);
+            }
 
             boolean staged = false;
             String jobDefinitionArn = null;

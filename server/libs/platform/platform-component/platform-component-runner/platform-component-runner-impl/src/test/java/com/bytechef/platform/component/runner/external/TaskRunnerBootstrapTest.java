@@ -57,6 +57,29 @@ class TaskRunnerBootstrapTest {
     }
 
     @Test
+    void testJavaScriptBootstrapPassesTheConnectionsOnlyToAThreeParameterPerform() {
+        String appended = TaskRunnerBootstrap.append("javascript", "function perform() {}\n", "process");
+
+        assertThat(appended).contains("process.env.BYTECHEF_CONNECTIONS_FILE")
+            .contains("perform.length >= 3")
+            .contains("perform(bytechefInput, bytechefConnection, bytechefContext)")
+            .contains("perform(bytechefInput, bytechefContext)")
+            .doesNotContain("BYTECHEF_CONNECTION_");
+    }
+
+    @Test
+    void testPythonBootstrapPassesTheConnectionsOnlyToAThreeParameterPerform() {
+        String appended = TaskRunnerBootstrap.append("python", "def perform(input, context):\n    pass\n", "process");
+
+        assertThat(appended).contains("os.environ.get(\"BYTECHEF_CONNECTIONS_FILE\")")
+            .contains("inspect.signature(perform)")
+            .contains(">= 3")
+            .contains("perform(bytechef_input, bytechef_connection, _BytechefContext())")
+            .contains("perform(bytechef_input, _BytechefContext())")
+            .doesNotContain("BYTECHEF_CONNECTION_");
+    }
+
+    @Test
     void testContextStubNamesTheRunnerInItsError() {
         assertThat(TaskRunnerBootstrap.append("javascript", "function perform() {}\n", "docker"))
             .contains("is not available under the docker runner");

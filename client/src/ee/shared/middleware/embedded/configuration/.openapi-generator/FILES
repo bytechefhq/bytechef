@@ -1,10 +1,12 @@
 apis/AppEventApi.ts
+apis/AutomationProjectCodeWorkflowApi.ts
 apis/CategoryApi.ts
 apis/ComponentDefinitionApi.ts
 apis/ConnectedUserProjectWorkflowApi.ts
 apis/ConnectionApi.ts
 apis/ConnectionTagApi.ts
 apis/IntegrationApi.ts
+apis/IntegrationCodeWorkflowApi.ts
 apis/IntegrationInstanceApi.ts
 apis/IntegrationInstanceConfigurationApi.ts
 apis/IntegrationInstanceConfigurationTagApi.ts
@@ -15,6 +17,8 @@ apis/index.ts
 docs/AppEvent.md
 docs/AppEventApi.md
 docs/AuthorizationType.md
+docs/AutomationProjectCodeWorkflowApi.md
+docs/AutomationProjectCodeWorkflowDeployResult.md
 docs/Category.md
 docs/CategoryApi.md
 docs/ComponentCategory.md
@@ -34,6 +38,7 @@ docs/Environment.md
 docs/Integration.md
 docs/IntegrationApi.md
 docs/IntegrationBasic.md
+docs/IntegrationCodeWorkflowApi.md
 docs/IntegrationInstance.md
 docs/IntegrationInstanceApi.md
 docs/IntegrationInstanceBasic.md
@@ -73,6 +78,7 @@ docs/WorkflowTrigger.md
 index.ts
 models/AppEvent.ts
 models/AuthorizationType.ts
+models/AutomationProjectCodeWorkflowDeployResult.ts
 models/Category.ts
 models/ComponentCategory.ts
 models/ComponentConnection.ts

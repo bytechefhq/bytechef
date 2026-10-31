@@ -35,6 +35,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingConnectionExcepti
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserComponentInputFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
@@ -44,6 +45,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.configurer.EmbeddedApiKeySecurityConfigurer;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -90,6 +92,9 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     private static final String HIDDEN_WORKFLOW_UUID = "hidden-automation-workflow-uuid";
     private static final String UNKNOWN_WORKFLOW_UUID = "no-such-uuid";
     private static final String WORKFLOW_UUID = "automation-workflow-uuid-1";
+
+    @Autowired
+    private ConnectedUserComponentInputFacade connectedUserComponentInputFacade;
 
     @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
@@ -236,6 +241,65 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
 
         expectCopyNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
         expectCopyNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testFrontendAutomationComponentInputOptionsResolvesWithTheRequestedConnection() {
+        Option option = mock(Option.class);
+
+        when(option.getLabel()).thenReturn("#general");
+        when(option.getValue()).thenReturn("C123");
+
+        when(connectedUserComponentInputFacade.getComponentInputOptions(
+            EXTERNAL_USER_ID, Environment.PRODUCTION, "slack", 1, "channel", "channel", Map.of("team", "T1"), "gen",
+            12L))
+                .thenReturn(List.of(option));
+
+        webTestClient
+            .post()
+            .uri("/v1/automation/component-input-options")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                Map.of(
+                    "componentName", "slack", "componentVersion", 1, "connectionId", 12, "groupName", "channel",
+                    "lookupDependsOnValues", Map.of("team", "T1"), "propertyName", "channel", "searchText", "gen"))
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(1)
+            .jsonPath("$[0].label")
+            .isEqualTo("#general")
+            .jsonPath("$[0].value")
+            .isEqualTo("C123");
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testFrontendAutomationComponentInputOptionsDefaultsMissingLookupValuesToAnEmptyMap() {
+        when(connectedUserComponentInputFacade.getComponentInputOptions(
+            EXTERNAL_USER_ID, Environment.PRODUCTION, "slack", 1, "channel", "channel", Map.of(), null, 12L))
+                .thenReturn(List.of());
+
+        webTestClient
+            .post()
+            .uri("/v1/automation/component-input-options")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                Map.of(
+                    "componentName", "slack", "componentVersion", 1, "connectionId", 12, "groupName", "channel",
+                    "propertyName", "channel"))
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(0);
+
+        verify(connectedUserComponentInputFacade).getComponentInputOptions(
+            EXTERNAL_USER_ID, Environment.PRODUCTION, "slack", 1, "channel", "channel", Map.of(), null, 12L);
     }
 
     @Test

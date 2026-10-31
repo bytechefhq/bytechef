@@ -576,32 +576,83 @@ class ProcessTaskRunnerTest {
     }
 
     @Test
-    void testADeclaredConnectionReachesTheProcessAndIsMaskedInStdout() {
+    void testTheConnectionsFileReachesTheCommandsAndIsMaskedInStdout() {
         assumeTrue(isExecutable("/bin/sh"));
 
         TaskRunnerRequest request = connectionRequest(
             List.of(
-                "test \"$BYTECHEF_CONNECTION_SLACK_TOKEN\" = 'xoxb-123456' && echo matched",
-                "echo \"token=$BYTECHEF_CONNECTION_SLACK_TOKEN\""),
+                "grep -q 'xoxb-123456' \"$BYTECHEF_CONNECTIONS_FILE\" && echo matched",
+                "echo \"file=$(cat \"$BYTECHEF_CONNECTIONS_FILE\")\""),
             Map.of());
 
         TaskRunnerResult result = injectingRunner().run(request);
 
         assertThat(result.stdout()).contains("matched")
-            .contains("token=******")
+            .contains("file=******")
             .doesNotContain("xoxb-123456");
     }
 
     @Test
-    void testTheAuthorsEnvironmentOverridesAnInjectedVariable() {
+    void testNoConnectionVariableReachesTheProcess() {
+        assumeTrue(isExecutable("/bin/sh"));
+
+        TaskRunnerResult result = injectingRunner().run(connectionRequest(List.of("env"), Map.of()));
+
+        assertThat(result.stdout()).contains("BYTECHEF_CONNECTIONS_FILE=")
+            .doesNotContain("BYTECHEF_CONNECTION_");
+    }
+
+    @Test
+    void testTheAuthorsEnvironmentCannotRedirectTheConnectionsFile() {
         assumeTrue(isExecutable("/bin/sh"));
 
         TaskRunnerRequest request = connectionRequest(
-            List.of("echo \"[$BYTECHEF_CONNECTION_SLACK_TOKEN]\""),
-            Map.of("BYTECHEF_CONNECTION_SLACK_TOKEN", "from-the-author"));
+            List.of("grep -q 'xoxb-123456' \"$BYTECHEF_CONNECTIONS_FILE\" && echo matched"),
+            Map.of("BYTECHEF_CONNECTIONS_FILE", "/nonexistent-bytechef-connections.json"));
 
         assertThat(injectingRunner().run(request)
-            .stdout()).contains("[from-the-author]");
+            .stdout()).contains("matched");
+    }
+
+    @Test
+    void testTheConnectionsFileLiesBesideTheInputFileAndIsNotAnOutputFile() {
+        assumeTrue(isExecutable("/bin/sh"));
+
+        TaskRunnerRequest request = new TaskRunnerRequest(
+            "shell", null,
+            List.of(
+                "test \"$(dirname \"$BYTECHEF_CONNECTIONS_FILE\")\" = \"$(dirname \"$BYTECHEF_INPUT_FILE\")\" && " +
+                    "echo beside",
+                "test ! -e \"$BYTECHEF_OUTPUT_DIR/$(basename \"$BYTECHEF_CONNECTIONS_FILE\")\" && echo absent"),
+            Map.of(), Map.of(), Map.of(), List.of("**", "*"), ParametersFactory.create(Map.of()),
+            ParametersFactory.create(Map.of()), Duration.ofSeconds(30), slackConnection(), mock(ActionContext.class));
+
+        TaskRunnerResult result = injectingRunner().run(request);
+
+        assertThat(result.stdout()).contains("beside")
+            .contains("absent");
+        assertThat(result.outputFiles()).isEmpty();
+    }
+
+    @Test
+    void testTheTaskRunnerConnectionIsNotInTheConnectionsFile() {
+        assumeTrue(isExecutable("/bin/sh"));
+
+        TaskRunnerRequest request = new TaskRunnerRequest(
+            "shell", null,
+            List.of(
+                "echo \"runner=$(grep -c 'runner-secret' \"$BYTECHEF_CONNECTIONS_FILE\")\"",
+                "echo \"slack=$(grep -c 'xoxb-123456' \"$BYTECHEF_CONNECTIONS_FILE\")\""),
+            Map.of(), Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
+            ParametersFactory.create(Map.of()), Duration.ofSeconds(30),
+            Map.of(
+                "slack", new ComponentConnection("slack", 1, 1L, Map.of("token", "xoxb-123456"), null),
+                "taskRunner", new ComponentConnection("aws", 1, 2L, Map.of("secret", "runner-secret"), null)),
+            mock(ActionContext.class));
+
+        assertThat(injectingRunner().run(request)
+            .stdout()).contains("runner=0")
+                .contains("slack=1");
     }
 
     @Test
@@ -609,7 +660,7 @@ class ProcessTaskRunnerTest {
         assumeTrue(isExecutable("/bin/sh"));
 
         TaskRunnerRequest request = connectionRequest(
-            List.of("echo \"leak $BYTECHEF_CONNECTION_SLACK_TOKEN\" >&2", "exit 3"), Map.of());
+            List.of("echo \"leak $(cat \"$BYTECHEF_CONNECTIONS_FILE\")\" >&2", "exit 3"), Map.of());
 
         assertThatThrownBy(() -> injectingRunner().run(request))
             .isInstanceOf(IllegalStateException.class)
@@ -618,22 +669,123 @@ class ProcessTaskRunnerTest {
     }
 
     @Test
-    void testAPythonScriptReadsTheConnectionAsJson() {
+    void testTheSwitchOffDeliversNoConnectionsFile() {
+        assumeTrue(isExecutable("/bin/sh"));
+
+        TaskRunnerRequest request = connectionRequest(
+            List.of(
+                "echo \"[${BYTECHEF_CONNECTIONS_FILE:-}]\"",
+                "ls -A \"$BYTECHEF_WORKING_DIR\""),
+            Map.of());
+
+        TaskRunnerResult result = processTaskRunner.run(request);
+
+        assertThat(result.stdout()).contains("[]")
+            .doesNotContain("connections.json")
+            .doesNotContain("BYTECHEF_CONNECTION_");
+    }
+
+    @Test
+    void testAPythonPerformWithAConnectionParameterReceivesTheConnections() {
         assumeTrue(isOnPath("python3"));
 
-        TaskRunnerRequest request = new TaskRunnerRequest(
+        TaskRunnerRequest request = connectionScriptRequest(
             "python",
             """
-                import json, os
-
-                def perform(input, context):
-                    return json.loads(os.environ["BYTECHEF_CONNECTION_SLACK"])["token"] == "xoxb-123456"
-                """,
-            List.of(), Map.of(), Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
-            ParametersFactory.create(Map.of()), Duration.ofSeconds(30), slackConnection(), mock(ActionContext.class));
+                def perform(input, connection, context):
+                    return [connection["slack"]["token"] == "xoxb-123456", type(context).__name__]
+                """);
 
         assertThat(injectingRunner().run(request)
-            .output()).isEqualTo(true);
+            .output()).isEqualTo(List.of(true, "_BytechefContext"));
+    }
+
+    @Test
+    void testAPythonPerformWithoutAConnectionParameterReceivesTheContextSecond() {
+        assumeTrue(isOnPath("python3"));
+
+        TaskRunnerRequest request = connectionScriptRequest(
+            "python",
+            """
+                def perform(input, context, debug=False):
+                    return type(context).__name__
+                """);
+
+        assertThat(injectingRunner().run(request)
+            .output()).isEqualTo("_BytechefContext");
+    }
+
+    @Test
+    void testAPythonPerformReceivesAnEmptyConnectionMapWhenTheSwitchIsOff() {
+        assumeTrue(isOnPath("python3"));
+
+        TaskRunnerRequest request = connectionScriptRequest(
+            "python",
+            """
+                def perform(input, connection, context):
+                    return connection
+                """);
+
+        assertThat(processTaskRunner.run(request)
+            .output()).isEqualTo(Map.of());
+    }
+
+    @Test
+    void testAJavaScriptPerformWithAConnectionParameterReceivesTheConnections() {
+        assumeTrue(isOnPath("node"));
+
+        TaskRunnerRequest request = connectionScriptRequest(
+            "javascript",
+            """
+                function perform(input, connection, context) {
+                    return [connection["slack"].token === "xoxb-123456", typeof context];
+                }
+                """);
+
+        assertThat(injectingRunner().run(request)
+            .output()).isEqualTo(List.of(true, "object"));
+    }
+
+    @Test
+    void testAJavaScriptPerformWithoutAConnectionParameterReceivesTheContextSecond() {
+        assumeTrue(isOnPath("node"));
+
+        TaskRunnerRequest request = connectionScriptRequest(
+            "javascript",
+            """
+                function perform(input, context) {
+                    try {
+                        return context.component;
+                    } catch (error) {
+                        return error.message;
+                    }
+                }
+                """);
+
+        assertThat(injectingRunner().run(request)
+            .output()).isEqualTo("context.component is not available under the process runner");
+    }
+
+    @Test
+    void testAJavaScriptPerformReceivesAnEmptyConnectionMapWhenTheSwitchIsOff() {
+        assumeTrue(isOnPath("node"));
+
+        TaskRunnerRequest request = connectionScriptRequest(
+            "javascript",
+            """
+                function perform(input, connection, context) {
+                    return connection;
+                }
+                """);
+
+        assertThat(processTaskRunner.run(request)
+            .output()).isEqualTo(Map.of());
+    }
+
+    private static TaskRunnerRequest connectionScriptRequest(String languageId, String script) {
+        return new TaskRunnerRequest(
+            languageId, script, List.of(), Map.of(), Map.of(), Map.of(), List.of(), ParametersFactory.create(Map.of()),
+            ParametersFactory.create(Map.of()), Duration.ofSeconds(30), slackConnection(), mock(ActionContext.class));
     }
 
     private static TaskRunnerRequest connectionRequest(List<String> commands, Map<String, String> env) {

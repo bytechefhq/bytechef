@@ -234,7 +234,7 @@ bytechef:
         # Enterprise. Runs script and commands tasks as pods on the cluster the task's kubernetes connection names.
         enabled: false
     # Gives script and commands tasks on the process, docker, kubernetes and aws-batch runners the parameters of the
-    # connections they declare, as BYTECHEF_CONNECTION_* environment variables, masked in the captured output.
+    # connections they declare, in the JSON file BYTECHEF_CONNECTIONS_FILE names, masked in the captured output.
     inject-connections: true
     # Ceilings on what a remote task runner may cost this server: a held worker permit, captured log bytes, and
     # bytes moved in or out of the execution. A runner may override them under its own properties.
@@ -297,6 +297,8 @@ bytechef:
       # kept separate so a burst of scheduled runs cannot leave an interactive caller waiting for a permit.
       sync-concurrency-limit: 5
   workflow:
+    code-workflow:
+      java-enabled: true
     output-storage:
       # Output storage provider for workflow output data (AWS(EE) | FILESYSTEM | JDBC) default: JDBC
       provider: JDBC

@@ -60,6 +60,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Ivica Cardic
@@ -85,6 +86,9 @@ public class IntegrationFacadeIntTest {
 
     @Autowired
     private IntegrationRepository integrationRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private IntegrationTagFacade integrationTagFacade;
@@ -195,6 +199,41 @@ public class IntegrationFacadeIntTest {
 
         assertThat(integrationRepository.count()).isEqualTo(0);
         assertThat(tagRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testDeleteCodeIntegration() {
+        IntegrationDTO integrationDTO = IntegrationDTO.builder()
+            .componentName("googleMail")
+            .name("Gmail")
+            .build();
+
+        long integrationId = integrationFacade.createIntegration(integrationDTO);
+
+        Long codeWorkflowContainerId = jdbcTemplate.queryForObject(
+            """
+                INSERT INTO code_workflow_container (name, uuid, external_version, language, workflows, created_date,
+                    created_by, last_modified_date, last_modified_by, version)
+                VALUES ('googleMail', gen_random_uuid(), '1.0.0', 0, '', now(), 'admin', now(), 'admin', 0)
+                RETURNING id
+                """,
+            Long.class);
+
+        jdbcTemplate.update(
+            """
+                INSERT INTO integration_code_workflow (code_workflow_container_id, integration_id,
+                    integration_version, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES (?, ?, 1, now(), 'admin', now(), 'admin', 0)
+                """,
+            codeWorkflowContainerId, integrationId);
+
+        integrationFacade.deleteIntegration(integrationId);
+
+        assertThat(integrationRepository.findById(integrationId)).isEmpty();
+        assertThat(
+            jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM integration_code_workflow WHERE integration_id = ?", Long.class, integrationId))
+                    .isZero();
     }
 
     @Test

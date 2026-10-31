@@ -8,6 +8,9 @@ import SettingsMenu from '@/ee/pages/embedded/integration/components/integration
 import {useIntegrationHeader} from '@/ee/pages/embedded/integration/components/integration-header/hooks/useIntegrationHeader';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import CodeWorkflowHeaderActions, {
+    CodeWorkflowSaveButton,
+} from '@/pages/platform/code-workflow/components/CodeWorkflowHeaderActions';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -115,8 +118,11 @@ const IntegrationHeader = ({
             </div>
 
             <div className="flex items-center gap-1">
+                {integration?.codeWorkflow && <CodeWorkflowHeaderActions />}
+
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
+                    leadingAction={integration?.codeWorkflow ? <CodeWorkflowSaveButton /> : undefined}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
                     runDisabled={runDisabled}

@@ -32,6 +32,14 @@ public interface IntegrationInstanceConfigurationFacade {
     void enableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable);
 
+    /**
+     * Makes a published integration version live in an environment: creates and enables an instance configuration when
+     * the integration has none there, otherwise moves the existing one to the version and enables it.
+     *
+     * @return the id of the instance configuration
+     */
+    long enableIntegrationVersion(long integrationId, int integrationVersion, Environment environment);
+
     IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
         long integrationId, boolean enabled, Environment environment);
 
