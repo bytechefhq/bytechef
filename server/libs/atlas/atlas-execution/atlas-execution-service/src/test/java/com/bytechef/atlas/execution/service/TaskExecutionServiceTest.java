@@ -118,6 +118,16 @@ class TaskExecutionServiceTest {
     }
 
     @Test
+    void fetchLastCancelledLeafJobTaskExecutionReadsLastCancelledLeafRow() {
+        TaskExecution cancelledTaskExecution = new TaskExecution();
+
+        when(taskExecutionRepository.findLastCancelledLeafByJobId(7L)).thenReturn(Optional.of(cancelledTaskExecution));
+
+        assertThat(taskExecutionService.fetchLastCancelledLeafJobTaskExecution(7L))
+            .containsSame(cancelledTaskExecution);
+    }
+
+    @Test
     void fetchLastStartedJobTaskExecutionReadsLastStartedRow() {
         TaskExecution startedTaskExecution = new TaskExecution();
 

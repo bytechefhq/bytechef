@@ -274,6 +274,14 @@ public interface JdbcTaskExecutionRepository
 
     @Override
     @Query("""
+        SELECT * FROM task_execution WHERE job_id = :jobId AND status = 4
+        AND NOT EXISTS (SELECT 1 FROM task_execution child WHERE child.parent_id = task_execution.id)
+        ORDER BY created_date DESC, id DESC LIMIT 1
+        """)
+    Optional<TaskExecution> findLastCancelledLeafByJobId(@Param("jobId") long jobId);
+
+    @Override
+    @Query("""
         SELECT * FROM task_execution WHERE job_id = :jobId AND start_date IS NOT NULL
         ORDER BY start_date DESC, id DESC LIMIT 1
         """)

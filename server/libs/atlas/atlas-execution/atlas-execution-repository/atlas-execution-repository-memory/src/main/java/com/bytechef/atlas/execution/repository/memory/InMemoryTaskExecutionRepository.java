@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.comparator.Comparators;
@@ -545,6 +546,21 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public Optional<TaskExecution> findLastCancelledLeafByJobId(long jobId) {
+        List<TaskExecution> jobTaskExecutions = findAllByJobIdOrderByCreatedDate(jobId);
+
+        Set<Long> parentIds = jobTaskExecutions.stream()
+            .map(TaskExecution::getParentId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        return jobTaskExecutions.stream()
+            .filter(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.CANCELLED)
+            .filter(taskExecution -> !parentIds.contains(taskExecution.getId()))
+            .max(CREATED_DATE_COMPARATOR);
     }
 
     @Override

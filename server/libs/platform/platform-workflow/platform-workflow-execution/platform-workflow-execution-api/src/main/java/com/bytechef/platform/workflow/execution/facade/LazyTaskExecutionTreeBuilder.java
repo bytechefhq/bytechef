@@ -157,7 +157,8 @@ public class LazyTaskExecutionTreeBuilder {
         }
 
         Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService
-            .fetchLastStartedJobTaskExecution(jobId)
+            .fetchLastCancelledLeafJobTaskExecution(jobId)
+            .or(() -> taskExecutionService.fetchLastStartedJobTaskExecution(jobId))
             .or(() -> taskExecutionService.fetchLastJobTaskExecution(jobId));
 
         return lastTaskExecutionOptional

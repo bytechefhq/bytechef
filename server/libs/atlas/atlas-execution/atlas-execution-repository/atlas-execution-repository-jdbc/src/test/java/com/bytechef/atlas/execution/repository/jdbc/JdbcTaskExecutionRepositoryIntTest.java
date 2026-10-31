@@ -466,6 +466,34 @@ public class JdbcTaskExecutionRepositoryIntTest {
     }
 
     @Test
+    public void testFindLastCancelledLeafByJobId() {
+        long jobId = saveJob();
+
+        long cancelledParentId = saveTaskExecutionId(jobId, null, TaskExecution.Status.CANCELLED);
+
+        saveTaskExecutionId(jobId, cancelledParentId, TaskExecution.Status.CANCELLED);
+        saveTaskExecutionId(jobId, cancelledParentId, TaskExecution.Status.COMPLETED);
+
+        long lastCancelledLeafId = saveTaskExecutionId(jobId, cancelledParentId, TaskExecution.Status.CANCELLED);
+        long newerCancelledParentId = saveTaskExecutionId(jobId, null, TaskExecution.Status.CANCELLED);
+
+        saveTaskExecutionId(jobId, newerCancelledParentId, TaskExecution.Status.COMPLETED);
+
+        Assertions.assertEquals(
+            lastCancelledLeafId, taskExecutionRepository.findLastCancelledLeafByJobId(jobId)
+                .map(TaskExecution::getId)
+                .orElseThrow());
+
+        long notCancelledJobId = saveJob();
+
+        saveTaskExecutionId(notCancelledJobId, TaskExecution.Status.COMPLETED);
+        saveTaskExecutionId(notCancelledJobId, TaskExecution.Status.FAILED);
+
+        Assertions.assertTrue(taskExecutionRepository.findLastCancelledLeafByJobId(notCancelledJobId)
+            .isEmpty());
+    }
+
+    @Test
     public void testFindAllUnfinishedByJobId() {
         long jobId = saveJob();
 
@@ -521,6 +549,20 @@ public class JdbcTaskExecutionRepositoryIntTest {
     private long saveTaskExecutionId(long jobId, TaskExecution.Status status) {
         TaskExecution taskExecution = TaskExecution.builder()
             .jobId(jobId)
+            .status(status)
+            .taskNumber(0)
+            .workflowTask(new WorkflowTask(Map.of("name", "task0", "type", "test/v1")))
+            .build();
+
+        taskExecution = taskExecutionRepository.save(taskExecution);
+
+        return Objects.requireNonNull(taskExecution.getId());
+    }
+
+    private long saveTaskExecutionId(long jobId, Long parentId, TaskExecution.Status status) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(jobId)
+            .parentId(parentId)
             .status(status)
             .taskNumber(0)
             .workflowTask(new WorkflowTask(Map.of("name", "task0", "type", "test/v1")))
