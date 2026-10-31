@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261031000001" author="Ivica Cardic">
+        <createTable tableName="mcp_integration_component">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_component_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="integration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_integration_component"
+            baseColumnNames="mcp_component_id"
+            constraintName="fk_mcp_integration_component_mcp_component"
+            referencedTableName="mcp_component"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_integration_component"
+            baseColumnNames="integration_id"
+            constraintName="fk_mcp_integration_component_integration"
+            referencedTableName="integration"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addUniqueConstraint
+            tableName="mcp_integration_component"
+            columnNames="mcp_component_id"
+            constraintName="uk_mcp_integration_component_mcp_component"/>
+
+        <createIndex tableName="mcp_integration_component" indexName="idx_mcp_integration_component_integration_id">
+            <column name="integration_id"/>
+        </createIndex>
+
+        <sql>
+            INSERT INTO mcp_integration_component (
+                mcp_component_id, integration_id, created_date, created_by, last_modified_date, last_modified_by,
+                version)
+            SELECT mcp_component.id, MIN(integration.id), CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', 0
+            FROM mcp_component
+            JOIN mcp_server ON mcp_server.id = mcp_component.mcp_server_id
+            JOIN integration ON integration.component_name = mcp_component.component_name
+            WHERE mcp_server.type = 1
+            GROUP BY mcp_component.id
+            HAVING COUNT(integration.id) = 1
+        </sql>
+    </changeSet>
+</databaseChangeLog>
