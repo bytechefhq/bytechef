@@ -76,6 +76,9 @@ public final class CopilotToolContextUtils {
         putIfNotNull(toolContext, AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, workspaceId);
         putIfNotNull(toolContext, AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, environmentId);
         putIfNotNull(
+            toolContext, AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY,
+            StringUtils.asString(state.get(CopilotConstants.STATE_PROJECT_OWNER)));
+        putIfNotNull(
             toolContext, ScopedProjectToolContext.TOOL_CONTEXT_SCOPED_PROJECT_ID_KEY,
             NumberUtils.asLong(state.get(CopilotConstants.STATE_SCOPED_PROJECT_ID)));
 

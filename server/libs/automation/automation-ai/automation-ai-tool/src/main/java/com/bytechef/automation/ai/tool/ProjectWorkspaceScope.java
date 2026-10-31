@@ -26,6 +26,7 @@ import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -35,8 +36,6 @@ import org.springframework.ai.chat.model.ToolContext;
  * @author Ivica Cardic
  */
 final class ProjectWorkspaceScope {
-
-    static final Set<ProjectOwner> HIDDEN_PROJECT_OWNERS = EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
 
     static final String WORKSPACE_ID_DESCRIPTION =
         "The workspace ID. Optional when the account has exactly one workspace or the conversation is already " +
@@ -59,15 +58,27 @@ final class ProjectWorkspaceScope {
         return ((WorkspaceScopeResolver.Resolved) workspaceScope).workspaceId();
     }
 
+    static Set<ProjectOwner> getHiddenProjectOwners(@Nullable ToolContext toolContext) {
+        Set<ProjectOwner> hiddenProjectOwners = EnumSet.allOf(ProjectOwner.class);
+
+        ProjectOwner declaredProjectOwner = fetchDeclaredProjectOwner(toolContext);
+
+        if (declaredProjectOwner != null && declaredProjectOwner != ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT) {
+            hiddenProjectOwners.remove(declaredProjectOwner);
+        }
+
+        return hiddenProjectOwners;
+    }
+
     static Project getWorkspaceProject(
         ProjectService projectService, ProjectOwnershipService projectOwnershipService, long projectId,
-        long workspaceId, ErrorType errorType) {
+        long workspaceId, Set<ProjectOwner> hiddenProjectOwners, ErrorType errorType) {
 
         Project project = projectService.fetchProject(projectId)
             .orElse(null);
 
         if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId) ||
-            isOwned(projectOwnershipService, projectId)) {
+            isOwned(projectOwnershipService, projectId, hiddenProjectOwners)) {
             throw new ExecutionException(
                 "Project " + projectId + " not found in workspace " + workspaceId, errorType);
         }
@@ -75,13 +86,16 @@ final class ProjectWorkspaceScope {
         return project;
     }
 
-    static List<Project> getWorkspaceProjects(ProjectService projectService, long workspaceId) {
-        return projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId, HIDDEN_PROJECT_OWNERS));
+    static List<Project> getWorkspaceProjects(
+        ProjectService projectService, long workspaceId, Set<ProjectOwner> hiddenProjectOwners) {
+
+        return projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId, hiddenProjectOwners));
     }
 
     static void checkWorkspaceWorkflow(
         ProjectOwnershipService projectOwnershipService, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService, String workflowId, long workspaceId, ErrorType errorType) {
+        ProjectWorkflowService projectWorkflowService, String workflowId, long workspaceId,
+        Set<ProjectOwner> hiddenProjectOwners, ErrorType errorType) {
 
         ProjectWorkflow projectWorkflow;
 
@@ -97,16 +111,37 @@ final class ProjectWorkspaceScope {
             .orElse(null);
 
         if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId) ||
-            isOwned(projectOwnershipService, projectWorkflow.getProjectId())) {
+            isOwned(projectOwnershipService, projectWorkflow.getProjectId(), hiddenProjectOwners)) {
 
             throw new ExecutionException("Workflow " + workflowId + " not found in workspace " + workspaceId,
                 errorType);
         }
     }
 
-    private static boolean isOwned(ProjectOwnershipService projectOwnershipService, long projectId) {
-        Set<Long> ownedProjectIds = projectOwnershipService.getOwnedProjectIds(
-            List.of(projectId), HIDDEN_PROJECT_OWNERS);
+    private static @Nullable ProjectOwner fetchDeclaredProjectOwner(@Nullable ToolContext toolContext) {
+        if (toolContext == null) {
+            return null;
+        }
+
+        Map<String, Object> context = toolContext.getContext();
+
+        if (context == null ||
+            !(context.get(AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY) instanceof String name)) {
+
+            return null;
+        }
+
+        try {
+            return ProjectOwner.valueOf(name);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return null;
+        }
+    }
+
+    private static boolean isOwned(
+        ProjectOwnershipService projectOwnershipService, long projectId, Set<ProjectOwner> hiddenProjectOwners) {
+
+        Set<Long> ownedProjectIds = projectOwnershipService.getOwnedProjectIds(List.of(projectId), hiddenProjectOwners);
 
         return !ownedProjectIds.isEmpty();
     }
