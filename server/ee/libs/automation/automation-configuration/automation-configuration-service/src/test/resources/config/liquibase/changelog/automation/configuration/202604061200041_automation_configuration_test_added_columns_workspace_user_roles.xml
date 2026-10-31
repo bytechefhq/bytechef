@@ -47,4 +47,16 @@
                    (workspace_role IS NULL AND custom_role_id IS NOT NULL));
         </sql>
     </changeSet>
+
+    <!--
+        The dev seed (workspace_user.csv) inserts id 2 explicitly without advancing the identity sequence, so the
+        second membership a test saves would collide with it. Move the sequence past the seeded rows.
+    -->
+    <changeSet id="202604061200041-4" author="Ivica Cardic">
+        <sql>
+            SELECT setval(
+                pg_get_serial_sequence('workspace_user', 'id'),
+                GREATEST((SELECT COALESCE(MAX(id), 0) FROM workspace_user), 1));
+        </sql>
+    </changeSet>
 </databaseChangeLog>
