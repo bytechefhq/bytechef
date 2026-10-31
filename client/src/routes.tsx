@@ -41,6 +41,11 @@ const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const AutomationConnections = lazy(() =>
     import('@/pages/automation/connections/Connections').then((module) => ({default: module.Connections}))
 );
+const AutomationToolInvocations = lazy(() =>
+    import('@/pages/automation/tool-invocations/AutomationToolInvocations').then((module) => ({
+        default: module.AutomationToolInvocations,
+    }))
+);
 const AutomationWorkflowExecutions = lazy(() =>
     import('@/pages/automation/workflow-executions/WorkflowExecutions').then((module) => ({
         default: module.WorkflowExecutions,
@@ -769,6 +774,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'executions',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper hasLeftSidebar>
+                                                    <AutomationToolInvocations />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'executions/tool-invocations',
                                 },
                                 {
                                     element: (

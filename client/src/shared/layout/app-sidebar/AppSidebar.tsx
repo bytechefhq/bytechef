@@ -61,7 +61,15 @@ export function AppSidebar({navigation}: AppSidebarProps) {
 
     const collapsed = state === 'collapsed' && !isMobile;
 
-    const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+    const activeHref = useMemo(() => {
+        const matches = navigation.filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+
+        return matches.reduce((longest, item) => (item.href.length > longest.length ? item.href : longest), '');
+    }, [navigation, pathname]);
+
+    const isActive = (href: string) => href === activeHref;
+
+    const isOnPath = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
     // Projects and integrations (and their workflow editors) only exist in development, so leaving
     // development moves the user to the environment-scoped deployments/configurations page instead.
@@ -70,9 +78,9 @@ export function AppSidebar({navigation}: AppSidebarProps) {
             return;
         }
 
-        if (isActive('/automation/projects')) {
+        if (isOnPath('/automation/projects')) {
             navigate('/automation/deployments');
-        } else if (isActive('/embedded/integrations')) {
+        } else if (isOnPath('/embedded/integrations')) {
             navigate('/embedded/configurations');
         }
     };

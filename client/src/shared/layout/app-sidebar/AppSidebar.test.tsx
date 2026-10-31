@@ -1,7 +1,15 @@
 import {SidebarProvider} from '@/components/ui/sidebar';
 import {render, screen} from '@/shared/util/test-utils';
 import {fireEvent} from '@testing-library/react';
-import {FolderIcon, MessagesSquareIcon, NetworkIcon, ServerCogIcon, ServerIcon} from 'lucide-react';
+import {
+    ActivityIcon,
+    FolderIcon,
+    MessagesSquareIcon,
+    NetworkIcon,
+    ServerCogIcon,
+    ServerIcon,
+    WrenchIcon,
+} from 'lucide-react';
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -42,6 +50,8 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 const navigation = [
     {href: '/automation/ai-hub', icon: MessagesSquareIcon, name: 'AI Hub'},
     {href: '/automation/projects', icon: FolderIcon, name: 'Projects'},
+    {href: '/automation/executions', icon: ActivityIcon, name: 'Workflow Executions'},
+    {href: '/automation/executions/tool-invocations', icon: WrenchIcon, name: 'Tool Invocations'},
 ];
 
 const serversGroup = {icon: ServerCogIcon, name: 'Servers'};
@@ -100,6 +110,30 @@ describe('AppSidebar', () => {
 
         expect(screen.queryByRole('button', {name: 'Close sidebar'})).not.toBeInTheDocument();
         expect(screen.getByTestId('environment-select')).toHaveTextContent('icon');
+    });
+
+    describe('active item', () => {
+        const isActiveLink = (name: string) => screen.getByRole('link', {name}).getAttribute('data-active') === 'true';
+
+        it('marks only the nested entry active on its own page', () => {
+            renderSidebar(true, '/automation/executions/tool-invocations');
+
+            expect(isActiveLink('Tool Invocations')).toBe(true);
+            expect(isActiveLink('Workflow Executions')).toBe(false);
+        });
+
+        it('marks the parent entry active on its own page', () => {
+            renderSidebar(true, '/automation/executions');
+
+            expect(isActiveLink('Workflow Executions')).toBe(true);
+            expect(isActiveLink('Tool Invocations')).toBe(false);
+        });
+
+        it('marks the parent entry active on a deep route that is not a nav entry', () => {
+            renderSidebar(true, '/automation/projects/1/project-workflows/2');
+
+            expect(isActiveLink('Projects')).toBe(true);
+        });
     });
 
     describe('environment', () => {
@@ -222,7 +256,7 @@ describe('AppSidebar', () => {
         });
 
         it('renders a one-item group as a plain row on the collapsed sidebar', () => {
-            renderSidebar(false, '/automation/projects', [...navigation, groupedNavigation[2]]);
+            renderSidebar(false, '/automation/projects', [...navigation, groupedNavigation[navigation.length]]);
 
             expect(screen.queryByRole('button', {name: 'Servers'})).not.toBeInTheDocument();
             expect(screen.getByRole('link', {name: 'MCP Servers'})).toBeInTheDocument();
