@@ -33,6 +33,7 @@ import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
@@ -46,6 +47,8 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -102,6 +105,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
+    private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
     private final ProjectWorkflowService projectWorkflowService;
     private final String publicUrl;
     private final SharedTemplateFileStorage sharedTemplateFileStorage;
@@ -119,6 +123,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         ApplicationProperties applicationProperties, EnvironmentService environmentService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
+        ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
         ProjectWorkflowService projectWorkflowService, SharedTemplateFileStorage sharedTemplateFileStorage,
         SharedTemplateService sharedTemplateService, WorkflowCacheManager workflowCacheManager,
         WorkflowFacade workflowFacade, List<WorkflowPreDeleteListener> workflowPreDeleteListeners,
@@ -131,6 +136,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
+        this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
         this.projectWorkflowService = projectWorkflowService;
         this.publicUrl = applicationProperties.getPublicUrl();
         this.sharedTemplateFileStorage = sharedTemplateFileStorage;
@@ -396,6 +402,22 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
                     workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
                 .toList();
         }
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public VersionWorkflowChange getProjectVersionWorkflowChange(
+        long projectId, int projectVersion, String workflowUuid) {
+
+        return projectVersionWorkflowChangeService.getVersionWorkflowChange(projectId, projectVersion, workflowUuid);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion) {
+        return projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, projectVersion);
     }
 
     @Override

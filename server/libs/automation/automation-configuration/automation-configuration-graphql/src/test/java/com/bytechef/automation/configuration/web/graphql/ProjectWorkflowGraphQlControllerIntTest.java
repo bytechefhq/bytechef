@@ -28,7 +28,14 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
+import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowDefinitionChange;
+import com.bytechef.platform.configuration.dto.WorkflowNodeChangeKind;
+import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
 import java.util.List;
@@ -62,6 +69,63 @@ public class ProjectWorkflowGraphQlControllerIntTest {
 
     @Autowired
     private ProjectWorkflowFacade projectWorkflowFacade;
+
+    @Test
+    void testProjectVersionWorkflowChanges() {
+        when(projectWorkflowFacade.getProjectVersionWorkflowChanges(1L, 2))
+            .thenReturn(new VersionWorkflowChanges(
+                1, 2, List.of(new VersionWorkflowChangeSummary("u1", "Flow", WorkflowChangeType.MODIFIED, 3))));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    projectVersionWorkflowChanges(projectId: 1, projectVersion: 2) {
+                        baseVersion
+                        version
+                        workflows {
+                            workflowUuid
+                            changeType
+                            changeCount
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("projectVersionWorkflowChanges.workflows[0].changeCount")
+            .entity(Integer.class)
+            .isEqualTo(3)
+            .path("projectVersionWorkflowChanges.workflows[0].changeType")
+            .entity(String.class)
+            .isEqualTo("MODIFIED");
+    }
+
+    @Test
+    void testProjectVersionWorkflowChange() {
+        when(projectWorkflowFacade.getProjectVersionWorkflowChange(1L, 2, "u1"))
+            .thenReturn(new VersionWorkflowChange(
+                "u1", "Flow", WorkflowChangeType.MODIFIED, 1, 2,
+                List.of(new WorkflowDefinitionChange(
+                    WorkflowNodeChangeKind.ADDED, WorkflowNodeChangeTarget.TASK, "task_1", "type/v1", null, null,
+                    List.of())),
+                null, null));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    projectVersionWorkflowChange(projectId: 1, projectVersion: 2, workflowUuid: "u1") {
+                        workflowUuid
+                        changes {
+                            kind
+                            target
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("projectVersionWorkflowChange.changes[0].kind")
+            .entity(String.class)
+            .isEqualTo("ADDED");
+    }
 
     @Test
     void testDeleteSharedWorkflow() {
