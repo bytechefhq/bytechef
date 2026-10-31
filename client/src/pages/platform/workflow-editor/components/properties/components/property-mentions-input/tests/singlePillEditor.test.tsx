@@ -2,6 +2,7 @@ vi.mock('@/pages/platform/workflow-editor/utils/saveProperty', () => ({
     default: vi.fn(),
 }));
 
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -45,22 +46,24 @@ const renderSinglePill = (props: Partial<ComponentProps<typeof PropertyMentionsI
     let editor: Editor | null = null;
 
     const EditorCapture = () => (
-        <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>
-            <PropertyMentionsInput
-                controlType="INTEGER"
-                disableAutoSave
-                expressionEnabled
-                onSinglePillAbandoned={onSinglePillAbandoned}
-                onValueChange={onValueChange}
-                path="parameters.count"
-                ref={(instance) => {
-                    editor = instance;
-                }}
-                singlePill
-                type="INTEGER"
-                {...props}
-            />
-        </WorkflowEditorProvider>
+        <TooltipProvider>
+            <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>
+                <PropertyMentionsInput
+                    controlType="INTEGER"
+                    disableAutoSave
+                    expressionEnabled
+                    onSinglePillAbandoned={onSinglePillAbandoned}
+                    onValueChange={onValueChange}
+                    path="parameters.count"
+                    ref={(instance) => {
+                        editor = instance;
+                    }}
+                    singlePill
+                    type="INTEGER"
+                    {...props}
+                />
+            </WorkflowEditorProvider>
+        </TooltipProvider>
     );
 
     const view = render(<EditorCapture />);
@@ -108,6 +111,26 @@ describe('single-pill editor', () => {
         expect(pressKey('a')).toBe(true);
         expect(pressKey('5')).toBe(true);
         expect(pressKey('$')).toBe(false);
+    });
+
+    it('hands = in the empty editor to the formula switch', async () => {
+        const onFormulaKey = vi.fn();
+
+        const {getEditor} = renderSinglePill({
+            handleInputTypeSwitchButtonClick: onFormulaKey,
+            showInputTypeSwitchButton: true,
+            value: '',
+        });
+
+        await settle();
+
+        const keyPressEvent = new KeyboardEvent('keypress', {bubbles: true, cancelable: true, charCode: 61, key: '='});
+
+        getEditor().view.dom.dispatchEvent(keyPressEvent);
+
+        expect(keyPressEvent.defaultPrevented).toBe(true);
+        expect(onFormulaKey).toHaveBeenCalledTimes(1);
+        expect(getEditor().getText()).toBe('');
     });
 
     it('refuses text pasted next to the pill', async () => {

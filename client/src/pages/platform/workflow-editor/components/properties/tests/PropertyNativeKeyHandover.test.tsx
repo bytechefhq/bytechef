@@ -482,6 +482,43 @@ describe('the Dynamic switch', () => {
         }
     );
 
+    const pressEditorKey = (editorElement: Element, key: string) => {
+        const keyPressEvent = new KeyboardEvent('keypress', {
+            bubbles: true,
+            cancelable: true,
+            charCode: key.charCodeAt(0),
+            key,
+        });
+
+        act(() => {
+            editorElement.dispatchEvent(keyPressEvent);
+        });
+
+        return keyPressEvent.defaultPrevented;
+    };
+
+    it.each([
+        ['an empty DATE field', () => renderEmptyTemporal('DATE')],
+        ['an empty TIME field', () => renderEmptyTemporal('TIME')],
+        ['a BOOLEAN select', () => renderSelect(enabledProperty, true)],
+    ])('= in the empty editor of %s turns Formula on', async (_, renderProperty) => {
+        const {container} = renderProperty();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        const editorElement = container.querySelector('.ProseMirror')!;
+
+        expect(pressEditorKey(editorElement, '=')).toBe(true);
+
+        await settle();
+
+        expect(screen.getByRole('switch', {name: 'Formula'})).toBeChecked();
+        expect(screen.queryByRole('switch', {name: 'Text'})).toBeNull();
+        expect(container.querySelector('.ProseMirror')).not.toBeNull();
+    });
+
     it('keeps the editor when focus moves to the data pill panel, and takes the pill picked there', async () => {
         const {container} = renderSelect(enabledProperty, true);
 
