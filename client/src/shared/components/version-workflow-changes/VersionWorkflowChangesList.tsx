@@ -10,11 +10,21 @@ import {
 
 interface VersionWorkflowChangesListProps {
     changes?: VersionWorkflowChanges;
+    isError?: boolean;
     isLoading: boolean;
     onWorkflowClick: (workflowUuid: string) => void;
 }
 
-const VersionWorkflowChangesList = ({changes, isLoading, onWorkflowClick}: VersionWorkflowChangesListProps) => {
+const VersionWorkflowChangesList = ({
+    changes,
+    isError,
+    isLoading,
+    onWorkflowClick,
+}: VersionWorkflowChangesListProps) => {
+    if (isError) {
+        return <p className="text-sm text-content-destructive">Couldn&apos;t load workflow changes.</p>;
+    }
+
     if (isLoading) {
         return (
             <div className="flex justify-center py-2">
@@ -52,7 +62,7 @@ const VersionWorkflowChangesList = ({changes, isLoading, onWorkflowClick}: Versi
                                 styleType={getWorkflowChangeTypeBadgeStyleType(workflow.changeType)}
                             />
 
-                            {workflow.changeType !== WorkflowChangeType.Removed && (
+                            {workflow.changeType === WorkflowChangeType.Modified && (
                                 <span className="text-xs text-content-neutral-secondary">
                                     {workflow.changeCount === 1 ? '1 change' : `${workflow.changeCount} changes`}
                                 </span>

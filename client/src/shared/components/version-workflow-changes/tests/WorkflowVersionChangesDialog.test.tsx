@@ -128,4 +128,26 @@ describe('WorkflowVersionChangesDialog', () => {
 
         expect(screen.getByTestId('mock-canvas-tab')).toHaveTextContent('V2');
     });
+
+    it('shows an error instead of the spinner when loading failed', () => {
+        render(<WorkflowVersionChangesDialog isError isLoading={false} onClose={vi.fn()} open versionLabel="V2" />);
+
+        expect(screen.getByText("Couldn't load the workflow changes.")).toBeInTheDocument();
+        expect(screen.getByText('Workflow changes')).toBeInTheDocument();
+        expect(document.querySelector('svg.animate-spin')).not.toBeInTheDocument();
+    });
+
+    it('says an added workflow was added on the Changes tab', () => {
+        render(
+            <WorkflowVersionChangesDialog
+                change={{...change, baseVersion: null, changeType: WorkflowChangeType.Added, changes: []}}
+                isLoading={false}
+                onClose={vi.fn()}
+                open
+                versionLabel="V2"
+            />
+        );
+
+        expect(screen.getByText('Workflow added in this version.')).toBeInTheDocument();
+    });
 });

@@ -19,7 +19,7 @@ const IntegrationVersionWorkflowChanges = ({
 }: IntegrationVersionWorkflowChangesProps) => {
     const [selectedWorkflowUuid, setSelectedWorkflowUuid] = useState<string | undefined>();
 
-    const {data, isLoading} = useIntegrationVersionWorkflowChangesQuery(
+    const {data, isError, isLoading} = useIntegrationVersionWorkflowChangesQuery(
         {integrationId: String(integrationId), integrationVersion},
         {enabled: expanded}
     );
@@ -28,6 +28,7 @@ const IntegrationVersionWorkflowChanges = ({
         <>
             <VersionWorkflowChangesList
                 changes={data?.integrationVersionWorkflowChanges}
+                isError={isError}
                 isLoading={isLoading}
                 onWorkflowClick={setSelectedWorkflowUuid}
             />

@@ -17,7 +17,7 @@ const AutomationWorkflowProjectWorkflowVersionChangeDialog = ({
     projectVersion,
     workflowUuid,
 }: AutomationWorkflowProjectWorkflowVersionChangeDialogProps) => {
-    const {data, isLoading} = useAutomationWorkflowProjectVersionWorkflowChangeQuery({
+    const {data, isError, isLoading} = useAutomationWorkflowProjectVersionWorkflowChangeQuery({
         id: projectId,
         projectVersion,
         workflowUuid,
@@ -29,6 +29,7 @@ const AutomationWorkflowProjectWorkflowVersionChangeDialog = ({
         <WorkflowVersionChangesDialog
             baseVersionLabel={change?.baseVersion == null ? undefined : formatVersionLabel(change.baseVersion, false)}
             change={change}
+            isError={isError}
             isLoading={isLoading}
             onClose={onClose}
             open

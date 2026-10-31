@@ -8,7 +8,7 @@ const changes = {
     baseVersion: 1,
     version: 2,
     workflows: [
-        {changeCount: 1, changeType: WorkflowChangeType.Added, label: 'First', workflowUuid: 'uuid-1'},
+        {changeCount: 0, changeType: WorkflowChangeType.Added, label: 'First', workflowUuid: 'uuid-1'},
         {changeCount: 3, changeType: WorkflowChangeType.Modified, label: null, workflowUuid: 'uuid-2'},
         {changeCount: 0, changeType: WorkflowChangeType.Removed, label: 'Gone', workflowUuid: 'uuid-3'},
     ],
@@ -25,9 +25,36 @@ describe('VersionWorkflowChangesList', () => {
         expect(screen.getByText('Added')).toBeInTheDocument();
         expect(screen.getByText('Modified')).toBeInTheDocument();
         expect(screen.getByText('Removed')).toBeInTheDocument();
-        expect(screen.getByText('1 change')).toBeInTheDocument();
         expect(screen.getByText('3 changes')).toBeInTheDocument();
+        expect(screen.getByLabelText('Open changes of First')).not.toHaveTextContent(/change/);
+        expect(screen.getByLabelText('Open changes of Gone')).not.toHaveTextContent(/change/);
         expect(screen.queryByText('0 changes')).not.toBeInTheDocument();
+    });
+
+    it('shows the singular change count only for a modified workflow', () => {
+        render(
+            <VersionWorkflowChangesList
+                changes={{
+                    version: 2,
+                    workflows: [
+                        {changeCount: 1, changeType: WorkflowChangeType.Modified, label: 'One', workflowUuid: 'uuid-1'},
+                        {changeCount: 1, changeType: WorkflowChangeType.Added, label: 'Two', workflowUuid: 'uuid-2'},
+                    ],
+                }}
+                isLoading={false}
+                onWorkflowClick={vi.fn()}
+            />
+        );
+
+        expect(screen.getAllByText('1 change')).toHaveLength(1);
+        expect(screen.getByLabelText('Open changes of One')).toHaveTextContent('1 change');
+    });
+
+    it('renders the error state', () => {
+        render(<VersionWorkflowChangesList isError isLoading={false} onWorkflowClick={vi.fn()} />);
+
+        expect(screen.getByText("Couldn't load workflow changes.")).toBeInTheDocument();
+        expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
     it('calls onWorkflowClick with the workflow uuid', async () => {

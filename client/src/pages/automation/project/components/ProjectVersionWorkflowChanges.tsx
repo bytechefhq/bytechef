@@ -19,7 +19,7 @@ const ProjectVersionWorkflowChanges = ({
 }: ProjectVersionWorkflowChangesProps) => {
     const [selectedWorkflowUuid, setSelectedWorkflowUuid] = useState<string | undefined>();
 
-    const {data, isLoading} = useProjectVersionWorkflowChangesQuery(
+    const {data, isError, isLoading} = useProjectVersionWorkflowChangesQuery(
         {projectId: String(projectId), projectVersion},
         {enabled: expanded}
     );
@@ -28,6 +28,7 @@ const ProjectVersionWorkflowChanges = ({
         <>
             <VersionWorkflowChangesList
                 changes={data?.projectVersionWorkflowChanges}
+                isError={isError}
                 isLoading={isLoading}
                 onWorkflowClick={setSelectedWorkflowUuid}
             />

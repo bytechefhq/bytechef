@@ -46,17 +46,3 @@ export function formatVersionWorkflowChangesSummary(workflows: VersionWorkflowCh
 export function formatVersionLabel(version: number | null | undefined, draft: boolean): string {
     return draft ? 'Draft' : `V${version}`;
 }
-
-export function formatVersionRange(
-    baseVersion: number | null | undefined,
-    version: number | null | undefined,
-    draft: boolean
-): string {
-    const versionLabel = formatVersionLabel(version, draft);
-
-    if (baseVersion == null) {
-        return versionLabel;
-    }
-
-    return `${formatVersionLabel(baseVersion, false)} → ${versionLabel}`;
-}

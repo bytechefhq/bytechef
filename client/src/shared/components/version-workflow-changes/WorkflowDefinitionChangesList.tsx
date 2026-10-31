@@ -1,5 +1,5 @@
 import Badge, {BadgeStyleType} from '@/components/Badge/Badge';
-import {WorkflowDefinitionChange, WorkflowNodeChangeKind} from '@/shared/middleware/graphql';
+import {WorkflowChangeType, WorkflowDefinitionChange, WorkflowNodeChangeKind} from '@/shared/middleware/graphql';
 
 const KIND_BADGES: Record<WorkflowNodeChangeKind, {label: string; styleType: BadgeStyleType}> = {
     [WorkflowNodeChangeKind.Added]: {label: 'Added', styleType: 'success-outline'},
@@ -9,10 +9,19 @@ const KIND_BADGES: Record<WorkflowNodeChangeKind, {label: string; styleType: Bad
 };
 
 interface WorkflowDefinitionChangesListProps {
+    changeType?: WorkflowChangeType;
     changes: WorkflowDefinitionChange[];
 }
 
-const WorkflowDefinitionChangesList = ({changes}: WorkflowDefinitionChangesListProps) => {
+const WorkflowDefinitionChangesList = ({changeType, changes}: WorkflowDefinitionChangesListProps) => {
+    if (changeType === WorkflowChangeType.Added) {
+        return <p className="text-sm text-content-neutral-secondary">Workflow added in this version.</p>;
+    }
+
+    if (changeType === WorkflowChangeType.Removed) {
+        return <p className="text-sm text-content-neutral-secondary">Workflow removed in this version.</p>;
+    }
+
     if (changes.length === 0) {
         return <p className="text-sm text-content-neutral-secondary">No structural changes.</p>;
     }
@@ -30,7 +39,7 @@ const WorkflowDefinitionChangesList = ({changes}: WorkflowDefinitionChangesListP
                         <div className="flex items-center gap-2 text-sm">
                             <Badge label={kindBadge.label} styleType={kindBadge.styleType} />
 
-                            <span className="font-medium">{change.label || change.name}</span>
+                            <span className="font-medium">{change.label || change.name || 'Workflow'}</span>
 
                             {change.type && (
                                 <span className="text-xs text-content-neutral-secondary">{change.type}</span>

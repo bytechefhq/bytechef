@@ -13,6 +13,7 @@ const MonacoDiffEditorWrapper = lazy(() => import('@/shared/components/MonacoDif
 interface WorkflowVersionChangesDialogProps {
     baseVersionLabel?: string;
     change?: VersionWorkflowChange;
+    isError?: boolean;
     isLoading: boolean;
     onClose: () => void;
     open: boolean;
@@ -22,6 +23,7 @@ interface WorkflowVersionChangesDialogProps {
 const WorkflowVersionChangesDialog = ({
     baseVersionLabel,
     change,
+    isError,
     isLoading,
     onClose,
     open,
@@ -39,7 +41,11 @@ const WorkflowVersionChangesDialog = ({
                     />
 
                     <DialogBody>
-                        {isLoading || !change ? (
+                        {isError ? (
+                            <p className="py-4 text-sm text-content-destructive">
+                                Couldn&apos;t load the workflow changes.
+                            </p>
+                        ) : isLoading || !change ? (
                             <div className="flex justify-center py-4">
                                 <LoadingIcon />
                             </div>
@@ -54,7 +60,10 @@ const WorkflowVersionChangesDialog = ({
                                 </TabsList>
 
                                 <TabsContent value="changes">
-                                    <WorkflowDefinitionChangesList changes={change.changes} />
+                                    <WorkflowDefinitionChangesList
+                                        changeType={change.changeType}
+                                        changes={change.changes}
+                                    />
                                 </TabsContent>
 
                                 <TabsContent value="definition">

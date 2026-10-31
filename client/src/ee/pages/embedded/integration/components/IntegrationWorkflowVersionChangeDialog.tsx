@@ -17,7 +17,7 @@ const IntegrationWorkflowVersionChangeDialog = ({
     onClose,
     workflowUuid,
 }: IntegrationWorkflowVersionChangeDialogProps) => {
-    const {data, isLoading} = useIntegrationVersionWorkflowChangeQuery({
+    const {data, isError, isLoading} = useIntegrationVersionWorkflowChangeQuery({
         integrationId: String(integrationId),
         integrationVersion,
         workflowUuid,
@@ -29,6 +29,7 @@ const IntegrationWorkflowVersionChangeDialog = ({
         <WorkflowVersionChangesDialog
             baseVersionLabel={change?.baseVersion == null ? undefined : formatVersionLabel(change.baseVersion, false)}
             change={change}
+            isError={isError}
             isLoading={isLoading}
             onClose={onClose}
             open

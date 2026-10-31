@@ -3,7 +3,6 @@ import {describe, expect, it} from 'vitest';
 
 import {
     formatVersionLabel,
-    formatVersionRange,
     formatVersionWorkflowChangesSummary,
     getWorkflowChangeTypeBadgeStyleType,
     getWorkflowChangeTypeLabel,
@@ -38,12 +37,9 @@ describe('versionWorkflowChangesUtils', () => {
         ).toBe('2 workflows changed (1 added, 1 removed)');
     });
 
-    it('formats version ranges with draft', () => {
+    it('formats version labels with draft', () => {
         expect(formatVersionLabel(3, false)).toBe('V3');
         expect(formatVersionLabel(null, true)).toBe('Draft');
-        expect(formatVersionRange(3, 4, false)).toBe('V3 → V4');
-        expect(formatVersionRange(4, 5, true)).toBe('V4 → Draft');
-        expect(formatVersionRange(null, 1, false)).toBe('V1');
     });
 
     it('maps change types to badge styles and labels', () => {
