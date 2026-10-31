@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.configuration.security.scope;
 import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
 
 /**
+ * The workflow-domain permission scopes.
+ *
  * @version ee
  *
  * @author Ivica Cardic

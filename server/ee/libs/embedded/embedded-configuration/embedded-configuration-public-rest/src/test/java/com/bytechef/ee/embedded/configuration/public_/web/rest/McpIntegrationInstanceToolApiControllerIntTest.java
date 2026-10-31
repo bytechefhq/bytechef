@@ -17,13 +17,13 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -42,7 +42,6 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @EmbeddedConfigurationPublicRestSharedMocks
 class McpIntegrationInstanceToolApiControllerIntTest {
 
-    private static final String API_KEY_PRINCIPAL = "api-key-principal";
     private static final String EXTERNAL_USER_ID = "external-user";
     private static final String FRONTEND_TOOL_ENABLE_PATH =
         "/v1/integration-instances/{id}/mcp-tools/{mcpToolId}/enable";
@@ -76,7 +75,7 @@ class McpIntegrationInstanceToolApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableFrontendMcpIntegrationInstanceToolValidatesOwnershipOfCurrentConnectedUser() {
         webTestClient
             .post()
@@ -94,7 +93,7 @@ class McpIntegrationInstanceToolApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = API_KEY_PRINCIPAL)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testDisableMcpIntegrationInstanceToolValidatesOwnershipOfPathExternalUser() {
         webTestClient
             .delete()
@@ -112,7 +111,7 @@ class McpIntegrationInstanceToolApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testEnableFrontendMcpIntegrationInstanceToolDeniedForNonOwner() {
         doThrow(new EmbeddedIntegrationNotVisibleException(INTEGRATION_INSTANCE_ID))
             .when(connectedUserIntegrationInstanceFacade)

@@ -11,7 +11,6 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
-import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionEndpointModel;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -34,16 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ApiCollectionEndpointApiController implements ApiCollectionEndpointApi {
 
-    private final ApiCollectionEndpointService apiCollectionEndpointService;
     private final ApiCollectionFacade apiCollectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ApiCollectionEndpointApiController(
-        ApiCollectionEndpointService apiCollectionEndpointService, ApiCollectionFacade apiCollectionFacade,
-        ConversionService conversionService) {
+        ApiCollectionFacade apiCollectionFacade, ConversionService conversionService) {
 
-        this.apiCollectionEndpointService = apiCollectionEndpointService;
         this.apiCollectionFacade = apiCollectionFacade;
         this.conversionService = conversionService;
     }
@@ -64,7 +60,7 @@ public class ApiCollectionEndpointApiController implements ApiCollectionEndpoint
 
     @Override
     public ResponseEntity<Void> deleteApiCollectionEndpoint(Long id) {
-        apiCollectionEndpointService.delete(id);
+        apiCollectionFacade.deleteApiCollectionEndpoint(id);
 
         return ResponseEntity.noContent()
             .build();

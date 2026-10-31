@@ -79,7 +79,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkspaceFacadeIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(classes = WorkspaceFacadeIntTest.Config.class, properties = "bytechef.edition=ce")
 @MockitoBean(types = {
     ApplicationProperties.class, CacheManager.class, CategoryService.class, ComponentConnectionFacade.class,
     ComponentDefinitionHelper.class, ConnectionFacade.class,

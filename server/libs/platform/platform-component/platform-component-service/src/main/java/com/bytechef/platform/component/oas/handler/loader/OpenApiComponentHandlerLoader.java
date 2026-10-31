@@ -91,7 +91,8 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
 
     @Override
     protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(OpenApiComponentHandler componentHandler) {
-        return (actionName, actionDefinitionFacade) -> new OpenApiComponentTaskHandler(
-            actionName, actionDefinitionFacade, componentHandler);
+        return (
+            actionName, actionDefinitionFacade, jobPrincipalAuthenticationRunner) -> new OpenApiComponentTaskHandler(
+                actionName, actionDefinitionFacade, jobPrincipalAuthenticationRunner, componentHandler);
     }
 }

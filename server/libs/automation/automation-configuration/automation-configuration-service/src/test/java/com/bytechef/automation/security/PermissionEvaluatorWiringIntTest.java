@@ -89,6 +89,8 @@ class PermissionEvaluatorWiringIntTest {
     @Test
     void testSkipContextBypassesDenial() throws Throwable {
         when(permissionService.hasResourceScope(1L, "Project", "PROJECT_DELETE")).thenReturn(false);
+        when(permissionService.isAuthorizationSkipped())
+            .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
 
         Boolean result = AutomationAuthorizationContext.callSkippingChecks(() -> {
             guardedService.deleteProject(1L);

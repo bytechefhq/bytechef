@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -31,6 +32,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
+import com.bytechef.ee.embedded.configuration.config.TenantAdminOnlyPermissionService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -66,7 +68,6 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -184,6 +185,9 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     private IntegrationRepository integrationRepository;
 
     @Autowired
+    private PermissionService permissionService;
+
+    @Autowired
     private IntegrationService integrationService;
 
     @Autowired
@@ -209,6 +213,8 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+
+        reset(permissionService);
 
         integrationInstanceWorkflowRepository.deleteAll();
         integrationInstanceRepository.deleteAll();
@@ -331,6 +337,86 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             integrationInstanceConfigurationFacade
                 .getIntegrationInstanceConfigurationIntegration(integrationId, true, Environment.STAGING)
                 .integrationVersion()).isEqualTo(2);
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowUpdatesAWorkflowOfTheCheckedConfiguration() {
+        authenticate(admin());
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            createPublishedIntegration().getId());
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            createIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId);
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+            newIntegrationInstanceConfigurationWorkflowUpdate(
+                integrationInstanceConfigurationWorkflow, integrationInstanceConfigurationId));
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService
+                .getIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow.getId())
+                .getInputs()
+                .get("key"))
+                    .isEqualTo("updated");
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowRefusesAWorkflowOfAnotherConfiguration() {
+        authenticate(admin());
+
+        long checkedIntegrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            createPublishedIntegration().getId());
+        long otherIntegrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            createPublishedIntegration().getId());
+
+        IntegrationInstanceConfigurationWorkflow otherIntegrationInstanceConfigurationWorkflow =
+            createIntegrationInstanceConfigurationWorkflow(otherIntegrationInstanceConfigurationId);
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+                newIntegrationInstanceConfigurationWorkflowUpdate(
+                    otherIntegrationInstanceConfigurationWorkflow, checkedIntegrationInstanceConfigurationId)))
+                        .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService
+                .getIntegrationInstanceConfigurationWorkflow(otherIntegrationInstanceConfigurationWorkflow.getId())
+                .getInputs())
+                    .isEmpty();
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowRefusesAConnectionTheCallerMayNotUse() {
+        authenticate(admin());
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            createPublishedIntegration().getId());
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            createIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId);
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflowUpdate =
+            newIntegrationInstanceConfigurationWorkflowUpdate(
+                integrationInstanceConfigurationWorkflow, integrationInstanceConfigurationId);
+
+        integrationInstanceConfigurationWorkflowUpdate.setConnections(
+            List.of(new IntegrationInstanceConfigurationWorkflowConnection(99L, "connection", "node_1")));
+
+        doReturn(false).when(permissionService)
+            .canUseConnectionInWorkflow(99L, integrationInstanceConfigurationWorkflow.getWorkflowId(),
+                Environment.STAGING);
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationWorkflowUpdate))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService
+                .getIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow.getId())
+                .getConnections())
+                    .isEmpty();
     }
 
     @Test
@@ -610,6 +696,21 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         return integrationInstanceConfigurationId;
     }
 
+    private IntegrationInstanceConfigurationWorkflow createIntegrationInstanceConfigurationWorkflow(
+        long integrationInstanceConfigurationId) {
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setInputs(Map.of());
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(UUID.randomUUID()
+            .toString());
+
+        return integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+    }
+
     private Integration createPublishedIntegration() {
         Integration integration = new Integration();
 
@@ -621,6 +722,26 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         integrationService.publishIntegration(integration.getId(), null);
 
         return integrationService.getIntegration(integration.getId());
+    }
+
+    private static IntegrationInstanceConfigurationWorkflow newIntegrationInstanceConfigurationWorkflowUpdate(
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
+        long integrationInstanceConfigurationId) {
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflowUpdate =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflowUpdate.setConnections(List.of());
+        integrationInstanceConfigurationWorkflowUpdate.setId(integrationInstanceConfigurationWorkflow.getId());
+        integrationInstanceConfigurationWorkflowUpdate.setInputs(Map.of("key", "updated"));
+        integrationInstanceConfigurationWorkflowUpdate.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflowUpdate
+            .setVersion(integrationInstanceConfigurationWorkflow.getVersion());
+        integrationInstanceConfigurationWorkflowUpdate
+            .setWorkflowId(integrationInstanceConfigurationWorkflow.getWorkflowId());
+
+        return integrationInstanceConfigurationWorkflowUpdate;
     }
 
     private static IntegrationInstanceConfigurationDTO newIntegrationInstanceConfigurationDTO(
@@ -742,12 +863,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            PermissionService permissionService = mock(PermissionService.class);
-
-            when(permissionService.isTenantAdmin())
-                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
-
-            return permissionService;
+            return TenantAdminOnlyPermissionService.create();
         }
     }
 }

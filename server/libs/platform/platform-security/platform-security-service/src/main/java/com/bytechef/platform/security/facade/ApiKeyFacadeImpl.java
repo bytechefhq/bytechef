@@ -20,9 +20,11 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.service.OwnedApiKeyCreator;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -33,21 +35,46 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * An API key authenticates as the user who owns it, carrying that user's authorities, so it is a second credential for
+ * a person rather than a shared resource. Every read and write here is therefore restricted to the owner, with the
+ * tenant admin as the single exception -- the same exception every other authorization check in the tree makes.
+ *
+ * <p>
+ * Enforced in plain Java rather than through {@code @PreAuthorize}: the ownership SpEL functions are contributed by
+ * {@code AutomationMethodSecurityConfiguration}, which is {@code @ConditionalOnBean(PermissionService.class)}. This
+ * facade also serves deployments that carry no such bean, where a gate naming those functions would fail to evaluate
+ * rather than deny. Ownership is knowable here without any of that machinery.
+ *
+ * <p>
+ * Note that a workspace role cannot decide this. A key acts as its owner in every workspace they belong to, so a
+ * workspace admin asked to approve it would be ruling on authority wider than their own -- and API keys carry no
+ * workspace at all, being keyed on (user, environment, type).
+ *
  * @author Ivica Cardic
  */
 @Service
 @Transactional
-public class ApiKeyFacadeImpl implements ApiKeyFacade {
+public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
 
     private final ApiKeyService apiKeyService;
+    private final OwnedApiKeyCreator ownedApiKeyCreator;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public ApiKeyFacadeImpl(ApiKeyService apiKeyService, UserService userService) {
+    public ApiKeyFacadeImpl(
+        ApiKeyService apiKeyService, OwnedApiKeyCreator ownedApiKeyCreator, UserService userService) {
+
         this.apiKeyService = apiKeyService;
+        this.ownedApiKeyCreator = ownedApiKeyCreator;
         this.userService = userService;
     }
 
+    /**
+     * A null {@code type} mints a platform key -- the kind the Admin API Keys page issues, which authenticates against
+     * the management surface rather than an automation or embedded one; an {@code EMBEDDED} key is what the Embedded
+     * API Keys page issues. The schema leaves the argument open, so without this any authenticated caller could issue
+     * either for themselves. Workspace-scoped automation keys go through {@link #createAutomationApiKey(ApiKey)}.
+     */
     @Override
     public ApiKey create(ApiKey apiKey, PlatformType type) {
         checkNotConnectedUser();
@@ -56,14 +83,14 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
             throw new AccessDeniedException("Only a tenant admin may create this API key");
         }
 
-        return createOwnedApiKey(apiKey, type);
+        return ownedApiKeyCreator.create(apiKey, type);
     }
 
     @Override
     public ApiKey createAutomationApiKey(ApiKey apiKey) {
         checkNotConnectedUser();
 
-        return createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
+        return ownedApiKeyCreator.create(apiKey, PlatformType.AUTOMATION);
     }
 
     @Override
@@ -109,19 +136,23 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
         return apiKeyService.update(apiKey);
     }
 
+    @Override
+    public void revokeAll(long userId) {
+        List<ApiKey> apiKeys = apiKeyService.getUserApiKeys(userId);
+
+        for (ApiKey apiKey : apiKeys) {
+            if (apiKey.getType() == PlatformType.EMBEDDED) {
+                continue;
+            }
+
+            apiKeyService.delete(apiKey.getId());
+        }
+    }
+
     private static void checkNotConnectedUser() {
         if (ConnectedUserAuthentications.isConnectedUser()) {
             throw new AccessDeniedException("A connected user has no platform API keys");
         }
-    }
-
-    private ApiKey createOwnedApiKey(ApiKey apiKey, PlatformType type) {
-        User user = userService.getCurrentUser();
-
-        apiKey.setType(type);
-        apiKey.setUserId(user.getId());
-
-        return apiKeyService.create(apiKey);
     }
 
     private List<ApiKey> filterOwned(List<ApiKey> apiKeys) {

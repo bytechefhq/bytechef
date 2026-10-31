@@ -2,7 +2,9 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import {PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import {Workflow} from '@/shared/middleware/automation/configuration';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,6 +16,7 @@ import ProjectDeploymentWorkflowExecutionsSheet from '../ProjectDeploymentWorkfl
 const {
     detailQueryMock,
     openInProjectOptionsMock,
+    openInProjectState,
     openProjectMock,
     openProjectWorkflowMock,
     queryMock,
@@ -24,6 +27,7 @@ const {
         data: enabled ? {id: 5, job: {id: '5'}, projectVersion: 2} : undefined,
     })),
     openInProjectOptionsMock: vi.fn(),
+    openInProjectState: {canOpenInProject: true},
     openProjectMock: vi.fn(),
     openProjectWorkflowMock: vi.fn(),
     queryMock: vi.fn(),
@@ -35,7 +39,11 @@ vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => (
     default: (options: {onBeforeNavigate?: () => void}) => {
         openInProjectOptionsMock(options);
 
-        return {openProject: openProjectMock, openProjectWorkflow: openProjectWorkflowMock};
+        return {
+            canOpenInProject: openInProjectState.canOpenInProject,
+            openProject: openProjectMock,
+            openProjectWorkflow: openProjectWorkflowMock,
+        };
     },
 }));
 
@@ -110,6 +118,7 @@ const jobExecution = {
 
 describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
     beforeEach(() => {
+        openInProjectState.canOpenInProject = true;
         detailQueryMock.mockClear();
         openProjectMock.mockReset();
         openProjectWorkflowMock.mockReset();
@@ -131,6 +140,7 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
             workflowExecutionSheetOpen: false,
         });
 
+        environmentStore.setState({currentEnvironmentId: PRODUCTION_ENVIRONMENT});
         useWorkspaceStore.setState({currentWorkspaceId: 1});
     });
 
@@ -156,7 +166,14 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         expect(screen.getByRole('tab', {name: 'Workflow'})).toHaveAttribute('data-state', 'inactive');
         expect(screen.getByText('No Executions')).toBeInTheDocument();
         expect(queryMock).toHaveBeenCalledWith(
-            {id: 1, pageNumber: 0, projectDeploymentId: 3, projectVersion: 3, workflowId: 'workflow1'},
+            {
+                environmentId: PRODUCTION_ENVIRONMENT,
+                id: 1,
+                pageNumber: 0,
+                projectDeploymentId: 3,
+                projectVersion: 3,
+                workflowId: 'workflow1',
+            },
             true
         );
     });
@@ -179,7 +196,14 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
 
         expect(document.querySelector('header')).toHaveTextContent('Subflow /workflow1/ V4');
         expect(queryMock).toHaveBeenLastCalledWith(
-            {id: 1, pageNumber: 0, projectDeploymentId: 3, projectVersion: 4, workflowId: 'workflow1-v4'},
+            {
+                environmentId: PRODUCTION_ENVIRONMENT,
+                id: 1,
+                pageNumber: 0,
+                projectDeploymentId: 3,
+                projectVersion: 4,
+                workflowId: 'workflow1-v4',
+            },
             true
         );
     });
@@ -208,6 +232,26 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         await user.click(screen.getByRole('button', {name: 'workflow1'}));
 
         expect(openProjectWorkflowMock).toHaveBeenCalledWith(7, 'workflow-uuid');
+    });
+
+    it('shows the project and workflow names as plain text to a member who may not view the project workflows', () => {
+        openInProjectState.canOpenInProject = false;
+
+        mockQueryResult([]);
+
+        useProjectDeploymentWorkflowSheetStore.getState().openProjectDeploymentWorkflowSheet({
+            projectDeploymentId: 3,
+            projectId: 7,
+            projectName: 'Subflow',
+            projectVersion: 3,
+            workflow: {id: 'workflow1', label: 'workflow1', workflowUuid: 'workflow-uuid'} as Workflow,
+        });
+
+        renderSheet();
+
+        expect(document.querySelector('header')).toHaveTextContent('Subflow /workflow1/ V3');
+        expect(screen.queryByRole('button', {name: 'Subflow'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'workflow1'})).not.toBeInTheDocument();
     });
 
     it('closes both sheets before leaving for the project editor', () => {
@@ -440,7 +484,13 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         expect(screen.queryByText('Workflow panel workflow1')).not.toBeInTheDocument();
         expect(document.querySelector('header')).toHaveTextContent('Subflow /workflow2');
         expect(queryMock).toHaveBeenLastCalledWith(
-            {id: 1, pageNumber: 0, projectDeploymentId: 3, workflowId: 'workflow2'},
+            {
+                environmentId: PRODUCTION_ENVIRONMENT,
+                id: 1,
+                pageNumber: 0,
+                projectDeploymentId: 3,
+                workflowId: 'workflow2',
+            },
             true
         );
     });

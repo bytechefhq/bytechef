@@ -38,7 +38,6 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
@@ -158,7 +157,7 @@ class ConnectionApiControllerIntTest {
 
     @Test
     void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(PlatformType.EMBEDDED))
+        when(connectionAdminFacade.getConnectionTags())
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         this.webTestClient
@@ -310,7 +309,7 @@ class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(connectionFacade).update(eq(1L), tagsArgumentCaptor.capture());
+        verify(connectionAdminFacade).updateConnectionTags(eq(1L), tagsArgumentCaptor.capture());
 
         assertThat(tagsArgumentCaptor.getValue())
             .singleElement()

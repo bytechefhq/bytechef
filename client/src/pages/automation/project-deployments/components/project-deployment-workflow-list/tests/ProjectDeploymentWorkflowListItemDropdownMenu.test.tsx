@@ -4,6 +4,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeploymentWorkflowListItemDropdownMenu from '../ProjectDeploymentWorkflowListItemDropdownMenu';
 
+const hoistedScope = vi.hoisted(() => ({canEditDeployment: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canEditDeployment,
+}));
+
 const handlers = {
     onEditClick: vi.fn(),
     onOpenInProjectClick: vi.fn(),
@@ -23,6 +29,8 @@ const openMenu = async (workflow: Partial<Workflow> = {connectionsCount: 1}, onO
 
 describe('ProjectDeploymentWorkflowListItemDropdownMenu', () => {
     beforeEach(() => {
+        hoistedScope.canEditDeployment = true;
+
         windowResizeObserver();
     });
 
@@ -76,4 +84,39 @@ describe('ProjectDeploymentWorkflowListItemDropdownMenu', () => {
             expect(screen.getByRole('menuitem', {name: 'Edit'})).not.toHaveAttribute('data-disabled');
         }
     );
+
+    it('shows Edit with DEPLOYMENT_EDIT', async () => {
+        render(
+            <ProjectDeploymentWorkflowListItemDropdownMenu
+                onEditClick={vi.fn()}
+                workflow={{connectionsCount: 1, inputsCount: 1} as Workflow}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More Deployment Workflow Actions'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+    });
+
+    it('offers only Open in Project without DEPLOYMENT_EDIT', async () => {
+        hoistedScope.canEditDeployment = false;
+
+        await openMenu(undefined, handlers.onOpenInProjectClick);
+
+        expect(screen.getByRole('menuitem', {name: 'Open in Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
+    });
+
+    it('hides the menu without DEPLOYMENT_EDIT when the workflow cannot be opened in its project', () => {
+        hoistedScope.canEditDeployment = false;
+
+        render(
+            <ProjectDeploymentWorkflowListItemDropdownMenu
+                onEditClick={vi.fn()}
+                workflow={{connectionsCount: 1, inputsCount: 1} as Workflow}
+            />
+        );
+
+        expect(screen.queryByRole('button', {name: 'More Deployment Workflow Actions'})).not.toBeInTheDocument();
+    });
 });

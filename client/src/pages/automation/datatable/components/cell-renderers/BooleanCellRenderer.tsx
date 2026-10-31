@@ -4,7 +4,12 @@ import useBooleanCellEditor from './hooks/useBooleanCellEditor';
 
 import type {BooleanCellRendererProps, GridRowType} from './types';
 
-export const createBooleanCellRenderer = ({columnName, onToggle, setLocalRows}: BooleanCellRendererProps) => {
+export const createBooleanCellRenderer = ({
+    columnName,
+    onToggle,
+    readOnly = false,
+    setLocalRows,
+}: BooleanCellRendererProps) => {
     return ({row}: {row: GridRowType}) => {
         if (row.id === '-1') {
             return null;
@@ -23,6 +28,7 @@ export const createBooleanCellRenderer = ({columnName, onToggle, setLocalRows}: 
                     aria-label={`Toggle ${columnName}`}
                     checked={checked}
                     className="size-4 cursor-pointer"
+                    disabled={readOnly}
                     onCheckedChange={(value) => handleToggle(value === true)}
                 />
             </div>

@@ -60,7 +60,14 @@ Both overrides are applied in the facade, ignoring the request body, so a hand-c
 
 ### What sharing actually exposes
 
-`WORKSPACE` grants **use plus existence**, not read plus write. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null, and no connection API mutates authorization parameters after creation. A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else.
+`WORKSPACE` grants **use plus existence**, not read plus write. A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else. Only the member who created a connection sees its secret values and can replace them. Organization connections are the exception: every organization admin can view and replace their secrets.
+
+| Connection | View and replace its secrets | Use it in workflows | Rename, tag and delete it |
+|---|---|---|---|
+| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins |
+| An organization connection | Every organization admin | Every member | Organization admins |
+| An embedded connection created for a connected user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
 Visibility is also a **precondition** of the permission check, not a filter running beside it - without that, a member holding `CONNECTION_EDIT` would pass a by-id check for a connection the list correctly hides.
 

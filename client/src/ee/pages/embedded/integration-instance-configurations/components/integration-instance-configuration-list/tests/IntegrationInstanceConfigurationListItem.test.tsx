@@ -6,6 +6,11 @@ import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from
 import {QueryClient} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
 const hoisted = vi.hoisted(() => ({
     captureIntegrationInstanceConfigurationEnabledMock: vi.fn(),
     deleteIntegrationInstanceConfigurationMock: vi.fn(),

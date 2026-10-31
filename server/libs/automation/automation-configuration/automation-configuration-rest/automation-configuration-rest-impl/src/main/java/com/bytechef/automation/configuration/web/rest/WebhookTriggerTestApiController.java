@@ -17,9 +17,8 @@
 package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.facade.ProjectWebhookTriggerTestFacade;
 import com.bytechef.automation.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
-import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
-import com.bytechef.platform.constant.PlatformType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,18 +31,18 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
-    private final WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private final ProjectWebhookTriggerTestFacade projectWebhookTriggerTestFacade;
 
-    public WebhookTriggerTestApiController(WebhookTriggerTestFacade webhookTriggerTestFacade) {
-        this.webhookTriggerTestFacade = webhookTriggerTestFacade;
+    public WebhookTriggerTestApiController(ProjectWebhookTriggerTestFacade projectWebhookTriggerTestFacade) {
+        this.projectWebhookTriggerTestFacade = projectWebhookTriggerTestFacade;
     }
 
     @Override
     public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
         String workflowId, Long environmentId, String triggerName) {
 
-        String webhookUrl = webhookTriggerTestFacade.enableTrigger(
-            workflowId, triggerName, environmentId, PlatformType.AUTOMATION);
+        String webhookUrl = projectWebhookTriggerTestFacade.startWebhookTriggerTest(
+            workflowId, triggerName, environmentId);
 
         return ResponseEntity.ok(
             new StartWebhookTriggerTest200ResponseModel()
@@ -52,7 +51,7 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
     @Override
     public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId, String triggerName) {
-        webhookTriggerTestFacade.disableTrigger(workflowId, triggerName, environmentId, PlatformType.AUTOMATION);
+        projectWebhookTriggerTestFacade.stopWebhookTriggerTest(workflowId, triggerName, environmentId);
 
         return ResponseEntity.noContent()
             .build();

@@ -1,6 +1,8 @@
 import {ConnectionDefinition} from '@/shared/middleware/platform/configuration';
 import {Fragment} from 'react';
 
+const HIDDEN_CREDENTIALS_HINT = 'Only the member who created this connection can see or replace its credentials.';
+
 interface ConnectionParametersProps {
     authorizationType?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -9,6 +11,7 @@ interface ConnectionParametersProps {
     connectionDefinition: ConnectionDefinition;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     connectionParameters?: {[key: string]: any};
+    credentialsHidden?: boolean;
 }
 
 const ConnectionParameters = ({
@@ -17,8 +20,19 @@ const ConnectionParameters = ({
     baseUri,
     connectionDefinition,
     connectionParameters,
+    credentialsHidden = false,
 }: ConnectionParametersProps) => {
     const {authorizations, properties: connectionProperties} = connectionDefinition;
+
+    if (credentialsHidden) {
+        return (
+            <HiddenConnectionParameters
+                authorizationType={authorizationType}
+                baseUri={baseUri}
+                connectionDefinition={connectionDefinition}
+            />
+        );
+    }
 
     const existingAuthorizations =
         authorizations?.filter(
@@ -99,6 +113,62 @@ const ConnectionParameters = ({
                         </Fragment>
                     ))}
             </ul>
+        </div>
+    );
+};
+
+const HiddenConnectionParameters = ({
+    authorizationType,
+    baseUri,
+    connectionDefinition,
+}: Pick<ConnectionParametersProps, 'authorizationType' | 'baseUri' | 'connectionDefinition'>) => {
+    const {authorizations, properties: connectionProperties} = connectionDefinition;
+
+    const authorization = authorizations?.find((authorization) => authorization.type === authorizationType);
+
+    const hiddenPropertyNames = [...(connectionProperties ?? []), ...(authorization?.properties ?? [])]
+        .map((property) => property.name)
+        .filter((propertyName): propertyName is string => !!propertyName);
+
+    if (!hiddenPropertyNames.length && !baseUri) {
+        return <></>;
+    }
+
+    return (
+        <div className="w-full space-y-2 overflow-hidden">
+            {baseUri && (
+                <div className="mb-8 flex">
+                    <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
+
+                    <span className="text-sm">{baseUri}</span>
+                </div>
+            )}
+
+            {hiddenPropertyNames.length > 0 && (
+                <>
+                    <h2 className="text-sm heading-tertiary">Credentials</h2>
+
+                    <ul className="flex w-full flex-col space-y-1 text-sm">
+                        {authorization && (
+                            <li className="flex">
+                                <span className="w-1/3 shrink-0 font-medium text-muted-foreground">Authorization:</span>
+
+                                <span>{authorization.title}</span>
+                            </li>
+                        )}
+
+                        {hiddenPropertyNames.map((propertyName) => (
+                            <li className="flex w-full" key={propertyName}>
+                                <span className="w-1/3 shrink-0 text-muted-foreground">{propertyName}:</span>
+
+                                <span className="min-w-0 flex-1 text-xs text-muted-foreground italic">Hidden</span>
+                            </li>
+                        ))}
+                    </ul>
+
+                    <p className="text-xs text-muted-foreground">{HIDDEN_CREDENTIALS_HINT}</p>
+                </>
+            )}
         </div>
     );
 };

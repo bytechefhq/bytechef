@@ -20,8 +20,10 @@ import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.dto.NotificationDTO;
 import com.bytechef.platform.notification.service.NotificationEventService;
 import com.bytechef.platform.notification.service.NotificationService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -51,8 +53,8 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public NotificationDTO createNotification(Notification notification) {
-
         notification = notificationService.create(notification);
 
         return new NotificationDTO(
@@ -61,6 +63,13 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void deleteNotification(long id) {
+        notificationService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public NotificationDTO updateNotification(Notification notification) {
         notification = notificationService.update(notification);
 

@@ -58,6 +58,7 @@ import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
@@ -1603,7 +1604,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             """;
 
         @MockitoBean
-        private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+        private ConnectedUserConnectionReader connectedUserConnectionReader;
 
         private String externalUserId;
 
@@ -1730,7 +1731,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
             when(connectionDTO.id()).thenReturn(connectionId);
             when(connectionDTO.componentName()).thenReturn("slack");
-            when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
+            when(connectedUserConnectionReader.getConnections(anyLong(), eq("slack"), eq(List.of())))
                 .thenReturn(List.of(connectionDTO));
             when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
             when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))

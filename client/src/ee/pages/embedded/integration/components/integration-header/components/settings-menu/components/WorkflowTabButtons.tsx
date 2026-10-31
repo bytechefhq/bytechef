@@ -1,6 +1,8 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {DownloadIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {MouseEvent} from 'react';
 
@@ -15,6 +17,9 @@ const WorkflowTabButtons = ({
     onShowEditWorkflowDialog: () => void;
     workflowId: string;
 }) => {
+    const canDeleteWorkflow = useHasEmbeddedScope('WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasEmbeddedScope('WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
+
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
             onCloseDropdownMenu();
@@ -23,13 +28,15 @@ const WorkflowTabButtons = ({
 
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
-            <Button
-                className="dropdown-menu-item"
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={onShowEditWorkflowDialog}
-                variant="ghost"
-            />
+            {canEditWorkflow && (
+                <Button
+                    className="dropdown-menu-item"
+                    icon={<EditIcon />}
+                    label="Edit"
+                    onClick={onShowEditWorkflowDialog}
+                    variant="ghost"
+                />
+            )}
 
             <Button
                 className="dropdown-menu-item"
@@ -39,15 +46,19 @@ const WorkflowTabButtons = ({
                 variant="ghost"
             />
 
-            <Separator />
+            {canDeleteWorkflow && (
+                <>
+                    <Separator />
 
-            <Button
-                className="dropdown-menu-item-destructive"
-                icon={<Trash2Icon />}
-                label="Delete"
-                onClick={() => onShowDeleteWorkflowAlertDialog()}
-                variant="ghost"
-            />
+                    <Button
+                        className="dropdown-menu-item-destructive"
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={() => onShowDeleteWorkflowAlertDialog()}
+                        variant="ghost"
+                    />
+                </>
+            )}
         </div>
     );
 };

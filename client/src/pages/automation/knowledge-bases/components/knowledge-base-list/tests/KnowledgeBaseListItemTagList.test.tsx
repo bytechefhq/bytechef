@@ -10,6 +10,12 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({canEditKnowledgeBase: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canEditKnowledgeBase,
+}));
+
 vi.mock('../hooks/useKnowledgeBaseListItemTagList', () => ({
     default: hoisted.mockUseKnowledgeBaseListItemTagList,
 }));
@@ -17,16 +23,18 @@ vi.mock('../hooks/useKnowledgeBaseListItemTagList', () => ({
 vi.mock('@/shared/components/TagList', () => ({
     default: ({
         id,
+        readOnly,
         remainingTags,
         tags,
     }: {
         getRequest?: unknown;
         id: number;
+        readOnly?: boolean;
         remainingTags?: unknown[];
         tags: unknown[];
         updateTagsMutation?: unknown;
     }) => (
-        <div data-testid="tag-list">
+        <div data-read-only={String(Boolean(readOnly))} data-testid="tag-list">
             ID: {id}, Tags: {tags.length}, Remaining: {remainingTags?.length ?? 0}
         </div>
     ),
@@ -46,6 +54,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.canEditKnowledgeBase = true;
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBaseListItemTagList.mockReturnValue({...defaultMockReturn});
 });
@@ -62,6 +72,24 @@ describe('KnowledgeBaseListItemTagList', () => {
         );
 
         expect(screen.getByTestId('tag-list')).toBeInTheDocument();
+    });
+
+    it('renders an editable tag list with KNOWLEDGE_BASE_EDIT', () => {
+        render(
+            <KnowledgeBaseListItemTagList knowledgeBaseId="123" remainingTags={mockRemainingTags} tags={mockTags} />
+        );
+
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'false');
+    });
+
+    it('renders a read-only tag list without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.canEditKnowledgeBase = false;
+
+        render(
+            <KnowledgeBaseListItemTagList knowledgeBaseId="123" remainingTags={mockRemainingTags} tags={mockTags} />
+        );
+
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'true');
     });
 
     it('passes converted id to TagList', () => {

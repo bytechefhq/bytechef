@@ -89,7 +89,7 @@ class ScopedConnectionGuardTest {
     }
 
     @Test
-    void testRunThatSkipsAuthorizationWithoutAScopedProjectIsNotEntitledToAnyConnection() {
+    void testConnectedUserRunWithoutAScopedProjectIsNotEntitledToAnyConnection() {
         ScopedConnectionGuard guard = newGuardEntitledTo(List.of(42L));
 
         ToolContext toolContext = new ToolContext(
@@ -97,7 +97,6 @@ class ScopedConnectionGuardTest {
                 .authentication(
                     new UsernamePasswordAuthenticationToken(
                         ScopedConnectionTestFixtures.EXTERNAL_USER_ID, null, List.of()))
-                .skipAutomationAuthorization(true)
                 .build()
                 .toToolContext());
 

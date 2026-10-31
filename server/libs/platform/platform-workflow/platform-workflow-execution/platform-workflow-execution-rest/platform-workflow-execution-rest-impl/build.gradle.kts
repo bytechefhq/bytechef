@@ -50,7 +50,12 @@ dependencies {
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
+    testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

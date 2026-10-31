@@ -79,4 +79,5 @@ dependencies {
     testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl")) {
         exclude(module = "logback-config")
     }
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

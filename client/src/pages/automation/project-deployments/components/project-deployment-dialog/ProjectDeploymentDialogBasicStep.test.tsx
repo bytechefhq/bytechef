@@ -3,7 +3,7 @@ import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeploymentDialogBasicStep from './ProjectDeploymentDialogBasicStep';
 
@@ -16,8 +16,17 @@ vi.mock('@/shared/queries/automation/projects.queries', () => ({
     useGetWorkspaceProjectsQuery: () => ({data: projects}),
 }));
 
+const hoisted = vi.hoisted(() => ({
+    deployableEnvironmentIds: undefined as number[] | undefined,
+    environments: undefined as {id: string; name: string}[] | undefined,
+}));
+
 vi.mock('@/shared/middleware/graphql', () => ({
-    useEnvironmentsQuery: () => ({data: undefined}),
+    useEnvironmentsQuery: () => ({data: hoisted.environments ? {environments: hoisted.environments} : undefined}),
+}));
+
+vi.mock('@/shared/hooks/useWorkspaceScopeEnvironmentIds', () => ({
+    useWorkspaceScopeEnvironmentIds: () => hoisted.deployableEnvironmentIds,
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -97,6 +106,25 @@ const BasicStepHarness = () => {
     );
 };
 
+const EnvironmentEditableHarness = () => {
+    const form = useForm<ProjectDeployment>({defaultValues: {name: ''}});
+
+    return (
+        <Form {...form}>
+            <ProjectDeploymentDialogBasicStep
+                basicStepTab="new-deployment"
+                changeProjectVersion={false}
+                control={form.control}
+                environmentEditable
+                getValues={form.getValues}
+                handleTabChange={vi.fn()}
+                projectDeployment={undefined}
+                setValue={form.setValue}
+            />
+        </Form>
+    );
+};
+
 const ChangeVersionHarness = ({
     onDeploymentSelect,
     projectDeployments,
@@ -158,6 +186,49 @@ const TabsHarness = ({projectDeployments}: {projectDeployments: ProjectDeploymen
 };
 
 describe('ProjectDeploymentDialogBasicStep', () => {
+    beforeEach(() => {
+        hoisted.deployableEnvironmentIds = undefined;
+        hoisted.environments = undefined;
+    });
+
+    describe('environment select', () => {
+        beforeAll(() => {
+            Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || vi.fn();
+            Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || vi.fn();
+            Element.prototype.scrollIntoView = Element.prototype.scrollIntoView || vi.fn();
+        });
+
+        beforeEach(() => {
+            hoisted.environments = [
+                {id: '0', name: 'Development'},
+                {id: '1', name: 'Staging'},
+                {id: '2', name: 'Production'},
+            ];
+        });
+
+        it('should offer only the environments in which the member may create deployments', async () => {
+            hoisted.deployableEnvironmentIds = [0, 1];
+
+            render(<EnvironmentEditableHarness />);
+
+            await userEvent.click(screen.getByRole('combobox'));
+
+            expect(screen.getByRole('option', {name: 'Development'})).toBeInTheDocument();
+            expect(screen.getByRole('option', {name: 'Staging'})).toBeInTheDocument();
+            expect(screen.queryByRole('option', {name: 'Production'})).not.toBeInTheDocument();
+        });
+
+        it('should offer every environment when the member is unrestricted', async () => {
+            render(<EnvironmentEditableHarness />);
+
+            await userEvent.click(screen.getByRole('combobox'));
+
+            expect(screen.getByRole('option', {name: 'Development'})).toBeInTheDocument();
+            expect(screen.getByRole('option', {name: 'Staging'})).toBeInTheDocument();
+            expect(screen.getByRole('option', {name: 'Production'})).toBeInTheDocument();
+        });
+    });
+
     it('should preselect the deployment of a project that has only one', () => {
         const onDeploymentSelect = vi.fn();
         const projectDeployment = {environmentId: 1, id: 7, name: 'Production', projectId: 1, projectVersion: 3};

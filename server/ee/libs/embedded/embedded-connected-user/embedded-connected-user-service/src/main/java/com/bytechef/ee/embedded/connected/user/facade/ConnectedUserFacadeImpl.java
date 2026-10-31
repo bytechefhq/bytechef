@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.connected.user.facade;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -37,7 +38,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -95,7 +96,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)")
     public ConnectedUserDTO createConnectedUser(
         String externalId, Environment environment, @Nullable String name, @Nullable String email,
         @Nullable Map<String, String> metadata) {
@@ -107,7 +108,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConnectedUserImportResultDTO importConnectedUsers(Environment environment, InputStream csvInputStream) {
         ParsedConnectedUsers parsedConnectedUsers = ConnectedUserCsvParser.parse(csvInputStream);
@@ -159,7 +160,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public ConnectedUserDTO updateConnectedUser(
         long id, @Nullable String name, @Nullable String email, @Nullable Map<String, String> metadata, int version) {
 
@@ -169,31 +170,43 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_DELETE')")
     public void deleteConnectedUser(long id) {
-        Set<Long> connectionIds = new LinkedHashSet<>(connectedUserConnectionService.getConnectionIds(id));
+        Map<Long, List<Long>> integrationInstanceIdsByConnectionId = new LinkedHashMap<>();
+
+        for (long connectionId : connectedUserConnectionService.getConnectionIds(id)) {
+            integrationInstanceIdsByConnectionId.put(connectionId, new ArrayList<>());
+        }
 
         for (IntegrationInstance integrationInstance : integrationInstanceService.getConnectedUserIntegrationInstances(
             id)) {
 
-            connectionIds.add(integrationInstance.getConnectionId());
+            List<Long> integrationInstanceIds = integrationInstanceIdsByConnectionId.computeIfAbsent(
+                integrationInstance.getConnectionId(), connectionId -> new ArrayList<>());
 
-            integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
+            integrationInstanceIds.add(integrationInstance.getId());
         }
 
-        connectedUserProjectFacade.deleteConnectedUserProjects(id);
+        AutomationAuthorizationContext
+            .runSkippingChecks(() -> connectedUserProjectFacade.deleteConnectedUserProjects(id));
 
-        for (long connectionId : connectionIds) {
-            connectedUserConnectionService.deleteByConnectionId(connectionId);
+        for (Map.Entry<Long, List<Long>> entry : integrationInstanceIdsByConnectionId.entrySet()) {
+            long connectionId = entry.getKey();
 
-            connectionFacade.delete(connectionId);
+            connectionFacade.delete(connectionId, () -> {
+                for (long integrationInstanceId : entry.getValue()) {
+                    integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceId);
+                }
+
+                connectedUserConnectionService.deleteByConnectionId(connectionId);
+            });
         }
 
         connectedUserService.deleteConnectedUser(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public void enableConnectedUser(long id, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(id);
@@ -210,7 +223,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public ConnectedUserDTO getConnectedUserDTO(long id) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(id);
 
@@ -230,14 +243,14 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public ConnectedUser getConnectedUser(long id) {
         return connectedUserService.getConnectedUser(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)")
     public Page<ConnectedUserDTO> getConnectedUserDTOs(
         Long environmentId, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
         LocalDate createDateTo, Long integrationId, int pageNumber) {
@@ -270,7 +283,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)")
     public Page<ConnectedUser> getConnectedUsers(
         Long environmentId, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
         int pageNumber) {

@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
@@ -85,6 +86,11 @@ class PermissionServiceTest {
         assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isFalse();
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isFalse();
         assertThat(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+            .isFalse();
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
         assertThat(permissionService.hasResourceRole(1L, "project", "ADMIN")).isFalse();
         assertThat(permissionService.isResourceOwner("project", 1L)).isFalse();
     }
@@ -108,6 +114,11 @@ class PermissionServiceTest {
         // CE has no scope mapping; getMyWorkspaceScopes returns an empty set so client code that relies on the list
         // (e.g., disabling buttons by scope) gracefully degrades rather than dereferencing null.
         assertThat(permissionService.getMyWorkspaceScopes(1L)).isEmpty();
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentReturnsEmpty() {
+        assertThat(permissionService.getMyWorkspaceScopes(1L, Environment.PRODUCTION)).isEmpty();
     }
 
     @Test

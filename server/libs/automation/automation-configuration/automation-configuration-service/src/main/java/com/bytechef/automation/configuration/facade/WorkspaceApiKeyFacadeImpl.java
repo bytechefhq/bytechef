@@ -51,7 +51,7 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_CREATE')")
+    @PreAuthorize("hasWorkspaceScopeInEnvironment(#workspaceId, 'API_KEY_CREATE', #apiKey.environment)")
     public String create(long workspaceId, ApiKey apiKey) {
         apiKey = apiKeyFacade.createAutomationApiKey(apiKey);
 
@@ -70,7 +70,7 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_VIEW')")
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'API_KEY_VIEW', #environmentId)")
     public List<ApiKey> getApiKeys(long workspaceId, long environmentId) {
         Set<Long> workspaceApiKeyIds = workspaceApiKeyService.getWorkspaceApiKeys(workspaceId)
             .stream()

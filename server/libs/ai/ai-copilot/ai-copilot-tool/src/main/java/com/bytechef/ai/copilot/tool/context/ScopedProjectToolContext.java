@@ -51,8 +51,11 @@ public final class ScopedProjectToolContext {
             return true;
         }
 
+        // A connected user's run carries their authentication but no platform user id. Without a scoped project such a
+        // run is still confined, so the guards fail closed rather than open.
         AgentToolInvocationContext invocationContext = AgentToolInvocationContext.fromToolContext(toolContext);
 
-        return invocationContext != null && invocationContext.skipAutomationAuthorization();
+        return invocationContext != null && invocationContext.authentication() != null &&
+            invocationContext.userId() == null;
     }
 }

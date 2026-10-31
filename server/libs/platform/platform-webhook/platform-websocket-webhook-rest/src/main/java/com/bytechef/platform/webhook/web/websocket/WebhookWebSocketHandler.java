@@ -25,6 +25,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -255,7 +256,12 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
                     if (subJobId != null) {
                         try {
-                            jobFacade.stopJob(subJobId);
+                            // A hang-up arrives without a user, so the guarded stop runs as the system.
+                            SecurityUtils.runAsSystem(() -> {
+                                jobFacade.stopJob(subJobId);
+
+                                return null;
+                            });
                         } catch (Exception exception) {
                             log.warn(
                                 "Failed to stop sub-workflow on WebSocket close: callSid={}, subJobId={}",

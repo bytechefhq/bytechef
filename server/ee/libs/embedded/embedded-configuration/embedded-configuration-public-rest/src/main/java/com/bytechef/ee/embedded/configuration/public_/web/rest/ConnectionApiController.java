@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
@@ -25,7 +24,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +68,9 @@ public class ConnectionApiController implements ConnectionApi {
     @Override
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String externalUserId, String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         Environment environment = getEnvironment(xEnvironment);
 
         Set<Long> ownedConnectionIds = connectedUserConnectionFacade.getOwnedConnectionIds(
@@ -192,9 +194,8 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     private ConnectedUser getCurrentConnectedUser(EnvironmentModel xEnvironment) {
-        String externalUserId = OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not authenticated");
-
-        return connectedUserService.getConnectedUser(externalUserId, getEnvironment(xEnvironment));
+        return connectedUserService.getConnectedUser(
+            ConnectedUserAuthentications.getCurrentExternalUserId(), getEnvironment(xEnvironment));
     }
 
     private Environment getEnvironment(EnvironmentModel xEnvironment) {

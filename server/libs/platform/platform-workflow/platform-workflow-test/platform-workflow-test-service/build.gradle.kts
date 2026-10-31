@@ -1,6 +1,8 @@
 dependencies {
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
@@ -38,6 +40,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
@@ -48,6 +52,9 @@ dependencies {
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 
+    testRuntimeOnly(project(":server:libs:platform:platform-category:platform-category-service"))
     testRuntimeOnly(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testRuntimeOnly(project(":server:libs:platform:platform-security:platform-security-service"))
     testRuntimeOnly(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testRuntimeOnly(project(":server:libs:platform:platform-user:platform-user-service"))
 }

@@ -5,6 +5,7 @@ import PageLoader from '@/components/PageLoader';
 import ConnectionsFilterTitle from '@/pages/automation/connections/components/ConnectionsFilterTitle';
 import {CONNECTIONS_DOCUMENTATION_URL} from '@/pages/automation/journey/automationJourneySteps';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -104,6 +105,7 @@ export const Connections = () => {
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                 connectionsQueryKey={ConnectionKeys.connections}
+                                platformType={PlatformType.AUTOMATION}
                                 triggerNode={<Button label="New Connection" />}
                                 useCreateConnectionMutation={useCreateConnectionMutation}
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
@@ -163,6 +165,7 @@ export const Connections = () => {
                                     }
                                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                     connectionsQueryKey={ConnectionKeys.connections}
+                                    platformType={PlatformType.AUTOMATION}
                                     triggerNode={
                                         <Button
                                             label="Create Connection"

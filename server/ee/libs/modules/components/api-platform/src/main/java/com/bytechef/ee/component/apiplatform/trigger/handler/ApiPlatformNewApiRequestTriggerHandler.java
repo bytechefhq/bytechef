@@ -11,6 +11,7 @@ import static com.bytechef.ee.component.apiplatform.constant.ApiPlatformConstant
 import static com.bytechef.ee.component.apiplatform.constant.ApiPlatformConstants.NEW_API_REQUEST;
 
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.trigger.handler.AbstractTriggerHandler;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,10 @@ import org.springframework.stereotype.Component;
 @Component(API_PLATFORM + "/v1/" + NEW_API_REQUEST)
 public class ApiPlatformNewApiRequestTriggerHandler extends AbstractTriggerHandler {
 
-    public ApiPlatformNewApiRequestTriggerHandler(TriggerDefinitionFacade triggerDefinitionFacade) {
-        super(API_PLATFORM, 1, NEW_API_REQUEST, triggerDefinitionFacade);
+    public ApiPlatformNewApiRequestTriggerHandler(
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(API_PLATFORM, 1, NEW_API_REQUEST, triggerDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }
