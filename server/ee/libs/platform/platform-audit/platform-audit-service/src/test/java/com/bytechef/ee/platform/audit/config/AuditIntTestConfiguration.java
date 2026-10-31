@@ -30,7 +30,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 @ComponentScan(
     basePackages = "com.bytechef.ee.platform.audit",
     excludeFilters = @Filter(type = FilterType.REGEX, pattern = ".*IntTest\\$.*"))
-@EnableAutoConfiguration
+@EnableAutoConfiguration(
+    excludeName = "com.bytechef.automation.configuration.config.AutomationConfigurationJdbcRepositoryConfiguration")
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class AuditIntTestConfiguration {
