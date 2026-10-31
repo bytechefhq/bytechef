@@ -21,92 +21,103 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.billing.client.StripeClient;
-import com.bytechef.platform.billing.config.BillingProperties;
+import com.bytechef.platform.billing.config.BillingIntTestConfiguration;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
-import com.bytechef.platform.billing.service.BillingSubscriptionService;
-import com.bytechef.platform.billing.service.BillingUsageService;
+import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.stripe.model.Subscription;
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Matija Petanjek
  */
-@ExtendWith(MockitoExtension.class)
-class BillingSubscriptionFacadeImplTest {
+@ActiveProfiles("testint")
+@Import(PostgreSQLContainerConfiguration.class)
+@SpringBootTest(classes = BillingIntTestConfiguration.class)
+class BillingSubscriptionFacadeIntTest {
 
     private static final String PRODUCT_STARTER_ID = "prod_starter_test";
     private static final String PRODUCT_GROWTH_ID = "prod_growth_test";
     private static final String PRODUCT_USAGE_ID = "prod_usage_test";
 
-    @Mock
-    private BillingSubscriptionService billingSubscriptionService;
+    @Autowired
+    private BillingSubscriptionFacade billingSubscriptionFacade;
 
-    @Mock
-    private BillingUsageService billingUsageService;
+    @Autowired
+    private BillingSubscriptionRepository billingSubscriptionRepository;
 
-    @Mock
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @MockitoBean
     private StripeClient stripeClient;
 
-    @Mock
-    private Subscription mockStripeSubscription;
-
-    private BillingSubscriptionFacadeImpl facade;
+    private final Subscription stripeSubscription = mock(Subscription.class);
 
     @BeforeEach
-    void setUp() {
-        BillingProperties billingProperties = new BillingProperties(
-            new BillingProperties.Stripe(
-                "sk_test_abc", null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null, "whsec_test",
-                null, null));
+    void beforeEach() {
+        jdbcTemplate.update("DELETE FROM principal_job");
+        jdbcTemplate.update("DELETE FROM job");
 
-        facade = new BillingSubscriptionFacadeImpl(
-            billingProperties, billingSubscriptionService, billingUsageService, stripeClient);
+        billingSubscriptionRepository.deleteAll();
     }
 
     @Test
     void testFetchCurrentSubscriptionReturnsDtoWithJobsExecuted() {
         BillingSubscription subscription = starterSubscription();
 
-        Instant periodStart = Instant.parse("2026-06-01T00:00:00Z");
+        Instant periodStart = Instant.now()
+            .minus(7, ChronoUnit.DAYS)
+            .truncatedTo(ChronoUnit.SECONDS);
 
         subscription.setCurrentPeriodStart(periodStart);
 
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
-        when(billingUsageService.countJobExecutionsSince(eq(periodStart), any(Instant.class))).thenReturn(42);
-        when(stripeClient.fetchScheduledPlanName(any())).thenReturn(Optional.of("GROWTH"));
+        BillingSubscription savedSubscription = billingSubscriptionRepository.save(subscription);
 
-        Optional<BillingSubscriptionDTO> result = facade.fetchCurrentSubscription();
+        seedDeployedJobs(42, Instant.now()
+            .minus(1, ChronoUnit.DAYS));
+        seedDeployedJobs(3, periodStart.minus(1, ChronoUnit.DAYS));
+
+        when(stripeClient.fetchScheduledPlanName("sub_starter")).thenReturn(Optional.of("GROWTH"));
+
+        Optional<BillingSubscriptionDTO> result = billingSubscriptionFacade.fetchCurrentSubscription();
 
         assertThat(result).isPresent();
         assertThat(result.get()
             .jobsExecuted()).isEqualTo(42);
         assertThat(result.get()
-            .subscription()).isSameAs(subscription);
+            .subscription()).isEqualTo(savedSubscription);
         assertThat(result.get()
             .scheduledPlanName()).isEqualTo("GROWTH");
     }
 
     @Test
     void testUpgradeSubscriptionCallsUpgradeNowForUpdatePath() {
-        BillingSubscription currentSubscription = starterSubscription();
+        billingSubscriptionRepository.save(starterSubscription());
 
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
-        when(stripeClient.retrieveSubscription("sub_starter")).thenReturn(mockStripeSubscription);
+        when(stripeClient.retrieveSubscription("sub_starter")).thenReturn(stripeSubscription);
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
 
-        facade.updateSubscription("GROWTH");
+        billingSubscriptionFacade.updateSubscription("GROWTH");
 
         verify(stripeClient).upgradeSubscriptionNow(
             eq("sub_starter"), eq("si_flat_starter"), eq("price_growth"), eq("GROWTH"), any());
@@ -115,64 +126,77 @@ class BillingSubscriptionFacadeImplTest {
 
     @Test
     void testUpdateSubscriptionSchedulesDowngrade() {
-        BillingSubscription currentSubscription = growthSubscription();
+        billingSubscriptionRepository.save(growthSubscription());
 
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
-        when(stripeClient.retrieveSubscription("sub_growth")).thenReturn(mockStripeSubscription);
+        when(stripeClient.retrieveSubscription("sub_growth")).thenReturn(stripeSubscription);
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_STARTER_ID)).thenReturn("price_starter");
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_USAGE_ID)).thenReturn("price_usage");
 
-        facade.updateSubscription("STARTER");
+        billingSubscriptionFacade.updateSubscription("STARTER");
 
         verify(stripeClient).scheduleDowngrade(
             eq("sub_growth"), eq("si_flat_growth"), eq("si_usage_growth"),
-            eq("price_starter"), eq("price_usage"), eq("STARTER"), any(), anyLong());
+            eq("price_starter"), eq("price_usage"), eq("STARTER"), any(),
+            eq(Instant.parse("2026-07-01T00:00:00Z")
+                .getEpochSecond()));
         verify(stripeClient, never()).upgradeSubscriptionNow(any(), any(), any(), any(), any());
     }
 
     @Test
     void testUpgradeSubscriptionReleasesExistingScheduleBeforeUpgrading() {
-        BillingSubscription currentSubscription = starterSubscription();
+        billingSubscriptionRepository.save(starterSubscription());
 
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
-        when(stripeClient.retrieveSubscription(any())).thenReturn(mockStripeSubscription);
+        when(stripeClient.retrieveSubscription(any())).thenReturn(stripeSubscription);
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
 
-        facade.updateSubscription("GROWTH");
+        billingSubscriptionFacade.updateSubscription("GROWTH");
 
-        verify(stripeClient).releaseSubscriptionScheduleIfPresent(mockStripeSubscription);
+        verify(stripeClient).releaseSubscriptionScheduleIfPresent(stripeSubscription);
         verify(stripeClient).upgradeSubscriptionNow(any(), any(), eq("price_growth"), eq("GROWTH"), any());
     }
 
     @Test
     void testCancelSubscriptionThrowsWhenNoActiveSubscription() {
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> facade.cancelSubscription())
+        assertThatThrownBy(() -> billingSubscriptionFacade.cancelSubscription())
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("No active subscription found");
     }
 
     @Test
     void testReactivateSubscriptionThrowsWhenNoActiveSubscription() {
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> facade.reactivateSubscription())
+        assertThatThrownBy(() -> billingSubscriptionFacade.reactivateSubscription())
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("No active subscription found");
     }
 
     @Test
     void testUpdateSubscriptionThrowsForUnknownPlanName() {
-        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(starterSubscription()));
-        when(stripeClient.retrieveSubscription(any())).thenReturn(mockStripeSubscription);
+        billingSubscriptionRepository.save(starterSubscription());
 
-        assertThatThrownBy(() -> facade.updateSubscription("ENTERPRISE"))
+        when(stripeClient.retrieveSubscription(any())).thenReturn(stripeSubscription);
+
+        assertThatThrownBy(() -> billingSubscriptionFacade.updateSubscription("ENTERPRISE"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Unknown plan: ENTERPRISE");
     }
 
-    private BillingSubscription starterSubscription() {
+    private void seedDeployedJobs(int count, Instant endDate) {
+        String workflowId = UUID.randomUUID()
+            .toString();
+
+        jdbcTemplate.update(
+            """
+                INSERT INTO job (workflow_id, status, current_task, priority, created_date, created_by,
+                    last_modified_date, last_modified_by, version, end_date)
+                SELECT ?, 2, 0, 0, now(), 'system', now(), 'system', 0, ? FROM generate_series(1, ?)
+                """,
+            workflowId, Timestamp.from(endDate), count);
+        jdbcTemplate.update(
+            "INSERT INTO principal_job (job_id, principal_id, type) SELECT id, 1, 0 FROM job WHERE workflow_id = ?",
+            workflowId);
+    }
+
+    private static BillingSubscription starterSubscription() {
         BillingSubscription subscription = new BillingSubscription();
 
         subscription.setSubscriptionId("sub_starter");
@@ -180,12 +204,14 @@ class BillingSubscriptionFacadeImplTest {
         subscription.setUsageProductId("si_usage_starter");
         subscription.setPlanName("STARTER");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setProductUnitLimit(5000);
+        subscription.setCurrentPeriodStart(Instant.parse("2026-06-01T00:00:00Z"));
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
 
         return subscription;
     }
 
-    private BillingSubscription growthSubscription() {
+    private static BillingSubscription growthSubscription() {
         BillingSubscription subscription = new BillingSubscription();
 
         subscription.setSubscriptionId("sub_growth");
@@ -193,6 +219,8 @@ class BillingSubscriptionFacadeImplTest {
         subscription.setUsageProductId("si_usage_growth");
         subscription.setPlanName("GROWTH");
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
+        subscription.setProductUnitLimit(5000);
+        subscription.setCurrentPeriodStart(Instant.parse("2026-06-01T00:00:00Z"));
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
 
         return subscription;
