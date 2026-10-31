@@ -145,7 +145,7 @@
         "use-debounce": "^10.1.1",
         "vite-plugin-svgr": "^5.2.0",
         "whatwg-fetch": "^3.6.20",
-        "zod": "^4.6.5",
+        "zod": "^4.6.6",
         "zundo": "^2.3.0",
         "zustand": "^5.0.15"
     },
