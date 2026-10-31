@@ -62,9 +62,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Runs {@link WorkflowServiceImpl} over the real JDBC workflow repository. A Mockito-backed {@link WorkflowRepository}
- * ordered ahead of the JDBC one (the "probing" repository) stands in for another workflow source that can fail, and
- * the JDBC repository is a {@link MockitoSpyBean} so a datasource failure can be injected where Postgres cannot
- * produce one on demand (#5202).
+ * ordered ahead of the JDBC one (the "probing" repository) stands in for another workflow source that can fail, and the
+ * JDBC repository is a {@link MockitoSpyBean} so a datasource failure can be injected where Postgres cannot produce one
+ * on demand (#5202).
  *
  * @author Ivica Cardic
  */
