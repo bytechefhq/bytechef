@@ -46,6 +46,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -232,6 +234,30 @@ class WorkflowExecutionApiControllerIntTest {
             null,
             TaskExecution.Status.COMPLETED, 0, "Title", "myComponent/v1/myAction", null, List.of(), List.of(),
             childJob, childCount, List.of(), List.of());
+    }
+
+    @Test
+    void getWorkflowExecutionsPagePassesTheConnectedUserAndProjectVersionToTheFacade() throws Exception {
+        WorkflowExecutionDTO workflowExecutionDTO = new WorkflowExecutionDTO(
+            33L, null, null, null, null, null, null, List.of(), 0L);
+
+        when(projectWorkflowExecutionFacade.getWorkflowExecutions(
+            null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0))
+                .thenReturn(new PageImpl<>(List.of(workflowExecutionDTO), PageRequest.of(0, 20), 1));
+
+        mockMvc.perform(
+            get("/internal/workspaces/1/workflow-executions")
+                .queryParam("projectDeploymentId", "9")
+                .queryParam("connectedUserId", "7")
+                .queryParam("workflowId", "workflow-1")
+                .queryParam("projectVersion", "2")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.content[0].id").value(33));
+
+        verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
+            null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0);
     }
 
     @Configuration
