@@ -7,6 +7,7 @@ import WorkflowExecutionContent from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import WorkflowExecutionLogsContent from '@/shared/components/workflow-executions/WorkflowExecutionLogsContent';
 import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workflow-executions/WorkflowExecutionsUtils';
+import useClusterElementCallValues from '@/shared/components/workflow-executions/hooks/useClusterElementCallValues';
 import {
     ClusterElementCallTaskExecutionI,
     isClusterElementCallTaskExecution,
@@ -51,8 +52,24 @@ const WorkflowExecutionsTabsPanel = ({
 }: WorkflowExecutionsTabsPanelProps) => {
     const [logsToolbarContainer, setLogsToolbarContainer] = useState<HTMLDivElement | null>(null);
 
-    const resolvedInput = selectedItemInput !== undefined ? selectedItemInput : selectedItem?.input;
-    const resolvedOutput = selectedItemOutput !== undefined ? selectedItemOutput : selectedItem?.output;
+    const callExecution =
+        selectedItem && isClusterElementCallTaskExecution(selectedItem as TaskExecution)
+            ? (selectedItem as ClusterElementCallTaskExecutionI)
+            : undefined;
+
+    const callValues = useClusterElementCallValues({callExecution, isEditorEnvironment, jobId: job?.id});
+
+    const displayedItem = useMemo(
+        () =>
+            callExecution
+                ? ({...callExecution, input: callValues.input, output: callValues.output} as TaskExecution)
+                : selectedItem,
+        [callExecution, callValues.input, callValues.output, selectedItem]
+    );
+
+    const resolvedInput = selectedItemInput !== undefined ? selectedItemInput : displayedItem?.input;
+    const resolvedOutput = selectedItemOutput !== undefined ? selectedItemOutput : displayedItem?.output;
+    const resolvedDataLoading = selectedItemDataLoading || callValues.isLoading;
 
     const handleValueChange = useCallback((value: string) => setActiveTab(value as TabValueType), [setActiveTab]);
 
@@ -60,28 +77,23 @@ const WorkflowExecutionsTabsPanel = ({
         () =>
             getDisplayValue({
                 job,
-                selectedItem,
+                selectedItem: displayedItem,
                 tab: activeTab,
                 triggerExecution,
             }),
-        [job, selectedItem, activeTab, triggerExecution]
+        [job, displayedItem, activeTab, triggerExecution]
     );
 
     const hasDialogContent = useMemo(
         () =>
             hasDialogContentValue({
                 job,
-                selectedItem,
+                selectedItem: displayedItem,
                 tab: activeTab,
                 triggerExecution,
             }),
-        [job, selectedItem, activeTab, triggerExecution]
+        [job, displayedItem, activeTab, triggerExecution]
     );
-
-    const callExecution =
-        selectedItem && isClusterElementCallTaskExecution(selectedItem as TaskExecution)
-            ? (selectedItem as ClusterElementCallTaskExecutionI)
-            : undefined;
 
     const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
 
@@ -217,13 +229,13 @@ const WorkflowExecutionsTabsPanel = ({
                                     <DialogBody>
                                         <WorkflowExecutionContent
                                             error={activeTab === 'error' ? selectedItem?.error : undefined}
-                                            input={activeTab === 'input' ? selectedItem?.input : undefined}
+                                            input={activeTab === 'input' ? displayedItem?.input : undefined}
                                             jobInputs={
                                                 activeTab === 'output' && isTriggerExecution ? job?.inputs : undefined
                                             }
                                             output={
                                                 activeTab === 'output' && !isTriggerExecution
-                                                    ? selectedItem?.output
+                                                    ? displayedItem?.output
                                                     : undefined
                                             }
                                             workflowTriggerName={
@@ -245,7 +257,7 @@ const WorkflowExecutionsTabsPanel = ({
             <ScrollArea className="min-h-0 flex-1">
                 <div className="mb-4">
                     <TabsContent className="p-3" value="input">
-                        {selectedItemDataLoading ? (
+                        {resolvedDataLoading ? (
                             <div className="flex items-center justify-center p-4">
                                 <span className="text-sm text-muted-foreground">Loading…</span>
                             </div>
@@ -259,7 +271,7 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsContent>
 
                     <TabsContent className="p-3" value="output">
-                        {selectedItemDataLoading ? (
+                        {resolvedDataLoading ? (
                             <div className="flex items-center justify-center p-4">
                                 <span className="text-sm text-muted-foreground">Loading…</span>
                             </div>
