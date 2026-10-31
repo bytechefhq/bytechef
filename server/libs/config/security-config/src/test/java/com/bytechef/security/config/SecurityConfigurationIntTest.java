@@ -32,6 +32,7 @@ import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.web.authentication.TenantUserDetailsService;
 import com.bytechef.security.web.rememberme.PersistentTokenRememberMeServices;
 import com.bytechef.tenant.service.TenantService;
 import jakarta.servlet.http.Cookie;
@@ -337,7 +338,7 @@ class SecurityConfigurationIntTest {
         private TenantService tenantService;
 
         @MockitoBean
-        private UserDetailsService userDetailsService;
+        private TenantUserDetailsService tenantUserDetailsService;
 
         @MockitoBean
         private UserService userService;
@@ -360,7 +361,7 @@ class SecurityConfigurationIntTest {
             when(tenantService.getTenantIdsByUserLogin("jane")).thenReturn(List.of(FIRST_TENANT_ID));
             when(persistentTokenService.fetchPersistentToken(SERIES)).thenReturn(Optional.of(persistentToken));
             when(userService.getUser(1L)).thenReturn(user);
-            when(userDetailsService.loadUserByUsername("jane"))
+            when(tenantUserDetailsService.loadUserByUsername("jane", COOKIE_TENANT_ID))
                 .thenReturn(
                     new org.springframework.security.core.userdetails.User(
                         "jane", "", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
