@@ -17,12 +17,14 @@
 package com.bytechef.atlas.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.SuspendedJobs;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -49,6 +51,7 @@ import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +68,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
@@ -83,6 +87,7 @@ import tools.jackson.databind.ObjectMapper;
 @RecordApplicationEvents
 public class JobFacadeIntTest {
 
+    private static final List<Job.Status> RESUME_EVENT_JOB_STATUSES = new CopyOnWriteArrayList<>();
     private static final List<UpdatedJobState> UPDATED_JOB_STATES = new CopyOnWriteArrayList<>();
 
     @Autowired
@@ -181,6 +186,59 @@ public class JobFacadeIntTest {
             .doesNotContain(new UpdatedJobState(Job.Status.STOPPED, false));
     }
 
+    @Test
+    public void testResumeJobStartsJobBeforePublishingResumeEvent() {
+        Job job = newJob();
+
+        job.setEndDate(Instant.now());
+        job.setStatus(Job.Status.STOPPED);
+
+        job = jobRepository.save(job);
+
+        long jobId = Validate.notNull(job.getId(), "id");
+
+        RESUME_EVENT_JOB_STATUSES.clear();
+
+        jobFacade.resumeJob(jobId);
+
+        List<ResumeJobEvent> resumeJobEvents = applicationEvents.stream(ResumeJobEvent.class)
+            .toList();
+
+        assertThat(resumeJobEvents).hasSize(1);
+
+        ResumeJobEvent resumeJobEvent = resumeJobEvents.getFirst();
+
+        assertThat(resumeJobEvent.getJobId()).isEqualTo(jobId);
+        assertThat(resumeJobEvent.isStarted()).isTrue();
+        assertThat(resumeJobEvent.getTaskExecutionId()).isNull();
+        assertThat(RESUME_EVENT_JOB_STATUSES)
+            .as("the job must already be STARTED when the resume event is published")
+            .containsExactly(Job.Status.STARTED);
+
+        Job resumedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(resumedJob.getStatus()).isEqualTo(Job.Status.STARTED);
+        assertThat(resumedJob.getEndDate()).isNull();
+    }
+
+    @Test
+    public void testResumeJobPublishesNothingWhenJobCannotBeResumed() {
+        Job job = jobRepository.save(newJob());
+
+        long jobId = Validate.notNull(job.getId(), "id");
+
+        assertThatThrownBy(() -> jobFacade.resumeJob(jobId))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(applicationEvents.stream(ResumeJobEvent.class)).isEmpty();
+
+        Job persistedJob = jobRepository.findById(jobId)
+            .orElseThrow();
+
+        assertThat(persistedJob.getStatus()).isEqualTo(Job.Status.COMPLETED);
+    }
+
     private record UpdatedJobState(Job.Status status, boolean waitingForApproval) {
     }
 
@@ -245,8 +303,31 @@ public class JobFacadeIntTest {
         }
 
         @Bean
+        ResumeJobEventJobStatusRecorder resumeJobEventJobStatusRecorder(JobRepository jobRepository) {
+            return new ResumeJobEventJobStatusRecorder(jobRepository);
+        }
+
+        @Bean
         TaskExecutionService taskExecutionService(TaskExecutionRepository taskExecutionRepository) {
             return new TaskExecutionServiceImpl(taskExecutionRepository);
+        }
+
+        public static class ResumeJobEventJobStatusRecorder {
+
+            private final JobRepository jobRepository;
+
+            @SuppressFBWarnings("EI")
+            public ResumeJobEventJobStatusRecorder(JobRepository jobRepository) {
+                this.jobRepository = jobRepository;
+            }
+
+            @EventListener
+            public void onResumeJobEvent(ResumeJobEvent resumeJobEvent) {
+                Job job = jobRepository.findById(resumeJobEvent.getJobId())
+                    .orElseThrow();
+
+                RESUME_EVENT_JOB_STATUSES.add(job.getStatus());
+            }
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
