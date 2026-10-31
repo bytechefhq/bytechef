@@ -207,9 +207,9 @@ class IntegrationWorkflowGraphQlControllerIntTest {
 
         this.graphQlTester
             .document("""
-                query {
+                query($workflowUuid: String!) {
                     integrationVersionWorkflowChange(
-                        integrationId: "7", integrationVersion: 2, workflowUuid: "%s") {
+                        integrationId: "7", integrationVersion: 2, workflowUuid: $workflowUuid) {
                         workflowUuid
                         label
                         changeType
@@ -229,7 +229,8 @@ class IntegrationWorkflowGraphQlControllerIntTest {
                         }
                     }
                 }
-                """.formatted(WORKFLOW_UUID))
+                """)
+            .variable("workflowUuid", WORKFLOW_UUID)
             .execute()
             .path("integrationVersionWorkflowChange.changeType")
             .entity(String.class)

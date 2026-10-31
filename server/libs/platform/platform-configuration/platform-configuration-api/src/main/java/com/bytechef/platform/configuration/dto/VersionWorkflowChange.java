@@ -16,12 +16,14 @@
 
 package com.bytechef.platform.configuration.dto;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record VersionWorkflowChange(
     String workflowUuid, @Nullable String label, WorkflowChangeType changeType, @Nullable Integer baseVersion,
     int version, List<WorkflowDefinitionChange> changes, @Nullable String oldDefinition,

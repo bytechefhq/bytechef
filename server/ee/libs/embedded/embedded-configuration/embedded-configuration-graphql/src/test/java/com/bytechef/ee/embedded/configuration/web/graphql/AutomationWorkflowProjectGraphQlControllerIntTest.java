@@ -582,9 +582,9 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
 
         this.graphQlTester
             .document("""
-                query {
+                query($workflowUuid: String!) {
                     automationWorkflowProjectVersionWorkflowChange(
-                        id: "5", projectVersion: 2, workflowUuid: "%s") {
+                        id: "5", projectVersion: 2, workflowUuid: $workflowUuid) {
                         workflowUuid
                         changeType
                         baseVersion
@@ -599,7 +599,8 @@ class AutomationWorkflowProjectGraphQlControllerIntTest {
                         }
                     }
                 }
-                """.formatted(SOURCE_WORKFLOW_UUID))
+                """)
+            .variable("workflowUuid", SOURCE_WORKFLOW_UUID)
             .execute()
             .path("automationWorkflowProjectVersionWorkflowChange.changeType")
             .entity(String.class)

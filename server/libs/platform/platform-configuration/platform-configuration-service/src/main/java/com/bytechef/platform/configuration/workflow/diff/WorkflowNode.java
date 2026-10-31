@@ -17,12 +17,14 @@
 package com.bytechef.platform.configuration.workflow.diff;
 
 import com.bytechef.platform.configuration.dto.WorkflowNodeChangeTarget;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record WorkflowNode(
     WorkflowNodeChangeTarget target, String name, @Nullable String type, @Nullable String label,
     @Nullable String parentPath, int index, Map<String, Object> attributes) {
