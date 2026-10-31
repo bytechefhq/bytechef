@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.execution.repository;
 
 import com.bytechef.platform.workflow.execution.domain.TaskState;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.relational.core.sql.LockMode;
 import org.springframework.data.relational.repository.Lock;
 import org.springframework.data.repository.ListCrudRepository;
@@ -33,4 +34,7 @@ public interface TaskStateRepository
 
     @Lock(LockMode.PESSIMISTIC_WRITE)
     Optional<TaskState> findByJobResumeId(String resumeId);
+
+    @Query("SELECT * FROM task_state WHERE job_resume_id = :resumeId")
+    Optional<TaskState> findUnlockedByJobResumeId(String resumeId);
 }

@@ -31,6 +31,11 @@ public class RemoteTaskStateService implements TaskStateService {
     }
 
     @Override
+    public <T> Optional<T> fetchUnlockedValue(JobResumeId jobResumeId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void save(JobResumeId jobResumeId, Object value) {
         throw new UnsupportedOperationException();
     }

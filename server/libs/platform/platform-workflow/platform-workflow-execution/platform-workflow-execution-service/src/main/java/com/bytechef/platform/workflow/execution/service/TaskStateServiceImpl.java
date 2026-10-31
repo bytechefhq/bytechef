@@ -53,6 +53,14 @@ public class TaskStateServiceImpl implements TaskStateService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true)
+    public <T> Optional<T> fetchUnlockedValue(JobResumeId jobResumeId) {
+        return taskStateRepository.findUnlockedByJobResumeId(jobResumeId.toString())
+            .map(taskState -> (T) taskState.getValue());
+    }
+
+    @Override
     public void save(JobResumeId jobResumeId, Object value) {
         taskStateRepository
             .findByJobResumeId(jobResumeId.toString())

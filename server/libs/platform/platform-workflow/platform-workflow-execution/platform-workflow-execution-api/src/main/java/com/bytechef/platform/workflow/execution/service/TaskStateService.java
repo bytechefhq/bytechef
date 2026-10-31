@@ -28,5 +28,7 @@ public interface TaskStateService {
 
     <T> Optional<T> fetchValue(JobResumeId jobResumeId);
 
+    <T> Optional<T> fetchUnlockedValue(JobResumeId jobResumeId);
+
     void save(JobResumeId jobResumeId, Object value);
 }
