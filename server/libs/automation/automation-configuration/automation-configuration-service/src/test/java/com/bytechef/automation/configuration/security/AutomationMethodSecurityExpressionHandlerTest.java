@@ -85,6 +85,22 @@ class AutomationMethodSecurityExpressionHandlerTest {
             .hasMessageContaining("isFirst");
     }
 
+    @Test
+    void testRejectsTwoBeansOfTheSameContributorClass() {
+        assertThatThrownBy(() -> createEvaluationContext(new FirstContributor(), new FirstContributor()))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("isFirst");
+    }
+
+    @Test
+    void testAllowsOverloadsWithinOneContributor() {
+        EvaluationContext evaluationContext = createEvaluationContext(new OverloadedContributor());
+
+        assertThat(evaluate("isOverloaded()", evaluationContext)).isTrue();
+        assertThat(evaluate("isOverloaded(7)", evaluationContext)).isTrue();
+        assertThat(evaluate("isOverloaded(8)", evaluationContext)).isFalse();
+    }
+
     private EvaluationContext createEvaluationContext(MethodSecurityExpressionContributor... contributors) {
         StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
 
@@ -130,6 +146,17 @@ class AutomationMethodSecurityExpressionHandlerTest {
         }
 
         public boolean isFirstWithId(long id) {
+            return id == 7;
+        }
+    }
+
+    static class OverloadedContributor implements MethodSecurityExpressionContributor {
+
+        public boolean isOverloaded() {
+            return true;
+        }
+
+        public boolean isOverloaded(long id) {
             return id == 7;
         }
     }
