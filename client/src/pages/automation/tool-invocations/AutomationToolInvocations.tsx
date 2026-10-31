@@ -26,5 +26,11 @@ export const AutomationToolInvocations = () => {
         [currentEnvironmentId, currentWorkspaceId]
     );
 
-    return <ToolInvocations mcpServerOptions={mcpServerOptions} workspaceScope={workspaceScope} />;
+    return (
+        <ToolInvocations
+            key={`${currentWorkspaceId}-${currentEnvironmentId}`}
+            mcpServerOptions={mcpServerOptions}
+            workspaceScope={workspaceScope}
+        />
+    );
 };

@@ -15,6 +15,7 @@ import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
+import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ANY_FILTER_OPTION = {label: 'Any', value: ''};
@@ -37,6 +38,8 @@ const surfaceOptions = [
     {label: 'Embedded API (Action)', value: 'EMBEDDED_API_ACTION'},
     {label: 'Embedded API (Tool)', value: 'EMBEDDED_API_TOOL'},
 ];
+
+const NON_WORKSPACE_SURFACES = new Set(['EMBEDDED_API_ACTION', 'EMBEDDED_API_TOOL', 'MCP_EMBEDDED', 'MCP_MANAGEMENT']);
 
 interface ToolInvocationsProps {
     mcpServerOptions?: Array<ComboBoxItemType>;
@@ -64,6 +67,14 @@ export const ToolInvocations = ({mcpServerOptions, workspaceScope}: ToolInvocati
         toolInvocationLogsIsFetching,
         toolInvocationLogsIsLoading,
     } = useToolInvocations(workspaceScope);
+
+    const visibleSurfaceOptions = useMemo(
+        () =>
+            workspaceScope === undefined
+                ? surfaceOptions
+                : surfaceOptions.filter((surfaceOption) => !NON_WORKSPACE_SURFACES.has(surfaceOption.value)),
+        [workspaceScope]
+    );
 
     return (
         <LayoutContainer
@@ -116,7 +127,7 @@ export const ToolInvocations = ({mcpServerOptions, workspaceScope}: ToolInvocati
                     <div className="flex flex-col space-y-2">
                         <Label>Surface</Label>
 
-                        <ComboBox items={surfaceOptions} onChange={handleSurfaceChange} value={filterSurface} />
+                        <ComboBox items={visibleSurfaceOptions} onChange={handleSurfaceChange} value={filterSurface} />
                     </div>
 
                     <div className="flex flex-col space-y-2">
