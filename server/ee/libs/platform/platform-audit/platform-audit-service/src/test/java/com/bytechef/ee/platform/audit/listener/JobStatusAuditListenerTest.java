@@ -11,7 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -97,6 +99,42 @@ class JobStatusAuditListenerTest {
 
         assertThat(persistentAuditEvent.getPlatform()).isNull();
         assertThat(persistentAuditEvent.getEventType()).isEqualTo("JOB_COMPLETED");
+    }
+
+    @Test
+    void testLaterStatusFillsInThePlatformOfTheCreatedEvent() {
+        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.EMBEDDED)).thenReturn(Optional.of(5L));
+
+        createListener().onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.STARTED));
+
+        verify(auditEventService).updateJobCreatedPlatform(eq(42L), eq(PlatformType.EMBEDDED), any());
+    }
+
+    @Test
+    void testCreatedEventDoesNotUpdateItself() {
+        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.AUTOMATION)).thenReturn(Optional.of(5L));
+
+        createListener().onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.CREATED));
+
+        verify(auditEventService, never()).updateJobCreatedPlatform(anyLong(), any(), any());
+    }
+
+    @Test
+    void testLaterStatusWithoutPlatformDoesNotUpdateTheCreatedEvent() {
+        createListener().onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.STARTED));
+
+        verify(auditEventService, never()).updateJobCreatedPlatform(anyLong(), any(), any());
+    }
+
+    @Test
+    void testFailingCreatedEventUpdateKeepsTheLaterStatusRow() {
+        when(principalJobService.fetchJobPrincipalId(42L, PlatformType.AUTOMATION)).thenReturn(Optional.of(5L));
+        doThrow(new IllegalStateException("database down")).when(auditEventService)
+            .updateJobCreatedPlatform(anyLong(), any(), any());
+
+        createListener().onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.COMPLETED));
+
+        assertThat(captureSavedEvent().getPlatform()).isEqualTo(PlatformType.AUTOMATION);
     }
 
     private JobStatusAuditListener createListener() {

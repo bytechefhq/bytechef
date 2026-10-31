@@ -148,6 +148,34 @@ public class PersistenceAuditEventRepositoryIntTest {
     }
 
     @Test
+    public void testUpdateJobCreatedPlatformFillsOnlyThatJobsRecentCreatedEventWithoutPlatform() {
+        LocalDateTime now = LocalDateTime.now();
+
+        save("SYSTEM", "JOB_CREATED", now, null, Map.of("jobId", "42"));
+        save("SYSTEM", "JOB_CREATED", now, null, Map.of("jobId", "43"));
+        save("SYSTEM", "JOB_STARTED", now, null, Map.of("jobId", "42"));
+        save("SYSTEM", "JOB_CREATED", now.minusDays(2), null, Map.of("jobId", "42"));
+        save("SYSTEM", "JOB_CREATED", now, PlatformType.AUTOMATION, Map.of("jobId", "42"));
+
+        int updated = persistenceAuditEventRepository.updateJobCreatedPlatform(
+            42L, PlatformType.EMBEDDED, now.minusDays(1));
+
+        assertThat(updated).isEqualTo(1);
+
+        List<PersistentAuditEvent> embeddedPersistentAuditEvents = persistenceAuditEventRepository.findAll()
+            .stream()
+            .filter(persistentAuditEvent -> persistentAuditEvent.getPlatform() == PlatformType.EMBEDDED)
+            .toList();
+
+        assertThat(embeddedPersistentAuditEvents).singleElement()
+            .satisfies(persistentAuditEvent -> {
+                assertThat(persistentAuditEvent.getEventType()).isEqualTo("JOB_CREATED");
+                assertThat(persistentAuditEvent.getData()).containsEntry("jobId", "42");
+                assertThat(persistentAuditEvent.getEventDate()).isAfter(now.minusDays(1));
+            });
+    }
+
+    @Test
     public void testFindAllFilteredBySearchMatchesPrincipalCaseInsensitively() {
         save("alice@example.com", "PERMISSION_CHECK", LocalDateTime.now());
         save("bob", "PERMISSION_CHECK", LocalDateTime.now());
