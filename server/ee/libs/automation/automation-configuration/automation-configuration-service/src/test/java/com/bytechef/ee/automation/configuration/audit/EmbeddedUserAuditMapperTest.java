@@ -59,6 +59,15 @@ class EmbeddedUserAuditMapperTest {
     }
 
     @Test
+    void testAddedWithACustomRoleRecordsTheCustomRole() {
+        Map<String, Object> arguments = arguments("userId", USER_ID, "embeddedRole", null, "customRoleId", 7L);
+
+        assertThat(
+            embeddedUserAuditMapper.map(invocation(EmbeddedUserAuditEvents.EMBEDDED_USER_ADDED, arguments, null)))
+                .containsExactlyInAnyOrderEntriesOf(Map.of("userId", "2", "role", "customRole:7"));
+    }
+
+    @Test
     void testAddedByEmailRecordsTheResolvedUserFromTheResult() {
         Map<String, Object> arguments = arguments("email", "jane@example.com", "embeddedRole", WorkspaceRole.EDITOR);
 

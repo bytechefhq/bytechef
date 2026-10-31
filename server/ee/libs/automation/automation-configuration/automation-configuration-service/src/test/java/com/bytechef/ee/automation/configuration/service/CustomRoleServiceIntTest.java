@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -31,6 +32,7 @@ import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
 import com.bytechef.ee.automation.configuration.facade.CustomRoleFacadeImpl;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
@@ -129,7 +131,7 @@ class CustomRoleServiceIntTest {
     @Test
     void testCustomRoleFacadeEnforcesCreateCustomRole() {
         assertThatThrownBy(
-            () -> customRoleFacade.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
+            () -> customRoleFacade.createCustomRole("r", "d", PermissionScopeSide.AUTOMATION, Set.of("WORKFLOW_VIEW")))
                 .isInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).isTenantAdmin();
@@ -143,7 +145,7 @@ class CustomRoleServiceIntTest {
         // Reaching validateScopeNames — which rejects the name against an empty registry — is what proves the tenant
         // admin got past the gate.
         assertThatThrownBy(
-            () -> customRoleFacade.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
+            () -> customRoleFacade.createCustomRole("r", "d", PermissionScopeSide.AUTOMATION, Set.of("WORKFLOW_VIEW")))
                 .isNotInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).isTenantAdmin();
@@ -160,7 +162,7 @@ class CustomRoleServiceIntTest {
 
     @Test
     void testCustomRoleFacadeEnforcesGetCustomRoles() {
-        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(null))
+        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(null, null))
             .isInstanceOf(AccessDeniedException.class);
 
         // The null-workspaceId tier is tenant-admin-only, and SpEL short-circuits the second disjunct because
@@ -173,10 +175,41 @@ class CustomRoleServiceIntTest {
     void testCustomRoleFacadeAllowsGetCustomRolesForATenantAdmin() {
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
-        assertThat(customRoleFacade.getCustomRoles(null)).isEmpty();
+        assertThat(customRoleFacade.getCustomRoles(null, null)).isEmpty();
 
         verify(permissionService).isTenantAdmin();
         verifyNoMoreInteractions(permissionService);
+    }
+
+    @Test
+    void testCustomRoleFacadeAllowsGetEmbeddedCustomRolesForAMemberViewer() {
+        when(permissionService.hasEmbeddedScope("EMBEDDED_VIEW")).thenReturn(true);
+
+        assertThat(customRoleFacade.getCustomRoles(null, PermissionScopeSide.EMBEDDED)).isEmpty();
+    }
+
+    @Test
+    void testCustomRoleFacadeAllowsGetEmbeddedCustomRolesForAMemberManagerOfOneEnvironment() {
+        when(permissionService.hasEmbeddedScope("EMBEDDED_MEMBER_MANAGE")).thenReturn(true);
+        when(permissionService.hasEmbeddedScopeInEveryEnvironment("EMBEDDED_MEMBER_MANAGE")).thenReturn(false);
+
+        assertThat(customRoleFacade.getCustomRoles(null, PermissionScopeSide.EMBEDDED)).isEmpty();
+    }
+
+    @Test
+    void testCustomRoleFacadeRefusesAutomationCustomRolesToAnEmbeddedMemberViewer() {
+        when(permissionService.hasEmbeddedScope("EMBEDDED_VIEW")).thenReturn(true);
+
+        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(null, PermissionScopeSide.AUTOMATION))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService, never()).hasEmbeddedScope("EMBEDDED_VIEW");
+    }
+
+    @Test
+    void testCustomRoleFacadeRefusesEmbeddedCustomRolesWithoutAnEmbeddedMemberScope() {
+        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(null, PermissionScopeSide.EMBEDDED))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     /**
@@ -186,7 +219,7 @@ class CustomRoleServiceIntTest {
      */
     @Test
     void testCustomRoleFacadeEnforcesGetCustomRolesForAWorkspace() {
-        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(WORKSPACE_ID))
+        assertThatThrownBy(() -> customRoleFacade.getCustomRoles(WORKSPACE_ID, null))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE);
@@ -197,7 +230,7 @@ class CustomRoleServiceIntTest {
     void testCustomRoleFacadeAllowsGetCustomRolesForAWorkspaceMemberManager() {
         when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE)).thenReturn(true);
 
-        assertThat(customRoleFacade.getCustomRoles(WORKSPACE_ID)).isEmpty();
+        assertThat(customRoleFacade.getCustomRoles(WORKSPACE_ID, null)).isEmpty();
 
         verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE);
         verifyNoMoreInteractions(permissionService);
@@ -274,7 +307,7 @@ class CustomRoleServiceIntTest {
 
         authenticateAsAnonymous();
 
-        assertThatThrownBy(() -> customRoleFacade.getPermissionScopeGroups())
+        assertThatThrownBy(() -> customRoleFacade.getPermissionScopeGroups(PermissionScopeSide.AUTOMATION))
             .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(permissionScopeRegistry, permissionService);
@@ -286,9 +319,10 @@ class CustomRoleServiceIntTest {
 
         reset(permissionScopeRegistry);
 
-        when(permissionScopeRegistry.getScopeGroups()).thenThrow(new IllegalStateException(BODY_REACHED));
+        when(permissionScopeRegistry.getScopeGroups(PermissionScopeSide.AUTOMATION))
+            .thenThrow(new IllegalStateException(BODY_REACHED));
 
-        assertThatThrownBy(() -> customRoleFacade.getPermissionScopeGroups())
+        assertThatThrownBy(() -> customRoleFacade.getPermissionScopeGroups(PermissionScopeSide.AUTOMATION))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage(BODY_REACHED);
 
