@@ -19,6 +19,32 @@ describe('parseWorkflowDefinition', () => {
         expect(workflow.triggers).toHaveLength(1);
     });
 
+    it('flattens tasks nested in task dispatchers so the canvas draws them', () => {
+        const workflow = parseWorkflowDefinition(
+            JSON.stringify({
+                tasks: [
+                    {
+                        name: 'condition_1',
+                        parameters: {
+                            caseFalse: [],
+                            caseTrue: [
+                                {
+                                    name: 'each_1',
+                                    parameters: {iteratee: {name: 'logger_1', type: 'logger/v1/info'}},
+                                    type: 'each/v1',
+                                },
+                            ],
+                        },
+                        type: 'condition/v1',
+                    },
+                    {name: 'http_1', type: 'http/v1/get'},
+                ],
+            })
+        );
+
+        expect(workflow.tasks!.map((task) => task.name)).toEqual(['condition_1', 'each_1', 'logger_1', 'http_1']);
+    });
+
     it('defaults tasks and triggers to empty arrays', () => {
         const workflow = parseWorkflowDefinition('{"label":"Empty"}');
 

@@ -1,3 +1,4 @@
+import getAllTasksRecursively from '@/pages/platform/workflow-editor/utils/getAllTasksRecursively';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 
 interface NamedTypeI {
@@ -32,6 +33,10 @@ function collectTypes(value: unknown, types: string[]) {
     Object.values(value).forEach((nestedValue) => collectTypes(nestedValue, types));
 }
 
+/**
+ * The canvas graph builder expects the flat task list the server returns for a workflow, so tasks nested in task
+ * dispatchers are lifted out of the raw definition here.
+ */
 export function parseWorkflowDefinition(definition: string): Workflow {
     const parsed = JSON.parse(definition);
 
@@ -39,7 +44,7 @@ export function parseWorkflowDefinition(definition: string): Workflow {
         definition,
         description: parsed.description,
         label: parsed.label,
-        tasks: parsed.tasks ?? [],
+        tasks: getAllTasksRecursively(parsed.tasks ?? []),
         triggers: parsed.triggers ?? [],
     } as Workflow;
 }
