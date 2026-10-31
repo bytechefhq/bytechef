@@ -21,6 +21,7 @@ import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -135,7 +136,7 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
     }
 
     @Test
-    void testWritesRecordsToMetadata() {
+    void testWritesRecordsWithoutTheirInputsAndOutputsToMetadata() {
         TaskExecution taskExecution = createTaskExecution("recordTwoCompletedCalls/v1");
 
         List<ClusterElementCallRef> refs = new CopyOnWriteArrayList<>();
@@ -170,9 +171,13 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
         ClusterElementCallRef secondRef = refs.get(1);
 
         assertEquals(firstRef.id(), firstRecord.id());
-        assertEquals("first", firstRecord.output());
+        assertEquals(ClusterElementCallRecord.Status.COMPLETED, firstRecord.status());
+        assertNull(firstRecord.input());
+        assertNull(firstRecord.output());
         assertEquals(secondRef.id(), secondRecord.id());
-        assertEquals("second", secondRecord.output());
+        assertEquals(ClusterElementCallRecord.Status.COMPLETED, secondRecord.status());
+        assertNull(secondRecord.input());
+        assertNull(secondRecord.output());
 
         Map<String, ?> metadata = completedTaskExecution.getMetadata();
 
@@ -238,8 +243,8 @@ class ClusterElementCallsTaskExecutionPostOutputProcessorIntTest {
 
         assertEquals("a", record.id());
         assertEquals(ClusterElementCallRecord.Status.COMPLETED, record.status());
-        assertEquals("stored input", record.input());
-        assertEquals("answer", record.output());
+        assertNull(record.input());
+        assertNull(record.output());
     }
 
     @Test

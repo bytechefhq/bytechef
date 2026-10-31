@@ -71,6 +71,7 @@ public class ClusterElementCallsTaskExecutionPostOutputProcessor implements Task
         taskExecution.putMetadata(
             TaskExecutionMetadataConstants.CLUSTER_ELEMENT_CALL_RECORDS,
             records.stream()
+                .map(ClusterElementCallRecord::withoutValues)
                 .map(ClusterElementCallRecord::toMap)
                 .toList());
     }
