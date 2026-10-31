@@ -24,14 +24,10 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
-import com.bytechef.platform.configuration.dto.VersionWorkflowChangeFactory;
-import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
-import com.bytechef.platform.configuration.dto.WorkflowChangeType;
-import com.bytechef.platform.configuration.dto.WorkflowDefinitionDiff;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWorkflowChangeService {
-
-    private static final Comparator<VersionWorkflowChangeSummary> SUMMARY_COMPARATOR = Comparator
-        .comparingInt((VersionWorkflowChangeSummary summary) -> changeTypeOrder(summary.changeType()))
-        .thenComparing(
-            VersionWorkflowChangeSummary::label, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+public class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWorkflowChangeService {
 
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -70,72 +61,34 @@ class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWorkflowC
 
     @Override
     public VersionWorkflowChanges getVersionWorkflowChanges(long projectId, int projectVersion) {
-        Project project = getProject(projectId, projectVersion);
+        Integer baseVersion = getBaseVersion(projectId, projectVersion);
 
-        Integer baseVersion = getBaseVersion(project, projectVersion);
-
-        Map<String, Workflow> oldWorkflows = getWorkflows(projectId, baseVersion);
-        Map<String, Workflow> newWorkflows = getWorkflows(projectId, projectVersion);
-
-        List<VersionWorkflowChangeSummary> summaries = new ArrayList<>();
-
-        for (String workflowUuid : getWorkflowUuids(oldWorkflows, newWorkflows)) {
-            Workflow oldWorkflow = oldWorkflows.get(workflowUuid);
-            Workflow newWorkflow = newWorkflows.get(workflowUuid);
-
-            WorkflowDefinitionDiff diff = workflowDefinitionDiffService.diff(oldWorkflow, newWorkflow);
-
-            if (diff.changeType() != WorkflowChangeType.UNCHANGED) {
-                summaries.add(VersionWorkflowChangeFactory.summary(workflowUuid, oldWorkflow, newWorkflow, diff));
-            }
-        }
-
-        summaries.sort(SUMMARY_COMPARATOR);
-
-        return new VersionWorkflowChanges(baseVersion, projectVersion, summaries);
+        return VersionWorkflowChangeCalculator.summarize(
+            baseVersion, projectVersion, getWorkflows(projectId, baseVersion), getWorkflows(projectId, projectVersion),
+            workflowDefinitionDiffService);
     }
 
     @Override
     public VersionWorkflowChange getVersionWorkflowChange(long projectId, int projectVersion, String workflowUuid) {
+        Integer baseVersion = getBaseVersion(projectId, projectVersion);
+
+        return VersionWorkflowChangeCalculator.fetchChange(
+            baseVersion, projectVersion, workflowUuid, getWorkflows(projectId, baseVersion),
+            getWorkflows(projectId, projectVersion), workflowDefinitionDiffService)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Workflow uuid=%s not found in project version v=%s".formatted(workflowUuid, projectVersion)));
+    }
+
+    private @Nullable Integer getBaseVersion(long projectId, int projectVersion) {
         Project project = getProject(projectId, projectVersion);
 
-        Integer baseVersion = getBaseVersion(project, projectVersion);
-
-        Workflow oldWorkflow = getWorkflows(projectId, baseVersion).get(workflowUuid);
-        Workflow newWorkflow = getWorkflows(projectId, projectVersion).get(workflowUuid);
-
-        if (oldWorkflow == null && newWorkflow == null) {
-            throw new IllegalArgumentException(
-                "Workflow uuid=%s not found in project version v=%s".formatted(workflowUuid, projectVersion));
-        }
-
-        WorkflowDefinitionDiff diff = workflowDefinitionDiffService.diff(oldWorkflow, newWorkflow);
-
-        return VersionWorkflowChangeFactory.change(
-            workflowUuid, baseVersion, projectVersion, oldWorkflow, newWorkflow, diff);
-    }
-
-    private static int changeTypeOrder(WorkflowChangeType changeType) {
-        return switch (changeType) {
-            case ADDED -> 0;
-            case MODIFIED -> 1;
-            case REMOVED -> 2;
-            case UNCHANGED -> 3;
-        };
-    }
-
-    private @Nullable Integer getBaseVersion(Project project, int projectVersion) {
-        Integer baseVersion = null;
+        List<Integer> versions = new ArrayList<>();
 
         for (ProjectVersion existingProjectVersion : project.getProjectVersions()) {
-            int version = existingProjectVersion.getVersion();
-
-            if (version < projectVersion && (baseVersion == null || version > baseVersion)) {
-                baseVersion = version;
-            }
+            versions.add(existingProjectVersion.getVersion());
         }
 
-        return baseVersion;
+        return VersionWorkflowChangeCalculator.resolveBaseVersion(versions, projectVersion);
     }
 
     private Project getProject(long projectId, int projectVersion) {
@@ -164,20 +117,5 @@ class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWorkflowC
         }
 
         return workflows;
-    }
-
-    private static List<String>
-        getWorkflowUuids(Map<String, Workflow> oldWorkflows, Map<String, Workflow> newWorkflows) {
-        Map<String, Boolean> workflowUuids = new LinkedHashMap<>();
-
-        for (String workflowUuid : oldWorkflows.keySet()) {
-            workflowUuids.put(workflowUuid, Boolean.TRUE);
-        }
-
-        for (String workflowUuid : newWorkflows.keySet()) {
-            workflowUuids.put(workflowUuid, Boolean.TRUE);
-        }
-
-        return new ArrayList<>(workflowUuids.keySet());
     }
 }
