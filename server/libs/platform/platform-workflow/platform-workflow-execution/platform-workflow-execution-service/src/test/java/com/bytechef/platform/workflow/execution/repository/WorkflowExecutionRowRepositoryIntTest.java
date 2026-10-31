@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -161,9 +162,10 @@ class WorkflowExecutionRowRepositoryIntTest {
                 "VALUES (?, ?, ?, 0, ?, 0, now(), 'system', now(), 'system', 0) RETURNING id",
             Long.class, workflowId, parentTaskExecutionId, Job.Status.COMPLETED.ordinal(), Timestamp.from(startDate));
 
-        principalJobRepository.save(new PrincipalJob(principalId, jobId, PlatformType.AUTOMATION));
+        principalJobRepository.save(
+            new PrincipalJob(principalId, Validate.notNull(jobId, "jobId"), PlatformType.AUTOMATION));
 
-        return jobId;
+        return Validate.notNull(jobId, "jobId");
     }
 
     private long saveTaskExecution(long jobId) {
@@ -174,7 +176,7 @@ class WorkflowExecutionRowRepositoryIntTest {
                 "VALUES (?, 0, 0, 0, 0, 0, '1s', 2, 0, '{}', 0, now(), 'system', now(), 'system') RETURNING id",
             Long.class, jobId);
 
-        return taskExecutionId;
+        return Validate.notNull(taskExecutionId, "taskExecutionId");
     }
 
     private long saveTriggerExecution(

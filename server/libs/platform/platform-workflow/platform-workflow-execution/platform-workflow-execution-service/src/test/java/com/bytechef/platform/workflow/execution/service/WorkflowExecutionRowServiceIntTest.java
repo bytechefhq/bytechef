@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,8 +109,8 @@ class WorkflowExecutionRowServiceIntTest {
                 "VALUES ('workflow-1', ?, 0, ?, 0, now(), 'system', now(), 'system', 0) RETURNING id",
             Long.class, status.ordinal(), Timestamp.from(NOW.plus(minutesAfterNow, ChronoUnit.MINUTES)));
 
-        principalJobRepository.save(new PrincipalJob(9L, jobId, type));
+        principalJobRepository.save(new PrincipalJob(9L, Validate.notNull(jobId, "jobId"), type));
 
-        return jobId;
+        return Validate.notNull(jobId, "jobId");
     }
 }
