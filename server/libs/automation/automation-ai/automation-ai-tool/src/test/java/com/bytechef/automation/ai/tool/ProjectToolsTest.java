@@ -173,7 +173,7 @@ class ProjectToolsTest {
             Project project = project(7L, WORKSPACE_ID);
 
             when(projectService.getWorkspaceProjectIds(WORKSPACE_ID,
-                EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+                EnumSet.allOf(ProjectOwner.class)))
                     .thenReturn(List.of(7L));
             when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project));
 
@@ -204,7 +204,7 @@ class ProjectToolsTest {
             resolveWorkspace(WORKSPACE_ID);
 
             when(projectService.getWorkspaceProjectIds(WORKSPACE_ID,
-                EnumSet.of(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)))
+                EnumSet.allOf(ProjectOwner.class)))
                     .thenReturn(List.of(7L));
             when(projectService.getProjects(List.of(7L))).thenReturn(List.of(project(7L, WORKSPACE_ID)));
 

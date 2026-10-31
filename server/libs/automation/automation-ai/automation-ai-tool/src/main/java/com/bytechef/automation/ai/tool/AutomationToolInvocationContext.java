@@ -27,6 +27,7 @@ public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nulla
 
     public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = "bytechef.automationTool.workspaceId";
     public static final String TOOL_CONTEXT_ENVIRONMENT_ID_KEY = "bytechef.automationTool.environmentId";
+    public static final String TOOL_CONTEXT_PROJECT_OWNER_KEY = "bytechef.automationTool.projectOwner";
 
     public static @Nullable AutomationToolInvocationContext fromToolContext(@Nullable ToolContext toolContext) {
         if (toolContext == null) {

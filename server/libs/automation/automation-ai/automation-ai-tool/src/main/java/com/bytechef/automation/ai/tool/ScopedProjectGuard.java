@@ -79,7 +79,8 @@ public class ScopedProjectGuard {
         if (scopedProjectId == null) {
             ProjectWorkspaceScope.checkWorkspaceWorkflow(
                 projectOwnershipService, projectService, projectWorkflowService, workflowId,
-                resolveWorkspaceId(workspaceId, toolContext, errorType), errorType);
+                resolveWorkspaceId(workspaceId, toolContext, errorType),
+                ProjectWorkspaceScope.getHiddenProjectOwners(toolContext), errorType);
 
             return;
         }
@@ -111,7 +112,8 @@ public class ScopedProjectGuard {
         if (scopedProjectId == null) {
             return ProjectWorkspaceScope.getWorkspaceProject(
                 projectService, projectOwnershipService, projectId,
-                resolveWorkspaceId(workspaceId, toolContext, errorType), errorType);
+                resolveWorkspaceId(workspaceId, toolContext, errorType),
+                ProjectWorkspaceScope.getHiddenProjectOwners(toolContext), errorType);
         }
 
         if (projectId != scopedProjectId) {
@@ -132,7 +134,7 @@ public class ScopedProjectGuard {
             return Set.copyOf(
                 projectService.getWorkspaceProjectIds(
                     resolveWorkspaceId(workspaceId, toolContext, errorType),
-                    ProjectWorkspaceScope.HIDDEN_PROJECT_OWNERS));
+                    ProjectWorkspaceScope.getHiddenProjectOwners(toolContext)));
         }
 
         return Set.of(scopedProjectId);
@@ -145,7 +147,8 @@ public class ScopedProjectGuard {
 
         if (scopedProjectId == null) {
             return ProjectWorkspaceScope.getWorkspaceProjects(
-                projectService, resolveWorkspaceId(workspaceId, toolContext, errorType));
+                projectService, resolveWorkspaceId(workspaceId, toolContext, errorType),
+                ProjectWorkspaceScope.getHiddenProjectOwners(toolContext));
         }
 
         return List.of(projectService.getProject(scopedProjectId));

@@ -72,6 +72,31 @@ class CopilotToolContextUtilsTest {
     }
 
     @Test
+    void testToToolContextCarriesTheDeclaredProjectOwner() {
+        Map<String, Object> stateMap = new HashMap<>();
+
+        stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, "7");
+        stateMap.put(CopilotConstants.STATE_PROJECT_OWNER, "EMBEDDED_AUTOMATION_WORKFLOW_PROJECT");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
+
+        assertThat(toolContext)
+            .containsEntry(
+                AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY, "EMBEDDED_AUTOMATION_WORKFLOW_PROJECT");
+    }
+
+    @Test
+    void testToToolContextOmitsTheProjectOwnerWhenTheRunDeclaresNone() {
+        Map<String, Object> stateMap = new HashMap<>();
+
+        stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, "7");
+
+        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
+
+        assertThat(toolContext).doesNotContainKey(AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY);
+    }
+
+    @Test
     void testToToolContextCarriesTheScopedProject() {
         Map<String, Object> stateMap = new HashMap<>();
 
