@@ -1,0 +1,8 @@
+billing:
+  enabled: true
+  stripe:
+    product-growth-id: prod_growth_test
+    product-starter-id: prod_starter_test
+    product-usage-id: prod_usage_test
+    secret-key: sk_test_abc
+    webhook-secret: whsec_test_webhook_secret
