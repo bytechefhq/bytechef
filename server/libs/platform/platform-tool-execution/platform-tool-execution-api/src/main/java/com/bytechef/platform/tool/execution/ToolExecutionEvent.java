@@ -16,25 +16,31 @@
 
 package com.bytechef.platform.tool.execution;
 
+import com.bytechef.platform.constant.PlatformType;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public record ToolExecutionEvent(
-    ToolExecutionSurface surface, ToolExecutionKind kind, String toolName, @Nullable String componentName,
-    @Nullable Integer componentVersion, @Nullable String operationName, @Nullable Long connectionId,
-    @Nullable Long workspaceId, @Nullable Long mcpServerId, @Nullable Long jobId, ToolExecutionOutcome outcome,
-    @Nullable String errorType, @Nullable String errorMessage, long durationMs) {
+    PlatformType type, ToolExecutionSurface surface, ToolExecutionKind kind, String toolName,
+    @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String operationName,
+    @Nullable Long connectionId, @Nullable Integer environment, @Nullable Long workspaceId,
+    @Nullable String externalUserId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
+    @Nullable Long mcpServerId, @Nullable Long jobId, ToolExecutionOutcome outcome, @Nullable String errorType,
+    @Nullable String errorMessage, long durationMs) {
 
     public static final int ERROR_MESSAGE_MAX_LENGTH = 512;
 
-    public static Builder builder(ToolExecutionSurface surface, ToolExecutionKind kind, String toolName) {
-        return new Builder(surface, kind, toolName);
+    public static Builder builder(
+        PlatformType type, ToolExecutionSurface surface, ToolExecutionKind kind, String toolName) {
+
+        return new Builder(type, surface, kind, toolName);
     }
 
     public static final class Builder {
 
+        private final PlatformType type;
         private final ToolExecutionSurface surface;
         private final ToolExecutionKind kind;
         private final String toolName;
@@ -43,7 +49,11 @@ public record ToolExecutionEvent(
         private @Nullable Integer componentVersion;
         private @Nullable String operationName;
         private @Nullable Long connectionId;
+        private @Nullable Integer environment;
         private @Nullable Long workspaceId;
+        private @Nullable String externalUserId;
+        private @Nullable Long connectedUserId;
+        private @Nullable Long integrationInstanceId;
         private @Nullable Long mcpServerId;
         private @Nullable Long jobId;
         private ToolExecutionOutcome outcome = ToolExecutionOutcome.SUCCESS;
@@ -51,7 +61,8 @@ public record ToolExecutionEvent(
         private @Nullable String errorMessage;
         private long durationMs;
 
-        private Builder(ToolExecutionSurface surface, ToolExecutionKind kind, String toolName) {
+        private Builder(PlatformType type, ToolExecutionSurface surface, ToolExecutionKind kind, String toolName) {
+            this.type = type;
             this.surface = surface;
             this.kind = kind;
             this.toolName = toolName;
@@ -81,8 +92,32 @@ public record ToolExecutionEvent(
             return this;
         }
 
+        public Builder environment(@Nullable Integer environment) {
+            this.environment = environment;
+
+            return this;
+        }
+
         public Builder workspaceId(@Nullable Long workspaceId) {
             this.workspaceId = workspaceId;
+
+            return this;
+        }
+
+        public Builder externalUserId(@Nullable String externalUserId) {
+            this.externalUserId = externalUserId;
+
+            return this;
+        }
+
+        public Builder connectedUserId(@Nullable Long connectedUserId) {
+            this.connectedUserId = connectedUserId;
+
+            return this;
+        }
+
+        public Builder integrationInstanceId(@Nullable Long integrationInstanceId) {
+            this.integrationInstanceId = integrationInstanceId;
 
             return this;
         }
@@ -129,8 +164,9 @@ public record ToolExecutionEvent(
 
         public ToolExecutionEvent build() {
             return new ToolExecutionEvent(
-                surface, kind, toolName, componentName, componentVersion, operationName, connectionId, workspaceId,
-                mcpServerId, jobId, outcome, errorType, errorMessage, durationMs);
+                type, surface, kind, toolName, componentName, componentVersion, operationName, connectionId,
+                environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId, jobId,
+                outcome, errorType, errorMessage, durationMs);
         }
     }
 }

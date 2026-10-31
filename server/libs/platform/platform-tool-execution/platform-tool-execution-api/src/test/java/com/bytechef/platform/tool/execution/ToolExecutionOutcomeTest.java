@@ -31,6 +31,8 @@ class ToolExecutionOutcomeTest {
         assertThat(Arrays.stream(ToolExecutionOutcome.values())
             .map(Enum::name)
             .toList())
-                .containsExactly("SUCCESS", "ERROR", "TIMEOUT");
+                .containsExactly(
+                    "SUCCESS", "ERROR", "CONNECTION_REQUIRED", "TIMEOUT", "APPROVAL_REQUIRED", "APPROVAL_DENIED",
+                    "RULE_BLOCKED");
     }
 }

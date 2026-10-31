@@ -31,6 +31,7 @@ class ToolExecutionSurfaceTest {
         assertThat(Arrays.stream(ToolExecutionSurface.values())
             .map(Enum::name)
             .toList())
-                .containsExactly("MCP_AUTOMATION");
+                .containsExactly(
+                    "MCP_AUTOMATION", "MCP_EMBEDDED", "MCP_MANAGEMENT", "EMBEDDED_API_ACTION", "EMBEDDED_API_TOOL");
     }
 }
