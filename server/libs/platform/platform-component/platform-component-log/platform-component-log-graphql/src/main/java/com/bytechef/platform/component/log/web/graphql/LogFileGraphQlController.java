@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -132,6 +133,8 @@ public class LogFileGraphQlController {
                     .toLowerCase()
                     .contains(filter.searchText()
                         .toLowerCase()))
+            .filter(entry -> filter.clusterElementCallId() == null ||
+                Objects.equals(filter.clusterElementCallId(), entry.clusterElementCallId()))
             .toList();
     }
 
@@ -141,7 +144,8 @@ public class LogFileGraphQlController {
         Long taskExecutionId,
         String fromTimestamp,
         String toTimestamp,
-        String searchText) {
+        String searchText,
+        String clusterElementCallId) {
     }
 
     @SuppressFBWarnings("EI")
