@@ -1,11 +1,13 @@
-import {CLUSTER_ELEMENT_NODE_WIDTH} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {memo, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {getFilteredClusterElementTypes} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import {
+    calculateNodeWidth,
+    getFilteredClusterElementTypes,
+} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -38,6 +40,50 @@ const ReadOnlyClusterElementNode = ({data}: {data: NodeDataType}) => {
         [nestedClusterRootComponentDefinition, data.clusterElementName, data.clusterElementType, data.operationName]
     );
 
+    if (data.isNestedClusterRoot) {
+        const nestedRootWidth = calculateNodeWidth(nestedClusterElementTypeNames.length);
+
+        return (
+            <div
+                className={twMerge(
+                    'relative flex min-h-18 items-center gap-4 rounded-2xl border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 px-6 text-primary [&_svg]:size-9',
+                    getTestNodeStateBorderClassName(testNodeState)
+                )}
+                data-nested-cluster-root
+                style={{width: `${nestedRootWidth}px`}}
+            >
+                {testNodeState && <WorkflowTestNodeStatus durationPlacement="top" testNodeState={testNodeState} />}
+
+                {data.icon ? data.icon : <ComponentIcon className="size-9 flex-none text-content-neutral-primary" />}
+
+                <div className="flex min-w-0 flex-col items-start overflow-hidden">
+                    <span className="w-full truncate font-semibold">{data.title || data.label}</span>
+
+                    {data.operationName && (
+                        <pre className="w-full truncate text-sm text-content-neutral-subtle">{data.operationName}</pre>
+                    )}
+
+                    <span className="w-full truncate text-xs text-content-neutral-secondary">
+                        {data.workflowNodeName}
+                    </span>
+                </div>
+
+                <Handle
+                    className={styles.handle}
+                    isConnectable={false}
+                    position={mapHandlePosition(Position.Top, layoutDirection)}
+                    type="target"
+                />
+
+                <ClusterSlotHandles
+                    clusterElementTypeNames={nestedClusterElementTypeNames}
+                    layoutDirection={layoutDirection}
+                    nodeWidth={nestedRootWidth}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col items-center">
             <div
@@ -55,12 +101,6 @@ const ReadOnlyClusterElementNode = ({data}: {data: NodeDataType}) => {
                     isConnectable={false}
                     position={mapHandlePosition(Position.Top, layoutDirection)}
                     type="target"
-                />
-
-                <ClusterSlotHandles
-                    clusterElementTypeNames={nestedClusterElementTypeNames}
-                    layoutDirection={layoutDirection}
-                    nodeWidth={CLUSTER_ELEMENT_NODE_WIDTH}
                 />
             </div>
 
