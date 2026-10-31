@@ -1,0 +1,9 @@
+{
+  "tasks": [ {
+    "name": "task_1",
+    "type": "noop/v1/noop"
+  }, {
+    "name": "task_2",
+    "type": "noop/v1/noop"
+  } ]
+}
