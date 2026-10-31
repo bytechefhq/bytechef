@@ -11,18 +11,27 @@ import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.service.TenantService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * An implementation of Spring Boot's AuditEventRepository.
@@ -49,13 +58,35 @@ public class CustomAuditEventRepository implements AuditEventRepository {
 
     private final AuditEventConverter auditEventConverter;
 
+    private final @Nullable TransactionTemplate requiresNewTransactionTemplate;
+
+    private final ObjectProvider<TenantService> tenantServiceProvider;
+
     private static final Logger log = LoggerFactory.getLogger(CustomAuditEventRepository.class);
 
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI"
+    })
     public CustomAuditEventRepository(
-        PersistenceAuditEventRepository persistenceAuditEventRepository, AuditEventConverter auditEventConverter) {
+        PersistenceAuditEventRepository persistenceAuditEventRepository, AuditEventConverter auditEventConverter,
+        ObjectProvider<TenantService> tenantServiceProvider,
+        ObjectProvider<PlatformTransactionManager> transactionManagerProvider) {
 
         this.persistenceAuditEventRepository = persistenceAuditEventRepository;
         this.auditEventConverter = auditEventConverter;
+        this.tenantServiceProvider = tenantServiceProvider;
+
+        PlatformTransactionManager transactionManager = transactionManagerProvider.getIfAvailable();
+
+        if (transactionManager == null) {
+            this.requiresNewTransactionTemplate = null;
+        } else {
+            TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+            transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+            this.requiresNewTransactionTemplate = transactionTemplate;
+        }
     }
 
     @Override
@@ -78,20 +109,68 @@ public class CustomAuditEventRepository implements AuditEventRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void add(AuditEvent event) {
-        if (!AUTHORIZATION_FAILURE.equals(event.getType()) && !ANONYMOUS_USER.equals(event.getPrincipal())) {
-            PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
+        if (AUTHORIZATION_FAILURE.equals(event.getType()) || ANONYMOUS_USER.equals(event.getPrincipal())) {
+            return;
+        }
 
-            persistentAuditEvent.setEventDate(LocalDateTimeUtils.toLocalDateTime(event.getTimestamp()));
-            persistentAuditEvent.setEventType(event.getType());
-            persistentAuditEvent.setPrincipal(StringUtils.truncate(event.getPrincipal(), PRINCIPAL_COLUMN_MAX_LENGTH));
+        PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
 
-            Map<String, String> eventData = auditEventConverter.convertDataToStrings(event.getData());
+        persistentAuditEvent.setEventDate(LocalDateTimeUtils.toLocalDateTime(event.getTimestamp()));
+        persistentAuditEvent.setEventType(event.getType());
+        persistentAuditEvent.setPrincipal(StringUtils.truncate(event.getPrincipal(), PRINCIPAL_COLUMN_MAX_LENGTH));
 
-            persistentAuditEvent.setData(truncate(eventData));
+        Map<String, String> eventData = auditEventConverter.convertDataToStrings(event.getData());
 
+        persistentAuditEvent.setData(truncate(eventData));
+
+        String tenantId = resolveTenantId(event.getPrincipal());
+
+        if (tenantId == null) {
+            save(persistentAuditEvent);
+        } else {
+            TenantContext.runWithTenantId(tenantId, () -> save(persistentAuditEvent));
+        }
+    }
+
+    private @Nullable String resolveTenantId(String principal) {
+        if (StringUtils.isBlank(principal) ||
+            !Objects.equals(TenantContext.getCurrentTenantId(), TenantContext.DEFAULT_TENANT_ID)) {
+
+            return null;
+        }
+
+        try {
+            TenantService tenantService = tenantServiceProvider.getIfAvailable();
+
+            if (tenantService == null || !tenantService.isMultiTenantEnabled()) {
+                return null;
+            }
+
+            EmailValidator emailValidator = EmailValidator.getInstance();
+
+            List<String> tenantIds = emailValidator.isValid(principal)
+                ? tenantService.getTenantIdsByUserEmail(principal)
+                : tenantService.getTenantIdsByUserLogin(principal.toLowerCase(Locale.ENGLISH));
+
+            if (tenantIds == null || tenantIds.isEmpty()) {
+                return null;
+            }
+
+            return tenantIds.getFirst();
+        } catch (RuntimeException exception) {
+            log.warn("Unable to resolve the tenant of an audit event principal", exception);
+
+            return null;
+        }
+    }
+
+    private void save(PersistentAuditEvent persistentAuditEvent) {
+        if (requiresNewTransactionTemplate == null) {
             persistenceAuditEventRepository.save(persistentAuditEvent);
+        } else {
+            requiresNewTransactionTemplate.executeWithoutResult(
+                transactionStatus -> persistenceAuditEventRepository.save(persistentAuditEvent));
         }
     }
 
