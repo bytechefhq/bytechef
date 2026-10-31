@@ -16,54 +16,81 @@
 
 package com.bytechef.platform.configuration.config;
 
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacadeImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.TypeExcludeFilter;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
+ * Loads the real platform-configuration services, facades and repositories against the Postgres Testcontainer. Use
+ * together with {@link PlatformConfigurationIntTestConfigurationSharedMocks}, which mocks the collaborators that live
+ * in other modules (component definitions, connections, component execution).
+ *
  * @author Matija Petanjek
  */
-@ComponentScan(basePackages = {
-    "com.bytechef.encryption",
-    "com.bytechef.platform.configuration",
-    "com.bytechef.platform.tag"
-}, excludeFilters = @ComponentScan.Filter(
-    type = FilterType.REGEX,
-    pattern = {
-        "com\\.bytechef\\.platform\\.configuration\\.facade\\..*",
-        "com\\.bytechef\\.platform\\.configuration\\.event\\..*",
-        "com\\.bytechef\\.platform\\.configuration\\.workflow\\..*"
-    }))
-@Import({
-    JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.encryption", "com.bytechef.platform.configuration"
+    },
+    excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
+@EnableAspectJAutoProxy
 @EnableAutoConfiguration
 @EnableCaching
+@EnableConfigurationProperties(ApplicationProperties.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class,
+    PlatformConfigurationIntTestConfiguration.PlatformConfigurationIntTestJdbcConfiguration.class,
+    PostgreSQLContainerConfiguration.class, WorkflowValidatorFacadeImpl.class
+})
 @Configuration
 public class PlatformConfigurationIntTestConfiguration {
 
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    Evaluator evaluator() {
+        return SpelEvaluator.create();
+    }
+
+    @Bean
+    WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
+
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
