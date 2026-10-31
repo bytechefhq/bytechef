@@ -504,6 +504,7 @@ export type AuditEventType = {
   eventType: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   outcome?: Maybe<AuditEventOutcome>;
+  platform?: Maybe<PlatformType>;
   principal: Scalars['String']['output'];
 };
 
@@ -3552,6 +3553,7 @@ export type QueryAuditEventsArgs = {
   eventType?: InputMaybe<Scalars['String']['input']>;
   fromDate?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+  platform?: InputMaybe<PlatformType>;
   search?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
