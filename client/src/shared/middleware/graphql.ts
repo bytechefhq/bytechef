@@ -668,6 +668,23 @@ export type ProjectTemplateQueryVariables = Exact<{
 
 export type ProjectTemplateQuery = { projectTemplate: { description: string | null, projectVersion: number | null, publicUrl: string | null, components: Array<{ key: string | null, value: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { componentName: string, version: number } | null } | null> }>, project: { name: string } | null, workflows: Array<{ id: string, label: string }> } | null };
 
+export type ProjectVersionWorkflowChangeQueryVariables = Exact<{
+  projectId: string | number;
+  projectVersion: number;
+  workflowUuid: string;
+}>;
+
+
+export type ProjectVersionWorkflowChangeQuery = { projectVersionWorkflowChange: { workflowUuid: string, label: string | null, changeType: Types.WorkflowChangeType, baseVersion: number | null, version: number, oldDefinition: string | null, newDefinition: string | null, changes: Array<{ kind: Types.WorkflowNodeChangeKind, target: Types.WorkflowNodeChangeTarget, name: string | null, type: string | null, label: string | null, parentPath: string | null, valueChanges: Array<{ path: string, oldValue: string | null, newValue: string | null }> }> } };
+
+export type ProjectVersionWorkflowChangesQueryVariables = Exact<{
+  projectId: string | number;
+  projectVersion: number;
+}>;
+
+
+export type ProjectVersionWorkflowChangesQuery = { projectVersionWorkflowChanges: { baseVersion: number | null, version: number, workflows: Array<{ workflowUuid: string, label: string | null, changeType: Types.WorkflowChangeType, changeCount: number }> } };
+
 export type SharedProjectQueryVariables = Exact<{
   projectUuid: string;
 }>;
@@ -1131,6 +1148,23 @@ export type AutomationWorkflowProjectTagsQueryVariables = Exact<{ [key: string]:
 
 export type AutomationWorkflowProjectTagsQuery = { automationWorkflowProjectTags: Array<{ id: string, name: string }> };
 
+export type AutomationWorkflowProjectVersionWorkflowChangeQueryVariables = Exact<{
+  id: string | number;
+  projectVersion: number;
+  workflowUuid: string;
+}>;
+
+
+export type AutomationWorkflowProjectVersionWorkflowChangeQuery = { automationWorkflowProjectVersionWorkflowChange: { workflowUuid: string, label: string | null, changeType: Types.WorkflowChangeType, baseVersion: number | null, version: number, oldDefinition: string | null, newDefinition: string | null, changes: Array<{ kind: Types.WorkflowNodeChangeKind, target: Types.WorkflowNodeChangeTarget, name: string | null, type: string | null, label: string | null, parentPath: string | null, valueChanges: Array<{ path: string, oldValue: string | null, newValue: string | null }> }> } };
+
+export type AutomationWorkflowProjectVersionWorkflowChangesQueryVariables = Exact<{
+  id: string | number;
+  projectVersion: number;
+}>;
+
+
+export type AutomationWorkflowProjectVersionWorkflowChangesQuery = { automationWorkflowProjectVersionWorkflowChanges: { baseVersion: number | null, version: number, workflows: Array<{ workflowUuid: string, label: string | null, changeType: Types.WorkflowChangeType, changeCount: number }> } };
+
 export type AutomationWorkflowProjectVersionsQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -1397,6 +1431,23 @@ export type EnableConnectedUserProjectWorkflowMutationVariables = Exact<{
 
 
 export type EnableConnectedUserProjectWorkflowMutation = { enableConnectedUserProjectWorkflow: boolean | null };
+
+export type IntegrationVersionWorkflowChangeQueryVariables = Exact<{
+  integrationId: string | number;
+  integrationVersion: number;
+  workflowUuid: string;
+}>;
+
+
+export type IntegrationVersionWorkflowChangeQuery = { integrationVersionWorkflowChange: { workflowUuid: string, label: string | null, changeType: Types.WorkflowChangeType, baseVersion: number | null, version: number, oldDefinition: string | null, newDefinition: string | null, changes: Array<{ kind: Types.WorkflowNodeChangeKind, target: Types.WorkflowNodeChangeTarget, name: string | null, type: string | null, label: string | null, parentPath: string | null, valueChanges: Array<{ path: string, oldValue: string | null, newValue: string | null }> }> } };
+
+export type IntegrationVersionWorkflowChangesQueryVariables = Exact<{
+  integrationId: string | number;
+  integrationVersion: number;
+}>;
+
+
+export type IntegrationVersionWorkflowChangesQuery = { integrationVersionWorkflowChanges: { baseVersion: number | null, version: number, workflows: Array<{ workflowUuid: string, label: string | null, changeType: Types.WorkflowChangeType, changeCount: number }> } };
 
 export type IntegrationWorkflowsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4718,6 +4769,87 @@ export const useProjectTemplateQuery = <
   }
     )};
 
+export const ProjectVersionWorkflowChangeDocument = new TypedDocumentString(`
+    query projectVersionWorkflowChange($projectId: ID!, $projectVersion: Int!, $workflowUuid: String!) {
+  projectVersionWorkflowChange(
+    projectId: $projectId
+    projectVersion: $projectVersion
+    workflowUuid: $workflowUuid
+  ) {
+    workflowUuid
+    label
+    changeType
+    baseVersion
+    version
+    oldDefinition
+    newDefinition
+    changes {
+      kind
+      target
+      name
+      type
+      label
+      parentPath
+      valueChanges {
+        path
+        oldValue
+        newValue
+      }
+    }
+  }
+}
+    `);
+
+export const useProjectVersionWorkflowChangeQuery = <
+      TData = ProjectVersionWorkflowChangeQuery,
+      TError = unknown
+    >(
+      variables: ProjectVersionWorkflowChangeQueryVariables,
+      options?: Omit<UseQueryOptions<ProjectVersionWorkflowChangeQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectVersionWorkflowChangeQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProjectVersionWorkflowChangeQuery, TError, TData>(
+      {
+    queryKey: ['projectVersionWorkflowChange', variables],
+    queryFn: fetcher<ProjectVersionWorkflowChangeQuery, ProjectVersionWorkflowChangeQueryVariables>(ProjectVersionWorkflowChangeDocument, variables),
+    ...options
+  }
+    )};
+
+export const ProjectVersionWorkflowChangesDocument = new TypedDocumentString(`
+    query projectVersionWorkflowChanges($projectId: ID!, $projectVersion: Int!) {
+  projectVersionWorkflowChanges(
+    projectId: $projectId
+    projectVersion: $projectVersion
+  ) {
+    baseVersion
+    version
+    workflows {
+      workflowUuid
+      label
+      changeType
+      changeCount
+    }
+  }
+}
+    `);
+
+export const useProjectVersionWorkflowChangesQuery = <
+      TData = ProjectVersionWorkflowChangesQuery,
+      TError = unknown
+    >(
+      variables: ProjectVersionWorkflowChangesQueryVariables,
+      options?: Omit<UseQueryOptions<ProjectVersionWorkflowChangesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectVersionWorkflowChangesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProjectVersionWorkflowChangesQuery, TError, TData>(
+      {
+    queryKey: ['projectVersionWorkflowChanges', variables],
+    queryFn: fetcher<ProjectVersionWorkflowChangesQuery, ProjectVersionWorkflowChangesQueryVariables>(ProjectVersionWorkflowChangesDocument, variables),
+    ...options
+  }
+    )};
+
 export const SharedProjectDocument = new TypedDocumentString(`
     query sharedProject($projectUuid: String!) {
   sharedProject(projectUuid: $projectUuid) {
@@ -6323,6 +6455,87 @@ export const useAutomationWorkflowProjectTagsQuery = <
   }
     )};
 
+export const AutomationWorkflowProjectVersionWorkflowChangeDocument = new TypedDocumentString(`
+    query automationWorkflowProjectVersionWorkflowChange($id: ID!, $projectVersion: Int!, $workflowUuid: String!) {
+  automationWorkflowProjectVersionWorkflowChange(
+    id: $id
+    projectVersion: $projectVersion
+    workflowUuid: $workflowUuid
+  ) {
+    workflowUuid
+    label
+    changeType
+    baseVersion
+    version
+    oldDefinition
+    newDefinition
+    changes {
+      kind
+      target
+      name
+      type
+      label
+      parentPath
+      valueChanges {
+        path
+        oldValue
+        newValue
+      }
+    }
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectVersionWorkflowChangeQuery = <
+      TData = AutomationWorkflowProjectVersionWorkflowChangeQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectVersionWorkflowChangeQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectVersionWorkflowChangeQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectVersionWorkflowChangeQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectVersionWorkflowChangeQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectVersionWorkflowChange', variables],
+    queryFn: fetcher<AutomationWorkflowProjectVersionWorkflowChangeQuery, AutomationWorkflowProjectVersionWorkflowChangeQueryVariables>(AutomationWorkflowProjectVersionWorkflowChangeDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationWorkflowProjectVersionWorkflowChangesDocument = new TypedDocumentString(`
+    query automationWorkflowProjectVersionWorkflowChanges($id: ID!, $projectVersion: Int!) {
+  automationWorkflowProjectVersionWorkflowChanges(
+    id: $id
+    projectVersion: $projectVersion
+  ) {
+    baseVersion
+    version
+    workflows {
+      workflowUuid
+      label
+      changeType
+      changeCount
+    }
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectVersionWorkflowChangesQuery = <
+      TData = AutomationWorkflowProjectVersionWorkflowChangesQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectVersionWorkflowChangesQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectVersionWorkflowChangesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectVersionWorkflowChangesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectVersionWorkflowChangesQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectVersionWorkflowChanges', variables],
+    queryFn: fetcher<AutomationWorkflowProjectVersionWorkflowChangesQuery, AutomationWorkflowProjectVersionWorkflowChangesQueryVariables>(AutomationWorkflowProjectVersionWorkflowChangesDocument, variables),
+    ...options
+  }
+    )};
+
 export const AutomationWorkflowProjectVersionsDocument = new TypedDocumentString(`
     query automationWorkflowProjectVersions($id: ID!) {
   automationWorkflowProjectVersions(id: $id) {
@@ -7223,6 +7436,87 @@ export const useEnableConnectedUserProjectWorkflowMutation = <
       {
     mutationKey: ['enableConnectedUserProjectWorkflow'],
     mutationFn: (variables?: EnableConnectedUserProjectWorkflowMutationVariables) => fetcher<EnableConnectedUserProjectWorkflowMutation, EnableConnectedUserProjectWorkflowMutationVariables>(EnableConnectedUserProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const IntegrationVersionWorkflowChangeDocument = new TypedDocumentString(`
+    query integrationVersionWorkflowChange($integrationId: ID!, $integrationVersion: Int!, $workflowUuid: String!) {
+  integrationVersionWorkflowChange(
+    integrationId: $integrationId
+    integrationVersion: $integrationVersion
+    workflowUuid: $workflowUuid
+  ) {
+    workflowUuid
+    label
+    changeType
+    baseVersion
+    version
+    oldDefinition
+    newDefinition
+    changes {
+      kind
+      target
+      name
+      type
+      label
+      parentPath
+      valueChanges {
+        path
+        oldValue
+        newValue
+      }
+    }
+  }
+}
+    `);
+
+export const useIntegrationVersionWorkflowChangeQuery = <
+      TData = IntegrationVersionWorkflowChangeQuery,
+      TError = unknown
+    >(
+      variables: IntegrationVersionWorkflowChangeQueryVariables,
+      options?: Omit<UseQueryOptions<IntegrationVersionWorkflowChangeQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationVersionWorkflowChangeQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<IntegrationVersionWorkflowChangeQuery, TError, TData>(
+      {
+    queryKey: ['integrationVersionWorkflowChange', variables],
+    queryFn: fetcher<IntegrationVersionWorkflowChangeQuery, IntegrationVersionWorkflowChangeQueryVariables>(IntegrationVersionWorkflowChangeDocument, variables),
+    ...options
+  }
+    )};
+
+export const IntegrationVersionWorkflowChangesDocument = new TypedDocumentString(`
+    query integrationVersionWorkflowChanges($integrationId: ID!, $integrationVersion: Int!) {
+  integrationVersionWorkflowChanges(
+    integrationId: $integrationId
+    integrationVersion: $integrationVersion
+  ) {
+    baseVersion
+    version
+    workflows {
+      workflowUuid
+      label
+      changeType
+      changeCount
+    }
+  }
+}
+    `);
+
+export const useIntegrationVersionWorkflowChangesQuery = <
+      TData = IntegrationVersionWorkflowChangesQuery,
+      TError = unknown
+    >(
+      variables: IntegrationVersionWorkflowChangesQueryVariables,
+      options?: Omit<UseQueryOptions<IntegrationVersionWorkflowChangesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationVersionWorkflowChangesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<IntegrationVersionWorkflowChangesQuery, TError, TData>(
+      {
+    queryKey: ['integrationVersionWorkflowChanges', variables],
+    queryFn: fetcher<IntegrationVersionWorkflowChangesQuery, IntegrationVersionWorkflowChangesQueryVariables>(IntegrationVersionWorkflowChangesDocument, variables),
     ...options
   }
     )};

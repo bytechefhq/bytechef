@@ -3254,6 +3254,8 @@ export type Query = {
   automationWorkflowProjectConfigurationWorkflowProvidableValues: AutomationWorkflowProjectConfigurationWorkflowProvidableValues;
   automationWorkflowProjectConfigurations: Array<AutomationWorkflowProjectConfiguration>;
   automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
+  automationWorkflowProjectVersionWorkflowChange: VersionWorkflowChange;
+  automationWorkflowProjectVersionWorkflowChanges: VersionWorkflowChanges;
   automationWorkflowProjectVersions: Array<AutomationWorkflowProjectVersion>;
   automationWorkflowProjects: Array<AutomationWorkflowProject>;
   clusterElementComponentConnections: Array<ComponentConnection>;
@@ -3300,6 +3302,8 @@ export type Query = {
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
+  integrationVersionWorkflowChange: VersionWorkflowChange;
+  integrationVersionWorkflowChanges: VersionWorkflowChanges;
   integrationWorkflows: Array<IntegrationWorkflow>;
   integrationWorkflowsByIntegrationId: Array<IntegrationWorkflow>;
   jobFileLogs: LogPage;
@@ -3345,6 +3349,8 @@ export type Query = {
   project?: Maybe<Project>;
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectTemplate?: Maybe<ProjectTemplate>;
+  projectVersionWorkflowChange: VersionWorkflowChange;
+  projectVersionWorkflowChanges: VersionWorkflowChanges;
   projects?: Maybe<Array<Maybe<Project>>>;
   provisionableConnectedUserMcpServers: Array<ProvisionableConnectedUserMcpServer>;
   provisionableConnectedUserProjects: Array<ProvisionableConnectedUserProject>;
@@ -3578,6 +3584,19 @@ export type QueryAutomationWorkflowProjectConfigurationWorkflowProvidableValuesA
 
 export type QueryAutomationWorkflowProjectConfigurationsArgs = {
   projectId: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectVersionWorkflowChangeArgs = {
+  id: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  workflowUuid: Scalars['String']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectVersionWorkflowChangesArgs = {
+  id: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
 };
 
 
@@ -3829,6 +3848,19 @@ export type QueryIdentityProviderArgs = {
 };
 
 
+export type QueryIntegrationVersionWorkflowChangeArgs = {
+  integrationId: Scalars['ID']['input'];
+  integrationVersion: Scalars['Int']['input'];
+  workflowUuid: Scalars['String']['input'];
+};
+
+
+export type QueryIntegrationVersionWorkflowChangesArgs = {
+  integrationId: Scalars['ID']['input'];
+  integrationVersion: Scalars['Int']['input'];
+};
+
+
 export type QueryIntegrationWorkflowsByIntegrationIdArgs = {
   integrationId: Scalars['ID']['input'];
 };
@@ -4009,6 +4041,19 @@ export type QueryProjectDeploymentWorkflowArgs = {
 export type QueryProjectTemplateArgs = {
   id: Scalars['String']['input'];
   sharedProject: Scalars['Boolean']['input'];
+};
+
+
+export type QueryProjectVersionWorkflowChangeArgs = {
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  workflowUuid: Scalars['String']['input'];
+};
+
+
+export type QueryProjectVersionWorkflowChangesArgs = {
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
 };
 
 
@@ -4478,6 +4523,33 @@ export type UpdateRowInput = {
   values: Scalars['Map']['input'];
 };
 
+export type VersionWorkflowChange = {
+  __typename?: 'VersionWorkflowChange';
+  baseVersion?: Maybe<Scalars['Int']['output']>;
+  changeType: WorkflowChangeType;
+  changes: Array<WorkflowDefinitionChange>;
+  label?: Maybe<Scalars['String']['output']>;
+  newDefinition?: Maybe<Scalars['String']['output']>;
+  oldDefinition?: Maybe<Scalars['String']['output']>;
+  version: Scalars['Int']['output'];
+  workflowUuid: Scalars['String']['output'];
+};
+
+export type VersionWorkflowChangeSummary = {
+  __typename?: 'VersionWorkflowChangeSummary';
+  changeCount: Scalars['Int']['output'];
+  changeType: WorkflowChangeType;
+  label?: Maybe<Scalars['String']['output']>;
+  workflowUuid: Scalars['String']['output'];
+};
+
+export type VersionWorkflowChanges = {
+  __typename?: 'VersionWorkflowChanges';
+  baseVersion?: Maybe<Scalars['Int']['output']>;
+  version: Scalars['Int']['output'];
+  workflows: Array<VersionWorkflowChangeSummary>;
+};
+
 export type Workflow = {
   __typename?: 'Workflow';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -4492,6 +4564,13 @@ export type Workflow = {
   version?: Maybe<Scalars['Int']['output']>;
 };
 
+export enum WorkflowChangeType {
+  Added = 'ADDED',
+  Modified = 'MODIFIED',
+  Removed = 'REMOVED',
+  Unchanged = 'UNCHANGED'
+}
+
 export type WorkflowConfigurationInput = {
   connections?: InputMaybe<Array<WorkflowConnectionInput>>;
   inputs?: InputMaybe<Scalars['Map']['input']>;
@@ -4502,6 +4581,24 @@ export type WorkflowConnectionInput = {
   connectionId: Scalars['ID']['input'];
   workflowConnectionKey: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+export type WorkflowDefinitionChange = {
+  __typename?: 'WorkflowDefinitionChange';
+  kind: WorkflowNodeChangeKind;
+  label?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  parentPath?: Maybe<Scalars['String']['output']>;
+  target: WorkflowNodeChangeTarget;
+  type?: Maybe<Scalars['String']['output']>;
+  valueChanges: Array<WorkflowDefinitionValueChange>;
+};
+
+export type WorkflowDefinitionValueChange = {
+  __typename?: 'WorkflowDefinitionValueChange';
+  newValue?: Maybe<Scalars['String']['output']>;
+  oldValue?: Maybe<Scalars['String']['output']>;
+  path: Scalars['String']['output'];
 };
 
 export type WorkflowInfo = {
@@ -4527,6 +4624,22 @@ export enum WorkflowIssueKind {
 export enum WorkflowIssueSeverity {
   Error = 'ERROR',
   Warning = 'WARNING'
+}
+
+export enum WorkflowNodeChangeKind {
+  Added = 'ADDED',
+  Modified = 'MODIFIED',
+  Moved = 'MOVED',
+  Removed = 'REMOVED'
+}
+
+export enum WorkflowNodeChangeTarget {
+  ClusterElement = 'CLUSTER_ELEMENT',
+  Input = 'INPUT',
+  Output = 'OUTPUT',
+  Task = 'TASK',
+  Trigger = 'TRIGGER',
+  Workflow = 'WORKFLOW'
 }
 
 export type WorkflowNodeTestOutputResult = {
