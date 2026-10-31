@@ -7,6 +7,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     McpComponent,
     useDeleteEmbeddedMcpComponentMutation,
@@ -25,7 +28,14 @@ interface McpComponentListItemDropDownProps {
 const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}: McpComponentListItemDropDownProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditWorkspaceMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+    const canEditEmbeddedMcpServer = useHasEmbeddedScope('MCP_EDIT');
+
     const queryClient = useQueryClient();
+
+    const canEditMcpServer = embedded ? canEditEmbeddedMcpServer : canEditWorkspaceMcpServer;
 
     const handleDeleteSuccess = () => {
         void queryClient.invalidateQueries({
@@ -61,11 +71,21 @@ const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}:
         }
     };
 
+    if (!canEditMcpServer) {
+        return null;
+    }
+
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button className="relative z-10" icon={<EllipsisVerticalIcon />} size="iconSm" variant="ghost" />
+                    <Button
+                        aria-label="MCP Component Actions"
+                        className="relative z-10"
+                        icon={<EllipsisVerticalIcon />}
+                        size="iconSm"
+                        variant="ghost"
+                    />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">

@@ -8,8 +8,10 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.bytechef.ee.automation.configuration.config.EmbeddedOwnerContributorsTestConfiguration;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.callback.UserCallback;
 import com.bytechef.platform.user.repository.AuthorityRepository;
@@ -17,12 +19,14 @@ import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.service.UserServiceImpl;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.OptionalLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -47,7 +51,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = CurrentUserResolverIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(
+    classes = CurrentUserResolverIntTest.Config.class,
+    properties = {
+        "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
+    })
 @Import(PostgreSQLContainerConfiguration.class)
 class CurrentUserResolverIntTest {
 
@@ -120,6 +128,11 @@ class CurrentUserResolverIntTest {
         }
 
         @Bean
+        Encryption encryption() {
+            return mock(Encryption.class);
+        }
+
+        @Bean
         PasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder();
         }
@@ -127,10 +140,12 @@ class CurrentUserResolverIntTest {
         @Bean
         UserService userService(
             AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-            PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+            PersistentTokenRepository persistentTokenRepository, UserRepository userRepository,
+            ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider) {
 
             return new UserServiceImpl(
-                authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository);
+                authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository,
+                workspaceMembershipAssignerProvider);
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

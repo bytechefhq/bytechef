@@ -12,6 +12,7 @@ import static com.bytechef.file.storage.base64.service.Base64FileStorageService.
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.execution.facade.ActionFacade;
 import com.bytechef.ee.embedded.execution.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
@@ -58,6 +59,8 @@ public class ActionApiController implements ActionApi {
     public ResponseEntity<Object> executeAction(
         String externalUserId, String componentName, Integer componentVersion, String actionName,
         ExecuteActionRequestModel executeActionRequestModel, EnvironmentModel xEnvironment, Long xInstanceId) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 

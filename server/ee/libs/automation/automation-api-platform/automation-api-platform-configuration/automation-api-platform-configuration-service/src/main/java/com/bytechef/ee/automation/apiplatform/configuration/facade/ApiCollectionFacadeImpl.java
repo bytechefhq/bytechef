@@ -33,6 +33,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -104,7 +105,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#apiCollectionDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasResourceScopeInEnvironment(#apiCollectionDTO.projectId, 'Project', 'API_PLATFORM_CREATE', " +
+        "#apiCollectionDTO.environment)")
     public ApiCollectionDTO createApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 
@@ -130,6 +132,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.apiCollectionId, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public ApiCollectionEndpointDTO createApiCollectionEndpoint(
         ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
 
@@ -162,6 +165,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollection', 'API_PLATFORM_DELETE')")
     public void deleteApiCollection(long id) {
         ApiCollection apiCollection = apiCollectionService.getApiCollection(id);
 
@@ -170,15 +174,30 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         }
 
         apiCollectionService.delete(id);
-        projectDeploymentFacade.deleteProjectDeployment(apiCollection.getProjectDeploymentId());
+
+        SecurityUtils.runAsSystem(() -> {
+            projectDeploymentFacade.deleteProjectDeployment(apiCollection.getProjectDeploymentId());
+
+            return null;
+        });
+    }
+
+    // Removing one endpoint changes the collection, so it takes the edit scope; deleteApiCollection removes every
+    // endpoint through the service directly and needs only the delete scope.
+    @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
+    public void deleteApiCollectionEndpoint(long id) {
+        apiCollectionEndpointService.delete(id);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollection', 'API_PLATFORM_VIEW')")
     public ApiCollectionDTO getApiCollection(long id) {
         return toApiCollectionDTO(apiCollectionService.getApiCollection(id));
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'API_PLATFORM_VIEW', #environmentId)")
     public List<ApiCollectionDTO> getApiCollections(
         long workspaceId, Long environmentId, Long projectId, Long tagId) {
 
@@ -190,9 +209,11 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
             .toList();
     }
 
+    // Scoped to one workspace.
     @Override
-    public List<Tag> getApiCollectionTags() {
-        List<ApiCollection> apiCollections = apiCollectionService.getApiCollections(null, null, null, null);
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_PLATFORM_VIEW')")
+    public List<Tag> getApiCollectionTags(long workspaceId) {
+        List<ApiCollection> apiCollections = apiCollectionService.getApiCollections(workspaceId, null, null, null);
 
         return tagService.getTags(
             apiCollections.stream()
@@ -202,6 +223,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollection', 'API_PLATFORM_VIEW')")
     public String getOpenApiSpecification(long id) {
         ApiCollection apiCollection = apiCollectionService.getApiCollection(id);
 
@@ -256,11 +278,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_PLATFORM_VIEW')")
     public List<Project> getWorkspaceProjects(long workspaceId) {
         return projectService.getProjects(apiCollectionService.getApiCollectionProjectIds(workspaceId));
     }
 
     @Override
+    @PreAuthorize("hasPermission(#apiCollectionDTO.id, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 
@@ -273,7 +297,10 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         return toApiCollectionDTO(apiCollectionService.update(apiCollection));
     }
 
+    // Keyed on the endpoint id, whose collection is read from the stored row: the update writes by id and ignores the
+    // collection id in the request, so a guard on that id would check a collection the write never touches.
     @Override
+    @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
     public ApiCollectionEndpointDTO updateApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
         ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointDTO.toApiCollectionEndpoint();
 
@@ -283,6 +310,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public void updateApiCollectionTags(long id, List<Tag> tags) {
         tags = checkTags(tags);
 

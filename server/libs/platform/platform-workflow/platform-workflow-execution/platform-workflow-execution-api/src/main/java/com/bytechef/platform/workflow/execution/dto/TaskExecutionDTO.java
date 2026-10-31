@@ -101,6 +101,34 @@ public record TaskExecutionDTO(
         return isTaskDispatcherType(type, "on-error");
     }
 
+    public TaskExecutionDTO withoutDetails() {
+        return new TaskExecutionDTO(
+            createdBy, createdDate, endDate, null, executionTime, icon, id, null, jobId, lastModifiedBy,
+            lastModifiedDate, maxRetries, null, parentId, priority, progress, retryAttempts, retryDelay,
+            retryDelayFactor, retryDelayMillis, startDate, status, taskNumber, title, type, workflowTask,
+            children == null ? null : children.stream()
+                .map(TaskExecutionDTO::withoutDetails)
+                .toList(),
+            iterations == null ? null : iterations.stream()
+                .map(iteration -> iteration.stream()
+                    .map(TaskExecutionDTO::withoutDetails)
+                    .toList())
+                .toList(),
+            childJob == null ? null : childJob.withoutDetails(), childCount,
+            clusterElementCalls == null ? null : clusterElementCalls.stream()
+                .map(clusterElementCall -> new ClusterElementCallDTO(
+                    clusterElementCall.name(), clusterElementCall.status(), clusterElementCall.startDate(),
+                    clusterElementCall.endDate(), null))
+                .toList(),
+            clusterElementCallRecords == null ? null : clusterElementCallRecords.stream()
+                .map(clusterElementCallRecord -> new ClusterElementCallRecordDTO(
+                    clusterElementCallRecord.id(), clusterElementCallRecord.parentId(),
+                    clusterElementCallRecord.workflowNodeName(), clusterElementCallRecord.componentName(),
+                    clusterElementCallRecord.toolName(), clusterElementCallRecord.status(),
+                    clusterElementCallRecord.startDate(), clusterElementCallRecord.endDate(), null, null, null))
+                .toList());
+    }
+
     public static List<TaskExecutionDTO> buildHierarchy(List<TaskExecutionDTO> taskExecutionDTOS) {
         if (taskExecutionDTOS == null || taskExecutionDTOS.isEmpty()) {
             return List.of();

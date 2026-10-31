@@ -38,6 +38,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
@@ -403,8 +404,11 @@ class ConnectedUserIntegrationFacadeIntTest {
                     new McpIntegrationInstanceConfiguration(
                         MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, integrationInstanceConfigurationId,
                         MCP_SERVER_ID)));
-        when(mcpServerService.getMcpServer(MCP_SERVER_ID))
-            .thenReturn(new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
+        McpServer mcpServer = new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true);
+
+        mcpServer.setId(MCP_SERVER_ID);
+
+        when(mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)).thenReturn(List.of(mcpServer));
         when(mcpIntegrationInstanceConfigurationWorkflowService
             .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                 MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID))
@@ -1638,13 +1642,18 @@ class ConnectedUserIntegrationFacadeIntTest {
             }
 
             @Test
-            void testTenantAdminProvisionsThroughTheGuardedChain() {
+            void testAMemberWithTheConnectedUserScopesProvisionsThroughTheGuardedChain() {
                 SecurityContextHolder.getContext()
                     .setAuthentication(
                         new UsernamePasswordAuthenticationToken(
-                            "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+                            "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-                when(permissionService.isTenantAdmin()).thenReturn(true);
+                when(permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_VIEW"))
+                    .thenReturn(true);
+                when(permissionService.hasResourceScope(connectedUserId, "ConnectedUser", "CONNECTED_USER_MANAGE"))
+                    .thenReturn(true);
+                when(permissionService.hasResourceScope(anyLong(), eq("IntegrationInstance"), anyString()))
+                    .thenReturn(true);
 
                 assertThat(integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId))
                     .extracting(integration -> integration.integration()
@@ -1699,8 +1708,12 @@ class ConnectedUserIntegrationFacadeIntTest {
                     @Lazy PermissionService permissionService,
                     ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-                    return new AutomationMethodSecurityExpressionHandler(
+                    AutomationMethodSecurityExpressionHandler handler = new AutomationMethodSecurityExpressionHandler(
                         permissionService, methodSecurityExpressionContributorProvider);
+
+                    handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+                    return handler;
                 }
             }
         }

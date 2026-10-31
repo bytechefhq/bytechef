@@ -1,9 +1,4 @@
-import {
-    ApprovalTask,
-    useApprovalTasksQuery,
-    useUpdateApprovalTaskMutation,
-    useUsersQuery,
-} from '@/shared/middleware/graphql';
+import {ApprovalTask, useApprovalTasksQuery, useUpdateApprovalTaskMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useCallback, useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/shallow';
@@ -19,6 +14,7 @@ import {
     toServerPriority,
     toServerStatus,
 } from '../utils/approval-task-utils';
+import {useApprovalTaskAssigneeUsers} from './useApprovalTaskAssigneeUsers';
 
 import type {ApprovalTaskAttachmentI, ApprovalTaskCommentI, ApprovalTaskI, AssigneeOptionI} from '../types/types';
 
@@ -62,7 +58,7 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {data: approvalTasksData} = useApprovalTasksQuery({environmentId: currentEnvironmentId});
-    const {data: usersData} = useUsersQuery();
+    const assigneeUsers = useApprovalTaskAssigneeUsers();
 
     const updateApprovalTaskMutation = useUpdateApprovalTaskMutation({
         onError: (error) => {
@@ -70,12 +66,12 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
         },
     });
 
-    const availableAssignees = useMemo(() => getAvailableAssignees(usersData?.users?.content), [usersData]);
-    const availableAssigneeOptions = useMemo(() => getAvailableAssigneeOptions(usersData?.users?.content), [usersData]);
+    const availableAssignees = useMemo(() => getAvailableAssignees(assigneeUsers), [assigneeUsers]);
+    const availableAssigneeOptions = useMemo(() => getAvailableAssigneeOptions(assigneeUsers), [assigneeUsers]);
 
     const mapApiApprovalTaskToUiApprovalTask = useCallback(
         (apiApprovalTask: ApprovalTask): ApprovalTaskI => ({
-            assignee: getAssigneeNameById(apiApprovalTask.assigneeId, usersData?.users?.content),
+            assignee: getAssigneeNameById(apiApprovalTask.assigneeId, assigneeUsers),
             assigneeId: apiApprovalTask.assigneeId,
             attachments: [],
             comments: [],
@@ -90,7 +86,7 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
             title: apiApprovalTask.name,
             version: apiApprovalTask.version,
         }),
-        [usersData]
+        [assigneeUsers]
     );
 
     useEffect(() => {

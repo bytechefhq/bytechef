@@ -32,6 +32,11 @@ class EmbeddedMcpServerTypeDefinition implements McpServerTypeDefinition {
     }
 
     @Override
+    public boolean isSecretKeyReadableByEditors() {
+        return true;
+    }
+
+    @Override
     public String resolvePath(String secretKey) {
         return "/api/embedded/" + secretKey + "/mcp";
     }

@@ -79,6 +79,11 @@ public class RemoteAiSkillFacadeClient implements AiSkillFacade {
     }
 
     @Override
+    public List<Tag> getAiSkillTags() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Tag> getTags(List<Long> tagIds) {
         throw new UnsupportedOperationException();
     }

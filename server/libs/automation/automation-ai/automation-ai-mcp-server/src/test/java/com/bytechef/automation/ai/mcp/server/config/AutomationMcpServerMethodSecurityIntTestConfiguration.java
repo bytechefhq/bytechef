@@ -17,9 +17,11 @@
 package com.bytechef.automation.ai.mcp.server.config;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -59,7 +61,12 @@ public class AutomationMcpServerMethodSecurityIntTestConfiguration {
 
     @Bean
     PermissionService permissionService() {
-        return mock(PermissionService.class);
+        PermissionService permissionService = mock(PermissionService.class);
+
+        when(permissionService.isAuthorizationSkipped())
+            .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
+
+        return permissionService;
     }
 
     public abstract static class GuardedMcpProjectService implements McpProjectService {

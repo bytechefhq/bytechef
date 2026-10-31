@@ -19,6 +19,7 @@ package com.bytechef.platform.knowledgebase.service;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
 import java.util.List;
+import java.util.Optional;
 
 public interface KnowledgeBaseDocumentService {
 
@@ -28,6 +29,14 @@ public interface KnowledgeBaseDocumentService {
      * @param id the unique identifier of the knowledge base document to be deleted
      */
     void delete(long id);
+
+    /**
+     * Retrieves the knowledge base document for the specified unique identifier, if it exists.
+     *
+     * @param id the unique identifier of the knowledge base document to retrieve
+     * @return the {@code KnowledgeBaseDocument} associated with the given ID, or an empty {@code Optional}
+     */
+    Optional<KnowledgeBaseDocument> fetchKnowledgeBaseDocument(long id);
 
     /**
      * Retrieves the knowledge base document for the specified unique identifier.

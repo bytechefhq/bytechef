@@ -16,6 +16,10 @@ const hoisted = vi.hoisted(() => ({
         {id: string; label: string; workflowTaskComponentNames: string[]; workflowUuid: string} | undefined,
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useDeleteMcpProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),

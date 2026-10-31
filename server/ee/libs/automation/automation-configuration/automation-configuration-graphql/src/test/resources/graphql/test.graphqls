@@ -2,6 +2,10 @@ type Query {
     _placeholder: Boolean
 }
 
+type Mutation {
+    _placeholder: Boolean
+}
+
 enum EnvironmentEnum {
     DEVELOPMENT
     STAGING

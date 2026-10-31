@@ -1,4 +1,6 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
@@ -16,4 +18,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 }

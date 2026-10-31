@@ -32,6 +32,7 @@ import com.bytechef.platform.component.jdbc.handler.loader.JdbcComponentHandlerL
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandlerProvider;
 import com.bytechef.platform.component.trigger.handler.ComponentTriggerHandlerProvider;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import java.util.List;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.BeanRegistrar;
@@ -68,7 +69,8 @@ class ComponentHandlerBeanRegistrar implements BeanRegistrar {
             .lazyInit()
             .supplier(context -> new ComponentTaskHandlerProvider(
                 COMPONENT_HANDLER_ENTRIES_SUPPLIER,
-                context.bean("actionDefinitionFacade", ActionDefinitionFacade.class))));
+                context.bean("actionDefinitionFacade", ActionDefinitionFacade.class),
+                context.bean(JobPrincipalAuthenticationRunner.class))));
 
         registry.registerBean("componentTriggerHandlerProvider", ComponentTriggerHandlerProvider.class, spec -> spec
             .lazyInit()
@@ -77,6 +79,7 @@ class ComponentHandlerBeanRegistrar implements BeanRegistrar {
                     .orderedStream()
                     .toList(),
                 COMPONENT_HANDLER_ENTRIES_SUPPLIER,
-                context.bean("triggerDefinitionFacade", TriggerDefinitionFacade.class))));
+                context.bean("triggerDefinitionFacade", TriggerDefinitionFacade.class),
+                context.bean(JobPrincipalAuthenticationRunner.class))));
     }
 }

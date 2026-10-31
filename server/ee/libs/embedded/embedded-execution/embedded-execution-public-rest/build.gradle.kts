@@ -47,6 +47,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.security:spring-security-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -54,6 +55,7 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
 //    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
@@ -63,4 +65,5 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(testFixtures(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api")))
 }

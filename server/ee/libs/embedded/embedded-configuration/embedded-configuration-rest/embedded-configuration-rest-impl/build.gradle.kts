@@ -56,6 +56,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
@@ -79,4 +80,5 @@ dependencies {
     testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl")) {
         exclude(module = "logback-config")
     }
+    testImplementation(testFixtures(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api")))
 }

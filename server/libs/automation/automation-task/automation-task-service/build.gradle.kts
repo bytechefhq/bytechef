@@ -5,6 +5,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.data:spring-data-commons")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
@@ -13,4 +14,5 @@ dependencies {
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
 }

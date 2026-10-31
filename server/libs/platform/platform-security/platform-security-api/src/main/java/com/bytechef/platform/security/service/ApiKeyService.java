@@ -31,7 +31,7 @@ public interface ApiKeyService {
 
     void delete(long id);
 
-    boolean exists(String secretKey, long environmentId);
+    boolean exists(String secretKey, long environmentId, PlatformType type);
 
     Optional<ApiKey> fetchApiKey(String secretKey);
 
@@ -44,6 +44,11 @@ public interface ApiKeyService {
     ApiKey getApiKey(long id);
 
     List<ApiKey> getApiKeys(long environmentId, @Nullable PlatformType type);
+
+    /**
+     * Every key a user owns, across environments and types.
+     */
+    List<ApiKey> getUserApiKeys(long userId);
 
     ApiKey update(ApiKey apiKey);
 

@@ -10,6 +10,7 @@ package com.bytechef.automation.configuration.security;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
@@ -43,6 +44,9 @@ class AutomationMethodSecurityConfigurationIntTest {
 
     @Autowired
     private GatedOperations gatedOperations;
+
+    @Autowired
+    private PermissionService permissionService;
 
     @AfterEach
     void tearDown() {
@@ -82,19 +86,32 @@ class AutomationMethodSecurityConfigurationIntTest {
     }
 
     @Test
-    void testApiKeyPrincipalKeepsSkipChecksBypass() throws Throwable {
+    void testApiKeyPrincipalIsStillCheckedUnderSkipChecks() throws Throwable {
         authenticate(new PlatformUserApiKeyAuthenticationToken(
             new User("user@localhost.com", "", List.of(new SimpleGrantedAuthority("ROLE_USER")))));
 
-        assertThat(callSkippingChecks(gatedOperations::tenantAdminOperation)).isEqualTo("granted");
-        assertThat(callSkippingChecks(() -> gatedOperations.resourceOwnerOperation(1L))).isEqualTo("granted");
-        assertThat(callSkippingChecks(() -> gatedOperations.currentUserOperation(1L))).isEqualTo("granted");
+        assertThatThrownBy(() -> callSkippingChecks(gatedOperations::tenantAdminOperation))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> callSkippingChecks(() -> gatedOperations.resourceOwnerOperation(1L)))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> callSkippingChecks(() -> gatedOperations.currentUserOperation(1L)))
+            .isInstanceOf(AccessDeniedException.class);
+
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+
+        try {
+            assertThat(callSkippingChecks(gatedOperations::tenantAdminOperation)).isEqualTo("granted");
+        } finally {
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+        }
     }
 
     @Test
-    void testMissingAuthenticationKeepsSkipChecksBypass() throws Throwable {
-        assertThat(callSkippingChecks(gatedOperations::tenantAdminOperation)).isEqualTo("granted");
-        assertThat(callSkippingChecks(() -> gatedOperations.resourceOwnerOperation(1L))).isEqualTo("granted");
+    void testMissingAuthenticationIsStillCheckedUnderSkipChecks() {
+        assertThatThrownBy(() -> callSkippingChecks(gatedOperations::tenantAdminOperation))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> callSkippingChecks(() -> gatedOperations.resourceOwnerOperation(1L)))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     private static void authenticate(Authentication authentication) {
@@ -120,7 +137,12 @@ class AutomationMethodSecurityConfigurationIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            return mock(PermissionService.class);
+            PermissionService permissionService = mock(PermissionService.class);
+
+            when(permissionService.isAuthorizationSkipped())
+                .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
+
+            return permissionService;
         }
     }
 

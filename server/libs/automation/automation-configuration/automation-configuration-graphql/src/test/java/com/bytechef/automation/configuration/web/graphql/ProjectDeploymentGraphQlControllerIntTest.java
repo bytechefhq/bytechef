@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.web.graphql;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -56,12 +56,12 @@ class ProjectDeploymentGraphQlControllerIntTest {
     private GraphQlTester graphQlTester;
 
     @MockitoBean
-    private ProjectDeploymentService projectDeploymentService;
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @Test
-    void testWorkspaceProjectDeploymentsRequestsTheNonEmbeddedDeploymentsFromTheService() {
+    void testWorkspaceProjectDeploymentsReturnsTheDeploymentsOfTheFacade() {
         when(environmentService.getEnvironment(2L)).thenReturn(Environment.PRODUCTION);
-        when(projectDeploymentService.getProjectDeployments(false, Environment.PRODUCTION, null, null, 1L))
+        when(projectDeploymentFacade.getProjectDeployments(1L, Environment.PRODUCTION, null, null))
             .thenReturn(List.of(projectDeployment(10L, 100L, "Orders")));
 
         graphQlTester

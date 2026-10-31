@@ -48,12 +48,15 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -81,6 +84,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @author Ivica Cardic
@@ -89,9 +93,12 @@ public class ProjectWorkflowExecutionFacadeTest {
 
     private ComponentDefinitionService componentDefinitionService;
     private ContextService contextService;
+    private EmbeddedResourceResolver embeddedResourceResolver;
+    private StaticListableBeanFactory embeddedResourceResolverBeanFactory;
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
     private JobService jobService;
+    private PermissionService permissionService;
     private PrincipalJobService principalJobService;
     private ProjectDeploymentService projectDeploymentService;
     private ProjectFacade projectFacade;
@@ -109,8 +116,11 @@ public class ProjectWorkflowExecutionFacadeTest {
         componentDefinitionService = mock(ComponentDefinitionService.class);
 
         contextService = mock(ContextService.class);
+        embeddedResourceResolver = mock(EmbeddedResourceResolver.class);
+        embeddedResourceResolverBeanFactory = new StaticListableBeanFactory();
         evaluator = mock(Evaluator.class);
         jobService = mock(JobService.class);
+        permissionService = mock(PermissionService.class);
         principalJobService = mock(PrincipalJobService.class);
         projectDeploymentService = mock(ProjectDeploymentService.class);
         projectFacade = mock(ProjectFacade.class);
@@ -120,12 +130,21 @@ public class ProjectWorkflowExecutionFacadeTest {
         taskFileStorage = mock(TaskFileStorage.class);
         workflowExecutionRowService = mock(WorkflowExecutionRowService.class);
 
+        // Permissive on purpose: these tests cover DTO assembly, not authorization. The facade's in-body narrowing
+        // checks run here even without a proxy -- only the @PreAuthorize annotations need one -- so a default mock
+        // returning false would fail every listing that names a project, deployment or workflow.
+        lenient().when(permissionService.hasResourceScope(any(), anyString(), anyString()))
+            .thenReturn(true);
+        lenient().when(permissionService.hasWorkflowScope(anyString(), anyString()))
+            .thenReturn(true);
+
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService,
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserProjectDeploymentResolver.class),
             new StaticListableBeanFactory().getBeanProvider(ConnectedUserWorkflowCopyResolver.class),
-            contextService, evaluator, mock(EnvironmentService.class),
-            workflowExecutionRowService, jobService, principalJobService, projectFacade,
+            contextService, embeddedResourceResolverBeanFactory.getBeanProvider(EmbeddedResourceResolver.class),
+            evaluator, mock(EnvironmentService.class),
+            workflowExecutionRowService, jobService, permissionService, principalJobService, projectFacade,
             projectDeploymentService, projectService, projectWorkflowService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
@@ -253,6 +272,83 @@ public class ProjectWorkflowExecutionFacadeTest {
         TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
 
         assertThat(taskExecutionDTO.childJob()).isNull();
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionWithoutDetailsScopeOmitsTaskData() {
+        taskExecution.setError(new ExecutionError("secret payload", List.of()));
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(jobService.getChildJobs(List.of(1L)))
+            .thenReturn(List.of());
+        when(permissionService.hasResourceScope(10L, "Job", "EXECUTION_DETAILS_VIEW"))
+            .thenReturn(false);
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        assertThat(taskExecutionDTO.input())
+            .isNull();
+        assertThat(taskExecutionDTO.output())
+            .isNull();
+        assertThat(taskExecutionDTO.error())
+            .isNull();
+        assertThat(taskExecutionDTO.id())
+            .isEqualTo(1L);
+
+        verify(taskFileStorage, never()).readContextValue(any());
+        verify(taskFileStorage, never()).readTaskExecutionOutput(any());
+    }
+
+    @Test
+    public void testWithoutDetailsOmitsPayloadsOfNestedTaskExecutionsAndChildJobs() {
+        Job job = new Job(20L);
+
+        job.setError(new ExecutionError("job failure", List.of()));
+        job.setInputs(Map.of("email", "someone@example.com"));
+
+        TaskExecutionDTO childTaskExecutionDTO = new TaskExecutionDTO(
+            taskExecution, "Child", "icon", Map.of("input", "child-input"), "child-output", null);
+        TaskExecutionDTO subflowTaskExecutionDTO = new TaskExecutionDTO(
+            taskExecution, "Subflow", "icon", Map.of("input", "subflow-input"), "subflow-output",
+            new JobDTO(job, Map.of("result", "child-job-output"), List.of(childTaskExecutionDTO)));
+
+        JobDTO jobDTO = new JobDTO(job, Map.of("result", "job-output"), List.of(subflowTaskExecutionDTO))
+            .withoutDetails();
+
+        assertThat(jobDTO.inputs())
+            .isEmpty();
+        assertThat(jobDTO.outputs())
+            .isNull();
+        assertThat(jobDTO.error())
+            .isNull();
+        assertThat(jobDTO.status())
+            .isEqualTo(job.getStatus());
+
+        TaskExecutionDTO redactedSubflowTaskExecutionDTO = jobDTO.taskExecutions()
+            .getFirst();
+
+        assertThat(redactedSubflowTaskExecutionDTO.input())
+            .isNull();
+        assertThat(redactedSubflowTaskExecutionDTO.output())
+            .isNull();
+        assertThat(redactedSubflowTaskExecutionDTO.title())
+            .isEqualTo("Subflow");
+
+        JobDTO redactedChildJobDTO = redactedSubflowTaskExecutionDTO.childJob();
+
+        assertThat(redactedChildJobDTO.outputs())
+            .isNull();
+        assertThat(redactedChildJobDTO.inputs())
+            .isEmpty();
+        assertThat(redactedChildJobDTO.taskExecutions())
+            .singleElement()
+            .satisfies(redactedChildTaskExecutionDTO -> {
+                assertThat(redactedChildTaskExecutionDTO.input())
+                    .isNull();
+                assertThat(redactedChildTaskExecutionDTO.output())
+                    .isNull();
+            });
     }
 
     @Test
@@ -781,6 +877,108 @@ public class ProjectWorkflowExecutionFacadeTest {
             .isInstanceOf(NoSuchElementException.class);
     }
 
+    @Test
+    public void testGetWorkflowExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+        givenConnectedUserProjectJob(10L);
+
+        when(permissionService.hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> facade.getWorkflowExecution(10L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(taskFileStorage, never()).readJobOutputs(any());
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+        givenConnectedUserProjectJob(10L);
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(permissionService.hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(10L, 1L))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(taskFileStorage, never()).readTaskExecutionOutput(any());
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionAllowsAConnectedUserProjectJobWithConnectedUserView() {
+        givenConnectedUserProjectJob(10L);
+
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+        when(taskFileStorage.readTaskExecutionOutput(any()))
+            .thenReturn("output-value");
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        assertThat(taskExecutionDTO.output())
+            .isEqualTo("output-value");
+
+        verify(permissionService).hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW");
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionSkipsConnectedUserViewForOtherJobs() {
+        Job job = new Job(10L);
+
+        job.setWorkflowId("workspace-workflow");
+
+        embeddedResourceResolverBeanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        when(jobService.getJob(10L))
+            .thenReturn(job);
+        when(taskExecutionService.fetchTaskExecution(1L))
+            .thenReturn(Optional.of(taskExecution));
+
+        facade.getWorkflowExecutionTaskExecution(10L, 1L);
+
+        verify(permissionService, never()).hasResourceScope(10L, "Job", "CONNECTED_USER_VIEW");
+    }
+
+    @Test
+    public void testGetWorkflowExecutionsDeniesWorkflowTheCallerCannotView() {
+        when(permissionService.hasWorkflowScope("workflow-1", "EXECUTION_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(
+            () -> facade.getWorkflowExecutions(false, 1L, null, null, null, null, null, "workflow-1", null, 3L, 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(workflowExecutionRowService);
+    }
+
+    @Test
+    public void testGetWorkflowExecutionsDeniesProjectTheCallerCannotView() {
+        when(permissionService.hasResourceScope(7L, "Project", "EXECUTION_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(
+            () -> facade.getWorkflowExecutions(false, 1L, null, null, null, 7L, null, null, null, 3L, 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verify(projectWorkflowService, never()).getProjectWorkflowIds(anyLong());
+        verifyNoInteractions(workflowExecutionRowService);
+    }
+
+    @Test
+    public void testGetWorkflowExecutionsDeniesProjectDeploymentTheCallerCannotView() {
+        when(projectWorkflowService.getProjectWorkflowIds(7L))
+            .thenReturn(List.of("workflow-1"));
+        when(permissionService.hasResourceScope(11L, "ProjectDeployment", "EXECUTION_VIEW"))
+            .thenReturn(false);
+
+        assertThatThrownBy(
+            () -> facade.getWorkflowExecutions(false, 1L, null, null, null, 7L, 11L, null, null, 3L, 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(workflowExecutionRowService);
+    }
+
     @Nested
     class GetWorkflowExecutionsTest {
 
@@ -853,6 +1051,13 @@ public class ProjectWorkflowExecutionFacadeTest {
         }
 
         @Test
+        public void testEmbeddedListingDoesNotCallTheGatedWorkspaceWorkflowFacade() {
+            facade.getWorkflowExecutions(true, null, null, null, null, null, null, null, null, WORKSPACE_ID, 0);
+
+            verifyNoInteractions(projectFacade);
+        }
+
+        @Test
         @SuppressWarnings("unchecked")
         public void testEmbeddedWorkflowFilterByReferenceWorkflowUuidCoversEveryCatalogVersion() {
             String referenceWorkflowUuid = UUID.randomUUID()
@@ -889,5 +1094,18 @@ public class ProjectWorkflowExecutionFacadeTest {
                 eq(true), any(), any(), any(), any());
             verifyNoInteractions(workflowExecutionRowService);
         }
+    }
+
+    private void givenConnectedUserProjectJob(long jobId) {
+        Job job = new Job(jobId);
+
+        job.setWorkflowId("connected-user-workflow");
+
+        embeddedResourceResolverBeanFactory.addBean("embeddedResourceResolver", embeddedResourceResolver);
+
+        when(jobService.getJob(jobId))
+            .thenReturn(job);
+        when(embeddedResourceResolver.isConnectedUserProjectWorkflow("connected-user-workflow"))
+            .thenReturn(true);
     }
 }

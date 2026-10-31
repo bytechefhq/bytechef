@@ -114,6 +114,14 @@ class PermissionServiceResourceTest {
     }
 
     @Test
+    void testCePermissionServiceAcceptsTwoResolversForOneType() {
+        PermissionService service = permissionService(
+            resolver("Connection", ResourceOwner.unknown()), resolver("Connection", ResourceOwner.ofWorkspace(42L)));
+
+        assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_VIEW")).isTrue();
+    }
+
+    @Test
     void testHasResourceScopeWorkspaceMappedIsPermissiveInCe() {
         // A workspace-mapped resource with no owner user (knowledge bases, data tables, workspaces, projects,
         // workflows, ...) is shared within the single CE workspace, so CE is permissive.

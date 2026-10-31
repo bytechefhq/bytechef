@@ -51,10 +51,10 @@ const publishedProject: Project = {
     workspaceId: 1,
 };
 
-const renderEmptyState = () =>
+const renderEmptyState = (canCreateDeployment = true) =>
     render(
         <MemoryRouter>
-            <ProjectDeploymentsEmptyState onDeploymentCreated={vi.fn()} />
+            <ProjectDeploymentsEmptyState canCreateDeployment={canCreateDeployment} onDeploymentCreated={vi.fn()} />
         </MemoryRouter>
     );
 
@@ -100,6 +100,15 @@ describe('ProjectDeploymentsEmptyState', () => {
 
         expect(steps[3]).toHaveTextContent('Deploy and enable');
         expect(steps[3]).toHaveAttribute('aria-current', 'step');
+    });
+
+    it('offers no deployment to create without the deployment create scopes', () => {
+        hoisted.projectsResult = {data: [publishedProject], error: null, isLoading: false};
+
+        renderEmptyState(false);
+
+        expect(screen.getByRole('heading', {level: 2, name: 'Create your first deployment'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Deployment'})).not.toBeInTheDocument();
     });
 
     it('records a click on the next step with the stage', async () => {

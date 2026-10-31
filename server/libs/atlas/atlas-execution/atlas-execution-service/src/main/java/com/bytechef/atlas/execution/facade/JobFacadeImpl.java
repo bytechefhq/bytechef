@@ -46,6 +46,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -174,6 +176,26 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_DETAILS_VIEW')")
+    public Job getJob(long id) {
+        return jobService.getJob(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public Page<Job> getJobsPage(int pageNumber) {
+        return jobService.getJobsPage(pageNumber);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public @Nullable Job getLatestJob() {
+        return jobService.fetchLastJob()
+            .orElse(null);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'Job', 'DEPLOYMENT_EDIT')")
     public void resumeJob(long id) {
         jobService.resumeToStatusStarted(id);
 
@@ -186,6 +208,7 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Job', 'DEPLOYMENT_EDIT')")
     public void stopJob(long id) {
         eventPublisher.publishEvent(new StopJobEvent(id));
     }

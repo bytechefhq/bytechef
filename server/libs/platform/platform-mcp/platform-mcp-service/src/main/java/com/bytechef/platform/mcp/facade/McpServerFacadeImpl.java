@@ -86,7 +86,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public void deleteMcpServer(long mcpServerId) {
         for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())

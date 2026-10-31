@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.connection.domain.Connection;
@@ -34,16 +35,16 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class ConnectedUserWorkflowConnectionResolver {
 
-    private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private final ConnectedUserConnectionReader connectedUserConnectionReader;
     private final ConnectionService connectionService;
     private final WorkflowConnectionSlot workflowConnectionSlot;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserWorkflowConnectionResolver(
-        ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionService connectionService,
+        ConnectedUserConnectionReader connectedUserConnectionReader, ConnectionService connectionService,
         WorkflowConnectionSlot workflowConnectionSlot) {
 
-        this.connectedUserConnectionFacade = connectedUserConnectionFacade;
+        this.connectedUserConnectionReader = connectedUserConnectionReader;
         this.connectionService = connectionService;
         this.workflowConnectionSlot = workflowConnectionSlot;
     }
@@ -114,7 +115,7 @@ public class ConnectedUserWorkflowConnectionResolver {
     }
 
     private List<Long> getEntitledConnectionIds(long connectedUserId, String componentName) {
-        return connectedUserConnectionFacade.getConnections(connectedUserId, componentName, List.of())
+        return connectedUserConnectionReader.getConnections(connectedUserId, componentName, List.of())
             .stream()
             .map(ConnectionDTO::id)
             .toList();

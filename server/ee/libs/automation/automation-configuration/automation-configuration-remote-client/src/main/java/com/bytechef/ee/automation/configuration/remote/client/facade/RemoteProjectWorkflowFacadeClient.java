@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
@@ -43,6 +44,11 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
 
     @Override
     public String duplicateWorkflow(long projectId, String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Workflow exportWorkflow(String workflowId) {
         throw new UnsupportedOperationException();
     }
 

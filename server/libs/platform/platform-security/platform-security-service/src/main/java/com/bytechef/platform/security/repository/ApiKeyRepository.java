@@ -19,7 +19,9 @@ package com.bytechef.platform.security.repository;
 import com.bytechef.platform.security.domain.ApiKey;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -28,7 +30,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
 
-    boolean existsBySecretKeyAndEnvironment(String secretKey, int environment);
+    boolean existsBySecretKeyAndEnvironmentAndType(String secretKey, int environment, int type);
 
     Optional<ApiKey> findBySecretKey(String secretKey);
 
@@ -37,4 +39,12 @@ public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
     List<ApiKey> findAllByEnvironmentAndTypeIsNull(int environment);
 
     List<ApiKey> findAllByEnvironmentAndType(int environment, int type);
+
+    /**
+     * Every key a user owns, across environments and types. Written out rather than derived because {@code userId} is
+     * an {@code AggregateReference}, whose derived-query handling of a bare id is the sort of thing that resolves at
+     * context startup rather than at compile time.
+     */
+    @Query("SELECT * FROM api_key WHERE user_id = :userId")
+    List<ApiKey> findAllByUserId(@Param("userId") long userId);
 }

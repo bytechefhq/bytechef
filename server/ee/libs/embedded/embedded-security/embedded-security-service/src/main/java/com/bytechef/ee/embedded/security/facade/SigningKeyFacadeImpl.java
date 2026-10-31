@@ -39,7 +39,8 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("#type == T(com.bytechef.platform.constant.PlatformType).EMBEDDED "
+        + "? hasEmbeddedScopeInEnvironment('EMBEDDED_SETTINGS_MANAGE', #signingKey.environment) : isTenantAdmin()")
     public String create(SigningKey signingKey, PlatformType type) {
         User user = userService.getCurrentUser();
 
@@ -50,25 +51,26 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'SigningKey', 'EMBEDDED_SETTINGS_MANAGE')")
     public void delete(long id) {
         signingKeyService.delete(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'SigningKey', 'EMBEDDED_SETTINGS_MANAGE')")
     public SigningKey getSigningKey(long id) {
         return signingKeyService.getSigningKey(id);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("#type == T(com.bytechef.platform.constant.PlatformType).EMBEDDED "
+        + "? hasEmbeddedScopeInEnvironmentId('EMBEDDED_SETTINGS_MANAGE', #environmentId) : isTenantAdmin()")
     public List<SigningKey> getSigningKeys(PlatformType type, long environmentId) {
         return signingKeyService.getSigningKeys(type, environmentId);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#signingKey.id, 'SigningKey', 'EMBEDDED_SETTINGS_MANAGE')")
     public SigningKey update(SigningKey signingKey) {
         return signingKeyService.update(signingKey);
     }

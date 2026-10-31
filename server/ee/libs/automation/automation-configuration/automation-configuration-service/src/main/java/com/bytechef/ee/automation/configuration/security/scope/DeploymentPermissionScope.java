@@ -10,11 +10,16 @@ package com.bytechef.ee.automation.configuration.security.scope;
 import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
 
 /**
+ * The deployment-domain permission scopes.
+ *
  * @version ee
  *
  * @author Ivica Cardic
  */
 public enum DeploymentPermissionScope implements PermissionScopeType {
 
-    DEPLOYMENT_PUSH
+    DEPLOYMENT_VIEW,
+    DEPLOYMENT_CREATE,
+    DEPLOYMENT_EDIT,
+    DEPLOYMENT_DELETE
 }

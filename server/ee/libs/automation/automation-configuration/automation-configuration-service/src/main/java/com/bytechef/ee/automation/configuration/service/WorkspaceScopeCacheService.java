@@ -12,11 +12,14 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -123,9 +126,46 @@ public class WorkspaceScopeCacheService {
 
     @Cacheable(value = WORKSPACE_SCOPES_CACHE)
     public Set<String> getWorkspaceScopes(long userId, long workspaceId) {
-        return workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
+        Optional<WorkspaceUser> implicitWorkspaceUser = workspaceUserRepository
+            .findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
+
+        if (implicitWorkspaceUser.isPresent()
+            && !workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(userId, workspaceId)) {
+
+            return dispatchScopes(implicitWorkspaceUser.get(), userId, workspaceId);
+        }
+
+        Set<String> unionScopes = new HashSet<>();
+
+        for (WorkspaceUser workspaceUser : workspaceUserRepository.findAllByUserIdAndWorkspaceId(userId, workspaceId)) {
+            if (workspaceUser.getEnvironment() != null) {
+                unionScopes.addAll(dispatchScopes(workspaceUser, userId, workspaceId));
+            }
+        }
+
+        return unionScopes;
+    }
+
+    @Cacheable(value = WORKSPACE_SCOPES_CACHE)
+    public Set<String> getWorkspaceScopes(long userId, long workspaceId, Environment environment) {
+        return fetchWorkspaceUser(userId, workspaceId, environment)
             .map(workspaceUser -> dispatchScopes(workspaceUser, userId, workspaceId))
             .orElse(Collections.emptySet());
+    }
+
+    private Optional<WorkspaceUser> fetchWorkspaceUser(long userId, long workspaceId, Environment environment) {
+        Optional<WorkspaceUser> environmentWorkspaceUser = workspaceUserRepository
+            .findByUserIdAndWorkspaceIdAndEnvironment(userId, workspaceId, environment.ordinal());
+
+        if (environmentWorkspaceUser.isPresent()) {
+            return environmentWorkspaceUser;
+        }
+
+        if (workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(userId, workspaceId)) {
+            return Optional.empty();
+        }
+
+        return workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
     }
 
     private void evictSingleEntry(long userId, long workspaceId) {
@@ -133,6 +173,10 @@ public class WorkspaceScopeCacheService {
 
         if (cache != null) {
             cache.evict(TenantCacheKeyUtils.getKey(userId, workspaceId));
+
+            for (Environment environment : Environment.values()) {
+                cache.evict(TenantCacheKeyUtils.getKey(userId, workspaceId, environment));
+            }
         }
     }
 

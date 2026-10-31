@@ -112,6 +112,27 @@ public class IntegrationInstanceConfiguration {
         return getClass().hashCode();
     }
 
+    public IntegrationInstanceConfiguration withoutConnectionParameters() {
+        IntegrationInstanceConfiguration copy = new IntegrationInstanceConfiguration();
+
+        copy.authorizationType = authorizationType;
+        copy.createdBy = createdBy;
+        copy.createdDate = createdDate;
+        copy.description = description;
+        copy.enabled = enabled;
+        copy.environment = environment;
+        copy.id = id;
+        copy.integrationId = integrationId;
+        copy.integrationInstanceConfigurationTags = new HashSet<>(integrationInstanceConfigurationTags);
+        copy.integrationVersion = integrationVersion;
+        copy.lastModifiedBy = lastModifiedBy;
+        copy.lastModifiedDate = lastModifiedDate;
+        copy.name = name;
+        copy.version = version;
+
+        return copy;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -178,6 +199,14 @@ public class IntegrationInstanceConfiguration {
         return enabled;
     }
 
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -202,6 +231,14 @@ public class IntegrationInstanceConfiguration {
 
     public void setIntegrationVersion(Integer integrationVersion) {
         this.integrationVersion = integrationVersion;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public void setName(String name) {

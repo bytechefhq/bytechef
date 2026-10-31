@@ -29,6 +29,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -299,7 +300,7 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testEnableIntegrationInstanceWorkflowAllowsTenantAdminOnAnyInstance() {
+    void testEnableIntegrationInstanceWorkflowAllowsAMemberWithTheManageScopeOnAnyInstance() {
         authenticate(createTenantAdminAuthentication());
 
         integrationInstanceFacade.enableIntegrationInstanceWorkflow(integrationInstanceBId, workflowId, true);
@@ -310,7 +311,7 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testEnableIntegrationInstanceWorkflowDeniesCallerWhoIsNeitherTenantAdminNorConnectedUser() {
+    void testEnableIntegrationInstanceWorkflowDeniesCallerWhoIsNeitherAMemberNorConnectedUser() {
         authenticate(
             new UsernamePasswordAuthenticationToken(
                 "user@localhost.com", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
@@ -390,7 +391,7 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testUpdateIntegrationInstanceWorkflowAllowsTenantAdminOnAnyInstance() {
+    void testUpdateIntegrationInstanceWorkflowAllowsAMemberWithTheManageScopeOnAnyInstance() {
         authenticate(createTenantAdminAuthentication());
 
         integrationInstanceFacade.updateIntegrationInstanceWorkflow(
@@ -414,7 +415,8 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     private Authentication createTenantAdminAuthentication() {
-        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(permissionService.hasResourceScope(any(), eq("IntegrationInstance"), eq("CONNECTED_USER_MANAGE")))
+            .thenReturn(true);
 
         return new UsernamePasswordAuthenticationToken(
             "admin@localhost.com", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
@@ -438,8 +440,12 @@ class IntegrationInstanceFacadeIntTest {
             @Lazy PermissionService permissionService,
             ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-            return new AutomationMethodSecurityExpressionHandler(
+            AutomationMethodSecurityExpressionHandler handler = new AutomationMethodSecurityExpressionHandler(
                 permissionService, methodSecurityExpressionContributorProvider);
+
+            handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return handler;
         }
     }
 }

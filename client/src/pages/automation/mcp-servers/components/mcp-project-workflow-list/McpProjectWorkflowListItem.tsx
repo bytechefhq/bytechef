@@ -4,11 +4,13 @@ import {Popover} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import McpToolActionsMenu from '@/shared/components/mcp-server/McpToolActionsMenu';
 import McpToolConfigureButton from '@/shared/components/mcp-server/McpToolConfigureButton';
 import WorkflowToolRowLabel from '@/shared/components/mcp-server/WorkflowToolRowLabel';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
@@ -33,6 +35,10 @@ const McpProjectWorkflowListItem = ({
     projectName,
     projectVersion,
 }: McpProjectWorkflowListItemProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
     const {
         handleCloseEditDialog,
         handleConfirmDelete,
@@ -99,27 +105,29 @@ const McpProjectWorkflowListItem = ({
                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                     />
 
-                    <div className="flex shrink-0 items-center gap-2">
-                        <McpToolConfigureButton
-                            anchorsPopover
-                            label={workflowLabel}
-                            onClick={() => openPopover(popoverId)}
-                        />
+                    {canEditMcpServer && (
+                        <div className="flex shrink-0 items-center gap-2">
+                            <McpToolConfigureButton
+                                anchorsPopover
+                                label={workflowLabel}
+                                onClick={() => openPopover(popoverId)}
+                            />
 
-                        <Switch
-                            aria-label={`Enable ${workflowLabel}`}
-                            checked={mcpProjectWorkflow.enabled}
-                            className="mr-2"
-                            disabled={isEnablePending}
-                            onCheckedChange={handleEnabledChange}
-                        />
+                            <Switch
+                                aria-label={`Enable ${workflowLabel}`}
+                                checked={mcpProjectWorkflow.enabled}
+                                className="mr-2"
+                                disabled={isEnablePending}
+                                onCheckedChange={handleEnabledChange}
+                            />
 
-                        <McpToolActionsMenu
-                            label={workflowLabel}
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                            onEditClick={() => setShowEditWorkflowDialog(true)}
-                        />
-                    </div>
+                            <McpToolActionsMenu
+                                label={workflowLabel}
+                                onDeleteClick={() => setShowDeleteDialog(true)}
+                                onEditClick={() => setShowEditWorkflowDialog(true)}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {isPopoverOpen && (

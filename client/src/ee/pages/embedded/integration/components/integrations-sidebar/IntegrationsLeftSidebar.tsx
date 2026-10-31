@@ -20,6 +20,8 @@ import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useQueries} from '@tanstack/react-query';
 import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
@@ -79,6 +81,9 @@ const IntegrationsLeftSidebar = ({
     const workflows = selectedIntegrationWorkflows || allIntegrationsWorkflows;
 
     const {calculateTimeDifference, getFilteredWorkflows, getWorkflowsIntegrationId} = useIntegrationsLeftSidebar();
+
+    const canCreateIntegration = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
 
     const targetIntegrationId = selectedIntegrationId === 0 ? integrationId : selectedIntegrationId;
 
@@ -143,18 +148,20 @@ const IntegrationsLeftSidebar = ({
                                 setSelectedIntegrationId={setSelectedIntegrationId}
                             />
 
-                            <IntegrationDialog
-                                integration={undefined}
-                                triggerNode={
-                                    <Button
-                                        aria-label="New integration"
-                                        className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                        icon={<PlusIcon />}
-                                        size="icon"
-                                        variant="outline"
-                                    />
-                                }
-                            />
+                            {canCreateIntegration && (
+                                <IntegrationDialog
+                                    integration={undefined}
+                                    triggerNode={
+                                        <Button
+                                            aria-label="New integration"
+                                            className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                            icon={<PlusIcon />}
+                                            size="icon"
+                                            variant="outline"
+                                        />
+                                    }
+                                />
+                            )}
                         </div>
                     )
                 )}
@@ -167,36 +174,38 @@ const IntegrationsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                <ButtonGroup className="w-full">
-                    <Button
-                        className="flex-1 [&_svg]:size-5"
-                        icon={<PlusIcon />}
-                        label="New Workflow"
-                        onClick={() => setShowWorkflowDialog(true)}
-                        variant="secondary"
-                    />
+                {canCreateWorkflow && (
+                    <ButtonGroup className="w-full">
+                        <Button
+                            className="flex-1 [&_svg]:size-5"
+                            icon={<PlusIcon />}
+                            label="New Workflow"
+                            onClick={() => setShowWorkflowDialog(true)}
+                            variant="secondary"
+                        />
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="More workflow options"
-                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
-                                icon={<ChevronDownIcon />}
-                                size="icon"
-                                variant="secondary"
-                            />
-                        </DropdownMenuTrigger>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    aria-label="More workflow options"
+                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
+                                    icon={<ChevronDownIcon />}
+                                    size="icon"
+                                    variant="secondary"
+                                />
+                            </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => workflowFileInputRef.current?.click()}
-                            >
-                                <UploadIcon /> Import Workflow
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </ButtonGroup>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => workflowFileInputRef.current?.click()}
+                                >
+                                    <UploadIcon /> Import Workflow
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </ButtonGroup>
+                )}
             </div>
 
             <ScrollArea className="mb-3 min-h-0 w-full flex-1 [&_[data-radix-scroll-area-viewport]>div]:block!">

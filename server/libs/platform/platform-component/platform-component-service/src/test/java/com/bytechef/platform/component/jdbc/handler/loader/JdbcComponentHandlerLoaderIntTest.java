@@ -31,6 +31,7 @@ import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.jdbc.handler.JdbcComponentHandlerImpl;
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.net.URI;
 import java.util.List;
@@ -101,7 +102,7 @@ class JdbcComponentHandlerLoaderIntTest {
         assertInstanceOf(
             ComponentTaskHandler.class,
             componentHandlerEntry.componentTaskHandlerFunction()
-                .apply("query", mock(ActionDefinitionFacade.class)));
+                .apply("query", mock(ActionDefinitionFacade.class), new JobPrincipalAuthenticationRunner(List.of())));
     }
 
     @Test

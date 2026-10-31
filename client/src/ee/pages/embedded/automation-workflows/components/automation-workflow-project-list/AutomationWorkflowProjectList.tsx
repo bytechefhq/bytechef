@@ -7,6 +7,8 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationWorkflowProjectConfigurationsQuery,
     AutomationWorkflowProjectTagsQuery,
@@ -63,6 +65,8 @@ const AutomationWorkflowProjectList = ({
     >();
     const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(new Set());
 
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+
     useEffect(() => {
         if (newlyCreatedProjectId) {
             setOpenProjectIds((previousOpenProjectIds) => {
@@ -112,7 +116,8 @@ const AutomationWorkflowProjectList = ({
                         <AutomationWorkflowProjectListItemTabs
                             actions={
                                 (activeTabs[project.id] || 'workflows') === 'workflows'
-                                    ? project.workflowTemplates.length > 0 && (
+                                    ? project.workflowTemplates.length > 0 &&
+                                      canCreateWorkflow && (
                                           <ButtonGroup aria-label="Workflow Creation Actions">
                                               <Button
                                                   aria-label="Create Workflow"
