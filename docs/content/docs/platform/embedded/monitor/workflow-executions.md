@@ -67,10 +67,10 @@ Click on any execution row to open a detail sheet that shows:
 
 In **Automations** mode, the execution detail sheet reuses the automation execution view and carries an [AI Copilot](/platform/automation/build/ai-copilot): it analyzes the finished or failed execution and helps debug errors. Copilot is an Enterprise Edition feature and is disabled by default _(the AI Copilot is coming soon - not yet available in the latest released version)_.
 
-> **Coming soon.** In both modes the detail colours the run on its read-only canvas and lists each AI
-> Agent tool call as a row under the agent's task, the same way the
-> [automation execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows)
-> does. See [Seeing which tools ran](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran).
+In both modes the detail colours the run on its read-only canvas and lists each AI
+Agent tool call as a row under the agent's task, the same way the
+[automation execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows)
+does. See [Seeing which tools ran](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran).
 
 ### Environment Selection
 
