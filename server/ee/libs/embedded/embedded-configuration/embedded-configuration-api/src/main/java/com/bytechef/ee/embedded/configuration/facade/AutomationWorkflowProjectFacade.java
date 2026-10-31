@@ -12,6 +12,8 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -29,6 +31,10 @@ public interface AutomationWorkflowProjectFacade {
     long duplicateProject(long projectId);
 
     List<AutomationWorkflowProjectVersionDTO> getProjectVersions(long projectId);
+
+    VersionWorkflowChange getProjectVersionWorkflowChange(long projectId, int projectVersion, String workflowUuid);
+
+    VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion);
 
     List<AutomationWorkflowProjectCategoryDTO> getCategories();
 

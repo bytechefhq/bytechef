@@ -63,6 +63,9 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
+import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
@@ -333,6 +336,53 @@ class AutomationWorkflowProjectFacadeIntTest {
             .containsExactly(
                 tuple(3, "DRAFT", null), tuple(2, "PUBLISHED", "Second release"),
                 tuple(1, "PUBLISHED", "First release"));
+    }
+
+    @Test
+    void testGetProjectVersionWorkflowChangesReportsAddedWorkflow() {
+        long projectId = automationWorkflowProjectFacade.createProject("Changes", "", null, List.of(), null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationWorkflowProjectFacade.publishProject(projectId);
+
+        VersionWorkflowChanges versionWorkflowChanges =
+            automationWorkflowProjectFacade.getProjectVersionWorkflowChanges(projectId, 1);
+
+        assertThat(versionWorkflowChanges.baseVersion()).isNull();
+        assertThat(versionWorkflowChanges.version()).isEqualTo(1);
+        assertThat(versionWorkflowChanges.workflows()).hasSize(1);
+        assertThat(versionWorkflowChanges.workflows()
+            .getFirst()
+            .workflowUuid()).isEqualTo(workflowUuid);
+        assertThat(versionWorkflowChanges.workflows()
+            .getFirst()
+            .changeType()).isEqualTo(WorkflowChangeType.ADDED);
+
+        VersionWorkflowChange versionWorkflowChange =
+            automationWorkflowProjectFacade.getProjectVersionWorkflowChange(projectId, 1, workflowUuid);
+
+        assertThat(versionWorkflowChange.changeType()).isEqualTo(WorkflowChangeType.ADDED);
+        assertThat(versionWorkflowChange.newDefinition()).isNotNull();
+    }
+
+    @Test
+    void testGetProjectVersionWorkflowChangesRejectsNonAutomationWorkflowProject() {
+        Project project = new Project();
+
+        project.setName("Plain " + UUID.randomUUID());
+        project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
+
+        long projectId = projectService.create(project)
+            .getId();
+
+        assertThatThrownBy(() -> automationWorkflowProjectFacade.getProjectVersionWorkflowChanges(projectId, 1))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("is not an automation workflow project");
+        assertThatThrownBy(
+            () -> automationWorkflowProjectFacade.getProjectVersionWorkflowChange(projectId, 1, "uuid"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("is not an automation workflow project");
     }
 
     @Test
