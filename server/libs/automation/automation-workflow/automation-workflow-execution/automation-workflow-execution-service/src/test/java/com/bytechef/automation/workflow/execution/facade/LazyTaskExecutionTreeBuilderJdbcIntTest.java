@@ -113,7 +113,8 @@ class LazyTaskExecutionTreeBuilderJdbcIntTest extends AbstractLazyTaskExecutionT
     }
 
     @Configuration
-    @EnableAutoConfiguration
+    @EnableAutoConfiguration(
+        excludeName = "com.bytechef.platform.workflow.execution.config.PlatformWorkflowExecutionJdbcRepositoryConfiguration")
     @Import({
         JacksonConfiguration.class, LiquibaseConfiguration.class,
         LazyTaskExecutionTreeBuilderJdbcIntTest.LazyTaskExecutionTreeBuilderIntJdbcConfiguration.class
