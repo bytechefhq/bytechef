@@ -14,6 +14,8 @@ import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -80,6 +82,18 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
     public List<ProjectWorkflowDTO> getProjectVersionWorkflows(
         long projectId, int projectVersion, boolean includeAllFields) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public VersionWorkflowChange getProjectVersionWorkflowChange(
+        long projectId, int projectVersion, String workflowUuid) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion) {
         throw new UnsupportedOperationException();
     }
 

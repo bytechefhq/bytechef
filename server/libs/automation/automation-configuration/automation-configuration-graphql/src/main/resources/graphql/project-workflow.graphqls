@@ -1,5 +1,7 @@
 extend type Query {
     preBuiltWorkflowTemplates(query: String, category: String): [WorkflowTemplate!]!
+    projectVersionWorkflowChange(projectId: ID!, projectVersion: Int!, workflowUuid: String!): VersionWorkflowChange!
+    projectVersionWorkflowChanges(projectId: ID!, projectVersion: Int!): VersionWorkflowChanges!
     sharedWorkflow(workflowUuid: String!): SharedWorkflow
     workflowTemplate(id: String!, sharedWorkflow: Boolean!): WorkflowTemplate
 }
