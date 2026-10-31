@@ -125,6 +125,19 @@ public interface IntegrationInstanceRepository
         @Param("integrationInstanceConfigurationId") long integrationInstanceConfigurationId);
 
     @Query("""
+        SELECT integration_instance.* FROM integration_instance
+        JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
+        WHERE integration_instance_configuration.integration_id = :integrationId
+        AND integration_instance_configuration.environment = :environment
+        AND integration_instance.connected_user_id = :connectedUserId
+        ORDER BY integration_instance.enabled DESC, integration_instance.created_date DESC
+        LIMIT 1
+        """)
+    Optional<IntegrationInstance> findFirstByConnectedUserIdAndIntegrationIdAndEnvironment(
+        @Param("connectedUserId") long connectedUserId, @Param("integrationId") long integrationId,
+        @Param("environment") int environment);
+
+    @Query("""
         SELECT COUNT(*) > 0
         FROM integration_instance
         WHERE connection_id = :connectionId

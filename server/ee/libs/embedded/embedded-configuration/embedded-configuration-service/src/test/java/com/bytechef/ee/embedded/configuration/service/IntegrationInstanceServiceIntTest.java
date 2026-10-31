@@ -153,6 +153,63 @@ class IntegrationInstanceServiceIntTest {
     }
 
     @Test
+    void testFetchIntegrationInstanceByIntegrationIdIgnoresANewerInstanceOfASiblingIntegration() {
+        long integrationId = createIntegration();
+
+        long ownInstanceId = integrationInstanceService
+            .create(USER_A_ID, CONNECTION_ID, createConfiguration(integrationId, 1))
+            .getId();
+
+        long siblingInstanceId = integrationInstanceService
+            .create(USER_A_ID, CONNECTION_ID, createConfiguration(createIntegration(), 1))
+            .getId();
+
+        assertThat(
+            integrationInstanceService.fetchIntegrationInstance(USER_A_ID, "componentName", Environment.PRODUCTION))
+                .hasValueSatisfying(integrationInstance -> assertThat(integrationInstance.getId())
+                    .isEqualTo(siblingInstanceId));
+        assertThat(
+            integrationInstanceService.fetchIntegrationInstanceByIntegrationId(
+                USER_A_ID, integrationId, Environment.PRODUCTION))
+                    .hasValueSatisfying(integrationInstance -> assertThat(integrationInstance.getId())
+                        .isEqualTo(ownInstanceId));
+        assertThat(
+            integrationInstanceService.fetchIntegrationInstanceByIntegrationId(
+                USER_B_ID, integrationId, Environment.PRODUCTION)).isEmpty();
+    }
+
+    @Test
+    void testFetchIntegrationInstanceByIntegrationIdMatchesOnlyTheRequestedEnvironment() {
+        long integrationId = createIntegration();
+
+        integrationInstanceService.create(USER_A_ID, CONNECTION_ID, createConfiguration(integrationId, 1));
+
+        assertThat(
+            integrationInstanceService.fetchIntegrationInstanceByIntegrationId(
+                USER_A_ID, integrationId, Environment.DEVELOPMENT)).isEmpty();
+    }
+
+    @Test
+    void testFetchIntegrationInstanceByIntegrationIdPrefersAnOlderEnabledInstanceOverANewerDisabledOne() {
+        long integrationId = createIntegration();
+
+        long configurationId = createConfiguration(integrationId, 1);
+
+        long enabledInstanceId = integrationInstanceService.create(USER_A_ID, CONNECTION_ID, configurationId)
+            .getId();
+        long disabledInstanceId = integrationInstanceService.create(USER_A_ID, CONNECTION_ID, configurationId)
+            .getId();
+
+        integrationInstanceService.updateEnabled(disabledInstanceId, false);
+
+        assertThat(
+            integrationInstanceService.fetchIntegrationInstanceByIntegrationId(
+                USER_A_ID, integrationId, Environment.PRODUCTION))
+                    .hasValueSatisfying(integrationInstance -> assertThat(integrationInstance.getId())
+                        .isEqualTo(enabledInstanceId));
+    }
+
+    @Test
     void testExistsByConnectionIdReportsWhetherAnIntegrationInstanceUsesTheConnection() {
         long configurationId = createConfiguration(createIntegration(), 1);
 

@@ -36,6 +36,9 @@ public interface IntegrationInstanceService {
     Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId);
 
+    Optional<IntegrationInstance> fetchIntegrationInstanceByIntegrationId(
+        long connectedUserId, long integrationId, Environment environment);
+
     IntegrationInstance getIntegrationInstance(
         long connectedUserId, List<String> componentNames, Environment environment);
 
