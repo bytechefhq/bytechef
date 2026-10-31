@@ -24,6 +24,11 @@ import org.springframework.stereotype.Component;
 public class RemoteUserServiceClient implements UserService {
 
     @Override
+    public Optional<User> activateInvitation(String key, String newPassword) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<User> activateRegistration(String key) {
         throw new UnsupportedOperationException();
     }

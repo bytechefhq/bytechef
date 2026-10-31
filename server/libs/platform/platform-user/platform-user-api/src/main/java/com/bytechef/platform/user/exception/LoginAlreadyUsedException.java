@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.exception.AbstractException;
+import com.bytechef.exception.ConfigurationException;
 
 /**
  * @author Ivica Cardic
  */
-public class LoginAlreadyUsedException extends AbstractException {
+public class LoginAlreadyUsedException extends ConfigurationException {
 
     public LoginAlreadyUsedException() {
         super("Login name already used!", UserErrorType.LOGIN_ALREADY_USED);

@@ -2460,7 +2460,6 @@ export type MutationInsertDataTableRowArgs = {
 
 export type MutationInviteUserArgs = {
   email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
   role: Scalars['String']['input'];
 };
 

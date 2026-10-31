@@ -89,6 +89,22 @@ class UserServiceIntTest {
 
     @Test
     @Transactional
+    void testClearActivationKeyClaimsAKeyOnlyOnce() {
+        user.setActivated(false);
+        user.setActivationKey("invitation-key");
+        user.setInvited(true);
+
+        User savedUser = userRepository.save(user);
+
+        long userId = savedUser.getId();
+
+        assertThat(userRepository.clearActivationKey(userId, "invitation-key")).isEqualTo(1);
+        assertThat(userRepository.clearActivationKey(userId, "invitation-key")).isZero();
+        assertThat(userRepository.findByActivationKey("invitation-key")).isEmpty();
+    }
+
+    @Test
+    @Transactional
     void testRemoveOldPersistentTokens() {
         userRepository.save(user);
 

@@ -9,10 +9,8 @@ const hoisted = vi.hoisted(() => {
         inviteUserMutate: vi.fn(),
         storeState: {
             inviteEmail: '',
-            invitePassword: 'GeneratedPass1',
             inviteRole: null as string | null,
             open: false,
-            regeneratePassword: vi.fn(),
             reset: vi.fn(),
             setInviteEmail: vi.fn(),
             setInviteRole: vi.fn(),
@@ -25,15 +23,10 @@ vi.mock('@/pages/settings/platform/users/stores/useInviteUserDialogStore', () =>
     useInviteUserDialogStore: vi.fn(() => {
         return {
             inviteEmail: hoisted.storeState.inviteEmail,
-            invitePassword: hoisted.storeState.invitePassword,
             inviteRole: hoisted.storeState.inviteRole,
             open: hoisted.storeState.open,
-            regeneratePassword: () => {
-                hoisted.storeState.regeneratePassword();
-            },
             reset: () => {
                 hoisted.storeState.inviteEmail = '';
-                hoisted.storeState.invitePassword = 'GeneratedPass1';
                 hoisted.storeState.inviteRole = null;
                 hoisted.storeState.open = false;
                 hoisted.storeState.reset();
@@ -52,11 +45,6 @@ vi.mock('@/pages/settings/platform/users/stores/useInviteUserDialogStore', () =>
             },
         };
     }),
-}));
-
-vi.mock('@/pages/settings/platform/users/util/password-utils', () => ({
-    generatePassword: vi.fn(() => 'GeneratedPass1'),
-    isValidPassword: vi.fn((password: string) => password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password)),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
@@ -87,7 +75,6 @@ describe('useInviteUserDialog', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         hoisted.storeState.inviteEmail = '';
-        hoisted.storeState.invitePassword = 'GeneratedPass1';
         hoisted.storeState.inviteRole = null;
         hoisted.storeState.open = false;
         hoisted.application = {edition: 'EE'};
@@ -105,7 +92,6 @@ describe('useInviteUserDialog', () => {
 
             expect(result.current.open).toBe(false);
             expect(result.current.inviteEmail).toBe('');
-            expect(result.current.invitePassword).toBe('GeneratedPass1');
             expect(result.current.inviteRole).toBeNull();
         });
 
@@ -184,7 +170,6 @@ describe('useInviteUserDialog', () => {
 
             expect(hoisted.inviteUserMutate).toHaveBeenCalledWith({
                 email: 'newuser@test.com',
-                password: 'GeneratedPass1',
                 role: 'ROLE_ADMIN',
             });
         });
@@ -202,7 +187,6 @@ describe('useInviteUserDialog', () => {
 
             expect(hoisted.inviteUserMutate).toHaveBeenCalledWith({
                 email: 'newuser@test.com',
-                password: 'GeneratedPass1',
                 role: 'ROLE_ADMIN',
             });
         });
